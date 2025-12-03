@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Coin & Dice Experiments</title>
+
+  <style>
+/* ------------------------------
+   Modern Theme & Color Palette
+   ------------------------------ */
+:root {
+  --bg: #f5f7fb;
+  --card-bg: #ffffff;
+  --border: #d9e1ec;
+  --text: #1f2937;
+  --subtext: #6b7280;
+
+  --primary: #6366f1;     
+  --primary-dark: #4f46e5;
+  --accent: #14b8a6;
+  --accent-dark: #0d9488;
+
+  --coin-gold: #fbbf24;
+  --dice-red: #ef4444;
+
+  --radius: 12px;
+  --shadow: 0px 4px 14px rgba(0,0,0,0.08);
+  --transition: 0.25s ease;
+}
+
+body {
+  font-family: "Inter", Arial, sans-serif;
+  background: var(--bg);
+  margin: 0;
+  padding: 30px;
+  color: var(--text);
+}
+
+/* ------------------------------ */
+h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 25px;
+  color: var(--primary-dark);
+}
+
+h2 {
+  margin-top: 40px;
+  color: var(--primary);
+  font-size: 22px;
+}
+
+/* ------------------------------ */
+input {
+  width: 100px;
+  padding: 8px 10px;
+  margin: 4px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: #fff;
+  transition: var(--transition);
+}
+input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.25);
+  outline: none;
+}
+
+/* ------------------------------ */
+.run-btn {
+  margin-top: 20px;
+  padding: 12px 28px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius);
+  border: none;
+  background: var(--primary);
+  color: white;
+  transition: var(--transition);
+  box-shadow: var(--shadow);
+}
+.run-btn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+/* ------------------------------ */
+.table-toggle-btn,
+.graph-controls button {
+  background: var(--accent);
+  border: none;
+  padding: 8px 16px;
+  color: white;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 14px;
+  transition: var(--transition);
+  box-shadow: var(--shadow);
+}
+.table-toggle-btn:hover,
+.graph-controls button:hover {
+  background: var(--accent-dark);
+  transform: translateY(-2px);
+}
+
+/* ------------------------------ */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-top: 15px;
+  box-shadow: var(--shadow);
+}
+th {
+  background: var(--primary);
+  color: white;
+  padding: 10px;
+}
+td {
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+}
+tr:nth-child(even) {
+  background: #f0f3ff;
+}
+
+/* ------------------------------ */
+canvas {
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-top: 20px;
+  width: 100%;
+  height: 350px;
+  background: var(--card-bg);
+  box-shadow: var(--shadow);
+}
+
+/* ------------------------------
+   Split-Screen Animation Panel
+   ------------------------------ */
+#animationContainer {
+  display: flex;
+  width: 100%;
+  height: 180px;
+  margin-top: 30px;
+  gap: 20px;
+}
+.anim-box {
+  flex: 1;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* ------------------------------
+   COIN (KEYFRAME ANIMATION)
+   ------------------------------ */
+.coin {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: var(--coin-gold);
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.2), var(--shadow);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.coin-anim {
+  animation: coinFlip 0.9s ease-out forwards;
+}
+
+@keyframes coinFlip {
+  0%   { transform: rotateY(0deg); }
+  100% { transform: rotateY(720deg); }
+}
+
+/* ------------------------------
+   DICE (KEYFRAME ANIMATION)
+   ------------------------------ */
+.dice {
+  width: 90px;
+  height: 90px;
+  background: white;
+  border-radius: 12px;
+  border: 3px solid var(--dice-red);
+  box-shadow: var(--shadow);
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  grid-template-rows: repeat(3,1fr);
+  gap: 6px;
+  padding: 12px;
+}
+
+.dice div {
+  width: 14px;
+  height: 14px;
+  background: var(--dice-red);
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.show-dot {
+  opacity: 1 !important;
+}
+
+.dice-anim {
+  animation: diceRoll 0.9s ease-out forwards;
+}
+
+@keyframes diceRoll {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+  </style>
+</head>
+
+<body>
+
+<h1>Coin & Dice Experiments</h1>
+
+<!-- SETTINGS -->
+<h2>Coin Settings</h2>
+<div>
+  Value Head: <input id="coinHeadVal" type="number" value="1">
+  Value Tail: <input id="coinTailVal" type="number" value="0">
+  Prob(Head): <input id="probHead" type="number" step="0.01" value="0.5">
+</div>
+
+<h2>Dice Settings</h2>
+<div>
+  Value 1: <input id="d1" type="number" value="1">
+  Value 2: <input id="d2" type="number" value="2">
+  Value 3: <input id="d3" type="number" value="3">
+  Value 4: <input id="d4" type="number" value="4">
+  Value 5: <input id="d5" type="number" value="5">
+  Value 6: <input id="d6" type="number" value="6">
+  <br>
+  Prob(1): <input id="prob1" type="number" step="0.01" value="0.2">
+  <span class="prob-display">
+    Prob(2–6): <span id="probRestDisp"></span>
+  </span>
+</div>
+
+<h2>Simulation Settings</h2>
+<div>
+  Number of experiments (N): <input id="numExp" type="number" value="10">
+</div>
+
+<button class="run-btn">Run Experiments</button>
+
+<!-- ANIMATION PANEL -->
+<div id="animationContainer">
+  <div class="anim-box">
+    <div id="coinAnim" class="coin">H</div>
+  </div>
+
+  <div class="anim-box">
+    <div id="diceAnim" class="dice">
+      <div></div><div></div><div></div>
+      <div></div><div></div><div></div>
+      <div></div><div></div><div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TABLES -->
+<div>
+  <button class="table-toggle-btn" data-table="coin">Minimize Coin Table</button>
+  <div id="coinTable"></div>
+</div>
+
+<div>
+  <button class="table-toggle-btn" data-table="dice">Minimize Dice Table</button>
+  <div id="diceTable"></div>
+</div>
+
+<!-- GRAPHS -->
+<h2>Coin Convergence Graph</h2>
+<div class="graph-controls">
+  <button data-graph="coin" data-type="observed">Toggle Observed</button>
+  <button data-graph="coin" data-type="expected">Toggle Expected</button>
+  <button data-graph="coin" data-type="reset">Reset Graph</button>
+</div>
+<canvas id="coinGraph"></canvas>
+
+<h2>Dice Convergence Graph</h2>
+<div class="graph-controls">
+  <button data-graph="dice" data-type="observed">Toggle Observed</button>
+  <button data-graph="dice" data-type="expected">Toggle Expected</button>
+  <button data-graph="dice" data-type="reset">Reset Graph</button>
+</div>
+<canvas id="diceGraph"></canvas>
+
+<script>
+/* -------------------------------------------------------
+   GLOBAL STATE
+------------------------------------------------------- */
+const state = {
+  coin: { observed: [], expected: [], showObserved: true, showExpected: true },
+  dice: { observed: [], expected: [], showObserved: true, showExpected: true },
+  tableVisibility: { coin: true, dice: true }
+};
+
+const cache = new Map();
+const getElement = id => cache.get(id) || cache.set(id, document.getElementById(id)).get(id);
+
+const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
+const getValue = (id, def) => parseFloat(getElement(id).value) || def;
+const getClampedValue = (id, def, min=0, max=1) => clamp(getValue(id, def), min, max);
+
+/* -------------------------------------------------------
+   DICE PROB DISPLAY
+------------------------------------------------------- */
+const updateDiceProbDisplay = () => {
+  const p1 = getClampedValue("prob1", 0.2);
+  getElement("probRestDisp").textContent = ((1 - p1) / 5).toFixed(4);
+};
+
+
+/* -------------------------------------------------------
+   HIGH-DPI CANVAS SETUP
+------------------------------------------------------- */
+const setupCanvas = canvas => {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext("2d", { alpha:false });
+  ctx.scale(dpr, dpr);
+  return ctx;
+};
+
+
+/* -------------------------------------------------------
+   TABLE BUILDER
+------------------------------------------------------- */
+const buildTable = (title, data, tableKey) => {
+  const visible = state.tableVisibility[tableKey];
+  return `
+    <h2>${title}</h2>
+    <table style="display:${visible ? "table":"none"};">
+      <tr>
+        <th>Iteration</th>
+        <th>${title.includes("Coin") ? "H/T":"Face"}</th>
+        <th>Value</th>
+        <th>Total</th>
+        <th>Expected</th>
+        <th>Absolute Diff</th>
+        <th>Relative Diff</th>
+      </tr>
+      ${data.map(row=>`
+        <tr>
+          <td>${row.iter}</td>
+          <td>${row.result}</td>
+          <td>${row.value.toFixed(4)}</td>
+          <td>${row.total.toFixed(4)}</td>
+          <td>${row.expected.toFixed(4)}</td>
+          <td>${row.absDiff.toFixed(4)}</td>
+          <td>${row.relDiff.toFixed(4)}</td>
+        </tr>
+      `).join("")}
+    </table>
+  `;
+};
+
+
+/* -------------------------------------------------------
+   MAIN SIMULATION
+------------------------------------------------------- */
+const runExperiments = () => {
+
+  const N = Math.max(1, parseInt(getElement("numExp").value) || 1);
+  const coinHeadVal = getValue("coinHeadVal", 1);
+  const coinTailVal = getValue("coinTailVal", 0);
+  const pH = getClampedValue("probHead", 0.5);
+
+  const diceVals = Array.from({length:6}, (_,i)=> getValue(`d${i+1}`, i+1));
+  const p1 = getClampedValue("prob1", 0.2);
+  const pRest = (1 - p1) / 5;
+
+  const evCoin = pH * coinHeadVal + (1-pH)*coinTailVal;
+  const evDice = p1*diceVals[0] + pRest*diceVals.slice(1).reduce((a,b)=>a+b,0);
+
+  const probBounds = [
+    p1,
+    p1 + pRest,
+    p1 + 2*pRest,
+    p1 + 3*pRest,
+    p1 + 4*pRest,
+    1
+  ];
+
+  let coinTotal = 0;
+  let diceTotal = 0;
+
+  const coinData = [];
+  const diceData = [];
+
+  state.coin.observed = [];
+  state.coin.expected = [];
+  state.dice.observed = [];
+  state.dice.expected = [];
+
+  for (let i=1; i<=N; i++) {
+
+    // COIN
+    const rc = Math.random();
+    const coinResult = rc < pH ? "H" : "T";
+    const coinValue = coinResult==="H" ? coinHeadVal : coinTailVal;
+
+    coinTotal += coinValue;
+    const coinExp = evCoin * i;
+    const coinAbs = Math.abs(coinTotal - coinExp);
+
+    state.coin.observed.push(coinTotal);
+    state.coin.expected.push(coinExp);
+
+    coinData.push({
+      iter:i, result:coinResult, value:coinValue,
+      total:coinTotal, expected:coinExp,
+      absDiff:coinAbs, relDiff: coinExp!==0 ? coinAbs/coinExp : 0
+    });
+
+    // DICE
+    const rd = Math.random();
+    const face = probBounds.findIndex(b=>rd<b)+1;
+    const diceValue = diceVals[face-1];
+
+    diceTotal += diceValue;
+    const diceExp = evDice * i;
+    const diceAbs = Math.abs(diceTotal - diceExp);
+
+    state.dice.observed.push(diceTotal);
+    state.dice.expected.push(diceExp);
+
+    diceData.push({
+      iter:i, result:face, value:diceValue,
+      total:diceTotal, expected:diceExp,
+      absDiff:diceAbs, relDiff: diceExp!==0 ? diceAbs/diceExp:0
+    });
+
+  }
+
+  getElement("coinTable").innerHTML =
+    buildTable("Coin Toss Results", coinData, "coin");
+
+  getElement("diceTable").innerHTML =
+    buildTable("Dice Throw Results", diceData, "dice");
+
+  drawGraph("coin");
+  drawGraph("dice");
+};
+
+
+/* -------------------------------------------------------
+   GRAPH DRAWING
+------------------------------------------------------- */
+const drawGraph = type => {
+  const canvas = getElement(`${type}Graph`);
+  const ctx = setupCanvas(canvas);
+
+  const { observed, expected, showObserved, showExpected } = state[type];
+  if (!observed.length) return;
+
+  const W = canvas.clientWidth;
+  const H = canvas.clientHeight;
+
+  const N = observed.length;
+  const maxY = Math.max(...observed, ...expected) * 1.1;
+
+  const left = 50;
+  const bottom = 35;
+  const top = 10;
+  const right = 10;
+
+  ctx.fillStyle="#fff";
+  ctx.fillRect(0,0,W,H);
+
+  ctx.strokeStyle="#000";
+  ctx.beginPath();
+  ctx.moveTo(left, top);
+  ctx.lineTo(left, H-bottom);
+  ctx.lineTo(W-right, H-bottom);
+  ctx.stroke();
+
+  ctx.fillStyle="#000";
+  ctx.font="12px Arial";
+
+  // X ticks
+  const xTickCount = Math.min(10,N);
+  const xStep = Math.floor(N/xTickCount) || 1;
+
+  for (let i=0; i<=N; i+=xStep){
+    const x = left + (i/N) * (W-left-right);
+    ctx.beginPath();
+    ctx.moveTo(x, H-bottom);
+    ctx.lineTo(x, H-bottom+6);
+    ctx.stroke();
+    ctx.fillText(i.toString(), x-5, H-bottom+18);
+  }
+
+  // Y ticks
+  const yTickCount = 7;
+  const yStep = maxY/yTickCount;
+
+  for (let j=0; j<=yTickCount; j++){
+    const yVal = yStep*j;
+    const y = (H-bottom) - (yVal/maxY)*(H-bottom-top);
+
+    ctx.beginPath();
+    ctx.moveTo(left-6, y);
+    ctx.lineTo(left, y);
+    ctx.stroke();
+    ctx.fillText(yVal.toFixed(0), left-40, y+4);
+  }
+
+  const drawLine = (data,color)=>{
+    ctx.strokeStyle=color;
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    data.forEach((val,i)=>{
+      const x = left + (i/(N-1))*(W-left-right);
+      const y = (H-bottom) - (val/maxY)*(H-bottom-top);
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+  };
+
+  if (showExpected) drawLine(expected,"red");
+  if (showObserved) drawLine(observed,"blue");
+};
+
+
+/* -------------------------------------------------------
+   GRAPH BUTTONS
+------------------------------------------------------- */
+const handleGraphControl = e => {
+  const {graph,type} = e.target.dataset;
+  if (!graph) return;
+
+  if (type==="reset") drawGraph(graph);
+  else if (type==="observed"){
+    state[graph].showObserved = !state[graph].showObserved;
+    drawGraph(graph);
+  }
+  else if (type==="expected"){
+    state[graph].showExpected = !state[graph].showExpected;
+    drawGraph(graph);
+  }
+};
+
+
+/* -------------------------------------------------------
+   TABLE MINIMIZATION
+------------------------------------------------------- */
+const toggleTable = e => {
+  const key = e.target.dataset.table;
+  if (!key) return;
+
+  state.tableVisibility[key] = !state.tableVisibility[key];
+
+  e.target.textContent =
+    state.tableVisibility[key]
+      ? `Minimize ${key==="coin"?"Coin":"Dice"} Table`
+      : `Show ${key==="coin"?"Coin":"Dice"} Table`;
+
+  const div = document.getElementById(`${key}Table`);
+  const table = div.querySelector("table");
+  if (table) table.style.display = state.tableVisibility[key] ? "table":"none";
+};
+
+
+/* -------------------------------------------------------
+   ANIMATION SYSTEM (KEYFRAMES)
+------------------------------------------------------- */
+const coinAnim = document.getElementById("coinAnim");
+const diceAnim = document.getElementById("diceAnim");
+const diceDots = diceAnim.querySelectorAll("div");
+
+const dicePatterns = {
+  1:[4],
+  2:[0,8],
+  3:[0,4,8],
+  4:[0,2,6,8],
+  5:[0,2,4,6,8],
+  6:[0,2,3,5,6,8]
+};
+
+function showDiceFace(face){
+  diceDots.forEach(dot => dot.classList.remove("show-dot"));
+  dicePatterns[face].forEach(i => diceDots[i].classList.add("show-dot"));
+}
+
+/* Reliable replay: remove animation → force reflow → add animation */
+function playAnimation(el, className){
+  el.classList.remove(className);
+  void el.offsetWidth;
+  el.classList.add(className);
+}
+
+
+/* -------------------------------------------------------
+   BUTTON LISTENERS
+------------------------------------------------------- */
+document.querySelector(".run-btn").addEventListener("click", ()=>{
+
+  const face = Math.floor(Math.random()*6)+1;
+  showDiceFace(face);
+
+  coinAnim.textContent = Math.random()<0.5 ? "H":"T";
+
+  playAnimation(coinAnim,"coin-anim");
+  playAnimation(diceAnim,"dice-anim");
+});
+
+document.querySelector(".run-btn").addEventListener("click", runExperiments);
+
+document.querySelectorAll(".graph-controls").forEach(el =>
+  el.addEventListener("click", handleGraphControl)
+);
+
+document.querySelectorAll(".table-toggle-btn").forEach(btn =>
+  btn.addEventListener("click", toggleTable)
+);
+
+getElement("prob1").addEventListener("input", updateDiceProbDisplay);
+
+updateDiceProbDisplay();
+
+</script>
+</body>
+</html>
