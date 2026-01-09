@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Interactive Decision Tree</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
+  <style>
+    :root{
+      --bg:#ffffff;
+      --ink:#1f2937;
+      --muted:#6b7280;
+      --line:#d1d5db;
+      --card:#f9fafb;
+      --shadow:0 10px 25px rgba(0,0,0,0.08);
+
+      --decision:#0f766e;
+      --strategy:#2563eb;
+      --outcome:#7c3aed;
+
+      --focus:#111827;
+    }
+
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:var(--bg);
+      color:var(--ink);
+    }
+
+    .wrap{ max-width:1200px; margin:0 auto; padding:18px 18px 28px; }
+
+    header{
+      display:flex; gap:14px; align-items:flex-start; justify-content:space-between;
+      flex-wrap:wrap; margin-bottom:12px;
+    }
+
+    .title{ display:flex; flex-direction:column; gap:4px; }
+    h1{ font-size:18px; margin:0; letter-spacing:0.2px; }
+
+    .controls{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+
+    .legend{
+      display:flex; gap:10px; align-items:center;
+      font-size:12px; color:var(--muted); flex-wrap:wrap;
+    }
+    .chip{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:6px 8px; border:1px solid var(--line);
+      border-radius:999px; background:var(--card);
+    }
+    .sq{
+      width:12px; height:12px; border-radius:3px; display:inline-block;
+      border:1px solid rgba(0,0,0,0.10);
+    }
+
+    .canvas{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:linear-gradient(180deg,#ffffff 0%, #fbfbfc 100%);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+
+    svg{ display:block; width:100%; height:720px; }
+
+    .link{
+      fill:none;
+      stroke:var(--line);
+      stroke-width:2;
+    }
+
+    .node text{ font-size:12.5px; fill:var(--ink); }
+    .node .label{ dominant-baseline:middle; }
+    .node .meta{ font-size:11px; fill:var(--muted); }
+
+    .node .pill{
+      fill:#fff;
+      stroke:var(--line);
+      stroke-width:1.2;
+      rx:10; ry:10;
+      filter: drop-shadow(0px 4px 10px rgba(0,0,0,0.06));
+    }
+
+    .focus-ring{ outline:none; }
+    .focus-ring:focus-visible .pill{ stroke:var(--focus); stroke-width:2; }
+
+    .cell{ font-size:11px; fill:var(--muted); }
+    .cellHead{ font-size:11px; fill:var(--muted); font-weight:700; }
+    .divider{ stroke:rgba(0,0,0,0.10); stroke-width:1; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1>Decision Tree, Business Strategies and Outcomes</h1>
+      </div>
+
+      <div class="controls">
+        <div class="legend" aria-label="Legend">
+          <span class="chip"><span class="sq" style="background:var(--decision)"></span> Decision</span>
+          <span class="chip"><span class="sq" style="background:var(--strategy)"></span> Strategy</span>
+          <span class="chip"><span class="sq" style="background:var(--outcome)"></span> Outcome</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="canvas" id="canvas">
+      <svg id="svg" aria-label="Interactive decision tree diagram"></svg>
+    </div>
+  </div>
+
+  <script>
+    // ---------------------------
+    // Data
+    // ---------------------------
+    const data = {
+      name: "Choose strategy",
+      type: "decision",
+      children: [
+        {
+          name: "Strategy A",
+          type: "strategy",
+          subtitle: "Innovate",
+          children: [
+            { name: "High demand", type: "outcome", prob: 0.30, payoff: 150000 },
+            { name: "Moderate demand", type: "outcome", prob: 0.40, payoff: 80000 },
+            { name: "Low demand", type: "outcome", prob: 0.30, payoff: -20000 }
+          ]
+        },
+        {
+          name: "Strategy B",
+          type: "strategy",
+          subtitle: "Improve",
+          children: [
+            { name: "High demand", type: "outcome", prob: 0.30, payoff: 110000 },
+            { name: "Moderate demand", type: "outcome", prob: 0.40, payoff: 90000 },
+            { name: "Low demand", type: "outcome", prob: 0.30, payoff: 40000 }
+          ]
+        },
+        {
+          name: "Strategy C",
+          type: "strategy",
+          subtitle: "License",
+          children: [
+            { name: "High demand", type: "outcome", prob: 0.30, payoff: 70000 },
+            { name: "Moderate demand", type: "outcome", prob: 0.40, payoff: 70000 },
+            { name: "Low demand", type: "outcome", prob: 0.30, payoff: 60000 }
+          ]
+        }
+      ]
+    };
+
+    // ---------------------------
+    // Setup
+    // ---------------------------
+    const VIEW_H = 720;
+    const margin = { top: 24, right: 40, bottom: 24, left: 40 };
+
+    const svg = d3.select("#svg");
+    const canvas = document.getElementById("canvas");
+
+    const gRoot  = svg.append("g");
+    const gLinks = gRoot.append("g").attr("class", "links");
+    const gNodes = gRoot.append("g").attr("class", "nodes");
+
+    const zoom = d3.zoom()
+      .scaleExtent([0.35, 2.5])
+      .on("zoom", (e) => gRoot.attr("transform", e.transform));
+
+    svg.call(zoom);
+
+    const root = d3.hierarchy(data);
+    expandAll(root);
+
+    // ---------------------------
+    // Small utilities
+    // ---------------------------
+    const cssVar = {
+      decision: "var(--decision)",
+      strategy: "var(--strategy)",
+      outcome:  "var(--outcome)"
+    };
+
+    function w() { return canvas.clientWidth; }
+    function h() { return VIEW_H; }
+
+    function moneyShort(n) {
+      const sign = n < 0 ? "-" : "";
+      const abs = Math.abs(n);
+
+      if (abs >= 1_000_000) return sign + (abs / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
+      if (abs >= 1_000)     return sign + Math.round(abs / 1_000) + "k";
+      return sign + abs;
+    }
+
+    function onEnterOrSpace(event, action) {
+      const key = event.key;
+      if (key !== "Enter" && key !== " ") return;
+      event.preventDefault();
+      action();
+    }
+
+    function textWidth(node) {
+      return node?.getComputedTextLength ? node.getComputedTextLength() : 0;
+    }
+
+    function linkPath(source, target) {
+      const midY = (source.y + target.y) / 2;
+      return `M${source.y},${source.x} C${midY},${source.x} ${midY},${target.x} ${target.y},${target.x}`;
+    }
+
+    function expandAll(node) {
+      if (!node) return;
+      if (node._children) {
+        node.children = node._children;
+        node._children = null;
+      }
+      (node.children || []).forEach(expandAll);
+    }
+
+    function toggleNode(node) {
+      if (!node.children && !node._children) return;
+
+      if (node.children) {
+        node._children = node.children;
+        node.children = null;
+      } else {
+        node.children = node._children;
+        node._children = null;
+      }
+
+      render();
+      fitView();
+    }
+
+    // ---------------------------
+    // Layout
+    // ---------------------------
+    function layoutTree() {
+      const W = w();
+      const H = h();
+
+      svg.attr("viewBox", [0, 0, W, H]);
+
+      d3.tree().nodeSize([82, 240])(root);
+
+      const nodes = root.descendants();
+      const links = root.links();
+
+      // Normalize X to fit inner height, and scale Y to fit inner width
+      let xMin = Infinity;
+      let xMax = -Infinity;
+      for (const d of nodes) {
+        xMin = Math.min(xMin, d.x);
+        xMax = Math.max(xMax, d.x);
+      }
+
+      const innerH = H - margin.top - margin.bottom;
+      const innerW = W - margin.left - margin.right;
+
+      const xSpan = (xMax - xMin) || 1;
+      const yMax = d3.max(nodes, (d) => d.y) || 1;
+      const yScale = Math.min(1, innerW / (yMax + 420));
+
+      for (const d of nodes) {
+        d.x = margin.top + ((d.x - xMin) / xSpan) * innerH;
+        d.y = margin.left + d.y * yScale;
+      }
+
+      return { nodes, links };
+    }
+
+    // ---------------------------
+    // Node markup
+    // ---------------------------
+    function buildNodeMarkup(sel) {
+      sel.append("rect").attr("class", "pill");
+
+      sel.append("rect")
+        .attr("class", "typebox")
+        .attr("rx", 3).attr("ry", 3);
+
+      sel.append("text").attr("class", "label");
+      sel.append("text").attr("class", "meta");
+
+      sel.append("line")
+        .attr("class", "divider tableTop")
+        .style("display", (d) => (d.data.type === "outcome" ? null : "none"));
+
+      sel.append("text")
+        .attr("class", "cellHead pHead")
+        .style("display", (d) => (d.data.type === "outcome" ? null : "none"))
+        .text("p");
+
+      sel.append("text")
+        .attr("class", "cellHead vHead")
+        .style("display", (d) => (d.data.type === "outcome" ? null : "none"))
+        .text("payoff");
+
+      sel.append("text")
+        .attr("class", "cell pVal")
+        .style("display", (d) => (d.data.type === "outcome" ? null : "none"));
+
+      sel.append("text")
+        .attr("class", "cell vVal")
+        .style("display", (d) => (d.data.type === "outcome" ? null : "none"));
+
+      sel.append("text")
+        .attr("class", "toggleglyph")
+        .attr("text-anchor", "middle")
+        .attr("font-size", 18)
+        .attr("fill", "#9ca3af");
+    }
+
+    function paintNode(g, d) {
+      const type = d.data.type;
+
+      g.select("rect.typebox").attr("fill", cssVar[type] || cssVar.outcome);
+      g.select("text.label").text(d.data.name || "");
+
+      const isStrategy = type === "strategy";
+      g.select("text.meta")
+        .text(isStrategy ? (d.data.subtitle || "") : "")
+        .style("display", isStrategy ? null : "none");
+
+      if (type === "outcome") {
+        g.select("text.pVal").text(d.data.prob ?? "");
+        g.select("text.vVal").text(moneyShort(d.data.payoff ?? 0));
+      }
+
+      const canToggle = Boolean(d.children || d._children);
+      const glyph = canToggle ? (d.children ? "−" : "+") : "";
+      g.select("text.toggleglyph").text(glyph);
+    }
+
+    function sizeAndPlaceNode(g, d) {
+      const PAD_X = 14;
+      const PAD_Y = 10;
+      const TYPE_SQ = 12;
+      const TYPE_GAP = 10;
+      const MIN_W = 220;
+      const colGap = 18;
+
+      const isOutcome = d.data.type === "outcome";
+
+      const wLabel = textWidth(g.select("text.label").node());
+      const wMeta  = textWidth(g.select("text.meta").node());
+
+      // Outcome table sizing (only used when outcome)
+      let pColW = 0, vColW = 0, tableW = 0;
+      if (isOutcome) {
+        pColW = Math.max(
+          textWidth(g.select("text.pHead").node()),
+          textWidth(g.select("text.pVal").node())
+        ) + 8;
+
+        vColW = Math.max(
+          textWidth(g.select("text.vHead").node()),
+          textWidth(g.select("text.vVal").node())
+        ) + 8;
+
+        tableW = pColW + colGap + vColW;
+      }
+
+      const leftInset = PAD_X + TYPE_SQ + TYPE_GAP;
+      const contentW = Math.max(wLabel, wMeta, tableW);
+      const width = Math.max(MIN_W, leftInset + contentW + PAD_X);
+
+      const hasMeta = (g.select("text.meta").text() || "").trim().length > 0;
+      const height = isOutcome ? 80 : (hasMeta ? 56 : 44);
+
+      // Main pill
+      g.select("rect.pill")
+        .attr("x", -width / 2)
+        .attr("y", -height / 2)
+        .attr("width", width)
+        .attr("height", height);
+
+      // Type square
+      g.select("rect.typebox")
+        .attr("x", -width / 2 + PAD_X)
+        .attr("y", -height / 2 + PAD_Y)
+        .attr("width", TYPE_SQ)
+        .attr("height", TYPE_SQ);
+
+      const startX = -width / 2 + leftInset;
+
+      // Title + meta
+      g.select("text.label")
+        .attr("x", startX)
+        .attr("y", isOutcome ? (-height / 2 + PAD_Y + 6) : (hasMeta ? -6 : 0));
+
+      g.select("text.meta")
+        .attr("x", startX)
+        .attr("y", 16);
+
+      // Outcome table
+      if (isOutcome) {
+        const titleBaselineY = (-height / 2 + PAD_Y + 6);
+        const dividerY = titleBaselineY + 12;
+        const tableTop = dividerY + 14;
+
+        const pX = startX;
+        const vX = startX + pColW + colGap;
+
+        g.select("line.tableTop")
+          .attr("x1", startX).attr("x2", startX + tableW)
+          .attr("y1", dividerY).attr("y2", dividerY);
+
+        g.select("text.pHead").attr("x", pX).attr("y", tableTop);
+        g.select("text.vHead").attr("x", vX).attr("y", tableTop);
+        g.select("text.pVal").attr("x", pX).attr("y", tableTop + 18);
+        g.select("text.vVal").attr("x", vX).attr("y", tableTop + 18);
+      }
+
+      // Toggle glyph
+      g.select("text.toggleglyph")
+        .attr("x", width / 2 - 16)
+        .attr("y", 4);
+    }
+
+    // ---------------------------
+    // Render/update
+    // ---------------------------
+    function render() {
+      const { nodes, links } = layoutTree();
+
+      gLinks.selectAll("path.link")
+        .data(links, (d) => `${d.target.data.name}-${d.target.depth}`)
+        .join(
+          (enter) => enter.append("path").attr("class", "link"),
+          (update) => update,
+          (exit) => exit.remove()
+        )
+        .attr("d", (d) => linkPath(d.source, d.target));
+
+      const nodeJoin = gNodes.selectAll("g.node")
+        .data(nodes, (d) => `${d.data.name}-${d.depth}`)
+        .join(
+          (enter) => {
+            const g = enter.append("g")
+              .attr("class", "node focus-ring")
+              .attr("tabindex", 0)
+              .on("click", (e, d) => toggleNode(d))
+              .on("keydown", (e, d) => onEnterOrSpace(e, () => toggleNode(d)));
+
+            buildNodeMarkup(g);
+            return g;
+          },
+          (update) => update,
+          (exit) => exit.remove()
+        );
+
+      nodeJoin
+        .attr("transform", (d) => `translate(${d.y},${d.x})`)
+        .each(function(d) {
+          const g = d3.select(this);
+          paintNode(g, d);
+          sizeAndPlaceNode(g, d);
+        });
+    }
+
+    // ---------------------------
+    // Fit view (immediate)
+    // ---------------------------
+    function fitView() {
+      const W = w();
+      const H = h();
+
+      const box = gRoot.node().getBBox();
+      const ok = isFinite(box.width) && isFinite(box.height) && box.width > 0 && box.height > 0;
+      if (!ok) return;
+
+      const padding = 36;
+      const fullW = box.width + padding * 2;
+      const fullH = box.height + padding * 2;
+
+      const scale = Math.min(W / fullW, H / fullH);
+
+      const centerX = box.x + box.width / 2;
+      const centerY = box.y + box.height / 2;
+
+      const t = d3.zoomIdentity
+        .translate(W / 2 - scale * centerX, H / 2 - scale * centerY)
+        .scale(scale);
+
+      svg.call(zoom.transform, t);
+    }
+
+    // ---------------------------
+    // Init + resize
+    // ---------------------------
+    function rerenderAndFit() {
+      render();
+      requestAnimationFrame(fitView);
+    }
+
+    rerenderAndFit();
+
+    new ResizeObserver(rerenderAndFit).observe(canvas);
+  </script>
+</body>
+</html>
