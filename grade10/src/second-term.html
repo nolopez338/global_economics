@@ -61,6 +61,7 @@
       box-shadow:var(--shadow);
       overflow:hidden;
       position:relative;
+      touch-action:none;
     }
 
     .decision-tree svg{ display:block; width:100%; height:720px; }
@@ -2141,11 +2142,11 @@
     const gLinks = gRoot.append("g").attr("class", "links");
     const gNodes = gRoot.append("g").attr("class", "nodes");
 
-    const zoom = d3.zoom()
-      .scaleExtent([0.35, 2.5])
-      .on("zoom", (e) => gRoot.attr("transform", e.transform));
-
-    svg.call(zoom);
+    const svgNode = svg.node();
+    svgNode.addEventListener("wheel", (event) => event.preventDefault(), { passive: false });
+    svgNode.addEventListener("gesturestart", (event) => event.preventDefault(), { passive: false });
+    svgNode.addEventListener("gesturechange", (event) => event.preventDefault(), { passive: false });
+    svgNode.addEventListener("gestureend", (event) => event.preventDefault(), { passive: false });
 
     const root = d3.hierarchy(data);
     expandAll(root);
@@ -2436,11 +2437,9 @@
       const centerX = box.x + box.width / 2;
       const centerY = box.y + box.height / 2;
 
-      const t = d3.zoomIdentity
-        .translate(W / 2 - scale * centerX, H / 2 - scale * centerY)
-        .scale(scale);
-
-      svg.call(zoom.transform, t);
+      const translateX = W / 2 - scale * centerX;
+      const translateY = H / 2 - scale * centerY;
+      gRoot.attr("transform", `translate(${translateX},${translateY}) scale(${scale})`);
     }
 
     function rerenderAndFit() {
