@@ -2058,6 +2058,10 @@
     const gRoot = svg.append("g");
     const gLinks = gRoot.append("g").attr("class", "links");
     const gNodes = gRoot.append("g").attr("class", "nodes");
+    const gMeasure = svg.append("g")
+      .attr("class", "node-measure")
+      .style("visibility", "hidden")
+      .style("pointer-events", "none");
 
     const svgNode = svg.node();
     svgNode.addEventListener("gesturestart", (event) => event.preventDefault(), { passive: false });
@@ -2074,7 +2078,9 @@
     };
 
     function w() { return canvas.clientWidth; }
-    function h() { return VIEW_H; }
+    function h() {
+      return Math.max(VIEW_H, canvas.clientHeight || VIEW_H);
+    }
 
     function moneyShort(n) {
       const sign = n < 0 ? "-" : "";
@@ -2094,6 +2100,35 @@
 
     function textWidth(node) {
       return node?.getComputedTextLength ? node.getComputedTextLength() : 0;
+    }
+
+    function nodeKey(d) {
+      return JSON.stringify({
+        name: d.data?.name,
+        type: d.data?.type,
+        subtitle: d.data?.subtitle,
+        prob: d.data?.prob,
+        payoff: d.data?.payoff
+      });
+    }
+
+    const sizeCache = new Map();
+
+    function measureNodeSize(d) {
+      const key = nodeKey(d);
+      if (sizeCache.has(key)) return sizeCache.get(key);
+
+      const g = gMeasure.append("g").attr("class", "node");
+      buildNodeMarkup(g);
+      paintNode(g, d);
+      sizeAndPlaceNode(g, d);
+
+      const box = g.node().getBBox();
+      g.remove();
+
+      const size = { width: box.width || 0, height: box.height || 0 };
+      sizeCache.set(key, size);
+      return size;
     }
 
     function linkPath(source, target) {
@@ -2129,9 +2164,21 @@
       const W = w();
       const H = h();
 
-      svg.attr("viewBox", [0, 0, W, H]);
+      const nodeList = root.descendants();
+      let maxWidth = 0;
+      let maxHeight = 0;
+      for (const node of nodeList) {
+        const size = measureNodeSize(node);
+        maxWidth = Math.max(maxWidth, size.width);
+        maxHeight = Math.max(maxHeight, size.height);
+      }
 
-      d3.tree().nodeSize([110, 280])(root);
+      const V_GAP = 36;
+      const H_GAP = 90;
+      const nodeSizeX = Math.max(110, maxHeight + V_GAP);
+      const nodeSizeY = Math.max(280, maxWidth + H_GAP);
+
+      d3.tree().nodeSize([nodeSizeX, nodeSizeY])(root);
 
       const nodes = root.descendants();
       const links = root.links();
@@ -2144,15 +2191,11 @@
       }
 
       const innerH = H - margin.top - margin.bottom;
-      const innerW = W - margin.left - margin.right;
-
       const xSpan = (xMax - xMin) || 1;
-      const yMax = d3.max(nodes, (d) => d.y) || 1;
-      const yScale = Math.min(1, innerW / (yMax + 320));
 
       for (const d of nodes) {
         d.x = margin.top + ((d.x - xMin) / xSpan) * innerH;
-        d.y = margin.left + d.y * yScale;
+        d.y = margin.left + d.y;
       }
 
       return { nodes, links };
@@ -2338,8 +2381,6 @@
 
     function fitView() {
       const W = w();
-      const H = h();
-
       const box = gRoot.node().getBBox();
       const ok = isFinite(box.width) && isFinite(box.height) && box.width > 0 && box.height > 0;
       if (!ok) return;
@@ -2348,13 +2389,17 @@
       const fullW = box.width + padding * 2;
       const fullH = box.height + padding * 2;
 
-      const scale = Math.min(W / fullW, H / fullH);
+      const targetH = Math.max(VIEW_H, fullH);
+      svg.attr("viewBox", [0, 0, W, targetH]);
+      svg.style("height", `${targetH}px`);
+
+      const scale = Math.min(W / fullW, targetH / fullH);
 
       const centerX = box.x + box.width / 2;
       const centerY = box.y + box.height / 2;
 
       const translateX = W / 2 - scale * centerX;
-      const translateY = H / 2 - scale * centerY;
+      const translateY = targetH / 2 - scale * centerY;
       gRoot.attr("transform", `translate(${translateX},${translateY}) scale(${scale})`);
     }
 
