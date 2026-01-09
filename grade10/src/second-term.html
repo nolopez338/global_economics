@@ -5,12 +5,91 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Second Term | Decision Rules with Data</title>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
   <link rel="stylesheet" href="../../assets/css/base.css">
   <link rel="stylesheet" href="../../assets/css/themes.css">
   <link rel="stylesheet" href="../../assets/css/layout.css">
   <link rel="stylesheet" href="../../assets/css/components.css">
   <link rel="stylesheet" href="../../assets/css/collapsible.css">
   <link rel="stylesheet" href="../../assets/css/subsection.css">
+  <style>
+    .decision-tree {
+      --bg:#ffffff;
+      --ink:#1f2937;
+      --muted:#6b7280;
+      --line:#d1d5db;
+      --card:#f9fafb;
+      --shadow:0 10px 25px rgba(0,0,0,0.08);
+
+      --decision:#0f766e;
+      --strategy:#2563eb;
+      --outcome:#7c3aed;
+
+      --focus:#111827;
+    }
+
+    .decision-tree .tree-wrap { max-width:1200px; margin:0 auto; padding:12px 0 18px; }
+
+    .decision-tree .tree-header{
+      display:flex; gap:14px; align-items:flex-start; justify-content:space-between;
+      flex-wrap:wrap; margin-bottom:12px;
+    }
+
+    .decision-tree .title{ display:flex; flex-direction:column; gap:4px; }
+    .decision-tree h3{ font-size:18px; margin:0; letter-spacing:0.2px; color:var(--ink); }
+
+    .decision-tree .controls{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+
+    .decision-tree .legend{
+      display:flex; gap:10px; align-items:center;
+      font-size:12px; color:var(--muted); flex-wrap:wrap;
+    }
+    .decision-tree .chip{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:6px 8px; border:1px solid var(--line);
+      border-radius:999px; background:var(--card);
+    }
+    .decision-tree .sq{
+      width:12px; height:12px; border-radius:3px; display:inline-block;
+      border:1px solid rgba(0,0,0,0.10);
+    }
+
+    .decision-tree .canvas{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:linear-gradient(180deg,#ffffff 0%, #fbfbfc 100%);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .decision-tree svg{ display:block; width:100%; height:720px; }
+
+    .decision-tree .link{
+      fill:none;
+      stroke:var(--line);
+      stroke-width:2;
+    }
+
+    .decision-tree .node text{ font-size:12.5px; fill:var(--ink); }
+    .decision-tree .node .label{ dominant-baseline:middle; }
+    .decision-tree .node .meta{ font-size:11px; fill:var(--muted); }
+
+    .decision-tree .node .pill{
+      fill:#fff;
+      stroke:var(--line);
+      stroke-width:1.2;
+      rx:10; ry:10;
+      filter: drop-shadow(0px 4px 10px rgba(0,0,0,0.06));
+    }
+
+    .decision-tree .focus-ring{ outline:none; }
+    .decision-tree .focus-ring:focus-visible .pill{ stroke:var(--focus); stroke-width:2; }
+
+    .decision-tree .cell{ font-size:11px; fill:var(--muted); }
+    .decision-tree .cellHead{ font-size:11px; fill:var(--muted); font-weight:700; }
+    .decision-tree .divider{ stroke:rgba(0,0,0,0.10); stroke-width:1; }
+  </style>
 </head>
 
 <body class="theme-grade10">
@@ -549,24 +628,27 @@
             </button>
             <div class="subsection-content" id="example-1-c9">
               We represent the same situation as a decision tree.
-              <pre>
-        Decision node choose strategy
-        │
-        ├─ Strategy A  Innovate
-        │   ├─ High demand 0.30 → 150k
-        │   ├─ Moderate demand 0.40 → 80k
-        │   └─ Low demand 0.30 → −20k
-        │
-        ├─ Strategy B  Improve
-        │   ├─ High demand 0.30 → 110k
-        │   ├─ Moderate demand 0.40 → 90k
-        │   └─ Low demand 0.30 → 40k
-        │
-        └─ Strategy C  License
-            ├─ High demand 0.30 → 70k
-            ├─ Moderate demand 0.40 → 70k
-            └─ Low demand 0.30 → 60k
-              </pre>
+              <div class="decision-tree">
+                <div class="tree-wrap">
+                  <div class="tree-header">
+                    <div class="title">
+                      <h3>Decision Tree, Business Strategies and Outcomes</h3>
+                    </div>
+
+                    <div class="controls">
+                      <div class="legend" aria-label="Legend">
+                        <span class="chip"><span class="sq" style="background:var(--decision)"></span> Decision</span>
+                        <span class="chip"><span class="sq" style="background:var(--strategy)"></span> Strategy</span>
+                        <span class="chip"><span class="sq" style="background:var(--outcome)"></span> Outcome</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="canvas" id="decision-tree-1">
+                    <svg id="decision-tree-1-svg" aria-label="Interactive decision tree diagram"></svg>
+                  </div>
+                </div>
+              </div>
               This diagram helps visualise all possible paths decisions followed by demand realisations and the associated payoffs.
             </div>
           </div>
@@ -1142,33 +1224,27 @@
               demand level is realised, and then the cost level is realised. Because demand and costs are independent, their
               probabilities multiply along each path. For simplicity, we show the combined states with their joint probabilities
               and profits.
-              <pre>
-  Decision node (choose strategy)
-  │
-  ├─ Strategy A  EU avocado plant
-  │   ├─ S1  high demand, favourable costs (0.18) → 4700
-  │   ├─ S2  high demand, unfavourable costs (0.12) → 3500
-  │   ├─ S3  moderate demand, favourable costs (0.27) → 2500
-  │   ├─ S4  moderate demand, unfavourable costs (0.18) → 1300
-  │   ├─ S5  weak demand, favourable costs (0.15) → 900
-  │   └─ S6  weak demand, unfavourable costs (0.10) → −300
-  │
-  ├─ Strategy B  US coffee focus
-  │   ├─ S1 (0.18) → 3400
-  │   ├─ S2 (0.12) → 2400
-  │   ├─ S3 (0.27) → 2600
-  │   ├─ S4 (0.18) → 1600
-  │   ├─ S5 (0.15) → 2000
-  │   └─ S6 (0.10) → 1000
-  │
-  └─ Strategy C  Regional diversification
-      ├─ S1 (0.18) → 2800
-      ├─ S2 (0.12) → 2100
-      ├─ S3 (0.27) → 2300
-      ├─ S4 (0.18) → 1600
-      ├─ S5 (0.15) → 1900
-      └─ S6 (0.10) → 1200
-              </pre>
+              <div class="decision-tree">
+                <div class="tree-wrap">
+                  <div class="tree-header">
+                    <div class="title">
+                      <h3>Decision Tree, Strategies and Combined Outcomes</h3>
+                    </div>
+
+                    <div class="controls">
+                      <div class="legend" aria-label="Legend">
+                        <span class="chip"><span class="sq" style="background:var(--decision)"></span> Decision</span>
+                        <span class="chip"><span class="sq" style="background:var(--strategy)"></span> Strategy</span>
+                        <span class="chip"><span class="sq" style="background:var(--outcome)"></span> Outcome</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="canvas" id="decision-tree-2">
+                    <svg id="decision-tree-2-svg" aria-label="Interactive decision tree diagram"></svg>
+                  </div>
+                </div>
+              </div>
               This diagram makes explicit the sequence of decisions and uncertain events, as well as the joint probabilities
               and profits associated with each possible path.
             </div>
@@ -1796,41 +1872,27 @@
               (revenue strategy and cost strategy), then the demand level is realised and then the cost level is realised.
               Because demand and costs are independent, their probabilities multiply along each path. For simplicity, we show
               the combined states with their joint probabilities and profits.
-              <pre>
-  Decision node (choose combined decision)
-  │
-  ├─ Decision A  premium revenue + stable costs
-  │   ├─ S1  high demand, favourable costs (0.18) → 4000
-  │   ├─ S2  high demand, unfavourable costs (0.12) → 3400
-  │   ├─ S3  moderate demand, favourable costs (0.27) → 2500
-  │   ├─ S4  moderate demand, unfavourable costs (0.18) → 1900
-  │   ├─ S5  weak demand, favourable costs (0.15) → 1200
-  │   └─ S6  weak demand, unfavourable costs (0.10) → 600
-  │
-  ├─ Decision B  premium revenue + flexible costs
-  │   ├─ S1 (0.18) → 4500
-  │   ├─ S2 (0.12) → 2600
-  │   ├─ S3 (0.27) → 3000
-  │   ├─ S4 (0.18) → 1100
-  │   ├─ S5 (0.15) → 1700
-  │   └─ S6 (0.10) → -200
-  │
-  ├─ Decision C  volume revenue + stable costs
-  │   ├─ S1 (0.18) → 3500
-  │   ├─ S2 (0.12) → 2900
-  │   ├─ S3 (0.27) → 2300
-  │   ├─ S4 (0.18) → 1700
-  │   ├─ S5 (0.15) → 1800
-  │   └─ S6 (0.10) → 1200
-  │
-  └─ Decision D  volume revenue + flexible costs
-      ├─ S1 (0.18) → 4000
-      ├─ S2 (0.12) → 2100
-      ├─ S3 (0.27) → 2800
-      ├─ S4 (0.18) → 900
-      ├─ S5 (0.15) → 2300
-      └─ S6 (0.10) → 400
-              </pre>
+              <div class="decision-tree">
+                <div class="tree-wrap">
+                  <div class="tree-header">
+                    <div class="title">
+                      <h3>Decision Tree, Combined Decisions and Outcomes</h3>
+                    </div>
+
+                    <div class="controls">
+                      <div class="legend" aria-label="Legend">
+                        <span class="chip"><span class="sq" style="background:var(--decision)"></span> Decision</span>
+                        <span class="chip"><span class="sq" style="background:var(--strategy)"></span> Strategy</span>
+                        <span class="chip"><span class="sq" style="background:var(--outcome)"></span> Outcome</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="canvas" id="decision-tree-3">
+                    <svg id="decision-tree-3-svg" aria-label="Interactive decision tree diagram"></svg>
+                  </div>
+                </div>
+              </div>
               This diagram makes explicit the sequence of decisions and uncertain events, as well as the joint probabilities and
               profits associated with each possible path.
             </div>
@@ -1962,6 +2024,489 @@
   </section>
 
 </main>
+
+<script>
+  const decisionTrees = [
+    {
+      canvasId: "decision-tree-1",
+      svgId: "decision-tree-1-svg",
+      data: {
+        name: "Choose strategy",
+        type: "decision",
+        children: [
+          {
+            name: "Strategy A",
+            type: "strategy",
+            subtitle: "Innovate",
+            children: [
+              { name: "High demand", type: "outcome", prob: 0.30, payoff: 150000 },
+              { name: "Moderate demand", type: "outcome", prob: 0.40, payoff: 80000 },
+              { name: "Low demand", type: "outcome", prob: 0.30, payoff: -20000 }
+            ]
+          },
+          {
+            name: "Strategy B",
+            type: "strategy",
+            subtitle: "Improve",
+            children: [
+              { name: "High demand", type: "outcome", prob: 0.30, payoff: 110000 },
+              { name: "Moderate demand", type: "outcome", prob: 0.40, payoff: 90000 },
+              { name: "Low demand", type: "outcome", prob: 0.30, payoff: 40000 }
+            ]
+          },
+          {
+            name: "Strategy C",
+            type: "strategy",
+            subtitle: "License",
+            children: [
+              { name: "High demand", type: "outcome", prob: 0.30, payoff: 70000 },
+              { name: "Moderate demand", type: "outcome", prob: 0.40, payoff: 70000 },
+              { name: "Low demand", type: "outcome", prob: 0.30, payoff: 60000 }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      canvasId: "decision-tree-2",
+      svgId: "decision-tree-2-svg",
+      data: {
+        name: "Choose strategy",
+        type: "decision",
+        children: [
+          {
+            name: "Strategy A",
+            type: "strategy",
+            subtitle: "EU avocado plant",
+            children: [
+              { name: "S1 high demand, favourable costs", type: "outcome", prob: 0.18, payoff: 4700 },
+              { name: "S2 high demand, unfavourable costs", type: "outcome", prob: 0.12, payoff: 3500 },
+              { name: "S3 moderate demand, favourable costs", type: "outcome", prob: 0.27, payoff: 2500 },
+              { name: "S4 moderate demand, unfavourable costs", type: "outcome", prob: 0.18, payoff: 1300 },
+              { name: "S5 weak demand, favourable costs", type: "outcome", prob: 0.15, payoff: 900 },
+              { name: "S6 weak demand, unfavourable costs", type: "outcome", prob: 0.10, payoff: -300 }
+            ]
+          },
+          {
+            name: "Strategy B",
+            type: "strategy",
+            subtitle: "US coffee focus",
+            children: [
+              { name: "S1 high demand, favourable costs", type: "outcome", prob: 0.18, payoff: 3400 },
+              { name: "S2 high demand, unfavourable costs", type: "outcome", prob: 0.12, payoff: 2400 },
+              { name: "S3 moderate demand, favourable costs", type: "outcome", prob: 0.27, payoff: 2600 },
+              { name: "S4 moderate demand, unfavourable costs", type: "outcome", prob: 0.18, payoff: 1600 },
+              { name: "S5 weak demand, favourable costs", type: "outcome", prob: 0.15, payoff: 2000 },
+              { name: "S6 weak demand, unfavourable costs", type: "outcome", prob: 0.10, payoff: 1000 }
+            ]
+          },
+          {
+            name: "Strategy C",
+            type: "strategy",
+            subtitle: "Regional diversification",
+            children: [
+              { name: "S1 high demand, favourable costs", type: "outcome", prob: 0.18, payoff: 2800 },
+              { name: "S2 high demand, unfavourable costs", type: "outcome", prob: 0.12, payoff: 2100 },
+              { name: "S3 moderate demand, favourable costs", type: "outcome", prob: 0.27, payoff: 2300 },
+              { name: "S4 moderate demand, unfavourable costs", type: "outcome", prob: 0.18, payoff: 1600 },
+              { name: "S5 weak demand, favourable costs", type: "outcome", prob: 0.15, payoff: 1900 },
+              { name: "S6 weak demand, unfavourable costs", type: "outcome", prob: 0.10, payoff: 1200 }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      canvasId: "decision-tree-3",
+      svgId: "decision-tree-3-svg",
+      data: {
+        name: "Choose combined decision",
+        type: "decision",
+        children: [
+          {
+            name: "Decision A",
+            type: "strategy",
+            subtitle: "Premium revenue + stable costs",
+            children: [
+              { name: "S1 high demand, favourable costs", type: "outcome", prob: 0.18, payoff: 4000 },
+              { name: "S2 high demand, unfavourable costs", type: "outcome", prob: 0.12, payoff: 3400 },
+              { name: "S3 moderate demand, favourable costs", type: "outcome", prob: 0.27, payoff: 2500 },
+              { name: "S4 moderate demand, unfavourable costs", type: "outcome", prob: 0.18, payoff: 1900 },
+              { name: "S5 weak demand, favourable costs", type: "outcome", prob: 0.15, payoff: 1200 },
+              { name: "S6 weak demand, unfavourable costs", type: "outcome", prob: 0.10, payoff: 600 }
+            ]
+          },
+          {
+            name: "Decision B",
+            type: "strategy",
+            subtitle: "Premium revenue + flexible costs",
+            children: [
+              { name: "S1 high demand, favourable costs", type: "outcome", prob: 0.18, payoff: 4500 },
+              { name: "S2 high demand, unfavourable costs", type: "outcome", prob: 0.12, payoff: 2600 },
+              { name: "S3 moderate demand, favourable costs", type: "outcome", prob: 0.27, payoff: 3000 },
+              { name: "S4 moderate demand, unfavourable costs", type: "outcome", prob: 0.18, payoff: 1100 },
+              { name: "S5 weak demand, favourable costs", type: "outcome", prob: 0.15, payoff: 1700 },
+              { name: "S6 weak demand, unfavourable costs", type: "outcome", prob: 0.10, payoff: -200 }
+            ]
+          },
+          {
+            name: "Decision C",
+            type: "strategy",
+            subtitle: "Volume revenue + stable costs",
+            children: [
+              { name: "S1 high demand, favourable costs", type: "outcome", prob: 0.18, payoff: 3500 },
+              { name: "S2 high demand, unfavourable costs", type: "outcome", prob: 0.12, payoff: 2900 },
+              { name: "S3 moderate demand, favourable costs", type: "outcome", prob: 0.27, payoff: 2300 },
+              { name: "S4 moderate demand, unfavourable costs", type: "outcome", prob: 0.18, payoff: 1700 },
+              { name: "S5 weak demand, favourable costs", type: "outcome", prob: 0.15, payoff: 1800 },
+              { name: "S6 weak demand, unfavourable costs", type: "outcome", prob: 0.10, payoff: 1200 }
+            ]
+          },
+          {
+            name: "Decision D",
+            type: "strategy",
+            subtitle: "Volume revenue + flexible costs",
+            children: [
+              { name: "S1 high demand, favourable costs", type: "outcome", prob: 0.18, payoff: 4000 },
+              { name: "S2 high demand, unfavourable costs", type: "outcome", prob: 0.12, payoff: 2100 },
+              { name: "S3 moderate demand, favourable costs", type: "outcome", prob: 0.27, payoff: 2800 },
+              { name: "S4 moderate demand, unfavourable costs", type: "outcome", prob: 0.18, payoff: 900 },
+              { name: "S5 weak demand, favourable costs", type: "outcome", prob: 0.15, payoff: 2300 },
+              { name: "S6 weak demand, unfavourable costs", type: "outcome", prob: 0.10, payoff: 400 }
+            ]
+          }
+        ]
+      }
+    }
+  ];
+
+  function createDecisionTree({ canvasId, svgId, data }) {
+    const VIEW_H = 720;
+    const margin = { top: 24, right: 40, bottom: 24, left: 40 };
+
+    const svg = d3.select(`#${svgId}`);
+    const canvas = document.getElementById(canvasId);
+
+    const gRoot = svg.append("g");
+    const gLinks = gRoot.append("g").attr("class", "links");
+    const gNodes = gRoot.append("g").attr("class", "nodes");
+
+    const zoom = d3.zoom()
+      .scaleExtent([0.35, 2.5])
+      .on("zoom", (e) => gRoot.attr("transform", e.transform));
+
+    svg.call(zoom);
+
+    const root = d3.hierarchy(data);
+    expandAll(root);
+
+    const cssVar = {
+      decision: "var(--decision)",
+      strategy: "var(--strategy)",
+      outcome: "var(--outcome)"
+    };
+
+    function w() { return canvas.clientWidth; }
+    function h() { return VIEW_H; }
+
+    function moneyShort(n) {
+      const sign = n < 0 ? "-" : "";
+      const abs = Math.abs(n);
+
+      if (abs >= 1_000_000) return sign + (abs / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
+      if (abs >= 1_000)     return sign + Math.round(abs / 1_000) + "k";
+      return sign + abs;
+    }
+
+    function onEnterOrSpace(event, action) {
+      const key = event.key;
+      if (key !== "Enter" && key !== " ") return;
+      event.preventDefault();
+      action();
+    }
+
+    function textWidth(node) {
+      return node?.getComputedTextLength ? node.getComputedTextLength() : 0;
+    }
+
+    function linkPath(source, target) {
+      const midY = (source.y + target.y) / 2;
+      return `M${source.y},${source.x} C${midY},${source.x} ${midY},${target.x} ${target.y},${target.x}`;
+    }
+
+    function expandAll(node) {
+      if (!node) return;
+      if (node._children) {
+        node.children = node._children;
+        node._children = null;
+      }
+      (node.children || []).forEach(expandAll);
+    }
+
+    function toggleNode(node) {
+      if (!node.children && !node._children) return;
+
+      if (node.children) {
+        node._children = node.children;
+        node.children = null;
+      } else {
+        node.children = node._children;
+        node._children = null;
+      }
+
+      render();
+      fitView();
+    }
+
+    function layoutTree() {
+      const W = w();
+      const H = h();
+
+      svg.attr("viewBox", [0, 0, W, H]);
+
+      d3.tree().nodeSize([82, 240])(root);
+
+      const nodes = root.descendants();
+      const links = root.links();
+
+      let xMin = Infinity;
+      let xMax = -Infinity;
+      for (const d of nodes) {
+        xMin = Math.min(xMin, d.x);
+        xMax = Math.max(xMax, d.x);
+      }
+
+      const innerH = H - margin.top - margin.bottom;
+      const innerW = W - margin.left - margin.right;
+
+      const xSpan = (xMax - xMin) || 1;
+      const yMax = d3.max(nodes, (d) => d.y) || 1;
+      const yScale = Math.min(1, innerW / (yMax + 420));
+
+      for (const d of nodes) {
+        d.x = margin.top + ((d.x - xMin) / xSpan) * innerH;
+        d.y = margin.left + d.y * yScale;
+      }
+
+      return { nodes, links };
+    }
+
+    function buildNodeMarkup(sel) {
+      sel.append("rect").attr("class", "pill");
+
+      sel.append("rect")
+        .attr("class", "typebox")
+        .attr("rx", 3).attr("ry", 3);
+
+      sel.append("text").attr("class", "label");
+      sel.append("text").attr("class", "meta");
+
+      sel.append("line")
+        .attr("class", "divider tableTop")
+        .style("display", (d) => (d.data.type === "outcome" ? null : "none"));
+
+      sel.append("text")
+        .attr("class", "cellHead pHead")
+        .style("display", (d) => (d.data.type === "outcome" ? null : "none"))
+        .text("p");
+
+      sel.append("text")
+        .attr("class", "cellHead vHead")
+        .style("display", (d) => (d.data.type === "outcome" ? null : "none"))
+        .text("payoff");
+
+      sel.append("text")
+        .attr("class", "cell pVal")
+        .style("display", (d) => (d.data.type === "outcome" ? null : "none"));
+
+      sel.append("text")
+        .attr("class", "cell vVal")
+        .style("display", (d) => (d.data.type === "outcome" ? null : "none"));
+
+      sel.append("text")
+        .attr("class", "toggleglyph")
+        .attr("text-anchor", "middle")
+        .attr("font-size", 18)
+        .attr("fill", "#9ca3af");
+    }
+
+    function paintNode(g, d) {
+      const type = d.data.type;
+
+      g.select("rect.typebox").attr("fill", cssVar[type] || cssVar.outcome);
+      g.select("text.label").text(d.data.name || "");
+
+      const isStrategy = type === "strategy";
+      g.select("text.meta")
+        .text(isStrategy ? (d.data.subtitle || "") : "")
+        .style("display", isStrategy ? null : "none");
+
+      if (type === "outcome") {
+        g.select("text.pVal").text(d.data.prob ?? "");
+        g.select("text.vVal").text(moneyShort(d.data.payoff ?? 0));
+      }
+
+      const canToggle = Boolean(d.children || d._children);
+      const glyph = canToggle ? (d.children ? "−" : "+") : "";
+      g.select("text.toggleglyph").text(glyph);
+    }
+
+    function sizeAndPlaceNode(g, d) {
+      const PAD_X = 14;
+      const PAD_Y = 10;
+      const TYPE_SQ = 12;
+      const TYPE_GAP = 10;
+      const MIN_W = 220;
+      const colGap = 18;
+
+      const isOutcome = d.data.type === "outcome";
+
+      const wLabel = textWidth(g.select("text.label").node());
+      const wMeta  = textWidth(g.select("text.meta").node());
+
+      let pColW = 0, vColW = 0, tableW = 0;
+      if (isOutcome) {
+        pColW = Math.max(
+          textWidth(g.select("text.pHead").node()),
+          textWidth(g.select("text.pVal").node())
+        ) + 8;
+
+        vColW = Math.max(
+          textWidth(g.select("text.vHead").node()),
+          textWidth(g.select("text.vVal").node())
+        ) + 8;
+
+        tableW = pColW + colGap + vColW;
+      }
+
+      const leftInset = PAD_X + TYPE_SQ + TYPE_GAP;
+      const contentW = Math.max(wLabel, wMeta, tableW);
+      const width = Math.max(MIN_W, leftInset + contentW + PAD_X);
+
+      const hasMeta = (g.select("text.meta").text() || "").trim().length > 0;
+      const height = isOutcome ? 80 : (hasMeta ? 56 : 44);
+
+      g.select("rect.pill")
+        .attr("x", -width / 2)
+        .attr("y", -height / 2)
+        .attr("width", width)
+        .attr("height", height);
+
+      g.select("rect.typebox")
+        .attr("x", -width / 2 + PAD_X)
+        .attr("y", -height / 2 + PAD_Y)
+        .attr("width", TYPE_SQ)
+        .attr("height", TYPE_SQ);
+
+      const startX = -width / 2 + leftInset;
+
+      g.select("text.label")
+        .attr("x", startX)
+        .attr("y", isOutcome ? (-height / 2 + PAD_Y + 6) : (hasMeta ? -6 : 0));
+
+      g.select("text.meta")
+        .attr("x", startX)
+        .attr("y", 16);
+
+      if (isOutcome) {
+        const titleBaselineY = (-height / 2 + PAD_Y + 6);
+        const dividerY = titleBaselineY + 12;
+        const tableTop = dividerY + 14;
+
+        const pX = startX;
+        const vX = startX + pColW + colGap;
+
+        g.select("line.tableTop")
+          .attr("x1", startX).attr("x2", startX + tableW)
+          .attr("y1", dividerY).attr("y2", dividerY);
+
+        g.select("text.pHead").attr("x", pX).attr("y", tableTop);
+        g.select("text.vHead").attr("x", vX).attr("y", tableTop);
+        g.select("text.pVal").attr("x", pX).attr("y", tableTop + 18);
+        g.select("text.vVal").attr("x", vX).attr("y", tableTop + 18);
+      }
+
+      g.select("text.toggleglyph")
+        .attr("x", width / 2 - 16)
+        .attr("y", 4);
+    }
+
+    function render() {
+      const { nodes, links } = layoutTree();
+
+      gLinks.selectAll("path.link")
+        .data(links, (d) => `${d.target.data.name}-${d.target.depth}`)
+        .join(
+          (enter) => enter.append("path").attr("class", "link"),
+          (update) => update,
+          (exit) => exit.remove()
+        )
+        .attr("d", (d) => linkPath(d.source, d.target));
+
+      const nodeJoin = gNodes.selectAll("g.node")
+        .data(nodes, (d) => `${d.data.name}-${d.depth}`)
+        .join(
+          (enter) => {
+            const g = enter.append("g")
+              .attr("class", "node focus-ring")
+              .attr("tabindex", 0)
+              .on("click", (e, d) => toggleNode(d))
+              .on("keydown", (e, d) => onEnterOrSpace(e, () => toggleNode(d)));
+
+            buildNodeMarkup(g);
+            return g;
+          },
+          (update) => update,
+          (exit) => exit.remove()
+        );
+
+      nodeJoin
+        .attr("transform", (d) => `translate(${d.y},${d.x})`)
+        .each(function(d) {
+          const g = d3.select(this);
+          paintNode(g, d);
+          sizeAndPlaceNode(g, d);
+        });
+    }
+
+    function fitView() {
+      const W = w();
+      const H = h();
+
+      const box = gRoot.node().getBBox();
+      const ok = isFinite(box.width) && isFinite(box.height) && box.width > 0 && box.height > 0;
+      if (!ok) return;
+
+      const padding = 36;
+      const fullW = box.width + padding * 2;
+      const fullH = box.height + padding * 2;
+
+      const scale = Math.min(W / fullW, H / fullH);
+
+      const centerX = box.x + box.width / 2;
+      const centerY = box.y + box.height / 2;
+
+      const t = d3.zoomIdentity
+        .translate(W / 2 - scale * centerX, H / 2 - scale * centerY)
+        .scale(scale);
+
+      svg.call(zoom.transform, t);
+    }
+
+    function rerenderAndFit() {
+      render();
+      requestAnimationFrame(fitView);
+    }
+
+    rerenderAndFit();
+
+    new ResizeObserver(rerenderAndFit).observe(canvas);
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    decisionTrees.forEach(createDecisionTree);
+  });
+</script>
 
 <script>
   (function () {
