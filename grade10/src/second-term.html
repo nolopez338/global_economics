@@ -2230,12 +2230,11 @@
       g.select("text.toggleglyph").text(glyph);
     }
 
-    function sizeAndPlaceNode(g, d) {
+    function computeNodeLayout(g, d) {
       const PAD_X = 14;
       const PAD_Y = 10;
       const TYPE_SQ = 12;
       const TYPE_GAP = 10;
-      const MIN_W = 220;
       const colGap = 18;
 
       const isOutcome = d.data.type === "outcome";
@@ -2260,10 +2259,45 @@
 
       const leftInset = PAD_X + TYPE_SQ + TYPE_GAP;
       const contentW = Math.max(wLabel, wMeta, tableW);
-      const width = Math.max(MIN_W, leftInset + contentW + PAD_X);
+      const width = leftInset + contentW + PAD_X;
 
       const hasMeta = (g.select("text.meta").text() || "").trim().length > 0;
       const height = isOutcome ? 80 : (hasMeta ? 56 : 44);
+
+      return {
+        width,
+        height,
+        hasMeta,
+        isOutcome,
+        leftInset,
+        colGap,
+        pColW,
+        vColW,
+        tableW,
+        PAD_X,
+        PAD_Y,
+        TYPE_SQ,
+        TYPE_GAP
+      };
+    }
+
+    function sizeAndPlaceNode(g, d, layerWidth) {
+      const {
+        width: baseWidth,
+        height,
+        hasMeta,
+        isOutcome,
+        leftInset,
+        colGap,
+        pColW,
+        vColW,
+        tableW,
+        PAD_X,
+        PAD_Y,
+        TYPE_SQ
+      } = d._layout;
+
+      const width = layerWidth ?? baseWidth;
 
       g.select("rect.pill")
         .attr("x", -width / 2)
@@ -2344,8 +2378,19 @@
         .each(function(d) {
           const g = d3.select(this);
           paintNode(g, d);
-          sizeAndPlaceNode(g, d);
+          d._layout = computeNodeLayout(g, d);
         });
+
+      const layerWidths = new Map();
+      nodes.forEach((d) => {
+        const width = d._layout?.width ?? 0;
+        layerWidths.set(d.depth, Math.max(layerWidths.get(d.depth) || 0, width));
+      });
+
+      nodeJoin.each(function(d) {
+        const g = d3.select(this);
+        sizeAndPlaceNode(g, d, layerWidths.get(d.depth));
+      });
     }
 
     function fitView() {
