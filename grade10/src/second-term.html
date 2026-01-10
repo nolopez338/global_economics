@@ -2143,7 +2143,13 @@
 
       svg.attr("viewBox", [0, 0, W, H]);
 
-      d3.tree().nodeSize([110, 280])(root);
+      const thirdLayerSeparation = 1.4;
+      const thirdLayerHorizontalGap = 120;
+
+      d3.tree()
+        .nodeSize([110, 280])
+        .separation((a, b) => (a.depth === 2 && b.depth === 2 ? thirdLayerSeparation : 1))
+        (root);
 
       const nodes = root.descendants();
       const links = root.links();
@@ -2165,6 +2171,9 @@
       for (const d of nodes) {
         d.x = margin.top + ((d.x - xMin) / xSpan) * innerH;
         d.y = margin.left + d.y * yScale;
+        if (d.depth >= 2) {
+          d.y += thirdLayerHorizontalGap;
+        }
       }
 
       return { nodes, links };
