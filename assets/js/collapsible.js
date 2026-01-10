@@ -7,13 +7,13 @@
     }
   }
 
-  function setupCollapsible(section, index) {
-    const button = section.querySelector('.collapse-toggle');
-    const content = section.querySelector('.collapsible-content');
+  function setupCollapsible(section, index, selectors, idPrefix) {
+    const button = section.querySelector(selectors.toggle);
+    const content = section.querySelector(selectors.content);
 
     if (!button || !content) return;
 
-    const contentId = content.id || `collapsible-content-${index}`;
+    const contentId = content.id || `${idPrefix}-${index}`;
     content.id = contentId;
     button.setAttribute('aria-controls', contentId);
 
@@ -27,7 +27,20 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    const sections = Array.from(document.querySelectorAll('.collapsible'));
-    sections.forEach((section, index) => setupCollapsible(section, index));
+    const collapsibleSections = Array.from(document.querySelectorAll('.collapsible'));
+    collapsibleSections.forEach((section, index) => setupCollapsible(
+      section,
+      index,
+      { toggle: '.collapse-toggle', content: '.collapsible-content' },
+      'collapsible-content'
+    ));
+
+    const subsections = Array.from(document.querySelectorAll('.subsection-minimize'));
+    subsections.forEach((section, index) => setupCollapsible(
+      section,
+      index,
+      { toggle: '.subsection-toggle', content: '.subsection-content' },
+      'subsection-content'
+    ));
   });
 })();

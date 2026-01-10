@@ -1,0 +1,147 @@
+window.decisionTreeData = [
+  {
+    canvasId: "decision-tree-1",
+    svgId: "decision-tree-1-svg",
+    data: {
+      name: "Choose strategy",
+      type: "decision",
+      children: [
+        {
+          name: "Strategy A",
+          type: "strategy",
+          subtitle: "Innovate",
+          children: [
+            { name: "High demand", type: "outcome", prob: 0.30, payoff: 150000 },
+            { name: "Moderate demand", type: "outcome", prob: 0.40, payoff: 80000 },
+            { name: "Low demand", type: "outcome", prob: 0.30, payoff: -20000 }
+          ]
+        },
+        {
+          name: "Strategy B",
+          type: "strategy",
+          subtitle: "Improve",
+          children: [
+            { name: "High demand", type: "outcome", prob: 0.30, payoff: 110000 },
+            { name: "Moderate demand", type: "outcome", prob: 0.40, payoff: 90000 },
+            { name: "Low demand", type: "outcome", prob: 0.30, payoff: 40000 }
+          ]
+        },
+        {
+          name: "Strategy C",
+          type: "strategy",
+          subtitle: "License",
+          children: [
+            { name: "High demand", type: "outcome", prob: 0.30, payoff: 70000 },
+            { name: "Moderate demand", type: "outcome", prob: 0.40, payoff: 70000 },
+            { name: "Low demand", type: "outcome", prob: 0.30, payoff: 60000 }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    canvasId: "decision-tree-2",
+    svgId: "decision-tree-2-svg",
+    data: {
+      name: "Choose strategy",
+      type: "decision",
+      children: [
+        {
+          name: "Strategy A",
+          type: "strategy",
+          subtitle: "EU avocado plant",
+          children: [
+            { name: "S1 high demand, favourable costs", type: "outcome", prob: 0.18, payoff: 4700 },
+            { name: "S2 high demand, unfavourable costs", type: "outcome", prob: 0.12, payoff: 3500 },
+            { name: "S3 weak demand, favourable costs", type: "outcome", prob: 0.42, payoff: 900 },
+            { name: "S4 weak demand, unfavourable costs", type: "outcome", prob: 0.28, payoff: -300 }
+          ]
+        },
+        {
+          name: "Strategy B",
+          type: "strategy",
+          subtitle: "US coffee focus",
+          children: [
+            { name: "S1 high demand, favourable costs", type: "outcome", prob: 0.18, payoff: 3400 },
+            { name: "S2 high demand, unfavourable costs", type: "outcome", prob: 0.12, payoff: 2400 },
+            { name: "S3 weak demand, favourable costs", type: "outcome", prob: 0.42, payoff: 2000 },
+            { name: "S4 weak demand, unfavourable costs", type: "outcome", prob: 0.28, payoff: 1000 }
+          ]
+        },
+        {
+          name: "Strategy C",
+          type: "strategy",
+          subtitle: "Regional diversification",
+          children: [
+            { name: "S1 high demand, favourable costs", type: "outcome", prob: 0.18, payoff: 2800 },
+            { name: "S2 high demand, unfavourable costs", type: "outcome", prob: 0.12, payoff: 2100 },
+            { name: "S3 weak demand, favourable costs", type: "outcome", prob: 0.42, payoff: 1900 },
+            { name: "S4 weak demand, unfavourable costs", type: "outcome", prob: 0.28, payoff: 1200 }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    canvasId: "decision-tree-3",
+    svgId: "decision-tree-3-svg",
+    data: {
+      name: "Choose combined decision",
+      type: "decision",
+      children: [
+        {
+          name: "Decision A",
+          type: "strategy",
+          subtitle: "Premium revenue + stable costs",
+          children: [
+            { name: "S1 high demand, favourable costs", type: "outcome", prob: 0.18, payoff: 4000 },
+            { name: "S2 high demand, unfavourable costs", type: "outcome", prob: 0.12, payoff: 3400 },
+            { name: "S3 moderate demand, favourable costs", type: "outcome", prob: 0.27, payoff: 2500 },
+            { name: "S4 moderate demand, unfavourable costs", type: "outcome", prob: 0.18, payoff: 1900 },
+            { name: "S5 weak demand, favourable costs", type: "outcome", prob: 0.15, payoff: 1200 },
+            { name: "S6 weak demand, unfavourable costs", type: "outcome", prob: 0.10, payoff: 600 }
+          ]
+        },
+        {
+          name: "Decision B",
+          type: "strategy",
+          subtitle: "Premium revenue + flexible costs",
+          children: [
+            { name: "S1 high demand, favourable costs", type: "outcome", prob: 0.18, payoff: 4500 },
+            { name: "S2 high demand, unfavourable costs", type: "outcome", prob: 0.12, payoff: 2600 },
+            { name: "S3 moderate demand, favourable costs", type: "outcome", prob: 0.27, payoff: 3000 },
+            { name: "S4 moderate demand, unfavourable costs", type: "outcome", prob: 0.18, payoff: 1100 },
+            { name: "S5 weak demand, favourable costs", type: "outcome", prob: 0.15, payoff: 1700 },
+            { name: "S6 weak demand, unfavourable costs", type: "outcome", prob: 0.10, payoff: -200 }
+          ]
+        },
+        {
+          name: "Decision C",
+          type: "strategy",
+          subtitle: "Volume revenue + stable costs",
+          children: [
+            { name: "S1 high demand, favourable costs", type: "outcome", prob: 0.18, payoff: 3500 },
+            { name: "S2 high demand, unfavourable costs", type: "outcome", prob: 0.12, payoff: 2900 },
+            { name: "S3 moderate demand, favourable costs", type: "outcome", prob: 0.27, payoff: 2300 },
+            { name: "S4 moderate demand, unfavourable costs", type: "outcome", prob: 0.18, payoff: 1700 },
+            { name: "S5 weak demand, favourable costs", type: "outcome", prob: 0.15, payoff: 1800 },
+            { name: "S6 weak demand, unfavourable costs", type: "outcome", prob: 0.10, payoff: 1200 }
+          ]
+        },
+        {
+          name: "Decision D",
+          type: "strategy",
+          subtitle: "Volume revenue + flexible costs",
+          children: [
+            { name: "S1 high demand, favourable costs", type: "outcome", prob: 0.18, payoff: 4000 },
+            { name: "S2 high demand, unfavourable costs", type: "outcome", prob: 0.12, payoff: 2100 },
+            { name: "S3 moderate demand, favourable costs", type: "outcome", prob: 0.27, payoff: 2800 },
+            { name: "S4 moderate demand, unfavourable costs", type: "outcome", prob: 0.18, payoff: 900 },
+            { name: "S5 weak demand, favourable costs", type: "outcome", prob: 0.15, payoff: 2300 },
+            { name: "S6 weak demand, unfavourable costs", type: "outcome", prob: 0.10, payoff: 400 }
+          ]
+        }
+      ]
+    }
+  }
+];

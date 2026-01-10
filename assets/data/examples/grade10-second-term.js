@@ -1,0 +1,50 @@
+window.exampleTocGroups = {
+  formulas: [
+    { href: "#formula-random-variables-intro", label: "Random variables and notation" },
+    { href: "#formula-expected-value", label: "Expected value of a discrete random variable" },
+    { href: "#formula-variance", label: "Variance of a discrete random variable" },
+    { href: "#formula-emv", label: "Expected monetary value (EMV)" },
+    { href: "#formula-maximin", label: "Maximin criterion" },
+    { href: "#formula-maximax", label: "Maximax criterion" },
+    { href: "#formula-minimax-regret", label: "Maximum opportunity criterion (minimax regret)" }
+  ],
+  "example-1": [
+    { href: "#example-1-problem", label: "Problem description" },
+    { href: "#example-1-c2", label: "(C2) Interpreting the parts of the decision problem" },
+    { href: "#example-1-c3", label: "(C3) Building the payoff table from the description" },
+    { href: "#example-1-c4", label: "(C4) Maximax rule decision making without probabilities" },
+    { href: "#example-1-c5", label: "(C5) Maximin rule decision making without probabilities" },
+    { href: "#example-1-c6", label: "(C6) Maximum opportunity criterion minimax regret" },
+    { href: "#example-1-c7", label: "(C7) Using probabilities and expected value Bayes decision rule" },
+    { href: "#example-1-c8", label: "(C8) Comparing Bayes, Maximin, Maximax and minimax regret" },
+    { href: "#example-1-c9", label: "(C9) Tree diagram of the decision-making problem" },
+    { href: "#example-1-c10", label: "(C10) Evaluating all possibilities in the decision problem" },
+    { href: "#example-1-c1", label: "(C1) Formulating the final decision and summarising all criteria" }
+  ],
+  "example-2": [
+    { href: "#example-2-problem", label: "Problem description" },
+    { href: "#example-2-c2", label: "(C2) Interpreting the parts of the decision problem" },
+    { href: "#example-2-c3", label: "(C3) Building the payoff table from revenue and expense information" },
+    { href: "#example-2-c4", label: "(C4) Maximax rule for decision making without probabilities" },
+    { href: "#example-2-c5", label: "(C5) Maximin rule for decision making without probabilities" },
+    { href: "#example-2-c6", label: "(C6) Maximum opportunity criterion (minimax regret)" },
+    { href: "#example-2-c7", label: "(C7) Using probabilities and expected value (Bayes decision rule)" },
+    { href: "#example-2-c8", label: "(C8) Comparing Bayes, Maximin, Maximax and minimax regret" },
+    { href: "#example-2-c9", label: "(C9) Tree diagram of the decision-making problem" },
+    { href: "#example-2-c10", label: "(C10) Evaluating all possibilities in the decision problem" },
+    { href: "#example-2-c1", label: "(C1) Formulating the final decision and summarising all criteria" }
+  ],
+  "example-3": [
+    { href: "#example-3-problem", label: "Problem description" },
+    { href: "#example-3-c2", label: "(C2) Interpreting the parts of the decision problem" },
+    { href: "#example-3-c3", label: "(C3) Building the payoff table from the revenue and expense information" },
+    { href: "#example-3-c4", label: "(C4) Maximax rule for decision making without probabilities" },
+    { href: "#example-3-c5", label: "(C5) Maximin rule for decision making without probabilities" },
+    { href: "#example-3-c6", label: "(C6) Maximum opportunity criterion (minimax regret)" },
+    { href: "#example-3-c7", label: "(C7) Using probabilities and expected value (Bayes decision rule)" },
+    { href: "#example-3-c8", label: "(C8) Comparing Bayes, Maximin, Maximax and minimax regret" },
+    { href: "#example-3-c9", label: "(C9) Tree diagram of the decision-making problem" },
+    { href: "#example-3-c10", label: "(C10) Evaluating all possibilities in the decision problem" },
+    { href: "#example-3-c1", label: "(C1) Formulating the final decision and summarising all criteria" }
+  ]
+};
