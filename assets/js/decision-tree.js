@@ -378,11 +378,6 @@
   }
 
   async function initDecisionTrees() {
-    if (Array.isArray(window.decisionTreeData)) {
-      window.decisionTreeData.forEach(createDecisionTree);
-      return;
-    }
-
     const src = document.body?.dataset?.decisionTreeSrc;
     if (!src) return;
 

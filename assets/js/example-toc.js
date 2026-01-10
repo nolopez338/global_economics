@@ -15,15 +15,6 @@
   }
 
   async function initExampleTocs() {
-    const inlineGroups = window.exampleTocGroups;
-    if (inlineGroups) {
-      document.querySelectorAll("[data-example-toc]").forEach((listElement) => {
-        const key = listElement.getAttribute("data-example-toc");
-        buildList(listElement, inlineGroups[key]);
-      });
-      return;
-    }
-
     const src = document.body?.dataset?.exampleTocSrc;
     if (!src) return;
 
