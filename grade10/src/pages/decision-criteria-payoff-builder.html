@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Decision Criteria Payoff Builder</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f7fb;
+      --card: #ffffff;
+      --text: #1b1b1f;
+      --muted: #5c5c6f;
+      --accent: #2a6df4;
+      --accent-soft: #dbe6ff;
+      --danger: #c62828;
+      --border: #d9d9e3;
+      --shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 32px auto 48px;
+      padding: 0 20px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      margin-top: 32px;
+      margin-bottom: 12px;
+      font-size: 1.4rem;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button.secondary {
+      background: #e6e8f2;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    button.danger {
+      background: #fbe9e7;
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      width: 100%;
+      font-size: 0.95rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    th,
+    td {
+      border: 1px solid var(--border);
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background: #f1f3ff;
+      font-weight: 600;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    .validation {
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    .helper {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .results-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .decision-label {
+      background: var(--accent-soft);
+      color: #1f3c9b;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .highlight {
+      background: #e8f0ff;
+      border-color: var(--accent);
+    }
+
+    .criterion-header {
+      text-align: left;
+      background: #fafbff;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Decision Criteria Payoff Builder</h1>
+    <p>
+      Build payoff tables for value and cost, then compute Maximax, Maximin,
+      Minimax Regret, and Bayes Decision Rule (Expected Value).
+    </p>
+
+    <section class="card">
+      <h2>1. Define decision alternatives</h2>
+      <div class="stack" id="alternatives-container"></div>
+      <button type="button" id="add-alternative">Add alternative</button>
+    </section>
+
+    <section class="card">
+      <h2>2. Define states of nature and probabilities</h2>
+      <div class="stack" id="states-container"></div>
+      <button type="button" id="add-state">Add state</button>
+      <p class="helper">Probabilities must be between 0 and 1 and sum to 1.</p>
+      <p class="validation" id="probability-error" aria-live="polite"></p>
+    </section>
+
+    <section class="card">
+      <h2>3. Enter payoff tables</h2>
+      <div class="toggle-row">
+        <button type="button" class="secondary" id="toggle-cost">Hide cost table</button>
+        <span class="helper" id="cost-status">Cost table is visible.</span>
+      </div>
+      <div class="stack">
+        <div>
+          <h3>Value payoff table</h3>
+          <div class="table-wrapper" id="value-table"></div>
+        </div>
+        <div id="cost-section">
+          <h3>Cost payoff table</h3>
+          <div class="table-wrapper" id="cost-table"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>4. Results</h2>
+      <button type="button" id="calculate">Calculate</button>
+      <div class="results-row" id="decision-labels"></div>
+      <div class="table-wrapper" id="results-table"></div>
+    </section>
+  </main>
+
+  <script>
+    const alternativesContainer = document.getElementById("alternatives-container");
+    const statesContainer = document.getElementById("states-container");
+    const addAlternativeButton = document.getElementById("add-alternative");
+    const addStateButton = document.getElementById("add-state");
+    const valueTableWrapper = document.getElementById("value-table");
+    const costTableWrapper = document.getElementById("cost-table");
+    const costSection = document.getElementById("cost-section");
+    const toggleCostButton = document.getElementById("toggle-cost");
+    const costStatus = document.getElementById("cost-status");
+    const probabilityError = document.getElementById("probability-error");
+    const calculateButton = document.getElementById("calculate");
+    const resultsTableWrapper = document.getElementById("results-table");
+    const decisionLabels = document.getElementById("decision-labels");
+
+    let showCostTable = true;
+
+    const createRowInput = (labelText, type = "text", value = "") => {
+      const row = document.createElement("div");
+      row.style.display = "grid";
+      row.style.gridTemplateColumns = "1fr 1fr auto";
+      row.style.gap = "8px";
+      row.style.alignItems = "center";
+
+      const label = document.createElement("input");
+      label.type = "text";
+      label.value = labelText;
+      label.placeholder = "Label";
+
+      const input = document.createElement("input");
+      input.type = type;
+      input.value = value;
+      if (type === "number") {
+        input.step = "0.01";
+      }
+
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.textContent = "Remove";
+      remove.className = "danger";
+      remove.addEventListener("click", () => {
+        row.remove();
+        refreshTables();
+      });
+
+      row.append(label, input, remove);
+      return { row, label, input };
+    };
+
+    const addAlternative = (name = "") => {
+      const count = alternativesContainer.children.length + 1;
+      const defaultName = name || `A${count}`;
+      const { row, label } = createRowInput(defaultName, "text");
+      label.addEventListener("input", refreshTables);
+      alternativesContainer.appendChild(row);
+      refreshTables();
+    };
+
+    const addState = (name = "", probability = "") => {
+      const count = statesContainer.children.length + 1;
+      const defaultName = name || `S${count}`;
+      const { row, label, input } = createRowInput(defaultName, "number", probability);
+      input.placeholder = "Probability";
+      input.min = "0";
+      input.max = "1";
+      input.addEventListener("input", () => {
+        validateProbabilities();
+        refreshTables();
+      });
+      label.addEventListener("input", refreshTables);
+      statesContainer.appendChild(row);
+      refreshTables();
+    };
+
+    const getAlternatives = () => {
+      return Array.from(alternativesContainer.querySelectorAll("input[type='text']"))
+        .map((input) => input.value.trim())
+        .filter((value, index, self) => value && self.indexOf(value) === index);
+    };
+
+    const getStates = () => {
+      const stateRows = Array.from(statesContainer.children);
+      return stateRows
+        .map((row) => {
+          const [labelInput, probabilityInput] = row.querySelectorAll("input");
+          return {
+            name: labelInput.value.trim(),
+            probability: parseFloat(probabilityInput.value),
+          };
+        })
+        .filter((state) => state.name);
+    };
+
+    const validateProbabilities = () => {
+      const states = getStates();
+      if (!states.length) {
+        probabilityError.textContent = "";
+        calculateButton.disabled = true;
+        return false;
+      }
+
+      let sum = 0;
+      for (const state of states) {
+        if (Number.isNaN(state.probability)) {
+          probabilityError.textContent = "Each state needs a probability.";
+          calculateButton.disabled = true;
+          return false;
+        }
+        if (state.probability < 0 || state.probability > 1) {
+          probabilityError.textContent = "Probabilities must be between 0 and 1.";
+          calculateButton.disabled = true;
+          return false;
+        }
+        sum += state.probability;
+      }
+
+      if (Math.abs(sum - 1) > 0.001) {
+        probabilityError.textContent = `Probabilities sum to ${sum.toFixed(3)}. They must total 1.`;
+        calculateButton.disabled = true;
+        return false;
+      }
+
+      probabilityError.textContent = "";
+      calculateButton.disabled = false;
+      return true;
+    };
+
+    const refreshTables = () => {
+      const alternatives = getAlternatives();
+      const states = getStates();
+
+      const buildTable = (tableId, existingTable) => {
+        const table = document.createElement("table");
+        table.id = tableId;
+
+        const thead = document.createElement("thead");
+        const headerRow = document.createElement("tr");
+        const blank = document.createElement("th");
+        blank.textContent = "State / Alternative";
+        headerRow.appendChild(blank);
+        for (const alt of alternatives) {
+          const th = document.createElement("th");
+          th.textContent = alt;
+          headerRow.appendChild(th);
+        }
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+        for (let i = 0; i < states.length; i += 1) {
+          const row = document.createElement("tr");
+          const stateCell = document.createElement("th");
+          stateCell.textContent = states[i].name;
+          row.appendChild(stateCell);
+
+          for (let j = 0; j < alternatives.length; j += 1) {
+            const cell = document.createElement("td");
+            const input = document.createElement("input");
+            input.type = "number";
+            input.step = "0.01";
+            input.value = existingTable?.[i]?.[j] ?? "0";
+            cell.appendChild(input);
+            row.appendChild(cell);
+          }
+          tbody.appendChild(row);
+        }
+        table.appendChild(tbody);
+        return table;
+      };
+
+      const readTableValues = (wrapper) => {
+        const table = wrapper.querySelector("table");
+        if (!table) {
+          return [];
+        }
+        const rows = Array.from(table.querySelectorAll("tbody tr"));
+        return rows.map((row) =>
+          Array.from(row.querySelectorAll("input"))
+            .map((input) => input.value)
+        );
+      };
+
+      const valueExisting = readTableValues(valueTableWrapper);
+      const costExisting = readTableValues(costTableWrapper);
+
+      valueTableWrapper.innerHTML = "";
+      costTableWrapper.innerHTML = "";
+
+      if (alternatives.length && states.length) {
+        valueTableWrapper.appendChild(buildTable("value-payoff", valueExisting));
+        costTableWrapper.appendChild(buildTable("cost-payoff", costExisting));
+      }
+
+      validateProbabilities();
+    };
+
+    const getTableNumbers = (wrapper) => {
+      const table = wrapper.querySelector("table");
+      if (!table) return [];
+      return Array.from(table.querySelectorAll("tbody tr")).map((row) =>
+        Array.from(row.querySelectorAll("input")).map((input) => parseFloat(input.value) || 0)
+      );
+    };
+
+    const calculateCriteria = () => {
+      if (!validateProbabilities()) {
+        return;
+      }
+
+      const alternatives = getAlternatives();
+      const states = getStates();
+      if (!alternatives.length || !states.length) {
+        return;
+      }
+
+      const values = getTableNumbers(valueTableWrapper);
+      const costs = showCostTable ? getTableNumbers(costTableWrapper) : values.map((row) => row.map(() => 0));
+
+      const netPayoffs = values.map((row, i) =>
+        row.map((value, j) => value - (costs[i]?.[j] ?? 0))
+      );
+
+      const maximax = alternatives.map((_, j) => Math.max(...netPayoffs.map((row) => row[j])));
+      const maximin = alternatives.map((_, j) => Math.min(...netPayoffs.map((row) => row[j])));
+
+      const bestByState = netPayoffs.map((row) => Math.max(...row));
+      const regrets = netPayoffs.map((row, i) => row.map((value) => bestByState[i] - value));
+      const minimaxRegret = alternatives.map((_, j) => Math.max(...regrets.map((row) => row[j])));
+
+      const emv = alternatives.map((_, j) =>
+        netPayoffs.reduce((sum, row, i) => sum + states[i].probability * row[j], 0)
+      );
+
+      const criteria = [
+        { name: "Maximax", values: maximax, best: Math.max(...maximax), type: "max" },
+        { name: "Maximin", values: maximin, best: Math.max(...maximin), type: "max" },
+        { name: "Minimax Regret", values: minimaxRegret, best: Math.min(...minimaxRegret), type: "min" },
+        { name: "Bayes EMV", values: emv, best: Math.max(...emv), type: "max" },
+      ];
+
+      renderResults(criteria, alternatives);
+    };
+
+    const renderResults = (criteria, alternatives) => {
+      resultsTableWrapper.innerHTML = "";
+      decisionLabels.innerHTML = "";
+
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      const headerRow = document.createElement("tr");
+      const headerCell = document.createElement("th");
+      headerCell.textContent = "Criterion";
+      headerRow.appendChild(headerCell);
+      alternatives.forEach((alt) => {
+        const th = document.createElement("th");
+        th.textContent = alt;
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+
+      criteria.forEach((criterion) => {
+        const row = document.createElement("tr");
+        const label = document.createElement("th");
+        label.textContent = criterion.name;
+        label.className = "criterion-header";
+        row.appendChild(label);
+
+        const bestValues = criterion.values
+          .map((value, index) => ({ value, index }))
+          .filter((item) => Math.abs(item.value - criterion.best) < 1e-6)
+          .map((item) => item.index);
+
+        criterion.values.forEach((value, index) => {
+          const cell = document.createElement("td");
+          cell.textContent = Number.isFinite(value) ? value.toFixed(2) : "-";
+          if (bestValues.includes(index)) {
+            cell.classList.add("highlight");
+          }
+          row.appendChild(cell);
+        });
+
+        tbody.appendChild(row);
+
+        const decision = document.createElement("div");
+        decision.className = "decision-label";
+        const selected = bestValues.map((index) => alternatives[index]);
+        decision.textContent = `${criterion.name} decision: ${selected.length > 1 ? "Tie" : selected[0]}${selected.length > 1 ? ` (Tie: ${selected.join(", ")})` : ""}`;
+        decisionLabels.appendChild(decision);
+      });
+
+      table.appendChild(tbody);
+      resultsTableWrapper.appendChild(table);
+    };
+
+    toggleCostButton.addEventListener("click", () => {
+      showCostTable = !showCostTable;
+      costSection.style.display = showCostTable ? "block" : "none";
+      toggleCostButton.textContent = showCostTable ? "Hide cost table" : "Show cost table";
+      costStatus.textContent = showCostTable ? "Cost table is visible." : "Cost table is hidden (costs assumed zero).";
+    });
+
+    addAlternativeButton.addEventListener("click", () => addAlternative());
+    addStateButton.addEventListener("click", () => addState());
+    calculateButton.addEventListener("click", calculateCriteria);
+
+    addAlternative("A");
+    addAlternative("B");
+    addState("S1", "0.5");
+    addState("S2", "0.5");
+
+    refreshTables();
+  </script>
+</body>
+</html>
