@@ -23,6 +23,54 @@
       justify-content: center;
       width: 1.5rem;
     }
+
+    .weekday-button {
+      display: block;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .weekday-button:focus-visible {
+      outline: 2px solid var(--muted);
+      outline-offset: 2px;
+    }
+
+    .weekday-menu {
+      position: fixed;
+      z-index: 10;
+      min-width: 160px;
+      padding: 6px;
+      border: 1px solid var(--grid);
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.18);
+    }
+
+    .weekday-menu[hidden] {
+      display: none;
+    }
+
+    .weekday-menu button {
+      width: 100%;
+      padding: 6px 8px;
+      border: 0;
+      background: transparent;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+      color: inherit;
+    }
+
+    .weekday-menu button:focus-visible {
+      outline: 2px solid var(--muted);
+      outline-offset: 2px;
+    }
   </style>
 </head>
 
@@ -72,6 +120,34 @@
     <section class="table-wrap" aria-label="Weekly schedule table">
       <table>
         <thead>
+          <tr id="weekday-header">
+            <th scope="col" aria-hidden="true"></th>
+            <th scope="col">
+              <button class="weekday-button" type="button" data-column="0" aria-controls="weekday-menu" aria-expanded="false">
+                Monday
+              </button>
+            </th>
+            <th scope="col">
+              <button class="weekday-button" type="button" data-column="1" aria-controls="weekday-menu" aria-expanded="false">
+                Tuesday
+              </button>
+            </th>
+            <th scope="col">
+              <button class="weekday-button" type="button" data-column="2" aria-controls="weekday-menu" aria-expanded="false">
+                Wednesday
+              </button>
+            </th>
+            <th scope="col">
+              <button class="weekday-button" type="button" data-column="3" aria-controls="weekday-menu" aria-expanded="false">
+                Thursday
+              </button>
+            </th>
+            <th scope="col">
+              <button class="weekday-button" type="button" data-column="4" aria-controls="weekday-menu" aria-expanded="false">
+                Friday
+              </button>
+            </th>
+          </tr>
           <tr>
             <th scope="col">Time</th>
             <th scope="col">Day 1</th>
@@ -265,6 +341,13 @@
       </table>
     </section>
   </main>
+  <div class="weekday-menu" id="weekday-menu" role="menu" aria-hidden="true" hidden>
+    <button type="button" role="menuitem" data-weekday="Monday">Monday</button>
+    <button type="button" role="menuitem" data-weekday="Tuesday">Tuesday</button>
+    <button type="button" role="menuitem" data-weekday="Wednesday">Wednesday</button>
+    <button type="button" role="menuitem" data-weekday="Thursday">Thursday</button>
+    <button type="button" role="menuitem" data-weekday="Friday">Friday</button>
+  </div>
   <script>
     const toggle = document.querySelector(".collapsible-toggle");
     const panel = document.getElementById("class-pages-panel");
@@ -277,6 +360,149 @@
         panel.hidden = isExpanded;
         icon.textContent = isExpanded ? "+" : "−";
       });
+    }
+
+    const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    const storageKey = "scheduleDay1Weekday";
+    const weekdayHeader = document.getElementById("weekday-header");
+    const weekdayButtons = Array.from(document.querySelectorAll(".weekday-button"));
+    const weekdayMenu = document.getElementById("weekday-menu");
+    const weekdayMenuItems = weekdayMenu ? Array.from(weekdayMenu.querySelectorAll("button[data-weekday]")) : [];
+    let lastTrigger = null;
+
+    const setExpandedState = (isExpanded) => {
+      weekdayButtons.forEach((button) => {
+        button.setAttribute("aria-expanded", String(isExpanded));
+      });
+    };
+
+    const updateWeekdayLabels = (day1Label) => {
+      const offset = Math.max(0, weekdays.indexOf(day1Label));
+      weekdayButtons.forEach((button, index) => {
+        const label = weekdays[(offset + index) % weekdays.length];
+        button.textContent = label;
+      });
+    };
+
+    const storeWeekday = (day1Label) => {
+      try {
+        localStorage.setItem(storageKey, day1Label);
+      } catch (error) {
+        console.error("Unable to store weekday selection.", error);
+      }
+    };
+
+    const getStoredWeekday = () => {
+      try {
+        return localStorage.getItem(storageKey);
+      } catch (error) {
+        console.error("Unable to read weekday selection.", error);
+        return null;
+      }
+    };
+
+    const applyWeekdaySelection = (day1Label) => {
+      if (!weekdays.includes(day1Label)) {
+        return;
+      }
+      updateWeekdayLabels(day1Label);
+      storeWeekday(day1Label);
+    };
+
+    const positionMenu = () => {
+      if (!weekdayMenu || !weekdayHeader) {
+        return;
+      }
+      const rect = weekdayHeader.getBoundingClientRect();
+      const top = rect.bottom + 4;
+      const left = rect.left;
+      weekdayMenu.style.top = `${top}px`;
+      weekdayMenu.style.left = `${left}px`;
+    };
+
+    const openMenu = (trigger) => {
+      if (!weekdayMenu) {
+        return;
+      }
+      lastTrigger = trigger || document.activeElement;
+      positionMenu();
+      weekdayMenu.hidden = false;
+      weekdayMenu.setAttribute("aria-hidden", "false");
+      setExpandedState(true);
+      const firstItem = weekdayMenuItems[0];
+      if (firstItem) {
+        firstItem.focus();
+      }
+    };
+
+    const closeMenu = () => {
+      if (!weekdayMenu) {
+        return;
+      }
+      weekdayMenu.hidden = true;
+      weekdayMenu.setAttribute("aria-hidden", "true");
+      setExpandedState(false);
+      if (lastTrigger && typeof lastTrigger.focus === "function") {
+        lastTrigger.focus();
+      }
+    };
+
+    if (weekdayHeader && weekdayMenu) {
+      weekdayHeader.addEventListener("click", (event) => {
+        const targetButton = event.target.closest(".weekday-button");
+        if (targetButton) {
+          openMenu(targetButton);
+          return;
+        }
+        openMenu(weekdayButtons[0]);
+      });
+
+      weekdayButtons.forEach((button) => {
+        button.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") {
+            closeMenu();
+          }
+        });
+      });
+
+      weekdayMenuItems.forEach((item) => {
+        item.addEventListener("click", () => {
+          const selection = item.getAttribute("data-weekday");
+          if (selection) {
+            applyWeekdaySelection(selection);
+          }
+          closeMenu();
+        });
+      });
+
+      weekdayMenu.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          closeMenu();
+        }
+      });
+
+      document.addEventListener("click", (event) => {
+        if (!weekdayMenu.hidden) {
+          const target = event.target;
+          if (!weekdayMenu.contains(target) && !weekdayHeader.contains(target)) {
+            closeMenu();
+          }
+        }
+      });
+
+      window.addEventListener("resize", () => {
+        if (!weekdayMenu.hidden) {
+          positionMenu();
+        }
+      });
+    }
+
+    const initialWeekday = getStoredWeekday();
+    if (initialWeekday && weekdays.includes(initialWeekday)) {
+      updateWeekdayLabels(initialWeekday);
+    } else {
+      updateWeekdayLabels(weekdays[0]);
     }
   </script>
 </body>
