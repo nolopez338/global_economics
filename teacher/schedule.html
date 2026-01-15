@@ -71,6 +71,61 @@
       outline: 2px solid var(--muted);
       outline-offset: 2px;
     }
+
+    .view-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 0 0 1rem;
+    }
+
+    .view-toggle button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid var(--grid);
+      border-radius: 999px;
+      background: #ffffff;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .view-toggle button[aria-checked="true"] {
+      background: var(--cool-1, #e2f4ff);
+    }
+
+    .view-toggle button:focus-visible {
+      outline: 2px solid var(--muted);
+      outline-offset: 2px;
+    }
+
+    .view-toggle-indicator {
+      display: inline-flex;
+      width: 2rem;
+      height: 1rem;
+      border-radius: 999px;
+      background: var(--grid);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .view-toggle-indicator::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 0.75rem;
+      height: 0.75rem;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.2);
+      transition: transform 0.2s ease;
+    }
+
+    .view-toggle button[aria-checked="true"] .view-toggle-indicator::after {
+      transform: translateX(1rem);
+    }
   </style>
 </head>
 
@@ -118,6 +173,13 @@
     </section>
 
     <section class="table-wrap" aria-label="Weekly schedule table">
+      <div class="view-toggle">
+        <span id="weekday-view-label">Weekday view</span>
+        <button id="weekday-view-toggle" type="button" role="switch" aria-checked="false" aria-labelledby="weekday-view-label">
+          <span class="view-toggle-indicator" aria-hidden="true"></span>
+          <span class="view-toggle-text" aria-hidden="true">Off</span>
+        </button>
+      </div>
       <table>
         <thead>
           <tr id="weekday-header">
@@ -364,11 +426,15 @@
 
     const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
     const storageKey = "scheduleDay1Weekday";
+    const weekdayViewKey = "scheduleWeekdayView";
     const weekdayHeader = document.getElementById("weekday-header");
     const weekdayButtons = Array.from(document.querySelectorAll(".weekday-button"));
     const weekdayMenu = document.getElementById("weekday-menu");
     const weekdayMenuItems = weekdayMenu ? Array.from(weekdayMenu.querySelectorAll("button[data-weekday]")) : [];
+    const weekdayViewToggle = document.getElementById("weekday-view-toggle");
+    const weekdayViewIndicator = weekdayViewToggle?.querySelector(".view-toggle-text");
     let lastTrigger = null;
+    let isWeekdayView = false;
 
     const setExpandedState = (isExpanded) => {
       weekdayButtons.forEach((button) => {
@@ -407,6 +473,9 @@
       }
       updateWeekdayLabels(day1Label);
       storeWeekday(day1Label);
+      if (isWeekdayView) {
+        applyColumnOrder("weekday");
+      }
     };
 
     const positionMenu = () => {
@@ -503,6 +572,113 @@
       updateWeekdayLabels(initialWeekday);
     } else {
       updateWeekdayLabels(weekdays[0]);
+    }
+
+    const scheduleTable = document.querySelector(".table-wrap table");
+
+    const ensureDayColumnAttributes = () => {
+      if (!scheduleTable) {
+        return;
+      }
+      const rows = scheduleTable.querySelectorAll("tr");
+      rows.forEach((row) => {
+        const cells = Array.from(row.children);
+        cells.slice(1).forEach((cell, index) => {
+          if (!cell.hasAttribute("data-day-column")) {
+            cell.setAttribute("data-day-column", String(index));
+          }
+        });
+      });
+    };
+
+    const getWeekdayOrder = () => {
+      const orderMap = new Map();
+      weekdayButtons.forEach((button, index) => {
+        const label = button.textContent?.trim();
+        if (label) {
+          orderMap.set(label, index);
+        }
+      });
+      const ordered = weekdays.map((label) => orderMap.get(label));
+      if (ordered.some((value) => typeof value !== "number")) {
+        return [0, 1, 2, 3, 4];
+      }
+      return ordered;
+    };
+
+    const reorderRow = (row, order) => {
+      const cells = Array.from(row.children);
+      const timeCell = cells[0];
+      if (!timeCell) {
+        return;
+      }
+      const dayCells = cells.slice(1);
+      const cellMap = new Map();
+      dayCells.forEach((cell) => {
+        const index = Number(cell.getAttribute("data-day-column"));
+        if (!Number.isNaN(index)) {
+          cellMap.set(index, cell);
+        }
+      });
+      const fragment = document.createDocumentFragment();
+      fragment.appendChild(timeCell);
+      order.forEach((index) => {
+        const cell = cellMap.get(index);
+        if (cell) {
+          fragment.appendChild(cell);
+        }
+      });
+      row.appendChild(fragment);
+    };
+
+    const applyColumnOrder = (mode) => {
+      if (!scheduleTable) {
+        return;
+      }
+      const order = mode === "weekday" ? getWeekdayOrder() : [0, 1, 2, 3, 4];
+      const rows = scheduleTable.querySelectorAll("tr");
+      rows.forEach((row) => reorderRow(row, order));
+    };
+
+    const setToggleState = (enabled) => {
+      if (!weekdayViewToggle || !weekdayViewIndicator) {
+        return;
+      }
+      isWeekdayView = enabled;
+      weekdayViewToggle.setAttribute("aria-checked", String(enabled));
+      weekdayViewIndicator.textContent = enabled ? "On" : "Off";
+      applyColumnOrder(enabled ? "weekday" : "day");
+      try {
+        localStorage.setItem(weekdayViewKey, String(enabled));
+      } catch (error) {
+        console.error("Unable to store weekday view selection.", error);
+      }
+    };
+
+    const getStoredView = () => {
+      try {
+        return localStorage.getItem(weekdayViewKey);
+      } catch (error) {
+        console.error("Unable to read weekday view selection.", error);
+        return null;
+      }
+    };
+
+    ensureDayColumnAttributes();
+    const storedView = getStoredView();
+    setToggleState(storedView === "true");
+
+    if (weekdayViewToggle) {
+      weekdayViewToggle.addEventListener("click", () => {
+        setToggleState(!isWeekdayView);
+      });
+
+      weekdayViewToggle.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          setToggleState(!isWeekdayView);
+        }
+      });
     }
   </script>
 </body>
