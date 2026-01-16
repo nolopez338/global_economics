@@ -811,6 +811,61 @@
       return `rgba(${blend(parsed.r)}, ${blend(parsed.g)}, ${blend(parsed.b)}, ${parsed.a})`;
     }
 
+    const specialRowTimeMap = new Map([
+      ["09:35 - 10:05", "activity"],
+      ["12:50 - 13:50", "activity"],
+      ["14:45 - 15:00", "pause"],
+    ]);
+
+    function getSpecialRowType(row) {
+      if (!row) {
+        return null;
+      }
+      if (row.classList.contains("row-activity")) {
+        return "activity";
+      }
+      if (row.classList.contains("row-pause")) {
+        return "pause";
+      }
+      const timeCell = row.querySelector("th[scope='row']");
+      const label = timeCell?.textContent?.trim();
+      return label ? specialRowTimeMap.get(label) ?? null : null;
+    }
+
+    function resolveRowBackgroundColor(row, cell) {
+      const cellBackground = getComputedStyle(cell).backgroundColor;
+      if (cellBackground && cellBackground !== "rgba(0, 0, 0, 0)" && cellBackground !== "transparent") {
+        return cellBackground;
+      }
+      const rowBackground = getComputedStyle(row).backgroundColor;
+      if (rowBackground && rowBackground !== "rgba(0, 0, 0, 0)" && rowBackground !== "transparent") {
+        return rowBackground;
+      }
+      return null;
+    }
+
+    function resolveSpecialRowHighlight(row, cell) {
+      const type = getSpecialRowType(row);
+      if (!type) {
+        return null;
+      }
+      const rowColor = resolveRowBackgroundColor(row, cell);
+      return rowColor ? lightenColor(rowColor, 0.35) : null;
+    }
+
+    function getDayCellForRow(row, columnIndex) {
+      if (!row) {
+        return null;
+      }
+      const byAttribute = row.querySelector(`[data-day-column="${columnIndex}"]`);
+      if (byAttribute) {
+        return byAttribute;
+      }
+      const cells = Array.from(row.children);
+      const dayCellIndex = columnIndex + 1;
+      return cells[dayCellIndex] ?? null;
+    }
+
     function resolveTodayHighlightBaseColor() {
       if (scheduleWrap) {
         const base = getComputedStyle(scheduleWrap).getPropertyValue("--today-highlight-base").trim();
@@ -873,19 +928,41 @@
       if (!fillColor) {
         return;
       }
-      scheduleTable
-        .querySelectorAll(`[data-day-column="${columnIndex}"]`)
-        .forEach((cell) => {
-          if (!originalBackgrounds.has(cell)) {
-            originalBackgrounds.set(cell, {
-              background: cell.style.background,
-              backgroundColor: cell.style.backgroundColor,
-            });
-          }
-          cell.style.backgroundColor = fillColor;
-          cell.style.setProperty("--today-highlight-fill", fillColor);
-          cell.classList.add("today-highlighted");
-        });
+      const headerRows = scheduleTable.querySelectorAll("thead tr");
+      headerRows.forEach((row) => {
+        const cell = getDayCellForRow(row, columnIndex);
+        if (!cell) {
+          return;
+        }
+        if (!originalBackgrounds.has(cell)) {
+          originalBackgrounds.set(cell, {
+            background: cell.style.background,
+            backgroundColor: cell.style.backgroundColor,
+          });
+        }
+        cell.style.backgroundColor = fillColor;
+        cell.style.setProperty("--today-highlight-fill", fillColor);
+        cell.classList.add("today-highlighted");
+      });
+
+      const bodyRows = scheduleTable.querySelectorAll("tbody tr");
+      bodyRows.forEach((row) => {
+        const cell = getDayCellForRow(row, columnIndex);
+        if (!cell) {
+          return;
+        }
+        const specialFill = resolveSpecialRowHighlight(row, cell);
+        const highlightFill = specialFill || fillColor;
+        if (!originalBackgrounds.has(cell)) {
+          originalBackgrounds.set(cell, {
+            background: cell.style.background,
+            backgroundColor: cell.style.backgroundColor,
+          });
+        }
+        cell.style.backgroundColor = highlightFill;
+        cell.style.setProperty("--today-highlight-fill", highlightFill);
+        cell.classList.add("today-highlighted");
+      });
     }
 
     function parseTimeRange(text) {
