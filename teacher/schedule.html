@@ -873,6 +873,11 @@
       if (!fillColor) {
         return;
       }
+      const highlightOverrides = [
+        { start: 9 * 60 + 35, end: 10 * 60 + 5, color: "rgba(187, 247, 208, 0.85)" },
+        { start: 12 * 60 + 50, end: 13 * 60 + 50, color: "rgba(187, 247, 208, 0.85)" },
+        { start: 14 * 60 + 45, end: 15 * 60 + 0, color: "rgba(221, 214, 254, 0.85)" },
+      ];
       scheduleTable
         .querySelectorAll(`[data-day-column="${columnIndex}"]`)
         .forEach((cell) => {
@@ -882,8 +887,15 @@
               backgroundColor: cell.style.backgroundColor,
             });
           }
-          cell.style.backgroundColor = fillColor;
-          cell.style.setProperty("--today-highlight-fill", fillColor);
+          const row = cell.closest("tr");
+          const timeCell = row?.querySelector("th[scope='row']");
+          const range = parseTimeRange(timeCell?.textContent?.trim());
+          const override = range
+            ? highlightOverrides.find((item) => item.start === range.start && item.end === range.end)
+            : null;
+          const cellFill = override ? override.color : fillColor;
+          cell.style.backgroundColor = cellFill;
+          cell.style.setProperty("--today-highlight-fill", cellFill);
           cell.classList.add("today-highlighted");
         });
     }
