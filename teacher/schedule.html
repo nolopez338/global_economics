@@ -130,6 +130,40 @@
     .view-toggle button[aria-checked="true"] .view-toggle-indicator::after {
       transform: translateX(1rem);
     }
+
+    .schedule-table-wrap {
+      position: relative;
+    }
+
+    .today-column {
+      box-shadow: inset 0 0 0 2px rgba(59, 130, 246, 0.35);
+    }
+
+    .current-time-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .current-time-line {
+      position: absolute;
+      height: 2px;
+      background: rgba(239, 68, 68, 0.8);
+      box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.3);
+    }
+
+    .current-time-label {
+      position: absolute;
+      top: -0.85rem;
+      right: 0;
+      padding: 0 0.4rem;
+      font-size: 0.7rem;
+      line-height: 1.2;
+      border-radius: 999px;
+      background: rgba(239, 68, 68, 0.12);
+      color: #991b1b;
+      white-space: nowrap;
+    }
   </style>
 </head>
 
@@ -177,7 +211,8 @@
     </section>
 
     <section class="table-wrap" aria-label="Weekly schedule table">
-      <table>
+      <div class="schedule-table-wrap">
+        <table>
         <thead>
           <tr id="weekday-header">
             <th scope="col" aria-hidden="true"></th>
@@ -397,7 +432,13 @@
             <td class="empty">—</td>
           </tr>
         </tbody>
-      </table>
+        </table>
+        <div class="current-time-overlay" aria-hidden="true" hidden>
+          <div class="current-time-line">
+            <span class="current-time-label"></span>
+          </div>
+        </div>
+      </div>
       <div class="view-toggle">
         <span id="weekday-view-label">Weekday view</span>
         <button id="weekday-view-toggle" type="button" role="switch" aria-checked="false" aria-labelledby="weekday-view-label">
@@ -437,6 +478,11 @@
     const weekdayMenuItems = weekdayMenu ? Array.from(weekdayMenu.querySelectorAll("button[data-weekday]")) : [];
     const weekdayViewToggle = document.getElementById("weekday-view-toggle");
     const weekdayViewIndicator = weekdayViewToggle?.querySelector(".view-toggle-text");
+    const scheduleTable = document.querySelector(".table-wrap table");
+    const scheduleWrap = document.querySelector(".schedule-table-wrap");
+    const currentTimeOverlay = document.querySelector(".current-time-overlay");
+    const currentTimeLine = document.querySelector(".current-time-line");
+    const currentTimeLabel = document.querySelector(".current-time-label");
     let lastTrigger = null;
     let isWeekdayView = false;
 
@@ -480,6 +526,7 @@
       if (isWeekdayView) {
         applyColumnOrder("weekday");
       }
+      updateTodayColumnHighlight();
     };
 
     const positionMenu = () => {
@@ -578,8 +625,6 @@
       updateWeekdayLabels(weekdays[0]);
     }
 
-    const scheduleTable = document.querySelector(".table-wrap table");
-
     const ensureDayColumnAttributes = () => {
       if (!scheduleTable) {
         return;
@@ -652,6 +697,8 @@
       weekdayViewToggle.setAttribute("aria-checked", String(enabled));
       weekdayViewIndicator.textContent = enabled ? "On" : "Off";
       applyColumnOrder(enabled ? "weekday" : "day");
+      updateTodayColumnHighlight();
+      updateCurrentTimeLine();
       try {
         localStorage.setItem(weekdayViewKey, String(enabled));
       } catch (error) {
@@ -684,6 +731,130 @@
         }
       });
     }
+
+    function clearTodayColumnHighlight() {
+      if (!scheduleTable) {
+        return;
+      }
+      scheduleTable.querySelectorAll(".today-column").forEach((cell) => {
+        cell.classList.remove("today-column");
+      });
+    }
+
+    function getTodayWeekdayLabel() {
+      const todayIndex = new Date().getDay();
+      if (todayIndex === 0 || todayIndex === 6) {
+        return null;
+      }
+      return weekdays[todayIndex - 1];
+    }
+
+    function findColumnIndexForWeekday(weekdayLabel) {
+      if (!weekdayLabel) {
+        return null;
+      }
+      if (isWeekdayView) {
+        const matchingButton = weekdayButtons.find(
+          (button) => button.textContent?.trim() === weekdayLabel
+        );
+        if (matchingButton) {
+          const headerCell = matchingButton.closest("[data-day-column]");
+          const columnIndex = headerCell?.getAttribute("data-day-column");
+          return columnIndex ? Number(columnIndex) : null;
+        }
+      }
+      const dayIndex = weekdayButtons.findIndex(
+        (button) => button.textContent?.trim() === weekdayLabel
+      );
+      return dayIndex >= 0 ? dayIndex : null;
+    }
+
+    function updateTodayColumnHighlight() {
+      if (!scheduleTable) {
+        return;
+      }
+      const todayLabel = getTodayWeekdayLabel();
+      const columnIndex = findColumnIndexForWeekday(todayLabel);
+      clearTodayColumnHighlight();
+      if (columnIndex === null || Number.isNaN(columnIndex)) {
+        return;
+      }
+      scheduleTable
+        .querySelectorAll(`[data-day-column="${columnIndex}"]`)
+        .forEach((cell) => {
+          cell.classList.add("today-column");
+        });
+    }
+
+    function parseTimeRange(text) {
+      if (!text) {
+        return null;
+      }
+      const [startText, endText] = text.split("-").map((part) => part.trim());
+      const toMinutes = (value) => {
+        const [hours, minutes] = value.split(":").map(Number);
+        if (Number.isNaN(hours) || Number.isNaN(minutes)) {
+          return null;
+        }
+        return hours * 60 + minutes;
+      };
+      const start = toMinutes(startText);
+      const end = toMinutes(endText);
+      if (start === null || end === null || end <= start) {
+        return null;
+      }
+      return { start, end };
+    }
+
+    function updateCurrentTimeLine() {
+      if (!scheduleTable || !scheduleWrap || !currentTimeOverlay || !currentTimeLine) {
+        return;
+      }
+      const now = new Date();
+      const nowMinutes = now.getHours() * 60 + now.getMinutes();
+      const rows = Array.from(scheduleTable.querySelectorAll("tbody tr"));
+      const matchingRow = rows.find((row) => {
+        const timeCell = row.querySelector("th[scope='row']");
+        const range = parseTimeRange(timeCell?.textContent?.trim());
+        return range ? nowMinutes >= range.start && nowMinutes <= range.end : false;
+      });
+
+      if (!matchingRow) {
+        currentTimeOverlay.hidden = true;
+        return;
+      }
+
+      const timeCell = matchingRow.querySelector("th[scope='row']");
+      const range = parseTimeRange(timeCell?.textContent?.trim());
+      if (!range) {
+        currentTimeOverlay.hidden = true;
+        return;
+      }
+      const fraction = (nowMinutes - range.start) / (range.end - range.start);
+      const wrapRect = scheduleWrap.getBoundingClientRect();
+      const rowRect = matchingRow.getBoundingClientRect();
+      const timeCellRect = timeCell?.getBoundingClientRect();
+      const leftOffset = timeCellRect ? timeCellRect.right - wrapRect.left : 0;
+      const rowTop = rowRect.top - wrapRect.top;
+      const top = rowTop + rowRect.height * fraction;
+      const width = wrapRect.width - leftOffset;
+
+      currentTimeOverlay.hidden = false;
+      currentTimeLine.style.left = `${leftOffset}px`;
+      currentTimeLine.style.width = `${width}px`;
+      currentTimeLine.style.top = `${top}px`;
+      if (currentTimeLabel) {
+        currentTimeLabel.textContent = now.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+    }
+
+    updateTodayColumnHighlight();
+    updateCurrentTimeLine();
+    setInterval(updateCurrentTimeLine, 30000);
+    window.addEventListener("resize", updateCurrentTimeLine);
   </script>
 </body>
 </html>
