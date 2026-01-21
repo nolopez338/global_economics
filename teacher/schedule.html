@@ -170,6 +170,22 @@
       color: #991b1b;
       white-space: nowrap;
     }
+
+    .week-summary {
+      margin-top: 0.35rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      font-size: 0.7rem;
+      line-height: 1.2;
+      color: #1f2937;
+    }
+
+    .week-summary-item {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   </style>
 </head>
 
@@ -456,6 +472,11 @@
           <span class="view-toggle-indicator" aria-hidden="true"></span>
           <span class="view-toggle-text" aria-hidden="true">Off</span>
         </button>
+        <span id="week-summary-label">Week summaries</span>
+        <button id="week-summary-toggle" type="button" role="switch" aria-checked="false" aria-labelledby="week-summary-label">
+          <span class="view-toggle-indicator" aria-hidden="true"></span>
+          <span class="view-toggle-text" aria-hidden="true">Off</span>
+        </button>
       </div>
     </section>
   </main>
@@ -483,6 +504,7 @@
     const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
     const storageKey = "scheduleDay1Weekday";
     const weekdayViewKey = "scheduleWeekdayView";
+    const weekSummaryKey = "scheduleWeekSummaries";
     const weekdayHeader = document.getElementById("weekday-header");
     const weekdayButtons = Array.from(document.querySelectorAll(".weekday-button"));
     const weekdayMenu = document.getElementById("weekday-menu");
@@ -491,6 +513,8 @@
     const weekdayViewIndicator = weekdayViewToggle?.querySelector(".view-toggle-text");
     const plainStyleToggle = document.getElementById("plain-style-toggle");
     const plainStyleIndicator = plainStyleToggle?.querySelector(".view-toggle-text");
+    const weekSummaryToggle = document.getElementById("week-summary-toggle");
+    const weekSummaryIndicator = weekSummaryToggle?.querySelector(".view-toggle-text");
     const scheduleTable = document.querySelector(".table-wrap table");
     const scheduleWrap = document.querySelector(".schedule-table-wrap");
     const currentTimeOverlay = document.querySelector(".current-time-overlay");
@@ -500,6 +524,8 @@
     let lastTrigger = null;
     let isWeekdayView = false;
     let isPlainStyle = false;
+    let isWeekSummaryEnabled = false;
+    let cachedClassEntries = null;
 
     const setExpandedState = (isExpanded) => {
       weekdayButtons.forEach((button) => {
@@ -542,6 +568,7 @@
         applyColumnOrder("weekday");
       }
       updateTodayColumnHighlight();
+      refreshWeekSummaries();
     };
 
     const positionMenu = () => {
@@ -714,6 +741,7 @@
       applyColumnOrder(enabled ? "weekday" : "day");
       updateTodayColumnHighlight();
       updateCurrentTimeLine();
+      refreshWeekSummaries();
       try {
         localStorage.setItem(weekdayViewKey, String(enabled));
       } catch (error) {
@@ -775,6 +803,246 @@
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
           setPlainStyleState(!isPlainStyle);
+        }
+      });
+    }
+
+    const getStoredSummaryPreference = () => {
+      try {
+        return localStorage.getItem(weekSummaryKey);
+      } catch (error) {
+        console.error("Unable to read week summary selection.", error);
+        return null;
+      }
+    };
+
+    const parseISODate = (value) => {
+      if (!value) {
+        return null;
+      }
+      const [year, month, day] = value.split("-").map(Number);
+      if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day)) {
+        return null;
+      }
+      const date = new Date(year, month - 1, day);
+      if (Number.isNaN(date.getTime())) {
+        return null;
+      }
+      date.setHours(0, 0, 0, 0);
+      return date;
+    };
+
+    const getNextWeekRange = () => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const currentDay = today.getDay();
+      const daysToNextMonday = ((8 - currentDay) % 7) || 7;
+      const start = new Date(today);
+      start.setDate(today.getDate() + daysToNextMonday);
+      const end = new Date(start);
+      end.setDate(start.getDate() + 4);
+      end.setHours(23, 59, 59, 999);
+      return { start, end };
+    };
+
+    const getClassPageLinks = () => {
+      const linkElements = Array.from(document.querySelectorAll(".class-grid .class-card"));
+      return linkElements
+        .map((link) => {
+          const href = link.getAttribute("href");
+          const label = link.textContent?.trim();
+          return href && label ? { href, classId: label } : null;
+        })
+        .filter(Boolean);
+    };
+
+    const buildClassEntriesFromDocument = (doc, fallbackClassId) => {
+      const rows = Array.from(doc.querySelectorAll("tr[data-class-id][data-date][data-weekday][data-session]"));
+      return rows
+        .map((row) => {
+          const {
+            classId,
+            date: dateText,
+            weekday,
+            session,
+            title,
+            description,
+          } = row.dataset;
+          const parsedDate = parseISODate(dateText);
+          if (!classId && !fallbackClassId) {
+            return null;
+          }
+          if (!parsedDate || !weekday || !session) {
+            return null;
+          }
+          return {
+            classId: classId || fallbackClassId,
+            date: parsedDate,
+            weekday,
+            session,
+            title,
+            description,
+          };
+        })
+        .filter(Boolean);
+    };
+
+    const loadClassEntries = async () => {
+      if (cachedClassEntries) {
+        return cachedClassEntries;
+      }
+      const classPages = getClassPageLinks();
+      if (classPages.length === 0) {
+        cachedClassEntries = [];
+        return cachedClassEntries;
+      }
+      const entries = [];
+      await Promise.all(
+        classPages.map(async ({ href, classId }) => {
+          try {
+            const response = await fetch(href);
+            if (!response.ok) {
+              console.warn(`Unable to load class page: ${href}`);
+              return;
+            }
+            const html = await response.text();
+            const doc = new DOMParser().parseFromString(html, "text/html");
+            entries.push(...buildClassEntriesFromDocument(doc, classId));
+          } catch (error) {
+            console.error(`Unable to load class page: ${href}`, error);
+          }
+        })
+      );
+      cachedClassEntries = entries;
+      return entries;
+    };
+
+    const clearWeekSummaries = () => {
+      if (!scheduleTable) {
+        return;
+      }
+      scheduleTable.querySelectorAll(".week-summary").forEach((summary) => summary.remove());
+    };
+
+    const getWeekdayLabelForColumn = (columnIndex) => {
+      const headerCell = weekdayHeader?.querySelector(`[data-day-column="${columnIndex}"]`);
+      const button = headerCell?.querySelector(".weekday-button");
+      return button?.textContent?.trim() ?? null;
+    };
+
+    const buildCellIndex = () => {
+      const cellMap = new Map();
+      if (!scheduleTable) {
+        return cellMap;
+      }
+      scheduleTable.querySelectorAll("tbody tr").forEach((row) => {
+        row.querySelectorAll("td").forEach((cell) => {
+          const link = cell.querySelector(".class-link");
+          const label = link?.querySelector(".block")?.textContent?.trim();
+          if (!label) {
+            return;
+          }
+          const [classId, session] = label.split("-").map((part) => part.trim());
+          const columnIndex = Number(cell.getAttribute("data-day-column"));
+          if (!classId || !session || Number.isNaN(columnIndex)) {
+            return;
+          }
+          const key = `${classId}-${session}-${columnIndex}`;
+          cellMap.set(key, { cell });
+        });
+      });
+      return cellMap;
+    };
+
+    const buildSummaryLabel = (entry) => {
+      const title = entry.title || entry.description || "Scheduled activity";
+      return `${entry.classId} \u2013 ${title}`;
+    };
+
+    const renderWeekSummaries = async () => {
+      if (!isWeekSummaryEnabled) {
+        clearWeekSummaries();
+        return;
+      }
+      const entries = await loadClassEntries();
+      if (!scheduleTable) {
+        return;
+      }
+      clearWeekSummaries();
+      const { start, end } = getNextWeekRange();
+      const cellIndex = buildCellIndex();
+      entries.forEach((entry) => {
+        if (entry.date < start || entry.date > end) {
+          return;
+        }
+        const columnIndex = findColumnIndexForWeekday(entry.weekday);
+        if (columnIndex === null || Number.isNaN(columnIndex)) {
+          return;
+        }
+        const key = `${entry.classId}-${entry.session}-${columnIndex}`;
+        const cellData = cellIndex.get(key);
+        if (!cellData) {
+          return;
+        }
+        const summary =
+          cellData.cell.querySelector(".week-summary") || document.createElement("div");
+        if (!summary.classList.contains("week-summary")) {
+          summary.className = "week-summary";
+          summary.setAttribute("role", "list");
+          summary.setAttribute(
+            "aria-label",
+            `Week summary for ${entry.classId} at ${getWeekdayLabelForColumn(columnIndex) ?? "this slot"}`
+          );
+          cellData.cell.append(summary);
+        }
+        const item = document.createElement("div");
+        item.className = "week-summary-item";
+        item.setAttribute("role", "listitem");
+        const label = buildSummaryLabel(entry);
+        item.textContent = label;
+        item.title = entry.description ? `${entry.classId} – ${entry.description}` : label;
+        summary.append(item);
+      });
+    };
+
+    const setWeekSummaryState = async (enabled) => {
+      if (!weekSummaryToggle || !weekSummaryIndicator) {
+        return;
+      }
+      isWeekSummaryEnabled = enabled;
+      weekSummaryToggle.setAttribute("aria-checked", String(enabled));
+      weekSummaryIndicator.textContent = enabled ? "On" : "Off";
+      if (enabled) {
+        await renderWeekSummaries();
+      } else {
+        clearWeekSummaries();
+      }
+      try {
+        localStorage.setItem(weekSummaryKey, String(enabled));
+      } catch (error) {
+        console.error("Unable to store week summary selection.", error);
+      }
+    };
+
+    function refreshWeekSummaries() {
+      if (!isWeekSummaryEnabled) {
+        return;
+      }
+      renderWeekSummaries();
+    }
+
+    const storedSummaryPreference = getStoredSummaryPreference();
+    setWeekSummaryState(storedSummaryPreference === "true");
+
+    if (weekSummaryToggle) {
+      weekSummaryToggle.addEventListener("click", () => {
+        setWeekSummaryState(!isWeekSummaryEnabled);
+      });
+
+      weekSummaryToggle.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          setWeekSummaryState(!isWeekSummaryEnabled);
         }
       });
     }
