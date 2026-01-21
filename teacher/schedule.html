@@ -173,18 +173,9 @@
 
     .week-summary {
       margin-top: 0.35rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.2rem;
-      font-size: 0.7rem;
-      line-height: 1.2;
-      color: #1f2937;
-    }
-
-    .week-summary-item {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 0.75rem;
+      line-height: 1.25;
+      color: var(--muted, #6b7280);
     }
   </style>
 </head>
@@ -832,19 +823,6 @@
       return date;
     };
 
-    const getNextWeekRange = () => {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const currentDay = today.getDay();
-      const daysToNextMonday = ((8 - currentDay) % 7) || 7;
-      const start = new Date(today);
-      start.setDate(today.getDate() + daysToNextMonday);
-      const end = new Date(start);
-      end.setDate(start.getDate() + 4);
-      end.setHours(23, 59, 59, 999);
-      return { start, end };
-    };
-
     const getClassPageLinks = () => {
       const linkElements = Array.from(document.querySelectorAll(".class-grid .class-card"));
       return linkElements
@@ -902,14 +880,13 @@
           try {
             const response = await fetch(href);
             if (!response.ok) {
-              console.warn(`Unable to load class page: ${href}`);
               return;
             }
             const html = await response.text();
             const doc = new DOMParser().parseFromString(html, "text/html");
             entries.push(...buildClassEntriesFromDocument(doc, classId));
           } catch (error) {
-            console.error(`Unable to load class page: ${href}`, error);
+            return;
           }
         })
       );
@@ -924,39 +901,108 @@
       scheduleTable.querySelectorAll(".week-summary").forEach((summary) => summary.remove());
     };
 
-    const getWeekdayLabelForColumn = (columnIndex) => {
-      const headerCell = weekdayHeader?.querySelector(`[data-day-column="${columnIndex}"]`);
-      const button = headerCell?.querySelector(".weekday-button");
-      return button?.textContent?.trim() ?? null;
-    };
-
-    const buildCellIndex = () => {
-      const cellMap = new Map();
-      if (!scheduleTable) {
-        return cellMap;
+    const normalizeDateKey = (date) => {
+      if (!date) {
+        return null;
       }
-      scheduleTable.querySelectorAll("tbody tr").forEach((row) => {
-        row.querySelectorAll("td").forEach((cell) => {
-          const link = cell.querySelector(".class-link");
-          const label = link?.querySelector(".block")?.textContent?.trim();
-          if (!label) {
-            return;
-          }
-          const [classId, session] = label.split("-").map((part) => part.trim());
-          const columnIndex = Number(cell.getAttribute("data-day-column"));
-          if (!classId || !session || Number.isNaN(columnIndex)) {
-            return;
-          }
-          const key = `${classId}-${session}-${columnIndex}`;
-          cellMap.set(key, { cell });
-        });
-      });
-      return cellMap;
+      return date.toISOString().split("T")[0];
     };
 
-    const buildSummaryLabel = (entry) => {
-      const title = entry.title || entry.description || "Scheduled activity";
-      return `${entry.classId} \u2013 ${title}`;
+    const parseDisplayDate = (value) => {
+      if (!value) {
+        return null;
+      }
+      const trimmed = value.trim();
+      const match = trimmed.match(/(\d{4})\s*([/-])\s*(\d{1,2})\s*[/-]\s*(\d{1,2})/);
+      if (!match) {
+        return null;
+      }
+      const [, yearText, separator, part1Text, part2Text] = match;
+      const year = Number(yearText);
+      let month = Number(part1Text);
+      let day = Number(part2Text);
+      if (separator === "/") {
+        day = Number(part1Text);
+        month = Number(part2Text);
+      }
+      if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day)) {
+        return null;
+      }
+      const date = new Date(year, month - 1, day);
+      if (Number.isNaN(date.getTime())) {
+        return null;
+      }
+      date.setHours(0, 0, 0, 0);
+      return date;
+    };
+
+    const findDateInText = (text) => {
+      if (!text) {
+        return null;
+      }
+      const match = text.match(/\d{4}\s*[/-]\s*\d{1,2}\s*[/-]\s*\d{1,2}/);
+      return match ? parseDisplayDate(match[0]) : null;
+    };
+
+    const getDateFromElement = (element) => {
+      if (!element) {
+        return null;
+      }
+      const dataDate = element.getAttribute("data-date");
+      if (dataDate) {
+        return parseISODate(dataDate) || parseDisplayDate(dataDate);
+      }
+      if (element.tagName === "TIME") {
+        const datetime = element.getAttribute("datetime");
+        if (datetime) {
+          return parseISODate(datetime) || parseDisplayDate(datetime);
+        }
+      }
+      return findDateInText(element.textContent);
+    };
+
+    const getDateForCell = (cell) => {
+      if (!cell) {
+        return null;
+      }
+      const directDate = getDateFromElement(cell);
+      if (directDate) {
+        return directDate;
+      }
+      const dateElement = cell.querySelector("[data-date], time[datetime]");
+      const elementDate = getDateFromElement(dateElement);
+      if (elementDate) {
+        return elementDate;
+      }
+      const columnIndex = Number(cell.getAttribute("data-day-column"));
+      if (Number.isNaN(columnIndex)) {
+        return null;
+      }
+      const headerCells = scheduleTable?.querySelectorAll("thead th[data-day-column]") ?? [];
+      const headerCell = Array.from(headerCells).find(
+        (header) => Number(header.getAttribute("data-day-column")) === columnIndex
+      );
+      return getDateFromElement(headerCell);
+    };
+
+    const buildSummaryText = (description) => {
+      if (!description) {
+        return "No Activity";
+      }
+      const trimmed = description.trim();
+      if (!trimmed) {
+        return "No Activity";
+      }
+      const sentenceMatch = trimmed.match(/[^.!?]+[.!?]?/);
+      return sentenceMatch ? sentenceMatch[0].trim() : trimmed;
+    };
+
+    const buildEntryKey = (classId, session, date) => {
+      const dateKey = normalizeDateKey(date);
+      if (!classId || !session || !dateKey) {
+        return null;
+      }
+      return `${classId}-${session}-${dateKey}`;
     };
 
     const renderWeekSummaries = async () => {
@@ -964,44 +1010,37 @@
         clearWeekSummaries();
         return;
       }
-      const entries = await loadClassEntries();
       if (!scheduleTable) {
         return;
       }
       clearWeekSummaries();
-      const { start, end } = getNextWeekRange();
-      const cellIndex = buildCellIndex();
+      const entries = await loadClassEntries();
+      const entryIndex = new Map();
       entries.forEach((entry) => {
-        if (entry.date < start || entry.date > end) {
+        const key = buildEntryKey(entry.classId, entry.session, entry.date);
+        if (key && !entryIndex.has(key)) {
+          entryIndex.set(key, entry);
+        }
+      });
+      scheduleTable.querySelectorAll("tbody td").forEach((cell) => {
+        const link = cell.querySelector(".class-link");
+        const block = link?.querySelector(".block");
+        if (!link || !block) {
           return;
         }
-        const columnIndex = findColumnIndexForWeekday(entry.weekday);
-        if (columnIndex === null || Number.isNaN(columnIndex)) {
+        const label = block.textContent?.trim() ?? "";
+        const [classId, session] = label.split("-").map((part) => part.trim());
+        if (!classId || !session) {
           return;
         }
-        const key = `${entry.classId}-${entry.session}-${columnIndex}`;
-        const cellData = cellIndex.get(key);
-        if (!cellData) {
-          return;
-        }
-        const summary =
-          cellData.cell.querySelector(".week-summary") || document.createElement("div");
-        if (!summary.classList.contains("week-summary")) {
-          summary.className = "week-summary";
-          summary.setAttribute("role", "list");
-          summary.setAttribute(
-            "aria-label",
-            `Week summary for ${entry.classId} at ${getWeekdayLabelForColumn(columnIndex) ?? "this slot"}`
-          );
-          cellData.cell.append(summary);
-        }
-        const item = document.createElement("div");
-        item.className = "week-summary-item";
-        item.setAttribute("role", "listitem");
-        const label = buildSummaryLabel(entry);
-        item.textContent = label;
-        item.title = entry.description ? `${entry.classId} – ${entry.description}` : label;
-        summary.append(item);
+        const cellDate = getDateForCell(cell);
+        const entryKey = buildEntryKey(classId, session, cellDate);
+        const entry = entryKey ? entryIndex.get(entryKey) : null;
+        const summaryText = buildSummaryText(entry?.description);
+        const summary = document.createElement("div");
+        summary.className = "week-summary";
+        summary.textContent = summaryText;
+        link.after(summary);
       });
     };
 
