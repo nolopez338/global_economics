@@ -46,7 +46,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "A",
-    "Class #": "Cycle 5",
+    "Class #": "5-2",
     "Date": "2026/01/27",
     "Weekday": "Tuesday",
     "Day": 3,
@@ -189,7 +189,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "D",
-    "Class #": "Cycle 5",
+    "Class #": "5-1",
     "Date": "2026/01/27",
     "Weekday": "Tuesday",
     "Day": 3,
@@ -244,7 +244,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "E",
-    "Class #": "Cycle 5",
+    "Class #": "5-1",
     "Date": "2026/01/27",
     "Weekday": "Tuesday",
     "Day": 3,
@@ -299,7 +299,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "A",
-    "Class #": "Cycle 5",
+    "Class #": "5-2",
     "Date": "2026/01/27",
     "Weekday": "Tuesday",
     "Day": 3,
@@ -354,7 +354,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "B",
-    "Class #": "Cycle 5",
+    "Class #": "5-1",
     "Date": "2026/01/27",
     "Weekday": "Tuesday",
     "Day": 3,
@@ -398,7 +398,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "C",
-    "Class #": "Cycle 5",
+    "Class #": "5-1",
     "Date": "2026/01/26",
     "Weekday": "Monday",
     "Day": 2,
@@ -486,7 +486,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "E",
-    "Class #": "Cycle 5",
+    "Class #": "5-1",
     "Date": "2026/01/26",
     "Weekday": "Monday",
     "Day": 2,
@@ -497,7 +497,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "E",
-    "Class #": "Cycle 5",
+    "Class #": "5-2",
     "Date": "2026/01/27",
     "Weekday": "Tuesday",
     "Day": 3,
