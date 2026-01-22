@@ -1,36 +1,3 @@
-const scheduleDataUrl = "../data/schedule.json";
-
-const parseScheduleDate = (value) => {
-  if (!value) {
-    return null;
-  }
-
-  const [yearPart, monthPart, dayPart] = value
-    .split("/")
-    .map((part) => part.trim())
-    .filter(Boolean);
-
-  if (!yearPart || !monthPart || !dayPart) {
-    return null;
-  }
-
-  const year = Number.parseInt(yearPart, 10);
-  const month = Number.parseInt(monthPart, 10);
-  const day = Number.parseInt(dayPart, 10);
-
-  if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day)) {
-    return null;
-  }
-
-  const date = new Date(year, month - 1, day);
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-
-  date.setHours(0, 0, 0, 0);
-  return date;
-};
-
 const formatScheduleDate = (value) => {
   const [year, month, day] = value.split("/");
   if (!year || !month || !day) {
@@ -40,15 +7,13 @@ const formatScheduleDate = (value) => {
   return `${year} / ${month} / ${day}`;
 };
 
-const scheduleDataPromise = (() => {
-  let cache = null;
-  return () => {
-    if (!cache) {
-      cache = fetch(scheduleDataUrl).then((response) => response.json());
-    }
-    return cache;
-  };
-})();
+const getScheduleData = () => {
+  if (Array.isArray(window.SCHEDULE_DATA)) {
+    return Promise.resolve(window.SCHEDULE_DATA);
+  }
+
+  return Promise.resolve([]);
+};
 
 const getColumnCount = (table) =>
   table.tHead?.rows[0]?.cells.length ?? 1;
@@ -112,25 +77,12 @@ const renderScheduleRows = (table, entries) => {
   });
 };
 
-const sortScheduleEntries = (entries) =>
-  entries.slice().sort((a, b) => {
-    const dateA = parseScheduleDate(a.Date);
-    const dateB = parseScheduleDate(b.Date);
-    if (dateA && dateB && dateA.getTime() !== dateB.getTime()) {
-      return dateA - dateB;
-    }
-
-    return String(a["Class #"]).localeCompare(String(b["Class #"]), undefined, {
-      numeric: true,
-    });
-  });
-
 const renderClassScheduleTable = ({ grade, section, tableEl }) => {
   if (!grade || !section || !tableEl) {
     return;
   }
 
-  scheduleDataPromise()
+  getScheduleData()
     .then((data) => {
       const matches = data.filter(
         (entry) =>
@@ -141,8 +93,7 @@ const renderClassScheduleTable = ({ grade, section, tableEl }) => {
       if (matches.length === 0) {
         renderEmptyRow(tableEl);
       } else {
-        const sorted = sortScheduleEntries(matches);
-        renderScheduleRows(tableEl, sorted);
+        renderScheduleRows(tableEl, matches);
       }
 
       tableEl.dataset.rendered = "true";
