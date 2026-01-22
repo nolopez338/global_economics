@@ -1,23 +1,22 @@
-const parseScheduleDate = (text) => {
-  if (!text) {
+const parseScheduleDate = (value) => {
+  if (!value) {
     return null;
   }
 
-  const parts = text
+  const [yearPart, monthPart, dayPart] = value
     .split("/")
     .map((part) => part.trim())
     .filter(Boolean);
 
-  if (parts.length < 3) {
+  if (!yearPart || !monthPart || !dayPart) {
     return null;
   }
 
-  const [yearPart, dayPart, monthPart] = parts;
   const year = Number.parseInt(yearPart, 10);
-  const day = Number.parseInt(dayPart, 10);
   const month = Number.parseInt(monthPart, 10);
+  const day = Number.parseInt(dayPart, 10);
 
-  if (Number.isNaN(year) || Number.isNaN(day) || Number.isNaN(month)) {
+  if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day)) {
     return null;
   }
 
@@ -62,8 +61,8 @@ const applyTodayMarker = (table) => {
   const rows = Array.from(body.rows);
   const dateRows = rows
     .map((row) => {
-      const dateCell = row.querySelector("td:nth-child(2)");
-      const date = parseScheduleDate(dateCell?.textContent ?? "");
+      const dateValue = row.dataset.date || "";
+      const date = parseScheduleDate(dateValue);
 
       return date ? { row, date } : null;
     })
@@ -95,8 +94,19 @@ const applyTodayMarker = (table) => {
   body.append(indicatorRow);
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+const applyTodayMarkers = () => {
   document
     .querySelectorAll(".class-schedule-table")
     .forEach((table) => applyTodayMarker(table));
+};
+
+document.addEventListener("class-schedule-rendered", (event) => {
+  const table = event.detail?.table;
+  if (table) {
+    applyTodayMarker(table);
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  applyTodayMarkers();
 });
