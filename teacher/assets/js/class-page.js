@@ -24,7 +24,7 @@ const getClassMetadata = () => {
   };
 };
 
-const createBreadcrumbs = (classKey, subtitle) => {
+const createBreadcrumbs = () => {
   const wrapper = document.createElement("div");
   wrapper.className = "breadcrumbs";
 
@@ -34,11 +34,7 @@ const createBreadcrumbs = (classKey, subtitle) => {
   link.setAttribute("aria-label", "Back to the main schedule");
   link.textContent = "← Back to Schedule";
 
-  const sub = document.createElement("span");
-  sub.className = "sub";
-  sub.textContent = subtitle || `Class ${classKey} overview`;
-
-  wrapper.append(link, sub);
+  wrapper.append(link);
   return wrapper;
 };
 
@@ -49,11 +45,7 @@ const createHeader = (classKey) => {
   const title = document.createElement("h1");
   title.textContent = `Schedule ${classKey}`;
 
-  const subtitle = document.createElement("p");
-  subtitle.className = "sub";
-  subtitle.textContent = `Placeholder schedule page for class ${classKey}. Update with class-specific details when ready.`;
-
-  textWrapper.append(title, subtitle);
+  textWrapper.append(title);
   header.append(textWrapper);
 
   return header;
@@ -140,12 +132,7 @@ const createNotesSection = (classKey, studentList, classNotes) => {
     studentSubsection.append(pdfParagraph);
   }
 
-  if (!studentList?.students || studentList.students.length === 0) {
-    const emptyStudents = document.createElement("p");
-    emptyStudents.className = "placeholder";
-    emptyStudents.textContent = "No student names are listed yet.";
-    studentSubsection.append(emptyStudents);
-  } else {
+  if (studentList?.students && studentList.students.length > 0) {
     const list = document.createElement("ul");
     studentList.students.forEach((student) => {
       if (!student?.name) {
@@ -159,11 +146,6 @@ const createNotesSection = (classKey, studentList, classNotes) => {
 
     if (list.children.length > 0) {
       studentSubsection.append(list);
-    } else {
-      const emptyStudents = document.createElement("p");
-      emptyStudents.className = "placeholder";
-      emptyStudents.textContent = "No student names are listed yet.";
-      studentSubsection.append(emptyStudents);
     }
   }
 
@@ -225,11 +207,11 @@ const renderClassPage = () => {
   container.innerHTML = "";
 
   container.append(
-    createBreadcrumbs(classKey, `Class ${classKey} overview`),
+    createBreadcrumbs(),
     createHeader(classKey),
     createNotesSection(classKey, studentList, notes),
     createCalendarSection(classKey, grade, section),
-    createBreadcrumbs(classKey, "Return to the full weekly schedule.")
+    createBreadcrumbs()
   );
 };
 
