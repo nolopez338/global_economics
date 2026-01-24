@@ -293,6 +293,7 @@ window.MathJax = {
   <div class="param-row" id="pointSizeRow" style="display:none;">
     Point size
     <input id="pointSizeSlider" type="range" min="1" max="30" value="3" style="width:200px;">
+    <input id="pointSizeInput" type="number" min="1" max="30" step="1" value="3" style="width:64px; margin-left:6px;">
     <span id="pointSizeLabel">3</span> px
   </div>
 
@@ -326,6 +327,7 @@ window.MathJax = {
   <div class="param-row" id="ciSliderRow" style="display:none;">
     Confidence level
     <input id="ciSlider" type="range" min="30" max="99" step="1" value="95" style="width:400px;">
+    <input id="ciInput" type="number" min="30" max="99" step="1" value="95" style="width:72px; margin-left:6px;">
     <span id="ciLabel">95%</span>
   </div>
 
@@ -1460,22 +1462,104 @@ function adjustEnd(delta) {
   drawHistogram();
 }
 
-startDecBtn.addEventListener("click", () => adjustStart(-1));
-startIncBtn.addEventListener("click", () => adjustStart(+1));
-endDecBtn.addEventListener("click", () => adjustEnd(-1));
-endIncBtn.addEventListener("click", () => adjustEnd(+1));
+const arrowRepeatIntervalMs = 80;
+
+function setupArrowButtonRepeat(button, action) {
+  let repeatTimer = null;
+  let suppressClick = false;
+
+  const startRepeat = (event) => {
+    if (event) event.preventDefault();
+    stopRepeat();
+    action();
+    repeatTimer = setInterval(action, arrowRepeatIntervalMs);
+    suppressClick = true;
+  };
+
+  const stopRepeat = () => {
+    if (repeatTimer !== null) {
+      clearInterval(repeatTimer);
+      repeatTimer = null;
+    }
+  };
+
+  // Prevent the synthetic click after a hold/repeat press.
+  button.addEventListener("click", (event) => {
+    if (suppressClick) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
+    suppressClick = false;
+  }, { capture: true });
+
+  button.addEventListener("pointerdown", startRepeat);
+  button.addEventListener("pointerup", stopRepeat);
+  button.addEventListener("pointercancel", stopRepeat);
+  button.addEventListener("pointerleave", stopRepeat);
+
+  // Fallbacks for environments without full pointer event coverage.
+  button.addEventListener("mousedown", startRepeat);
+  button.addEventListener("mouseup", stopRepeat);
+  button.addEventListener("mouseleave", stopRepeat);
+  button.addEventListener("touchstart", startRepeat, { passive: false });
+  button.addEventListener("touchend", stopRepeat);
+  button.addEventListener("touchcancel", stopRepeat);
+
+  window.addEventListener("pointerup", stopRepeat);
+  window.addEventListener("pointercancel", stopRepeat);
+  window.addEventListener("mouseup", stopRepeat);
+  window.addEventListener("touchend", stopRepeat);
+  window.addEventListener("touchcancel", stopRepeat);
+  window.addEventListener("blur", stopRepeat);
+}
+
+setupArrowButtonRepeat(startDecBtn, () => adjustStart(-1));
+setupArrowButtonRepeat(startIncBtn, () => adjustStart(+1));
+setupArrowButtonRepeat(endDecBtn, () => adjustEnd(-1));
+setupArrowButtonRepeat(endIncBtn, () => adjustEnd(+1));
 
 // Toggles and sliders
 const toggleMean = document.getElementById("toggleMean");
 const toggleStd = document.getElementById("toggleStd");
 const pointSizeSlider = document.getElementById("pointSizeSlider");
+const pointSizeInput = document.getElementById("pointSizeInput");
 const pointSizeLabel = document.getElementById("pointSizeLabel");
 
 const toggleCI = document.getElementById("toggleCI");
 const toggleOverallMean = document.getElementById("toggleOverallMean");
 const ciSlider = document.getElementById("ciSlider");
+const ciInput = document.getElementById("ciInput");
 const ciLabel = document.getElementById("ciLabel");
 const ciSliderRow = document.getElementById("ciSliderRow");
+
+function clampToSliderBounds(value, slider) {
+  const min = parseInt(slider.min, 10);
+  const max = parseInt(slider.max, 10);
+  let next = Math.round(value);
+  if (next < min) next = min;
+  if (next > max) next = max;
+  return next;
+}
+
+function applyPointSizeValue(value) {
+  if (!Number.isFinite(value)) return;
+  const next = clampToSliderBounds(value, pointSizeSlider);
+  pointSize = next;
+  pointSizeSlider.value = next;
+  pointSizeInput.value = next;
+  pointSizeLabel.textContent = next;
+  drawScatter();
+}
+
+function applyCiLevelValue(value) {
+  if (!Number.isFinite(value)) return;
+  const next = clampToSliderBounds(value, ciSlider);
+  ciLevel = next;
+  ciSlider.value = next;
+  ciInput.value = next;
+  ciLabel.textContent = next + "%";
+  if (showCI) drawScatter();
+}
 
 toggleMean.addEventListener("change", () => {
   showMean = toggleMean.checked;
@@ -1488,9 +1572,19 @@ toggleStd.addEventListener("change", () => {
 });
 
 pointSizeSlider.addEventListener("input", () => {
-  pointSize = parseInt(pointSizeSlider.value);
-  pointSizeLabel.textContent = pointSize;
-  drawScatter();
+  applyPointSizeValue(parseFloat(pointSizeSlider.value));
+});
+
+pointSizeInput.addEventListener("input", () => {
+  applyPointSizeValue(pointSizeInput.valueAsNumber);
+});
+
+pointSizeInput.addEventListener("change", () => {
+  if (!Number.isFinite(pointSizeInput.valueAsNumber)) {
+    pointSizeInput.value = pointSize;
+  } else {
+    applyPointSizeValue(pointSizeInput.valueAsNumber);
+  }
 });
 
 toggleCI.addEventListener("change", () => {
@@ -1505,10 +1599,24 @@ toggleOverallMean.addEventListener("change", () => {
 });
 
 ciSlider.addEventListener("input", () => {
-  ciLevel = parseInt(ciSlider.value);
-  ciLabel.textContent = ciLevel + "%";
-  if (showCI) drawScatter();
+  applyCiLevelValue(parseFloat(ciSlider.value));
 });
+
+ciInput.addEventListener("input", () => {
+  applyCiLevelValue(ciInput.valueAsNumber);
+});
+
+ciInput.addEventListener("change", () => {
+  if (!Number.isFinite(ciInput.valueAsNumber)) {
+    ciInput.value = ciLevel;
+  } else {
+    applyCiLevelValue(ciInput.valueAsNumber);
+  }
+});
+
+// Keep manual inputs synchronized with the current state on load.
+applyPointSizeValue(pointSize);
+applyCiLevelValue(ciLevel);
 
 // init (default: Continuous / Normal)
 categorySel.addEventListener("change", updateDistributionOptions);
