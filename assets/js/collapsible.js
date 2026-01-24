@@ -13,12 +13,18 @@
 
     if (!button || !content) return;
 
+    if (!button.id) {
+      button.id = `collapsible-toggle-${index}`;
+    }
+
     const contentId = content.id || `collapsible-content-${index}`;
     content.id = contentId;
     button.setAttribute('aria-controls', contentId);
+    content.setAttribute('role', 'region');
+    content.setAttribute('aria-labelledby', button.id);
 
-    const isCollapsed = section.classList.contains('collapsed');
-    updateState(button, !isCollapsed);
+    section.classList.add('collapsed');
+    updateState(button, false);
 
     button.addEventListener('click', () => {
       const nextState = section.classList.toggle('collapsed');
@@ -32,12 +38,18 @@
 
     if (!button || !content) return;
 
+    if (!button.id) {
+      button.id = `subsection-toggle-${index}`;
+    }
+
     const contentId = content.id || `subsection-content-${index}`;
     content.id = contentId;
     button.setAttribute('aria-controls', contentId);
+    content.setAttribute('role', 'region');
+    content.setAttribute('aria-labelledby', button.id);
 
-    const isCollapsed = section.classList.contains('collapsed');
-    updateState(button, !isCollapsed);
+    section.classList.add('collapsed');
+    updateState(button, false);
 
     button.addEventListener('click', () => {
       const collapsed = section.classList.toggle('collapsed');
@@ -46,6 +58,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    document.documentElement.classList.add('js-enabled');
     const sections = Array.from(document.querySelectorAll('.collapsible'));
     sections.forEach((section, index) => setupCollapsible(section, index));
 
