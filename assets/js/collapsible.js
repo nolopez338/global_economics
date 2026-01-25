@@ -23,8 +23,9 @@
     content.setAttribute('role', 'region');
     content.setAttribute('aria-labelledby', button.id);
 
-    section.classList.add('collapsed');
-    updateState(button, false);
+    const defaultExpanded = section.id === 'table-of-contents';
+    section.classList.toggle('collapsed', !defaultExpanded);
+    updateState(button, defaultExpanded);
 
     button.addEventListener('click', () => {
       const nextState = section.classList.toggle('collapsed');
@@ -48,8 +49,9 @@
     content.setAttribute('role', 'region');
     content.setAttribute('aria-labelledby', button.id);
 
-    section.classList.add('collapsed');
-    updateState(button, false);
+    const defaultExpanded = section.id === 'table-of-contents';
+    section.classList.toggle('collapsed', !defaultExpanded);
+    updateState(button, defaultExpanded);
 
     button.addEventListener('click', () => {
       const collapsed = section.classList.toggle('collapsed');
