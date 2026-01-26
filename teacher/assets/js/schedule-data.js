@@ -518,6 +518,17 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 11,
+    "Section": "C",
+    "Class #": "6-2",
+    "Date": "2026/02/02",
+    "Weekday": "Monday",
+    "Day": 2,
+    "Description": "Introduction to the effects of the sample size on the Confidence Interval",
+    "Material": "Introduction to the effects of the sample size on the Confidence Interval",
+    "Summary": "Introduction to the effects of the sample size on the Confidence Interval"
+  },
+  {
+    "Grade": 11,
     "Section": "D",
     "Class #": "3-2",
     "Date": "2026/01/14",
@@ -636,5 +647,16 @@ window.SCHEDULE_DATA = [
     "Description": "Individual exam consisting on 3 questions from which 2 should be chosen.",
     "Material": "Learning Evidence 1",
     "Summary": "Learning Evidence 1"
+  },
+  {
+    "Grade": 11,
+    "Section": "E",
+    "Class #": "6-2",
+    "Date": "2026/02/02",
+    "Weekday": "Monday",
+    "Day": 2,
+    "Description": "Introduction to the effects of the sample size on the Confidence Interval",
+    "Material": "Introduction to the effects of the sample size on the Confidence Interval",
+    "Summary": "Introduction to the effects of the sample size on the Confidence Interval"
   }
 ];
