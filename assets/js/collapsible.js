@@ -61,6 +61,29 @@
     });
   }
 
+  function expandSection(section) {
+    if (!section.classList.contains('collapsed')) return;
+    section.classList.remove('collapsed');
+    const button = section.classList.contains('subsection-minimize')
+      ? section.querySelector('.subsection-toggle')
+      : section.querySelector('.collapse-toggle');
+    if (button) {
+      updateState(button, true);
+    }
+  }
+
+  function expandAncestorSections(target) {
+    const sections = [];
+    let node = target;
+    while (node) {
+      if (node.classList?.contains('collapsible') || node.classList?.contains('subsection-minimize')) {
+        sections.push(node);
+      }
+      node = node.parentElement;
+    }
+    sections.reverse().forEach(expandSection);
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     document.documentElement.classList.add('js-enabled');
     const sections = Array.from(document.querySelectorAll('.collapsible'));
@@ -68,5 +91,15 @@
 
     const subsections = Array.from(document.querySelectorAll('.subsection-minimize'));
     subsections.forEach((section, index) => setupSubsection(section, index));
+
+    document.addEventListener('click', (event) => {
+      const link = event.target.closest('.section-toc a[href^="#"]');
+      if (!link) return;
+      const href = link.getAttribute('href');
+      if (!href || href.length < 2) return;
+      const target = document.getElementById(href.slice(1));
+      if (!target) return;
+      expandAncestorSections(target);
+    });
   });
 })();
