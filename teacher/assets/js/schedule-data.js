@@ -519,7 +519,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "C",
-    "Class #": "6-2",
+    "Class #": "6-1",
     "Date": "2026/02/02",
     "Weekday": "Monday",
     "Day": 2,
@@ -651,7 +651,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "E",
-    "Class #": "6-2",
+    "Class #": "6-1",
     "Date": "2026/02/02",
     "Weekday": "Monday",
     "Day": 2,
