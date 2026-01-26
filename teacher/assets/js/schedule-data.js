@@ -100,6 +100,17 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 10,
+    "Section": "B",
+    "Class #": "5-2",
+    "Date": "2026/01/29",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Mock Review",
+    "Material": "Mock Review",
+    "Summary": "Mock Review"
+  },
+  {
+    "Grade": 10,
     "Section": "C",
     "Class #": "3-2",
     "Date": "2026/01/15",
@@ -141,6 +152,17 @@ window.SCHEDULE_DATA = [
     "Description": "Mock exam session (2 questions)",
     "Material": "Mock exam",
     "Summary": "Mock exam"
+  },
+  {
+    "Grade": 10,
+    "Section": "C",
+    "Class #": "5-2",
+    "Date": "2026/01/29",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Mock Review",
+    "Material": "Mock Review",
+    "Summary": "Mock Review"
   },
   {
     "Grade": 10,
@@ -383,6 +405,17 @@ window.SCHEDULE_DATA = [
     "Description": "Individual exam consisting on 3 questions from which 2 should be chosen.",
     "Material": "Learning Evidence 1",
     "Summary": "Learning Evidence 1"
+  },
+  {
+    "Grade": 11,
+    "Section": "B",
+    "Class #": "5-2",
+    "Date": "2026/01/29",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Introduction to the effects of the sample size on the Confidence Interval",
+    "Material": "Introduction to the effects of the sample size on the Confidence Interval",
+    "Summary": "Introduction to the effects of the sample size on the Confidence Interval"
   },
   {
     "Grade": 11,
