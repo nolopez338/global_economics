@@ -23,7 +23,8 @@
     content.setAttribute('role', 'region');
     content.setAttribute('aria-labelledby', button.id);
 
-    const defaultExpanded = section.id === 'table-of-contents';
+    const defaultExpanded = section.id === 'table-of-contents'
+      || section.querySelector('.section-toc');
     section.classList.toggle('collapsed', !defaultExpanded);
     updateState(button, defaultExpanded);
 
@@ -49,7 +50,8 @@
     content.setAttribute('role', 'region');
     content.setAttribute('aria-labelledby', button.id);
 
-    const defaultExpanded = section.id === 'table-of-contents';
+    const defaultExpanded = section.id === 'table-of-contents'
+      || section.querySelector('.section-toc');
     section.classList.toggle('collapsed', !defaultExpanded);
     updateState(button, defaultExpanded);
 
