@@ -56,6 +56,17 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 10,
+    "Section": "A",
+    "Class #": "6-1",
+    "Date": "2026/01/30",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Exam session",
+    "Material": "Exam session",
+    "Summary": "Exam session"
+  },
+  {
+    "Grade": 10,
     "Section": "B",
     "Class #": "3-2",
     "Date": "2026/01/15",
@@ -111,6 +122,17 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 10,
+    "Section": "B",
+    "Class #": "6-1",
+    "Date": "2026/01/30",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Exam session",
+    "Material": "Exam session",
+    "Summary": "Exam session"
+  },
+  {
+    "Grade": 10,
     "Section": "C",
     "Class #": "3-2",
     "Date": "2026/01/15",
@@ -163,6 +185,17 @@ window.SCHEDULE_DATA = [
     "Description": "Mock Review",
     "Material": "Mock Review",
     "Summary": "Mock Review"
+  },
+  {
+    "Grade": 10,
+    "Section": "C",
+    "Class #": "6-1",
+    "Date": "2026/01/30",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Exam session",
+    "Material": "Exam session",
+    "Summary": "Exam session"
   },
   {
     "Grade": 10,
@@ -350,6 +383,17 @@ window.SCHEDULE_DATA = [
     "Description": "Individual exam consisting on 3 questions from which 2 should be chosen.",
     "Material": "Learning Evidence 1",
     "Summary": "Learning Evidence 1"
+  },
+  {
+    "Grade": 11,
+    "Section": "A",
+    "Class #": "6-1",
+    "Date": "2026/01/30",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Introduction to the effects of the sample size on the Confidence Interval",
+    "Material": "Introduction to the effects of the sample size on the Confidence Interval",
+    "Summary": "Introduction to the effects of the sample size on the Confidence Interval"
   },
   {
     "Grade": 11,
@@ -526,6 +570,17 @@ window.SCHEDULE_DATA = [
     "Description": "Individual exam consisting of 3 questions, from which 2 must be chosen.",
     "Material": "Learning Evidence 1",
     "Summary": "Learning Evidence 1"
+  },
+  {
+    "Grade": 11,
+    "Section": "D",
+    "Class #": "6-1",
+    "Date": "2026/01/30",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Introduction to the effects of the sample size on the Confidence Interval",
+    "Material": "Introduction to the effects of the sample size on the Confidence Interval",
+    "Summary": "Introduction to the effects of the sample size on the Confidence Interval"
   },
   {
     "Grade": 11,
