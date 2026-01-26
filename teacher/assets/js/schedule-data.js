@@ -199,6 +199,17 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 10,
+    "Section": "D",
+    "Class #": "5-2",
+    "Date": "2026/01/28",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Exam in pairs. Students select 2 out of 3 questions.",
+    "Material": "Exam",
+    "Summary": "Exam"
+  },
+  {
+    "Grade": 10,
     "Section": "E",
     "Class #": "3-1",
     "Date": "2026/01/13",
@@ -251,6 +262,17 @@ window.SCHEDULE_DATA = [
     "Description": "Mock exam reviewed.",
     "Material": "Last session before the exam",
     "Summary": "Last session before the exam"
+  },
+  {
+    "Grade": 10,
+    "Section": "E",
+    "Class #": "5-2",
+    "Date": "2026/01/28",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Exam in pairs. Students select 2 out of 3 questions.",
+    "Material": "Exam",
+    "Summary": "Exam"
   },
   {
     "Grade": 11,
@@ -408,6 +430,17 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 11,
+    "Section": "C",
+    "Class #": "5-2",
+    "Date": "2026/01/28",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Individual exam consisting of 3 questions, from which 2 must be chosen.",
+    "Material": "Learning Evidence 1",
+    "Summary": "Learning Evidence 1"
+  },
+  {
+    "Grade": 11,
     "Section": "D",
     "Class #": "3-2",
     "Date": "2026/01/14",
@@ -449,6 +482,17 @@ window.SCHEDULE_DATA = [
     "Description": "Mock exam session (2 questions)",
     "Material": "Mock exam",
     "Summary": "Mock exam"
+  },
+  {
+    "Grade": 11,
+    "Section": "D",
+    "Class #": "5-2",
+    "Date": "2026/01/28",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Individual exam consisting of 3 questions, from which 2 must be chosen.",
+    "Material": "Learning Evidence 1",
+    "Summary": "Learning Evidence 1"
   },
   {
     "Grade": 11,
