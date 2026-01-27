@@ -7,6 +7,27 @@
     }
   }
 
+  function getSectionButton(section) {
+    if (section.classList.contains('subsection-minimize')) {
+      return section.querySelector('.subsection-toggle');
+    }
+    return section.querySelector('.collapse-toggle');
+  }
+
+  function setSectionExpanded(section, expanded) {
+    const button = getSectionButton(section);
+    if (!button) return;
+    section.classList.toggle('collapsed', !expanded);
+    updateState(button, expanded);
+  }
+
+  function toggleSection(section) {
+    const button = getSectionButton(section);
+    if (!button) return;
+    const collapsed = section.classList.toggle('collapsed');
+    updateState(button, !collapsed);
+  }
+
   function setupCollapsible(section, index) {
     const button = section.querySelector('.collapse-toggle');
     const content = section.querySelector('.collapsible-content');
@@ -29,8 +50,7 @@
     updateState(button, defaultExpanded);
 
     button.addEventListener('click', () => {
-      const nextState = section.classList.toggle('collapsed');
-      updateState(button, !nextState);
+      toggleSection(section);
     });
   }
 
@@ -56,20 +76,13 @@
     updateState(button, defaultExpanded);
 
     button.addEventListener('click', () => {
-      const collapsed = section.classList.toggle('collapsed');
-      updateState(button, !collapsed);
+      toggleSection(section);
     });
   }
 
   function expandSection(section) {
     if (!section.classList.contains('collapsed')) return;
-    section.classList.remove('collapsed');
-    const button = section.classList.contains('subsection-minimize')
-      ? section.querySelector('.subsection-toggle')
-      : section.querySelector('.collapse-toggle');
-    if (button) {
-      updateState(button, true);
-    }
+    setSectionExpanded(section, true);
   }
 
   function expandAncestorSections(target) {
@@ -91,6 +104,34 @@
 
     const subsections = Array.from(document.querySelectorAll('.subsection-minimize'));
     subsections.forEach((section, index) => setupSubsection(section, index));
+
+    document.querySelectorAll('.toggle-label, .toggle-icon').forEach((element) => {
+      if (element.closest('.collapse-toggle, .subsection-toggle')) return;
+      element.setAttribute('role', 'button');
+      element.setAttribute('tabindex', '0');
+    });
+
+    document.addEventListener('click', (event) => {
+      const toggleTarget = event.target.closest('.toggle-label, .toggle-icon');
+      if (!toggleTarget) return;
+      const button = toggleTarget.closest('.collapse-toggle, .subsection-toggle');
+      const section = toggleTarget.closest('.collapsible, .subsection-minimize');
+      if (!button || !section) return;
+      event.preventDefault();
+      event.stopPropagation();
+      toggleSection(section);
+    }, true);
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      const toggleTarget = event.target.closest('.toggle-label, .toggle-icon');
+      if (!toggleTarget) return;
+      if (toggleTarget.closest('.collapse-toggle, .subsection-toggle')) return;
+      const section = toggleTarget.closest('.collapsible, .subsection-minimize');
+      if (!section) return;
+      event.preventDefault();
+      toggleSection(section);
+    });
 
     document.addEventListener('click', (event) => {
       const link = event.target.closest('.section-toc a[href^="#"]');
