@@ -28,6 +28,27 @@
     updateState(button, !collapsed);
   }
 
+  function getDefaultExpanded(section, button) {
+    const ariaExpanded = button.getAttribute('aria-expanded');
+    if (ariaExpanded === 'true') return true;
+    if (ariaExpanded === 'false') return false;
+    if (section.classList.contains('collapsed')) return false;
+    return section.id === 'table-of-contents'
+      || section.querySelector('.section-toc');
+  }
+
+  function handleToggleActivation(toggleTarget, event) {
+    const section = toggleTarget.closest('.collapsible, .subsection-minimize');
+    if (!section) return;
+    const button = getSectionButton(section);
+    if (!button) return;
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    toggleSection(section);
+  }
+
   function setupCollapsible(section, index) {
     const button = section.querySelector('.collapse-toggle');
     const content = section.querySelector('.collapsible-content');
@@ -44,8 +65,7 @@
     content.setAttribute('role', 'region');
     content.setAttribute('aria-labelledby', button.id);
 
-    const defaultExpanded = section.id === 'table-of-contents'
-      || section.querySelector('.section-toc');
+    const defaultExpanded = getDefaultExpanded(section, button);
     section.classList.toggle('collapsed', !defaultExpanded);
     updateState(button, defaultExpanded);
 
@@ -70,8 +90,7 @@
     content.setAttribute('role', 'region');
     content.setAttribute('aria-labelledby', button.id);
 
-    const defaultExpanded = section.id === 'table-of-contents'
-      || section.querySelector('.section-toc');
+    const defaultExpanded = getDefaultExpanded(section, button);
     section.classList.toggle('collapsed', !defaultExpanded);
     updateState(button, defaultExpanded);
 
@@ -114,12 +133,7 @@
     document.addEventListener('click', (event) => {
       const toggleTarget = event.target.closest('.toggle-label, .toggle-icon');
       if (!toggleTarget) return;
-      const button = toggleTarget.closest('.collapse-toggle, .subsection-toggle');
-      const section = toggleTarget.closest('.collapsible, .subsection-minimize');
-      if (!button || !section) return;
-      event.preventDefault();
-      event.stopPropagation();
-      toggleSection(section);
+      handleToggleActivation(toggleTarget, event);
     }, true);
 
     document.addEventListener('keydown', (event) => {
@@ -127,10 +141,7 @@
       const toggleTarget = event.target.closest('.toggle-label, .toggle-icon');
       if (!toggleTarget) return;
       if (toggleTarget.closest('.collapse-toggle, .subsection-toggle')) return;
-      const section = toggleTarget.closest('.collapsible, .subsection-minimize');
-      if (!section) return;
-      event.preventDefault();
-      toggleSection(section);
+      handleToggleActivation(toggleTarget, event);
     });
 
     document.addEventListener('click', (event) => {
