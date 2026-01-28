@@ -72,6 +72,46 @@ body {
 /* Rest of layout */
 .param-row { margin: 10px 0; }
 
+.toggle-pairs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toggle-pair {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.toggle-pair label,
+.toggle-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toggle-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.ci-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.points-adjust {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 button {
   padding: 8px 15px;
   margin: 5px;
@@ -299,36 +339,49 @@ window.MathJax = {
 
   <!-- Legend + toggles for running lines -->
   <div class="param-row" id="linesToggleRow" style="display:none;">
-    <label>
-      <input type="checkbox" id="toggleMean" checked>
-      <span class="legend-box legend-mean"></span> Running average
-    </label>
-    &nbsp;&nbsp;
-    <label>
-      <input type="checkbox" id="toggleStd" checked>
-      <span class="legend-box legend-std"></span> Running std dev
-    </label>
+    <div class="toggle-pairs">
+      <div class="toggle-pair">
+        <label>
+          <input type="checkbox" id="toggleOverallMean">
+          True average line
+        </label>
+        <label>
+          <input type="checkbox" id="toggleMean" checked>
+          <span class="legend-box legend-mean"></span> Running average
+        </label>
+      </div>
+      <div class="toggle-pair">
+        <label>
+          <input type="checkbox" id="toggleOverallStd">
+          True std dev
+        </label>
+        <label>
+          <input type="checkbox" id="toggleStd" checked>
+          <span class="legend-box legend-std"></span> Running std dev
+        </label>
+      </div>
+    </div>
   </div>
 
-  <!-- Extra toggles (CI + true average) -->
+  <!-- Extra toggles (CI only) -->
   <div class="param-row" id="extraLinesRow" style="display:none;">
-    <label>
-      <input type="checkbox" id="toggleCI">
-      Confidence interval
-    </label>
-    &nbsp;&nbsp;
-    <label>
-      <input type="checkbox" id="toggleOverallMean">
-      True average line
-    </label>
-  </div>
-
-  <!-- Confidence level slider (30–99%) -->
-  <div class="param-row" id="ciSliderRow" style="display:none;">
-    Confidence level
-    <input id="ciSlider" type="range" min="30" max="99" step="1" value="95" style="width:400px;">
-    <input id="ciInput" type="number" min="30" max="99" step="1" value="95" style="width:72px; margin-left:6px;">
-    <span id="ciLabel">95%</span>
+    <div class="toggle-row">
+      <label>
+        <input type="checkbox" id="toggleCI">
+        Confidence interval
+      </label>
+      <div class="ci-controls" id="ciSliderRow" style="display:none;" aria-hidden="true">
+        <span>Confidence level</span>
+        <input id="ciSlider" type="range" min="30" max="99" step="1" value="95" style="width:300px;">
+        <input id="ciInput" type="number" min="30" max="99" step="1" value="95" style="width:72px;">
+        <span id="ciLabel">95%</span>
+        <div class="points-adjust">
+          <span>Points to display</span>
+          <button id="pointsDec" class="arrow-btn" type="button">-</button>
+          <button id="pointsInc" class="arrow-btn" type="button">+</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="graph-container">
@@ -361,6 +414,7 @@ let pointSize = 3;
 // CI and true average line toggles
 let showCI = false;
 let showOverallMean = false;
+let showOverallStd = false;
 let ciLevel = 95; // percent
 
 // range selection (indices)
@@ -388,6 +442,8 @@ const startDecBtn = document.getElementById("startDec");
 const startIncBtn = document.getElementById("startInc");
 const endDecBtn = document.getElementById("endDec");
 const endIncBtn = document.getElementById("endInc");
+const pointsDecBtn = document.getElementById("pointsDec");
+const pointsIncBtn = document.getElementById("pointsInc");
 
 // Distribution equations in TeX for MathJax
 const distributionEquations = {
@@ -539,6 +595,54 @@ function getTrueMean() {
   if (dist === "Gamma") {
     if (!isFinite(kshape) || !isFinite(theta)) return null;
     return kshape * theta;
+  }
+  return null;
+}
+
+// Theoretical true standard deviation based on distribution parameters
+function getTrueStd() {
+  const dist = distSel.value;
+
+  const p = parseFloat(document.getElementById("p")?.value);
+  const nBin = parseFloat(document.getElementById("n")?.value);
+  const a = parseFloat(document.getElementById("a")?.value);
+  const b = parseFloat(document.getElementById("b")?.value);
+  const sigma = parseFloat(document.getElementById("sigma")?.value);
+  const lambda = parseFloat(document.getElementById("lambda")?.value);
+  const kshape = parseFloat(document.getElementById("k")?.value);
+  const theta = parseFloat(document.getElementById("theta")?.value);
+
+  if (dist === "Bernoulli") {
+    if (!isFinite(p)) return null;
+    return Math.sqrt(p * (1 - p));
+  }
+  if (dist === "Binomial") {
+    if (!isFinite(nBin) || !isFinite(p)) return null;
+    return Math.sqrt(nBin * p * (1 - p));
+  }
+  if (dist === "Geometric") {
+    if (!isFinite(p) || p <= 0) return null;
+    return Math.sqrt((1 - p) / (p * p));
+  }
+  if (dist === "Poisson") {
+    if (!isFinite(lambda)) return null;
+    return Math.sqrt(lambda);
+  }
+  if (dist === "Uniform") {
+    if (!isFinite(a) || !isFinite(b)) return null;
+    return Math.abs(b - a) / Math.sqrt(12);
+  }
+  if (dist === "Normal") {
+    if (!isFinite(sigma)) return null;
+    return sigma;
+  }
+  if (dist === "Exponential") {
+    if (!isFinite(lambda) || lambda <= 0) return null;
+    return 1 / lambda;
+  }
+  if (dist === "Gamma") {
+    if (!isFinite(kshape) || !isFinite(theta)) return null;
+    return Math.sqrt(kshape) * theta;
   }
   return null;
 }
@@ -855,7 +959,8 @@ function generate(n) {
   document.getElementById("extraLinesRow").style.display = "block";
 
   const ciSliderRow = document.getElementById("ciSliderRow");
-  ciSliderRow.style.display = showCI ? "block" : "none";
+  ciSliderRow.style.display = showCI ? "inline-flex" : "none";
+  ciSliderRow.setAttribute("aria-hidden", showCI ? "false" : "true");
 
   updateRangeLabel();
   drawScatter();
@@ -1075,6 +1180,12 @@ function drawScatter() {
   }
 
   const trueMean = getTrueMean();
+  const trueStd = getTrueStd();
+
+  if (showOverallStd && trueStd != null && isFinite(trueStd)) {
+    if (trueStd < minY) minY = trueStd;
+    if (trueStd > maxY) maxY = trueStd;
+  }
 
   let sampleMean = null;
   if (N > 0) {
@@ -1249,6 +1360,23 @@ function drawScatter() {
     const labelText = "True μ: " + trueMean.toFixed(3);
     const xLabel = marginLeft + 10;
     drawLabel(ctx, xLabel, yTrue, labelText, W, H);
+  }
+
+  // True std dev line
+  if (showOverallStd && trueStd != null && isFinite(trueStd)) {
+    const yTrueStd = valueToY(trueStd);
+    ctx.strokeStyle = "#16a34a";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    ctx.moveTo(marginLeft, yTrueStd);
+    ctx.lineTo(marginLeft + effectiveW, yTrueStd);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    const labelText = "True σ: " + trueStd.toFixed(3);
+    const xLabel = marginLeft + 10;
+    drawLabel(ctx, xLabel, yTrueStd, labelText, W, H);
   }
 
   // CI labels
@@ -1517,10 +1645,13 @@ setupArrowButtonRepeat(startDecBtn, () => adjustStart(-1));
 setupArrowButtonRepeat(startIncBtn, () => adjustStart(+1));
 setupArrowButtonRepeat(endDecBtn, () => adjustEnd(-1));
 setupArrowButtonRepeat(endIncBtn, () => adjustEnd(+1));
+setupArrowButtonRepeat(pointsDecBtn, () => adjustEnd(-1));
+setupArrowButtonRepeat(pointsIncBtn, () => adjustEnd(+1));
 
 // Toggles and sliders
 const toggleMean = document.getElementById("toggleMean");
 const toggleStd = document.getElementById("toggleStd");
+const toggleOverallStd = document.getElementById("toggleOverallStd");
 const pointSizeSlider = document.getElementById("pointSizeSlider");
 const pointSizeInput = document.getElementById("pointSizeInput");
 const pointSizeLabel = document.getElementById("pointSizeLabel");
@@ -1571,6 +1702,11 @@ toggleStd.addEventListener("change", () => {
   drawScatter();
 });
 
+toggleOverallStd.addEventListener("change", () => {
+  showOverallStd = toggleOverallStd.checked;
+  drawScatter();
+});
+
 pointSizeSlider.addEventListener("input", () => {
   applyPointSizeValue(parseFloat(pointSizeSlider.value));
 });
@@ -1589,7 +1725,8 @@ pointSizeInput.addEventListener("change", () => {
 
 toggleCI.addEventListener("change", () => {
   showCI = toggleCI.checked;
-  ciSliderRow.style.display = showCI ? "block" : "none";
+  ciSliderRow.style.display = showCI ? "inline-flex" : "none";
+  ciSliderRow.setAttribute("aria-hidden", showCI ? "false" : "true");
   drawScatter();
 });
 
