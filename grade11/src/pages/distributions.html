@@ -1780,6 +1780,56 @@ setupArrowButtonRepeat(startIncBtn, () => adjustStart(+1));
 setupArrowButtonRepeat(endDecBtn, () => adjustEnd(-1));
 setupArrowButtonRepeat(endIncBtn, () => adjustEnd(+1));
 
+const holdDelayMs = 450;
+const holdRepeatIntervalMs = 220;
+
+function setupHoldAdjustButton(button, action) {
+  let delayTimer = null;
+  let repeatTimer = null;
+  let didTrigger = false;
+
+  const stopHold = () => {
+    if (delayTimer !== null) {
+      clearTimeout(delayTimer);
+      delayTimer = null;
+    }
+    if (repeatTimer !== null) {
+      clearInterval(repeatTimer);
+      repeatTimer = null;
+    }
+  };
+
+  const startHold = (event) => {
+    if (event) event.preventDefault();
+    stopHold();
+    didTrigger = false;
+    delayTimer = setTimeout(() => {
+      didTrigger = true;
+      action();
+      repeatTimer = setInterval(action, holdRepeatIntervalMs);
+    }, holdDelayMs);
+  };
+
+  button.addEventListener("click", (event) => {
+    if (didTrigger) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
+  }, { capture: true });
+
+  button.addEventListener("mousedown", startHold);
+  button.addEventListener("mouseup", stopHold);
+  button.addEventListener("mouseleave", stopHold);
+  button.addEventListener("touchstart", startHold, { passive: false });
+  button.addEventListener("touchend", stopHold);
+  button.addEventListener("touchcancel", stopHold);
+
+  window.addEventListener("mouseup", stopHold);
+  window.addEventListener("touchend", stopHold);
+  window.addEventListener("touchcancel", stopHold);
+  window.addEventListener("blur", stopHold);
+}
+
 // Toggles and sliders
 const toggleMean = document.getElementById("toggleMean");
 const toggleStd = document.getElementById("toggleStd");
@@ -1854,10 +1904,10 @@ function applyCiLevelValue(value) {
   if (showCI) drawScatter();
 }
 
-setupArrowButtonRepeat(pointSizeDecBtn, () => applyPointSizeValue(pointSize - pointSizeStep));
-setupArrowButtonRepeat(pointSizeIncBtn, () => applyPointSizeValue(pointSize + pointSizeStep));
-setupArrowButtonRepeat(ciDecBtn, () => applyCiLevelValue(ciLevel - ciArrowStep));
-setupArrowButtonRepeat(ciIncBtn, () => applyCiLevelValue(ciLevel + ciArrowStep));
+setupHoldAdjustButton(pointSizeDecBtn, () => applyPointSizeValue(pointSize - pointSizeStep));
+setupHoldAdjustButton(pointSizeIncBtn, () => applyPointSizeValue(pointSize + pointSizeStep));
+setupHoldAdjustButton(ciDecBtn, () => applyCiLevelValue(ciLevel - ciArrowStep));
+setupHoldAdjustButton(ciIncBtn, () => applyCiLevelValue(ciLevel + ciArrowStep));
 
 function setFlattenButtonState() {
   flattenButton.textContent = isFlattened ? "Unflatten" : "Flatten";
