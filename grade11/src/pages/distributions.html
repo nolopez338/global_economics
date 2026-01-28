@@ -112,6 +112,27 @@ body {
   gap: 6px;
 }
 
+.control-label {
+  font-weight: 600;
+}
+
+.slider-medium {
+  width: 200px;
+}
+
+.slider-wide {
+  width: 300px;
+}
+
+.numeric-input {
+  width: 72px;
+}
+
+.numeric-input-compact {
+  width: 64px;
+  margin-left: 6px;
+}
+
 button {
   padding: 8px 15px;
   margin: 5px;
@@ -331,10 +352,10 @@ window.MathJax = {
 
   <!-- Point size slider -->
   <div class="param-row" id="pointSizeRow" style="display:none;">
-    Point size
-    <input id="pointSizeSlider" type="range" min="1" max="30" value="3" style="width:200px;">
-    <input id="pointSizeInput" type="number" min="1" max="30" step="1" value="3" style="width:64px; margin-left:6px;">
-    <span id="pointSizeLabel">3</span> px
+    <label class="control-label" for="pointSizeSlider">Circle size</label>
+    <input id="pointSizeSlider" class="slider-medium" type="range" min="2" max="12" value="4">
+    <input id="pointSizeInput" class="numeric-input-compact" type="number" min="2" max="12" step="1" value="4">
+    <span id="pointSizeLabel">4</span> px
   </div>
 
   <!-- Legend + toggles for running lines -->
@@ -372,13 +393,13 @@ window.MathJax = {
       </label>
       <div class="ci-controls" id="ciSliderRow" style="display:none;" aria-hidden="true">
         <span>Confidence level</span>
-        <input id="ciSlider" type="range" min="30" max="99" step="1" value="95" style="width:300px;">
-        <input id="ciInput" type="number" min="30" max="99" step="1" value="95" style="width:72px;">
+        <input id="ciSlider" class="slider-wide" type="range" min="30" max="99" step="1" value="95">
+        <input id="ciInput" class="numeric-input" type="number" min="30" max="99" step="1" value="95">
         <span id="ciLabel">95%</span>
         <div class="points-adjust">
-          <span>Points to display</span>
-          <button id="pointsDec" class="arrow-btn" type="button">-</button>
-          <button id="pointsInc" class="arrow-btn" type="button">+</button>
+          <span>Adjust level</span>
+          <button id="ciDec" class="arrow-btn" type="button">-</button>
+          <button id="ciInc" class="arrow-btn" type="button">+</button>
         </div>
       </div>
     </div>
@@ -409,7 +430,7 @@ let hoveredBinRange = null;
 // running-line toggles and point size
 let showMean = true;
 let showStd = true;
-let pointSize = 3;
+let pointSize = 4;
 
 // CI and true average line toggles
 let showCI = false;
@@ -442,8 +463,8 @@ const startDecBtn = document.getElementById("startDec");
 const startIncBtn = document.getElementById("startInc");
 const endDecBtn = document.getElementById("endDec");
 const endIncBtn = document.getElementById("endInc");
-const pointsDecBtn = document.getElementById("pointsDec");
-const pointsIncBtn = document.getElementById("pointsInc");
+const ciDecBtn = document.getElementById("ciDec");
+const ciIncBtn = document.getElementById("ciInc");
 
 // Distribution equations in TeX for MathJax
 const distributionEquations = {
@@ -1270,7 +1291,9 @@ function drawScatter() {
       : marginLeft + effectiveW / 2;
     const y = valueToY(data[globalIndex]);
 
-    ctx.fillRect(x - pointSize / 2, y - pointSize / 2, pointSize, pointSize);
+    ctx.beginPath();
+    ctx.arc(x, y, pointSize, 0, 2 * Math.PI);
+    ctx.fill();
 
     pointPositions.push({ x, y, index: globalIndex, value: data[globalIndex], r: hoverRadius });
   }
@@ -1645,8 +1668,8 @@ setupArrowButtonRepeat(startDecBtn, () => adjustStart(-1));
 setupArrowButtonRepeat(startIncBtn, () => adjustStart(+1));
 setupArrowButtonRepeat(endDecBtn, () => adjustEnd(-1));
 setupArrowButtonRepeat(endIncBtn, () => adjustEnd(+1));
-setupArrowButtonRepeat(pointsDecBtn, () => adjustEnd(-1));
-setupArrowButtonRepeat(pointsIncBtn, () => adjustEnd(+1));
+setupArrowButtonRepeat(ciDecBtn, () => applyCiLevelValue(ciLevel - parseInt(ciSlider.step, 10)));
+setupArrowButtonRepeat(ciIncBtn, () => applyCiLevelValue(ciLevel + parseInt(ciSlider.step, 10)));
 
 // Toggles and sliders
 const toggleMean = document.getElementById("toggleMean");
