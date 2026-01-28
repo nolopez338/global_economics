@@ -145,6 +145,11 @@ button {
 
 button:hover { background: #3759a3; }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .arrow-btn {
   background: #888;
   width: 28px;
@@ -358,6 +363,10 @@ window.MathJax = {
     <span id="pointSizeLabel">4</span> px
   </div>
 
+  <div class="param-row" id="flattenRow" style="display:none;">
+    <button id="flattenButton" type="button" aria-pressed="false">Flatten</button>
+  </div>
+
   <!-- Legend + toggles for running lines -->
   <div class="param-row" id="linesToggleRow" style="display:none;">
     <div class="toggle-pairs">
@@ -431,6 +440,13 @@ let hoveredBinRange = null;
 let showMean = true;
 let showStd = true;
 let pointSize = 4;
+
+// flatten animation state
+let isFlattened = false;
+let isFlattenAnimating = false;
+let axisXCurrent = null;
+let pointsBlend = 0;
+let pointsTargetX = null;
 
 // CI and true average line toggles
 let showCI = false;
@@ -977,6 +993,7 @@ function generate(n) {
   document.getElementById("sliderContainer").style.display = "block";
   document.getElementById("linesToggleRow").style.display = "block";
   document.getElementById("pointSizeRow").style.display = "block";
+  document.getElementById("flattenRow").style.display = "block";
   document.getElementById("extraLinesRow").style.display = "block";
 
   const ciSliderRow = document.getElementById("ciSliderRow");
@@ -989,9 +1006,10 @@ function generate(n) {
 }
 
 // Axes
-function drawAxes(ctx, W, H, minY, maxY, xLabel, yLabel) {
+function drawAxes(ctx, W, H, minY, maxY, xLabel, yLabel, axisXOverride) {
   const marginLeft = 60;
   const marginBottom = 40;
+  const axisX = Number.isFinite(axisXOverride) ? axisXOverride : marginLeft;
 
   ctx.strokeStyle = "#cccccc";
   ctx.beginPath();
@@ -1001,8 +1019,8 @@ function drawAxes(ctx, W, H, minY, maxY, xLabel, yLabel) {
 
   ctx.strokeStyle = "#000";
   ctx.beginPath();
-  ctx.moveTo(marginLeft, 20);
-  ctx.lineTo(marginLeft, H - marginBottom);
+  ctx.moveTo(axisX, 20);
+  ctx.lineTo(axisX, H - marginBottom);
   ctx.stroke();
 
   ctx.textAlign = "center";
@@ -1025,11 +1043,11 @@ function drawAxes(ctx, W, H, minY, maxY, xLabel, yLabel) {
     const yPix = (1-t)*(H - marginBottom - 20) + 20;
 
     ctx.beginPath();
-    ctx.moveTo(marginLeft-5, yPix);
-    ctx.lineTo(marginLeft, yPix);
+    ctx.moveTo(axisX - 5, yPix);
+    ctx.lineTo(axisX, yPix);
     ctx.stroke();
 
-    ctx.fillText(yVal.toFixed(3), marginLeft-8, yPix+4);
+    ctx.fillText(yVal.toFixed(3), axisX - 8, yPix + 4);
   }
 }
 
@@ -1143,9 +1161,53 @@ function updateRangeLabel() {
     `Start: ${start}  End: ${end}  (count: ${count})`;
 }
 
+function getScatterLayout() {
+  resizeCanvas(scatterCanvas);
+  const W = scatterCanvas.width;
+  const H = scatterCanvas.height;
+  const marginLeft = 60;
+  const marginBottom = 40;
+  const topMargin = 20;
+  const effectiveW = W - marginLeft - 20;
+  return {
+    W,
+    H,
+    marginLeft,
+    marginBottom,
+    topMargin,
+    effectiveW,
+    axisBaseX: marginLeft,
+    axisCenterX: marginLeft + effectiveW / 2
+  };
+}
+
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function animateValue(from, to, durationMs, onUpdate, onComplete) {
+  const start = performance.now();
+  const duration = Math.max(1, durationMs);
+
+  const step = (now) => {
+    const elapsed = now - start;
+    const t = Math.min(1, elapsed / duration);
+    const eased = easeInOutCubic(t);
+    const value = from + (to - from) * eased;
+    onUpdate(value);
+    if (t < 1) {
+      requestAnimationFrame(step);
+    } else if (onComplete) {
+      onComplete();
+    }
+  };
+
+  requestAnimationFrame(step);
+}
+
 // Scatter plot with running stats, CI, true mean, and range
 function drawScatter() {
-  resizeCanvas(scatterCanvas);
+  const layout = getScatterLayout();
   const ctx = scatterCtx;
   ctx.clearRect(0,0,scatterCanvas.width,scatterCanvas.height);
 
@@ -1159,12 +1221,14 @@ function drawScatter() {
   const N = end - start + 1;
   if (N <= 0) return;
 
-  const W = scatterCanvas.width;
-  const H = scatterCanvas.height;
+  const W = layout.W;
+  const H = layout.H;
 
-  const marginLeft = 60;
-  const marginBottom = 40;
-  const topMargin = 20;
+  const marginLeft = layout.marginLeft;
+  const marginBottom = layout.marginBottom;
+  const topMargin = layout.topMargin;
+  const axisBaseX = layout.axisBaseX;
+  const axisCenterX = layout.axisCenterX;
 
   const runningMean = new Array(N);
   const runningStd = new Array(N);
@@ -1239,7 +1303,32 @@ function drawScatter() {
     minY -= 1;
   }
 
-  drawAxes(ctx, W, H, minY, maxY, "Sample Index", "Value");
+  if (!isFlattenAnimating) {
+    if (isFlattened) {
+      axisXCurrent = axisCenterX;
+      pointsBlend = 1;
+      pointsTargetX = axisCenterX;
+    } else {
+      axisXCurrent = axisBaseX;
+      pointsBlend = 0;
+    }
+  }
+
+  if (!Number.isFinite(axisXCurrent)) {
+    axisXCurrent = axisBaseX;
+  }
+  if (!Number.isFinite(pointsTargetX)) {
+    pointsTargetX = axisCenterX;
+  }
+
+  const transformX = (baseX) => {
+    if (pointsBlend === 0 || !Number.isFinite(pointsTargetX)) {
+      return baseX;
+    }
+    return baseX + (pointsTargetX - baseX) * pointsBlend;
+  };
+
+  drawAxes(ctx, W, H, minY, maxY, "Sample Index", "Value", axisXCurrent);
 
   const effectiveW = W - marginLeft - 20;
   const effectiveH = H - marginBottom - topMargin;
@@ -1257,7 +1346,9 @@ function drawScatter() {
     const height = Math.abs(y2 - y1);
 
     ctx.fillStyle = "rgba(59, 130, 246, 0.18)";
-    ctx.fillRect(marginLeft, yTop, effectiveW, height);
+    const bandStart = transformX(marginLeft);
+    const bandEnd = transformX(marginLeft + effectiveW);
+    ctx.fillRect(Math.min(bandStart, bandEnd), yTop, Math.abs(bandEnd - bandStart), height);
   }
 
   let yLower, yUpper;
@@ -1268,15 +1359,19 @@ function drawScatter() {
     const height = Math.abs(yUpper - yLower);
 
     ctx.fillStyle = "rgba(249, 115, 22, 0.15)";
-    ctx.fillRect(marginLeft, yTop, effectiveW, height);
+    const bandStart = transformX(marginLeft);
+    const bandEnd = transformX(marginLeft + effectiveW);
+    ctx.fillRect(Math.min(bandStart, bandEnd), yTop, Math.abs(bandEnd - bandStart), height);
 
     ctx.strokeStyle = "rgba(249, 115, 22, 0.7)";
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(marginLeft, yLower);
-    ctx.lineTo(marginLeft + effectiveW, yLower);
-    ctx.moveTo(marginLeft, yUpper);
-    ctx.lineTo(marginLeft + effectiveW, yUpper);
+    const lineStart = transformX(marginLeft);
+    const lineEnd = transformX(marginLeft + effectiveW);
+    ctx.moveTo(lineStart, yLower);
+    ctx.lineTo(lineEnd, yLower);
+    ctx.moveTo(lineStart, yUpper);
+    ctx.lineTo(lineEnd, yUpper);
     ctx.stroke();
   }
 
@@ -1286,9 +1381,10 @@ function drawScatter() {
   // Points in selected range
   for (let i = 0; i < N; i++) {
     const globalIndex = start + i;
-    const x = N > 1
+    const baseX = N > 1
       ? marginLeft + (i / (N - 1)) * effectiveW
       : marginLeft + effectiveW / 2;
+    const x = transformX(baseX);
     const y = valueToY(data[globalIndex]);
 
     ctx.beginPath();
@@ -1304,9 +1400,10 @@ function drawScatter() {
     ctx.lineWidth = 2;
     ctx.beginPath();
     for (let i = 0; i < N; i++) {
-      const x = N > 1
+      const baseX = N > 1
         ? marginLeft + (i / (N - 1)) * effectiveW
         : marginLeft + effectiveW / 2;
+      const x = transformX(baseX);
       const y = valueToY(runningMean[i]);
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
@@ -1315,9 +1412,10 @@ function drawScatter() {
 
     if (N > 0) {
       const lastIndexLocal = N - 1;
-      const xLastMean = N > 1
+      const baseXLastMean = N > 1
         ? marginLeft + (lastIndexLocal / (N - 1)) * effectiveW
         : marginLeft + effectiveW / 2;
+      const xLastMean = transformX(baseXLastMean);
       const yLastMean = valueToY(runningMean[lastIndexLocal]);
 
       ctx.beginPath();
@@ -1339,9 +1437,10 @@ function drawScatter() {
     ctx.lineWidth = 2;
     ctx.beginPath();
     for (let i = 0; i < N; i++) {
-      const x = N > 1
+      const baseX = N > 1
         ? marginLeft + (i / (N - 1)) * effectiveW
         : marginLeft + effectiveW / 2;
+      const x = transformX(baseX);
       const y = valueToY(runningStd[i]);
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
@@ -1350,9 +1449,10 @@ function drawScatter() {
 
     if (N > 0) {
       const lastIndexLocal = N - 1;
-      const xLastStd = N > 1
+      const baseXLastStd = N > 1
         ? marginLeft + (lastIndexLocal / (N - 1)) * effectiveW
         : marginLeft + effectiveW / 2;
+      const xLastStd = transformX(baseXLastStd);
       const yLastStd = valueToY(runningStd[lastIndexLocal]);
 
       ctx.beginPath();
@@ -1375,13 +1475,15 @@ function drawScatter() {
     ctx.lineWidth = 2;
     ctx.setLineDash([6, 4]);
     ctx.beginPath();
-    ctx.moveTo(marginLeft, yTrue);
-    ctx.lineTo(marginLeft + effectiveW, yTrue);
+    const lineStart = transformX(marginLeft);
+    const lineEnd = transformX(marginLeft + effectiveW);
+    ctx.moveTo(lineStart, yTrue);
+    ctx.lineTo(lineEnd, yTrue);
     ctx.stroke();
     ctx.setLineDash([]);
 
     const labelText = "True μ: " + trueMean.toFixed(3);
-    const xLabel = marginLeft + 10;
+    const xLabel = transformX(marginLeft + 10);
     drawLabel(ctx, xLabel, yTrue, labelText, W, H);
   }
 
@@ -1392,13 +1494,15 @@ function drawScatter() {
     ctx.lineWidth = 2;
     ctx.setLineDash([6, 4]);
     ctx.beginPath();
-    ctx.moveTo(marginLeft, yTrueStd);
-    ctx.lineTo(marginLeft + effectiveW, yTrueStd);
+    const lineStart = transformX(marginLeft);
+    const lineEnd = transformX(marginLeft + effectiveW);
+    ctx.moveTo(lineStart, yTrueStd);
+    ctx.lineTo(lineEnd, yTrueStd);
     ctx.stroke();
     ctx.setLineDash([]);
 
     const labelText = "True σ: " + trueStd.toFixed(3);
-    const xLabel = marginLeft + 10;
+    const xLabel = transformX(marginLeft + 10);
     drawLabel(ctx, xLabel, yTrueStd, labelText, W, H);
   }
 
@@ -1406,7 +1510,7 @@ function drawScatter() {
   if (showCI && N > 1 && ciLower != null && ciUpper != null) {
     const labelLow = "CI low: " + ciLower.toFixed(3);
     const labelHigh = "CI high: " + ciUpper.toFixed(3);
-    const xLabel = marginLeft + 10;
+    const xLabel = transformX(marginLeft + 10);
 
     const yLowPix = valueToY(ciLower);
     const yHighPix = valueToY(ciUpper);
@@ -1678,6 +1782,7 @@ const toggleOverallStd = document.getElementById("toggleOverallStd");
 const pointSizeSlider = document.getElementById("pointSizeSlider");
 const pointSizeInput = document.getElementById("pointSizeInput");
 const pointSizeLabel = document.getElementById("pointSizeLabel");
+const flattenButton = document.getElementById("flattenButton");
 
 const toggleCI = document.getElementById("toggleCI");
 const toggleOverallMean = document.getElementById("toggleOverallMean");
@@ -1713,6 +1818,72 @@ function applyCiLevelValue(value) {
   ciInput.value = next;
   ciLabel.textContent = next + "%";
   if (showCI) drawScatter();
+}
+
+function setFlattenButtonState() {
+  flattenButton.textContent = isFlattened ? "Unflatten" : "Flatten";
+  flattenButton.setAttribute("aria-pressed", isFlattened ? "true" : "false");
+}
+
+function setFlattenAnimatingState(isAnimating) {
+  isFlattenAnimating = isAnimating;
+  flattenButton.disabled = isAnimating;
+}
+
+function runFlattenSequence() {
+  if (isFlattenAnimating || data.length === 0) return;
+  const layout = getScatterLayout();
+  if (!(layout.effectiveW > 0)) return;
+
+  axisXCurrent = Number.isFinite(axisXCurrent) ? axisXCurrent : layout.axisBaseX;
+  pointsTargetX = layout.axisCenterX;
+  setFlattenAnimatingState(true);
+  isFlattened = true;
+  setFlattenButtonState();
+  drawScatter();
+
+  animateValue(axisXCurrent, layout.axisCenterX, 500, (value) => {
+    axisXCurrent = value;
+    drawScatter();
+  }, () => {
+    animateValue(pointsBlend, 1, 500, (value) => {
+      pointsBlend = value;
+      drawScatter();
+    }, () => {
+      pointsBlend = 1;
+      axisXCurrent = layout.axisCenterX;
+      setFlattenAnimatingState(false);
+      drawScatter();
+    });
+  });
+}
+
+function runUnflattenSequence() {
+  if (isFlattenAnimating || data.length === 0) return;
+  const layout = getScatterLayout();
+  if (!(layout.effectiveW > 0)) return;
+
+  axisXCurrent = Number.isFinite(axisXCurrent) ? axisXCurrent : layout.axisCenterX;
+  pointsTargetX = Number.isFinite(pointsTargetX) ? pointsTargetX : layout.axisCenterX;
+  setFlattenAnimatingState(true);
+  isFlattened = false;
+  setFlattenButtonState();
+  drawScatter();
+
+  animateValue(axisXCurrent, layout.axisBaseX, 500, (value) => {
+    axisXCurrent = value;
+    drawScatter();
+  }, () => {
+    animateValue(pointsBlend, 0, 500, (value) => {
+      pointsBlend = value;
+      drawScatter();
+    }, () => {
+      pointsBlend = 0;
+      axisXCurrent = layout.axisBaseX;
+      setFlattenAnimatingState(false);
+      drawScatter();
+    });
+  });
 }
 
 toggleMean.addEventListener("change", () => {
@@ -1758,6 +1929,14 @@ toggleOverallMean.addEventListener("change", () => {
   drawScatter();
 });
 
+flattenButton.addEventListener("click", () => {
+  if (isFlattened) {
+    runUnflattenSequence();
+  } else {
+    runFlattenSequence();
+  }
+});
+
 ciSlider.addEventListener("input", () => {
   applyCiLevelValue(parseFloat(ciSlider.value));
 });
@@ -1777,6 +1956,7 @@ ciInput.addEventListener("change", () => {
 // Keep manual inputs synchronized with the current state on load.
 applyPointSizeValue(pointSize);
 applyCiLevelValue(ciLevel);
+setFlattenButtonState();
 
 // init (default: Continuous / Normal)
 categorySel.addEventListener("change", updateDistributionOptions);
