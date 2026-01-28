@@ -177,11 +177,101 @@
       line-height: 1.25;
       color: var(--muted, #6b7280);
     }
+
+    .password-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(248, 250, 252, 0.96);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      z-index: 1000;
+    }
+
+    .password-card {
+      width: min(420px, 100%);
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.18);
+      border: 1px solid var(--grid, #e2e8f0);
+      text-align: center;
+    }
+
+    .password-card h1 {
+      font-size: 1.5rem;
+      margin: 0 0 0.75rem;
+      color: var(--ink, #0f172a);
+    }
+
+    .password-card p {
+      margin: 0 0 1.5rem;
+      color: var(--muted, #6b7280);
+    }
+
+    .password-card label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      text-align: left;
+    }
+
+    .password-card input[type="password"] {
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      border-radius: 10px;
+      border: 1px solid var(--grid, #e2e8f0);
+      font: inherit;
+    }
+
+    .password-card input[type="password"]:focus-visible {
+      outline: 2px solid var(--muted);
+      outline-offset: 2px;
+    }
+
+    .password-card button {
+      margin-top: 1rem;
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      border-radius: 999px;
+      border: 0;
+      background: var(--cool-2, #bae6fd);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .password-card button:focus-visible {
+      outline: 2px solid var(--muted);
+      outline-offset: 2px;
+    }
+
+    .password-error {
+      margin-top: 0.75rem;
+      color: #b91c1c;
+      font-size: 0.9rem;
+    }
+
+    #protected-content[hidden] {
+      display: none;
+    }
   </style>
 </head>
 
 <body>
-  <main>
+  <div class="password-overlay" id="password-overlay" role="dialog" aria-modal="true" aria-labelledby="password-title">
+    <div class="password-card">
+      <h1 id="password-title">Teacher Schedule</h1>
+      <p>Please enter the access password to view the schedule.</p>
+      <form id="password-form">
+        <label for="password-input">Password</label>
+        <input id="password-input" name="password" type="password" autocomplete="current-password" required />
+        <button type="submit">Enter</button>
+        <p class="password-error" id="password-error" hidden>Incorrect password. Please try again.</p>
+      </form>
+    </div>
+  </div>
+  <main id="protected-content" hidden>
     <nav class="breadcrumbs" aria-label="Main navigation">
       <a class="back-link" href="../index.html">← Back to Main</a>
     </nav>
@@ -482,6 +572,76 @@
     <button type="button" role="menuitem" data-weekday="Friday">Friday</button>
   </div>
   <script>
+    const protectedContent = document.getElementById("protected-content");
+    const passwordOverlay = document.getElementById("password-overlay");
+    const passwordForm = document.getElementById("password-form");
+    const passwordInput = document.getElementById("password-input");
+    const passwordError = document.getElementById("password-error");
+    const unlockKey = "scheduleUnlocked";
+    // Expected SHA-256 hash: e519d416c8b2623331c17695e7c6ab641e96cd0ce3f636b097b1be68fd793e16
+    const expectedHash = "e519d416c8b2623331c17695e7c6ab641e96cd0ce3f636b097b1be68fd793e16";
+
+    const bufferToHex = (buffer) =>
+      Array.from(new Uint8Array(buffer))
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("");
+
+    const unlockContent = () => {
+      if (passwordOverlay) {
+        passwordOverlay.remove();
+      }
+      if (protectedContent) {
+        protectedContent.hidden = false;
+      }
+    };
+
+    const checkUnlock = async (password) => {
+      const encoded = new TextEncoder().encode(password);
+      const digest = await crypto.subtle.digest("SHA-256", encoded);
+      return bufferToHex(digest) === expectedHash;
+    };
+
+    const handleSubmit = async (event) => {
+      event.preventDefault();
+      if (!passwordInput) {
+        return;
+      }
+      const value = passwordInput.value;
+      const matches = await checkUnlock(value);
+      if (matches) {
+        try {
+          sessionStorage.setItem(unlockKey, "true");
+        } catch (error) {
+          console.error("Unable to store unlock state.", error);
+        }
+        unlockContent();
+        return;
+      }
+      if (passwordError) {
+        passwordError.hidden = false;
+      }
+      passwordInput.value = "";
+      passwordInput.focus();
+    };
+
+    const getStoredUnlock = () => {
+      try {
+        return sessionStorage.getItem(unlockKey);
+      } catch (error) {
+        console.error("Unable to read unlock state.", error);
+        return null;
+      }
+    };
+
+    if (getStoredUnlock() === "true") {
+      unlockContent();
+    } else if (passwordForm && passwordInput) {
+      passwordForm.addEventListener("submit", handleSubmit);
+      requestAnimationFrame(() => {
+        passwordInput.focus();
+      });
+    }
+
     const toggle = document.querySelector(".collapsible-toggle");
     const panel = document.getElementById("class-pages-panel");
     const icon = toggle?.querySelector(".collapsible-icon");
