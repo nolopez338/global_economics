@@ -116,6 +116,12 @@
     sections.reverse().forEach(expandSection);
   }
 
+  function expandMainSectionFromTarget(target) {
+    const mainSection = target.closest('.content-card.collapsible');
+    if (!mainSection) return;
+    expandSection(mainSection);
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     document.documentElement.classList.add('js-enabled');
     const sections = Array.from(document.querySelectorAll('.collapsible'));
@@ -153,5 +159,25 @@
       if (!target) return;
       expandAncestorSections(target);
     });
+
+    const mainToc = document.getElementById('table-of-contents');
+    if (mainToc) {
+      mainToc.addEventListener('click', (event) => {
+        const link = event.target.closest('a[href^="#"]');
+        if (!link || !mainToc.contains(link)) return;
+        const href = link.getAttribute('href');
+        if (!href || href.length < 2) return;
+        const target = document.getElementById(href.slice(1));
+        if (!target) return;
+        expandMainSectionFromTarget(target);
+        event.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (history.pushState) {
+          history.pushState(null, '', href);
+        } else {
+          window.location.hash = href;
+        }
+      });
+    }
   });
 })();
