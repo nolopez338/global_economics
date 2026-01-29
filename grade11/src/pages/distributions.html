@@ -427,6 +427,11 @@ window.MathJax = {
   <div class="hist-container">
     <canvas id="histCanvas"></canvas>
   </div>
+  <div class="param-row" id="histTransposeRow">
+    <button id="transposeHistButton" type="button" aria-pressed="false">
+      Transpose histogram
+    </button>
+  </div>
 </div>
 
 <script>
@@ -459,6 +464,9 @@ let showOverallMean = false;
 let showOverallStd = false;
 let ciLevel = 95; // percent
 
+// histogram orientation
+let isHistogramTransposed = false;
+
 // range selection (indices)
 let rangeStart = 0;
 let rangeEnd = 0;
@@ -488,6 +496,7 @@ const pointSizeDecBtn = document.getElementById("pointSizeDec");
 const pointSizeIncBtn = document.getElementById("pointSizeInc");
 const ciDecBtn = document.getElementById("ciDec");
 const ciIncBtn = document.getElementById("ciInc");
+const transposeHistButton = document.getElementById("transposeHistButton");
 
 // Distribution equations in TeX for MathJax
 const distributionEquations = {
@@ -1058,6 +1067,97 @@ function drawAxes(ctx, W, H, minY, maxY, xLabel, yLabel, axisXOverride) {
   }
 }
 
+function drawHistogramAxes(ctx, W, H, {
+  marginLeft,
+  marginBottom,
+  topMargin,
+  rightMargin,
+  maxCount,
+  bins,
+  min,
+  binSize,
+  isTransposed
+}) {
+  const effectiveW = W - marginLeft - rightMargin;
+  const effectiveH = H - marginBottom - topMargin;
+
+  ctx.strokeStyle = "#cccccc";
+  ctx.beginPath();
+  ctx.moveTo(marginLeft, H - marginBottom);
+  ctx.lineTo(W - rightMargin, H - marginBottom);
+  ctx.stroke();
+
+  ctx.strokeStyle = "#000";
+  ctx.beginPath();
+  ctx.moveTo(marginLeft, topMargin);
+  ctx.lineTo(marginLeft, H - marginBottom);
+  ctx.stroke();
+
+  const xLabel = isTransposed ? "Frequency" : "Value Range (bins)";
+  const yLabel = isTransposed ? "Value Range (bins)" : "Frequency";
+
+  ctx.textAlign = "center";
+  ctx.font = "14px Arial";
+  ctx.fillText(xLabel, W / 2, H - 5);
+
+  ctx.save();
+  ctx.translate(15, H / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText(yLabel, 0, 0);
+  ctx.restore();
+
+  ctx.font = "12px Arial";
+
+  if (isTransposed) {
+    const xTicks = 5;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    for (let i = 0; i <= xTicks; i++) {
+      const t = i / xTicks;
+      const xVal = maxCount * t;
+      const xPix = marginLeft + t * effectiveW;
+      ctx.beginPath();
+      ctx.moveTo(xPix, H - marginBottom);
+      ctx.lineTo(xPix, H - marginBottom + 5);
+      ctx.stroke();
+      ctx.fillText(xVal.toFixed(0), xPix, H - marginBottom + 6);
+    }
+
+    const yTicks = Math.min(6, bins);
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    const binHeight = bins > 0 ? effectiveH / bins : 0;
+    if (yTicks > 0) {
+      for (let i = 0; i < yTicks; i++) {
+        const t = yTicks === 1 ? 0 : i / (yTicks - 1);
+        const binIndex = Math.round(t * (bins - 1));
+        const yPix = topMargin + (binIndex + 0.5) * binHeight;
+        const start = min + binIndex * binSize;
+        const end = start + binSize;
+        ctx.beginPath();
+        ctx.moveTo(marginLeft - 5, yPix);
+        ctx.lineTo(marginLeft, yPix);
+        ctx.stroke();
+        ctx.fillText(`${start.toFixed(2)}-${end.toFixed(2)}`, marginLeft - 8, yPix);
+      }
+    }
+  } else {
+    const yTicks = 5;
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    for (let i = 0; i <= yTicks; i++) {
+      const t = i / yTicks;
+      const yVal = maxCount * t;
+      const yPix = (1 - t) * effectiveH + topMargin;
+      ctx.beginPath();
+      ctx.moveTo(marginLeft - 5, yPix);
+      ctx.lineTo(marginLeft, yPix);
+      ctx.stroke();
+      ctx.fillText(yVal.toFixed(0), marginLeft - 8, yPix);
+    }
+  }
+}
+
 // Normal inverse CDF
 function normInv(p) {
   if (p <= 0 || p >= 1) throw new Error("p must be in (0,1)");
@@ -1557,6 +1657,8 @@ function drawHistogram() {
 
   const marginLeft = 60;
   const marginBottom = 40;
+  const topMargin = 20;
+  const rightMargin = 20;
 
   const bins = getBinCount(N);
   const min = Math.min(...subset);
@@ -1571,29 +1673,64 @@ function drawHistogram() {
 
   const maxCount = Math.max(...counts);
 
-  drawAxes(ctx, W, H, 0, maxCount, "Value Range (bins)", "Frequency");
+  drawHistogramAxes(ctx, W, H, {
+    marginLeft,
+    marginBottom,
+    topMargin,
+    rightMargin,
+    maxCount,
+    bins,
+    min,
+    binSize,
+    isTransposed: isHistogramTransposed
+  });
 
-  const effectiveW = W - marginLeft - 20;
-  const effectiveH = H - marginBottom - 20;
-  const barW = effectiveW / bins;
+  const effectiveW = W - marginLeft - rightMargin;
+  const effectiveH = H - marginBottom - topMargin;
 
   histogramBars = [];
 
   ctx.fillStyle = "#4a7bd1";
-  for (let i=0;i<bins;i++) {
-    const h = maxCount > 0 ? (counts[i]/maxCount)*effectiveH : 0;
-    const x = marginLeft + i*barW;
-    const y = H - marginBottom - h;
+  if (isHistogramTransposed) {
+    const barH = bins > 0 ? effectiveH / bins : 0;
+    for (let i = 0; i < bins; i++) {
+      const w = maxCount > 0 ? (counts[i] / maxCount) * effectiveW : 0;
+      const x = marginLeft;
+      const y = topMargin + i * barH;
 
-    ctx.fillRect(x,y,barW-2,h);
+      ctx.fillRect(x, y, w, Math.max(0, barH - 2));
 
-    histogramBars.push({
-      x, y, w: barW-2, h,
-      binIndex: i,
-      count: counts[i],
-      minVal: min + i*binSize,
-      maxVal: min + (i+1)*binSize
-    });
+      histogramBars.push({
+        x,
+        y,
+        w,
+        h: Math.max(0, barH - 2),
+        binIndex: i,
+        count: counts[i],
+        minVal: min + i * binSize,
+        maxVal: min + (i + 1) * binSize
+      });
+    }
+  } else {
+    const barW = bins > 0 ? effectiveW / bins : 0;
+    for (let i = 0; i < bins; i++) {
+      const h = maxCount > 0 ? (counts[i] / maxCount) * effectiveH : 0;
+      const x = marginLeft + i * barW;
+      const y = H - marginBottom - h;
+
+      ctx.fillRect(x, y, Math.max(0, barW - 2), h);
+
+      histogramBars.push({
+        x,
+        y,
+        w: Math.max(0, barW - 2),
+        h,
+        binIndex: i,
+        count: counts[i],
+        minVal: min + i * binSize,
+        maxVal: min + (i + 1) * binSize
+      });
+    }
   }
 }
 
@@ -2059,6 +2196,19 @@ flattenButton.addEventListener("click", () => {
   }
 });
 
+function updateTransposeButtonState() {
+  transposeHistButton.textContent = isHistogramTransposed
+    ? "Show standard histogram"
+    : "Transpose histogram";
+  transposeHistButton.setAttribute("aria-pressed", isHistogramTransposed ? "true" : "false");
+}
+
+transposeHistButton.addEventListener("click", () => {
+  isHistogramTransposed = !isHistogramTransposed;
+  updateTransposeButtonState();
+  drawHistogram();
+});
+
 ciSlider.addEventListener("input", () => {
   applyCiLevelValue(parseFloat(ciSlider.value));
 });
@@ -2079,6 +2229,7 @@ ciInput.addEventListener("change", () => {
 applyPointSizeValue(pointSize);
 applyCiLevelValue(ciLevel);
 setFlattenButtonState();
+updateTransposeButtonState();
 
 // init (default: Continuous / Normal)
 categorySel.addEventListener("change", updateDistributionOptions);
