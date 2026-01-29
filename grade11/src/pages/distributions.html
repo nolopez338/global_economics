@@ -407,8 +407,8 @@ window.MathJax = {
       </label>
       <div class="ci-controls" id="ciSliderRow" style="display:none;" aria-hidden="true">
         <span>Confidence level</span>
-        <input id="ciSlider" class="slider-wide" type="range" min="30" max="99" step="1" value="95">
-        <input id="ciInput" class="numeric-input" type="number" min="30" max="99" step="0.5" value="95">
+        <input id="ciSlider" class="slider-wide" type="range" min="30" max="99.99" step="0.01" value="95">
+        <input id="ciInput" class="numeric-input" type="number" min="30" max="99.99" step="0.01" value="95">
         <span id="ciLabel">95%</span>
         <div class="points-adjust">
           <span>Adjust level</span>
@@ -1814,7 +1814,9 @@ function setupHoldAdjustButton(button, action) {
     if (didTrigger) {
       event.preventDefault();
       event.stopImmediatePropagation();
+      return;
     }
+    action();
   }, { capture: true });
 
   button.addEventListener("mousedown", startHold);
@@ -1847,7 +1849,7 @@ const ciLabel = document.getElementById("ciLabel");
 const ciSliderRow = document.getElementById("ciSliderRow");
 
 const pointSizeStep = parseFloat(pointSizeSlider.step || "1");
-const ciArrowStep = 0.5;
+const ciMax = parseFloat(ciSlider.max);
 
 function getStepDecimals(step) {
   if (!Number.isFinite(step)) return 0;
@@ -1860,11 +1862,12 @@ function getStepDecimals(step) {
   return parts[1] ? parts[1].length : 0;
 }
 
-function formatStepValue(value, step) {
+function formatStepValue(value, step, { trimZeros = true } = {}) {
   const decimals = getStepDecimals(step);
   if (!Number.isFinite(value)) return "";
   if (decimals === 0) return String(Math.round(value));
-  return value.toFixed(decimals).replace(/\.0+$/, "");
+  const fixed = value.toFixed(decimals);
+  return trimZeros ? fixed.replace(/\.0+$/, "") : fixed;
 }
 
 function clampToSliderBounds(value, slider, step = 1) {
@@ -1881,6 +1884,28 @@ function clampToSliderBounds(value, slider, step = 1) {
   return parseFloat(next.toFixed(decimals));
 }
 
+function getCiStep(value) {
+  if (!Number.isFinite(value)) return 1;
+  if (value < 99) return 1;
+  if (value < 99.9) return 0.1;
+  if (value < 99.99) return 0.01;
+  return 0.01;
+}
+
+function clampCiLevel(value) {
+  const min = parseFloat(ciSlider.min);
+  const max = Number.isFinite(ciMax) ? ciMax : parseFloat(ciSlider.max);
+  let next = Number(value);
+  if (!Number.isFinite(next)) return null;
+  if (next < min) next = min;
+  if (next > max) next = max;
+  const step = getCiStep(next);
+  const decimals = getStepDecimals(step);
+  next = Math.round((next - min) / step) * step + min;
+  next = Math.min(Math.max(next, min), max);
+  return parseFloat(next.toFixed(decimals));
+}
+
 function applyPointSizeValue(value) {
   if (!Number.isFinite(value)) return;
   const next = clampToSliderBounds(value, pointSizeSlider, pointSizeStep);
@@ -1894,9 +1919,10 @@ function applyPointSizeValue(value) {
 
 function applyCiLevelValue(value) {
   if (!Number.isFinite(value)) return;
-  const next = clampToSliderBounds(value, ciSlider, ciArrowStep);
+  const next = clampCiLevel(value);
   if (!Number.isFinite(next)) return;
-  const formatted = formatStepValue(next, ciArrowStep);
+  const step = getCiStep(next);
+  const formatted = formatStepValue(next, step, { trimZeros: false });
   ciLevel = next;
   ciSlider.value = next;
   ciInput.value = formatted;
@@ -1906,8 +1932,15 @@ function applyCiLevelValue(value) {
 
 setupHoldAdjustButton(pointSizeDecBtn, () => applyPointSizeValue(pointSize - pointSizeStep));
 setupHoldAdjustButton(pointSizeIncBtn, () => applyPointSizeValue(pointSize + pointSizeStep));
-setupHoldAdjustButton(ciDecBtn, () => applyCiLevelValue(ciLevel - ciArrowStep));
-setupHoldAdjustButton(ciIncBtn, () => applyCiLevelValue(ciLevel + ciArrowStep));
+setupHoldAdjustButton(ciDecBtn, () => {
+  const step = getCiStep(ciLevel);
+  applyCiLevelValue(ciLevel - step);
+});
+setupHoldAdjustButton(ciIncBtn, () => {
+  if (ciLevel >= ciMax) return;
+  const step = getCiStep(ciLevel);
+  applyCiLevelValue(ciLevel + step);
+});
 
 function setFlattenButtonState() {
   flattenButton.textContent = isFlattened ? "Unflatten" : "Flatten";
