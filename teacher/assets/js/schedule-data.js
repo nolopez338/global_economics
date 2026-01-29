@@ -67,6 +67,28 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 10,
+    "Section": "A",
+    "Class #": "6-2",
+    "Date": "2026/02/03",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Maximum Opportunity Criterion (C6) overview with guided practice, plus homework assigned for Criterion C7.",
+    "Material": "Maximum Opportunity Criterion (C6)",
+    "Summary": "Maximum Opportunity Criterion (C6)"
+  },
+  {
+    "Grade": 10,
+    "Section": "A",
+    "Class #": "7-1",
+    "Date": "2026/02/06",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Quiz-style workshop reinforcing Criterion C6, followed by revision of key questions.",
+    "Material": "Quiz workshop",
+    "Summary": "Quiz workshop"
+  },
+  {
+    "Grade": 10,
     "Section": "B",
     "Class #": "3-2",
     "Date": "2026/01/15",
@@ -133,6 +155,28 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 10,
+    "Section": "B",
+    "Class #": "6-2",
+    "Date": "2026/02/05",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Maximum Opportunity Criterion (C6) clarification with guided work, plus homework assigned for Criterion C7.",
+    "Material": "Maximum Opportunity Criterion (C6)",
+    "Summary": "Maximum Opportunity Criterion (C6)"
+  },
+  {
+    "Grade": 10,
+    "Section": "B",
+    "Class #": "7-1",
+    "Date": "2026/02/06",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Quiz-style workshop reinforcing Criterion C6, followed by revision of key questions.",
+    "Material": "Quiz workshop",
+    "Summary": "Quiz workshop"
+  },
+  {
+    "Grade": 10,
     "Section": "C",
     "Class #": "3-2",
     "Date": "2026/01/15",
@@ -196,6 +240,28 @@ window.SCHEDULE_DATA = [
     "Description": "Exam session",
     "Material": "Exam session",
     "Summary": "Exam session"
+  },
+  {
+    "Grade": 10,
+    "Section": "C",
+    "Class #": "6-2",
+    "Date": "2026/02/05",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Maximum Opportunity Criterion (C6) clarification with guided work, plus homework assigned for Criterion C7.",
+    "Material": "Maximum Opportunity Criterion (C6)",
+    "Summary": "Maximum Opportunity Criterion (C6)"
+  },
+  {
+    "Grade": 10,
+    "Section": "C",
+    "Class #": "7-1",
+    "Date": "2026/02/06",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Quiz-style workshop reinforcing Criterion C6, followed by revision of key questions.",
+    "Material": "Quiz workshop",
+    "Summary": "Quiz workshop"
   },
   {
     "Grade": 10,
@@ -265,6 +331,28 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 10,
+    "Section": "D",
+    "Class #": "6-1",
+    "Date": "2026/02/03",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Maximum Opportunity Criterion (C6) overview with guided practice, plus homework assigned for Criterion C7.",
+    "Material": "Maximum Opportunity Criterion (C6)",
+    "Summary": "Maximum Opportunity Criterion (C6)"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "6-2",
+    "Date": "2026/02/04",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Quiz-based practice for Criterion C6, with structured revision of previously assigned questions.",
+    "Material": "Quiz practice",
+    "Summary": "Quiz practice"
+  },
+  {
+    "Grade": 10,
     "Section": "E",
     "Class #": "3-1",
     "Date": "2026/01/13",
@@ -328,6 +416,28 @@ window.SCHEDULE_DATA = [
     "Description": "Exam in pairs. Students select 2 out of 3 questions.",
     "Material": "Exam",
     "Summary": "Exam"
+  },
+  {
+    "Grade": 10,
+    "Section": "E",
+    "Class #": "6-1",
+    "Date": "2026/02/03",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Maximum Opportunity Criterion (C6) overview with guided practice, plus homework assigned for Criterion C7.",
+    "Material": "Maximum Opportunity Criterion (C6)",
+    "Summary": "Maximum Opportunity Criterion (C6)"
+  },
+  {
+    "Grade": 10,
+    "Section": "E",
+    "Class #": "6-2",
+    "Date": "2026/02/04",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Quiz-based practice for Criterion C6, with structured revision of previously assigned questions.",
+    "Material": "Quiz practice",
+    "Summary": "Quiz practice"
   },
   {
     "Grade": 11,
@@ -394,6 +504,28 @@ window.SCHEDULE_DATA = [
     "Description": "Introduction to the effects of the sample size on the Confidence Interval",
     "Material": "Introduction to the effects of the sample size on the Confidence Interval",
     "Summary": "Introduction to the effects of the sample size on the Confidence Interval"
+  },
+  {
+    "Grade": 11,
+    "Section": "A",
+    "Class #": "6-2",
+    "Date": "2026/02/03",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Quiz-style workshop focused on Criterion C6, with homework assigned for Criterion C7.",
+    "Material": "Quiz workshop",
+    "Summary": "Quiz workshop"
+  },
+  {
+    "Grade": 11,
+    "Section": "A",
+    "Class #": "7-1",
+    "Date": "2026/02/06",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Homework support for Criteria C6 and C7, with focused revision of exam-style questions.",
+    "Material": "Homework support",
+    "Summary": "Homework support"
   },
   {
     "Grade": 11,
@@ -463,6 +595,28 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 11,
+    "Section": "B",
+    "Class #": "6-1",
+    "Date": "2026/02/03",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Quiz-style workshop focused on Criterion C6, with homework assigned for Criterion C7.",
+    "Material": "Quiz workshop",
+    "Summary": "Quiz workshop"
+  },
+  {
+    "Grade": 11,
+    "Section": "B",
+    "Class #": "6-2",
+    "Date": "2026/02/05",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Guided support for homework on Criteria C6 and C7, with targeted question revision.",
+    "Material": "Homework support",
+    "Summary": "Homework support"
+  },
+  {
+    "Grade": 11,
     "Section": "C",
     "Class #": "3-2",
     "Date": "2026/01/14",
@@ -526,6 +680,28 @@ window.SCHEDULE_DATA = [
     "Description": "Introduction to the effects of the sample size on the Confidence Interval",
     "Material": "Introduction to the effects of the sample size on the Confidence Interval",
     "Summary": "Introduction to the effects of the sample size on the Confidence Interval"
+  },
+  {
+    "Grade": 11,
+    "Section": "C",
+    "Class #": "6-2",
+    "Date": "2026/02/04",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Quiz-style workshop focused on Criterion C6, with homework assigned for Criterion C7.",
+    "Material": "Quiz workshop",
+    "Summary": "Quiz workshop"
+  },
+  {
+    "Grade": 11,
+    "Section": "C",
+    "Class #": "7-1",
+    "Date": "2026/02/09",
+    "Weekday": "Monday",
+    "Day": 2,
+    "Description": "Homework support for Criteria C6 and C7, with focused revision of exam-style questions.",
+    "Material": "Homework support",
+    "Summary": "Homework support"
   },
   {
     "Grade": 11,
@@ -595,6 +771,28 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 11,
+    "Section": "D",
+    "Class #": "6-2",
+    "Date": "2026/02/04",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Quiz-style workshop focused on Criterion C6, with homework assigned for Criterion C7.",
+    "Material": "Quiz workshop",
+    "Summary": "Quiz workshop"
+  },
+  {
+    "Grade": 11,
+    "Section": "D",
+    "Class #": "7-1",
+    "Date": "2026/02/06",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Homework support for Criteria C6 and C7, with focused revision of exam-style questions.",
+    "Material": "Homework support",
+    "Summary": "Homework support"
+  },
+  {
+    "Grade": 11,
     "Section": "E",
     "Class #": "3-2",
     "Date": "2026/01/13",
@@ -658,5 +856,27 @@ window.SCHEDULE_DATA = [
     "Description": "Introduction to the effects of the sample size on the Confidence Interval",
     "Material": "Introduction to the effects of the sample size on the Confidence Interval",
     "Summary": "Introduction to the effects of the sample size on the Confidence Interval"
+  },
+  {
+    "Grade": 11,
+    "Section": "E",
+    "Class #": "6-2",
+    "Date": "2026/02/03",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Quiz-style workshop focused on Criterion C6, with homework assigned for Criterion C7.",
+    "Material": "Quiz workshop",
+    "Summary": "Quiz workshop"
+  },
+  {
+    "Grade": 11,
+    "Section": "E",
+    "Class #": "7-1",
+    "Date": "2026/02/09",
+    "Weekday": "Monday",
+    "Day": 2,
+    "Description": "Homework support for Criteria C6 and C7, with focused revision of exam-style questions.",
+    "Material": "Homework support",
+    "Summary": "Homework support"
   }
 ];
