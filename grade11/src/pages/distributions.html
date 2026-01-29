@@ -1022,9 +1022,150 @@ function generate(n) {
 }
 
 // Axes
-function drawAxes(ctx, W, H, minY, maxY, xLabel, yLabel, axisXOverride) {
+function getScatterStats() {
+  const total = data.length;
+  if (total === 0) return null;
+
+  let start = Math.max(0, Math.min(rangeStart, total - 1));
+  let end   = Math.max(0, Math.min(rangeEnd, total - 1));
+  if (end < start) [start, end] = [end, start];
+
+  const N = end - start + 1;
+  if (N <= 0) return null;
+
+  const runningMean = new Array(N);
+  const runningStd = new Array(N);
+  let sum = 0;
+  let sumSq = 0;
+
+  let minY = Infinity;
+  let maxY = -Infinity;
+
+  for (let i = 0; i < N; i++) {
+    const idx = start + i;
+    const v = data[idx];
+    sum += v;
+    sumSq += v * v;
+    const n = i + 1;
+    const mean = sum / n;
+    const variance = n > 1 ? (sumSq / n - mean * mean) : 0;
+    const std = Math.sqrt(Math.max(variance, 0));
+
+    runningMean[i] = mean;
+    runningStd[i] = std;
+
+    if (v < minY) minY = v;
+    if (v > maxY) maxY = v;
+    if (showMean) {
+      if (mean < minY) minY = mean;
+      if (mean > maxY) maxY = mean;
+    }
+    if (showStd) {
+      if (std < minY) minY = std;
+      if (std > maxY) maxY = std;
+    }
+  }
+
+  const trueMean = getTrueMean();
+  const trueStd = getTrueStd();
+
+  if (showOverallStd && trueStd != null && isFinite(trueStd)) {
+    if (trueStd < minY) minY = trueStd;
+    if (trueStd > maxY) maxY = trueStd;
+  }
+
+  let sampleMean = null;
+  if (N > 0) {
+    sampleMean = runningMean[N - 1];
+  }
+
+  let ciLower = null;
+  let ciUpper = null;
+  if (showCI && N > 1) {
+    const z = getZ(ciLevel);
+    const stdFinal = runningStd[N - 1];
+    const margin = z * stdFinal / Math.sqrt(N);
+    ciLower = sampleMean - margin;
+    ciUpper = sampleMean + margin;
+    if (ciLower < minY) minY = ciLower;
+    if (ciUpper > maxY) maxY = ciUpper;
+  }
+
+  if (trueMean != null && isFinite(trueMean)) {
+    let distBelow = trueMean - minY;
+    let distAbove = maxY - trueMean;
+    let maxDist = Math.max(distBelow, distAbove);
+    if (!(maxDist > 0)) maxDist = 1;
+    minY = trueMean - maxDist;
+    maxY = trueMean + maxDist;
+  }
+
+  if (maxY === minY) {
+    maxY += 1;
+    minY -= 1;
+  }
+
+  return {
+    start,
+    end,
+    N,
+    runningMean,
+    runningStd,
+    minY,
+    maxY,
+    trueMean,
+    trueStd,
+    sampleMean,
+    ciLower,
+    ciUpper
+  };
+}
+
+function getScatterAxisConfig(stats) {
+  const tickCount = 5;
+  const tickValues = [];
+  for (let i = 0; i <= tickCount; i++) {
+    const t = i / tickCount;
+    tickValues.push(stats.minY + t * (stats.maxY - stats.minY));
+  }
+  return {
+    minY: stats.minY,
+    maxY: stats.maxY,
+    tickValues,
+    tickFormat: (val) => val.toFixed(3),
+    label: "Value"
+  };
+}
+
+function createYAxisScale(minY, maxY, topMargin, bottomMargin, H) {
+  const effectiveH = H - bottomMargin - topMargin;
+  return (val) =>
+    (1 - (val - minY) / (maxY - minY + 1e-12)) * effectiveH + topMargin;
+}
+
+function drawYAxisTicks(ctx, axisX, topMargin, bottomMargin, H, axisConfig) {
+  const { minY, maxY, tickValues, tickFormat } = axisConfig;
+  const effectiveH = H - bottomMargin - topMargin;
+
+  ctx.font = "12px Arial";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "alphabetic";
+
+  tickValues.forEach((value) => {
+    const t = (value - minY) / (maxY - minY || 1);
+    const yPix = (1 - t) * effectiveH + topMargin;
+    ctx.beginPath();
+    ctx.moveTo(axisX - 5, yPix);
+    ctx.lineTo(axisX, yPix);
+    ctx.stroke();
+    ctx.fillText(tickFormat(value), axisX - 8, yPix + 4);
+  });
+}
+
+function drawAxes(ctx, W, H, axisConfig, xLabel, axisXOverride) {
   const marginLeft = 60;
   const marginBottom = 40;
+  const topMargin = 20;
   const axisX = Number.isFinite(axisXOverride) ? axisXOverride : marginLeft;
 
   ctx.strokeStyle = "#cccccc";
@@ -1046,25 +1187,10 @@ function drawAxes(ctx, W, H, minY, maxY, xLabel, yLabel, axisXOverride) {
   ctx.save();
   ctx.translate(15, H/2);
   ctx.rotate(-Math.PI/2);
-  ctx.fillText(yLabel, 0, 0);
+  ctx.fillText(axisConfig.label, 0, 0);
   ctx.restore();
 
-  const ticks = 5;
-  ctx.font = "12px Arial";
-  ctx.textAlign = "right";
-
-  for (let i=0;i<=ticks;i++) {
-    const t = i/ticks;
-    const yVal = minY + t*(maxY - minY);
-    const yPix = (1-t)*(H - marginBottom - 20) + 20;
-
-    ctx.beginPath();
-    ctx.moveTo(axisX - 5, yPix);
-    ctx.lineTo(axisX, yPix);
-    ctx.stroke();
-
-    ctx.fillText(yVal.toFixed(3), axisX - 8, yPix + 4);
-  }
+  drawYAxisTicks(ctx, axisX, topMargin, marginBottom, H, axisConfig);
 }
 
 function drawHistogramAxes(ctx, W, H, {
@@ -1076,7 +1202,8 @@ function drawHistogramAxes(ctx, W, H, {
   bins,
   min,
   binSize,
-  isTransposed
+  isTransposed,
+  scatterAxisConfig
 }) {
   const effectiveW = W - marginLeft - rightMargin;
   const effectiveH = H - marginBottom - topMargin;
@@ -1094,7 +1221,7 @@ function drawHistogramAxes(ctx, W, H, {
   ctx.stroke();
 
   const xLabel = isTransposed ? "Frequency" : "Value Range (bins)";
-  const yLabel = isTransposed ? "Value Range (bins)" : "Frequency";
+  const yLabel = isTransposed && scatterAxisConfig ? scatterAxisConfig.label : "Frequency";
 
   ctx.textAlign = "center";
   ctx.font = "14px Arial";
@@ -1123,23 +1250,8 @@ function drawHistogramAxes(ctx, W, H, {
       ctx.fillText(xVal.toFixed(0), xPix, H - marginBottom + 6);
     }
 
-    const yTicks = Math.min(6, bins);
-    ctx.textAlign = "right";
-    ctx.textBaseline = "middle";
-    const binHeight = bins > 0 ? effectiveH / bins : 0;
-    if (yTicks > 0) {
-      for (let i = 0; i < yTicks; i++) {
-        const t = yTicks === 1 ? 0 : i / (yTicks - 1);
-        const binIndex = Math.round(t * (bins - 1));
-        const yPix = topMargin + (binIndex + 0.5) * binHeight;
-        const start = min + binIndex * binSize;
-        const end = start + binSize;
-        ctx.beginPath();
-        ctx.moveTo(marginLeft - 5, yPix);
-        ctx.lineTo(marginLeft, yPix);
-        ctx.stroke();
-        ctx.fillText(`${start.toFixed(2)}-${end.toFixed(2)}`, marginLeft - 8, yPix);
-      }
+    if (scatterAxisConfig) {
+      drawYAxisTicks(ctx, marginLeft, topMargin, marginBottom, H, scatterAxisConfig);
     }
   } else {
     const yTicks = 5;
@@ -1318,15 +1430,21 @@ function drawScatter() {
   const ctx = scatterCtx;
   ctx.clearRect(0,0,scatterCanvas.width,scatterCanvas.height);
 
-  const total = data.length;
-  if (total === 0) return;
+  const stats = getScatterStats();
+  if (!stats) return;
 
-  let start = Math.max(0, Math.min(rangeStart, total - 1));
-  let end   = Math.max(0, Math.min(rangeEnd, total - 1));
-  if (end < start) [start, end] = [end, start];
+  const {
+    start,
+    N,
+    runningMean,
+    runningStd,
+    trueMean,
+    trueStd,
+    ciLower,
+    ciUpper
+  } = stats;
 
-  const N = end - start + 1;
-  if (N <= 0) return;
+  const axisConfig = getScatterAxisConfig(stats);
 
   const W = layout.W;
   const H = layout.H;
@@ -1336,79 +1454,6 @@ function drawScatter() {
   const topMargin = layout.topMargin;
   const axisBaseX = layout.axisBaseX;
   const axisCenterX = layout.axisCenterX;
-
-  const runningMean = new Array(N);
-  const runningStd = new Array(N);
-  let sum = 0;
-  let sumSq = 0;
-
-  let minY = Infinity;
-  let maxY = -Infinity;
-
-  // compute running stats over selected range
-  for (let i = 0; i < N; i++) {
-    const idx = start + i;
-    const v = data[idx];
-    sum += v;
-    sumSq += v * v;
-    const n = i + 1;
-    const mean = sum / n;
-    const variance = n > 1 ? (sumSq / n - mean * mean) : 0;
-    const std = Math.sqrt(Math.max(variance, 0));
-
-    runningMean[i] = mean;
-    runningStd[i] = std;
-
-    if (v < minY) minY = v;
-    if (v > maxY) maxY = v;
-    if (showMean) {
-      if (mean < minY) minY = mean;
-      if (mean > maxY) maxY = mean;
-    }
-    if (showStd) {
-      if (std < minY) minY = std;
-      if (std > maxY) maxY = std;
-    }
-  }
-
-  const trueMean = getTrueMean();
-  const trueStd = getTrueStd();
-
-  if (showOverallStd && trueStd != null && isFinite(trueStd)) {
-    if (trueStd < minY) minY = trueStd;
-    if (trueStd > maxY) maxY = trueStd;
-  }
-
-  let sampleMean = null;
-  if (N > 0) {
-    sampleMean = runningMean[N - 1];
-  }
-
-  let ciLower = null;
-  let ciUpper = null;
-  if (showCI && N > 1) {
-    const z = getZ(ciLevel);
-    const stdFinal = runningStd[N - 1];
-    const margin = z * stdFinal / Math.sqrt(N);
-    ciLower = sampleMean - margin;
-    ciUpper = sampleMean + margin;
-    if (ciLower < minY) minY = ciLower;
-    if (ciUpper > maxY) maxY = ciUpper;
-  }
-
-  if (trueMean != null && isFinite(trueMean)) {
-    let distBelow = trueMean - minY;
-    let distAbove = maxY - trueMean;
-    let maxDist = Math.max(distBelow, distAbove);
-    if (!(maxDist > 0)) maxDist = 1;
-    minY = trueMean - maxDist;
-    maxY = trueMean + maxDist;
-  }
-
-  if (maxY === minY) {
-    maxY += 1;
-    minY -= 1;
-  }
 
   if (!isFlattenAnimating) {
     if (isFlattened) {
@@ -1435,13 +1480,12 @@ function drawScatter() {
     return baseX + (pointsTargetX - baseX) * pointsBlend;
   };
 
-  drawAxes(ctx, W, H, minY, maxY, "Sample Index", "Value", axisXCurrent);
+  drawAxes(ctx, W, H, axisConfig, "Sample Index", axisXCurrent);
 
   const effectiveW = W - marginLeft - 20;
   const effectiveH = H - marginBottom - topMargin;
 
-  const valueToY = (val) =>
-    (1 - (val - minY) / (maxY - minY + 1e-12)) * effectiveH + topMargin;
+  const valueToY = createYAxisScale(axisConfig.minY, axisConfig.maxY, topMargin, marginBottom, H);
 
   pointPositions = [];
 
@@ -1673,6 +1717,9 @@ function drawHistogram() {
 
   const maxCount = Math.max(...counts);
 
+  const scatterStats = isHistogramTransposed ? getScatterStats() : null;
+  const scatterAxisConfig = scatterStats ? getScatterAxisConfig(scatterStats) : null;
+
   drawHistogramAxes(ctx, W, H, {
     marginLeft,
     marginBottom,
@@ -1682,7 +1729,8 @@ function drawHistogram() {
     bins,
     min,
     binSize,
-    isTransposed: isHistogramTransposed
+    isTransposed: isHistogramTransposed,
+    scatterAxisConfig
   });
 
   const effectiveW = W - marginLeft - rightMargin;
@@ -1692,23 +1740,32 @@ function drawHistogram() {
 
   ctx.fillStyle = "#4a7bd1";
   if (isHistogramTransposed) {
-    const barH = bins > 0 ? effectiveH / bins : 0;
+    const valueToY = scatterAxisConfig
+      ? createYAxisScale(scatterAxisConfig.minY, scatterAxisConfig.maxY, topMargin, marginBottom, H)
+      : createYAxisScale(min, max, topMargin, marginBottom, H);
     for (let i = 0; i < bins; i++) {
       const w = maxCount > 0 ? (counts[i] / maxCount) * effectiveW : 0;
       const x = marginLeft;
-      const y = topMargin + i * barH;
+      const binMin = min + i * binSize;
+      const binMax = min + (i + 1) * binSize;
+      const y1 = valueToY(binMax);
+      const y2 = valueToY(binMin);
+      const yTop = Math.min(y1, y2);
+      const fullH = Math.abs(y2 - y1);
+      const barH = Math.max(0, fullH - 2);
+      const y = yTop + (fullH - barH) / 2;
 
-      ctx.fillRect(x, y, w, Math.max(0, barH - 2));
+      ctx.fillRect(x, y, w, barH);
 
       histogramBars.push({
         x,
         y,
         w,
-        h: Math.max(0, barH - 2),
+        h: barH,
         binIndex: i,
         count: counts[i],
-        minVal: min + i * binSize,
-        maxVal: min + (i + 1) * binSize
+        minVal: binMin,
+        maxVal: binMax
       });
     }
   } else {
