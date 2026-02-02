@@ -89,6 +89,17 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 10,
+    "Section": "A",
+    "Class #": "8-2",
+    "Date": "2026/02/17",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Midterm Exam",
+    "Material": "Midterm Exam",
+    "Summary": "Midterm Exam"
+  },
+  {
+    "Grade": 10,
     "Section": "B",
     "Class #": "3-2",
     "Date": "2026/01/15",
@@ -177,6 +188,17 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 10,
+    "Section": "B",
+    "Class #": "8-2",
+    "Date": "2026/02/19",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Midterm Exam",
+    "Material": "Midterm Exam",
+    "Summary": "Midterm Exam"
+  },
+  {
+    "Grade": 10,
     "Section": "C",
     "Class #": "3-2",
     "Date": "2026/01/15",
@@ -262,6 +284,17 @@ window.SCHEDULE_DATA = [
     "Description": "Quiz-style workshop reinforcing Criterion C6, followed by revision of key questions.",
     "Material": "Quiz workshop",
     "Summary": "Quiz workshop"
+  },
+  {
+    "Grade": 10,
+    "Section": "C",
+    "Class #": "8-2",
+    "Date": "2026/02/19",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Midterm Exam",
+    "Material": "Midterm Exam",
+    "Summary": "Midterm Exam"
   },
   {
     "Grade": 10,
@@ -353,6 +386,17 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 10,
+    "Section": "D",
+    "Class #": "8-1",
+    "Date": "2026/02/17",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Midterm Exam",
+    "Material": "Midterm Exam",
+    "Summary": "Midterm Exam"
+  },
+  {
+    "Grade": 10,
     "Section": "E",
     "Class #": "3-1",
     "Date": "2026/01/13",
@@ -438,6 +482,17 @@ window.SCHEDULE_DATA = [
     "Description": "Quiz-based practice for Criterion C6, with structured revision of previously assigned questions.",
     "Material": "Quiz practice",
     "Summary": "Quiz practice"
+  },
+  {
+    "Grade": 10,
+    "Section": "E",
+    "Class #": "8-2",
+    "Date": "2026/02/18",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Midterm Exam",
+    "Material": "Midterm Exam",
+    "Summary": "Midterm Exam"
   },
   {
     "Grade": 11,
@@ -526,6 +581,17 @@ window.SCHEDULE_DATA = [
     "Description": "Homework support for Criteria C6 and C7, with focused revision of exam-style questions.",
     "Material": "Homework support",
     "Summary": "Homework support"
+  },
+  {
+    "Grade": 11,
+    "Section": "A",
+    "Class #": "8-2",
+    "Date": "2026/02/17",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Midterm Exam",
+    "Material": "Midterm Exam",
+    "Summary": "Midterm Exam"
   },
   {
     "Grade": 11,
@@ -617,6 +683,17 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 11,
+    "Section": "B",
+    "Class #": "8-2",
+    "Date": "2026/02/19",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Midterm Exam",
+    "Material": "Midterm Exam",
+    "Summary": "Midterm Exam"
+  },
+  {
+    "Grade": 11,
     "Section": "C",
     "Class #": "3-2",
     "Date": "2026/01/14",
@@ -702,6 +779,17 @@ window.SCHEDULE_DATA = [
     "Description": "Homework support for Criteria C6 and C7, with focused revision of exam-style questions.",
     "Material": "Homework support",
     "Summary": "Homework support"
+  },
+  {
+    "Grade": 11,
+    "Section": "C",
+    "Class #": "8-2",
+    "Date": "2026/02/18",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Midterm Exam",
+    "Material": "Midterm Exam",
+    "Summary": "Midterm Exam"
   },
   {
     "Grade": 11,
@@ -793,6 +881,17 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 11,
+    "Section": "D",
+    "Class #": "8-2",
+    "Date": "2026/02/18",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Midterm Exam",
+    "Material": "Midterm Exam",
+    "Summary": "Midterm Exam"
+  },
+  {
+    "Grade": 11,
     "Section": "E",
     "Class #": "3-2",
     "Date": "2026/01/13",
@@ -878,5 +977,16 @@ window.SCHEDULE_DATA = [
     "Description": "Homework support for Criteria C6 and C7, with focused revision of exam-style questions.",
     "Material": "Homework support",
     "Summary": "Homework support"
+  },
+  {
+    "Grade": 11,
+    "Section": "E",
+    "Class #": "8-2",
+    "Date": "2026/02/17",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Midterm Exam",
+    "Material": "Midterm Exam",
+    "Summary": "Midterm Exam"
   }
 ];
