@@ -567,7 +567,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/03",
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "Quiz-style workshop focused on Criterion C6, with homework assigned for Criterion C7.",
+    "Description": "Review of C6 examples, Exam revisions.",
     "Material": "Quiz workshop",
     "Summary": "Quiz workshop"
   },
@@ -666,7 +666,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/03",
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "Quiz-style workshop focused on Criterion C6, with homework assigned for Criterion C7.",
+    "Description": "Review of C6 examples, Exam revisions.",
     "Material": "Quiz workshop",
     "Summary": "Quiz workshop"
   },
@@ -963,7 +963,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/03",
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "Quiz-style workshop focused on Criterion C6, with homework assigned for Criterion C7.",
+    "Description": "Review of C6 examples, Exam revisions.",
     "Material": "Quiz workshop",
     "Summary": "Quiz workshop"
   },
