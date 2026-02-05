@@ -83,7 +83,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/06",
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "Quiz-style workshop reinforcing Criterion C6, followed by revision of key questions.",
+    "Description": "Quiz-style workshop reinforcing Criterion C6, followed by revision C7.",
     "Material": "Quiz workshop",
     "Summary": "Quiz workshop"
   },
@@ -171,7 +171,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/05",
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "Maximum Opportunity Criterion (C6) clarification with guided work, plus homework assigned for Criterion C7.",
+    "Description": "Maximum Opportunity Criterion (C6) clarification with guided work.",
     "Material": "Maximum Opportunity Criterion (C6)",
     "Summary": "Maximum Opportunity Criterion (C6)"
   },
@@ -182,7 +182,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/06",
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "Quiz-style workshop reinforcing Criterion C6, followed by revision of key questions.",
+    "Description": "Quiz-style workshop reinforcing Criterion C6, followed by revision C7.",
     "Material": "Quiz workshop",
     "Summary": "Quiz workshop"
   },
@@ -281,7 +281,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/06",
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "Quiz-style workshop reinforcing Criterion C6, followed by revision of key questions.",
+    "Description": "Quiz-style workshop reinforcing Criterion C6, followed by revision C7.",
     "Material": "Quiz workshop",
     "Summary": "Quiz workshop"
   },
@@ -578,7 +578,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/06",
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "Homework support for Criteria C6 and C7, with focused revision of exam-style questions.",
+    "Description": "Quiz-style workshop reinforcing Criterion C6, followed by revision C7.",
     "Material": "Homework support",
     "Summary": "Homework support"
   },
@@ -875,7 +875,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/06",
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "Homework support for Criteria C6 and C7, with focused revision of exam-style questions.",
+    "Description": "Quiz-style workshop reinforcing Criterion C6, followed by revision C7.",
     "Material": "Homework support",
     "Summary": "Homework support"
   },
