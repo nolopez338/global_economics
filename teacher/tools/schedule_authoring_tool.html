@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Schedule Authoring Tool</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 1rem; line-height: 1.35; }
+      h1,h2 { margin: 0.5rem 0; }
+      .row { margin: 0.75rem 0; }
+      textarea { width: 100%; min-height: 180px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+      pre { background: #f5f5f5; padding: 0.75rem; overflow: auto; border: 1px solid #ddd; }
+      .errors { border: 1px solid #d88; background: #fff5f5; padding: 0.75rem; }
+      .ok { border: 1px solid #8d8; background: #f4fff4; padding: 0.75rem; }
+      button { margin-right: 0.5rem; margin-top: 0.5rem; }
+      label { font-weight: bold; display: block; }
+      .grid { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+      .panel { border: 1px solid #ccc; padding: 0.75rem; }
+    </style>
+    <script src="../assets/js/class-data.js"></script>
+  </head>
+  <body>
+    <h1>Schedule Authoring Tool (Browser-only Prototype)</h1>
+    <p>Load <code>teacher/authoring/schedule.csv</code>, validate it, and generate JS artifacts.</p>
+
+    <div class="grid">
+      <div class="panel">
+        <h2>CSV Input</h2>
+        <div class="row">
+          <label for="csvFile">Upload schedule.csv</label>
+          <input id="csvFile" type="file" accept=".csv,text/csv" />
+        </div>
+        <div class="row">
+          <label for="csvText">Or paste CSV text</label>
+          <textarea id="csvText" placeholder="Paste schedule CSV here"></textarea>
+        </div>
+        <div class="row">
+          <label for="slotsFile">Optional slots.csv override</label>
+          <input id="slotsFile" type="file" accept=".csv,text/csv" />
+        </div>
+        <div class="row">
+          <button id="loadDefaultsBtn" type="button">Load default authoring CSVs</button>
+          <button id="validateBtn" type="button">Validate</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Validation Output</h2>
+        <div id="validationOutput" class="ok">No validation run yet.</div>
+      </div>
+    </div>
+
+    <h2>Generated Artifacts</h2>
+    <div class="row">
+      <button id="generateFlatBtn" type="button">Generate Flat (window.SCHEDULE_DATA)</button>
+      <button id="generateNormBtn" type="button">Generate Normalized + Adapter</button>
+    </div>
+
+    <h3>Flat Artifact</h3>
+    <pre id="flatOut"></pre>
+    <button id="downloadFlatBtn" type="button">Download flat artifact</button>
+
+    <h3>Normalized Artifact</h3>
+    <pre id="normOut"></pre>
+    <button id="downloadNormBtn" type="button">Download normalized artifact</button>
+
+    <h3>Adapter Artifact</h3>
+    <pre id="adapterOut"></pre>
+    <button id="downloadAdapterBtn" type="button">Download adapter artifact</button>
+
+    <script>
+      const REQUIRED_COLUMNS = ["class_id", "date", "weekday", "slot", "title", "location"];
+      const ALLOWED_WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"];
+      const ORIGINAL_KEYS = ["Grade", "Section", "Class #", "Date", "Weekday", "Day", "Description", "Material", "Summary"];
+
+      let lastRows = [];
+      let allowedSlots = [];
+      let allowedClassIds = [];
+
+      function parseCSV(text) {
+        const rows = [];
+        let i = 0, field = "", row = [], inQuotes = false;
+        while (i < text.length) {
+          const ch = text[i];
+          if (inQuotes) {
+            if (ch === '"') {
+              if (text[i + 1] === '"') {
+                field += '"';
+                i += 2;
+                continue;
+              }
+              inQuotes = false;
+            } else {
+              field += ch;
+            }
+          } else {
+            if (ch === '"') {
+              inQuotes = true;
+            } else if (ch === ',') {
+              row.push(field);
+              field = "";
+            } else if (ch === '\n') {
+              row.push(field);
+              rows.push(row);
+              row = [];
+              field = "";
+            } else if (ch !== '\r') {
+              field += ch;
+            }
+          }
+          i += 1;
+        }
+        row.push(field);
+        rows.push(row);
+        const filtered = rows.filter((r) => !(r.length === 1 && r[0] === ""));
+        const headers = filtered[0] || [];
+        const body = filtered.slice(1).map((r) => {
+          const obj = {};
+          headers.forEach((h, idx) => { obj[h] = r[idx] ?? ""; });
+          return obj;
+        });
+        return { headers, rows: body };
+      }
+
+      function csvEscape(value) {
+        const str = String(value ?? "");
+        if (/[",\n]/.test(str)) return '"' + str.replace(/"/g, '""') + '"';
+        return str;
+      }
+
+      function toJS(name, data) {
+        return `${name} = ${JSON.stringify(data, null, 2)};\n`;
+      }
+
+      function getClassIdSetFromGlobal() {
+        const lists = window.CLASS_STUDENT_LISTS;
+        if (!lists || typeof lists !== "object") return [];
+        return Object.keys(lists);
+      }
+
+      function dayFromDate(dateYMD) {
+        const [y, m, d] = dateYMD.split("-").map(Number);
+        const dt = new Date(Date.UTC(y, m - 1, d));
+        const names = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        return names[dt.getUTCDay()];
+      }
+
+      function validate(headers, rows) {
+        const errors = [];
+        const seen = new Set();
+
+        REQUIRED_COLUMNS.forEach((column) => {
+          if (!headers.includes(column)) {
+            errors.push(`source schedule.csv | row 0 | column ${column} | value <missing> | expected rule required column present`);
+          }
+        });
+
+        rows.forEach((row, index) => {
+          const rowNo = index + 1;
+          const dateVal = row.date || "";
+          const weekdayVal = row.weekday || "";
+          const classIdVal = row.class_id || "";
+          const slotVal = row.slot || "";
+
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(dateVal)) {
+            errors.push(`source schedule.csv | row ${rowNo} | column date | value ${JSON.stringify(dateVal)} | expected rule YYYY-MM-DD`);
+          } else {
+            const wd = dayFromDate(dateVal);
+            if (wd === "Sat" || wd === "Sun") {
+              errors.push(`source schedule.csv | row ${rowNo} | column date | value ${JSON.stringify(dateVal)} | expected rule weekday must be Mon-Fri`);
+            }
+            if (weekdayVal && weekdayVal !== wd) {
+              errors.push(`source schedule.csv | row ${rowNo} | column weekday | value ${JSON.stringify(weekdayVal)} | expected rule date-consistent weekday ${wd}`);
+            }
+          }
+
+          if (!ALLOWED_WEEKDAYS.includes(weekdayVal)) {
+            errors.push(`source schedule.csv | row ${rowNo} | column weekday | value ${JSON.stringify(weekdayVal)} | expected rule one of ${ALLOWED_WEEKDAYS.join("/")}`);
+          }
+
+          if (!allowedClassIds.includes(classIdVal)) {
+            errors.push(`source schedule.csv | row ${rowNo} | column class_id | value ${JSON.stringify(classIdVal)} | expected rule class_id exists in class-data.js`);
+          }
+
+          if (allowedSlots.length > 0 && !allowedSlots.includes(slotVal)) {
+            errors.push(`source schedule.csv | row ${rowNo} | column slot | value ${JSON.stringify(slotVal)} | expected rule slot exists in slots.csv`);
+          }
+
+          const key = `${classIdVal}|${dateVal}|${slotVal}`;
+          if (seen.has(key)) {
+            errors.push(`source schedule.csv | row ${rowNo} | column class_id+date+slot | value ${JSON.stringify(key)} | expected rule unique collision key`);
+          }
+          seen.add(key);
+        });
+
+        return errors;
+      }
+
+      function rowsToFlat(rows) {
+        return rows.map((r) => ({
+          Grade: Number(r.Grade),
+          Section: r.Section,
+          "Class #": r["Class #"],
+          Date: r.Date,
+          Weekday: r.Weekday,
+          Day: Number(r.Day),
+          Description: r.Description,
+          Material: r.Material,
+          Summary: r.Summary
+        }));
+      }
+
+      function rowsToNorm(rows) {
+        return rows.map((r) => ({
+          class_id: r.class_id,
+          date: r.date,
+          weekday: r.weekday,
+          slot: r.slot,
+          title: r.title,
+          location: r.location,
+          grade: Number(r.Grade),
+          section: r.Section,
+          day: Number(r.Day),
+          description: r.Description,
+          material: r.Material,
+          summary: r.Summary,
+          date_raw: r.Date,
+          weekday_raw: r.Weekday
+        }));
+      }
+
+      function buildAdapter() {
+        return [
+          "window.SCHEDULE_DATA = (window.SCHEDULE_NORM || []).map((entry) => ({",
+          "  Grade: Number(entry.grade),",
+          "  Section: entry.section,",
+          "  \"Class #\": entry.slot,",
+          "  Date: entry.date_raw || entry.date.replace(/-/g, '/'),",
+          "  Weekday: entry.weekday_raw || entry.weekday,",
+          "  Day: Number(entry.day),",
+          "  Description: entry.description || '',",
+          "  Material: entry.material || '',",
+          "  Summary: entry.summary || entry.title || ''",
+          "}));",
+          ""
+        ].join("\n");
+      }
+
+      function download(filename, content) {
+        const blob = new Blob([content], { type: "application/javascript" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      async function readFile(input) {
+        const file = input.files?.[0];
+        if (!file) return "";
+        return file.text();
+      }
+
+      async function loadDefaultCSVs() {
+        const [scheduleRes, slotsRes] = await Promise.all([
+          fetch("../authoring/schedule.csv"),
+          fetch("../authoring/slots.csv")
+        ]);
+        const scheduleText = await scheduleRes.text();
+        const slotsText = await slotsRes.text();
+        document.getElementById("csvText").value = scheduleText;
+
+        const slotParsed = parseCSV(slotsText);
+        allowedSlots = slotParsed.rows.map((r) => r.slot).filter(Boolean);
+      }
+
+      async function parseInputs() {
+        const fileText = await readFile(document.getElementById("csvFile"));
+        const pasted = document.getElementById("csvText").value;
+        const csvText = fileText || pasted;
+        if (!csvText.trim()) throw new Error("No CSV provided.");
+
+        const slotsFileText = await readFile(document.getElementById("slotsFile"));
+        if (slotsFileText.trim()) {
+          const slotParsed = parseCSV(slotsFileText);
+          allowedSlots = slotParsed.rows.map((r) => r.slot).filter(Boolean);
+        } else if (allowedSlots.length === 0) {
+          try {
+            const slotRes = await fetch("../authoring/slots.csv");
+            const slotParsed = parseCSV(await slotRes.text());
+            allowedSlots = slotParsed.rows.map((r) => r.slot).filter(Boolean);
+          } catch (_) {
+            allowedSlots = [];
+          }
+        }
+
+        const parsed = parseCSV(csvText);
+        return parsed;
+      }
+
+      function writeValidation(errors) {
+        const box = document.getElementById("validationOutput");
+        if (errors.length === 0) {
+          box.className = "ok";
+          box.textContent = `Validation passed (${lastRows.length} rows).`;
+          return;
+        }
+        box.className = "errors";
+        box.innerHTML = "<strong>Validation failed:</strong><ul>" + errors.map((e) => `<li>${e}</li>`).join("") + "</ul>";
+      }
+
+      document.getElementById("loadDefaultsBtn").addEventListener("click", async () => {
+        await loadDefaultCSVs();
+      });
+
+      document.getElementById("validateBtn").addEventListener("click", async () => {
+        allowedClassIds = getClassIdSetFromGlobal();
+        const { headers, rows } = await parseInputs();
+        lastRows = rows;
+        const errors = validate(headers, rows);
+        writeValidation(errors);
+      });
+
+      document.getElementById("generateFlatBtn").addEventListener("click", async () => {
+        allowedClassIds = getClassIdSetFromGlobal();
+        const { headers, rows } = await parseInputs();
+        lastRows = rows;
+        const errors = validate(headers, rows);
+        writeValidation(errors);
+        if (errors.length) return;
+
+        const flat = toJS("window.SCHEDULE_DATA", rowsToFlat(rows));
+        document.getElementById("flatOut").textContent = flat;
+      });
+
+      document.getElementById("generateNormBtn").addEventListener("click", async () => {
+        allowedClassIds = getClassIdSetFromGlobal();
+        const { headers, rows } = await parseInputs();
+        lastRows = rows;
+        const errors = validate(headers, rows);
+        writeValidation(errors);
+        if (errors.length) return;
+
+        const norm = toJS("window.SCHEDULE_NORM", rowsToNorm(rows));
+        const adapter = buildAdapter();
+        document.getElementById("normOut").textContent = norm;
+        document.getElementById("adapterOut").textContent = adapter;
+      });
+
+      document.getElementById("downloadFlatBtn").addEventListener("click", () => {
+        const t = document.getElementById("flatOut").textContent;
+        if (t.trim()) download("schedule-flat.generated.js", t);
+      });
+      document.getElementById("downloadNormBtn").addEventListener("click", () => {
+        const t = document.getElementById("normOut").textContent;
+        if (t.trim()) download("schedule-norm.generated.js", t);
+      });
+      document.getElementById("downloadAdapterBtn").addEventListener("click", () => {
+        const t = document.getElementById("adapterOut").textContent;
+        if (t.trim()) download("schedule-adapter.generated.js", t);
+      });
+    </script>
+  </body>
+</html>
