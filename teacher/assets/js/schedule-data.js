@@ -171,9 +171,9 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/05",
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "Maximum Opportunity Criterion (C6) clarification with guided work.",
-    "Material": "Maximum Opportunity Criterion (C6)",
-    "Summary": "Maximum Opportunity Criterion (C6)"
+    "Description": "Review of C6 examples, Exam revisions.",
+    "Material": "C6",
+    "Summary": "C6"
   },
   {
     "Grade": 10,
@@ -182,9 +182,31 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/06",
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "Quiz-style workshop reinforcing Criterion C6, followed by revision C7.",
-    "Material": "Quiz workshop",
-    "Summary": "Quiz workshop"
+    "Description": "Workshop session (C6/C7).",
+    "Material": "Workshop",
+    "Summary": "Workshop"
+  },
+  {
+    "Grade": 10,
+    "Section": "B",
+    "Class #": "7-2",
+    "Date": "2026/02/12",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Homework support (C7/C8).",
+    "Material": "Homework support",
+    "Summary": "Homework support"
+  },
+  {
+    "Grade": 10,
+    "Section": "B",
+    "Class #": "8-1",
+    "Date": "2026/02/13",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Midterm Mock",
+    "Material": "Midterm Mock",
+    "Summary": "Midterm Mock"
   },
   {
     "Grade": 10,
@@ -270,9 +292,9 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/05",
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "Maximum Opportunity Criterion (C6) clarification with guided work, plus homework assigned for Criterion C7.",
-    "Material": "Maximum Opportunity Criterion (C6)",
-    "Summary": "Maximum Opportunity Criterion (C6)"
+    "Description": "Review of C6 examples, Exam revisions.",
+    "Material": "C6",
+    "Summary": "C6"
   },
   {
     "Grade": 10,
@@ -281,9 +303,31 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/06",
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "Quiz-style workshop reinforcing Criterion C6, followed by revision C7.",
-    "Material": "Quiz workshop",
-    "Summary": "Quiz workshop"
+    "Description": "Workshop session (C6/C7).",
+    "Material": "Workshop",
+    "Summary": "Workshop"
+  },
+  {
+    "Grade": 10,
+    "Section": "C",
+    "Class #": "7-2",
+    "Date": "2026/02/12",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Homework support (C7/C8).",
+    "Material": "Homework support",
+    "Summary": "Homework support"
+  },
+  {
+    "Grade": 10,
+    "Section": "C",
+    "Class #": "8-1",
+    "Date": "2026/02/13",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Midterm Mock",
+    "Material": "Midterm Mock",
+    "Summary": "Midterm Mock"
   },
   {
     "Grade": 10,
@@ -369,9 +413,9 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/03",
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "Maximum Opportunity Criterion (C6) overview with guided practice, plus homework assigned for Criterion C7.",
-    "Material": "Maximum Opportunity Criterion (C6)",
-    "Summary": "Maximum Opportunity Criterion (C6)"
+    "Description": "Exam session",
+    "Material": "Exam session",
+    "Summary": "Exam session"
   },
   {
     "Grade": 10,
@@ -380,9 +424,31 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/04",
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "Review of C6 examples, exam revisions.",
-    "Material": "Quiz practice",
-    "Summary": "Quiz practice"
+    "Description": "Review of C6 examples, Exam revisions.",
+    "Material": "C6",
+    "Summary": "C6"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "7-1",
+    "Date": "2026/02/10",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Workshop session (C6/C7).",
+    "Material": "Workshop",
+    "Summary": "Workshop"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "7-2",
+    "Date": "2026/02/11",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Midterm Mock",
+    "Material": "Midterm Mock",
+    "Summary": "Midterm Mock"
   },
   {
     "Grade": 10,
@@ -468,9 +534,9 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/03",
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "Maximum Opportunity Criterion (C6) overview with guided practice, plus homework assigned for Criterion C7.",
-    "Material": "Maximum Opportunity Criterion (C6)",
-    "Summary": "Maximum Opportunity Criterion (C6)"
+    "Description": "Exam session",
+    "Material": "Exam session",
+    "Summary": "Exam session"
   },
   {
     "Grade": 10,
@@ -479,9 +545,42 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/04",
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "Quiz-based practice for Criterion C6, with structured revision of previously assigned questions.",
-    "Material": "Quiz practice",
-    "Summary": "Quiz practice"
+    "Description": "Review of C6 examples, Exam revisions.",
+    "Material": "C6",
+    "Summary": "C6"
+  },
+  {
+    "Grade": 10,
+    "Section": "E",
+    "Class #": "7-1",
+    "Date": "2026/02/10",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Workshop session (C6/C7).",
+    "Material": "Workshop",
+    "Summary": "Workshop"
+  },
+  {
+    "Grade": 10,
+    "Section": "E",
+    "Class #": "7-2",
+    "Date": "2026/02/11",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Homework support (C7/C8).",
+    "Material": "Homework support",
+    "Summary": "Homework support"
+  },
+  {
+    "Grade": 10,
+    "Section": "E",
+    "Class #": "8-1",
+    "Date": "2026/02/17",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Midterm Mock",
+    "Material": "Midterm Mock",
+    "Summary": "Midterm Mock"
   },
   {
     "Grade": 10,
@@ -556,9 +655,9 @@ window.SCHEDULE_DATA = [
     "Date": "2026/01/30",
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "Introduction to the effects of the sample size on the Confidence Interval",
-    "Material": "Introduction to the effects of the sample size on the Confidence Interval",
-    "Summary": "Introduction to the effects of the sample size on the Confidence Interval"
+    "Description": "Exam session",
+    "Material": "Exam session",
+    "Summary": "Exam session"
   },
   {
     "Grade": 11,
@@ -568,8 +667,8 @@ window.SCHEDULE_DATA = [
     "Weekday": "Tuesday",
     "Day": 3,
     "Description": "Review of C6 examples, Exam revisions.",
-    "Material": "Quiz workshop",
-    "Summary": "Quiz workshop"
+    "Material": "C6",
+    "Summary": "C6"
   },
   {
     "Grade": 11,
@@ -578,9 +677,31 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/06",
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "Quiz-style workshop reinforcing Criterion C6, followed by revision C7.",
+    "Description": "Workshop session (C6/C7).",
+    "Material": "Workshop",
+    "Summary": "Workshop"
+  },
+  {
+    "Grade": 11,
+    "Section": "A",
+    "Class #": "7-2",
+    "Date": "2026/02/10",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Homework support (C7/C8).",
     "Material": "Homework support",
     "Summary": "Homework support"
+  },
+  {
+    "Grade": 11,
+    "Section": "A",
+    "Class #": "8-1",
+    "Date": "2026/02/13",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Midterm Mock",
+    "Material": "Midterm Mock",
+    "Summary": "Midterm Mock"
   },
   {
     "Grade": 11,
@@ -666,9 +787,9 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/03",
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "Review of C6 examples, Exam revisions.",
-    "Material": "Quiz workshop",
-    "Summary": "Quiz workshop"
+    "Description": "Exam session",
+    "Material": "Exam session",
+    "Summary": "Exam session"
   },
   {
     "Grade": 11,
@@ -677,9 +798,42 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/05",
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "Exam for C6, Review of C7",
+    "Description": "Review of C6 examples, Exam revisions.",
+    "Material": "C6",
+    "Summary": "C6"
+  },
+  {
+    "Grade": 11,
+    "Section": "B",
+    "Class #": "7-1",
+    "Date": "2026/02/10",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Workshop session (C6/C7).",
+    "Material": "Workshop",
+    "Summary": "Workshop"
+  },
+  {
+    "Grade": 11,
+    "Section": "B",
+    "Class #": "7-2",
+    "Date": "2026/02/12",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Homework support (C7/C8).",
     "Material": "Homework support",
     "Summary": "Homework support"
+  },
+  {
+    "Grade": 11,
+    "Section": "B",
+    "Class #": "8-1",
+    "Date": "2026/02/17",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Midterm Mock",
+    "Material": "Midterm Mock",
+    "Summary": "Midterm Mock"
   },
   {
     "Grade": 11,
@@ -754,9 +908,9 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/02",
     "Weekday": "Monday",
     "Day": 2,
-    "Description": "Introduction to the effects of the sample size on the Confidence Interval",
-    "Material": "Introduction to the effects of the sample size on the Confidence Interval",
-    "Summary": "Introduction to the effects of the sample size on the Confidence Interval"
+    "Description": "Exam session",
+    "Material": "Exam session",
+    "Summary": "Exam session"
   },
   {
     "Grade": 11,
@@ -765,9 +919,9 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/04",
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "Quiz-style workshop focused on Criterion C6, with homework assigned for Criterion C7.",
-    "Material": "Quiz workshop",
-    "Summary": "Quiz workshop"
+    "Description": "Review of C6 examples, Exam revisions.",
+    "Material": "C6",
+    "Summary": "C6"
   },
   {
     "Grade": 11,
@@ -776,9 +930,31 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/09",
     "Weekday": "Monday",
     "Day": 2,
-    "Description": "Homework support for Criteria C6 and C7, with focused revision of exam-style questions.",
+    "Description": "Workshop session (C6/C7).",
+    "Material": "Workshop",
+    "Summary": "Workshop"
+  },
+  {
+    "Grade": 11,
+    "Section": "C",
+    "Class #": "7-2",
+    "Date": "2026/02/11",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Homework support (C7/C8).",
     "Material": "Homework support",
     "Summary": "Homework support"
+  },
+  {
+    "Grade": 11,
+    "Section": "C",
+    "Class #": "8-1",
+    "Date": "2026/02/16",
+    "Weekday": "Monday",
+    "Day": 2,
+    "Description": "Midterm Mock",
+    "Material": "Midterm Mock",
+    "Summary": "Midterm Mock"
   },
   {
     "Grade": 11,
@@ -853,9 +1029,9 @@ window.SCHEDULE_DATA = [
     "Date": "2026/01/30",
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "Introduction to the effects of the sample size on the Confidence Interval",
-    "Material": "Introduction to the effects of the sample size on the Confidence Interval",
-    "Summary": "Introduction to the effects of the sample size on the Confidence Interval"
+    "Description": "Exam session",
+    "Material": "Exam session",
+    "Summary": "Exam session"
   },
   {
     "Grade": 11,
@@ -865,8 +1041,8 @@ window.SCHEDULE_DATA = [
     "Weekday": "Wednesday",
     "Day": 4,
     "Description": "Review of C6 examples, Exam revisions.",
-    "Material": "Quiz workshop",
-    "Summary": "Quiz workshop"
+    "Material": "C6",
+    "Summary": "C6"
   },
   {
     "Grade": 11,
@@ -875,9 +1051,31 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/06",
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "Quiz-style workshop reinforcing Criterion C6, followed by revision C7.",
+    "Description": "Workshop session (C6/C7).",
+    "Material": "Workshop",
+    "Summary": "Workshop"
+  },
+  {
+    "Grade": 11,
+    "Section": "D",
+    "Class #": "7-2",
+    "Date": "2026/02/11",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Homework support (C7/C8).",
     "Material": "Homework support",
     "Summary": "Homework support"
+  },
+  {
+    "Grade": 11,
+    "Section": "D",
+    "Class #": "8-1",
+    "Date": "2026/02/13",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Midterm Mock",
+    "Material": "Midterm Mock",
+    "Summary": "Midterm Mock"
   },
   {
     "Grade": 11,
@@ -952,9 +1150,9 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/02",
     "Weekday": "Monday",
     "Day": 2,
-    "Description": "Introduction to the effects of the sample size on the Confidence Interval",
-    "Material": "Introduction to the effects of the sample size on the Confidence Interval",
-    "Summary": "Introduction to the effects of the sample size on the Confidence Interval"
+    "Description": "Exam session",
+    "Material": "Exam session",
+    "Summary": "Exam session"
   },
   {
     "Grade": 11,
@@ -964,8 +1162,8 @@ window.SCHEDULE_DATA = [
     "Weekday": "Tuesday",
     "Day": 3,
     "Description": "Review of C6 examples, Exam revisions.",
-    "Material": "Quiz workshop",
-    "Summary": "Quiz workshop"
+    "Material": "C6",
+    "Summary": "C6"
   },
   {
     "Grade": 11,
@@ -974,9 +1172,31 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/09",
     "Weekday": "Monday",
     "Day": 2,
-    "Description": "Homework support for Criteria C6 and C7, with focused revision of exam-style questions.",
+    "Description": "Workshop session (C6/C7).",
+    "Material": "Workshop",
+    "Summary": "Workshop"
+  },
+  {
+    "Grade": 11,
+    "Section": "E",
+    "Class #": "7-2",
+    "Date": "2026/02/10",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Homework support (C7/C8).",
     "Material": "Homework support",
     "Summary": "Homework support"
+  },
+  {
+    "Grade": 11,
+    "Section": "E",
+    "Class #": "8-1",
+    "Date": "2026/02/16",
+    "Weekday": "Monday",
+    "Day": 2,
+    "Description": "Midterm Mock",
+    "Material": "Midterm Mock",
+    "Summary": "Midterm Mock"
   },
   {
     "Grade": 11,
