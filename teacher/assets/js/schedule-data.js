@@ -72,9 +72,9 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/03",
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "Maximum Opportunity Criterion (C6) overview with guided practice, plus homework assigned for Criterion C7.",
-    "Material": "Maximum Opportunity Criterion (C6)",
-    "Summary": "Maximum Opportunity Criterion (C6)"
+    "Description": "Review of C6 examples, Exam revisions.",
+    "Material": "C6",
+    "Summary": "C6"
   },
   {
     "Grade": 10,
@@ -83,9 +83,31 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/06",
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "Quiz-style workshop reinforcing Criterion C6, followed by revision C7.",
-    "Material": "Quiz workshop",
-    "Summary": "Quiz workshop"
+    "Description": "Workshop session (C6/C7).",
+    "Material": "Workshop",
+    "Summary": "Workshop"
+  },
+  {
+    "Grade": 10,
+    "Section": "A",
+    "Class #": "7-2",
+    "Date": "2026/02/10",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Homework support (C7/C8).",
+    "Material": "Homework support",
+    "Summary": "Homework support"
+  },
+  {
+    "Grade": 10,
+    "Section": "A",
+    "Class #": "8-1",
+    "Date": "2026/02/13",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Midterm Mock",
+    "Material": "Midterm Mock",
+    "Summary": "Midterm Mock"
   },
   {
     "Grade": 10,
