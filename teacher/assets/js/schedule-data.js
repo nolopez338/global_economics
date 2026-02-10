@@ -83,7 +83,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/06",
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "Workshop session (C6/C7).",
+    "Description": "Review of C6",
     "Material": "Workshop",
     "Summary": "Workshop"
   },
@@ -94,7 +94,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/10",
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "Homework support (C7/C8).",
+    "Description": "Exam C6 and Review of C7",
     "Material": "Homework support",
     "Summary": "Homework support"
   },
@@ -105,7 +105,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/13",
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "Midterm Mock",
+    "Description": "Workshop on C7",
     "Material": "Midterm Mock",
     "Summary": "Midterm Mock"
   },
@@ -119,6 +119,17 @@ window.SCHEDULE_DATA = [
     "Description": "Midterm Exam",
     "Material": "Midterm Exam",
     "Summary": "Midterm Exam"
+  },
+  {
+    "Grade": 10,
+    "Section": "A",
+    "Class #": "9-1",
+    "Date": "2026-02-20",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Midterm Mock",
+    "Material": "Midterm Mock",
+    "Summary": "Midterm Mock"
   },
   {
     "Grade": 10,
@@ -204,7 +215,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/06",
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "Workshop session (C6/C7).",
+    "Description": "Exam on C6 and Review of C7",
     "Material": "Workshop",
     "Summary": "Workshop"
   },
@@ -215,7 +226,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/12",
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "Homework support (C7/C8).",
+    "Description": "Homework support for C7",
     "Material": "Homework support",
     "Summary": "Homework support"
   },
@@ -325,7 +336,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/06",
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "Workshop session (C6/C7).",
+    "Description": "Exam on C6 and Review of C7",
     "Material": "Workshop",
     "Summary": "Workshop"
   },
@@ -336,7 +347,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/12",
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "Homework support (C7/C8).",
+    "Description": "Homework support for C7",
     "Material": "Homework support",
     "Summary": "Homework support"
   },
@@ -457,7 +468,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/10",
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "Workshop session (C6/C7).",
+    "Description": "Exam on C6 and Review of C7",
     "Material": "Workshop",
     "Summary": "Workshop"
   },
@@ -578,7 +589,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/10",
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "Workshop session (C6/C7).",
+    "Description": "Exam on C6 and Review of C7",
     "Material": "Workshop",
     "Summary": "Workshop"
   },
@@ -589,7 +600,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/11",
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "Homework support (C7/C8).",
+    "Description": "Homework support for C7",
     "Material": "Homework support",
     "Summary": "Homework support"
   },
@@ -699,7 +710,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/06",
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "Workshop session (C6/C7).",
+    "Description": "Exam on C6 and Review of C7",
     "Material": "Workshop",
     "Summary": "Workshop"
   },
@@ -710,7 +721,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/10",
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "Homework support (C7/C8).",
+    "Description": "Homework support for C7",
     "Material": "Homework support",
     "Summary": "Homework support"
   },
@@ -831,7 +842,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/10",
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "Workshop session (C6/C7).",
+    "Description": "Exam on C6 and Review of C7",
     "Material": "Workshop",
     "Summary": "Workshop"
   },
@@ -842,7 +853,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/12",
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "Homework support (C7/C8).",
+    "Description": "Homework support for C7",
     "Material": "Homework support",
     "Summary": "Homework support"
   },
@@ -952,7 +963,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/09",
     "Weekday": "Monday",
     "Day": 2,
-    "Description": "Workshop session (C6/C7).",
+    "Description": "Exam on C6 and Review of C7",
     "Material": "Workshop",
     "Summary": "Workshop"
   },
@@ -963,7 +974,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/11",
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "Homework support (C7/C8).",
+    "Description": "Homework support for C7",
     "Material": "Homework support",
     "Summary": "Homework support"
   },
@@ -1073,7 +1084,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/06",
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "Workshop session (C6/C7).",
+    "Description": "Exam on C6 and Review of C7",
     "Material": "Workshop",
     "Summary": "Workshop"
   },
@@ -1084,7 +1095,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/11",
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "Homework support (C7/C8).",
+    "Description": "Homework support for C7",
     "Material": "Homework support",
     "Summary": "Homework support"
   },
@@ -1194,7 +1205,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/09",
     "Weekday": "Monday",
     "Day": 2,
-    "Description": "Workshop session (C6/C7).",
+    "Description": "Exam on C6 and Review of C7",
     "Material": "Workshop",
     "Summary": "Workshop"
   },
@@ -1205,7 +1216,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/10",
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "Homework support (C7/C8).",
+    "Description": "Homework support for C7",
     "Material": "Homework support",
     "Summary": "Homework support"
   },
