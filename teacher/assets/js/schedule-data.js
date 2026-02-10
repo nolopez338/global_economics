@@ -479,7 +479,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026/02/11",
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "Midterm Mock",
+    "Description": "Workshop on C7",
     "Material": "Midterm Mock",
     "Summary": "Midterm Mock"
   },
@@ -493,6 +493,28 @@ window.SCHEDULE_DATA = [
     "Description": "Midterm Exam",
     "Material": "Midterm Exam",
     "Summary": "Midterm Exam"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "8-2",
+    "Date": "2026/02/17",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "No Class Ash Wednesday",
+    "Material": "No Class Ash Wednesday",
+    "Summary": "No Class Ash Wednesday"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "9-1",
+    "Date": "2026/02/24",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Midterm mock",
+    "Material": "Midterm mock",
+    "Summary": "Midterm mock"
   },
   {
     "Grade": 10,
