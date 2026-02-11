@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Full Schedule</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 1rem; }
+      table { border-collapse: collapse; width: 100%; margin-bottom: 1rem; }
+      th, td { border: 1px solid #bbb; padding: 0.4rem; text-align: left; }
+      .today { background: #fff7cc; }
+      .date-heading { margin-top: 1.25rem; }
+      .error { color: #b00020; font-weight: bold; }
+    </style>
+    <script src="../assets/generated/schedule-flat.generated.js"></script>
+  </head>
+  <body>
+    <h1>Full Schedule</h1>
+    <p>This page reads <code>teacher/assets/generated/schedule-flat.generated.js</code>.</p>
+    <div id="status"></div>
+    <div id="scheduleRoot"></div>
+
+    <script>
+      function toISO(dateSlash) {
+        if (!dateSlash) return "";
+        return dateSlash.replace(/\//g, "-");
+      }
+
+      function deriveGradeAndGroup(classId) {
+        const normalized = String(classId || "").trim();
+        const gradeMatch = normalized.match(/^\d+/);
+        const groupMatch = normalized.match(/([A-Za-z])$/);
+
+        return {
+          grade: gradeMatch ? gradeMatch[0] : "",
+          group: groupMatch ? groupMatch[1].toUpperCase() : "",
+        };
+      }
+
+      function render() {
+        const root = document.getElementById("scheduleRoot");
+        const status = document.getElementById("status");
+        const data = Array.isArray(window.SCHEDULE_DATA) ? [...window.SCHEDULE_DATA] : [];
+
+        if (!data.length) {
+          status.innerHTML = '<p class="error">No data found in generated artifact.</p>';
+          return;
+        }
+
+        data.sort((a, b) => {
+          const da = toISO(a.Date);
+          const db = toISO(b.Date);
+          if (da !== db) return da.localeCompare(db);
+          return String(a["Class #"]).localeCompare(String(b["Class #"]));
+        });
+
+        const today = new Date();
+        const y = today.getFullYear();
+        const m = String(today.getMonth() + 1).padStart(2, "0");
+        const d = String(today.getDate()).padStart(2, "0");
+        const todayIso = `${y}-${m}-${d}`;
+
+        const groups = new Map();
+        data.forEach((entry) => {
+          const key = toISO(entry.Date);
+          if (!groups.has(key)) groups.set(key, []);
+          groups.get(key).push(entry);
+        });
+
+        root.innerHTML = "";
+        groups.forEach((entries, date) => {
+          const isToday = date === todayIso;
+          const heading = document.createElement("h2");
+          heading.className = "date-heading";
+          heading.textContent = `${date}${isToday ? " (Today)" : ""}`;
+          root.appendChild(heading);
+
+          const table = document.createElement("table");
+          if (isToday) table.classList.add("today");
+          table.innerHTML = `
+            <thead>
+              <tr>
+                <th>Grade</th>
+                <th>Group</th>
+                <th>Class ID</th>
+                <th>Slot</th>
+                <th>Weekday</th>
+                <th>Title</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          `;
+
+          const body = table.querySelector("tbody");
+          entries.forEach((entry) => {
+            const classId = `${entry.Grade || ""}${entry.Section || ""}`;
+            const { grade, group } = deriveGradeAndGroup(classId);
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${grade}</td>
+              <td>${group}</td>
+              <td>${classId}</td>
+              <td>${entry["Class #"]}</td>
+              <td>${entry.Weekday}</td>
+              <td>${entry.Summary || ""}</td>
+              <td>${entry.Description || ""}</td>
+            `;
+            body.appendChild(row);
+          });
+
+          root.appendChild(table);
+        });
+
+        status.textContent = `Loaded ${data.length} entries from generated artifact.`;
+      }
+
+      render();
+    </script>
+  </body>
+</html>
