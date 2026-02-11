@@ -1,3 +1,6 @@
+// AUTO-GENERATED FILE
+// Generated from teacher/authoring/schedule.csv
+// Do not edit manually.
 window.SCHEDULE_DATA = [
   {
     "Grade": 10,
