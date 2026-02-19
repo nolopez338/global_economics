@@ -136,6 +136,39 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 10,
+    "Section": "A",
+    "Class #": "9-2",
+    "Date": "2026-02-24",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
+    "Section": "A",
+    "Class #": "10-1",
+    "Date": "2026-02-27",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
+    "Section": "A",
+    "Class #": "10-2",
+    "Date": "2026-03-03",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
     "Section": "B",
     "Class #": "3-2",
     "Date": "2026/01/15",
@@ -257,6 +290,39 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 10,
+    "Section": "B",
+    "Class #": "9-1",
+    "Date": "2026-02-20",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
+    "Section": "B",
+    "Class #": "9-2",
+    "Date": "2026-02-26",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
+    "Section": "B",
+    "Class #": "10-1",
+    "Date": "2026-02-27",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
     "Section": "C",
     "Class #": "3-2",
     "Date": "2026/01/15",
@@ -375,6 +441,39 @@ window.SCHEDULE_DATA = [
     "Description": "Midterm Exam",
     "Material": "Midterm Exam",
     "Summary": "Midterm Exam"
+  },
+  {
+    "Grade": 10,
+    "Section": "C",
+    "Class #": "9-1",
+    "Date": "2026-02-20",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
+    "Section": "C",
+    "Class #": "9-2",
+    "Date": "2026-02-26",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
+    "Section": "C",
+    "Class #": "10-1",
+    "Date": "2026-02-27",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
   },
   {
     "Grade": 10,
@@ -521,6 +620,39 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 10,
+    "Section": "D",
+    "Class #": "9-2",
+    "Date": "2026-02-25",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "10-1",
+    "Date": "2026-03-03",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "10-2",
+    "Date": "2026-03-04",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
     "Section": "E",
     "Class #": "3-1",
     "Date": "2026/01/13",
@@ -652,6 +784,39 @@ window.SCHEDULE_DATA = [
     "Summary": "Midterm Exam"
   },
   {
+    "Grade": 10,
+    "Section": "E",
+    "Class #": "9-1",
+    "Date": "2026-02-24",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
+    "Section": "E",
+    "Class #": "9-2",
+    "Date": "2026-02-25",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
+    "Section": "E",
+    "Class #": "10-1",
+    "Date": "2026-03-03",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
     "Grade": 11,
     "Section": "A",
     "Class #": "3-2",
@@ -771,6 +936,39 @@ window.SCHEDULE_DATA = [
     "Description": "Midterm Exam",
     "Material": "Midterm Exam",
     "Summary": "Midterm Exam"
+  },
+  {
+    "Grade": 11,
+    "Section": "A",
+    "Class #": "9-1",
+    "Date": "2026-02-20",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 11,
+    "Section": "A",
+    "Class #": "9-2",
+    "Date": "2026-02-24",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 11,
+    "Section": "A",
+    "Class #": "10-1",
+    "Date": "2026-02-27",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
   },
   {
     "Grade": 11,
@@ -906,6 +1104,39 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 11,
+    "Section": "B",
+    "Class #": "9-1",
+    "Date": "2026-02-24",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 11,
+    "Section": "B",
+    "Class #": "9-2",
+    "Date": "2026-02-26",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 11,
+    "Section": "B",
+    "Class #": "10-1",
+    "Date": "2026-03-03",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 11,
     "Section": "C",
     "Class #": "3-2",
     "Date": "2026/01/14",
@@ -1024,6 +1255,39 @@ window.SCHEDULE_DATA = [
     "Description": "Midterm Exam",
     "Material": "Midterm Exam",
     "Summary": "Midterm Exam"
+  },
+  {
+    "Grade": 11,
+    "Section": "C",
+    "Class #": "9-1",
+    "Date": "2026-02-23",
+    "Weekday": "Monday",
+    "Day": 2,
+    "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 11,
+    "Section": "C",
+    "Class #": "9-2",
+    "Date": "2026-02-25",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 11,
+    "Section": "C",
+    "Class #": "10-1",
+    "Date": "2026-03-02",
+    "Weekday": "Monday",
+    "Day": 2,
+    "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
   },
   {
     "Grade": 11,
@@ -1148,6 +1412,39 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 11,
+    "Section": "D",
+    "Class #": "9-1",
+    "Date": "2026-02-20",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 11,
+    "Section": "D",
+    "Class #": "9-2",
+    "Date": "2026-02-25",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 11,
+    "Section": "D",
+    "Class #": "10-1",
+    "Date": "2026-02-27",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 11,
     "Section": "E",
     "Class #": "3-2",
     "Date": "2026/01/13",
@@ -1266,5 +1563,38 @@ window.SCHEDULE_DATA = [
     "Description": "Midterm Exam",
     "Material": "Midterm Exam",
     "Summary": "Midterm Exam"
+  },
+  {
+    "Grade": 11,
+    "Section": "E",
+    "Class #": "9-1",
+    "Date": "2026-02-23",
+    "Weekday": "Monday",
+    "Day": 2,
+    "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 11,
+    "Section": "E",
+    "Class #": "9-2",
+    "Date": "2026-02-24",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 11,
+    "Section": "E",
+    "Class #": "10-1",
+    "Date": "2026-03-02",
+    "Weekday": "Monday",
+    "Day": 2,
+    "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
   }
 ];
