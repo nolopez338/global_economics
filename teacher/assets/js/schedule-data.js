@@ -169,6 +169,28 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 10,
+    "Section": "A",
+    "Class #": "11-1",
+    "Date": "2026-03-06",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project submission + project problems",
+    "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
+    "Section": "A",
+    "Class #": "11-2",
+    "Date": "2026-03-10",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
+    "Material": "Wrap-up",
+    "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
+  },
+  {
+    "Grade": 10,
     "Section": "B",
     "Class #": "3-2",
     "Date": "2026/01/15",
@@ -323,6 +345,28 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 10,
+    "Section": "B",
+    "Class #": "10-2",
+    "Date": "2026-03-05",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project submission + project problems",
+    "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
+    "Section": "B",
+    "Class #": "11-1",
+    "Date": "2026-03-06",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
+    "Material": "Wrap-up",
+    "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
+  },
+  {
+    "Grade": 10,
     "Section": "C",
     "Class #": "3-2",
     "Date": "2026/01/15",
@@ -474,6 +518,28 @@ window.SCHEDULE_DATA = [
     "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
     "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
+    "Section": "C",
+    "Class #": "10-2",
+    "Date": "2026-03-05",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project submission + project problems",
+    "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
+    "Section": "C",
+    "Class #": "11-1",
+    "Date": "2026-03-06",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
+    "Material": "Wrap-up",
+    "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
   },
   {
     "Grade": 10,
@@ -653,6 +719,28 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 10,
+    "Section": "D",
+    "Class #": "11-1",
+    "Date": "2026-03-10",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project submission + project problems",
+    "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "11-2",
+    "Date": "2026-03-11",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
+    "Material": "Wrap-up",
+    "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
+  },
+  {
+    "Grade": 10,
     "Section": "E",
     "Class #": "3-1",
     "Date": "2026/01/13",
@@ -817,6 +905,28 @@ window.SCHEDULE_DATA = [
     "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
   },
   {
+    "Grade": 10,
+    "Section": "E",
+    "Class #": "10-2",
+    "Date": "2026-03-04",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project submission + project problems",
+    "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
+    "Section": "E",
+    "Class #": "11-1",
+    "Date": "2026-03-10",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
+    "Material": "Wrap-up",
+    "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
+  },
+  {
     "Grade": 11,
     "Section": "A",
     "Class #": "3-2",
@@ -969,6 +1079,28 @@ window.SCHEDULE_DATA = [
     "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
     "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 11,
+    "Section": "A",
+    "Class #": "10-2",
+    "Date": "2026-03-03",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project submission + project problems",
+    "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 11,
+    "Section": "A",
+    "Class #": "11-1",
+    "Date": "2026-03-06",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
+    "Material": "Wrap-up",
+    "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
   },
   {
     "Grade": 11,
@@ -1137,6 +1269,28 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 11,
+    "Section": "B",
+    "Class #": "10-2",
+    "Date": "2026-03-05",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project submission + project problems",
+    "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 11,
+    "Section": "B",
+    "Class #": "11-1",
+    "Date": "2026-03-10",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
+    "Material": "Wrap-up",
+    "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
+  },
+  {
+    "Grade": 11,
     "Section": "C",
     "Class #": "3-2",
     "Date": "2026/01/14",
@@ -1288,6 +1442,28 @@ window.SCHEDULE_DATA = [
     "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
     "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 11,
+    "Section": "C",
+    "Class #": "10-2",
+    "Date": "2026-03-04",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project submission + project problems",
+    "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 11,
+    "Section": "C",
+    "Class #": "11-1",
+    "Date": "2026-03-09",
+    "Weekday": "Monday",
+    "Day": 2,
+    "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
+    "Material": "Wrap-up",
+    "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
   },
   {
     "Grade": 11,
@@ -1445,6 +1621,28 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 11,
+    "Section": "D",
+    "Class #": "10-2",
+    "Date": "2026-03-04",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project submission + project problems",
+    "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 11,
+    "Section": "D",
+    "Class #": "11-1",
+    "Date": "2026-03-06",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
+    "Material": "Wrap-up",
+    "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
+  },
+  {
+    "Grade": 11,
     "Section": "E",
     "Class #": "3-2",
     "Date": "2026/01/13",
@@ -1596,5 +1794,27 @@ window.SCHEDULE_DATA = [
     "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
     "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 11,
+    "Section": "E",
+    "Class #": "10-2",
+    "Date": "2026-03-03",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project submission + project problems",
+    "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 11,
+    "Section": "E",
+    "Class #": "11-1",
+    "Date": "2026-03-09",
+    "Weekday": "Monday",
+    "Day": 2,
+    "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
+    "Material": "Wrap-up",
+    "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
   }
 ];
