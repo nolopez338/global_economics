@@ -1,34 +1,3 @@
-const parseScheduleDate = (value) => {
-  if (!value) {
-    return null;
-  }
-
-  const [yearPart, monthPart, dayPart] = value
-    .split("/")
-    .map((part) => part.trim())
-    .filter(Boolean);
-
-  if (!yearPart || !monthPart || !dayPart) {
-    return null;
-  }
-
-  const year = Number.parseInt(yearPart, 10);
-  const month = Number.parseInt(monthPart, 10);
-  const day = Number.parseInt(dayPart, 10);
-
-  if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day)) {
-    return null;
-  }
-
-  const date = new Date(year, month - 1, day);
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-
-  date.setHours(0, 0, 0, 0);
-  return date;
-};
-
 const buildTodayIndicatorRow = (columnCount) => {
   const row = document.createElement("tr");
   row.className = "today-indicator-row";
@@ -59,39 +28,42 @@ const applyTodayMarker = (table) => {
   body.querySelectorAll(".today-row").forEach((row) => row.classList.remove("today-row"));
 
   const rows = Array.from(body.rows);
-  const dateRows = rows
-    .map((row) => {
-      const dateValue = row.dataset.date || "";
-      const date = parseScheduleDate(dateValue);
-
-      return date ? { row, date } : null;
-    })
-    .filter(Boolean);
-
-  if (dateRows.length === 0) {
+  if (rows.length === 0) {
     return;
   }
 
+  const headerCells = Array.from(table.tHead?.rows[0]?.cells ?? []);
+  const detectedDateColumnIndex = headerCells.findIndex(
+    (cell) => cell.textContent.trim().toLowerCase() === "date"
+  );
+  const dateColumnIndex = detectedDateColumnIndex >= 0 ? detectedDateColumnIndex : 1;
+
+  // Compute today in local time using ISO format for reliable comparison.
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const dd = String(today.getDate()).padStart(2, "0");
+  const todayISO = `${yyyy}-${mm}-${dd}`;
 
-  const todayRows = dateRows.filter(({ date }) => date.getTime() === today.getTime());
-  if (todayRows.length > 0) {
-    todayRows.forEach(({ row }) => row.classList.add("today-row"));
-    return;
-  }
-
-  const futureRow = dateRows.find(({ date }) => date.getTime() > today.getTime());
   const columnCount =
     table.tHead?.rows[0]?.cells.length ?? rows[0]?.cells.length ?? 1;
-  const indicatorRow = buildTodayIndicatorRow(columnCount);
 
-  if (futureRow) {
-    body.insertBefore(indicatorRow, futureRow.row);
+  // Insert the Today indicator immediately after the first matching date row.
+  for (const row of rows) {
+    const dateCell = row.cells[dateColumnIndex];
+    if (!dateCell) {
+      continue;
+    }
+
+    const rowDate = dateCell.textContent.trim();
+    if (rowDate !== todayISO) {
+      continue;
+    }
+
+    const todayRow = buildTodayIndicatorRow(columnCount);
+    row.parentNode.insertBefore(todayRow, row.nextSibling);
     return;
   }
-
-  body.append(indicatorRow);
 };
 
 const applyTodayMarkers = () => {
