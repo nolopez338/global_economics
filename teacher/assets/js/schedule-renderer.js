@@ -1,10 +1,10 @@
 const formatScheduleDate = (value) => {
-  const [year, month, day] = value.split("/");
+  const [year, month, day] = value.split("/").map((part) => part.trim());
   if (!year || !month || !day) {
     return value;
   }
 
-  return `${year} / ${month} / ${day}`;
+  return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
 };
 
 const getScheduleData = () => {
