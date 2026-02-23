@@ -45,10 +45,7 @@ const applyTodayMarker = (table) => {
   const dd = String(today.getDate()).padStart(2, "0");
   const todayISO = `${yyyy}-${mm}-${dd}`;
 
-  const columnCount =
-    table.tHead?.rows[0]?.cells.length ?? rows[0]?.cells.length ?? 1;
-
-  // Insert the Today indicator immediately after the first matching date row.
+  // Highlight the first matching date row.
   for (const row of rows) {
     const dateCell = row.cells[dateColumnIndex];
     if (!dateCell) {
@@ -60,10 +57,34 @@ const applyTodayMarker = (table) => {
       continue;
     }
 
-    const todayRow = buildTodayIndicatorRow(columnCount);
-    row.parentNode.insertBefore(todayRow, row.nextSibling);
+    row.classList.add("today-row");
     return;
   }
+
+  const columnCount =
+    table.tHead?.rows[0]?.cells.length ?? rows[0]?.cells.length ?? 1;
+  const todayRow = buildTodayIndicatorRow(columnCount);
+
+  let insertionReferenceRow = null;
+  for (const row of rows) {
+    const dateCell = row.cells[dateColumnIndex];
+    if (!dateCell) {
+      continue;
+    }
+
+    const rowDate = dateCell.textContent.trim();
+    if (rowDate > todayISO) {
+      insertionReferenceRow = row;
+      break;
+    }
+  }
+
+  if (insertionReferenceRow) {
+    body.insertBefore(todayRow, insertionReferenceRow);
+    return;
+  }
+
+  body.append(todayRow);
 };
 
 const applyTodayMarkers = () => {
