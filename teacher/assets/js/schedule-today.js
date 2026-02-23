@@ -18,6 +18,20 @@ const buildTodayIndicatorRow = (columnCount) => {
   return row;
 };
 
+const normalizeDateString = (raw) => {
+  if (!raw) {
+    return null;
+  }
+
+  const match = raw.trim().match(/^(\d{4})[-\/](\d{2})[-\/](\d{2})$/);
+  if (!match) {
+    return null;
+  }
+
+  const [, year, month, day] = match;
+  return `${year}-${month}-${day}`;
+};
+
 const applyTodayMarker = (table) => {
   const body = table.tBodies[0];
   if (!body) {
@@ -48,22 +62,43 @@ const applyTodayMarker = (table) => {
   const columnCount =
     table.tHead?.rows[0]?.cells.length ?? rows[0]?.cells.length ?? 1;
 
-  // Insert the Today indicator immediately after the first matching date row.
+  let hasParseableDate = false;
+  let firstGreaterDateRow = null;
+
   for (const row of rows) {
     const dateCell = row.cells[dateColumnIndex];
     if (!dateCell) {
       continue;
     }
 
-    const rowDate = dateCell.textContent.trim();
-    if (rowDate !== todayISO) {
+    const rowDateNormalized = normalizeDateString(dateCell.textContent);
+    if (!rowDateNormalized) {
       continue;
     }
 
-    const todayRow = buildTodayIndicatorRow(columnCount);
-    row.parentNode.insertBefore(todayRow, row.nextSibling);
+    hasParseableDate = true;
+
+    if (rowDateNormalized === todayISO) {
+      row.classList.add("today-row");
+      return;
+    }
+
+    if (!firstGreaterDateRow && rowDateNormalized > todayISO) {
+      firstGreaterDateRow = row;
+    }
+  }
+
+  if (!hasParseableDate) {
     return;
   }
+
+  const todayRow = buildTodayIndicatorRow(columnCount);
+  if (firstGreaterDateRow) {
+    body.insertBefore(todayRow, firstGreaterDateRow);
+    return;
+  }
+
+  body.append(todayRow);
 };
 
 const applyTodayMarkers = () => {
