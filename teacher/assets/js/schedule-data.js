@@ -191,6 +191,61 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 10,
+    "Section": "A",
+    "Class #": "1-1",
+    "Date": "2026-03-13",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
+    "Section": "A",
+    "Class #": "1-2",
+    "Date": "2026-03-17",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
+    "Section": "A",
+    "Class #": "2-1",
+    "Date": "2026-03-20",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
+    "Section": "A",
+    "Class #": "2-2",
+    "Date": "2026-03-24",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
+    "Section": "A",
+    "Class #": "3-1",
+    "Date": "2026-03-27",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
     "Section": "B",
     "Class #": "3-2",
     "Date": "2026/01/15",
@@ -364,6 +419,72 @@ window.SCHEDULE_DATA = [
     "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
     "Material": "Wrap-up",
     "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
+  },
+  {
+    "Grade": 10,
+    "Section": "B",
+    "Class #": "1-1",
+    "Date": "2026-03-12",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
+    "Section": "B",
+    "Class #": "1-2",
+    "Date": "2026-03-13",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
+    "Section": "B",
+    "Class #": "2-1",
+    "Date": "2026-03-19",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
+    "Section": "B",
+    "Class #": "2-2",
+    "Date": "2026-03-20",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
+    "Section": "B",
+    "Class #": "3-1",
+    "Date": "2026-03-26",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
+    "Section": "B",
+    "Class #": "11-2",
+    "Date": "2026-03-27",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
   },
   {
     "Grade": 10,
@@ -551,6 +672,61 @@ window.SCHEDULE_DATA = [
     "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
     "Material": "Wrap-up",
     "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
+  },
+  {
+    "Grade": 10,
+    "Section": "C",
+    "Class #": "1-1",
+    "Date": "2026-03-12",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
+    "Section": "C",
+    "Class #": "1-2",
+    "Date": "2026-03-13",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
+    "Section": "C",
+    "Class #": "2-1",
+    "Date": "2026-03-14",
+    "Weekday": "Saturday",
+    "Day": 2,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
+    "Section": "C",
+    "Class #": "2-2",
+    "Date": "2026-03-19",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
+    "Section": "C",
+    "Class #": "3-1",
+    "Date": "2026-03-20",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
   },
   {
     "Grade": 10,
@@ -752,6 +928,50 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 10,
+    "Section": "D",
+    "Class #": "1-1",
+    "Date": "2026-03-17",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "1-2",
+    "Date": "2026-03-18",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "2-1",
+    "Date": "2026-03-24",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "2-2",
+    "Date": "2026-03-25",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
     "Section": "E",
     "Class #": "3-1",
     "Date": "2026/01/13",
@@ -938,6 +1158,61 @@ window.SCHEDULE_DATA = [
     "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
   },
   {
+    "Grade": 10,
+    "Section": "E",
+    "Class #": "1-1",
+    "Date": "2026-03-11",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
+    "Section": "E",
+    "Class #": "1-2",
+    "Date": "2026-03-17",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
+    "Section": "E",
+    "Class #": "2-1",
+    "Date": "2026-03-18",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
+    "Section": "E",
+    "Class #": "2-2",
+    "Date": "2026-03-24",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 10,
+    "Section": "E",
+    "Class #": "11-2",
+    "Date": "2026-03-25",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
     "Grade": 11,
     "Section": "A",
     "Class #": "3-2",
@@ -1112,6 +1387,72 @@ window.SCHEDULE_DATA = [
     "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
     "Material": "Wrap-up",
     "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
+  },
+  {
+    "Grade": 11,
+    "Section": "A",
+    "Class #": "1-1",
+    "Date": "2026-03-10",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "A",
+    "Class #": "1-2",
+    "Date": "2026-03-13",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "A",
+    "Class #": "2-1",
+    "Date": "2026-03-17",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "A",
+    "Class #": "2-2",
+    "Date": "2026-03-20",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "A",
+    "Class #": "3-1",
+    "Date": "2026-03-24",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "A",
+    "Class #": "11-2",
+    "Date": "2026-03-27",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
   },
   {
     "Grade": 11,
@@ -1302,6 +1643,61 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 11,
+    "Section": "B",
+    "Class #": "1-1",
+    "Date": "2026-03-12",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "B",
+    "Class #": "1-2",
+    "Date": "2026-03-17",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "B",
+    "Class #": "2-1",
+    "Date": "2026-03-19",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "B",
+    "Class #": "2-2",
+    "Date": "2026-03-24",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "B",
+    "Class #": "11-2",
+    "Date": "2026-03-26",
+    "Weekday": "Thursday",
+    "Day": 5,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
     "Section": "C",
     "Class #": "3-2",
     "Date": "2026/01/14",
@@ -1475,6 +1871,72 @@ window.SCHEDULE_DATA = [
     "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
     "Material": "Wrap-up",
     "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
+  },
+  {
+    "Grade": 11,
+    "Section": "C",
+    "Class #": "1-1",
+    "Date": "2026-03-11",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "C",
+    "Class #": "1-2",
+    "Date": "2026-03-16",
+    "Weekday": "Monday",
+    "Day": 2,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "C",
+    "Class #": "2-1",
+    "Date": "2026-03-18",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "C",
+    "Class #": "2-2",
+    "Date": "2026-03-23",
+    "Weekday": "Monday",
+    "Day": 2,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "C",
+    "Class #": "3-1",
+    "Date": "2026-03-25",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "C",
+    "Class #": "11-2",
+    "Date": "2026-03-30",
+    "Weekday": "Monday",
+    "Day": 2,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
   },
   {
     "Grade": 11,
@@ -1654,6 +2116,72 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 11,
+    "Section": "D",
+    "Class #": "1-1",
+    "Date": "2026-03-11",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "D",
+    "Class #": "1-2",
+    "Date": "2026-03-13",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "D",
+    "Class #": "2-1",
+    "Date": "2026-03-18",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "D",
+    "Class #": "2-2",
+    "Date": "2026-03-20",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "D",
+    "Class #": "3-1",
+    "Date": "2026-03-25",
+    "Weekday": "Wednesday",
+    "Day": 4,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "D",
+    "Class #": "11-2",
+    "Date": "2026-03-27",
+    "Weekday": "Friday",
+    "Day": 1,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
     "Section": "E",
     "Class #": "3-2",
     "Date": "2026/01/13",
@@ -1827,5 +2355,71 @@ window.SCHEDULE_DATA = [
     "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
     "Material": "Wrap-up",
     "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
-  }
+  },
+  {
+    "Grade": 11,
+    "Section": "E",
+    "Class #": "1-1",
+    "Date": "2026-03-10",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "E",
+    "Class #": "1-2",
+    "Date": "2026-03-16",
+    "Weekday": "Monday",
+    "Day": 2,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "E",
+    "Class #": "2-1",
+    "Date": "2026-03-17",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "E",
+    "Class #": "2-2",
+    "Date": "2026-03-23",
+    "Weekday": "Monday",
+    "Day": 2,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "E",
+    "Class #": "3-1",
+    "Date": "2026-03-24",
+    "Weekday": "Tuesday",
+    "Day": 3,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
+  {
+    "Grade": 11,
+    "Section": "E",
+    "Class #": "11-2",
+    "Date": "2026-03-30",
+    "Weekday": "Monday",
+    "Day": 2,
+    "Description": "Class",
+    "Material": "",
+    "Summary": ""
+  },
 ];
