@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grade 10 - Continuous Probabilities</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #2563eb;
+      --primary-soft: #dbeafe;
+      --danger: #dc2626;
+      --ok: #059669;
+      --border: #e5e7eb;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1rem;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .back-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.25rem, 2.4vw, 1.9rem);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .muted { color: var(--muted); }
+
+    .grid {
+      display: grid;
+      gap: 0.75rem;
+      grid-template-columns: repeat(12, 1fr);
+    }
+
+    .field { display: flex; flex-direction: column; gap: 0.3rem; }
+    .col-12 { grid-column: span 12; }
+    .col-6 { grid-column: span 6; }
+    .col-4 { grid-column: span 4; }
+    .col-3 { grid-column: span 3; }
+
+    label { font-weight: 600; font-size: 0.95rem; }
+
+    input, select, button {
+      font: inherit;
+      padding: 0.55rem 0.65rem;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      color: var(--text);
+    }
+
+    button {
+      cursor: pointer;
+      border-color: transparent;
+      font-weight: 600;
+    }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-secondary { background: #e2e8f0; color: #0f172a; }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    details {
+      border: 1px dashed #cbd5e1;
+      border-radius: 8px;
+      padding: 0.6rem;
+      background: #f8fafc;
+    }
+
+    summary { cursor: pointer; font-weight: 600; }
+
+    .status {
+      margin-top: 0.75rem;
+      padding: 0.65rem 0.8rem;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      font-weight: 600;
+    }
+
+    .status.ok {
+      background: #ecfdf5;
+      color: #065f46;
+      border-color: #a7f3d0;
+    }
+
+    .status.warn {
+      background: #fff7ed;
+      color: #9a3412;
+      border-color: #fed7aa;
+    }
+
+    .status.error {
+      background: #fef2f2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .metric {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem;
+      background: #fafafa;
+    }
+
+    .metric .k { color: var(--muted); font-size: 0.85rem; }
+    .metric .v { font-weight: 700; font-size: 1rem; }
+
+    .graph-wrap {
+      position: relative;
+      width: 100%;
+      min-height: 360px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    canvas {
+      width: 100%;
+      height: 420px;
+      display: block;
+    }
+
+    .tooltip {
+      position: absolute;
+      pointer-events: none;
+      transform: translate(-50%, -115%);
+      background: rgba(17, 24, 39, 0.92);
+      color: white;
+      border-radius: 6px;
+      padding: 0.35rem 0.45rem;
+      font-size: 0.82rem;
+      white-space: nowrap;
+      display: none;
+      z-index: 5;
+    }
+
+    @media (max-width: 840px) {
+      .col-6, .col-4, .col-3 { grid-column: span 12; }
+      canvas { height: 340px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <div class="header card">
+      <a class="back-link" href="#">← Back to Term 3</a>
+      <h1>Continuous Probability Distributions</h1>
+    </div>
+
+    <section class="card">
+      <h2>Introduction</h2>
+      <p>
+        A <strong>continuous random variable</strong> can take any value in an interval (or across all real numbers).
+        Instead of listing probabilities at single points, we use a <strong>probability density function (PDF)</strong>.
+      </p>
+      <p>
+        For a valid PDF, two key properties are required: <strong>f(x) ≥ 0</strong> for all x, and the
+        <strong>total area under the curve is 1</strong>. For continuous variables, probability at a single point is 0,
+        and probabilities on intervals are found using the <strong>area under the curve</strong> over that interval.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>PDF Input</h2>
+      <div class="grid">
+        <div class="field col-12">
+          <label for="exampleSelect">Load example</label>
+          <select id="exampleSelect">
+            <option value="">-- Select an example --</option>
+            <option value="uniform">Uniform on [0,1]</option>
+            <option value="exponential">Exponential (λ=1), display on [0,8]</option>
+            <option value="normal">Standard normal, display on [-4,4]</option>
+          </select>
+        </div>
+
+        <div class="field col-12">
+          <label for="exprInput">f(x) expression</label>
+          <input id="exprInput" type="text" value="exp(-x^2)" spellcheck="false" />
+        </div>
+
+        <div class="field col-4">
+          <label for="xminInput">xmin</label>
+          <input id="xminInput" type="number" step="any" value="-2" />
+        </div>
+        <div class="field col-4">
+          <label for="xmaxInput">xmax</label>
+          <input id="xmaxInput" type="number" step="any" value="2" />
+        </div>
+        <div class="field col-4">
+          <label for="samplesInput">Samples (N)</label>
+          <input id="samplesInput" type="number" min="100" max="5000" step="1" value="600" />
+        </div>
+
+        <div class="field col-12">
+          <label><input id="shadeToggle" type="checkbox" checked /> Shade area</label>
+        </div>
+
+        <div class="actions col-12">
+          <button id="updateBtn" class="btn-primary" type="button">Update graph</button>
+          <button id="resetBtn" class="btn-secondary" type="button">Reset</button>
+        </div>
+      </div>
+
+      <details style="margin-top:0.8rem;">
+        <summary>Supported functions and syntax</summary>
+        <ul>
+          <li>Operators: <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>^</code>, parentheses</li>
+          <li>Variable: <code>x</code></li>
+          <li>Constants: <code>pi</code>, <code>e</code></li>
+          <li>Functions: <code>exp</code>, <code>sqrt</code>, <code>abs</code>, <code>ln</code> or <code>log</code>, <code>sin</code>, <code>cos</code>, <code>tan</code>, <code>pow</code>, <code>min</code>, <code>max</code></li>
+          <li>Examples: <code>0.5*x</code>, <code>exp(-x)</code>, <code>1/sqrt(2*pi)*exp(-0.5*x^2)</code>, <code>(3/8)*(1+x)</code></li>
+        </ul>
+      </details>
+
+      <div id="status" class="status warn" role="status">Enter a function and click “Update graph”.</div>
+    </section>
+
+    <section class="card">
+      <h2>Computed results</h2>
+      <div id="results" class="results-grid"></div>
+      <p class="muted" style="margin-top:0.7rem;">Note: Mean and variance shown here are domain-truncated approximations based on your chosen [xmin, xmax].</p>
+    </section>
+
+    <section class="card">
+      <h2>PDF graph</h2>
+      <div class="graph-wrap" id="graphWrap">
+        <canvas id="pdfCanvas"></canvas>
+        <div class="tooltip" id="tooltip"></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const els = {
+        exprInput: document.getElementById('exprInput'),
+        xminInput: document.getElementById('xminInput'),
+        xmaxInput: document.getElementById('xmaxInput'),
+        samplesInput: document.getElementById('samplesInput'),
+        updateBtn: document.getElementById('updateBtn'),
+        resetBtn: document.getElementById('resetBtn'),
+        shadeToggle: document.getElementById('shadeToggle'),
+        exampleSelect: document.getElementById('exampleSelect'),
+        status: document.getElementById('status'),
+        results: document.getElementById('results'),
+        canvas: document.getElementById('pdfCanvas'),
+        graphWrap: document.getElementById('graphWrap'),
+        tooltip: document.getElementById('tooltip')
+      };
+
+      const defaults = { expr: 'exp(-x^2)', xmin: -2, xmax: 2, samples: 600, shade: true };
+      const state = { x: [], y: [], xmin: defaults.xmin, xmax: defaults.xmax, hoverIndex: -1, valid: false, parser: null };
+
+      const funcDefs = {
+        exp: { argc: 1, fn: Math.exp }, sqrt: { argc: 1, fn: Math.sqrt }, abs: { argc: 1, fn: Math.abs },
+        ln: { argc: 1, fn: Math.log }, log: { argc: 1, fn: Math.log }, sin: { argc: 1, fn: Math.sin },
+        cos: { argc: 1, fn: Math.cos }, tan: { argc: 1, fn: Math.tan }, pow: { argc: 2, fn: Math.pow },
+        min: { argc: 2, fn: Math.min }, max: { argc: 2, fn: Math.max }
+      };
+
+      const OPS = {
+        '+': { p: 2, a: 'L', n: 2, fn: (a, b) => a + b }, '-': { p: 2, a: 'L', n: 2, fn: (a, b) => a - b },
+        '*': { p: 3, a: 'L', n: 2, fn: (a, b) => a * b }, '/': { p: 3, a: 'L', n: 2, fn: (a, b) => a / b },
+        '^': { p: 4, a: 'R', n: 2, fn: (a, b) => Math.pow(a, b) }, 'u-': { p: 5, a: 'R', n: 1, fn: (a) => -a }
+      };
+
+      function fmt(v, digits = 4) {
+        return Number.isFinite(v) ? Number(v).toFixed(digits) : '—';
+      }
+
+      function parseExpression(input) {
+        if (typeof input !== 'string' || !input.trim()) throw new Error('Expression is empty.');
+        const tokens = tokenize(input);
+        const rpn = toRPN(tokens);
+        return function evalAt(xVal) {
+          const stack = [];
+          for (const t of rpn) {
+            if (t.type === 'num') stack.push(t.value);
+            else if (t.type === 'var') stack.push(xVal);
+            else if (t.type === 'const') stack.push(t.value);
+            else if (t.type === 'op') {
+              const op = OPS[t.value];
+              if (op.n === 1) {
+                if (stack.length < 1) throw new Error('Malformed expression near unary operator.');
+                stack.push(op.fn(stack.pop()));
+              } else {
+                if (stack.length < 2) throw new Error('Malformed expression near binary operator.');
+                const b = stack.pop();
+                const a = stack.pop();
+                stack.push(op.fn(a, b));
+              }
+            } else if (t.type === 'func') {
+              const def = funcDefs[t.value];
+              if (!def) throw new Error(`Unknown function: ${t.value}`);
+              if (stack.length < def.argc) throw new Error(`Function ${t.value} expects ${def.argc} argument(s).`);
+              const args = stack.splice(stack.length - def.argc, def.argc);
+              stack.push(def.fn(...args));
+            }
+          }
+          if (stack.length !== 1) throw new Error('Malformed expression: leftover tokens after evaluation.');
+          return stack[0];
+        };
+      }
+
+      function tokenize(str) {
+        const tokens = [];
+        let i = 0;
+        while (i < str.length) {
+          const c = str[i];
+          if (/\s/.test(c)) { i++; continue; }
+
+          if (/[0-9.]/.test(c)) {
+            const start = i;
+            let dotCount = 0;
+            while (i < str.length && /[0-9.]/.test(str[i])) {
+              if (str[i] === '.') dotCount++;
+              i++;
+            }
+            if (dotCount > 1) throw new Error(`Invalid number at position ${start + 1}.`);
+            const raw = str.slice(start, i);
+            const num = Number(raw);
+            if (!Number.isFinite(num)) throw new Error(`Invalid number '${raw}' at position ${start + 1}.`);
+            tokens.push({ type: 'num', value: num, pos: start + 1 });
+            continue;
+          }
+
+          if (/[A-Za-z_]/.test(c)) {
+            const start = i;
+            while (i < str.length && /[A-Za-z_]/.test(str[i])) i++;
+            const word = str.slice(start, i).toLowerCase();
+            if (word === 'x') tokens.push({ type: 'var', value: 'x', pos: start + 1 });
+            else if (word === 'pi') tokens.push({ type: 'const', value: Math.PI, pos: start + 1 });
+            else if (word === 'e') tokens.push({ type: 'const', value: Math.E, pos: start + 1 });
+            else if (funcDefs[word]) tokens.push({ type: 'func', value: word, pos: start + 1 });
+            else throw new Error(`Unsupported identifier '${word}' at position ${start + 1}.`);
+            continue;
+          }
+
+          if ('+-*/^(),'.includes(c)) {
+            const type = c === '(' || c === ')' ? 'paren' : (c === ',' ? 'comma' : 'op');
+            tokens.push({ type, value: c, pos: i + 1 });
+            i++;
+            continue;
+          }
+
+          throw new Error(`Invalid character '${c}' at position ${i + 1}.`);
+        }
+        return tokens;
+      }
+
+      function toRPN(tokens) {
+        const out = [];
+        const stack = [];
+        let prev = null;
+
+        for (let i = 0; i < tokens.length; i++) {
+          const t = tokens[i];
+          if (t.type === 'num' || t.type === 'var' || t.type === 'const') {
+            out.push(t);
+          } else if (t.type === 'func') {
+            stack.push(t);
+          } else if (t.type === 'comma') {
+            while (stack.length && !(stack[stack.length - 1].type === 'paren' && stack[stack.length - 1].value === '(')) {
+              out.push(stack.pop());
+            }
+            if (!stack.length) throw new Error(`Misplaced comma at position ${t.pos}.`);
+          } else if (t.type === 'op') {
+            let opVal = t.value;
+            if (opVal === '-' && (!prev || prev.type === 'op' || (prev.type === 'paren' && prev.value === '(') || prev.type === 'comma')) opVal = 'u-';
+            const o1 = OPS[opVal];
+            if (!o1) throw new Error(`Unknown operator '${opVal}' at position ${t.pos}.`);
+
+            while (stack.length) {
+              const top = stack[stack.length - 1];
+              if (top.type !== 'op') break;
+              const o2 = OPS[top.value];
+              if (!o2) break;
+              const shouldPop = (o1.a === 'L' && o1.p <= o2.p) || (o1.a === 'R' && o1.p < o2.p);
+              if (!shouldPop) break;
+              out.push(stack.pop());
+            }
+            stack.push({ type: 'op', value: opVal, pos: t.pos });
+          } else if (t.type === 'paren' && t.value === '(') {
+            stack.push(t);
+          } else if (t.type === 'paren' && t.value === ')') {
+            let foundLeft = false;
+            while (stack.length) {
+              const top = stack.pop();
+              if (top.type === 'paren' && top.value === '(') { foundLeft = true; break; }
+              out.push(top);
+            }
+            if (!foundLeft) throw new Error(`Mismatched ')' at position ${t.pos}.`);
+            if (stack.length && stack[stack.length - 1].type === 'func') out.push(stack.pop());
+          }
+          prev = t;
+        }
+
+        while (stack.length) {
+          const t = stack.pop();
+          if (t.type === 'paren') throw new Error(`Mismatched '(' at position ${t.pos}.`);
+          out.push(t);
+        }
+        return out;
+      }
+
+      function trapezoidIntegral(x, y) {
+        let total = 0;
+        for (let i = 0; i < x.length - 1; i++) total += 0.5 * (y[i] + y[i + 1]) * (x[i + 1] - x[i]);
+        return total;
+      }
+
+      function setStatus(kind, text) {
+        els.status.className = `status ${kind}`;
+        els.status.textContent = text;
+      }
+
+      function updateResults(data) {
+        const items = [
+          ['xmin', fmt(data.xmin)], ['xmax', fmt(data.xmax)], ['N', `${data.N}`],
+          ['Min f(x)', fmt(data.minY)], ['Max f(x)', fmt(data.maxY)], ['Area ∫f(x)dx', fmt(data.area)],
+          ['Mean E[X]', fmt(data.mean)], ['Variance Var(X)', fmt(data.variance)]
+        ];
+        els.results.innerHTML = items.map(([k, v]) => `<div class="metric"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
+      }
+
+      function evaluateAndDraw() {
+        const expr = els.exprInput.value.trim();
+        const xmin = Number(els.xminInput.value);
+        const xmax = Number(els.xmaxInput.value);
+        let N = Math.round(Number(els.samplesInput.value));
+
+        if (!Number.isFinite(xmin) || !Number.isFinite(xmax) || xmax <= xmin) {
+          state.valid = false;
+          setStatus('error', 'Domain error: ensure xmin and xmax are numbers with xmax > xmin.');
+          drawGraph();
+          return;
+        }
+        if (!Number.isFinite(N)) N = defaults.samples;
+        N = Math.max(100, Math.min(5000, N));
+        els.samplesInput.value = String(N);
+
+        let fn;
+        try {
+          fn = parseExpression(expr);
+          state.parser = fn;
+        } catch (err) {
+          state.valid = false;
+          setStatus('error', `Parse error: ${err.message}`);
+          drawGraph();
+          return;
+        }
+
+        const x = new Array(N);
+        const y = new Array(N);
+        const h = (xmax - xmin) / (N - 1);
+        let minY = Infinity, maxY = -Infinity;
+
+        for (let i = 0; i < N; i++) {
+          const xv = xmin + i * h;
+          let yv;
+          try {
+            yv = fn(xv);
+          } catch (err) {
+            state.valid = false;
+            setStatus('error', `Evaluation error near x=${fmt(xv)}: ${err.message}`);
+            drawGraph();
+            return;
+          }
+          if (!Number.isFinite(yv) || Number.isNaN(yv)) {
+            state.valid = false;
+            setStatus('error', `Invalid value at x=${fmt(xv)}: result is not finite.`);
+            drawGraph();
+            return;
+          }
+          if (yv < -1e-9) {
+            state.valid = false;
+            setStatus('error', `Nonnegativity failed: f(x) is significantly negative at x=${fmt(xv)} (f=${fmt(yv)}).`);
+            drawGraph();
+            return;
+          }
+          if (yv < 0) yv = 0;
+          x[i] = xv;
+          y[i] = yv;
+          if (yv < minY) minY = yv;
+          if (yv > maxY) maxY = yv;
+        }
+
+        const area = trapezoidIntegral(x, y);
+        const xf = x.map((v, i) => v * y[i]);
+        const mean = trapezoidIntegral(x, xf);
+        const varf = x.map((v, i) => (v - mean) * (v - mean) * y[i]);
+        const variance = trapezoidIntegral(x, varf);
+
+        state.x = x;
+        state.y = y;
+        state.xmin = xmin;
+        state.xmax = xmax;
+        state.valid = true;
+
+        updateResults({ xmin, xmax, N, minY, maxY, area, mean, variance });
+
+        if (Math.abs(area - 1) <= 0.01) {
+          setStatus('ok', `Area ≈ ${fmt(area)}. Area is close to 1 on this domain.`);
+        } else {
+          setStatus('warn', `Area ≈ ${fmt(area)}. Area is not close to 1 on this domain (PDF may be truncated or not normalized).`);
+        }
+
+        drawGraph();
+      }
+
+      function drawGraph() {
+        const canvas = els.canvas;
+        const rect = els.graphWrap.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        const width = Math.max(200, Math.floor(rect.width));
+        const height = Math.max(260, Math.floor(canvas.clientHeight || 420));
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, width, height);
+
+        const m = { l: 62, r: 20, t: 18, b: 46 };
+        const w = width - m.l - m.r;
+        const h = height - m.t - m.b;
+
+        if (!state.valid || !state.x.length) {
+          drawAxes(ctx, m, w, h, state.xmin, state.xmax, 0, 1);
+          ctx.fillStyle = '#6b7280';
+          ctx.fillText('No valid graph to display.', m.l + 10, m.t + 22);
+          return;
+        }
+
+        const x = state.x, y = state.y;
+        const xmin = x[0], xmax = x[x.length - 1];
+        let ymax = Math.max(...y);
+        ymax = Math.max(1e-6, ymax * 1.08);
+        const ymin = 0;
+
+        const px = (v) => m.l + ((v - xmin) / (xmax - xmin)) * w;
+        const py = (v) => m.t + h - ((v - ymin) / (ymax - ymin)) * h;
+
+        drawAxes(ctx, m, w, h, xmin, xmax, ymin, ymax);
+
+        if (els.shadeToggle.checked) {
+          ctx.beginPath();
+          ctx.moveTo(px(x[0]), py(0));
+          for (let i = 0; i < x.length; i++) ctx.lineTo(px(x[i]), py(y[i]));
+          ctx.lineTo(px(x[x.length - 1]), py(0));
+          ctx.closePath();
+          ctx.fillStyle = 'rgba(37,99,235,0.18)';
+          ctx.fill();
+        }
+
+        ctx.beginPath();
+        for (let i = 0; i < x.length; i++) {
+          const cx = px(x[i]);
+          const cy = py(y[i]);
+          if (i === 0) ctx.moveTo(cx, cy); else ctx.lineTo(cx, cy);
+        }
+        ctx.strokeStyle = '#1d4ed8';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        if (state.hoverIndex >= 0 && state.hoverIndex < x.length) {
+          const i = state.hoverIndex;
+          const cx = px(x[i]), cy = py(y[i]);
+          ctx.beginPath();
+          ctx.arc(cx, cy, 4.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#dc2626';
+          ctx.fill();
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+      }
+
+      function drawAxes(ctx, m, w, h, xmin, xmax, ymin, ymax) {
+        const x0 = m.l, y0 = m.t + h;
+        ctx.save();
+
+        const ticks = 8;
+        ctx.strokeStyle = '#e5e7eb';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= ticks; i++) {
+          const tx = m.l + (i / ticks) * w;
+          ctx.beginPath(); ctx.moveTo(tx, m.t); ctx.lineTo(tx, m.t + h); ctx.stroke();
+        }
+        for (let i = 0; i <= ticks; i++) {
+          const ty = m.t + (i / ticks) * h;
+          ctx.beginPath(); ctx.moveTo(m.l, ty); ctx.lineTo(m.l + w, ty); ctx.stroke();
+        }
+
+        ctx.strokeStyle = '#111827';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(m.l, m.t); ctx.lineTo(m.l, y0); ctx.lineTo(m.l + w, y0); ctx.stroke();
+
+        ctx.fillStyle = '#111827';
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('x', m.l + w / 2, m.t + h + 32);
+
+        ctx.save();
+        ctx.translate(18, m.t + h / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.textAlign = 'center';
+        ctx.fillText('f(x)', 0, 0);
+        ctx.restore();
+
+        ctx.fillStyle = '#4b5563';
+        ctx.textAlign = 'center';
+        for (let i = 0; i <= ticks; i++) {
+          const xv = xmin + (i / ticks) * (xmax - xmin);
+          const tx = m.l + (i / ticks) * w;
+          ctx.fillText(fmt(xv, 2), tx, y0 + 16);
+        }
+
+        ctx.textAlign = 'right';
+        for (let i = 0; i <= ticks; i++) {
+          const yv = ymax - (i / ticks) * (ymax - ymin);
+          const ty = m.t + (i / ticks) * h;
+          ctx.fillText(fmt(yv, 2), m.l - 8, ty + 4);
+        }
+
+        ctx.restore();
+      }
+
+      function handleHover(evt) {
+        if (!state.valid || !state.x.length) {
+          els.tooltip.style.display = 'none';
+          return;
+        }
+
+        const rect = els.canvas.getBoundingClientRect();
+        const xPix = evt.clientX - rect.left;
+        const m = { l: 62, r: 20 };
+        const plotW = rect.width - m.l - m.r;
+        if (xPix < m.l || xPix > m.l + plotW) {
+          state.hoverIndex = -1;
+          els.tooltip.style.display = 'none';
+          drawGraph();
+          return;
+        }
+
+        const t = (xPix - m.l) / plotW;
+        const idx = Math.max(0, Math.min(state.x.length - 1, Math.round(t * (state.x.length - 1))));
+        state.hoverIndex = idx;
+        drawGraph();
+
+        const tip = els.tooltip;
+        tip.style.display = 'block';
+        tip.style.left = `${xPix}px`;
+        const yPix = (() => {
+          const yVal = state.y[idx];
+          const ymax = Math.max(1e-6, Math.max(...state.y) * 1.08);
+          const mTop = 18, mBottom = 46;
+          const plotH = rect.height - mTop - mBottom;
+          return mTop + plotH - (yVal / ymax) * plotH;
+        })();
+        tip.style.top = `${Math.max(18, yPix)}px`;
+        tip.textContent = `x=${fmt(state.x[idx])}, f(x)=${fmt(state.y[idx])}`;
+      }
+
+      function resetAll() {
+        els.exprInput.value = defaults.expr;
+        els.xminInput.value = String(defaults.xmin);
+        els.xmaxInput.value = String(defaults.xmax);
+        els.samplesInput.value = String(defaults.samples);
+        els.shadeToggle.checked = defaults.shade;
+        els.exampleSelect.value = '';
+        evaluateAndDraw();
+      }
+
+      function applyExample(name) {
+        if (name === 'uniform') {
+          els.exprInput.value = '1';
+          els.xminInput.value = '0';
+          els.xmaxInput.value = '1';
+        } else if (name === 'exponential') {
+          els.exprInput.value = 'exp(-x)';
+          els.xminInput.value = '0';
+          els.xmaxInput.value = '8';
+        } else if (name === 'normal') {
+          els.exprInput.value = '1/sqrt(2*pi)*exp(-0.5*x^2)';
+          els.xminInput.value = '-4';
+          els.xmaxInput.value = '4';
+        }
+        evaluateAndDraw();
+      }
+
+      let resizeTimer = null;
+      window.addEventListener('resize', () => {
+        if (resizeTimer) clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => drawGraph(), 140);
+      });
+
+      els.updateBtn.addEventListener('click', evaluateAndDraw);
+      els.resetBtn.addEventListener('click', resetAll);
+      els.shadeToggle.addEventListener('change', drawGraph);
+      els.exampleSelect.addEventListener('change', (e) => applyExample(e.target.value));
+      els.canvas.addEventListener('mousemove', handleHover);
+      els.canvas.addEventListener('mouseleave', () => { state.hoverIndex = -1; els.tooltip.style.display = 'none'; drawGraph(); });
+
+      // Initial draw
+      evaluateAndDraw();
+    })();
+  </script>
+</body>
+</html>
