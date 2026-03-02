@@ -490,6 +490,33 @@
         return { value: total, ok: Number.isFinite(total) && !Number.isNaN(total), reason: 'Integration failed.' };
       }
 
+      function getGraphXRange(xmin, xmax) {
+        const safeDefault = { min: -5, max: 5 };
+
+        if (!Number.isFinite(xmin) || !Number.isFinite(xmax)) {
+          return safeDefault;
+        }
+
+        let left = xmin;
+        let right = xmax;
+        if (right < left) {
+          [left, right] = [right, left];
+        }
+
+        if (left === right) {
+          return { min: left - 1, max: right + 1 };
+        }
+
+        const graphMinX = left - 1;
+        const graphMaxX = right + 1;
+
+        if (!Number.isFinite(graphMinX) || !Number.isFinite(graphMaxX) || graphMinX >= graphMaxX) {
+          return safeDefault;
+        }
+
+        return { min: graphMinX, max: graphMaxX };
+      }
+
       function setErrors(errors) {
         if (!errors.length) {
           els.errorBox.hidden = true;
@@ -654,7 +681,7 @@
         }
 
         const x = state.x, y = state.y;
-        const xmin = x[0], xmax = x[x.length - 1];
+        const { min: xmin, max: xmax } = getGraphXRange(state.xmin, state.xmax);
         let ymax = Math.max(...y);
         let ymin = Math.min(...y);
         ymax = Math.max(1e-6, ymax * 1.08);
@@ -770,7 +797,11 @@
         }
 
         const t = (xPix - m.l) / plotW;
-        const idx = Math.max(0, Math.min(state.x.length - 1, Math.round(t * (state.x.length - 1))));
+        const { min: graphMinX, max: graphMaxX } = getGraphXRange(state.xmin, state.xmax);
+        const xVal = graphMinX + t * (graphMaxX - graphMinX);
+        const sampleSpan = state.x[state.x.length - 1] - state.x[0];
+        const normalized = sampleSpan === 0 ? 0.5 : (xVal - state.x[0]) / sampleSpan;
+        const idx = Math.max(0, Math.min(state.x.length - 1, Math.round(normalized * (state.x.length - 1))));
         state.hoverIndex = idx;
         drawGraph();
 
