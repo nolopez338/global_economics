@@ -299,7 +299,6 @@
       <div class="controls">
         <button type="button" id="updateGraphBtn" class="btn-primary">Update graph</button>
         <button type="button" id="loadExampleBtn">Load example</button>
-        <button type="button" id="downloadBtn">Download PMF as .txt</button>
       </div>
 
       <div id="errorBox" class="error-box" role="alert" aria-live="assertive"></div>
@@ -727,35 +726,50 @@
         }
       }
 
-      function downloadPMF() {
-        if (!currentData.length) {
-          showErrors(['Cannot download: no valid PMF loaded. Click "Update graph" after entering valid data.']);
-          return;
+      function loadExample() {
+        let rows = Array.from(tableBody.querySelectorAll('tr')).map(row => ({
+          xInput: row.querySelector('.x-input'),
+          pInput: row.querySelector('.p-input')
+        })).filter(pair => pair.xInput && pair.pInput);
+
+        if (!rows.length) {
+          ensureAtLeastRows(1);
+          rows = Array.from(tableBody.querySelectorAll('tr')).map(row => ({
+            xInput: row.querySelector('.x-input'),
+            pInput: row.querySelector('.p-input')
+          })).filter(pair => pair.xInput && pair.pInput);
         }
 
-        const text = currentData.map(d => `${formatNum(d.x, 12)} ${formatNum(d.p, 12)}`).join('\n');
-        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'pmf.txt';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-      }
+        const weights = rows.map(() => Math.random() + Number.EPSILON);
+        const weightSum = weights.reduce((acc, w) => acc + w, 0);
+        const rawProbabilities = weights.map(w => w / weightSum);
+        const probabilities = [];
+        const decimals = 6;
+        let roundedRunning = 0;
 
-      function loadExample() {
-        const example = [
-          { x: 0, p: 0.1 },
-          { x: 1, p: 0.3 },
-          { x: 2, p: 0.4 },
-          { x: 3, p: 0.2 }
-        ];
+        rows.forEach((pair, idx) => {
+          const parsedX = Number(pair.xInput.value.trim());
+          const xValue = Number.isFinite(parsedX) ? parsedX : idx + 1;
+          pair.xInput.value = String(xValue);
 
-        clearRows();
-        example.forEach(e => addRow(e.x, e.p));
-        textArea.value = example.map(e => `${e.x} ${e.p}`).join('\n');
+          if (idx === rows.length - 1) {
+            probabilities.push(Math.max(0, 1 - roundedRunning));
+            return;
+          }
+
+          const rounded = Number(rawProbabilities[idx].toFixed(decimals));
+          probabilities.push(rounded);
+          roundedRunning += rounded;
+        });
+
+        rows.forEach((pair, idx) => {
+          const pValue = idx === rows.length - 1 ? Math.max(0, 1 - probabilities.slice(0, -1).reduce((acc, p) => acc + p, 0)) : probabilities[idx];
+          probabilities[idx] = pValue;
+          pair.pInput.value = pValue.toFixed(decimals);
+        });
+
+        textArea.value = rows.map((pair, idx) => `${pair.xInput.value} ${probabilities[idx].toFixed(decimals)}`).join('\n');
+        showErrors([]);
         parseAndUpdate();
       }
 
@@ -769,7 +783,6 @@
       });
       document.getElementById('clearRowsBtn').addEventListener('click', () => clearRows());
       document.getElementById('updateGraphBtn').addEventListener('click', parseAndUpdate);
-      document.getElementById('downloadBtn').addEventListener('click', downloadPMF);
       document.getElementById('loadExampleBtn').addEventListener('click', loadExample);
 
       canvas.addEventListener('mousemove', updateTooltip);
