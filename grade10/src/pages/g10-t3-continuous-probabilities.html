@@ -137,6 +137,18 @@
       border-color: #fecaca;
     }
 
+    .error-box {
+      margin-top: 0.75rem;
+      padding: 0.65rem 0.8rem;
+      border-radius: 8px;
+      border: 1px solid #fecaca;
+      background: #fef2f2;
+      color: #991b1b;
+    }
+
+    .error-box[hidden] { display: none; }
+    .error-box ul { margin: 0.35rem 0 0; padding-left: 1.2rem; }
+
     .results-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -263,6 +275,7 @@
       </details>
 
       <div id="status" class="status warn" role="status">Enter a function and click “Update graph”.</div>
+      <div id="errorBox" class="error-box" role="alert" hidden></div>
     </section>
 
     <section class="card">
@@ -295,7 +308,8 @@
         results: document.getElementById('results'),
         canvas: document.getElementById('pdfCanvas'),
         graphWrap: document.getElementById('graphWrap'),
-        tooltip: document.getElementById('tooltip')
+        tooltip: document.getElementById('tooltip'),
+        errorBox: document.getElementById('errorBox')
       };
 
       const defaults = { expr: 'exp(-x^2)', xmin: -2, xmax: 2, samples: 600, shade: true };
@@ -453,10 +467,27 @@
         return out;
       }
 
-      function trapezoidIntegral(x, y) {
+      function trapezoidIntegralSafe(x, y) {
         let total = 0;
-        for (let i = 0; i < x.length - 1; i++) total += 0.5 * (y[i] + y[i + 1]) * (x[i + 1] - x[i]);
-        return total;
+        for (let i = 0; i < x.length - 1; i++) {
+          const trap = 0.5 * (y[i] + y[i + 1]) * (x[i + 1] - x[i]);
+          if (!Number.isFinite(trap) || Number.isNaN(trap)) {
+            return { value: NaN, ok: false, reason: `Non-finite trapezoid at sample ${i}.` };
+          }
+          total += trap;
+        }
+        return { value: total, ok: Number.isFinite(total) && !Number.isNaN(total), reason: 'Integration failed.' };
+      }
+
+      function setErrors(errors) {
+        if (!errors.length) {
+          els.errorBox.hidden = true;
+          els.errorBox.innerHTML = '';
+          return;
+        }
+        const bullets = errors.map((e) => `<li>${e}</li>`).join('');
+        els.errorBox.innerHTML = `<strong>Model validation issues:</strong><ul>${bullets}</ul>`;
+        els.errorBox.hidden = false;
       }
 
       function setStatus(kind, text) {
@@ -475,17 +506,31 @@
 
       function evaluateAndDraw() {
         const expr = els.exprInput.value.trim();
-        const xmin = Number(els.xminInput.value);
-        const xmax = Number(els.xmaxInput.value);
+        const rawXmin = Number(els.xminInput.value);
+        const rawXmax = Number(els.xmaxInput.value);
         let N = Math.round(Number(els.samplesInput.value));
+        const errors = [];
 
-        if (!Number.isFinite(xmin) || !Number.isFinite(xmax) || xmax <= xmin) {
-          state.valid = false;
-          setStatus('error', 'Domain error: ensure xmin and xmax are numbers with xmax > xmin.');
-          drawGraph();
-          return;
+        let xmin = rawXmin;
+        let xmax = rawXmax;
+        if (!Number.isFinite(rawXmin) || !Number.isFinite(rawXmax)) {
+          xmin = defaults.xmin;
+          xmax = defaults.xmax;
+          errors.push(`xmin/xmax must be numeric. Used safe plotting bounds [${fmt(xmin)}, ${fmt(xmax)}].`);
+        } else if (rawXmax === rawXmin) {
+          xmin = rawXmin - 1;
+          xmax = rawXmax + 1;
+          errors.push(`xmin and xmax are equal (${fmt(rawXmin)}). Expanded bounds to [${fmt(xmin)}, ${fmt(xmax)}] for plotting.`);
+        } else if (rawXmax < rawXmin) {
+          xmin = rawXmax;
+          xmax = rawXmin;
+          errors.push(`Bounds were reversed (xmin > xmax). Swapped bounds to [${fmt(xmin)}, ${fmt(xmax)}] for plotting only.`);
         }
-        if (!Number.isFinite(N)) N = defaults.samples;
+
+        if (!Number.isFinite(N)) {
+          errors.push(`Sample count must be numeric. Used default N=${defaults.samples}.`);
+          N = defaults.samples;
+        }
         N = Math.max(100, Math.min(5000, N));
         els.samplesInput.value = String(N);
 
@@ -494,16 +539,18 @@
           fn = parseExpression(expr);
           state.parser = fn;
         } catch (err) {
-          state.valid = false;
-          setStatus('error', `Parse error: ${err.message}`);
-          drawGraph();
-          return;
+          fn = () => 0;
+          state.parser = fn;
+          errors.push(`Could not parse expression. Plotted f(x)=0 fallback. Reason: ${err.message}`);
         }
 
         const x = new Array(N);
         const y = new Array(N);
         const h = (xmax - xmin) / (N - 1);
         let minY = Infinity, maxY = -Infinity;
+        let nonFiniteCount = 0;
+        const badSamples = [];
+        let negativeCount = 0;
 
         for (let i = 0; i < N; i++) {
           const xv = xmin + i * h;
@@ -511,92 +558,111 @@
           try {
             yv = fn(xv);
           } catch (err) {
-            state.valid = false;
-            setStatus('error', `Evaluation error near x=${fmt(xv)}: ${err.message}`);
-            drawGraph();
-            return;
+            yv = 0;
+            nonFiniteCount++;
+            if (badSamples.length < 5) badSamples.push(`x=${fmt(xv)} (${err.message})`);
           }
+
           if (!Number.isFinite(yv) || Number.isNaN(yv)) {
-            state.valid = false;
-            setStatus('error', `Invalid value at x=${fmt(xv)}: result is not finite.`);
-            drawGraph();
-            return;
+            yv = 0;
+            nonFiniteCount++;
+            if (badSamples.length < 5) badSamples.push(`x=${fmt(xv)} (non-finite value)`);
           }
-          if (yv < -1e-9) {
-            state.valid = false;
-            setStatus('error', `Nonnegativity failed: f(x) is significantly negative at x=${fmt(xv)} (f=${fmt(yv)}).`);
-            drawGraph();
-            return;
-          }
-          if (yv < 0) yv = 0;
+
+          if (yv < 0) negativeCount++;
+
           x[i] = xv;
           y[i] = yv;
           if (yv < minY) minY = yv;
           if (yv > maxY) maxY = yv;
         }
 
-        const area = trapezoidIntegral(x, y);
+        if (nonFiniteCount > 0) {
+          errors.push(`Non-numeric/undefined density values were replaced with 0 at ${nonFiniteCount} sample point(s). Examples: ${badSamples.join('; ')}.`);
+        }
+        if (negativeCount > 0) {
+          errors.push(`Density is negative at ${negativeCount} sampled point(s). Negative values are shown on the graph.`);
+        }
+
+        const areaRes = trapezoidIntegralSafe(x, y);
         const xf = x.map((v, i) => v * y[i]);
-        const mean = trapezoidIntegral(x, xf);
+        const meanRes = trapezoidIntegralSafe(x, xf);
+        const mean = meanRes.value;
         const varf = x.map((v, i) => (v - mean) * (v - mean) * y[i]);
-        const variance = trapezoidIntegral(x, varf);
+        const varianceRes = trapezoidIntegralSafe(x, varf);
+
+        if (!areaRes.ok) errors.push(`Area integration failed: ${areaRes.reason}`);
+        if (!meanRes.ok) errors.push(`Mean integration failed: ${meanRes.reason}`);
+        if (!varianceRes.ok) errors.push(`Variance integration failed: ${varianceRes.reason}`);
+
+        const area = areaRes.value;
+        const meanValue = meanRes.ok ? meanRes.value : NaN;
+        const variance = varianceRes.ok ? varianceRes.value : NaN;
+
+        const areaTol = 1e-3;
+        if (Number.isFinite(area) && Math.abs(area - 1) > areaTol) {
+          errors.push(`Total area under the curve over [${fmt(xmin)}, ${fmt(xmax)}] is ${fmt(area)}, not 1.`);
+        }
 
         state.x = x;
         state.y = y;
         state.xmin = xmin;
         state.xmax = xmax;
-        state.valid = true;
+        state.valid = x.length > 1;
 
-        updateResults({ xmin, xmax, N, minY, maxY, area, mean, variance });
+        updateResults({ xmin, xmax, N, minY, maxY, area, mean: meanValue, variance });
 
-        if (Math.abs(area - 1) <= 0.01) {
-          setStatus('ok', `Area ≈ ${fmt(area)}. Area is close to 1 on this domain.`);
+        if (errors.length) {
+          setStatus('error', 'Graph rendered with validation errors. See details below.');
         } else {
-          setStatus('warn', `Area ≈ ${fmt(area)}. Area is not close to 1 on this domain (PDF may be truncated or not normalized).`);
+          setStatus('ok', `Valid PDF on this domain. Area ≈ ${fmt(area)}.`);
         }
-
+        setErrors(errors);
         drawGraph();
       }
 
       function drawGraph() {
-        const canvas = els.canvas;
+        const c = els.canvas;
         const rect = els.graphWrap.getBoundingClientRect();
-        const dpr = window.devicePixelRatio || 1;
-        const width = Math.max(200, Math.floor(rect.width));
-        const height = Math.max(260, Math.floor(canvas.clientHeight || 420));
-        canvas.width = Math.floor(width * dpr);
-        canvas.height = Math.floor(height * dpr);
-        const ctx = canvas.getContext('2d');
+        const dpr = Math.max(1, window.devicePixelRatio || 1);
+        c.width = Math.floor(rect.width * dpr);
+        c.height = Math.floor(420 * dpr);
+        c.style.height = '420px';
+
+        const ctx = c.getContext('2d');
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        ctx.clearRect(0, 0, width, height);
+        ctx.clearRect(0, 0, rect.width, 420);
 
         const m = { l: 62, r: 20, t: 18, b: 46 };
-        const w = width - m.l - m.r;
-        const h = height - m.t - m.b;
+        const w = rect.width - m.l - m.r;
+        const h = 420 - m.t - m.b;
 
-        if (!state.valid || !state.x.length) {
-          drawAxes(ctx, m, w, h, state.xmin, state.xmax, 0, 1);
-          ctx.fillStyle = '#6b7280';
-          ctx.fillText('No valid graph to display.', m.l + 10, m.t + 22);
+        if (!state.x.length || !state.y.length) {
+          drawAxes(ctx, m, w, h, 0, 1, 0, 1);
           return;
         }
 
         const x = state.x, y = state.y;
         const xmin = x[0], xmax = x[x.length - 1];
         let ymax = Math.max(...y);
+        let ymin = Math.min(...y);
         ymax = Math.max(1e-6, ymax * 1.08);
-        const ymin = 0;
+        ymin = Math.min(0, ymin * 1.08);
+        if (Math.abs(ymax - ymin) < 1e-9) {
+          ymax = ymin + 1;
+        }
 
-        const px = (v) => m.l + ((v - xmin) / (xmax - xmin)) * w;
+        const px = (v) => m.l + ((v - xmin) / (xmax - xmin || 1)) * w;
         const py = (v) => m.t + h - ((v - ymin) / (ymax - ymin)) * h;
 
         drawAxes(ctx, m, w, h, xmin, xmax, ymin, ymax);
 
+        const baseY = py(0);
         if (els.shadeToggle.checked) {
           ctx.beginPath();
-          ctx.moveTo(px(x[0]), py(0));
+          ctx.moveTo(px(x[0]), baseY);
           for (let i = 0; i < x.length; i++) ctx.lineTo(px(x[i]), py(y[i]));
-          ctx.lineTo(px(x[x.length - 1]), py(0));
+          ctx.lineTo(px(x[x.length - 1]), baseY);
           ctx.closePath();
           ctx.fillStyle = 'rgba(37,99,235,0.18)';
           ctx.fill();
@@ -676,7 +742,7 @@
       }
 
       function handleHover(evt) {
-        if (!state.valid || !state.x.length) {
+        if (!state.x.length) {
           els.tooltip.style.display = 'none';
           return;
         }
@@ -702,10 +768,12 @@
         tip.style.left = `${xPix}px`;
         const yPix = (() => {
           const yVal = state.y[idx];
-          const ymax = Math.max(1e-6, Math.max(...state.y) * 1.08);
+          let ymax = Math.max(1e-6, Math.max(...state.y) * 1.08);
+          let ymin = Math.min(0, Math.min(...state.y) * 1.08);
+          if (Math.abs(ymax - ymin) < 1e-9) ymax = ymin + 1;
           const mTop = 18, mBottom = 46;
           const plotH = rect.height - mTop - mBottom;
-          return mTop + plotH - (yVal / ymax) * plotH;
+          return mTop + plotH - ((yVal - ymin) / (ymax - ymin)) * plotH;
         })();
         tip.style.top = `${Math.max(18, yPix)}px`;
         tip.textContent = `x=${fmt(state.x[idx])}, f(x)=${fmt(state.y[idx])}`;
