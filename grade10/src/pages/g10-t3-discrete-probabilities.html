@@ -346,7 +346,7 @@
       const ctx = canvas.getContext('2d');
 
       let currentData = [];
-      let barMeta = [];
+      let pointMeta = [];
       let hoveredIndex = -1;
       let resizeTimer = null;
 
@@ -560,7 +560,7 @@
       function drawPMF(data) {
         const { width, height } = setupCanvasSize();
         ctx.clearRect(0, 0, width, height);
-        barMeta = [];
+        pointMeta = [];
 
         const m = { top: 20, right: 20, bottom: 52, left: 58 };
         const iw = width - m.left - m.right;
@@ -638,29 +638,32 @@
         ctx.fillText('p(x)', 0, 0);
         ctx.restore();
 
-        let barWidth = 32;
-        if (data.length > 1) {
-          let minDx = Infinity;
-          for (let i = 1; i < data.length; i++) {
-            minDx = Math.min(minDx, Math.abs(xScale(data[i].x) - xScale(data[i - 1].x)));
-          }
-          if (Number.isFinite(minDx)) barWidth = Math.max(10, Math.min(44, minDx * 0.6));
-        }
+        const pointRadius = 5;
 
         data.forEach((d, i) => {
           const cx = xScale(d.x);
-          const xLeft = cx - barWidth / 2;
           const pY = yScale(d.p);
           const zeroY = yScale(0);
-          const yTop = Math.min(zeroY, pY);
-          const h = Math.abs(zeroY - pY);
           const isHover = i === hoveredIndex;
+          const stemTop = Math.min(zeroY, pY);
 
-          ctx.fillStyle = isHover ? '#f59e0b' : '#3b82f6';
           ctx.strokeStyle = isHover ? '#92400e' : '#1d4ed8';
-          ctx.lineWidth = isHover ? 2 : 1;
-          ctx.fillRect(xLeft, yTop, barWidth, h);
-          ctx.strokeRect(xLeft, yTop, barWidth, h);
+          ctx.lineWidth = isHover ? 1.6 : 1;
+          ctx.beginPath();
+          ctx.moveTo(cx, zeroY);
+          ctx.lineTo(cx, pY);
+          ctx.stroke();
+
+          ctx.fillStyle = isHover ? '#f59e0b' : '#2563eb';
+          ctx.beginPath();
+          ctx.arc(cx, pY, pointRadius, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.strokeStyle = isHover ? '#78350f' : '#1e3a8a';
+          ctx.lineWidth = isHover ? 1.5 : 1;
+          ctx.beginPath();
+          ctx.arc(cx, pY, pointRadius, 0, Math.PI * 2);
+          ctx.stroke();
 
           ctx.fillStyle = '#111827';
           ctx.font = '12px Arial';
@@ -668,7 +671,7 @@
           ctx.textBaseline = 'top';
           ctx.fillText(formatNum(d.x, 3), cx, m.top + ih + 6);
 
-          barMeta.push({ index: i, cx, xLeft, yTop, width: barWidth, height: h, data: d });
+          pointMeta.push({ index: i, cx, pY, stemTop, data: d });
         });
       }
 
@@ -688,11 +691,11 @@
         drawPMF(currentData);
       }
 
-      function nearestBar(mouseX) {
-        if (!barMeta.length) return -1;
+      function nearestPoint(mouseX) {
+        if (!pointMeta.length) return -1;
         let best = -1;
         let bestDist = Infinity;
-        for (const b of barMeta) {
+        for (const b of pointMeta) {
           const d = Math.abs(mouseX - b.cx);
           if (d < bestDist) {
             bestDist = d;
@@ -703,7 +706,7 @@
       }
 
       function updateTooltip(evt) {
-        if (!currentData.length || !barMeta.length) {
+        if (!currentData.length || !pointMeta.length) {
           tooltip.style.opacity = '0';
           return;
         }
@@ -711,14 +714,14 @@
         const rect = canvas.getBoundingClientRect();
         const x = evt.clientX - rect.left;
         const y = evt.clientY - rect.top;
-        const idx = nearestBar(x);
+        const idx = nearestPoint(x);
 
         if (idx !== hoveredIndex) {
           hoveredIndex = idx;
           drawPMF(currentData);
         }
 
-        const bm = barMeta.find(b => b.index === idx);
+        const bm = pointMeta.find(b => b.index === idx);
         if (!bm) {
           tooltip.style.opacity = '0';
           return;
@@ -726,7 +729,7 @@
 
         tooltip.innerHTML = `x = ${formatNum(bm.data.x, 6)}<br>p(x) = ${formatNum(bm.data.p, 6)}`;
         tooltip.style.left = `${Math.max(20, Math.min(rect.width - 20, bm.cx))}px`;
-        tooltip.style.top = `${Math.max(18, bm.yTop)}px`;
+        tooltip.style.top = `${Math.max(18, bm.stemTop)}px`;
         tooltip.style.opacity = '1';
 
         if (y < 0 || y > rect.height || x < 0 || x > rect.width) {
