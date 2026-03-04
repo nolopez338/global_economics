@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from pathlib import Path
 from typing import Any, Dict, List
@@ -9,6 +10,7 @@ from typing import Any, Dict, List
 import pandas as pd
 
 CRITERIA = [f"C{i}" for i in range(1, 11)]
+CRITERIA_SET = set(CRITERIA)
 
 
 def list_xls_files(folder: Path) -> List[Path]:
@@ -61,6 +63,21 @@ def _normalize_space_upper(value: Any) -> str:
     return " ".join(text.split()).upper()
 
 
+def _extract_criteria_tokens(value: Any) -> List[str]:
+    """Extract normalized criteria labels (C1..C10) from a cell value."""
+    text = _normalize_space_upper(value)
+    if not text:
+        return []
+
+    # Accept variants such as "C 1" or text that embeds the token (e.g. "CRITERIO C1").
+    tokens: List[str] = []
+    for number in re.findall(r"\bC\s*(10|[1-9])\b", text):
+        token = f"C{number}"
+        if token in CRITERIA_SET:
+            tokens.append(token)
+    return tokens
+
+
 def _normalize_yes_no(value: Any) -> str:
     if value is None or (isinstance(value, float) and pd.isna(value)):
         return ""
@@ -87,20 +104,27 @@ def _first_non_empty(values: List[Any]) -> Any:
 def detect_columns(df_raw: pd.DataFrame, debug: bool = False) -> Dict[str, Any]:
     """Detect row/column positions for No, ESTUDIANTES, and C1..C10 headers."""
     header_row_idx = None
-    c1_col_idx = None
+    criteria_hits_by_row: Dict[int, int] = {}
 
     for ridx in range(df_raw.shape[0]):
         row = df_raw.iloc[ridx]
+        row_tokens: set[str] = set()
         for cidx, val in enumerate(row.tolist()):
-            if _normalize_space_upper(val) == "C1":
+            tokens = _extract_criteria_tokens(val)
+            row_tokens.update(tokens)
+            if "C1" in tokens and header_row_idx is None:
                 header_row_idx = ridx
-                c1_col_idx = cidx
-                break
+        if row_tokens:
+            criteria_hits_by_row[ridx] = len(row_tokens)
         if header_row_idx is not None:
             break
 
     if header_row_idx is None:
-        raise ValueError("Could not detect criteria header row (missing C1).")
+        # Fallback: pick the row that contains the most criteria labels.
+        if criteria_hits_by_row:
+            header_row_idx = max(criteria_hits_by_row, key=criteria_hits_by_row.get)
+        else:
+            raise ValueError("Could not detect criteria header row (missing C1).")
 
     search_start = max(0, header_row_idx - 3)
     search_end = min(df_raw.shape[0], header_row_idx + 1)
@@ -118,13 +142,22 @@ def detect_columns(df_raw: pd.DataFrame, debug: bool = False) -> Dict[str, Any]:
                 students_col_idx = cidx
 
     c_cols: Dict[str, int] = {}
-    header_row = df_raw.iloc[header_row_idx]
-    norm_header = [_normalize_space_upper(v) for v in header_row.tolist()]
 
-    for ck in CRITERIA:
-        token = ck.upper()
-        if token in norm_header:
-            c_cols[ck] = norm_header.index(token)
+    # First, read criteria positions from the detected header row.
+    header_row = df_raw.iloc[header_row_idx]
+    for cidx, val in enumerate(header_row.tolist()):
+        for token in _extract_criteria_tokens(val):
+            c_cols.setdefault(token, cidx)
+
+    # Some exports place criteria labels across neighboring rows.
+    if len(c_cols) < len(CRITERIA):
+        row_candidates = [header_row_idx - 1, header_row_idx + 1]
+        for ridx in row_candidates:
+            if ridx < 0 or ridx >= df_raw.shape[0]:
+                continue
+            for cidx, val in enumerate(df_raw.iloc[ridx].tolist()):
+                for token in _extract_criteria_tokens(val):
+                    c_cols.setdefault(token, cidx)
 
     if no_col_idx is None:
         raise ValueError("Could not detect 'No' column.")
