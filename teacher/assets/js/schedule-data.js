@@ -1747,7 +1747,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026-03-03",
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
+    "Description": "FAS",
     "Material": "Project (C8–C10)",
     "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
   },
@@ -1758,7 +1758,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026-03-04",
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
+    "Description": "FAS",
     "Material": "Project submission + project problems",
     "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
   },
@@ -1769,7 +1769,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026-03-10",
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
+    "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Wrap-up",
     "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
   },
@@ -1780,7 +1780,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026-03-11",
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "Class",
+    "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
     "Material": "",
     "Summary": ""
   },
