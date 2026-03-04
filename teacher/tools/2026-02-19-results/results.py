@@ -14,27 +14,20 @@ CRITERIA_SET = set(CRITERIA)
 
 
 def list_xls_files(folder: Path) -> List[Path]:
-    """Return sorted .xls files in a folder."""
-    return sorted(p for p in folder.glob("*.xls") if p.is_file())
+    """Return sorted .xls/.xlsx files in a folder (case-insensitive)."""
+    files = [p for p in folder.iterdir() if p.is_file() and p.suffix.lower() in (".xls", ".xlsx")]
+    return sorted(files, key=lambda p: p.name.lower())
 
 
 def read_raw_xls(path: Path) -> pd.DataFrame:
-    """Read a legacy .xls file into a raw DataFrame without assuming headers."""
+    """Read an Excel/HTML-exported .xls/.xlsx file into a raw DataFrame without assuming headers."""
     try:
-        return pd.read_excel(path, header=None, dtype=object, engine="xlrd")
-    except ImportError:
-        print(
-            "Error: Missing Excel engine for .xls files.\n"
-            "Please install xlrd with:\n"
-            "  pip install xlrd==1.2.0",
-            file=sys.stderr,
-        )
-        raise SystemExit(1)
+        # Let pandas pick a suitable engine first (more resilient across installs).
+        return pd.read_excel(path, header=None, dtype=object)
     except Exception as exc:
         msg = str(exc).lower()
-        # Some school exports are HTML tables saved with a .xls extension.
-        # xlrd cannot parse those files (e.g. "Expected BOF record; found b'\xef\xbb\xbf<html'").
-        if "expected bof record" in msg or "unsupported format" in msg:
+        # Some school exports are HTML tables saved with a .xls extension:
+        if "expected bof record" in msg or "unsupported format" in msg or "<html" in msg:
             try:
                 tables = pd.read_html(path, header=None)
             except Exception:
@@ -45,13 +38,38 @@ def read_raw_xls(path: Path) -> pd.DataFrame:
                     raise ValueError(f"No tables found in HTML-based Excel file: {path.name}")
                 return tables[0].astype(object)
 
-        if "xlrd" in msg or "engine" in msg or "xls" in msg:
-            print(
-                f"Error reading '{path.name}': {exc}\n"
-                "Tip: ensure xlrd is installed and compatible with .xls:\n"
-                "  pip install xlrd==1.2.0",
-                file=sys.stderr,
-            )
+        # Engine/import issues: give actionable advice depending on extension.
+        if isinstance(exc, ImportError) or "xlrd" in msg or "engine" in msg or "xls" in msg:
+            if path.suffix.lower() == ".xls":
+                # Updated message to reflect pandas 3.x requirements (xlrd>=2.0.1)
+                if isinstance(exc, ImportError):
+                    # Bind the ImportError as exc and provide the updated guidance.
+                    print(
+                        "Error: Excel reader dependency issue for .xls files.\n"
+                        f"Details: {exc}\n"
+                        "For pandas 3.x, install/upgrade xlrd with:\n"
+                        "  python -m pip install -U xlrd\n"
+                        "or\n"
+                        "  python -m pip install \"xlrd>=2.0.1\"",
+                        file=sys.stderr,
+                    )
+                    raise SystemExit(1)
+                else:
+                    print(
+                        f"Error reading '{path.name}': {exc}\n"
+                        "Tip: ensure xlrd is installed and compatible with .xls:\n"
+                        "  python -m pip install -U xlrd\n"
+                        "  (or: python -m pip install \"xlrd>=2.0.1\")",
+                        file=sys.stderr,
+                    )
+                    raise SystemExit(1)
+            else:
+                print(
+                    f"Error reading '{path.name}': {exc}\n"
+                    "Tip: ensure an appropriate Excel engine is installed (openpyxl for .xlsx):\n"
+                    "  pip install openpyxl",
+                    file=sys.stderr,
+                )
             raise SystemExit(1)
         raise
 
@@ -136,10 +154,15 @@ def detect_columns(df_raw: pd.DataFrame, debug: bool = False) -> Dict[str, Any]:
         row = df_raw.iloc[ridx]
         for cidx, val in enumerate(row.tolist()):
             token = _normalize_space_upper(val)
-            if token == "NO" and no_col_idx is None:
-                no_col_idx = cidx
-            elif token == "ESTUDIANTES" and students_col_idx is None:
-                students_col_idx = cidx
+            # Normalize common variants for the "No" column (N, N°, N°, Nº, #, NRO, etc.)
+            tok_plain = re.sub(r"[^\w#]", "", token)  # keep letters/digits/underscore and '#'
+            if tok_plain in ("NO", "N", "#", "NRO") or token.startswith(("N°", "Nº")):
+                if no_col_idx is None:
+                    no_col_idx = cidx
+            # Accept ESTUDIANT, ESTUDIANTES, and nearby variants
+            elif "ESTUDIANT" in token:
+                if students_col_idx is None:
+                    students_col_idx = cidx
 
     c_cols: Dict[str, int] = {}
 
