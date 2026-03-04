@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Normal Distribution Explorer</title>
+  <style>
+    :root {
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #4b5563;
+      --primary: #2563eb;
+      --primary-soft: rgba(37, 99, 235, 0.2);
+      --accent: #d97706;
+      --error: #b91c1c;
+      --border: #d1d5db;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      margin: 0 0 16px;
+      font-size: 28px;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      background: #fafafa;
+    }
+
+    .panel h2 {
+      font-size: 18px;
+      margin: 0 0 8px;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 8px 0;
+    }
+
+    label {
+      font-size: 14px;
+      color: var(--muted);
+      min-width: 76px;
+    }
+
+    input[type="number"] {
+      width: 110px;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    input[type="range"] {
+      width: 190px;
+    }
+
+    input[type="checkbox"] {
+      transform: translateY(1px);
+    }
+
+    .error {
+      color: var(--error);
+      font-size: 12px;
+      min-height: 14px;
+    }
+
+    .graph-wrap {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      background: #fff;
+    }
+
+    #plotCanvas {
+      width: 100%;
+      height: 430px;
+      display: block;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      background: #ffffff;
+      cursor: crosshair;
+      touch-action: none;
+    }
+
+    .stats {
+      margin-top: 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      background: #fafafa;
+      display: grid;
+      gap: 8px;
+      font-size: 15px;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Normal Distribution Explorer</h1>
+
+    <div class="controls-grid">
+      <section class="panel">
+        <h2>Mean (μ)</h2>
+        <div class="row">
+          <label for="meanInput">μ value</label>
+          <input id="meanInput" type="number" step="0.1" value="0" />
+          <input id="meanSlider" type="range" min="-10" max="10" step="0.1" value="0" />
+        </div>
+        <div class="row">
+          <label for="meanMinInput">μ min</label>
+          <input id="meanMinInput" type="number" step="0.1" value="-10" />
+          <label for="meanMaxInput" style="min-width: 56px;">μ max</label>
+          <input id="meanMaxInput" type="number" step="0.1" value="10" />
+        </div>
+        <div id="meanError" class="error"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Variance (σ²)</h2>
+        <div class="row">
+          <label for="varInput">σ² value</label>
+          <input id="varInput" type="number" step="0.1" value="1" />
+          <input id="varSlider" type="range" min="0.1" max="10" step="0.1" value="1" />
+        </div>
+        <div class="row">
+          <label for="varMinInput">σ² min</label>
+          <input id="varMinInput" type="number" step="0.1" value="0.1" />
+          <label for="varMaxInput" style="min-width: 56px;">σ² max</label>
+          <input id="varMaxInput" type="number" step="0.1" value="10" />
+        </div>
+        <div id="varError" class="error"></div>
+      </section>
+
+      <section class="panel">
+        <h2>View</h2>
+        <div class="row">
+          <label for="autoRange" style="min-width: 140px;">Auto x-range</label>
+          <input id="autoRange" type="checkbox" checked />
+          <span class="muted">Use μ ± Kσ</span>
+        </div>
+        <div class="row">
+          <label for="kSigmaInput">K</label>
+          <input id="kSigmaInput" type="number" step="0.5" min="0.5" value="4" />
+        </div>
+        <div class="row">
+          <label for="xMinInput">x min</label>
+          <input id="xMinInput" type="number" step="0.1" value="-4" />
+          <label for="xMaxInput" style="min-width: 56px;">x max</label>
+          <input id="xMaxInput" type="number" step="0.1" value="4" />
+        </div>
+        <div id="viewError" class="error"></div>
+      </section>
+    </div>
+
+    <div class="graph-wrap">
+      <canvas id="plotCanvas" width="1000" height="430"></canvas>
+    </div>
+
+    <section class="stats">
+      <div><strong>Markers:</strong> <span id="markerText" class="mono">none</span></div>
+      <div id="probabilityText" class="mono">Click on the graph to place marker(s).</div>
+      <div class="muted">Interactions: left click = add marker, drag marker to move, right click near marker = remove nearest marker.</div>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      const MIN_POSITIVE_VARIANCE = 1e-6;
+      const MARKER_HIT_RADIUS = 12;
+      const SAMPLE_COUNT = 800;
+
+      const state = {
+        mu: 0,
+        variance: 1,
+        meanRange: { min: -10, max: 10 },
+        varRange: { min: 0.1, max: 10 },
+        autoRange: true,
+        kSigma: 4,
+        manualDomain: { min: -4, max: 4 },
+        domain: { min: -4, max: 4 },
+        markers: [],
+        draggingIndex: null,
+        plot: { left: 56, right: 24, top: 18, bottom: 44, width: 0, height: 0, yMax: 1 }
+      };
+
+      const el = {
+        meanInput: document.getElementById('meanInput'),
+        meanSlider: document.getElementById('meanSlider'),
+        meanMinInput: document.getElementById('meanMinInput'),
+        meanMaxInput: document.getElementById('meanMaxInput'),
+        meanError: document.getElementById('meanError'),
+
+        varInput: document.getElementById('varInput'),
+        varSlider: document.getElementById('varSlider'),
+        varMinInput: document.getElementById('varMinInput'),
+        varMaxInput: document.getElementById('varMaxInput'),
+        varError: document.getElementById('varError'),
+
+        autoRange: document.getElementById('autoRange'),
+        kSigmaInput: document.getElementById('kSigmaInput'),
+        xMinInput: document.getElementById('xMinInput'),
+        xMaxInput: document.getElementById('xMaxInput'),
+        viewError: document.getElementById('viewError'),
+
+        markerText: document.getElementById('markerText'),
+        probabilityText: document.getElementById('probabilityText'),
+
+        canvas: document.getElementById('plotCanvas')
+      };
+
+      const ctx = el.canvas.getContext('2d');
+
+      function clamp(v, min, max) {
+        return Math.max(min, Math.min(max, v));
+      }
+
+      function parseNumber(value, fallback) {
+        const n = Number(value);
+        return Number.isFinite(n) ? n : fallback;
+      }
+
+      function formatNum(n, digits = 4) {
+        return Number(n).toFixed(digits);
+      }
+
+      function erfApprox(x) {
+        const sign = x < 0 ? -1 : 1;
+        const ax = Math.abs(x);
+        const t = 1 / (1 + 0.3275911 * ax);
+        const a1 = 0.254829592;
+        const a2 = -0.284496736;
+        const a3 = 1.421413741;
+        const a4 = -1.453152027;
+        const a5 = 1.061405429;
+        const poly = (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t;
+        const y = 1 - poly * Math.exp(-ax * ax);
+        return sign * y;
+      }
+
+      function normalPdf(x, mu, variance) {
+        const safeVariance = Math.max(variance, MIN_POSITIVE_VARIANCE);
+        const sigma = Math.sqrt(safeVariance);
+        const coeff = 1 / (sigma * Math.sqrt(2 * Math.PI));
+        const z = (x - mu) / sigma;
+        return coeff * Math.exp(-0.5 * z * z);
+      }
+
+      function normalCdf(x, mu, variance) {
+        const safeVariance = Math.max(variance, MIN_POSITIVE_VARIANCE);
+        const sigma = Math.sqrt(safeVariance);
+        const z = (x - mu) / (sigma * Math.sqrt(2));
+        return 0.5 * (1 + erfApprox(z));
+      }
+
+      function syncControlsFromState() {
+        el.meanInput.value = state.mu;
+        el.meanSlider.value = state.mu;
+        el.meanSlider.min = state.meanRange.min;
+        el.meanSlider.max = state.meanRange.max;
+        el.meanMinInput.value = state.meanRange.min;
+        el.meanMaxInput.value = state.meanRange.max;
+
+        el.varInput.value = state.variance;
+        el.varSlider.value = state.variance;
+        el.varSlider.min = state.varRange.min;
+        el.varSlider.max = state.varRange.max;
+        el.varMinInput.value = state.varRange.min;
+        el.varMaxInput.value = state.varRange.max;
+
+        el.autoRange.checked = state.autoRange;
+        el.kSigmaInput.value = state.kSigma;
+        el.xMinInput.value = state.manualDomain.min;
+        el.xMaxInput.value = state.manualDomain.max;
+        el.kSigmaInput.disabled = !state.autoRange;
+        el.xMinInput.disabled = state.autoRange;
+        el.xMaxInput.disabled = state.autoRange;
+      }
+
+      function updateDomain() {
+        el.viewError.textContent = '';
+        const sigma = Math.sqrt(Math.max(state.variance, MIN_POSITIVE_VARIANCE));
+        if (state.autoRange) {
+          const safeK = Math.max(0.5, parseNumber(state.kSigma, 4));
+          state.kSigma = safeK;
+          state.domain.min = state.mu - safeK * sigma;
+          state.domain.max = state.mu + safeK * sigma;
+        } else {
+          const xMin = parseNumber(state.manualDomain.min, -4);
+          const xMax = parseNumber(state.manualDomain.max, 4);
+          if (!(xMin < xMax)) {
+            el.viewError.textContent = 'x min must be less than x max. Using previous valid domain.';
+          } else {
+            state.domain.min = xMin;
+            state.domain.max = xMax;
+            state.manualDomain.min = xMin;
+            state.manualDomain.max = xMax;
+          }
+        }
+
+        state.markers = state.markers.map((m) => ({ x: clamp(m.x, state.domain.min, state.domain.max) }));
+      }
+
+      function updateRangesWithValidation() {
+        el.meanError.textContent = '';
+        el.varError.textContent = '';
+
+        const meanMin = parseNumber(el.meanMinInput.value, state.meanRange.min);
+        const meanMax = parseNumber(el.meanMaxInput.value, state.meanRange.max);
+        if (meanMin < meanMax) {
+          state.meanRange.min = meanMin;
+          state.meanRange.max = meanMax;
+          state.mu = clamp(state.mu, meanMin, meanMax);
+        } else {
+          el.meanError.textContent = 'μ min must be less than μ max.';
+        }
+
+        const varMin = parseNumber(el.varMinInput.value, state.varRange.min);
+        const varMax = parseNumber(el.varMaxInput.value, state.varRange.max);
+        if (!(varMin < varMax)) {
+          el.varError.textContent = 'σ² min must be less than σ² max.';
+        } else {
+          state.varRange.min = varMin;
+          state.varRange.max = varMax;
+          state.variance = clamp(state.variance, varMin, varMax);
+        }
+      }
+
+      function setVarianceWithValidation(rawValue) {
+        let v = parseNumber(rawValue, state.variance);
+        v = clamp(v, state.varRange.min, state.varRange.max);
+        state.variance = v;
+
+        if (v <= 0) {
+          el.varError.textContent = `σ² must be > 0. Computations use ${MIN_POSITIVE_VARIANCE}.`;
+        } else if (el.varError.textContent.includes('Computations use')) {
+          el.varError.textContent = '';
+        }
+      }
+
+      function getSafeVariance() {
+        return state.variance <= 0 ? MIN_POSITIVE_VARIANCE : state.variance;
+      }
+
+      function resizeCanvas() {
+        const rect = el.canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        const width = Math.max(320, Math.floor(rect.width));
+        const height = Math.max(260, Math.floor(rect.height));
+        el.canvas.width = width * dpr;
+        el.canvas.height = height * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        state.plot.width = width - state.plot.left - state.plot.right;
+        state.plot.height = height - state.plot.top - state.plot.bottom;
+      }
+
+      function xToPx(x) {
+        const t = (x - state.domain.min) / (state.domain.max - state.domain.min);
+        return state.plot.left + t * state.plot.width;
+      }
+
+      function yToPx(y) {
+        const t = y / state.plot.yMax;
+        return state.plot.top + (1 - t) * state.plot.height;
+      }
+
+      function pxToX(px) {
+        const t = (px - state.plot.left) / state.plot.width;
+        return state.domain.min + clamp(t, 0, 1) * (state.domain.max - state.domain.min);
+      }
+
+      function sampleCurve() {
+        const safeVar = getSafeVariance();
+        const points = [];
+        let yMax = 0;
+        for (let i = 0; i <= SAMPLE_COUNT; i++) {
+          const t = i / SAMPLE_COUNT;
+          const x = state.domain.min + t * (state.domain.max - state.domain.min);
+          const y = normalPdf(x, state.mu, safeVar);
+          points.push({ x, y });
+          if (y > yMax) yMax = y;
+        }
+        state.plot.yMax = yMax * 1.08;
+        return points;
+      }
+
+      function drawAxes() {
+        const { left, top, width, height } = state.plot;
+        const baseY = top + height;
+
+        ctx.strokeStyle = '#9ca3af';
+        ctx.lineWidth = 1;
+
+        ctx.beginPath();
+        ctx.moveTo(left, baseY);
+        ctx.lineTo(left + width, baseY);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(left, top);
+        ctx.lineTo(left, baseY);
+        ctx.stroke();
+
+        ctx.fillStyle = '#4b5563';
+        ctx.font = '12px Arial';
+
+        const xTicks = 8;
+        for (let i = 0; i <= xTicks; i++) {
+          const tx = i / xTicks;
+          const x = state.domain.min + tx * (state.domain.max - state.domain.min);
+          const px = left + tx * width;
+          ctx.beginPath();
+          ctx.moveTo(px, baseY);
+          ctx.lineTo(px, baseY + 5);
+          ctx.stroke();
+          ctx.fillText(formatNum(x, 2), px - 16, baseY + 18);
+        }
+
+        const yTicks = 4;
+        for (let i = 1; i <= yTicks; i++) {
+          const ty = i / yTicks;
+          const y = ty * state.plot.yMax;
+          const py = yToPx(y);
+          ctx.strokeStyle = '#e5e7eb';
+          ctx.beginPath();
+          ctx.moveTo(left, py);
+          ctx.lineTo(left + width, py);
+          ctx.stroke();
+
+          ctx.strokeStyle = '#9ca3af';
+          ctx.beginPath();
+          ctx.moveTo(left - 5, py);
+          ctx.lineTo(left, py);
+          ctx.stroke();
+          ctx.fillText(formatNum(y, 3), 6, py + 4);
+        }
+      }
+
+      function drawCurve(points) {
+        ctx.strokeStyle = '#1d4ed8';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        points.forEach((p, i) => {
+          const px = xToPx(p.x);
+          const py = yToPx(p.y);
+          if (i === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        });
+        ctx.stroke();
+      }
+
+      function fillArea(points, xStart, xEnd, color) {
+        const a = Math.max(state.domain.min, Math.min(xStart, xEnd));
+        const b = Math.min(state.domain.max, Math.max(xStart, xEnd));
+        if (!(a < b)) return;
+        const baseY = state.plot.top + state.plot.height;
+
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        let started = false;
+        for (const p of points) {
+          if (p.x < a || p.x > b) continue;
+          const px = xToPx(p.x);
+          const py = yToPx(p.y);
+          if (!started) {
+            ctx.moveTo(px, baseY);
+            ctx.lineTo(px, py);
+            started = true;
+          } else {
+            ctx.lineTo(px, py);
+          }
+        }
+
+        if (!started) return;
+        const endPx = xToPx(b);
+        ctx.lineTo(endPx, yToPx(normalPdf(b, state.mu, getSafeVariance())));
+        ctx.lineTo(endPx, baseY);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      function drawMarkers() {
+        const baseY = state.plot.top + state.plot.height;
+        state.markers.forEach((m, index) => {
+          const y = normalPdf(m.x, state.mu, getSafeVariance());
+          const px = xToPx(m.x);
+          const py = yToPx(y);
+
+          ctx.strokeStyle = index === 0 ? '#d97706' : '#059669';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(px, py);
+          ctx.lineTo(px, baseY);
+          ctx.stroke();
+
+          ctx.fillStyle = index === 0 ? '#d97706' : '#059669';
+          ctx.beginPath();
+          ctx.arc(px, py, 6, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#111827';
+          ctx.font = '12px Arial';
+          ctx.fillText(`x${index + 1}: ${formatNum(m.x, 3)}`, px + 8, py - 8);
+        });
+      }
+
+      function updateProbabilityText() {
+        if (state.markers.length === 0) {
+          el.markerText.textContent = 'none';
+          el.probabilityText.textContent = 'Click on the graph to place marker(s).';
+          return;
+        }
+
+        const safeVar = getSafeVariance();
+
+        if (state.markers.length === 1) {
+          const a = state.markers[0].x;
+          const left = normalCdf(a, state.mu, safeVar);
+          const right = 1 - left;
+          el.markerText.textContent = `x1 = ${formatNum(a, 4)}`;
+          el.probabilityText.innerHTML = `P(X ≤ a) = ${formatNum(left, 4)} &nbsp;&nbsp;|&nbsp;&nbsp; P(X ≥ a) = ${formatNum(right, 4)}`;
+          return;
+        }
+
+        const x1 = state.markers[0].x;
+        const x2 = state.markers[1].x;
+        const a = Math.min(x1, x2);
+        const b = Math.max(x1, x2);
+        const cdfA = normalCdf(a, state.mu, safeVar);
+        const cdfB = normalCdf(b, state.mu, safeVar);
+        const left = cdfA;
+        const middle = cdfB - cdfA;
+        const right = 1 - cdfB;
+
+        el.markerText.textContent = `x1 = ${formatNum(x1, 4)}, x2 = ${formatNum(x2, 4)} (ordered: a=${formatNum(a, 4)}, b=${formatNum(b, 4)})`;
+        el.probabilityText.innerHTML = `P(X ≤ a) = ${formatNum(left, 4)} &nbsp;&nbsp;|&nbsp;&nbsp; P(a ≤ X ≤ b) = ${formatNum(middle, 4)} &nbsp;&nbsp;|&nbsp;&nbsp; P(X ≥ b) = ${formatNum(right, 4)}`;
+      }
+
+      function render() {
+        updateDomain();
+        resizeCanvas();
+
+        const points = sampleCurve();
+        ctx.clearRect(0, 0, el.canvas.width, el.canvas.height);
+
+        drawAxes();
+
+        if (state.markers.length === 1) {
+          fillArea(points, state.domain.min, state.markers[0].x, 'rgba(217, 119, 6, 0.22)');
+        } else if (state.markers.length === 2) {
+          const a = Math.min(state.markers[0].x, state.markers[1].x);
+          const b = Math.max(state.markers[0].x, state.markers[1].x);
+          fillArea(points, state.domain.min, a, 'rgba(59, 130, 246, 0.10)');
+          fillArea(points, a, b, 'rgba(16, 185, 129, 0.24)');
+          fillArea(points, b, state.domain.max, 'rgba(59, 130, 246, 0.10)');
+        }
+
+        drawCurve(points);
+        drawMarkers();
+        updateProbabilityText();
+      }
+
+      function addMarker(x) {
+        const marker = { x: clamp(x, state.domain.min, state.domain.max) };
+        if (state.markers.length === 0) {
+          state.markers.push(marker);
+        } else if (state.markers.length === 1) {
+          state.markers.push(marker);
+        } else {
+          state.markers.splice(1, 1);
+          state.markers.push(marker);
+        }
+      }
+
+      function findNearestMarkerIndex(clientX, clientY) {
+        const rect = el.canvas.getBoundingClientRect();
+        const mx = clientX - rect.left;
+        const my = clientY - rect.top;
+
+        let nearest = -1;
+        let bestDist = Number.POSITIVE_INFINITY;
+
+        state.markers.forEach((m, index) => {
+          const px = xToPx(m.x);
+          const py = yToPx(normalPdf(m.x, state.mu, getSafeVariance()));
+          const dx = px - mx;
+          const dy = py - my;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < bestDist) {
+            bestDist = dist;
+            nearest = index;
+          }
+        });
+
+        return bestDist <= MARKER_HIT_RADIUS ? nearest : -1;
+      }
+
+      function onPointerDown(event) {
+        const markerIdx = findNearestMarkerIndex(event.clientX, event.clientY);
+        if (markerIdx >= 0) {
+          state.draggingIndex = markerIdx;
+          el.canvas.style.cursor = 'grabbing';
+          event.preventDefault();
+        }
+      }
+
+      function onPointerMove(event) {
+        if (state.draggingIndex === null) {
+          const near = findNearestMarkerIndex(event.clientX, event.clientY);
+          el.canvas.style.cursor = near >= 0 ? 'grab' : 'crosshair';
+          return;
+        }
+
+        const rect = el.canvas.getBoundingClientRect();
+        const x = pxToX(event.clientX - rect.left);
+        state.markers[state.draggingIndex].x = x;
+        render();
+      }
+
+      function onPointerUp() {
+        state.draggingIndex = null;
+        el.canvas.style.cursor = 'crosshair';
+      }
+
+      function onCanvasClick(event) {
+        if (event.button !== 0) return;
+        if (state.draggingIndex !== null) return;
+
+        const rect = el.canvas.getBoundingClientRect();
+        const x = pxToX(event.clientX - rect.left);
+        addMarker(x);
+        render();
+      }
+
+      function onCanvasContextMenu(event) {
+        event.preventDefault();
+        const idx = findNearestMarkerIndex(event.clientX, event.clientY);
+        if (idx >= 0) {
+          state.markers.splice(idx, 1);
+          render();
+        }
+      }
+
+      function wireControls() {
+        el.meanInput.addEventListener('input', () => {
+          state.mu = clamp(parseNumber(el.meanInput.value, state.mu), state.meanRange.min, state.meanRange.max);
+          syncControlsFromState();
+          render();
+        });
+
+        el.meanSlider.addEventListener('input', () => {
+          state.mu = clamp(parseNumber(el.meanSlider.value, state.mu), state.meanRange.min, state.meanRange.max);
+          syncControlsFromState();
+          render();
+        });
+
+        [el.meanMinInput, el.meanMaxInput].forEach((input) => {
+          input.addEventListener('input', () => {
+            updateRangesWithValidation();
+            syncControlsFromState();
+            render();
+          });
+        });
+
+        el.varInput.addEventListener('input', () => {
+          setVarianceWithValidation(el.varInput.value);
+          syncControlsFromState();
+          render();
+        });
+
+        el.varSlider.addEventListener('input', () => {
+          setVarianceWithValidation(el.varSlider.value);
+          syncControlsFromState();
+          render();
+        });
+
+        [el.varMinInput, el.varMaxInput].forEach((input) => {
+          input.addEventListener('input', () => {
+            updateRangesWithValidation();
+            setVarianceWithValidation(state.variance);
+            syncControlsFromState();
+            render();
+          });
+        });
+
+        el.autoRange.addEventListener('change', () => {
+          state.autoRange = el.autoRange.checked;
+          syncControlsFromState();
+          render();
+        });
+
+        el.kSigmaInput.addEventListener('input', () => {
+          state.kSigma = Math.max(0.5, parseNumber(el.kSigmaInput.value, state.kSigma));
+          syncControlsFromState();
+          render();
+        });
+
+        el.xMinInput.addEventListener('input', () => {
+          state.manualDomain.min = parseNumber(el.xMinInput.value, state.manualDomain.min);
+          render();
+        });
+
+        el.xMaxInput.addEventListener('input', () => {
+          state.manualDomain.max = parseNumber(el.xMaxInput.value, state.manualDomain.max);
+          render();
+        });
+      }
+
+      function wireCanvas() {
+        el.canvas.addEventListener('pointerdown', onPointerDown);
+        window.addEventListener('pointermove', onPointerMove);
+        window.addEventListener('pointerup', onPointerUp);
+        el.canvas.addEventListener('click', onCanvasClick);
+        el.canvas.addEventListener('contextmenu', onCanvasContextMenu);
+      }
+
+      function init() {
+        wireControls();
+        wireCanvas();
+        syncControlsFromState();
+        updateRangesWithValidation();
+        render();
+        window.addEventListener('resize', render);
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
