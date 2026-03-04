@@ -601,6 +601,7 @@
     const passwordInput = document.getElementById("password-input");
     const passwordError = document.getElementById("password-error");
     const unlockKey = "scheduleUnlocked";
+    const scheduleRenderedEventName = "class-schedule-rendered";
     // Expected SHA-256 hash: e519d416c8b2623331c17695e7c6ab641e96cd0ce3f636b097b1be68fd793e16
     const expectedHash = "e519d416c8b2623331c17695e7c6ab641e96cd0ce3f636b097b1be68fd793e16";
 
@@ -609,6 +610,14 @@
         .map((byte) => byte.toString(16).padStart(2, "0"))
         .join("");
 
+    const triggerScheduleRendered = () => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          document.dispatchEvent(new Event(scheduleRenderedEventName));
+        });
+      });
+    };
+
     const unlockContent = () => {
       if (passwordOverlay) {
         passwordOverlay.remove();
@@ -616,6 +625,7 @@
       if (protectedContent) {
         protectedContent.hidden = false;
       }
+      triggerScheduleRendered();
     };
 
     const checkUnlock = async (password) => {
@@ -1509,6 +1519,12 @@
         });
       }
     }
+
+    document.addEventListener(scheduleRenderedEventName, () => {
+      updateTodayColumnHighlight();
+      updateCurrentTimeLine();
+      refreshWeekSummaries();
+    });
 
     updateTodayColumnHighlight();
     updateCurrentTimeLine();
