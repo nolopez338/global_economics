@@ -30,6 +30,19 @@ def read_raw_xls(path: Path) -> pd.DataFrame:
         raise SystemExit(1)
     except Exception as exc:
         msg = str(exc).lower()
+        # Some school exports are HTML tables saved with a .xls extension.
+        # xlrd cannot parse those files (e.g. "Expected BOF record; found b'\xef\xbb\xbf<html'").
+        if "expected bof record" in msg or "unsupported format" in msg:
+            try:
+                tables = pd.read_html(path, header=None)
+            except Exception:
+                # Fall through to the generic error handling below.
+                pass
+            else:
+                if not tables:
+                    raise ValueError(f"No tables found in HTML-based Excel file: {path.name}")
+                return tables[0].astype(object)
+
         if "xlrd" in msg or "engine" in msg or "xls" in msg:
             print(
                 f"Error reading '{path.name}': {exc}\n"
