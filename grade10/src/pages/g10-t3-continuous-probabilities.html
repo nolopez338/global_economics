@@ -361,6 +361,8 @@
   <script>
     (() => {
       const INTERNAL_SAMPLES = 500;
+      const EPS = 1e-3;
+      const DRAG_RADIUS = 10;
       const els = {
         distributionType: document.getElementById('distributionType'),
         uniformParams: document.getElementById('uniformParams'),
@@ -402,29 +404,30 @@
         shade: true
       };
 
-      const state = { x: [], y: [], xmin: -1, xmax: 3, hoverIndex: -1, points: [] };
+      const state = {
+        x: [],
+        y: [],
+        xmin: -1,
+        xmax: 3,
+        ymin: 0,
+        ymax: 1,
+        hoverIndex: -1,
+        points: [],
+        controlPoints: [],
+        drag: null,
+        plot: { m: { l: 62, r: 20, t: 18, b: 46 }, w: 1, h: 1, rectWidth: 1, rectHeight: 420 }
+      };
 
       function fmt(v, digits = 4) {
-        return Number.isFinite(v) ? Number(v).toFixed(digits) : '—';
+        if (!Number.isFinite(v)) return 'NaN';
+        const abs = Math.abs(v);
+        if (abs > 0 && abs < 0.001) return v.toExponential(2);
+        return v.toFixed(digits);
       }
 
-      function trapezoidIntegralSafe(x, y) {
-        let total = 0;
-        for (let i = 0; i < x.length - 1; i++) {
-          const trap = 0.5 * (y[i] + y[i + 1]) * (x[i + 1] - x[i]);
-          if (!Number.isFinite(trap)) return { value: NaN, ok: false, reason: `Non-finite trapezoid at sample ${i}.` };
-          total += trap;
-        }
-        return { value: total, ok: Number.isFinite(total), reason: 'Integration failed.' };
-      }
-
-      function areaFromPoints(points) {
-        let area = 0;
-        for (let i = 0; i < points.length - 1; i++) {
-          const dx = points[i + 1].x - points[i].x;
-          area += 0.5 * (points[i].y + points[i + 1].y) * dx;
-        }
-        return area;
+      function toInputNumber(v) {
+        if (!Number.isFinite(v)) return '0';
+        return String(Number(v.toFixed(6)));
       }
 
       function showPanels() {
@@ -435,6 +438,11 @@
         els.piecewiseParams.hidden = t !== 'piecewise';
       }
 
+      function setStatus(kind, message) {
+        els.status.className = `status ${kind}`;
+        els.status.textContent = message;
+      }
+
       function setErrors(errors) {
         if (!errors.length) {
           els.errorBox.hidden = true;
@@ -442,35 +450,60 @@
           return;
         }
         els.errorBox.hidden = false;
-        els.errorBox.innerHTML = `<strong>Model validation issues:</strong><ul>${errors.map((e) => `<li>${e}</li>`).join('')}</ul>`;
+        els.errorBox.innerHTML = `<strong>Validation issues</strong><ul>${errors.map((e) => `<li>${e}</li>`).join('')}</ul>`;
       }
 
-      function setStatus(kind, text) {
-        els.status.className = `status ${kind}`;
-        els.status.textContent = text;
+      function trapArea(points) {
+        let area = 0;
+        for (let i = 0; i < points.length - 1; i++) {
+          const p1 = points[i];
+          const p2 = points[i + 1];
+          const dx = p2.x - p1.x;
+          if (!Number.isFinite(dx) || dx <= 0) return NaN;
+          area += dx * (p1.y + p2.y) / 2;
+        }
+        return area;
       }
 
-      function updateResults(data) {
-        const items = [
-          ['Distribution', data.type],
-          ['xmin', fmt(data.xmin)],
-          ['xmax', fmt(data.xmax)],
-          ['Min f(x)', fmt(data.minY)],
-          ['Max f(x)', fmt(data.maxY)],
-          ['Area ∫f(x)dx', fmt(data.area)],
-          ['Mean E[X]', fmt(data.mean)],
-          ['Variance Var(X)', fmt(data.variance)]
+      function trapezoidIntegralSafe(x, y) {
+        if (!Array.isArray(x) || !Array.isArray(y)) return { ok: false, value: NaN, reason: 'Inputs must be arrays.' };
+        if (x.length !== y.length) return { ok: false, value: NaN, reason: 'x and y arrays have different lengths.' };
+        if (x.length < 2) return { ok: false, value: NaN, reason: 'At least two samples are required.' };
+        let area = 0;
+        for (let i = 0; i < x.length - 1; i++) {
+          const dx = x[i + 1] - x[i];
+          const ya = y[i];
+          const yb = y[i + 1];
+          if (!Number.isFinite(dx) || !Number.isFinite(ya) || !Number.isFinite(yb)) {
+            return { ok: false, value: NaN, reason: `Non-finite value at segment ${i}.` };
+          }
+          if (dx < 0) return { ok: false, value: NaN, reason: 'x must be nondecreasing for integration.' };
+          area += dx * (ya + yb) / 2;
+        }
+        return { ok: true, value: area };
+      }
+
+      function updateResults({ type, xmin, xmax, minY, maxY, area, mean, variance }) {
+        const std = Number.isFinite(variance) && variance >= 0 ? Math.sqrt(variance) : NaN;
+        const cards = [
+          ['Type', type],
+          ['x-range used', `${fmt(xmin, 3)} to ${fmt(xmax, 3)}`],
+          ['y-range sampled', `${fmt(minY, 3)} to ${fmt(maxY, 3)}`],
+          ['Area under PDF', fmt(area)],
+          ['Mean E[X]', fmt(mean)],
+          ['Variance Var(X)', fmt(variance)],
+          ['Std dev σ', fmt(std)]
         ];
-        els.results.innerHTML = items.map(([k, v]) => `<div class="metric"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
+        els.results.innerHTML = cards.map(([k, v]) => `<div class="metric"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
       }
 
       function normalizePoints(points, errors) {
-        const area = areaFromPoints(points);
+        const area = trapArea(points);
         if (!Number.isFinite(area) || area <= 0) {
           errors.push('Area must be positive to normalize the PDF. A flat fallback density was used.');
           const left = points[0].x;
           const right = points[points.length - 1].x;
-          const width = Math.max(1e-6, right - left);
+          const width = Math.max(EPS, right - left);
           return [{ x: left, y: 1 / width }, { x: right, y: 1 / width }];
         }
         return points.map((p) => ({ x: p.x, y: p.y / area }));
@@ -484,91 +517,114 @@
         });
       }
 
-      function buildPointsFromInputs() {
-        const t = els.distributionType.value;
+      function setPiecewiseX(index, value) {
+        const row = els.piecewiseRows.querySelectorAll('tr')[index];
+        if (!row) return;
+        const input = row.querySelector('.pw-x');
+        input.value = toInputNumber(value);
+      }
+
+      function clamp(v, lo, hi) {
+        return Math.min(hi, Math.max(lo, v));
+      }
+
+      function readAndSanitize() {
+        const type = els.distributionType.value;
         const errors = [];
+        let params = {};
         let points = [];
 
-        if (t === 'uniform') {
-          const a = Number(els.uniformA.value);
-          const b = Number(els.uniformB.value);
-          if (!Number.isFinite(a) || !Number.isFinite(b)) {
-            errors.push('Uniform parameters a and b must be numeric.');
+        if (type === 'uniform') {
+          let a = Number(els.uniformA.value);
+          let b = Number(els.uniformB.value);
+          if (!Number.isFinite(a)) { errors.push('Uniform parameter a must be numeric.'); a = defaults.uniform.a; }
+          if (!Number.isFinite(b)) { errors.push('Uniform parameter b must be numeric.'); b = defaults.uniform.b; }
+          if (!(b - a > EPS)) {
+            errors.push('Uniform requires b > a. Values were clamped.');
+            if (b <= a) b = a + 1;
+            if (b - a <= EPS) b = a + EPS;
           }
-          if (!(b > a)) {
-            errors.push('Uniform requires b > a.');
-          }
-          const left = Number.isFinite(a) ? a : 0;
-          const right = Number.isFinite(b) ? (b > left ? b : left + 1) : left + 1;
-          points = [{ x: left, y: 1 }, { x: right, y: 1 }];
+          els.uniformA.value = toInputNumber(a);
+          els.uniformB.value = toInputNumber(b);
+          params = { a, b };
+          points = normalizePoints([{ x: a, y: 1 }, { x: b, y: 1 }], errors);
         }
 
-        if (t === 'triangular') {
-          const a = Number(els.triA.value);
-          const m = Number(els.triM.value);
-          const b = Number(els.triB.value);
-          if (!Number.isFinite(a) || !Number.isFinite(m) || !Number.isFinite(b)) {
-            errors.push('Triangular parameters a, m, and b must be numeric.');
+        if (type === 'triangular') {
+          let a = Number(els.triA.value);
+          let m = Number(els.triM.value);
+          let b = Number(els.triB.value);
+          if (!Number.isFinite(a)) { errors.push('Triangular parameter a must be numeric.'); a = defaults.triangular.a; }
+          if (!Number.isFinite(m)) { errors.push('Triangular parameter m must be numeric.'); m = defaults.triangular.m; }
+          if (!Number.isFinite(b)) { errors.push('Triangular parameter b must be numeric.'); b = defaults.triangular.b; }
+          if (!(a < m)) {
+            errors.push('Triangular requires a < m. Value a was clamped.');
+            a = m - 1;
           }
-          if (!(a < m && m < b)) {
-            errors.push('Triangular requires a < m < b.');
+          if (!(m < b)) {
+            errors.push('Triangular requires m < b. Value b was clamped.');
+            b = m + 1;
           }
-          const left = Number.isFinite(a) ? a : 0;
-          const mode = Number.isFinite(m) ? m : left + 1;
-          const right = Number.isFinite(b) ? (b > mode ? b : mode + 1) : mode + 1;
-          points = [{ x: left, y: 0 }, { x: mode, y: 1 }, { x: right, y: 0 }];
+          if (!(a < m - EPS)) a = m - EPS;
+          if (!(b > m + EPS)) b = m + EPS;
+          els.triA.value = toInputNumber(a);
+          els.triM.value = toInputNumber(m);
+          els.triB.value = toInputNumber(b);
+          params = { a, m, b };
+          points = normalizePoints([{ x: a, y: 0 }, { x: m, y: 1 }, { x: b, y: 0 }], errors);
         }
 
-        if (t === 'trapezoid') {
-          const a = Number(els.trapA.value);
-          const b = Number(els.trapB.value);
-          const c = Number(els.trapC.value);
-          const d = Number(els.trapD.value);
-          if (!Number.isFinite(a) || !Number.isFinite(b) || !Number.isFinite(c) || !Number.isFinite(d)) {
-            errors.push('Trapezoid parameters a, b, c, and d must be numeric.');
-          }
-          if (!(a < b && b <= c && c < d)) {
-            errors.push('Trapezoid requires a < b ≤ c < d.');
-          }
-          const pa = Number.isFinite(a) ? a : 0;
-          const pb = Number.isFinite(b) ? b : pa + 1;
-          const pc = Number.isFinite(c) ? c : Math.max(pb, pa + 2);
-          const pd = Number.isFinite(d) ? d : Math.max(pc + 1, pa + 3);
-          points = [{ x: pa, y: 0 }, { x: pb, y: 1 }, { x: pc, y: 1 }, { x: pd, y: 0 }];
+        if (type === 'trapezoid') {
+          let a = Number(els.trapA.value);
+          let b = Number(els.trapB.value);
+          let c = Number(els.trapC.value);
+          let d = Number(els.trapD.value);
+          if (!Number.isFinite(a)) { errors.push('Trapezoid parameter a must be numeric.'); a = defaults.trapezoid.a; }
+          if (!Number.isFinite(b)) { errors.push('Trapezoid parameter b must be numeric.'); b = defaults.trapezoid.b; }
+          if (!Number.isFinite(c)) { errors.push('Trapezoid parameter c must be numeric.'); c = defaults.trapezoid.c; }
+          if (!Number.isFinite(d)) { errors.push('Trapezoid parameter d must be numeric.'); d = defaults.trapezoid.d; }
+
+          if (!(b > a)) { errors.push('Trapezoid requires a < b.'); b = a + 1; }
+          if (c < b) { errors.push('Trapezoid requires b ≤ c.'); c = b; }
+          if (!(d > c)) { errors.push('Trapezoid requires c < d.'); d = c + 1; }
+          if (!(a < b - EPS)) a = b - EPS;
+          if (!(d > c + EPS)) d = c + EPS;
+
+          els.trapA.value = toInputNumber(a);
+          els.trapB.value = toInputNumber(b);
+          els.trapC.value = toInputNumber(c);
+          els.trapD.value = toInputNumber(d);
+          params = { a, b, c, d };
+          points = normalizePoints([{ x: a, y: 0 }, { x: b, y: 1 }, { x: c, y: 1 }, { x: d, y: 0 }], errors);
         }
 
-        if (t === 'piecewise') {
+        if (type === 'piecewise') {
           const rows = getPiecewiseRows();
-          if (rows.length < 2) {
-            errors.push('Piecewise linear requires at least two points.');
-          }
+          if (rows.length < 2) errors.push('Piecewise linear requires at least two points.');
           points = rows.map((p, i) => {
             let x = p.x;
             let y = p.y;
-            if (!Number.isFinite(x)) {
-              errors.push(`Row ${i + 1}: x must be numeric.`);
-              x = i;
-            }
-            if (!Number.isFinite(y)) {
-              errors.push(`Row ${i + 1}: y must be numeric.`);
-              y = 0;
-            }
-            if (y < 0) {
-              errors.push(`Row ${i + 1}: y must be ≥ 0.`);
-              y = 0;
-            }
+            if (!Number.isFinite(x)) { errors.push(`Row ${i + 1}: x must be numeric.`); x = i; }
+            if (!Number.isFinite(y)) { errors.push(`Row ${i + 1}: y must be numeric.`); y = 0; }
+            if (y < 0) { errors.push(`Row ${i + 1}: y must be ≥ 0.`); y = 0; }
             return { x, y };
           });
           for (let i = 1; i < points.length; i++) {
             if (!(points[i].x > points[i - 1].x)) {
-              errors.push('Piecewise linear requires strictly increasing x values.');
-              points[i].x = points[i - 1].x + 1e-3;
+              errors.push('Piecewise linear requires strictly increasing x values. Values were clamped.');
+              points[i].x = points[i - 1].x + EPS;
             }
           }
+          points.forEach((p, i) => {
+            setPiecewiseX(i, p.x);
+            const row = els.piecewiseRows.querySelectorAll('tr')[i];
+            if (row) row.querySelector('.pw-y').value = toInputNumber(p.y);
+          });
+          params = { raw: points.map((p) => ({ ...p })) };
+          points = normalizePoints(points, errors);
         }
 
-        const normalized = normalizePoints(points, errors);
-        return { type: t, points: normalized, errors };
+        return { type, params, points, errors };
       }
 
       function evaluatePiecewise(points, xVal) {
@@ -586,9 +642,39 @@
         return 0;
       }
 
+      function makeControlPoints(model) {
+        const cps = [];
+        const p = model.points;
+        if (!p.length) return cps;
+        if (model.type === 'uniform') {
+          const k = p[0].y;
+          cps.push({ id: 'ua0', x: model.params.a, y: 0, draggable: true });
+          cps.push({ id: 'uak', x: model.params.a, y: k, draggable: false });
+          cps.push({ id: 'ubk', x: model.params.b, y: k, draggable: false });
+          cps.push({ id: 'ub0', x: model.params.b, y: 0, draggable: true });
+        }
+        if (model.type === 'triangular') {
+          cps.push({ id: 'ta0', x: model.params.a, y: 0, draggable: true });
+          cps.push({ id: 'tmh', x: model.params.m, y: p[1].y, draggable: false });
+          cps.push({ id: 'tb0', x: model.params.b, y: 0, draggable: true });
+        }
+        if (model.type === 'trapezoid') {
+          cps.push({ id: 'za0', x: model.params.a, y: 0, draggable: true });
+          cps.push({ id: 'zbh', x: model.params.b, y: p[1].y, draggable: false });
+          cps.push({ id: 'zch', x: model.params.c, y: p[2].y, draggable: false });
+          cps.push({ id: 'zd0', x: model.params.d, y: 0, draggable: true });
+        }
+        if (model.type === 'piecewise') {
+          p.forEach((pt, i) => cps.push({ id: `pw-${i}`, x: pt.x, y: pt.y, draggable: false }));
+          cps.push({ id: 'pw-start', x: p[0].x, y: 0, draggable: true });
+          cps.push({ id: 'pw-end', x: p[p.length - 1].x, y: 0, draggable: true });
+        }
+        return cps;
+      }
+
       function evaluateAndDraw() {
         showPanels();
-        const model = buildPointsFromInputs();
+        const model = readAndSanitize();
         const errors = [...model.errors];
         const points = model.points;
 
@@ -629,6 +715,7 @@
         state.xmin = xmin;
         state.xmax = xmax;
         state.points = points;
+        state.controlPoints = makeControlPoints(model);
 
         updateResults({
           type: model.type,
@@ -641,13 +728,29 @@
           variance: varianceRes.value
         });
 
-        if (errors.length) {
-          setStatus('error', 'Graph rendered with validation errors. See details below.');
-        } else {
-          setStatus('ok', `Valid PDF rendered. Area ≈ ${fmt(areaRes.value)}.`);
-        }
+        if (errors.length) setStatus('error', 'Graph rendered with validation errors. See details below.');
+        else setStatus('ok', `Valid PDF rendered. Area ≈ ${fmt(areaRes.value)}.`);
         setErrors(errors);
         drawGraph();
+      }
+
+      function dataToPixel(xVal, yVal) {
+        const { m, w, h } = state.plot;
+        const px = m.l + ((xVal - state.xmin) / (state.xmax - state.xmin || 1)) * w;
+        const py = m.t + h - ((yVal - state.ymin) / (state.ymax - state.ymin || 1)) * h;
+        return { px, py };
+      }
+
+      function pixelToData(clientX, clientY) {
+        const rect = els.canvas.getBoundingClientRect();
+        const { m, w, h } = state.plot;
+        const xPix = clientX - rect.left;
+        const yPix = clientY - rect.top;
+        const tx = (xPix - m.l) / (w || 1);
+        const ty = (yPix - m.t) / (h || 1);
+        const xVal = state.xmin + tx * (state.xmax - state.xmin);
+        const yVal = state.ymax - ty * (state.ymax - state.ymin);
+        return { xVal, yVal, xPix, yPix };
       }
 
       function drawGraph() {
@@ -665,8 +768,10 @@
         const m = { l: 62, r: 20, t: 18, b: 46 };
         const w = rect.width - m.l - m.r;
         const h = 420 - m.t - m.b;
+        state.plot = { m, w, h, rectWidth: rect.width, rectHeight: 420 };
 
         if (!state.x.length || !state.y.length) {
+          state.ymin = 0; state.ymax = 1;
           drawAxes(ctx, m, w, h, 0, 1, 0, 1);
           return;
         }
@@ -680,6 +785,8 @@
         ymax = Math.max(1e-6, ymax * 1.08);
         ymin = Math.min(0, ymin * 1.08);
         if (Math.abs(ymax - ymin) < 1e-9) ymax = ymin + 1;
+        state.ymin = ymin;
+        state.ymax = ymax;
 
         const px = (v) => m.l + ((v - xmin) / (xmax - xmin || 1)) * w;
         const py = (v) => m.t + h - ((v - ymin) / (ymax - ymin)) * h;
@@ -706,6 +813,21 @@
         ctx.strokeStyle = '#1d4ed8';
         ctx.lineWidth = 2;
         ctx.stroke();
+
+        state.controlPoints.forEach((cp) => {
+          const pxy = dataToPixel(cp.x, cp.y);
+          const active = state.drag && state.drag.id === cp.id;
+          const radius = active ? 6.5 : 4.5;
+          ctx.beginPath();
+          ctx.arc(pxy.px, pxy.py, radius, 0, Math.PI * 2);
+          ctx.fillStyle = cp.draggable ? '#2563eb' : '#0f172a';
+          ctx.globalAlpha = cp.draggable ? 0.95 : 0.75;
+          ctx.fill();
+          ctx.globalAlpha = 1;
+          ctx.lineWidth = active ? 2 : 1.25;
+          ctx.strokeStyle = active ? '#f59e0b' : '#ffffff';
+          ctx.stroke();
+        });
 
         if (state.hoverIndex >= 0 && state.hoverIndex < x.length) {
           const i = state.hoverIndex;
@@ -782,14 +904,120 @@
         ctx.restore();
       }
 
-      function handleHover(evt) {
+      function nearestDraggable(clientX, clientY) {
+        let hit = null;
+        state.controlPoints.forEach((cp) => {
+          if (!cp.draggable) return;
+          const pxy = dataToPixel(cp.x, cp.y);
+          const dx = pxy.px - (clientX - els.canvas.getBoundingClientRect().left);
+          const dy = pxy.py - (clientY - els.canvas.getBoundingClientRect().top);
+          const dist = Math.hypot(dx, dy);
+          if (dist <= DRAG_RADIUS && (!hit || dist < hit.dist)) hit = { cp, dist };
+        });
+        return hit ? hit.cp : null;
+      }
+
+      function setCursor(clientX, clientY) {
+        if (state.drag) {
+          els.canvas.style.cursor = 'grabbing';
+          return;
+        }
+        const cp = nearestDraggable(clientX, clientY);
+        els.canvas.style.cursor = cp ? 'grab' : 'default';
+      }
+
+      function applyDrag(clientX) {
+        if (!state.drag) return;
+        const { xVal } = pixelToData(clientX, 0);
+        const type = els.distributionType.value;
+
+        if (type === 'uniform') {
+          let a = Number(els.uniformA.value);
+          let b = Number(els.uniformB.value);
+          if (state.drag.id === 'ua0') a = clamp(xVal, -Infinity, b - EPS);
+          if (state.drag.id === 'ub0') b = clamp(xVal, a + EPS, Infinity);
+          els.uniformA.value = toInputNumber(a);
+          els.uniformB.value = toInputNumber(b);
+        }
+
+        if (type === 'triangular') {
+          const m = Number(els.triM.value);
+          let a = Number(els.triA.value);
+          let b = Number(els.triB.value);
+          if (state.drag.id === 'ta0') a = clamp(xVal, -Infinity, m - EPS);
+          if (state.drag.id === 'tb0') b = clamp(xVal, m + EPS, Infinity);
+          els.triA.value = toInputNumber(a);
+          els.triB.value = toInputNumber(b);
+        }
+
+        if (type === 'trapezoid') {
+          const b = Number(els.trapB.value);
+          const c = Number(els.trapC.value);
+          let a = Number(els.trapA.value);
+          let d = Number(els.trapD.value);
+          if (state.drag.id === 'za0') a = clamp(xVal, -Infinity, b - EPS);
+          if (state.drag.id === 'zd0') d = clamp(xVal, c + EPS, Infinity);
+          els.trapA.value = toInputNumber(a);
+          els.trapD.value = toInputNumber(d);
+        }
+
+        if (type === 'piecewise') {
+          const rows = getPiecewiseRows();
+          if (rows.length >= 2) {
+            if (state.drag.id === 'pw-start') {
+              const next = rows[1].x;
+              setPiecewiseX(0, clamp(xVal, -Infinity, next - EPS));
+            }
+            if (state.drag.id === 'pw-end') {
+              const prev = rows[rows.length - 2].x;
+              setPiecewiseX(rows.length - 1, clamp(xVal, prev + EPS, Infinity));
+            }
+          }
+        }
+
+        evaluateAndDraw();
+      }
+
+      function pointFromEvent(evt) {
+        if (evt.touches && evt.touches.length) return { clientX: evt.touches[0].clientX, clientY: evt.touches[0].clientY };
+        if (evt.changedTouches && evt.changedTouches.length) return { clientX: evt.changedTouches[0].clientX, clientY: evt.changedTouches[0].clientY };
+        return { clientX: evt.clientX, clientY: evt.clientY };
+      }
+
+      function startDrag(evt) {
+        const p = pointFromEvent(evt);
+        const cp = nearestDraggable(p.clientX, p.clientY);
+        if (!cp) return;
+        state.drag = { id: cp.id };
+        els.tooltip.style.display = 'none';
+        els.canvas.style.cursor = 'grabbing';
+        if (evt.cancelable) evt.preventDefault();
+      }
+
+      function movePointer(evt) {
+        const p = pointFromEvent(evt);
+        if (state.drag) {
+          applyDrag(p.clientX);
+          if (evt.cancelable) evt.preventDefault();
+          return;
+        }
+        setCursor(p.clientX, p.clientY);
+        handleHover(p.clientX, p.clientY);
+      }
+
+      function endDrag() {
+        state.drag = null;
+        els.canvas.style.cursor = 'default';
+      }
+
+      function handleHover(clientX, clientY) {
         if (!state.x.length) {
           els.tooltip.style.display = 'none';
           return;
         }
 
         const rect = els.canvas.getBoundingClientRect();
-        const xPix = evt.clientX - rect.left;
+        const xPix = clientX - rect.left;
         const m = { l: 62, r: 20 };
         const plotW = rect.width - m.l - m.r;
         if (xPix < m.l || xPix > m.l + plotW) {
@@ -812,13 +1040,10 @@
         tip.style.left = `${xPix}px`;
         const yPix = (() => {
           const yVal = state.y[idx];
-          let ymax = Math.max(1e-6, Math.max(...state.y) * 1.08);
-          let ymin = Math.min(0, Math.min(...state.y) * 1.08);
-          if (Math.abs(ymax - ymin) < 1e-9) ymax = ymin + 1;
           const mTop = 18;
           const mBottom = 46;
           const plotH = rect.height - mTop - mBottom;
-          return mTop + plotH - ((yVal - ymin) / (ymax - ymin)) * plotH;
+          return mTop + plotH - ((yVal - state.ymin) / (state.ymax - state.ymin || 1)) * plotH;
         })();
         tip.style.top = `${Math.max(18, yPix)}px`;
         tip.textContent = `x=${fmt(state.x[idx])}, f(x)=${fmt(state.y[idx])}`;
@@ -895,12 +1120,21 @@
       els.updateBtn.addEventListener('click', evaluateAndDraw);
       els.resetBtn.addEventListener('click', resetAll);
       els.shadeToggle.addEventListener('change', drawGraph);
-      els.canvas.addEventListener('mousemove', handleHover);
+      els.canvas.addEventListener('mousemove', movePointer);
+      els.canvas.addEventListener('mousedown', startDrag);
+      els.canvas.addEventListener('mouseup', endDrag);
       els.canvas.addEventListener('mouseleave', () => {
         state.hoverIndex = -1;
         els.tooltip.style.display = 'none';
+        if (!state.drag) els.canvas.style.cursor = 'default';
         drawGraph();
       });
+
+      els.canvas.addEventListener('touchstart', startDrag, { passive: false });
+      els.canvas.addEventListener('touchmove', movePointer, { passive: false });
+      els.canvas.addEventListener('touchend', endDrag);
+      els.canvas.addEventListener('touchcancel', endDrag);
+      window.addEventListener('mouseup', endDrag);
 
       resetAll();
     })();
