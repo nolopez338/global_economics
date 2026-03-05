@@ -583,13 +583,15 @@
         const yMin = Math.min(0, minP - yPadding);
         const yMax = Math.max(0, maxP + yPadding);
         const yRange = Math.max(1e-9, yMax - yMin);
-        const xMin = data[0].x;
-        const xMax = data[data.length - 1].x;
-        const xRange = Math.max(1e-9, xMax - xMin);
+        const xValues = data.map(d => d.x);
+        const xmin = Math.min(...xValues);
+        const xmax = Math.max(...xValues);
+        const graphXMin = xmin - 1;
+        const graphXMax = xmax + 1;
+        const xRange = Math.max(1e-9, graphXMax - graphXMin);
 
         const xScale = (x) => {
-          if (data.length === 1) return m.left + iw / 2;
-          return m.left + ((x - xMin) / xRange) * iw;
+          return m.left + ((x - graphXMin) / xRange) * iw;
         };
         const yScale = (p) => m.top + ih - ((p - yMin) / yRange) * ih;
 
@@ -841,14 +843,22 @@
         r.addEventListener('change', () => setMode(getMode()));
       });
 
-      document.getElementById('addRowBtn').addEventListener('click', () => addRow());
+      document.getElementById('addRowBtn').addEventListener('click', () => {
+        addRow();
+        parseAndUpdate();
+      });
       document.getElementById('removeRowBtn').addEventListener('click', () => {
         if (tableBody.lastElementChild) tableBody.removeChild(tableBody.lastElementChild);
+        parseAndUpdate();
       });
-      document.getElementById('clearRowsBtn').addEventListener('click', () => clearRows());
+      document.getElementById('clearRowsBtn').addEventListener('click', () => {
+        clearRows();
+        parseAndUpdate();
+      });
       document.getElementById('updateGraphBtn').addEventListener('click', parseAndUpdate);
       document.getElementById('loadExampleBtn').addEventListener('click', loadExample);
       document.getElementById('loadUniformBtn').addEventListener('click', loadUniform);
+      tableBody.addEventListener('input', parseAndUpdate);
 
       canvas.addEventListener('mousemove', updateTooltip);
       canvas.addEventListener('mouseleave', hideTooltip);
