@@ -111,15 +111,6 @@
       align-items: center;
     }
 
-    details {
-      border: 1px dashed #cbd5e1;
-      border-radius: 8px;
-      padding: 0.6rem;
-      background: #f8fafc;
-    }
-
-    summary { cursor: pointer; font-weight: 600; }
-
     .status {
       margin-top: 0.75rem;
       padding: 0.65rem 0.8rem;
@@ -207,6 +198,34 @@
       z-index: 5;
     }
 
+    .params-panel[hidden] {
+      display: none;
+    }
+
+    .points-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.35rem;
+    }
+
+    .points-table th,
+    .points-table td {
+      border: 1px solid var(--border);
+      padding: 0.35rem;
+      text-align: left;
+    }
+
+    .points-table input {
+      width: 100%;
+      padding: 0.4rem 0.5rem;
+      border-radius: 6px;
+    }
+
+    .remove-row {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
     @media (max-width: 840px) {
       .col-6, .col-4, .col-3 { grid-column: span 12; }
       canvas { height: 340px; }
@@ -237,31 +256,77 @@
       <h2>PDF Input</h2>
       <div class="grid">
         <div class="field col-12">
-          <label for="exampleSelect">Load example</label>
-          <select id="exampleSelect">
-            <option value="">-- Select an example --</option>
-            <option value="uniform">Uniform on [0,1]</option>
-            <option value="exponential">Exponential (λ=1), display on [0,8]</option>
-            <option value="normal">Standard normal, display on [-4,4]</option>
+          <label for="distributionType">Distribution type</label>
+          <select id="distributionType">
+            <option value="uniform">Uniform</option>
+            <option value="triangular">Triangular</option>
+            <option value="trapezoid">Trapezoid</option>
+            <option value="piecewise">Piecewise linear</option>
           </select>
         </div>
 
-        <div class="field col-12">
-          <label for="exprInput">f(x) expression</label>
-          <input id="exprInput" type="text" value="exp(-x^2)" spellcheck="false" />
+        <div id="uniformParams" class="params-panel col-12">
+          <div class="grid">
+            <div class="field col-6">
+              <label for="uniformA">a (left bound)</label>
+              <input id="uniformA" type="number" step="any" value="0" />
+            </div>
+            <div class="field col-6">
+              <label for="uniformB">b (right bound)</label>
+              <input id="uniformB" type="number" step="any" value="1" />
+            </div>
+          </div>
         </div>
 
-        <div class="field col-4">
-          <label for="xminInput">xmin</label>
-          <input id="xminInput" type="number" step="any" value="-2" />
+        <div id="triangularParams" class="params-panel col-12" hidden>
+          <div class="grid">
+            <div class="field col-4">
+              <label for="triA">a (left bound)</label>
+              <input id="triA" type="number" step="any" value="0" />
+            </div>
+            <div class="field col-4">
+              <label for="triM">m (mode)</label>
+              <input id="triM" type="number" step="any" value="1" />
+            </div>
+            <div class="field col-4">
+              <label for="triB">b (right bound)</label>
+              <input id="triB" type="number" step="any" value="2" />
+            </div>
+          </div>
         </div>
-        <div class="field col-4">
-          <label for="xmaxInput">xmax</label>
-          <input id="xmaxInput" type="number" step="any" value="2" />
+
+        <div id="trapezoidParams" class="params-panel col-12" hidden>
+          <div class="grid">
+            <div class="field col-3">
+              <label for="trapA">a (left bound)</label>
+              <input id="trapA" type="number" step="any" value="0" />
+            </div>
+            <div class="field col-3">
+              <label for="trapB">b (start plateau)</label>
+              <input id="trapB" type="number" step="any" value="1" />
+            </div>
+            <div class="field col-3">
+              <label for="trapC">c (end plateau)</label>
+              <input id="trapC" type="number" step="any" value="2" />
+            </div>
+            <div class="field col-3">
+              <label for="trapD">d (right bound)</label>
+              <input id="trapD" type="number" step="any" value="3" />
+            </div>
+          </div>
         </div>
-        <div class="field col-4">
-          <label for="samplesInput">Samples (N)</label>
-          <input id="samplesInput" type="number" min="100" max="5000" step="1" value="600" />
+
+        <div id="piecewiseParams" class="params-panel col-12" hidden>
+          <label>Points (x, y)</label>
+          <table class="points-table">
+            <thead>
+              <tr><th>x</th><th>y</th><th>Action</th></tr>
+            </thead>
+            <tbody id="piecewiseRows"></tbody>
+          </table>
+          <div class="actions" style="margin-top:0.6rem;">
+            <button id="addPointBtn" class="btn-secondary" type="button">Add row</button>
+          </div>
         </div>
 
         <div class="field col-12">
@@ -274,25 +339,14 @@
         </div>
       </div>
 
-      <details style="margin-top:0.8rem;">
-        <summary>Supported functions and syntax</summary>
-        <ul>
-          <li>Operators: <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>^</code>, parentheses</li>
-          <li>Variable: <code>x</code></li>
-          <li>Constants: <code>pi</code>, <code>e</code></li>
-          <li>Functions: <code>exp</code>, <code>sqrt</code>, <code>abs</code>, <code>ln</code> or <code>log</code>, <code>sin</code>, <code>cos</code>, <code>tan</code>, <code>pow</code>, <code>min</code>, <code>max</code></li>
-          <li>Examples: <code>0.5*x</code>, <code>exp(-x)</code>, <code>1/sqrt(2*pi)*exp(-0.5*x^2)</code>, <code>(3/8)*(1+x)</code></li>
-        </ul>
-      </details>
-
-      <div id="status" class="status warn" role="status">Enter a function and click “Update graph”.</div>
+      <div id="status" class="status warn" role="status">Adjust the distribution parameters to update the graph.</div>
       <div id="errorBox" class="error-box" role="alert" hidden></div>
     </section>
 
     <section class="card content-card">
       <h2>Computed results</h2>
       <div id="results" class="results-grid"></div>
-      <p class="muted" style="margin-top:0.7rem;">Note: Mean and variance shown here are domain-truncated approximations based on your chosen [xmin, xmax].</p>
+      <p class="muted" style="margin-top:0.7rem;">The system samples the selected PDF internally and normalizes it where required.</p>
     </section>
 
     <section class="card content-card">
@@ -306,15 +360,27 @@
 
   <script>
     (() => {
+      const INTERNAL_SAMPLES = 500;
       const els = {
-        exprInput: document.getElementById('exprInput'),
-        xminInput: document.getElementById('xminInput'),
-        xmaxInput: document.getElementById('xmaxInput'),
-        samplesInput: document.getElementById('samplesInput'),
+        distributionType: document.getElementById('distributionType'),
+        uniformParams: document.getElementById('uniformParams'),
+        triangularParams: document.getElementById('triangularParams'),
+        trapezoidParams: document.getElementById('trapezoidParams'),
+        piecewiseParams: document.getElementById('piecewiseParams'),
+        uniformA: document.getElementById('uniformA'),
+        uniformB: document.getElementById('uniformB'),
+        triA: document.getElementById('triA'),
+        triM: document.getElementById('triM'),
+        triB: document.getElementById('triB'),
+        trapA: document.getElementById('trapA'),
+        trapB: document.getElementById('trapB'),
+        trapC: document.getElementById('trapC'),
+        trapD: document.getElementById('trapD'),
+        piecewiseRows: document.getElementById('piecewiseRows'),
+        addPointBtn: document.getElementById('addPointBtn'),
         updateBtn: document.getElementById('updateBtn'),
         resetBtn: document.getElementById('resetBtn'),
         shadeToggle: document.getElementById('shadeToggle'),
-        exampleSelect: document.getElementById('exampleSelect'),
         status: document.getElementById('status'),
         results: document.getElementById('results'),
         canvas: document.getElementById('pdfCanvas'),
@@ -323,198 +389,50 @@
         errorBox: document.getElementById('errorBox')
       };
 
-      const defaults = { expr: 'exp(-x^2)', xmin: -2, xmax: 2, samples: 600, shade: true };
-      const state = { x: [], y: [], xmin: defaults.xmin, xmax: defaults.xmax, hoverIndex: -1, valid: false, parser: null };
-
-      const funcDefs = {
-        exp: { argc: 1, fn: Math.exp }, sqrt: { argc: 1, fn: Math.sqrt }, abs: { argc: 1, fn: Math.abs },
-        ln: { argc: 1, fn: Math.log }, log: { argc: 1, fn: Math.log }, sin: { argc: 1, fn: Math.sin },
-        cos: { argc: 1, fn: Math.cos }, tan: { argc: 1, fn: Math.tan }, pow: { argc: 2, fn: Math.pow },
-        min: { argc: 2, fn: Math.min }, max: { argc: 2, fn: Math.max }
+      const defaults = {
+        distributionType: 'uniform',
+        uniform: { a: 0, b: 1 },
+        triangular: { a: 0, m: 1, b: 2 },
+        trapezoid: { a: 0, b: 1, c: 2, d: 3 },
+        piecewise: [
+          { x: 0, y: 0 },
+          { x: 1, y: 1 },
+          { x: 2, y: 0 }
+        ],
+        shade: true
       };
 
-      const OPS = {
-        '+': { p: 2, a: 'L', n: 2, fn: (a, b) => a + b }, '-': { p: 2, a: 'L', n: 2, fn: (a, b) => a - b },
-        '*': { p: 3, a: 'L', n: 2, fn: (a, b) => a * b }, '/': { p: 3, a: 'L', n: 2, fn: (a, b) => a / b },
-        '^': { p: 4, a: 'R', n: 2, fn: (a, b) => Math.pow(a, b) }, 'u-': { p: 5, a: 'R', n: 1, fn: (a) => -a }
-      };
+      const state = { x: [], y: [], xmin: -1, xmax: 3, hoverIndex: -1, points: [] };
 
       function fmt(v, digits = 4) {
         return Number.isFinite(v) ? Number(v).toFixed(digits) : '—';
-      }
-
-      function parseExpression(input) {
-        if (typeof input !== 'string' || !input.trim()) throw new Error('Expression is empty.');
-        const tokens = tokenize(input);
-        const rpn = toRPN(tokens);
-        return function evalAt(xVal) {
-          const stack = [];
-          for (const t of rpn) {
-            if (t.type === 'num') stack.push(t.value);
-            else if (t.type === 'var') stack.push(xVal);
-            else if (t.type === 'const') stack.push(t.value);
-            else if (t.type === 'op') {
-              const op = OPS[t.value];
-              if (op.n === 1) {
-                if (stack.length < 1) throw new Error('Malformed expression near unary operator.');
-                stack.push(op.fn(stack.pop()));
-              } else {
-                if (stack.length < 2) throw new Error('Malformed expression near binary operator.');
-                const b = stack.pop();
-                const a = stack.pop();
-                stack.push(op.fn(a, b));
-              }
-            } else if (t.type === 'func') {
-              const def = funcDefs[t.value];
-              if (!def) throw new Error(`Unknown function: ${t.value}`);
-              if (stack.length < def.argc) throw new Error(`Function ${t.value} expects ${def.argc} argument(s).`);
-              const args = stack.splice(stack.length - def.argc, def.argc);
-              stack.push(def.fn(...args));
-            }
-          }
-          if (stack.length !== 1) throw new Error('Malformed expression: leftover tokens after evaluation.');
-          return stack[0];
-        };
-      }
-
-      function tokenize(str) {
-        const tokens = [];
-        let i = 0;
-        while (i < str.length) {
-          const c = str[i];
-          if (/\s/.test(c)) { i++; continue; }
-
-          if (/[0-9.]/.test(c)) {
-            const start = i;
-            let dotCount = 0;
-            while (i < str.length && /[0-9.]/.test(str[i])) {
-              if (str[i] === '.') dotCount++;
-              i++;
-            }
-            if (dotCount > 1) throw new Error(`Invalid number at position ${start + 1}.`);
-            const raw = str.slice(start, i);
-            const num = Number(raw);
-            if (!Number.isFinite(num)) throw new Error(`Invalid number '${raw}' at position ${start + 1}.`);
-            tokens.push({ type: 'num', value: num, pos: start + 1 });
-            continue;
-          }
-
-          if (/[A-Za-z_]/.test(c)) {
-            const start = i;
-            while (i < str.length && /[A-Za-z_]/.test(str[i])) i++;
-            const word = str.slice(start, i).toLowerCase();
-            if (word === 'x') tokens.push({ type: 'var', value: 'x', pos: start + 1 });
-            else if (word === 'pi') tokens.push({ type: 'const', value: Math.PI, pos: start + 1 });
-            else if (word === 'e') tokens.push({ type: 'const', value: Math.E, pos: start + 1 });
-            else if (funcDefs[word]) tokens.push({ type: 'func', value: word, pos: start + 1 });
-            else throw new Error(`Unsupported identifier '${word}' at position ${start + 1}.`);
-            continue;
-          }
-
-          if ('+-*/^(),'.includes(c)) {
-            const type = c === '(' || c === ')' ? 'paren' : (c === ',' ? 'comma' : 'op');
-            tokens.push({ type, value: c, pos: i + 1 });
-            i++;
-            continue;
-          }
-
-          throw new Error(`Invalid character '${c}' at position ${i + 1}.`);
-        }
-        return tokens;
-      }
-
-      function toRPN(tokens) {
-        const out = [];
-        const stack = [];
-        let prev = null;
-
-        for (let i = 0; i < tokens.length; i++) {
-          const t = tokens[i];
-          if (t.type === 'num' || t.type === 'var' || t.type === 'const') {
-            out.push(t);
-          } else if (t.type === 'func') {
-            stack.push(t);
-          } else if (t.type === 'comma') {
-            while (stack.length && !(stack[stack.length - 1].type === 'paren' && stack[stack.length - 1].value === '(')) {
-              out.push(stack.pop());
-            }
-            if (!stack.length) throw new Error(`Misplaced comma at position ${t.pos}.`);
-          } else if (t.type === 'op') {
-            let opVal = t.value;
-            if (opVal === '-' && (!prev || prev.type === 'op' || (prev.type === 'paren' && prev.value === '(') || prev.type === 'comma')) opVal = 'u-';
-            const o1 = OPS[opVal];
-            if (!o1) throw new Error(`Unknown operator '${opVal}' at position ${t.pos}.`);
-
-            while (stack.length) {
-              const top = stack[stack.length - 1];
-              if (top.type !== 'op') break;
-              const o2 = OPS[top.value];
-              if (!o2) break;
-              const shouldPop = (o1.a === 'L' && o1.p <= o2.p) || (o1.a === 'R' && o1.p < o2.p);
-              if (!shouldPop) break;
-              out.push(stack.pop());
-            }
-            stack.push({ type: 'op', value: opVal, pos: t.pos });
-          } else if (t.type === 'paren' && t.value === '(') {
-            stack.push(t);
-          } else if (t.type === 'paren' && t.value === ')') {
-            let foundLeft = false;
-            while (stack.length) {
-              const top = stack.pop();
-              if (top.type === 'paren' && top.value === '(') { foundLeft = true; break; }
-              out.push(top);
-            }
-            if (!foundLeft) throw new Error(`Mismatched ')' at position ${t.pos}.`);
-            if (stack.length && stack[stack.length - 1].type === 'func') out.push(stack.pop());
-          }
-          prev = t;
-        }
-
-        while (stack.length) {
-          const t = stack.pop();
-          if (t.type === 'paren') throw new Error(`Mismatched '(' at position ${t.pos}.`);
-          out.push(t);
-        }
-        return out;
       }
 
       function trapezoidIntegralSafe(x, y) {
         let total = 0;
         for (let i = 0; i < x.length - 1; i++) {
           const trap = 0.5 * (y[i] + y[i + 1]) * (x[i + 1] - x[i]);
-          if (!Number.isFinite(trap) || Number.isNaN(trap)) {
-            return { value: NaN, ok: false, reason: `Non-finite trapezoid at sample ${i}.` };
-          }
+          if (!Number.isFinite(trap)) return { value: NaN, ok: false, reason: `Non-finite trapezoid at sample ${i}.` };
           total += trap;
         }
-        return { value: total, ok: Number.isFinite(total) && !Number.isNaN(total), reason: 'Integration failed.' };
+        return { value: total, ok: Number.isFinite(total), reason: 'Integration failed.' };
       }
 
-      function getGraphXRange(xmin, xmax) {
-        const safeDefault = { min: -5, max: 5 };
-
-        if (!Number.isFinite(xmin) || !Number.isFinite(xmax)) {
-          return safeDefault;
+      function areaFromPoints(points) {
+        let area = 0;
+        for (let i = 0; i < points.length - 1; i++) {
+          const dx = points[i + 1].x - points[i].x;
+          area += 0.5 * (points[i].y + points[i + 1].y) * dx;
         }
+        return area;
+      }
 
-        let left = xmin;
-        let right = xmax;
-        if (right < left) {
-          [left, right] = [right, left];
-        }
-
-        if (left === right) {
-          return { min: left - 1, max: right + 1 };
-        }
-
-        const graphMinX = left - 1;
-        const graphMaxX = right + 1;
-
-        if (!Number.isFinite(graphMinX) || !Number.isFinite(graphMaxX) || graphMinX >= graphMaxX) {
-          return safeDefault;
-        }
-
-        return { min: graphMinX, max: graphMaxX };
+      function showPanels() {
+        const t = els.distributionType.value;
+        els.uniformParams.hidden = t !== 'uniform';
+        els.triangularParams.hidden = t !== 'triangular';
+        els.trapezoidParams.hidden = t !== 'trapezoid';
+        els.piecewiseParams.hidden = t !== 'piecewise';
       }
 
       function setErrors(errors) {
@@ -523,9 +441,8 @@
           els.errorBox.innerHTML = '';
           return;
         }
-        const bullets = errors.map((e) => `<li>${e}</li>`).join('');
-        els.errorBox.innerHTML = `<strong>Model validation issues:</strong><ul>${bullets}</ul>`;
         els.errorBox.hidden = false;
+        els.errorBox.innerHTML = `<strong>Model validation issues:</strong><ul>${errors.map((e) => `<li>${e}</li>`).join('')}</ul>`;
       }
 
       function setStatus(kind, text) {
@@ -535,97 +452,171 @@
 
       function updateResults(data) {
         const items = [
-          ['xmin', fmt(data.xmin)], ['xmax', fmt(data.xmax)], ['N', `${data.N}`],
-          ['Min f(x)', fmt(data.minY)], ['Max f(x)', fmt(data.maxY)], ['Area ∫f(x)dx', fmt(data.area)],
-          ['Mean E[X]', fmt(data.mean)], ['Variance Var(X)', fmt(data.variance)]
+          ['Distribution', data.type],
+          ['xmin', fmt(data.xmin)],
+          ['xmax', fmt(data.xmax)],
+          ['Min f(x)', fmt(data.minY)],
+          ['Max f(x)', fmt(data.maxY)],
+          ['Area ∫f(x)dx', fmt(data.area)],
+          ['Mean E[X]', fmt(data.mean)],
+          ['Variance Var(X)', fmt(data.variance)]
         ];
         els.results.innerHTML = items.map(([k, v]) => `<div class="metric"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
       }
 
-      function evaluateAndDraw() {
-        const expr = els.exprInput.value.trim();
-        const rawXmin = Number(els.xminInput.value);
-        const rawXmax = Number(els.xmaxInput.value);
-        let N = Math.round(Number(els.samplesInput.value));
+      function normalizePoints(points, errors) {
+        const area = areaFromPoints(points);
+        if (!Number.isFinite(area) || area <= 0) {
+          errors.push('Area must be positive to normalize the PDF. A flat fallback density was used.');
+          const left = points[0].x;
+          const right = points[points.length - 1].x;
+          const width = Math.max(1e-6, right - left);
+          return [{ x: left, y: 1 / width }, { x: right, y: 1 / width }];
+        }
+        return points.map((p) => ({ x: p.x, y: p.y / area }));
+      }
+
+      function getPiecewiseRows() {
+        return Array.from(els.piecewiseRows.querySelectorAll('tr')).map((row) => {
+          const x = Number(row.querySelector('.pw-x').value);
+          const y = Number(row.querySelector('.pw-y').value);
+          return { x, y };
+        });
+      }
+
+      function buildPointsFromInputs() {
+        const t = els.distributionType.value;
         const errors = [];
+        let points = [];
 
-        let xmin = rawXmin;
-        let xmax = rawXmax;
-        if (!Number.isFinite(rawXmin) || !Number.isFinite(rawXmax)) {
-          xmin = defaults.xmin;
-          xmax = defaults.xmax;
-          errors.push(`xmin/xmax must be numeric. Used safe plotting bounds [${fmt(xmin)}, ${fmt(xmax)}].`);
-        } else if (rawXmax === rawXmin) {
-          xmin = rawXmin - 1;
-          xmax = rawXmax + 1;
-          errors.push(`xmin and xmax are equal (${fmt(rawXmin)}). Expanded bounds to [${fmt(xmin)}, ${fmt(xmax)}] for plotting.`);
-        } else if (rawXmax < rawXmin) {
-          xmin = rawXmax;
-          xmax = rawXmin;
-          errors.push(`Bounds were reversed (xmin > xmax). Swapped bounds to [${fmt(xmin)}, ${fmt(xmax)}] for plotting only.`);
-        }
-
-        if (!Number.isFinite(N)) {
-          errors.push(`Sample count must be numeric. Used default N=${defaults.samples}.`);
-          N = defaults.samples;
-        }
-        N = Math.max(100, Math.min(5000, N));
-        els.samplesInput.value = String(N);
-
-        let fn;
-        try {
-          fn = parseExpression(expr);
-          state.parser = fn;
-        } catch (err) {
-          fn = () => 0;
-          state.parser = fn;
-          errors.push(`Could not parse expression. Plotted f(x)=0 fallback. Reason: ${err.message}`);
-        }
-
-        const x = new Array(N);
-        const y = new Array(N);
-        const h = (xmax - xmin) / (N - 1);
-        let minY = Infinity, maxY = -Infinity;
-        let nonFiniteCount = 0;
-        const badSamples = [];
-        let negativeCount = 0;
-
-        for (let i = 0; i < N; i++) {
-          const xv = xmin + i * h;
-          let yv;
-          try {
-            yv = fn(xv);
-          } catch (err) {
-            yv = 0;
-            nonFiniteCount++;
-            if (badSamples.length < 5) badSamples.push(`x=${fmt(xv)} (${err.message})`);
+        if (t === 'uniform') {
+          const a = Number(els.uniformA.value);
+          const b = Number(els.uniformB.value);
+          if (!Number.isFinite(a) || !Number.isFinite(b)) {
+            errors.push('Uniform parameters a and b must be numeric.');
           }
-
-          if (!Number.isFinite(yv) || Number.isNaN(yv)) {
-            yv = 0;
-            nonFiniteCount++;
-            if (badSamples.length < 5) badSamples.push(`x=${fmt(xv)} (non-finite value)`);
+          if (!(b > a)) {
+            errors.push('Uniform requires b > a.');
           }
+          const left = Number.isFinite(a) ? a : 0;
+          const right = Number.isFinite(b) ? (b > left ? b : left + 1) : left + 1;
+          points = [{ x: left, y: 1 }, { x: right, y: 1 }];
+        }
 
-          if (yv < 0) negativeCount++;
+        if (t === 'triangular') {
+          const a = Number(els.triA.value);
+          const m = Number(els.triM.value);
+          const b = Number(els.triB.value);
+          if (!Number.isFinite(a) || !Number.isFinite(m) || !Number.isFinite(b)) {
+            errors.push('Triangular parameters a, m, and b must be numeric.');
+          }
+          if (!(a < m && m < b)) {
+            errors.push('Triangular requires a < m < b.');
+          }
+          const left = Number.isFinite(a) ? a : 0;
+          const mode = Number.isFinite(m) ? m : left + 1;
+          const right = Number.isFinite(b) ? (b > mode ? b : mode + 1) : mode + 1;
+          points = [{ x: left, y: 0 }, { x: mode, y: 1 }, { x: right, y: 0 }];
+        }
 
+        if (t === 'trapezoid') {
+          const a = Number(els.trapA.value);
+          const b = Number(els.trapB.value);
+          const c = Number(els.trapC.value);
+          const d = Number(els.trapD.value);
+          if (!Number.isFinite(a) || !Number.isFinite(b) || !Number.isFinite(c) || !Number.isFinite(d)) {
+            errors.push('Trapezoid parameters a, b, c, and d must be numeric.');
+          }
+          if (!(a < b && b <= c && c < d)) {
+            errors.push('Trapezoid requires a < b ≤ c < d.');
+          }
+          const pa = Number.isFinite(a) ? a : 0;
+          const pb = Number.isFinite(b) ? b : pa + 1;
+          const pc = Number.isFinite(c) ? c : Math.max(pb, pa + 2);
+          const pd = Number.isFinite(d) ? d : Math.max(pc + 1, pa + 3);
+          points = [{ x: pa, y: 0 }, { x: pb, y: 1 }, { x: pc, y: 1 }, { x: pd, y: 0 }];
+        }
+
+        if (t === 'piecewise') {
+          const rows = getPiecewiseRows();
+          if (rows.length < 2) {
+            errors.push('Piecewise linear requires at least two points.');
+          }
+          points = rows.map((p, i) => {
+            let x = p.x;
+            let y = p.y;
+            if (!Number.isFinite(x)) {
+              errors.push(`Row ${i + 1}: x must be numeric.`);
+              x = i;
+            }
+            if (!Number.isFinite(y)) {
+              errors.push(`Row ${i + 1}: y must be numeric.`);
+              y = 0;
+            }
+            if (y < 0) {
+              errors.push(`Row ${i + 1}: y must be ≥ 0.`);
+              y = 0;
+            }
+            return { x, y };
+          });
+          for (let i = 1; i < points.length; i++) {
+            if (!(points[i].x > points[i - 1].x)) {
+              errors.push('Piecewise linear requires strictly increasing x values.');
+              points[i].x = points[i - 1].x + 1e-3;
+            }
+          }
+        }
+
+        const normalized = normalizePoints(points, errors);
+        return { type: t, points: normalized, errors };
+      }
+
+      function evaluatePiecewise(points, xVal) {
+        if (xVal < points[0].x || xVal > points[points.length - 1].x) return 0;
+        for (let i = 0; i < points.length - 1; i++) {
+          const p1 = points[i];
+          const p2 = points[i + 1];
+          if (xVal >= p1.x && xVal <= p2.x) {
+            const dx = p2.x - p1.x;
+            if (dx <= 0) return 0;
+            const t = (xVal - p1.x) / dx;
+            return p1.y + t * (p2.y - p1.y);
+          }
+        }
+        return 0;
+      }
+
+      function evaluateAndDraw() {
+        showPanels();
+        const model = buildPointsFromInputs();
+        const errors = [...model.errors];
+        const points = model.points;
+
+        const pMin = points[0].x;
+        const pMax = points[points.length - 1].x;
+        const width = Math.max(1, pMax - pMin);
+        const xmin = pMin - 0.15 * width;
+        const xmax = pMax + 0.15 * width;
+
+        const x = new Array(INTERNAL_SAMPLES);
+        const y = new Array(INTERNAL_SAMPLES);
+        const step = (xmax - xmin) / (INTERNAL_SAMPLES - 1);
+        let minY = Infinity;
+        let maxY = -Infinity;
+
+        for (let i = 0; i < INTERNAL_SAMPLES; i++) {
+          const xv = xmin + i * step;
+          const yv = evaluatePiecewise(points, xv);
           x[i] = xv;
           y[i] = yv;
           if (yv < minY) minY = yv;
           if (yv > maxY) maxY = yv;
         }
 
-        if (nonFiniteCount > 0) {
-          errors.push(`Non-numeric/undefined density values were replaced with 0 at ${nonFiniteCount} sample point(s). Examples: ${badSamples.join('; ')}.`);
-        }
-        if (negativeCount > 0) {
-          errors.push(`Density is negative at ${negativeCount} sampled point(s). Negative values are shown on the graph.`);
-        }
-
         const areaRes = trapezoidIntegralSafe(x, y);
         const xf = x.map((v, i) => v * y[i]);
         const meanRes = trapezoidIntegralSafe(x, xf);
-        const mean = meanRes.value;
+        const mean = meanRes.ok ? meanRes.value : NaN;
         const varf = x.map((v, i) => (v - mean) * (v - mean) * y[i]);
         const varianceRes = trapezoidIntegralSafe(x, varf);
 
@@ -633,27 +624,27 @@
         if (!meanRes.ok) errors.push(`Mean integration failed: ${meanRes.reason}`);
         if (!varianceRes.ok) errors.push(`Variance integration failed: ${varianceRes.reason}`);
 
-        const area = areaRes.value;
-        const meanValue = meanRes.ok ? meanRes.value : NaN;
-        const variance = varianceRes.ok ? varianceRes.value : NaN;
-
-        const areaTol = 1e-3;
-        if (Number.isFinite(area) && Math.abs(area - 1) > areaTol) {
-          errors.push(`Total area under the curve over [${fmt(xmin)}, ${fmt(xmax)}] is ${fmt(area)}, not 1.`);
-        }
-
         state.x = x;
         state.y = y;
         state.xmin = xmin;
         state.xmax = xmax;
-        state.valid = x.length > 1;
+        state.points = points;
 
-        updateResults({ xmin, xmax, N, minY, maxY, area, mean: meanValue, variance });
+        updateResults({
+          type: model.type,
+          xmin,
+          xmax,
+          minY,
+          maxY,
+          area: areaRes.value,
+          mean,
+          variance: varianceRes.value
+        });
 
         if (errors.length) {
           setStatus('error', 'Graph rendered with validation errors. See details below.');
         } else {
-          setStatus('ok', `Valid PDF on this domain. Area ≈ ${fmt(area)}.`);
+          setStatus('ok', `Valid PDF rendered. Area ≈ ${fmt(areaRes.value)}.`);
         }
         setErrors(errors);
         drawGraph();
@@ -680,15 +671,15 @@
           return;
         }
 
-        const x = state.x, y = state.y;
-        const { min: xmin, max: xmax } = getGraphXRange(state.xmin, state.xmax);
+        const x = state.x;
+        const y = state.y;
+        const xmin = state.xmin;
+        const xmax = state.xmax;
         let ymax = Math.max(...y);
         let ymin = Math.min(...y);
         ymax = Math.max(1e-6, ymax * 1.08);
         ymin = Math.min(0, ymin * 1.08);
-        if (Math.abs(ymax - ymin) < 1e-9) {
-          ymax = ymin + 1;
-        }
+        if (Math.abs(ymax - ymin) < 1e-9) ymax = ymin + 1;
 
         const px = (v) => m.l + ((v - xmin) / (xmax - xmin || 1)) * w;
         const py = (v) => m.t + h - ((v - ymin) / (ymax - ymin)) * h;
@@ -718,7 +709,8 @@
 
         if (state.hoverIndex >= 0 && state.hoverIndex < x.length) {
           const i = state.hoverIndex;
-          const cx = px(x[i]), cy = py(y[i]);
+          const cx = px(x[i]);
+          const cy = py(y[i]);
           ctx.beginPath();
           ctx.arc(cx, cy, 4.5, 0, Math.PI * 2);
           ctx.fillStyle = '#dc2626';
@@ -730,7 +722,8 @@
       }
 
       function drawAxes(ctx, m, w, h, xmin, xmax, ymin, ymax) {
-        const x0 = m.l, y0 = m.t + h;
+        const x0 = m.l;
+        const y0 = m.t + h;
         ctx.save();
 
         const ticks = 8;
@@ -738,21 +731,31 @@
         ctx.lineWidth = 1;
         for (let i = 0; i <= ticks; i++) {
           const tx = m.l + (i / ticks) * w;
-          ctx.beginPath(); ctx.moveTo(tx, m.t); ctx.lineTo(tx, m.t + h); ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(tx, m.t);
+          ctx.lineTo(tx, m.t + h);
+          ctx.stroke();
         }
         for (let i = 0; i <= ticks; i++) {
           const ty = m.t + (i / ticks) * h;
-          ctx.beginPath(); ctx.moveTo(m.l, ty); ctx.lineTo(m.l + w, ty); ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(m.l, ty);
+          ctx.lineTo(m.l + w, ty);
+          ctx.stroke();
         }
 
         ctx.strokeStyle = '#111827';
         ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.moveTo(m.l, m.t); ctx.lineTo(m.l, y0); ctx.lineTo(m.l + w, y0); ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(m.l, m.t);
+        ctx.lineTo(m.l, y0);
+        ctx.lineTo(m.l + w, y0);
+        ctx.stroke();
 
         ctx.fillStyle = '#111827';
         ctx.font = '12px sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('x', m.l + w / 2, m.t + h + 32);
+        ctx.fillText('x', x0 + w / 2, m.t + h + 32);
 
         ctx.save();
         ctx.translate(18, m.t + h / 2);
@@ -797,8 +800,7 @@
         }
 
         const t = (xPix - m.l) / plotW;
-        const { min: graphMinX, max: graphMaxX } = getGraphXRange(state.xmin, state.xmax);
-        const xVal = graphMinX + t * (graphMaxX - graphMinX);
+        const xVal = state.xmin + t * (state.xmax - state.xmin);
         const sampleSpan = state.x[state.x.length - 1] - state.x[0];
         const normalized = sampleSpan === 0 ? 0.5 : (xVal - state.x[0]) / sampleSpan;
         const idx = Math.max(0, Math.min(state.x.length - 1, Math.round(normalized * (state.x.length - 1))));
@@ -813,7 +815,8 @@
           let ymax = Math.max(1e-6, Math.max(...state.y) * 1.08);
           let ymin = Math.min(0, Math.min(...state.y) * 1.08);
           if (Math.abs(ymax - ymin) < 1e-9) ymax = ymin + 1;
-          const mTop = 18, mBottom = 46;
+          const mTop = 18;
+          const mBottom = 46;
           const plotH = rect.height - mTop - mBottom;
           return mTop + plotH - ((yVal - ymin) / (ymax - ymin)) * plotH;
         })();
@@ -821,30 +824,42 @@
         tip.textContent = `x=${fmt(state.x[idx])}, f(x)=${fmt(state.y[idx])}`;
       }
 
-      function resetAll() {
-        els.exprInput.value = defaults.expr;
-        els.xminInput.value = String(defaults.xmin);
-        els.xmaxInput.value = String(defaults.xmax);
-        els.samplesInput.value = String(defaults.samples);
-        els.shadeToggle.checked = defaults.shade;
-        els.exampleSelect.value = '';
-        evaluateAndDraw();
+      function addPiecewiseRow(x = 0, y = 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><input class="pw-x" type="number" step="any" value="${x}" /></td>
+          <td><input class="pw-y" type="number" step="any" value="${y}" min="0" /></td>
+          <td><button type="button" class="btn-secondary remove-row">Remove</button></td>
+        `;
+        tr.querySelectorAll('input').forEach((input) => {
+          input.addEventListener('input', evaluateAndDraw);
+          input.addEventListener('change', evaluateAndDraw);
+        });
+        tr.querySelector('.remove-row').addEventListener('click', () => {
+          if (els.piecewiseRows.children.length <= 2) {
+            setStatus('warn', 'Piecewise linear distribution needs at least two points.');
+            return;
+          }
+          tr.remove();
+          evaluateAndDraw();
+        });
+        els.piecewiseRows.appendChild(tr);
       }
 
-      function applyExample(name) {
-        if (name === 'uniform') {
-          els.exprInput.value = '1';
-          els.xminInput.value = '0';
-          els.xmaxInput.value = '1';
-        } else if (name === 'exponential') {
-          els.exprInput.value = 'exp(-x)';
-          els.xminInput.value = '0';
-          els.xmaxInput.value = '8';
-        } else if (name === 'normal') {
-          els.exprInput.value = '1/sqrt(2*pi)*exp(-0.5*x^2)';
-          els.xminInput.value = '-4';
-          els.xmaxInput.value = '4';
-        }
+      function resetAll() {
+        els.distributionType.value = defaults.distributionType;
+        els.uniformA.value = defaults.uniform.a;
+        els.uniformB.value = defaults.uniform.b;
+        els.triA.value = defaults.triangular.a;
+        els.triM.value = defaults.triangular.m;
+        els.triB.value = defaults.triangular.b;
+        els.trapA.value = defaults.trapezoid.a;
+        els.trapB.value = defaults.trapezoid.b;
+        els.trapC.value = defaults.trapezoid.c;
+        els.trapD.value = defaults.trapezoid.d;
+        els.shadeToggle.checked = defaults.shade;
+        els.piecewiseRows.innerHTML = '';
+        defaults.piecewise.forEach((p) => addPiecewiseRow(p.x, p.y));
         evaluateAndDraw();
       }
 
@@ -854,15 +869,40 @@
         resizeTimer = setTimeout(() => drawGraph(), 140);
       });
 
+      [
+        els.distributionType,
+        els.uniformA,
+        els.uniformB,
+        els.triA,
+        els.triM,
+        els.triB,
+        els.trapA,
+        els.trapB,
+        els.trapC,
+        els.trapD
+      ].forEach((el) => {
+        el.addEventListener('change', evaluateAndDraw);
+        el.addEventListener('input', evaluateAndDraw);
+      });
+
+      els.addPointBtn.addEventListener('click', () => {
+        const rows = getPiecewiseRows();
+        const last = rows[rows.length - 1] || { x: 0, y: 0 };
+        addPiecewiseRow(last.x + 1, last.y);
+        evaluateAndDraw();
+      });
+
       els.updateBtn.addEventListener('click', evaluateAndDraw);
       els.resetBtn.addEventListener('click', resetAll);
       els.shadeToggle.addEventListener('change', drawGraph);
-      els.exampleSelect.addEventListener('change', (e) => applyExample(e.target.value));
       els.canvas.addEventListener('mousemove', handleHover);
-      els.canvas.addEventListener('mouseleave', () => { state.hoverIndex = -1; els.tooltip.style.display = 'none'; drawGraph(); });
+      els.canvas.addEventListener('mouseleave', () => {
+        state.hoverIndex = -1;
+        els.tooltip.style.display = 'none';
+        drawGraph();
+      });
 
-      // Initial draw
-      evaluateAndDraw();
+      resetAll();
     })();
   </script>
 </body>
