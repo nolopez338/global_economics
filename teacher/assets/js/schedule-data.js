@@ -2187,7 +2187,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026-03-10",
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "Class",
+    "Description": "Pre Icfes Training",
     "Material": "",
     "Summary": ""
   },
@@ -2594,7 +2594,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026-03-10",
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
+    "Description": "Pre Icfes Training",
     "Material": "Wrap-up",
     "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
   },
@@ -3001,7 +3001,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026-03-09",
     "Weekday": "Monday",
     "Day": 2,
-    "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
+    "Description": "Pre Icfes Training",
     "Material": "Wrap-up",
     "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
   },
@@ -3012,7 +3012,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026-03-11",
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
+    "Description": "Pre Icfes Training",
     "Material": "",
     "Summary": ""
   },
@@ -3419,7 +3419,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026-03-11",
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "Class",
+    "Description": "Pre Icfes Training",
     "Material": "",
     "Summary": ""
   },
@@ -3815,7 +3815,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026-03-09",
     "Weekday": "Monday",
     "Day": 2,
-    "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
+    "Description": "Pre Icfes Training",
     "Material": "Wrap-up",
     "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
   },
@@ -3826,7 +3826,7 @@ window.SCHEDULE_DATA = [
     "Date": "2026-03-10",
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
+    "Description": "Pre Icfes Training",
     "Material": "",
     "Summary": ""
   },
