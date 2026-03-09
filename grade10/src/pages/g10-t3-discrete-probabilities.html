@@ -292,21 +292,28 @@
       </div>
       <div id="errorBox" class="error-box" role="alert" aria-live="assertive"></div>
     </section>
-    <section class="card content-card">
-      <h2>Computed Results</h2>
-      <div id="variableControlBox" class="result-box" style="display:none; margin-bottom:0.75rem;">
-        <div><strong>Variable value</strong></div>
-        <div class="result-grid">
-          <div class="metric">
-            <div class="label" id="variableNameLabel">t</div>
-            <div class="value" style="display:flex; gap:0.5rem; align-items:center;">
-              <input type="range" id="variableSlider" min="-5" max="5" step="0.1" value="1" style="flex:1;">
-              <input type="number" id="variableNumber" min="-5" max="5" step="0.1" value="1" style="width:110px;">
+    <section class="card content-card collapsible" id="computed-results">
+      <h2>
+        <button class="collapse-toggle" type="button" aria-expanded="false" id="computed-results-toggle" aria-controls="computed-results-content">
+          <span class="toggle-label">Computed Results</span>
+          <span class="toggle-icon" aria-hidden="true">+</span>
+        </button>
+      </h2>
+      <div class="collapsible-content" id="computed-results-content" role="region" aria-labelledby="computed-results-toggle" hidden>
+        <div id="variableControlBox" class="result-box" style="display:none; margin-bottom:0.75rem;">
+          <div><strong>Variable value</strong></div>
+          <div class="result-grid">
+            <div class="metric">
+              <div class="label" id="variableNameLabel">t</div>
+              <div class="value" style="display:flex; gap:0.5rem; align-items:center;">
+                <input type="range" id="variableSlider" min="-5" max="5" step="0.1" value="1" style="flex:1;">
+                <input type="number" id="variableNumber" min="-5" max="5" step="0.1" value="1" style="width:110px;">
+              </div>
             </div>
           </div>
         </div>
+        <div id="resultBox" class="result-box" aria-live="polite"></div>
       </div>
-      <div id="resultBox" class="result-box" aria-live="polite"></div>
     </section>
     <section class="card content-card">
       <h2>PMF Graph</h2>
@@ -323,6 +330,8 @@
       const textArea = document.getElementById('pmfTextarea');
       const errorBox = document.getElementById('errorBox');
       const resultBox = document.getElementById('resultBox');
+      const computedResultsToggle = document.getElementById('computed-results-toggle');
+      const computedResultsContent = document.getElementById('computed-results-content');
       const canvas = document.getElementById('pmfCanvas');
       const variableControlBox = document.getElementById('variableControlBox');
       const variableNameLabel = document.getElementById('variableNameLabel');
@@ -341,6 +350,17 @@
       let resizeTimer = null;
       let activeVariableName = null;
       let variableValue = 1;
+      function setComputedResultsExpanded(expanded) {
+        computedResultsToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        const icon = computedResultsToggle.querySelector('.toggle-icon');
+        if (icon) icon.textContent = expanded ? '−' : '+';
+        computedResultsContent.hidden = !expanded;
+      }
+      computedResultsToggle.addEventListener('click', function () {
+        const isExpanded = computedResultsToggle.getAttribute('aria-expanded') === 'true';
+        setComputedResultsExpanded(!isExpanded);
+      });
+      setComputedResultsExpanded(false);
       function formatNum(n, digits = 6) {
         if (!Number.isFinite(n)) return '—';
         return Number(n).toFixed(digits).replace(/\.0+$/, '').replace(/(\.\d*?)0+$/, '$1');
