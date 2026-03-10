@@ -58,17 +58,39 @@ const renderScheduleRows = (table, entries) => {
   const mainBody = table.createTBody();
 
   const todayISO = getTodayISODate();
-  const currentAndFutureEntries = [];
-  const pastEntries = [];
-
-  entries.forEach((entry) => {
+  const classifiedEntries = entries.map((entry) => {
     const normalizedDate = normalizeScheduleDate(entry.Date);
-    if (normalizedDate && normalizedDate < todayISO) {
-      pastEntries.push(entry);
+    return {
+      entry,
+      normalizedDate,
+      isPast: Boolean(normalizedDate && normalizedDate < todayISO),
+    };
+  });
+
+  const uniquePastDates = Array.from(
+    new Set(
+      classifiedEntries
+        .filter((item) => item.isPast)
+        .map((item) => item.normalizedDate)
+    )
+  ).sort();
+
+  const olderPastDates = new Set(
+    uniquePastDates.length > 2
+      ? uniquePastDates.slice(0, uniquePastDates.length - 2)
+      : []
+  );
+
+  const olderPastEntries = [];
+  const visibleEntries = [];
+
+  classifiedEntries.forEach((item) => {
+    if (item.isPast && olderPastDates.has(item.normalizedDate)) {
+      olderPastEntries.push(item.entry);
       return;
     }
 
-    currentAndFutureEntries.push(entry);
+    visibleEntries.push(item.entry);
   });
 
   const appendEntryRow = (entry, body) => {
@@ -114,7 +136,7 @@ const renderScheduleRows = (table, entries) => {
     return row;
   };
 
-  if (pastEntries.length > 0) {
+  if (olderPastEntries.length > 0) {
     const sectionId = `${table.dataset.grade || "class"}-${table.dataset.section || "section"}-past-dates`;
     const toggleRow = document.createElement("tr");
     toggleRow.className = "past-dates-toggle-row";
@@ -143,7 +165,7 @@ const renderScheduleRows = (table, entries) => {
     toggleRow.append(toggleCell);
     mainBody.append(toggleRow);
 
-    const pastRows = pastEntries.map((entry, index) => {
+    const pastRows = olderPastEntries.map((entry, index) => {
       const row = appendEntryRow(entry, mainBody);
       if (index === 0) {
         row.id = sectionId;
@@ -163,7 +185,7 @@ const renderScheduleRows = (table, entries) => {
     });
   }
 
-  currentAndFutureEntries.forEach((entry) => appendEntryRow(entry, mainBody));
+  visibleEntries.forEach((entry) => appendEntryRow(entry, mainBody));
 
   if (mainBody.rows.length === 0) {
     const row = document.createElement("tr");
