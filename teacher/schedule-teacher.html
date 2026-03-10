@@ -542,7 +542,7 @@
       const links = document.querySelectorAll("a.class-link, a.class-card");
       links.forEach((link) => {
         const href = link.getAttribute("href");
-        const match = href && href.match(/^pages\/class_schedules\\/(\d{2})([A-E])\.html$/i);
+        const match = href && href.match(/^pages\/class_schedules\/(\d{2})([A-E])\.html$/i);
         if (!match) {
           return;
         }
@@ -633,8 +633,7 @@
       if (isWeekdayView) {
         applyColumnOrder("weekday");
       }
-      updateTodayColumnHighlight();
-      refreshWeekSummaries();
+      refreshScheduleView();
     };
 
     const positionMenu = () => {
@@ -750,14 +749,16 @@
 
     const getWeekdayOrder = () => {
       const orderMap = new Map();
-      weekdayButtons.forEach((button, index) => {
+      weekdayButtons.forEach((button) => {
         const label = button.textContent?.trim();
-        if (label) {
-          orderMap.set(label, index);
+        const columnCell = button.closest("[data-day-column]");
+        const dayColumn = columnCell ? Number(columnCell.getAttribute("data-day-column")) : NaN;
+        if (label && !Number.isNaN(dayColumn)) {
+          orderMap.set(label, dayColumn);
         }
       });
       const ordered = weekdays.map((label) => orderMap.get(label));
-      if (ordered.some((value) => typeof value !== "number")) {
+      if (ordered.some((value) => typeof value !== "number" || Number.isNaN(value))) {
         return [0, 1, 2, 3, 4];
       }
       return ordered;
@@ -801,15 +802,13 @@
       if (!weekdayViewToggle || !weekdayViewIndicator) {
         return;
       }
-      isWeekdayView = enabled;
-      weekdayViewToggle.setAttribute("aria-checked", String(enabled));
-      weekdayViewIndicator.textContent = enabled ? "On" : "Off";
-      applyColumnOrder(enabled ? "weekday" : "day");
-      updateTodayColumnHighlight();
-      updateCurrentTimeLine();
-      refreshWeekSummaries();
+      isWeekdayView = Boolean(enabled);
+      weekdayViewToggle.setAttribute("aria-checked", String(isWeekdayView));
+      weekdayViewIndicator.textContent = isWeekdayView ? "On" : "Off";
+      applyColumnOrder(isWeekdayView ? "weekday" : "day");
+      refreshScheduleView();
       try {
-        localStorage.setItem(weekdayViewKey, String(enabled));
+        localStorage.setItem(weekdayViewKey, String(isWeekdayView));
       } catch (error) {
         console.error("Unable to store weekday view selection.", error);
       }
@@ -819,19 +818,11 @@
       if (!plainStyleToggle || !plainStyleIndicator || !scheduleWrap) {
         return;
       }
-      isPlainStyle = enabled;
-      plainStyleToggle.setAttribute("aria-checked", String(enabled));
-      plainStyleIndicator.textContent = enabled ? "On" : "Off";
-      scheduleWrap.classList.toggle("plain-style", enabled);
-      if (enabled) {
-        clearTodayColumnHighlight();
-        if (currentTimeOverlay) {
-          currentTimeOverlay.hidden = true;
-        }
-        return;
-      }
-      updateTodayColumnHighlight();
-      updateCurrentTimeLine();
+      isPlainStyle = Boolean(enabled);
+      plainStyleToggle.setAttribute("aria-checked", String(isPlainStyle));
+      plainStyleIndicator.textContent = isPlainStyle ? "On" : "Off";
+      scheduleWrap.classList.toggle("plain-style", isPlainStyle);
+      refreshScheduleView();
     };
 
     const getStoredView = () => {
@@ -1145,6 +1136,12 @@
       renderWeekSummaries();
     }
 
+    function refreshScheduleView() {
+      updateTodayColumnHighlight();
+      updateCurrentTimeLine();
+      refreshWeekSummaries();
+    }
+
     const storedSummaryPreference = getStoredSummaryPreference();
     setWeekSummaryState(storedSummaryPreference === "true");
 
@@ -1275,7 +1272,7 @@
         if (matchingButton) {
           const headerCell = matchingButton.closest("[data-day-column]");
           const columnIndex = headerCell?.getAttribute("data-day-column");
-          return columnIndex ? Number(columnIndex) : null;
+          return columnIndex !== null && columnIndex !== undefined ? Number(columnIndex) : null;
         }
       }
       const dayIndex = weekdayButtons.findIndex(
@@ -1401,15 +1398,12 @@
     }
 
     document.addEventListener(scheduleRenderedEventName, () => {
-      updateTodayColumnHighlight();
-      updateCurrentTimeLine();
-      refreshWeekSummaries();
+      refreshScheduleView();
     });
 
-    updateTodayColumnHighlight();
-    updateCurrentTimeLine();
+    refreshScheduleView();
     setInterval(updateCurrentTimeLine, 30000);
-    window.addEventListener("resize", updateCurrentTimeLine);
+    window.addEventListener("resize", refreshScheduleView);
   </script>
 </body>
 </html>
