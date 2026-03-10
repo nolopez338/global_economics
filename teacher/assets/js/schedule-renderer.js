@@ -18,6 +18,28 @@ const getScheduleData = () => {
 const getColumnCount = (table) =>
   table.tHead?.rows[0]?.cells.length ?? 1;
 
+const normalizeScheduleDate = (raw) => {
+  if (!raw) {
+    return null;
+  }
+
+  const match = String(raw).trim().match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
+  if (!match) {
+    return null;
+  }
+
+  const [, year, month, day] = match;
+  return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+};
+
+const getTodayISODate = () => {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const dd = String(today.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+};
+
 const renderEmptyRow = (table) => {
   const body = table.tBodies[0] ?? table.createTBody();
   body.innerHTML = "";
@@ -31,10 +53,47 @@ const renderEmptyRow = (table) => {
 };
 
 const renderScheduleRows = (table, entries) => {
-  const body = table.tBodies[0] ?? table.createTBody();
-  body.innerHTML = "";
+  table.querySelectorAll("tbody").forEach((body) => body.remove());
 
-  entries.forEach((entry) => {
+  const mainBody = table.createTBody();
+
+  const todayISO = getTodayISODate();
+  const classifiedEntries = entries.map((entry) => {
+    const normalizedDate = normalizeScheduleDate(entry.Date);
+    return {
+      entry,
+      normalizedDate,
+      isPast: Boolean(normalizedDate && normalizedDate < todayISO),
+    };
+  });
+
+  const uniquePastDates = Array.from(
+    new Set(
+      classifiedEntries
+        .filter((item) => item.isPast)
+        .map((item) => item.normalizedDate)
+    )
+  ).sort();
+
+  const olderPastDates = new Set(
+    uniquePastDates.length > 2
+      ? uniquePastDates.slice(0, uniquePastDates.length - 2)
+      : []
+  );
+
+  const olderPastEntries = [];
+  const visibleEntries = [];
+
+  classifiedEntries.forEach((item) => {
+    if (item.isPast && olderPastDates.has(item.normalizedDate)) {
+      olderPastEntries.push(item.entry);
+      return;
+    }
+
+    visibleEntries.push(item.entry);
+  });
+
+  const appendEntryRow = (entry, body) => {
     const row = document.createElement("tr");
     row.dataset.date = entry.Date;
     row.dataset.weekday = entry.Weekday;
@@ -74,7 +133,68 @@ const renderScheduleRows = (table, entries) => {
     );
 
     body.append(row);
-  });
+    return row;
+  };
+
+  if (olderPastEntries.length > 0) {
+    const sectionId = `${table.dataset.grade || "class"}-${table.dataset.section || "section"}-past-dates`;
+    const toggleRow = document.createElement("tr");
+    toggleRow.className = "past-dates-toggle-row";
+
+    const toggleCell = document.createElement("td");
+    toggleCell.colSpan = getColumnCount(table);
+
+    const toggleButton = document.createElement("button");
+    toggleButton.type = "button";
+    toggleButton.className = "past-dates-toggle";
+    toggleButton.setAttribute("aria-expanded", "false");
+    toggleButton.setAttribute("aria-controls", sectionId);
+
+    const label = document.createElement("span");
+    label.className = "toggle-label";
+    label.textContent = "Past dates";
+
+    const icon = document.createElement("span");
+    icon.className = "toggle-icon";
+    icon.setAttribute("aria-hidden", "true");
+    icon.textContent = "+";
+
+    toggleButton.append(label, icon);
+
+    toggleCell.append(toggleButton);
+    toggleRow.append(toggleCell);
+    mainBody.append(toggleRow);
+
+    const pastRows = olderPastEntries.map((entry, index) => {
+      const row = appendEntryRow(entry, mainBody);
+      if (index === 0) {
+        row.id = sectionId;
+      }
+      row.hidden = true;
+      return row;
+    });
+
+    toggleButton.addEventListener("click", () => {
+      const isExpanded = toggleButton.getAttribute("aria-expanded") === "true";
+      const nextExpanded = !isExpanded;
+      toggleButton.setAttribute("aria-expanded", nextExpanded ? "true" : "false");
+      icon.textContent = nextExpanded ? "−" : "+";
+      pastRows.forEach((row) => {
+        row.hidden = !nextExpanded;
+      });
+    });
+  }
+
+  visibleEntries.forEach((entry) => appendEntryRow(entry, mainBody));
+
+  if (mainBody.rows.length === 0) {
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = getColumnCount(table);
+    cell.textContent = "No current or upcoming entries.";
+    row.append(cell);
+    mainBody.append(row);
+  }
 };
 
 const renderClassScheduleTable = ({ grade, section, tableEl }) => {
