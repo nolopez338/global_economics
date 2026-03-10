@@ -56,7 +56,6 @@ const renderScheduleRows = (table, entries) => {
   table.querySelectorAll("tbody").forEach((body) => body.remove());
 
   const mainBody = table.createTBody();
-  const pastBody = table.createTBody();
 
   const todayISO = getTodayISODate();
   const currentAndFutureEntries = [];
@@ -112,9 +111,8 @@ const renderScheduleRows = (table, entries) => {
     );
 
     body.append(row);
+    return row;
   };
-
-  currentAndFutureEntries.forEach((entry) => appendEntryRow(entry, mainBody));
 
   if (pastEntries.length > 0) {
     const sectionId = `${table.dataset.grade || "class"}-${table.dataset.section || "section"}-past-dates`;
@@ -140,22 +138,32 @@ const renderScheduleRows = (table, entries) => {
     icon.textContent = "+";
 
     toggleButton.append(label, icon);
-    toggleButton.addEventListener("click", () => {
-      const isExpanded = toggleButton.getAttribute("aria-expanded") === "true";
-      const nextExpanded = !isExpanded;
-      toggleButton.setAttribute("aria-expanded", nextExpanded ? "true" : "false");
-      icon.textContent = nextExpanded ? "−" : "+";
-      pastBody.hidden = !nextExpanded;
-    });
 
     toggleCell.append(toggleButton);
     toggleRow.append(toggleCell);
     mainBody.append(toggleRow);
 
-    pastBody.id = sectionId;
-    pastBody.hidden = true;
-    pastEntries.forEach((entry) => appendEntryRow(entry, pastBody));
+    const pastRows = pastEntries.map((entry, index) => {
+      const row = appendEntryRow(entry, mainBody);
+      if (index === 0) {
+        row.id = sectionId;
+      }
+      row.hidden = true;
+      return row;
+    });
+
+    toggleButton.addEventListener("click", () => {
+      const isExpanded = toggleButton.getAttribute("aria-expanded") === "true";
+      const nextExpanded = !isExpanded;
+      toggleButton.setAttribute("aria-expanded", nextExpanded ? "true" : "false");
+      icon.textContent = nextExpanded ? "−" : "+";
+      pastRows.forEach((row) => {
+        row.hidden = !nextExpanded;
+      });
+    });
   }
+
+  currentAndFutureEntries.forEach((entry) => appendEntryRow(entry, mainBody));
 
   if (mainBody.rows.length === 0) {
     const row = document.createElement("tr");
