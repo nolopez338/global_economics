@@ -51,7 +51,7 @@ const createHeader = (classKey) => {
   return header;
 };
 
-const createNotesSection = (classKey, studentList, classNotes) => {
+const createNotesSection = (classKey, studentList, classNotes, mode) => {
   const section = document.createElement("section");
   section.className = "page-card";
   section.setAttribute("aria-label", `Class ${classKey} description`);
@@ -121,7 +121,7 @@ const createNotesSection = (classKey, studentList, classNotes) => {
 
   studentSubsection.append(studentHeading);
 
-  if (studentList?.pdfUrl) {
+  if (studentList?.pdfUrl && mode === "teacher") {
     const pdfParagraph = document.createElement("p");
     const pdfLink = document.createElement("a");
     pdfLink.href = studentList.pdfUrl;
@@ -196,6 +196,7 @@ const renderClassPage = () => {
   }
 
   const { container, classKey, grade, section } = metadata;
+  const mode = container.dataset.mode || "public";
 
   const studentLists = window.CLASS_STUDENT_LISTS || {};
   const classNotes = window.CLASS_NOTES || {};
@@ -209,7 +210,7 @@ const renderClassPage = () => {
   container.append(
     createBreadcrumbs(),
     createHeader(classKey),
-    createNotesSection(classKey, studentList, notes),
+    createNotesSection(classKey, studentList, notes, mode),
     createCalendarSection(classKey, grade, section),
     createBreadcrumbs()
   );
