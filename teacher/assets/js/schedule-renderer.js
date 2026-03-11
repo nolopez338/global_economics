@@ -15,6 +15,22 @@ const getScheduleData = () => {
   return Promise.resolve([]);
 };
 
+const normalizeOrigin = (origin) =>
+  origin === "schedule-teacher" ? "schedule-teacher" : "schedule";
+
+const isNonEmptyValue = (value) =>
+  value !== undefined && value !== null && String(value).trim() !== "";
+
+const getMaterialValue = (entry, origin) => {
+  if (normalizeOrigin(origin) === "schedule-teacher") {
+    if (isNonEmptyValue(entry["Material teacher"])) {
+      return entry["Material teacher"];
+    }
+  }
+
+  return entry.Material || "";
+};
+
 const getColumnCount = (table) =>
   table.tHead?.rows[0]?.cells.length ?? 1;
 
@@ -53,6 +69,12 @@ const renderEmptyRow = (table) => {
 };
 
 const renderScheduleRows = (table, entries) => {
+  const origin = normalizeOrigin(
+    table.dataset.origin ||
+      document.querySelector("#class-page")?.dataset.origin ||
+      "schedule"
+  );
+
   table.querySelectorAll("tbody").forEach((body) => body.remove());
 
   const mainBody = table.createTBody();
@@ -95,9 +117,11 @@ const renderScheduleRows = (table, entries) => {
 
   const appendEntryRow = (entry, body) => {
     const row = document.createElement("tr");
+    const material = getMaterialValue(entry, origin);
     row.dataset.date = entry.Date;
     row.dataset.weekday = entry.Weekday;
     row.dataset.description = entry.Description;
+    row.dataset.material = material;
     row.dataset.classId = `${entry.Grade}${entry.Section}`;
     if (entry.Summary) {
       row.dataset.summary = entry.Summary;
@@ -121,7 +145,7 @@ const renderScheduleRows = (table, entries) => {
     descriptionCell.textContent = entry.Description;
 
     const materialCell = document.createElement("td");
-    materialCell.textContent = entry.Material || "";
+    materialCell.textContent = material;
 
     row.append(
       classCell,

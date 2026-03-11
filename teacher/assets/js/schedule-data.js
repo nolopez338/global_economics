@@ -11,6 +11,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Introductory class - Presentation of Calendar - Example 1 as example, Example 2 as exercise.",
     "Material": "Practice Activity 1",
+    "Material teacher": "Practice Activity 1",
     "Summary": "Practice Activity 1"
   },
   {
@@ -22,6 +23,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Practice Activity 2: Problems where profit is divided into revenue minus costs.",
     "Material": "Practice Activity 2",
+    "Material teacher": "Practice Activity 2",
     "Summary": "Practice Activity 2"
   },
   {
@@ -33,6 +35,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Last class before mock exam: One complete exercise from Practice Activity 2, plus basic information for the mock exam and the real exam as learning evidence.",
     "Material": "Practice Activity 2",
+    "Material teacher": "Practice Activity 2",
     "Summary": "Practice Activity 2"
   },
   {
@@ -44,6 +47,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Mock exam session (2 questions)",
     "Material": "Mock exam",
+    "Material teacher": "Mock exam",
     "Summary": "Mock exam"
   },
   {
@@ -55,6 +59,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Mock exam reviewed.",
     "Material": "Last session before the exam",
+    "Material teacher": "Last session before the exam",
     "Summary": "Last session before the exam"
   },
   {
@@ -66,6 +71,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Exam session",
     "Material": "Exam session",
+    "Material teacher": "Exam session",
     "Summary": "Exam session"
   },
   {
@@ -77,6 +83,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Review of C6 examples, Exam revisions.",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -88,6 +95,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Review of C6",
     "Material": "Workshop",
+    "Material teacher": "Workshop",
     "Summary": "Workshop"
   },
   {
@@ -99,6 +107,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Exam C6 and Review of C7",
     "Material": "Homework support",
+    "Material teacher": "Homework support",
     "Summary": "Homework support"
   },
   {
@@ -110,6 +119,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Workshop on C7",
     "Material": "Midterm Mock",
+    "Material teacher": "Midterm Mock",
     "Summary": "Midterm Mock"
   },
   {
@@ -121,6 +131,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Midterm Exam",
     "Material": "Midterm Exam",
+    "Material teacher": "Midterm Exam",
     "Summary": "Midterm Exam"
   },
   {
@@ -132,6 +143,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Midterm Mock",
     "Material": "Midterm Mock",
+    "Material teacher": "Midterm Mock",
     "Summary": "Midterm Mock"
   },
   {
@@ -143,6 +155,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -154,6 +167,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Expo Javeriana",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -165,6 +179,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -176,6 +191,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -187,6 +203,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C1",
     "Material": "C1",
+    "Material teacher": "C1",
     "Summary": "C1"
   },
   {
@@ -198,6 +215,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C1",
     "Material": "C1",
+    "Material teacher": "C1",
     "Summary": "C1"
   },
   {
@@ -209,6 +227,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C2",
     "Material": "C2",
+    "Material teacher": "C2",
     "Summary": "C2"
   },
   {
@@ -220,6 +239,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C2",
     "Material": "C2",
+    "Material teacher": "C2",
     "Summary": "C2"
   },
   {
@@ -231,6 +251,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C3",
     "Material": "C3",
+    "Material teacher": "C3",
     "Summary": "C3"
   },
   {
@@ -242,6 +263,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C3",
     "Material": "C3",
+    "Material teacher": "C3",
     "Summary": "C3"
   },
   {
@@ -253,6 +275,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C4",
     "Material": "C4",
+    "Material teacher": "C4",
     "Summary": "C4"
   },
   {
@@ -264,6 +287,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C4",
     "Material": "C4",
+    "Material teacher": "C4",
     "Summary": "C4"
   },
   {
@@ -275,6 +299,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C5",
     "Material": "C5",
+    "Material teacher": "C5",
     "Summary": "C5"
   },
   {
@@ -286,6 +311,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C5",
     "Material": "C5",
+    "Material teacher": "C5",
     "Summary": "C5"
   },
   {
@@ -297,6 +323,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C6",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -308,6 +335,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C6",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -319,6 +347,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C7",
     "Material": "C7",
+    "Material teacher": "C7",
     "Summary": "C7"
   },
   {
@@ -330,6 +359,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C7",
     "Material": "C7",
+    "Material teacher": "C7",
     "Summary": "C7"
   },
   {
@@ -341,6 +371,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C8",
     "Material": "C8",
+    "Material teacher": "C8",
     "Summary": "C8"
   },
   {
@@ -352,6 +383,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C8",
     "Material": "C8",
+    "Material teacher": "C8",
     "Summary": "C8"
   },
   {
@@ -363,6 +395,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C9",
     "Material": "C9",
+    "Material teacher": "C9",
     "Summary": "C9"
   },
   {
@@ -374,6 +407,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C9",
     "Material": "C9",
+    "Material teacher": "C9",
     "Summary": "C9"
   },
   {
@@ -385,6 +419,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C10",
     "Material": "C10",
+    "Material teacher": "C10",
     "Summary": "C10"
   },
   {
@@ -396,6 +431,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C10",
     "Material": "C10",
+    "Material teacher": "C10",
     "Summary": "C10"
   },
   {
@@ -407,6 +443,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Introductory class - Presentation of Calendar - Example 1 as example, Example 2 as exercise.",
     "Material": "Practice Activity 1",
+    "Material teacher": "Practice Activity 1",
     "Summary": "Practice Activity 1"
   },
   {
@@ -418,6 +455,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Practice Activity 2: Problems where profit is divided into revenue minus costs.",
     "Material": "Practice Activity 2",
+    "Material teacher": "Practice Activity 2",
     "Summary": "Practice Activity 2"
   },
   {
@@ -429,6 +467,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Last class before mock exam: One complete exercise from Practice Activity 2, plus basic information for the mock exam and the real exam as learning evidence.",
     "Material": "Practice Activity 2",
+    "Material teacher": "Practice Activity 2",
     "Summary": "Practice Activity 2"
   },
   {
@@ -440,6 +479,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Mock exam session (2 questions)",
     "Material": "Mock exam",
+    "Material teacher": "Mock exam",
     "Summary": "Mock exam"
   },
   {
@@ -451,6 +491,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Mock Review",
     "Material": "Mock Review",
+    "Material teacher": "Mock Review",
     "Summary": "Mock Review"
   },
   {
@@ -462,6 +503,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Exam session",
     "Material": "Exam session",
+    "Material teacher": "Exam session",
     "Summary": "Exam session"
   },
   {
@@ -473,6 +515,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Review of C6 examples, Exam revisions.",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -484,6 +527,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Exam on C6 and Review of C7",
     "Material": "Workshop",
+    "Material teacher": "Workshop",
     "Summary": "Workshop"
   },
   {
@@ -495,6 +539,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Homework support for C7",
     "Material": "Homework support",
+    "Material teacher": "Homework support",
     "Summary": "Homework support"
   },
   {
@@ -506,6 +551,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Midterm Mock",
     "Material": "Midterm Mock",
+    "Material teacher": "Midterm Mock",
     "Summary": "Midterm Mock"
   },
   {
@@ -517,6 +563,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Midterm Exam",
     "Material": "Midterm Exam",
+    "Material teacher": "Midterm Exam",
     "Summary": "Midterm Exam"
   },
   {
@@ -528,6 +575,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -539,6 +587,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -550,6 +599,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Expo Javeriana",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -561,6 +611,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -572,6 +623,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project submission + project problems",
+    "Material teacher": "Project submission + project problems",
     "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -583,6 +635,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C1",
     "Material": "C1",
+    "Material teacher": "C1",
     "Summary": "C1"
   },
   {
@@ -594,6 +647,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C1",
     "Material": "C1",
+    "Material teacher": "C1",
     "Summary": "C1"
   },
   {
@@ -605,6 +659,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C2",
     "Material": "C2",
+    "Material teacher": "C2",
     "Summary": "C2"
   },
   {
@@ -616,6 +671,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C2",
     "Material": "C2",
+    "Material teacher": "C2",
     "Summary": "C2"
   },
   {
@@ -627,6 +683,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C3",
     "Material": "C3",
+    "Material teacher": "C3",
     "Summary": "C3"
   },
   {
@@ -638,6 +695,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C3",
     "Material": "C3",
+    "Material teacher": "C3",
     "Summary": "C3"
   },
   {
@@ -649,6 +707,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C4",
     "Material": "C4",
+    "Material teacher": "C4",
     "Summary": "C4"
   },
   {
@@ -660,6 +719,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C4",
     "Material": "C4",
+    "Material teacher": "C4",
     "Summary": "C4"
   },
   {
@@ -671,6 +731,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C5",
     "Material": "C5",
+    "Material teacher": "C5",
     "Summary": "C5"
   },
   {
@@ -682,6 +743,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C5",
     "Material": "C5",
+    "Material teacher": "C5",
     "Summary": "C5"
   },
   {
@@ -693,6 +755,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C6",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -704,6 +767,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C6",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -715,6 +779,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C7",
     "Material": "C7",
+    "Material teacher": "C7",
     "Summary": "C7"
   },
   {
@@ -726,6 +791,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C7",
     "Material": "C7",
+    "Material teacher": "C7",
     "Summary": "C7"
   },
   {
@@ -737,6 +803,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C8",
     "Material": "C8",
+    "Material teacher": "C8",
     "Summary": "C8"
   },
   {
@@ -748,6 +815,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C8",
     "Material": "C8",
+    "Material teacher": "C8",
     "Summary": "C8"
   },
   {
@@ -759,6 +827,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C9",
     "Material": "C9",
+    "Material teacher": "C9",
     "Summary": "C9"
   },
   {
@@ -770,6 +839,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C9",
     "Material": "C9",
+    "Material teacher": "C9",
     "Summary": "C9"
   },
   {
@@ -781,6 +851,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C10",
     "Material": "C10",
+    "Material teacher": "C10",
     "Summary": "C10"
   },
   {
@@ -792,6 +863,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C10",
     "Material": "C10",
+    "Material teacher": "C10",
     "Summary": "C10"
   },
   {
@@ -803,6 +875,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Introductory class - Presentation of Calendar - Example 1 as example, Example 2 as exercise.",
     "Material": "Practice Activity 1",
+    "Material teacher": "Practice Activity 1",
     "Summary": "Practice Activity 1"
   },
   {
@@ -814,6 +887,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Practice Activity 2: Problems where profit is divided into revenue minus costs.",
     "Material": "Practice Activity 2",
+    "Material teacher": "Practice Activity 2",
     "Summary": "Practice Activity 2"
   },
   {
@@ -825,6 +899,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Last class before mock exam: One complete exercise from Practice Activity 2, plus basic information for the mock exam and the real exam as learning evidence.",
     "Material": "Practice Activity 2",
+    "Material teacher": "Practice Activity 2",
     "Summary": "Practice Activity 2"
   },
   {
@@ -836,6 +911,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Mock exam session (2 questions)",
     "Material": "Mock exam",
+    "Material teacher": "Mock exam",
     "Summary": "Mock exam"
   },
   {
@@ -847,6 +923,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Mock Review",
     "Material": "Mock Review",
+    "Material teacher": "Mock Review",
     "Summary": "Mock Review"
   },
   {
@@ -858,6 +935,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Exam session",
     "Material": "Exam session",
+    "Material teacher": "Exam session",
     "Summary": "Exam session"
   },
   {
@@ -869,6 +947,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Review of C6 examples, Exam revisions.",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -880,6 +959,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Exam on C6 and Review of C7",
     "Material": "Workshop",
+    "Material teacher": "Workshop",
     "Summary": "Workshop"
   },
   {
@@ -891,6 +971,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Homework support for C7",
     "Material": "Homework support",
+    "Material teacher": "Homework support",
     "Summary": "Homework support"
   },
   {
@@ -902,6 +983,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Midterm Mock",
     "Material": "Midterm Mock",
+    "Material teacher": "Midterm Mock",
     "Summary": "Midterm Mock"
   },
   {
@@ -913,6 +995,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Midterm Exam",
     "Material": "Midterm Exam",
+    "Material teacher": "Midterm Exam",
     "Summary": "Midterm Exam"
   },
   {
@@ -924,6 +1007,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "No class: Class goes to Computational thinking",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "No class: Class goes to Computational thinking"
   },
   {
@@ -935,6 +1019,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -946,6 +1031,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Expo Javeriana",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -957,6 +1043,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -968,6 +1055,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project submission + project problems",
+    "Material teacher": "Project submission + project problems",
     "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -979,6 +1067,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C1",
     "Material": "C1",
+    "Material teacher": "C1",
     "Summary": "C1"
   },
   {
@@ -990,6 +1079,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C1",
     "Material": "C1",
+    "Material teacher": "C1",
     "Summary": "C1"
   },
   {
@@ -1001,6 +1091,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C2",
     "Material": "C2",
+    "Material teacher": "C2",
     "Summary": "C2"
   },
   {
@@ -1012,6 +1103,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C2",
     "Material": "C2",
+    "Material teacher": "C2",
     "Summary": "C2"
   },
   {
@@ -1023,6 +1115,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C3",
     "Material": "C3",
+    "Material teacher": "C3",
     "Summary": "C3"
   },
   {
@@ -1034,6 +1127,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C3",
     "Material": "C3",
+    "Material teacher": "C3",
     "Summary": "C3"
   },
   {
@@ -1045,6 +1139,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C4",
     "Material": "C4",
+    "Material teacher": "C4",
     "Summary": "C4"
   },
   {
@@ -1056,6 +1151,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C4",
     "Material": "C4",
+    "Material teacher": "C4",
     "Summary": "C4"
   },
   {
@@ -1067,6 +1163,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C5",
     "Material": "C5",
+    "Material teacher": "C5",
     "Summary": "C5"
   },
   {
@@ -1078,6 +1175,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C5",
     "Material": "C5",
+    "Material teacher": "C5",
     "Summary": "C5"
   },
   {
@@ -1089,6 +1187,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C6",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -1100,6 +1199,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C6",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -1111,6 +1211,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C7",
     "Material": "C7",
+    "Material teacher": "C7",
     "Summary": "C7"
   },
   {
@@ -1122,6 +1223,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C7",
     "Material": "C7",
+    "Material teacher": "C7",
     "Summary": "C7"
   },
   {
@@ -1133,6 +1235,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C8",
     "Material": "C8",
+    "Material teacher": "C8",
     "Summary": "C8"
   },
   {
@@ -1144,6 +1247,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C8",
     "Material": "C8",
+    "Material teacher": "C8",
     "Summary": "C8"
   },
   {
@@ -1155,6 +1259,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C9",
     "Material": "C9",
+    "Material teacher": "C9",
     "Summary": "C9"
   },
   {
@@ -1166,6 +1271,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C9",
     "Material": "C9",
+    "Material teacher": "C9",
     "Summary": "C9"
   },
   {
@@ -1177,6 +1283,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C10",
     "Material": "C10",
+    "Material teacher": "C10",
     "Summary": "C10"
   },
   {
@@ -1188,6 +1295,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C10",
     "Material": "C10",
+    "Material teacher": "C10",
     "Summary": "C10"
   },
   {
@@ -1199,6 +1307,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Introductory class - Presentation of Calendar - Example 1 as example, Example 2 as exercise.",
     "Material": "Practice Activity 1",
+    "Material teacher": "Practice Activity 1",
     "Summary": "Practice Activity 1"
   },
   {
@@ -1210,6 +1319,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Second class - Example 1 as example, Example 2 as task.",
     "Material": "Practice Activity 2",
+    "Material teacher": "Practice Activity 2",
     "Summary": "Practice Activity 2"
   },
   {
@@ -1221,6 +1331,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Last class before mock exam: One complete exercise from Practice Activity 2, plus basic information for the mock exam and the real exam as learning evidence.",
     "Material": "Practice Activity 2",
+    "Material teacher": "Practice Activity 2",
     "Summary": "Practice Activity 2"
   },
   {
@@ -1232,6 +1343,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Mock exam: One question followed by sufficient time to review and revise the mock exam.",
     "Material": "Mock exam",
+    "Material teacher": "Mock exam",
     "Summary": "Mock exam"
   },
   {
@@ -1243,6 +1355,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Mock exam reviewed.",
     "Material": "Last session before the exam",
+    "Material teacher": "Last session before the exam",
     "Summary": "Last session before the exam"
   },
   {
@@ -1254,6 +1367,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Exam in pairs. Students select 2 out of 3 questions.",
     "Material": "Exam",
+    "Material teacher": "Exam",
     "Summary": "Exam"
   },
   {
@@ -1265,6 +1379,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Exam session",
     "Material": "Exam session",
+    "Material teacher": "Exam session",
     "Summary": "Exam session"
   },
   {
@@ -1276,6 +1391,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Review of C6 examples, Exam revisions.",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -1287,6 +1403,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Exam on C6 and Review of C7",
     "Material": "Workshop",
+    "Material teacher": "Workshop",
     "Summary": "Workshop"
   },
   {
@@ -1298,6 +1415,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Workshop on C7",
     "Material": "Midterm Mock",
+    "Material teacher": "Midterm Mock",
     "Summary": "Midterm Mock"
   },
   {
@@ -1309,6 +1427,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Midterm Exam",
     "Material": "Midterm Exam",
+    "Material teacher": "Midterm Exam",
     "Summary": "Midterm Exam"
   },
   {
@@ -1320,6 +1439,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "No Class Ash Wednesday",
     "Material": "No Class Ash Wednesday",
+    "Material teacher": "No Class Ash Wednesday",
     "Summary": "No Class Ash Wednesday"
   },
   {
@@ -1331,6 +1451,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "FAS",
     "Material": "Midterm mock",
+    "Material teacher": "Midterm mock",
     "Summary": "Midterm mock"
   },
   {
@@ -1342,6 +1463,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "FAS",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -1353,6 +1475,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -1364,6 +1487,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project submission + project problems",
+    "Material teacher": "Project submission + project problems",
     "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -1375,6 +1499,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C1",
     "Material": "C1",
+    "Material teacher": "C1",
     "Summary": "C1"
   },
   {
@@ -1386,6 +1511,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C1",
     "Material": "C1",
+    "Material teacher": "C1",
     "Summary": "C1"
   },
   {
@@ -1397,6 +1523,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C2",
     "Material": "C2",
+    "Material teacher": "C2",
     "Summary": "C2"
   },
   {
@@ -1408,6 +1535,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C2",
     "Material": "C2",
+    "Material teacher": "C2",
     "Summary": "C2"
   },
   {
@@ -1419,6 +1547,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C3",
     "Material": "C3",
+    "Material teacher": "C3",
     "Summary": "C3"
   },
   {
@@ -1430,6 +1559,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C3",
     "Material": "C3",
+    "Material teacher": "C3",
     "Summary": "C3"
   },
   {
@@ -1441,6 +1571,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C4",
     "Material": "C4",
+    "Material teacher": "C4",
     "Summary": "C4"
   },
   {
@@ -1452,6 +1583,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C4",
     "Material": "C4",
+    "Material teacher": "C4",
     "Summary": "C4"
   },
   {
@@ -1463,6 +1595,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C5",
     "Material": "C5",
+    "Material teacher": "C5",
     "Summary": "C5"
   },
   {
@@ -1474,6 +1607,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C5",
     "Material": "C5",
+    "Material teacher": "C5",
     "Summary": "C5"
   },
   {
@@ -1485,6 +1619,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C6",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -1496,6 +1631,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C6",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -1507,6 +1643,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C7",
     "Material": "C7",
+    "Material teacher": "C7",
     "Summary": "C7"
   },
   {
@@ -1518,6 +1655,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C7",
     "Material": "C7",
+    "Material teacher": "C7",
     "Summary": "C7"
   },
   {
@@ -1529,6 +1667,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C8",
     "Material": "C8",
+    "Material teacher": "C8",
     "Summary": "C8"
   },
   {
@@ -1540,6 +1679,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C8",
     "Material": "C8",
+    "Material teacher": "C8",
     "Summary": "C8"
   },
   {
@@ -1551,6 +1691,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C9",
     "Material": "C9",
+    "Material teacher": "C9",
     "Summary": "C9"
   },
   {
@@ -1562,6 +1703,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C9",
     "Material": "C9",
+    "Material teacher": "C9",
     "Summary": "C9"
   },
   {
@@ -1573,6 +1715,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C10",
     "Material": "C10",
+    "Material teacher": "C10",
     "Summary": "C10"
   },
   {
@@ -1584,6 +1727,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C10",
     "Material": "C10",
+    "Material teacher": "C10",
     "Summary": "C10"
   },
   {
@@ -1595,6 +1739,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Introductory class - Presentation of Calendar - Example 1 as example, Example 2 as exercise.",
     "Material": "Practice Activity 1",
+    "Material teacher": "Practice Activity 1",
     "Summary": "Practice Activity 1"
   },
   {
@@ -1606,6 +1751,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Second class - Example 1 as example, Example 2 as task.",
     "Material": "Practice Activity 2",
+    "Material teacher": "Practice Activity 2",
     "Summary": "Practice Activity 2"
   },
   {
@@ -1617,6 +1763,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Last class before mock exam: One complete exercise from Practice Activity 2, plus basic information for the mock exam and the real exam as learning evidence.",
     "Material": "Practice Activity 2",
+    "Material teacher": "Practice Activity 2",
     "Summary": "Practice Activity 2"
   },
   {
@@ -1628,6 +1775,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Mock exam: One question followed by sufficient time to review and revise the mock exam.",
     "Material": "Mock exam",
+    "Material teacher": "Mock exam",
     "Summary": "Mock exam"
   },
   {
@@ -1639,6 +1787,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Mock exam reviewed.",
     "Material": "Last session before the exam",
+    "Material teacher": "Last session before the exam",
     "Summary": "Last session before the exam"
   },
   {
@@ -1650,6 +1799,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Exam in pairs. Students select 2 out of 3 questions.",
     "Material": "Exam",
+    "Material teacher": "Exam",
     "Summary": "Exam"
   },
   {
@@ -1661,6 +1811,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Exam session",
     "Material": "Exam session",
+    "Material teacher": "Exam session",
     "Summary": "Exam session"
   },
   {
@@ -1672,6 +1823,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Review of C6 examples, Exam revisions.",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -1683,6 +1835,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Exam on C6 and Review of C7",
     "Material": "Workshop",
+    "Material teacher": "Workshop",
     "Summary": "Workshop"
   },
   {
@@ -1694,6 +1847,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Homework support for C7",
     "Material": "Homework support",
+    "Material teacher": "Homework support",
     "Summary": "Homework support"
   },
   {
@@ -1705,6 +1859,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Midterm Mock",
     "Material": "Midterm Mock",
+    "Material teacher": "Midterm Mock",
     "Summary": "Midterm Mock"
   },
   {
@@ -1716,6 +1871,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Midterm Exam",
     "Material": "Midterm Exam",
+    "Material teacher": "Midterm Exam",
     "Summary": "Midterm Exam"
   },
   {
@@ -1727,6 +1883,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -1738,6 +1895,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -1749,6 +1907,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "FAS",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -1760,6 +1919,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "FAS",
     "Material": "Project submission + project problems",
+    "Material teacher": "Project submission + project problems",
     "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -1771,6 +1931,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Wrap-up",
+    "Material teacher": "Wrap-up",
     "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
   },
   {
@@ -1782,6 +1943,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
     "Material": "",
+    "Material teacher": "",
     "Summary": ""
   },
   {
@@ -1793,6 +1955,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C1",
     "Material": "C1",
+    "Material teacher": "C1",
     "Summary": "C1"
   },
   {
@@ -1804,6 +1967,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C1",
     "Material": "C1",
+    "Material teacher": "C1",
     "Summary": "C1"
   },
   {
@@ -1815,6 +1979,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C2",
     "Material": "C2",
+    "Material teacher": "C2",
     "Summary": "C2"
   },
   {
@@ -1826,6 +1991,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C2",
     "Material": "C2",
+    "Material teacher": "C2",
     "Summary": "C2"
   },
   {
@@ -1837,6 +2003,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C3",
     "Material": "C3",
+    "Material teacher": "C3",
     "Summary": "C3"
   },
   {
@@ -1848,6 +2015,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C3",
     "Material": "C3",
+    "Material teacher": "C3",
     "Summary": "C3"
   },
   {
@@ -1859,6 +2027,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C4",
     "Material": "C4",
+    "Material teacher": "C4",
     "Summary": "C4"
   },
   {
@@ -1870,6 +2039,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C4",
     "Material": "C4",
+    "Material teacher": "C4",
     "Summary": "C4"
   },
   {
@@ -1881,6 +2051,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C5",
     "Material": "C5",
+    "Material teacher": "C5",
     "Summary": "C5"
   },
   {
@@ -1892,6 +2063,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C5",
     "Material": "C5",
+    "Material teacher": "C5",
     "Summary": "C5"
   },
   {
@@ -1903,6 +2075,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C6",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -1914,6 +2087,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C6",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -1925,6 +2099,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C7",
     "Material": "C7",
+    "Material teacher": "C7",
     "Summary": "C7"
   },
   {
@@ -1936,6 +2111,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C7",
     "Material": "C7",
+    "Material teacher": "C7",
     "Summary": "C7"
   },
   {
@@ -1947,6 +2123,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C8",
     "Material": "C8",
+    "Material teacher": "C8",
     "Summary": "C8"
   },
   {
@@ -1958,6 +2135,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C8",
     "Material": "C8",
+    "Material teacher": "C8",
     "Summary": "C8"
   },
   {
@@ -1969,6 +2147,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C9",
     "Material": "C9",
+    "Material teacher": "C9",
     "Summary": "C9"
   },
   {
@@ -1980,6 +2159,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C9",
     "Material": "C9",
+    "Material teacher": "C9",
     "Summary": "C9"
   },
   {
@@ -1991,6 +2171,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C10",
     "Material": "C10",
+    "Material teacher": "C10",
     "Summary": "C10"
   },
   {
@@ -2002,6 +2183,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C10",
     "Material": "C10",
+    "Material teacher": "C10",
     "Summary": "C10"
   },
   {
@@ -2013,6 +2195,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Introductory class - Presentation of Calendar - Example 1 as example, Example 2 as exercise.",
     "Material": "Main page",
+    "Material teacher": "Main page",
     "Summary": "Main page"
   },
   {
@@ -2024,6 +2207,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Practice Activity 2: Problems with focus on analysis, with emphasis on criteria C2, C3, and C4.",
     "Material": "Practice Activity 2",
+    "Material teacher": "Practice Activity 2",
     "Summary": "Practice Activity 2"
   },
   {
@@ -2035,6 +2219,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Last class before mock exam: One complete exercise from Practice Activity 1, plus basic information for the mock exam and the real exam as learning evidence.",
     "Material": "Practice Activity 1",
+    "Material teacher": "Practice Activity 1",
     "Summary": "Practice Activity 1"
   },
   {
@@ -2046,6 +2231,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Mock exam session (2 questions)",
     "Material": "Mock exam",
+    "Material teacher": "Mock exam",
     "Summary": "Mock exam"
   },
   {
@@ -2057,6 +2243,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Individual exam consisting on 3 questions from which 2 should be chosen.",
     "Material": "Learning Evidence 1",
+    "Material teacher": "Learning Evidence 1",
     "Summary": "Learning Evidence 1"
   },
   {
@@ -2068,6 +2255,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Exam session",
     "Material": "Exam session",
+    "Material teacher": "Exam session",
     "Summary": "Exam session"
   },
   {
@@ -2079,6 +2267,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Review of C6 examples, Exam revisions.",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -2090,6 +2279,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Exam on C6 and Review of C7",
     "Material": "Workshop",
+    "Material teacher": "Workshop",
     "Summary": "Workshop"
   },
   {
@@ -2101,6 +2291,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Homework support for C7",
     "Material": "Homework support",
+    "Material teacher": "Homework support",
     "Summary": "Homework support"
   },
   {
@@ -2112,6 +2303,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Midterm Mock",
     "Material": "Midterm Mock",
+    "Material teacher": "Midterm Mock",
     "Summary": "Midterm Mock"
   },
   {
@@ -2123,6 +2315,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Midterm Exam",
     "Material": "Midterm Exam",
+    "Material teacher": "Midterm Exam",
     "Summary": "Midterm Exam"
   },
   {
@@ -2134,6 +2327,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -2145,6 +2339,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -2156,6 +2351,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -2167,6 +2363,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project submission + project problems",
+    "Material teacher": "Project submission + project problems",
     "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -2178,6 +2375,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
     "Material": "Wrap-up",
+    "Material teacher": "Wrap-up",
     "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
   },
   {
@@ -2189,6 +2387,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Pre Icfes Training",
     "Material": "",
+    "Material teacher": "",
     "Summary": ""
   },
   {
@@ -2200,6 +2399,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C1",
     "Material": "C1",
+    "Material teacher": "C1",
     "Summary": "C1"
   },
   {
@@ -2211,6 +2411,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C1",
     "Material": "C1",
+    "Material teacher": "C1",
     "Summary": "C1"
   },
   {
@@ -2222,6 +2423,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C2",
     "Material": "C2",
+    "Material teacher": "C2",
     "Summary": "C2"
   },
   {
@@ -2233,6 +2435,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C2",
     "Material": "C2",
+    "Material teacher": "C2",
     "Summary": "C2"
   },
   {
@@ -2244,6 +2447,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C3",
     "Material": "C3",
+    "Material teacher": "C3",
     "Summary": "C3"
   },
   {
@@ -2255,6 +2459,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C3",
     "Material": "C3",
+    "Material teacher": "C3",
     "Summary": "C3"
   },
   {
@@ -2266,6 +2471,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C4",
     "Material": "C4",
+    "Material teacher": "C4",
     "Summary": "C4"
   },
   {
@@ -2277,6 +2483,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C4",
     "Material": "C4",
+    "Material teacher": "C4",
     "Summary": "C4"
   },
   {
@@ -2288,6 +2495,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C5",
     "Material": "C5",
+    "Material teacher": "C5",
     "Summary": "C5"
   },
   {
@@ -2299,6 +2507,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C5",
     "Material": "C5",
+    "Material teacher": "C5",
     "Summary": "C5"
   },
   {
@@ -2310,6 +2519,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C6",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -2321,6 +2531,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C6",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -2332,6 +2543,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C7",
     "Material": "C7",
+    "Material teacher": "C7",
     "Summary": "C7"
   },
   {
@@ -2343,6 +2555,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C7",
     "Material": "C7",
+    "Material teacher": "C7",
     "Summary": "C7"
   },
   {
@@ -2354,6 +2567,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C8",
     "Material": "C8",
+    "Material teacher": "C8",
     "Summary": "C8"
   },
   {
@@ -2365,6 +2579,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C8",
     "Material": "C8",
+    "Material teacher": "C8",
     "Summary": "C8"
   },
   {
@@ -2376,6 +2591,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C9",
     "Material": "C9",
+    "Material teacher": "C9",
     "Summary": "C9"
   },
   {
@@ -2387,6 +2603,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C9",
     "Material": "C9",
+    "Material teacher": "C9",
     "Summary": "C9"
   },
   {
@@ -2398,6 +2615,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C10",
     "Material": "C10",
+    "Material teacher": "C10",
     "Summary": "C10"
   },
   {
@@ -2409,6 +2627,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C10",
     "Material": "C10",
+    "Material teacher": "C10",
     "Summary": "C10"
   },
   {
@@ -2420,6 +2639,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Introductory class - Presentation of Calendar - Example 1 as example, Example 2 as exercise.",
     "Material": "Main page",
+    "Material teacher": "Main page",
     "Summary": "Main page"
   },
   {
@@ -2431,6 +2651,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Example 1 from Practice Activity 2 as task, one of the examples of the class before as example. Focus on C2, C3, and C4.",
     "Material": "Practice Activity 2",
+    "Material teacher": "Practice Activity 2",
     "Summary": "Practice Activity 2"
   },
   {
@@ -2442,6 +2663,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Last class before mock exam: One complete exercise from Practice Activity 1, plus basic information for the mock exam and the real exam as learning evidence.",
     "Material": "Practice Activity 1",
+    "Material teacher": "Practice Activity 1",
     "Summary": "Practice Activity 1"
   },
   {
@@ -2453,6 +2675,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Mock Exam: Mock exam session.",
     "Material": "Mock Exam",
+    "Material teacher": "Mock Exam",
     "Summary": "Mock Exam"
   },
   {
@@ -2464,6 +2687,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Individual exam consisting on 3 questions from which 2 should be chosen.",
     "Material": "Learning Evidence 1",
+    "Material teacher": "Learning Evidence 1",
     "Summary": "Learning Evidence 1"
   },
   {
@@ -2475,6 +2699,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Introduction to the effects of the sample size on the Confidence Interval",
     "Material": "Introduction to the effects of the sample size on the Confidence Interval",
+    "Material teacher": "Introduction to the effects of the sample size on the Confidence Interval",
     "Summary": "Introduction to the effects of the sample size on the Confidence Interval"
   },
   {
@@ -2486,6 +2711,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Exam session",
     "Material": "Exam session",
+    "Material teacher": "Exam session",
     "Summary": "Exam session"
   },
   {
@@ -2497,6 +2723,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Review of C6 examples, Exam revisions.",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -2508,6 +2735,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Exam on C6 and Review of C7",
     "Material": "Workshop",
+    "Material teacher": "Workshop",
     "Summary": "Workshop"
   },
   {
@@ -2519,6 +2747,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Homework support for C7",
     "Material": "Homework support",
+    "Material teacher": "Homework support",
     "Summary": "Homework support"
   },
   {
@@ -2530,6 +2759,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Midterm Mock",
     "Material": "Midterm Mock",
+    "Material teacher": "Midterm Mock",
     "Summary": "Midterm Mock"
   },
   {
@@ -2541,6 +2771,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Midterm Exam",
     "Material": "Midterm Exam",
+    "Material teacher": "Midterm Exam",
     "Summary": "Midterm Exam"
   },
   {
@@ -2552,6 +2783,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -2563,6 +2795,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -2574,6 +2807,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -2585,6 +2819,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project submission + project problems",
+    "Material teacher": "Project submission + project problems",
     "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -2596,6 +2831,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Pre Icfes Training",
     "Material": "Wrap-up",
+    "Material teacher": "Wrap-up",
     "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
   },
   {
@@ -2607,6 +2843,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Class",
     "Material": "",
+    "Material teacher": "",
     "Summary": ""
   },
   {
@@ -2618,6 +2855,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C1",
     "Material": "C1",
+    "Material teacher": "C1",
     "Summary": "C1"
   },
   {
@@ -2629,6 +2867,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C1",
     "Material": "C1",
+    "Material teacher": "C1",
     "Summary": "C1"
   },
   {
@@ -2640,6 +2879,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C2",
     "Material": "C2",
+    "Material teacher": "C2",
     "Summary": "C2"
   },
   {
@@ -2651,6 +2891,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C2",
     "Material": "C2",
+    "Material teacher": "C2",
     "Summary": "C2"
   },
   {
@@ -2662,6 +2903,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C3",
     "Material": "C3",
+    "Material teacher": "C3",
     "Summary": "C3"
   },
   {
@@ -2673,6 +2915,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C3",
     "Material": "C3",
+    "Material teacher": "C3",
     "Summary": "C3"
   },
   {
@@ -2684,6 +2927,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C4",
     "Material": "C4",
+    "Material teacher": "C4",
     "Summary": "C4"
   },
   {
@@ -2695,6 +2939,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C4",
     "Material": "C4",
+    "Material teacher": "C4",
     "Summary": "C4"
   },
   {
@@ -2706,6 +2951,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C5",
     "Material": "C5",
+    "Material teacher": "C5",
     "Summary": "C5"
   },
   {
@@ -2717,6 +2963,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C5",
     "Material": "C5",
+    "Material teacher": "C5",
     "Summary": "C5"
   },
   {
@@ -2728,6 +2975,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C6",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -2739,6 +2987,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C6",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -2750,6 +2999,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C7",
     "Material": "C7",
+    "Material teacher": "C7",
     "Summary": "C7"
   },
   {
@@ -2761,6 +3011,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C7",
     "Material": "C7",
+    "Material teacher": "C7",
     "Summary": "C7"
   },
   {
@@ -2772,6 +3023,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C8",
     "Material": "C8",
+    "Material teacher": "C8",
     "Summary": "C8"
   },
   {
@@ -2783,6 +3035,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C8",
     "Material": "C8",
+    "Material teacher": "C8",
     "Summary": "C8"
   },
   {
@@ -2794,6 +3047,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C9",
     "Material": "C9",
+    "Material teacher": "C9",
     "Summary": "C9"
   },
   {
@@ -2805,6 +3059,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C9",
     "Material": "C9",
+    "Material teacher": "C9",
     "Summary": "C9"
   },
   {
@@ -2816,6 +3071,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C10",
     "Material": "C10",
+    "Material teacher": "C10",
     "Summary": "C10"
   },
   {
@@ -2827,6 +3083,7 @@ window.SCHEDULE_DATA = [
     "Day": 5,
     "Description": "Work on C10",
     "Material": "C10",
+    "Material teacher": "C10",
     "Summary": "C10"
   },
   {
@@ -2838,6 +3095,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Introductory class - Presentation of Calendar - Example 1 as example, Example 2 as exercise.",
     "Material": "Main page",
+    "Material teacher": "Main page",
     "Summary": "Main page"
   },
   {
@@ -2849,6 +3107,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Practice Activity 2. Problems with focus on analysis, with emphasis on criteria C2, C3, and C4.",
     "Material": "Main page",
+    "Material teacher": "Main page",
     "Summary": "Main page"
   },
   {
@@ -2860,6 +3119,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Last class before mock exam: One complete exercise from Practice Activity 1, plus basic information for the mock exam and the real exam as learning evidence.",
     "Material": "Practice Activity 1",
+    "Material teacher": "Practice Activity 1",
     "Summary": "Practice Activity 1"
   },
   {
@@ -2871,6 +3131,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Mock exam session (2 questions)",
     "Material": "Mock exam session (2 questions)",
+    "Material teacher": "Mock exam session (2 questions)",
     "Summary": "Mock exam session (2 questions)"
   },
   {
@@ -2882,6 +3143,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Individual exam consisting of 3 questions, from which 2 must be chosen.",
     "Material": "Learning Evidence 1",
+    "Material teacher": "Learning Evidence 1",
     "Summary": "Learning Evidence 1"
   },
   {
@@ -2893,6 +3155,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Exam session",
     "Material": "Exam session",
+    "Material teacher": "Exam session",
     "Summary": "Exam session"
   },
   {
@@ -2904,6 +3167,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Review of C6 examples, Exam revisions.",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -2915,6 +3179,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Exam on C6 and Review of C7",
     "Material": "Workshop",
+    "Material teacher": "Workshop",
     "Summary": "Workshop"
   },
   {
@@ -2926,6 +3191,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Homework support for C7",
     "Material": "Homework support",
+    "Material teacher": "Homework support",
     "Summary": "Homework support"
   },
   {
@@ -2937,6 +3203,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Midterm Mock",
     "Material": "Midterm Mock",
+    "Material teacher": "Midterm Mock",
     "Summary": "Midterm Mock"
   },
   {
@@ -2948,6 +3215,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Midterm Exam",
     "Material": "Midterm Exam",
+    "Material teacher": "Midterm Exam",
     "Summary": "Midterm Exam"
   },
   {
@@ -2959,6 +3227,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -2970,6 +3239,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -2981,6 +3251,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Educational outing",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -2992,6 +3263,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project submission + project problems",
+    "Material teacher": "Project submission + project problems",
     "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -3003,6 +3275,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Pre Icfes Training",
     "Material": "Wrap-up",
+    "Material teacher": "Wrap-up",
     "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
   },
   {
@@ -3014,6 +3287,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Pre Icfes Training",
     "Material": "",
+    "Material teacher": "",
     "Summary": ""
   },
   {
@@ -3025,6 +3299,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Class",
     "Material": "C1",
+    "Material teacher": "C1",
     "Summary": "C1"
   },
   {
@@ -3036,6 +3311,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C1",
     "Material": "C1",
+    "Material teacher": "C1",
     "Summary": "C1"
   },
   {
@@ -3047,6 +3323,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Work on C1",
     "Material": "C2",
+    "Material teacher": "C2",
     "Summary": "C2"
   },
   {
@@ -3058,6 +3335,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C2",
     "Material": "C2",
+    "Material teacher": "C2",
     "Summary": "C2"
   },
   {
@@ -3069,6 +3347,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Work on C2",
     "Material": "C3",
+    "Material teacher": "C3",
     "Summary": "C3"
   },
   {
@@ -3080,6 +3359,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C3",
     "Material": "C3",
+    "Material teacher": "C3",
     "Summary": "C3"
   },
   {
@@ -3091,6 +3371,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Work on C3",
     "Material": "C4",
+    "Material teacher": "C4",
     "Summary": "C4"
   },
   {
@@ -3102,6 +3383,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C4",
     "Material": "C4",
+    "Material teacher": "C4",
     "Summary": "C4"
   },
   {
@@ -3113,6 +3395,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Work on C4",
     "Material": "C5",
+    "Material teacher": "C5",
     "Summary": "C5"
   },
   {
@@ -3124,6 +3407,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C5",
     "Material": "C5",
+    "Material teacher": "C5",
     "Summary": "C5"
   },
   {
@@ -3135,6 +3419,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Work on C5",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -3146,6 +3431,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C6",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -3157,6 +3443,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Work on C6",
     "Material": "C7",
+    "Material teacher": "C7",
     "Summary": "C7"
   },
   {
@@ -3168,6 +3455,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C7",
     "Material": "C7",
+    "Material teacher": "C7",
     "Summary": "C7"
   },
   {
@@ -3179,6 +3467,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Work on C7",
     "Material": "C8",
+    "Material teacher": "C8",
     "Summary": "C8"
   },
   {
@@ -3190,6 +3479,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C8",
     "Material": "C8",
+    "Material teacher": "C8",
     "Summary": "C8"
   },
   {
@@ -3201,6 +3491,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Work on C8",
     "Material": "C9",
+    "Material teacher": "C9",
     "Summary": "C9"
   },
   {
@@ -3212,6 +3503,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C9",
     "Material": "C9",
+    "Material teacher": "C9",
     "Summary": "C9"
   },
   {
@@ -3223,6 +3515,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Work on C9",
     "Material": "C10",
+    "Material teacher": "C10",
     "Summary": "C10"
   },
   {
@@ -3234,6 +3527,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C10",
     "Material": "C10",
+    "Material teacher": "C10",
     "Summary": "C10"
   },
   {
@@ -3245,6 +3539,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Introductory class - Presentation of Calendar - Example 1 as example, Example 2 as exercise.",
     "Material": "Main page",
+    "Material teacher": "Main page",
     "Summary": "Main page"
   },
   {
@@ -3256,6 +3551,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Practice Activity 2: Problems with focus on analysis, with emphasis on criteria C2, C3, and C4.",
     "Material": "Practice Activity 2",
+    "Material teacher": "Practice Activity 2",
     "Summary": "Practice Activity 2"
   },
   {
@@ -3267,6 +3563,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Last class before mock exam: One complete exercise from Practice Activity 1, plus basic information for the mock exam and the real exam as learning evidence.",
     "Material": "Practice Activity 1",
+    "Material teacher": "Practice Activity 1",
     "Summary": "Practice Activity 1"
   },
   {
@@ -3278,6 +3575,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Mock exam session (2 questions)",
     "Material": "Mock exam",
+    "Material teacher": "Mock exam",
     "Summary": "Mock exam"
   },
   {
@@ -3289,6 +3587,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Individual exam consisting of 3 questions, from which 2 must be chosen.",
     "Material": "Learning Evidence 1",
+    "Material teacher": "Learning Evidence 1",
     "Summary": "Learning Evidence 1"
   },
   {
@@ -3300,6 +3599,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Exam session",
     "Material": "Exam session",
+    "Material teacher": "Exam session",
     "Summary": "Exam session"
   },
   {
@@ -3311,6 +3611,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Review of C6 examples, Exam revisions.",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -3322,6 +3623,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Exam on C6 and Review of C7",
     "Material": "Workshop",
+    "Material teacher": "Workshop",
     "Summary": "Workshop"
   },
   {
@@ -3333,6 +3635,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Homework support for C7",
     "Material": "Homework support",
+    "Material teacher": "Homework support",
     "Summary": "Homework support"
   },
   {
@@ -3344,6 +3647,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Midterm Mock",
     "Material": "Midterm Mock",
+    "Material teacher": "Midterm Mock",
     "Summary": "Midterm Mock"
   },
   {
@@ -3355,6 +3659,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Midterm Exam",
     "Material": "Midterm Exam",
+    "Material teacher": "Midterm Exam",
     "Summary": "Midterm Exam"
   },
   {
@@ -3366,6 +3671,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -3377,6 +3683,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -3388,6 +3695,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -3399,6 +3707,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project submission + project problems",
+    "Material teacher": "Project submission + project problems",
     "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -3410,6 +3719,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria.",
     "Material": "Wrap-up",
+    "Material teacher": "Wrap-up",
     "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
   },
   {
@@ -3421,6 +3731,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Pre Icfes Training",
     "Material": "",
+    "Material teacher": "",
     "Summary": ""
   },
   {
@@ -3432,6 +3743,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C1",
     "Material": "C1",
+    "Material teacher": "C1",
     "Summary": "C1"
   },
   {
@@ -3443,6 +3755,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C1",
     "Material": "C1",
+    "Material teacher": "C1",
     "Summary": "C1"
   },
   {
@@ -3454,6 +3767,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C2",
     "Material": "C2",
+    "Material teacher": "C2",
     "Summary": "C2"
   },
   {
@@ -3465,6 +3779,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C2",
     "Material": "C2",
+    "Material teacher": "C2",
     "Summary": "C2"
   },
   {
@@ -3476,6 +3791,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C3",
     "Material": "C3",
+    "Material teacher": "C3",
     "Summary": "C3"
   },
   {
@@ -3487,6 +3803,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C3",
     "Material": "C3",
+    "Material teacher": "C3",
     "Summary": "C3"
   },
   {
@@ -3498,6 +3815,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C4",
     "Material": "C4",
+    "Material teacher": "C4",
     "Summary": "C4"
   },
   {
@@ -3509,6 +3827,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C4",
     "Material": "C4",
+    "Material teacher": "C4",
     "Summary": "C4"
   },
   {
@@ -3520,6 +3839,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C5",
     "Material": "C5",
+    "Material teacher": "C5",
     "Summary": "C5"
   },
   {
@@ -3531,6 +3851,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C5",
     "Material": "C5",
+    "Material teacher": "C5",
     "Summary": "C5"
   },
   {
@@ -3542,6 +3863,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C6",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -3553,6 +3875,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C6",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -3564,6 +3887,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C7",
     "Material": "C7",
+    "Material teacher": "C7",
     "Summary": "C7"
   },
   {
@@ -3575,6 +3899,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C7",
     "Material": "C7",
+    "Material teacher": "C7",
     "Summary": "C7"
   },
   {
@@ -3586,6 +3911,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C8",
     "Material": "C8",
+    "Material teacher": "C8",
     "Summary": "C8"
   },
   {
@@ -3597,6 +3923,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C8",
     "Material": "C8",
+    "Material teacher": "C8",
     "Summary": "C8"
   },
   {
@@ -3608,6 +3935,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C9",
     "Material": "C9",
+    "Material teacher": "C9",
     "Summary": "C9"
   },
   {
@@ -3619,6 +3947,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C9",
     "Material": "C9",
+    "Material teacher": "C9",
     "Summary": "C9"
   },
   {
@@ -3630,6 +3959,7 @@ window.SCHEDULE_DATA = [
     "Day": 1,
     "Description": "Work on C10",
     "Material": "C10",
+    "Material teacher": "C10",
     "Summary": "C10"
   },
   {
@@ -3641,6 +3971,7 @@ window.SCHEDULE_DATA = [
     "Day": 4,
     "Description": "Work on C10",
     "Material": "C10",
+    "Material teacher": "C10",
     "Summary": "C10"
   },
   {
@@ -3652,6 +3983,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Introductory class - Presentation of Calendar - Example 1 as example, Example 2 as exercise.",
     "Material": "Main page",
+    "Material teacher": "Main page",
     "Summary": "Main page"
   },
   {
@@ -3663,6 +3995,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Practice Activity 2. Problems with focus on analysis, with emphasis on criteria C2, C3, and C4.",
     "Material": "Main page",
+    "Material teacher": "Main page",
     "Summary": "Main page"
   },
   {
@@ -3674,6 +4007,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Last class before mock exam: One complete exercise from Practice Activity 1, plus basic information for the mock exam and the real exam as learning evidence.",
     "Material": "Practice Activity 1",
+    "Material teacher": "Practice Activity 1",
     "Summary": "Practice Activity 1"
   },
   {
@@ -3685,6 +4019,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Mock exam session (2 questions)",
     "Material": "Mock exam session (2 questions)",
+    "Material teacher": "Mock exam session (2 questions)",
     "Summary": "Mock exam session (2 questions)"
   },
   {
@@ -3696,6 +4031,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Individual exam consisting on 3 questions from which 2 should be chosen.",
     "Material": "Learning Evidence 1",
+    "Material teacher": "Learning Evidence 1",
     "Summary": "Learning Evidence 1"
   },
   {
@@ -3707,6 +4043,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Exam session",
     "Material": "Exam session",
+    "Material teacher": "Exam session",
     "Summary": "Exam session"
   },
   {
@@ -3718,6 +4055,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Review of C6 examples, Exam revisions.",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -3729,6 +4067,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Exam on C6 and Review of C7",
     "Material": "Workshop",
+    "Material teacher": "Workshop",
     "Summary": "Workshop"
   },
   {
@@ -3740,6 +4079,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Homework support for C7",
     "Material": "Homework support",
+    "Material teacher": "Homework support",
     "Summary": "Homework support"
   },
   {
@@ -3751,6 +4091,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Midterm Mock",
     "Material": "Midterm Mock",
+    "Material teacher": "Midterm Mock",
     "Summary": "Midterm Mock"
   },
   {
@@ -3762,6 +4103,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Midterm Exam",
     "Material": "Midterm Exam",
+    "Material teacher": "Midterm Exam",
     "Summary": "Midterm Exam"
   },
   {
@@ -3773,6 +4115,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -3784,6 +4127,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -3795,6 +4139,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Educational outing",
     "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
     "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -3806,6 +4151,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
     "Material": "Project submission + project problems",
+    "Material teacher": "Project submission + project problems",
     "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
   },
   {
@@ -3817,6 +4163,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Pre Icfes Training",
     "Material": "Wrap-up",
+    "Material teacher": "Wrap-up",
     "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
   },
   {
@@ -3828,6 +4175,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Pre Icfes Training",
     "Material": "",
+    "Material teacher": "",
     "Summary": ""
   },
   {
@@ -3839,6 +4187,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Class",
     "Material": "C1",
+    "Material teacher": "C1",
     "Summary": "C1"
   },
   {
@@ -3850,6 +4199,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C1",
     "Material": "C1",
+    "Material teacher": "C1",
     "Summary": "C1"
   },
   {
@@ -3861,6 +4211,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Work on C1",
     "Material": "C2",
+    "Material teacher": "C2",
     "Summary": "C2"
   },
   {
@@ -3872,6 +4223,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C2",
     "Material": "C2",
+    "Material teacher": "C2",
     "Summary": "C2"
   },
   {
@@ -3883,6 +4235,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Work on C2",
     "Material": "C3",
+    "Material teacher": "C3",
     "Summary": "C3"
   },
   {
@@ -3894,6 +4247,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C3",
     "Material": "C3",
+    "Material teacher": "C3",
     "Summary": "C3"
   },
   {
@@ -3905,6 +4259,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Work on C3",
     "Material": "C4",
+    "Material teacher": "C4",
     "Summary": "C4"
   },
   {
@@ -3916,6 +4271,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C4",
     "Material": "C4",
+    "Material teacher": "C4",
     "Summary": "C4"
   },
   {
@@ -3927,6 +4283,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Work on C4",
     "Material": "C5",
+    "Material teacher": "C5",
     "Summary": "C5"
   },
   {
@@ -3938,6 +4295,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C5",
     "Material": "C5",
+    "Material teacher": "C5",
     "Summary": "C5"
   },
   {
@@ -3949,6 +4307,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Work on C5",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -3960,6 +4319,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C6",
     "Material": "C6",
+    "Material teacher": "C6",
     "Summary": "C6"
   },
   {
@@ -3971,6 +4331,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Work on C6",
     "Material": "C7",
+    "Material teacher": "C7",
     "Summary": "C7"
   },
   {
@@ -3982,6 +4343,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C7",
     "Material": "C7",
+    "Material teacher": "C7",
     "Summary": "C7"
   },
   {
@@ -3993,6 +4355,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Work on C7",
     "Material": "C8",
+    "Material teacher": "C8",
     "Summary": "C8"
   },
   {
@@ -4004,6 +4367,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C8",
     "Material": "C8",
+    "Material teacher": "C8",
     "Summary": "C8"
   },
   {
@@ -4015,6 +4379,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Work on C8",
     "Material": "C9",
+    "Material teacher": "C9",
     "Summary": "C9"
   },
   {
@@ -4026,6 +4391,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C9",
     "Material": "C9",
+    "Material teacher": "C9",
     "Summary": "C9"
   },
   {
@@ -4037,6 +4403,7 @@ window.SCHEDULE_DATA = [
     "Day": 2,
     "Description": "Work on C9",
     "Material": "C10",
+    "Material teacher": "C10",
     "Summary": "C10"
   },
   {
@@ -4048,6 +4415,7 @@ window.SCHEDULE_DATA = [
     "Day": 3,
     "Description": "Work on C10",
     "Material": "C10",
+    "Material teacher": "C10",
     "Summary": "C10"
   }
 ];
