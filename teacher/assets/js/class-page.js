@@ -24,13 +24,21 @@ const getClassMetadata = () => {
   };
 };
 
-const createBreadcrumbs = () => {
+const getBackToScheduleHref = (origin) => {
+  if (origin === "schedule-teacher") {
+    return "../schedule-teacher.html";
+  }
+
+  return "../schedule.html";
+};
+
+const createBreadcrumbs = (origin) => {
   const wrapper = document.createElement("div");
   wrapper.className = "breadcrumbs";
 
   const link = document.createElement("a");
   link.className = "back-link";
-  link.href = "../schedule.html";
+  link.href = getBackToScheduleHref(origin);
   link.setAttribute("aria-label", "Back to the main schedule");
   link.textContent = "← Back to Schedule";
 
@@ -197,6 +205,7 @@ const renderClassPage = () => {
 
   const { container, classKey, grade, section } = metadata;
   const mode = container.dataset.mode || "public";
+  const origin = container.dataset.origin || "schedule";
 
   const studentLists = window.CLASS_STUDENT_LISTS || {};
   const classNotes = window.CLASS_NOTES || {};
@@ -208,11 +217,11 @@ const renderClassPage = () => {
   container.innerHTML = "";
 
   container.append(
-    createBreadcrumbs(),
+    createBreadcrumbs(origin),
     createHeader(classKey),
     createNotesSection(classKey, studentList, notes, mode),
     createCalendarSection(classKey, grade, section),
-    createBreadcrumbs()
+    createBreadcrumbs(origin)
   );
 };
 
