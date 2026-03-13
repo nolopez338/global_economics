@@ -218,7 +218,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C1",
+    "Description": "Resting from ICFES",
     "Material": "C1",
     "Material teacher": "C1",
     "Summary": "C1"
@@ -244,7 +244,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C2",
+    "Description": "Work on C1",
     "Material": "C2",
     "Material teacher": "C2",
     "Summary": "C2"
@@ -270,7 +270,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C3",
+    "Description": "Work on C2",
     "Material": "C3",
     "Material teacher": "C3",
     "Summary": "C3"
@@ -296,7 +296,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C4",
+    "Description": "Work on C3",
     "Material": "C4",
     "Material teacher": "C4",
     "Summary": "C4"
@@ -322,7 +322,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C5",
+    "Description": "Work on C4",
     "Material": "C5",
     "Material teacher": "C5",
     "Summary": "C5"
@@ -348,7 +348,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C6",
+    "Description": "Work on C5",
     "Material": "C6",
     "Material teacher": "C6",
     "Summary": "C6"
@@ -374,7 +374,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C7",
+    "Description": "Work on C6",
     "Material": "C7",
     "Material teacher": "C7",
     "Summary": "C7"
@@ -400,7 +400,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C8",
+    "Description": "Work on C7",
     "Material": "C8",
     "Material teacher": "C8",
     "Summary": "C8"
@@ -426,7 +426,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C9",
+    "Description": "Work on C8",
     "Material": "C9",
     "Material teacher": "C9",
     "Summary": "C9"
@@ -452,7 +452,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C10",
+    "Description": "Work on C9",
     "Material": "C10",
     "Material teacher": "C10",
     "Summary": "C10"
@@ -686,7 +686,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C1",
+    "Description": "Resting from ICFES",
     "Material": "C1",
     "Material teacher": "C1",
     "Summary": "C1"
@@ -712,7 +712,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C2",
+    "Description": "Work on C1",
     "Material": "C2",
     "Material teacher": "C2",
     "Summary": "C2"
@@ -738,7 +738,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C3",
+    "Description": "Work on C2",
     "Material": "C3",
     "Material teacher": "C3",
     "Summary": "C3"
@@ -764,7 +764,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C4",
+    "Description": "Work on C3",
     "Material": "C4",
     "Material teacher": "C4",
     "Summary": "C4"
@@ -790,7 +790,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C5",
+    "Description": "Work on C4",
     "Material": "C5",
     "Material teacher": "C5",
     "Summary": "C5"
@@ -816,7 +816,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C6",
+    "Description": "Work on C5",
     "Material": "C6",
     "Material teacher": "C6",
     "Summary": "C6"
@@ -842,7 +842,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C7",
+    "Description": "Work on C6",
     "Material": "C7",
     "Material teacher": "C7",
     "Summary": "C7"
@@ -868,7 +868,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C8",
+    "Description": "Work on C7",
     "Material": "C8",
     "Material teacher": "C8",
     "Summary": "C8"
@@ -894,7 +894,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C9",
+    "Description": "Work on C8",
     "Material": "C9",
     "Material teacher": "C9",
     "Summary": "C9"
@@ -920,7 +920,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C10",
+    "Description": "Work on C9",
     "Material": "C10",
     "Material teacher": "C10",
     "Summary": "C10"
@@ -1154,7 +1154,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 3,
-    "Description": "Work on C1",
+    "Description": "Resting from ICFES",
     "Material": "C1",
     "Material teacher": "C1",
     "Summary": "C1"
@@ -1180,7 +1180,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C2",
+    "Description": "Work on C1",
     "Material": "C2",
     "Material teacher": "C2",
     "Summary": "C2"
@@ -1206,7 +1206,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C3",
+    "Description": "Work on C2",
     "Material": "C3",
     "Material teacher": "C3",
     "Summary": "C3"
@@ -1232,7 +1232,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C4",
+    "Description": "Work on C3",
     "Material": "C4",
     "Material teacher": "C4",
     "Summary": "C4"
@@ -1258,7 +1258,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C5",
+    "Description": "Work on C4",
     "Material": "C5",
     "Material teacher": "C5",
     "Summary": "C5"
@@ -1284,7 +1284,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C6",
+    "Description": "Work on C5",
     "Material": "C6",
     "Material teacher": "C6",
     "Summary": "C6"
@@ -1310,7 +1310,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C7",
+    "Description": "Work on C6",
     "Material": "C7",
     "Material teacher": "C7",
     "Summary": "C7"
@@ -1336,7 +1336,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C8",
+    "Description": "Work on C7",
     "Material": "C8",
     "Material teacher": "C8",
     "Summary": "C8"
@@ -1362,7 +1362,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C9",
+    "Description": "Work on C8",
     "Material": "C9",
     "Material teacher": "C9",
     "Summary": "C9"
@@ -1388,7 +1388,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C10",
+    "Description": "Work on C9",
     "Material": "C10",
     "Material teacher": "C10",
     "Summary": "C10"
@@ -2597,7 +2597,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C1",
+    "Description": "Resting from ICFES",
     "Material": "C1",
     "Material teacher": "C1",
     "Summary": "C1"
@@ -2623,7 +2623,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C2",
+    "Description": "Work on C1",
     "Material": "C2",
     "Material teacher": "C2",
     "Summary": "C2"
@@ -2649,7 +2649,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C3",
+    "Description": "Work on C2",
     "Material": "C3",
     "Material teacher": "C3",
     "Summary": "C3"
@@ -2675,7 +2675,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C4",
+    "Description": "Work on C3",
     "Material": "C4",
     "Material teacher": "C4",
     "Summary": "C4"
@@ -2701,7 +2701,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C5",
+    "Description": "Work on C4",
     "Material": "C5",
     "Material teacher": "C5",
     "Summary": "C5"
@@ -2727,7 +2727,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C6",
+    "Description": "Work on C5",
     "Material": "C6",
     "Material teacher": "C6",
     "Summary": "C6"
@@ -2753,7 +2753,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C7",
+    "Description": "Work on C6",
     "Material": "C7",
     "Material teacher": "C7",
     "Summary": "C7"
@@ -2779,7 +2779,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C8",
+    "Description": "Work on C7",
     "Material": "C8",
     "Material teacher": "C8",
     "Summary": "C8"
@@ -2805,7 +2805,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C9",
+    "Description": "Work on C8",
     "Material": "C9",
     "Material teacher": "C9",
     "Summary": "C9"
@@ -2831,7 +2831,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C10",
+    "Description": "Work on C9",
     "Material": "C10",
     "Material teacher": "C10",
     "Summary": "C10"
@@ -4053,7 +4053,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C1",
+    "Description": "Resting from ICFES",
     "Material": "C1",
     "Material teacher": "C1",
     "Summary": "C1"
@@ -4079,7 +4079,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C2",
+    "Description": "Work on C1",
     "Material": "C2",
     "Material teacher": "C2",
     "Summary": "C2"
@@ -4105,7 +4105,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C3",
+    "Description": "Work on C2",
     "Material": "C3",
     "Material teacher": "C3",
     "Summary": "C3"
@@ -4131,7 +4131,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C4",
+    "Description": "Work on C3",
     "Material": "C4",
     "Material teacher": "C4",
     "Summary": "C4"
@@ -4157,7 +4157,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C5",
+    "Description": "Work on C4",
     "Material": "C5",
     "Material teacher": "C5",
     "Summary": "C5"
@@ -4183,7 +4183,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C6",
+    "Description": "Work on C5",
     "Material": "C6",
     "Material teacher": "C6",
     "Summary": "C6"
@@ -4209,7 +4209,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C7",
+    "Description": "Work on C6",
     "Material": "C7",
     "Material teacher": "C7",
     "Summary": "C7"
@@ -4235,7 +4235,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C8",
+    "Description": "Work on C7",
     "Material": "C8",
     "Material teacher": "C8",
     "Summary": "C8"
@@ -4261,7 +4261,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C9",
+    "Description": "Work on C8",
     "Material": "C9",
     "Material teacher": "C9",
     "Summary": "C9"
@@ -4287,7 +4287,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Work on C10",
+    "Description": "Work on C9",
     "Material": "C10",
     "Material teacher": "C10",
     "Summary": "C10"
