@@ -231,9 +231,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "Work on C1",
-    "Material": "C1",
-    "Material teacher": "C1",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C1"
   },
   {
@@ -244,9 +244,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C1",
-    "Material": "C2",
-    "Material teacher": "C2",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
@@ -257,9 +257,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C2",
-    "Material": "C2",
-    "Material teacher": "C2",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
@@ -270,9 +270,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C2",
-    "Material": "C3",
-    "Material teacher": "C3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C3"
   },
   {
@@ -283,9 +283,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C3",
-    "Material": "C3",
-    "Material teacher": "C3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C3"
   },
   {
@@ -296,9 +296,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C3",
-    "Material": "C4",
-    "Material teacher": "C4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C4"
   },
   {
@@ -309,9 +309,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C4",
-    "Material": "C4",
-    "Material teacher": "C4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C4"
   },
   {
@@ -322,9 +322,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C4",
-    "Material": "C5",
-    "Material teacher": "C5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C5"
   },
   {
@@ -335,9 +335,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C5",
-    "Material": "C5",
-    "Material teacher": "C5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C5"
   },
   {
@@ -348,9 +348,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C5",
-    "Material": "C6",
-    "Material teacher": "C6",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C6"
   },
   {
@@ -361,9 +361,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C6",
-    "Material": "C6",
-    "Material teacher": "C6",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C6"
   },
   {
@@ -374,9 +374,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "Work on C6",
-    "Material": "C7",
-    "Material teacher": "C7",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C7"
   },
   {
@@ -387,9 +387,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "Work on C7",
-    "Material": "C7",
-    "Material teacher": "C7",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C7"
   },
   {
@@ -400,9 +400,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "Work on C7",
-    "Material": "C8",
-    "Material teacher": "C8",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C8"
   },
   {
@@ -413,9 +413,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "Work on C8",
-    "Material": "C8",
-    "Material teacher": "C8",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C8"
   },
   {
@@ -426,9 +426,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 1",
-    "Description": "Work on C8",
-    "Material": "C9",
-    "Material teacher": "C9",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C9"
   },
   {
@@ -439,9 +439,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "Work on C9",
-    "Material": "C9",
-    "Material teacher": "C9",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C9"
   },
   {
@@ -452,9 +452,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 1",
-    "Description": "Work on C9",
-    "Material": "C10",
-    "Material teacher": "C10",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C10"
   },
   {
@@ -465,9 +465,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "Work on C10",
-    "Material": "C10",
-    "Material teacher": "C10",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C10"
   },
   {
@@ -699,9 +699,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 5",
-    "Description": "Work on C1",
-    "Material": "C1",
-    "Material teacher": "C1",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C1"
   },
   {
@@ -712,9 +712,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C1",
-    "Material": "C2",
-    "Material teacher": "C2",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
@@ -725,9 +725,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 5",
-    "Description": "Work on C2",
-    "Material": "C2",
-    "Material teacher": "C2",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
@@ -738,9 +738,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C2",
-    "Material": "C3",
-    "Material teacher": "C3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C3"
   },
   {
@@ -751,9 +751,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 5",
-    "Description": "Work on C3",
-    "Material": "C3",
-    "Material teacher": "C3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C3"
   },
   {
@@ -764,9 +764,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C3",
-    "Material": "C4",
-    "Material teacher": "C4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C4"
   },
   {
@@ -777,9 +777,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 5",
-    "Description": "Work on C4",
-    "Material": "C4",
-    "Material teacher": "C4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C4"
   },
   {
@@ -790,9 +790,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C4",
-    "Material": "C5",
-    "Material teacher": "C5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C5"
   },
   {
@@ -803,9 +803,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 5",
-    "Description": "Work on C5",
-    "Material": "C5",
-    "Material teacher": "C5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C5"
   },
   {
@@ -816,9 +816,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C5",
-    "Material": "C6",
-    "Material teacher": "C6",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C6"
   },
   {
@@ -829,9 +829,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 5",
-    "Description": "Work on C6",
-    "Material": "C6",
-    "Material teacher": "C6",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C6"
   },
   {
@@ -842,9 +842,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "Work on C6",
-    "Material": "C7",
-    "Material teacher": "C7",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C7"
   },
   {
@@ -855,9 +855,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 5",
-    "Description": "Work on C7",
-    "Material": "C7",
-    "Material teacher": "C7",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C7"
   },
   {
@@ -868,9 +868,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "Work on C7",
-    "Material": "C8",
-    "Material teacher": "C8",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C8"
   },
   {
@@ -881,9 +881,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 5",
-    "Description": "Work on C8",
-    "Material": "C8",
-    "Material teacher": "C8",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C8"
   },
   {
@@ -894,9 +894,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 1",
-    "Description": "Work on C8",
-    "Material": "C9",
-    "Material teacher": "C9",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C9"
   },
   {
@@ -907,9 +907,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 5",
-    "Description": "Work on C9",
-    "Material": "C9",
-    "Material teacher": "C9",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C9"
   },
   {
@@ -920,9 +920,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 1",
-    "Description": "Work on C9",
-    "Material": "C10",
-    "Material teacher": "C10",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C10"
   },
   {
@@ -933,9 +933,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 5",
-    "Description": "Work on C10",
-    "Material": "C10",
-    "Material teacher": "C10",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C10"
   },
   {
@@ -1167,9 +1167,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 5",
-    "Description": "Work on C1",
-    "Material": "C1",
-    "Material teacher": "C1",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C1"
   },
   {
@@ -1180,9 +1180,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C1",
-    "Material": "C2",
-    "Material teacher": "C2",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
@@ -1193,9 +1193,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 5",
-    "Description": "Work on C2",
-    "Material": "C2",
-    "Material teacher": "C2",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
@@ -1206,9 +1206,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C2",
-    "Material": "C3",
-    "Material teacher": "C3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C3"
   },
   {
@@ -1219,9 +1219,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 5",
-    "Description": "Work on C3",
-    "Material": "C3",
-    "Material teacher": "C3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C3"
   },
   {
@@ -1232,9 +1232,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C3",
-    "Material": "C4",
-    "Material teacher": "C4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C4"
   },
   {
@@ -1245,9 +1245,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 5",
-    "Description": "Work on C4",
-    "Material": "C4",
-    "Material teacher": "C4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C4"
   },
   {
@@ -1258,9 +1258,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C4",
-    "Material": "C5",
-    "Material teacher": "C5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C5"
   },
   {
@@ -1271,9 +1271,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 5",
-    "Description": "Work on C5",
-    "Material": "C5",
-    "Material teacher": "C5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C5"
   },
   {
@@ -1284,9 +1284,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C5",
-    "Material": "C6",
-    "Material teacher": "C6",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C6"
   },
   {
@@ -1297,9 +1297,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 5",
-    "Description": "Work on C6",
-    "Material": "C6",
-    "Material teacher": "C6",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C6"
   },
   {
@@ -1310,9 +1310,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "Work on C6",
-    "Material": "C7",
-    "Material teacher": "C7",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C7"
   },
   {
@@ -1323,9 +1323,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 5",
-    "Description": "Work on C7",
-    "Material": "C7",
-    "Material teacher": "C7",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C7"
   },
   {
@@ -1336,9 +1336,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "Work on C7",
-    "Material": "C8",
-    "Material teacher": "C8",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C8"
   },
   {
@@ -1349,9 +1349,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 5",
-    "Description": "Work on C8",
-    "Material": "C8",
-    "Material teacher": "C8",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C8"
   },
   {
@@ -1362,9 +1362,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 1",
-    "Description": "Work on C8",
-    "Material": "C9",
-    "Material teacher": "C9",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C9"
   },
   {
@@ -1375,9 +1375,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 5",
-    "Description": "Work on C9",
-    "Material": "C9",
-    "Material teacher": "C9",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C9"
   },
   {
@@ -1388,9 +1388,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 1",
-    "Description": "Work on C9",
-    "Material": "C10",
-    "Material teacher": "C10",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C10"
   },
   {
@@ -1401,9 +1401,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 5",
-    "Description": "Work on C10",
-    "Material": "C10",
-    "Material teacher": "C10",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C10"
   },
   {
@@ -1622,9 +1622,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C1",
-    "Material": "C1",
-    "Material teacher": "C1",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C1"
   },
   {
@@ -1635,9 +1635,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 4",
-    "Description": "Work on C1",
-    "Material": "C1",
-    "Material teacher": "C1",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C1"
   },
   {
@@ -1648,9 +1648,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "Work on C2",
-    "Material": "C2",
-    "Material teacher": "C2",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
@@ -1661,9 +1661,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 4",
-    "Description": "Work on C2",
-    "Material": "C2",
-    "Material teacher": "C2",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
@@ -1674,9 +1674,9 @@ window.SCHEDULE_DATA = [
     "Term": null,
     "Weekday": " ",
     "Day": " ",
-    "Description": "Work on C3",
-    "Material": "C3",
-    "Material teacher": "C3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C3"
   },
   {
@@ -1687,9 +1687,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 4",
-    "Description": "Work on C3",
-    "Material": "C3",
-    "Material teacher": "C3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C3"
   },
   {
@@ -1700,9 +1700,9 @@ window.SCHEDULE_DATA = [
     "Term": null,
     "Weekday": " ",
     "Day": " ",
-    "Description": "Work on C4",
-    "Material": "C4",
-    "Material teacher": "C4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C4"
   },
   {
@@ -1713,9 +1713,9 @@ window.SCHEDULE_DATA = [
     "Term": null,
     "Weekday": " ",
     "Day": " ",
-    "Description": "Work on C4",
-    "Material": "C4",
-    "Material teacher": "C4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C4"
   },
   {
@@ -1726,9 +1726,9 @@ window.SCHEDULE_DATA = [
     "Term": null,
     "Weekday": " ",
     "Day": " ",
-    "Description": "Work on C5",
-    "Material": "C5",
-    "Material teacher": "C5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C5"
   },
   {
@@ -1739,9 +1739,9 @@ window.SCHEDULE_DATA = [
     "Term": null,
     "Weekday": " ",
     "Day": " ",
-    "Description": "Work on C5",
-    "Material": "C5",
-    "Material teacher": "C5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C5"
   },
   {
@@ -1752,9 +1752,9 @@ window.SCHEDULE_DATA = [
     "Term": null,
     "Weekday": " ",
     "Day": " ",
-    "Description": "Work on C6",
-    "Material": "C6",
-    "Material teacher": "C6",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C6"
   },
   {
@@ -1765,9 +1765,9 @@ window.SCHEDULE_DATA = [
     "Term": null,
     "Weekday": " ",
     "Day": " ",
-    "Description": "Work on C6",
-    "Material": "C6",
-    "Material teacher": "C6",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C6"
   },
   {
@@ -1778,9 +1778,9 @@ window.SCHEDULE_DATA = [
     "Term": null,
     "Weekday": " ",
     "Day": " ",
-    "Description": "Work on C7",
-    "Material": "C7",
-    "Material teacher": "C7",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C7"
   },
   {
@@ -1791,9 +1791,9 @@ window.SCHEDULE_DATA = [
     "Term": null,
     "Weekday": " ",
     "Day": " ",
-    "Description": "Work on C7",
-    "Material": "C7",
-    "Material teacher": "C7",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C7"
   },
   {
@@ -1804,9 +1804,9 @@ window.SCHEDULE_DATA = [
     "Term": null,
     "Weekday": " ",
     "Day": " ",
-    "Description": "Work on C8",
-    "Material": "C8",
-    "Material teacher": "C8",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C8"
   },
   {
@@ -1817,9 +1817,9 @@ window.SCHEDULE_DATA = [
     "Term": null,
     "Weekday": " ",
     "Day": " ",
-    "Description": "Work on C8",
-    "Material": "C8",
-    "Material teacher": "C8",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C8"
   },
   {
@@ -1830,9 +1830,9 @@ window.SCHEDULE_DATA = [
     "Term": null,
     "Weekday": " ",
     "Day": " ",
-    "Description": "Work on C9",
-    "Material": "C9",
-    "Material teacher": "C9",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C9"
   },
   {
@@ -1843,9 +1843,9 @@ window.SCHEDULE_DATA = [
     "Term": null,
     "Weekday": " ",
     "Day": " ",
-    "Description": "Work on C9",
-    "Material": "C9",
-    "Material teacher": "C9",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C9"
   },
   {
@@ -1856,9 +1856,9 @@ window.SCHEDULE_DATA = [
     "Term": null,
     "Weekday": " ",
     "Day": " ",
-    "Description": "Work on C10",
-    "Material": "C10",
-    "Material teacher": "C10",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C10"
   },
   {
@@ -1869,9 +1869,9 @@ window.SCHEDULE_DATA = [
     "Term": null,
     "Weekday": " ",
     "Day": " ",
-    "Description": "Work on C10",
-    "Material": "C10",
-    "Material teacher": "C10",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C10"
   },
   {
@@ -2116,9 +2116,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "Work on C1",
-    "Material": "C1",
-    "Material teacher": "C1",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C1"
   },
   {
@@ -2129,9 +2129,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 4",
-    "Description": "Work on C1",
-    "Material": "C1",
-    "Material teacher": "C1",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C1"
   },
   {
@@ -2142,9 +2142,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C2",
-    "Material": "C2",
-    "Material teacher": "C2",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
@@ -2155,9 +2155,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 4",
-    "Description": "Work on C2",
-    "Material": "C2",
-    "Material teacher": "C2",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
@@ -2168,9 +2168,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C3",
-    "Material": "C3",
-    "Material teacher": "C3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C3"
   },
   {
@@ -2181,9 +2181,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 4",
-    "Description": "Work on C3",
-    "Material": "C3",
-    "Material teacher": "C3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C3"
   },
   {
@@ -2194,9 +2194,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C4",
-    "Material": "C4",
-    "Material teacher": "C4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C4"
   },
   {
@@ -2207,9 +2207,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 4",
-    "Description": "Work on C4",
-    "Material": "C4",
-    "Material teacher": "C4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C4"
   },
   {
@@ -2220,9 +2220,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C5",
-    "Material": "C5",
-    "Material teacher": "C5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C5"
   },
   {
@@ -2233,9 +2233,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 4",
-    "Description": "Work on C5",
-    "Material": "C5",
-    "Material teacher": "C5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C5"
   },
   {
@@ -2246,9 +2246,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C6",
-    "Material": "C6",
-    "Material teacher": "C6",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C6"
   },
   {
@@ -2259,9 +2259,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "Work on C6",
-    "Material": "C6",
-    "Material teacher": "C6",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C6"
   },
   {
@@ -2272,9 +2272,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "Work on C7",
-    "Material": "C7",
-    "Material teacher": "C7",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C7"
   },
   {
@@ -2285,9 +2285,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "Work on C7",
-    "Material": "C7",
-    "Material teacher": "C7",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C7"
   },
   {
@@ -2298,9 +2298,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "Work on C8",
-    "Material": "C8",
-    "Material teacher": "C8",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C8"
   },
   {
@@ -2311,9 +2311,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 4",
-    "Description": "Work on C8",
-    "Material": "C8",
-    "Material teacher": "C8",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C8"
   },
   {
@@ -2324,9 +2324,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "Work on C9",
-    "Material": "C9",
-    "Material teacher": "C9",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C9"
   },
   {
@@ -2337,9 +2337,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 4",
-    "Description": "Work on C9",
-    "Material": "C9",
-    "Material teacher": "C9",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C9"
   },
   {
@@ -2350,9 +2350,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "Work on C10",
-    "Material": "C10",
-    "Material teacher": "C10",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C10"
   },
   {
@@ -2363,9 +2363,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 4",
-    "Description": "Work on C10",
-    "Material": "C10",
-    "Material teacher": "C10",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C10"
   },
   {
@@ -2610,9 +2610,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "Work on C1",
-    "Material": "C1",
-    "Material teacher": "C1",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C1"
   },
   {
@@ -2623,9 +2623,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C1",
-    "Material": "C2",
-    "Material teacher": "C2",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
@@ -2636,9 +2636,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C2",
-    "Material": "C2",
-    "Material teacher": "C2",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
@@ -2649,9 +2649,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C2",
-    "Material": "C3",
-    "Material teacher": "C3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C3"
   },
   {
@@ -2662,9 +2662,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C3",
-    "Material": "C3",
-    "Material teacher": "C3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C3"
   },
   {
@@ -2675,9 +2675,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C3",
-    "Material": "C4",
-    "Material teacher": "C4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C4"
   },
   {
@@ -2688,9 +2688,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C4",
-    "Material": "C4",
-    "Material teacher": "C4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C4"
   },
   {
@@ -2701,9 +2701,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C4",
-    "Material": "C5",
-    "Material teacher": "C5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C5"
   },
   {
@@ -2714,9 +2714,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C5",
-    "Material": "C5",
-    "Material teacher": "C5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C5"
   },
   {
@@ -2727,9 +2727,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C5",
-    "Material": "C6",
-    "Material teacher": "C6",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C6"
   },
   {
@@ -2740,9 +2740,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C6",
-    "Material": "C6",
-    "Material teacher": "C6",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C6"
   },
   {
@@ -2753,9 +2753,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "Work on C6",
-    "Material": "C7",
-    "Material teacher": "C7",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C7"
   },
   {
@@ -2766,9 +2766,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "Work on C7",
-    "Material": "C7",
-    "Material teacher": "C7",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C7"
   },
   {
@@ -2779,9 +2779,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "Work on C7",
-    "Material": "C8",
-    "Material teacher": "C8",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C8"
   },
   {
@@ -2792,9 +2792,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "Work on C8",
-    "Material": "C8",
-    "Material teacher": "C8",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C8"
   },
   {
@@ -2805,9 +2805,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 1",
-    "Description": "Work on C8",
-    "Material": "C9",
-    "Material teacher": "C9",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C9"
   },
   {
@@ -2818,9 +2818,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "Work on C9",
-    "Material": "C9",
-    "Material teacher": "C9",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C9"
   },
   {
@@ -2831,9 +2831,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 1",
-    "Description": "Work on C9",
-    "Material": "C10",
-    "Material teacher": "C10",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C10"
   },
   {
@@ -2844,9 +2844,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "Work on C10",
-    "Material": "C10",
-    "Material teacher": "C10",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C10"
   },
   {
@@ -3091,9 +3091,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "Work on C1",
-    "Material": "C1",
-    "Material teacher": "C1",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C1"
   },
   {
@@ -3104,9 +3104,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 5",
-    "Description": "Work on C1",
-    "Material": "C1",
-    "Material teacher": "C1",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C1"
   },
   {
@@ -3117,9 +3117,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C2",
-    "Material": "C2",
-    "Material teacher": "C2",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
@@ -3130,9 +3130,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 5",
-    "Description": "Work on C2",
-    "Material": "C2",
-    "Material teacher": "C2",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
@@ -3143,9 +3143,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C3",
-    "Material": "C3",
-    "Material teacher": "C3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C3"
   },
   {
@@ -3156,9 +3156,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 5",
-    "Description": "Work on C3",
-    "Material": "C3",
-    "Material teacher": "C3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C3"
   },
   {
@@ -3169,9 +3169,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C4",
-    "Material": "C4",
-    "Material teacher": "C4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C4"
   },
   {
@@ -3182,9 +3182,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 5",
-    "Description": "Work on C4",
-    "Material": "C4",
-    "Material teacher": "C4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C4"
   },
   {
@@ -3195,9 +3195,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C5",
-    "Material": "C5",
-    "Material teacher": "C5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C5"
   },
   {
@@ -3208,9 +3208,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 5",
-    "Description": "Work on C5",
-    "Material": "C5",
-    "Material teacher": "C5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C5"
   },
   {
@@ -3221,9 +3221,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C6",
-    "Material": "C6",
-    "Material teacher": "C6",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C6"
   },
   {
@@ -3234,9 +3234,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 5",
-    "Description": "Work on C6",
-    "Material": "C6",
-    "Material teacher": "C6",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C6"
   },
   {
@@ -3247,9 +3247,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "Work on C7",
-    "Material": "C7",
-    "Material teacher": "C7",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C7"
   },
   {
@@ -3260,9 +3260,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 5",
-    "Description": "Work on C7",
-    "Material": "C7",
-    "Material teacher": "C7",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C7"
   },
   {
@@ -3273,9 +3273,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "Work on C8",
-    "Material": "C8",
-    "Material teacher": "C8",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C8"
   },
   {
@@ -3286,9 +3286,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 5",
-    "Description": "Work on C8",
-    "Material": "C8",
-    "Material teacher": "C8",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C8"
   },
   {
@@ -3299,9 +3299,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "Work on C9",
-    "Material": "C9",
-    "Material teacher": "C9",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C9"
   },
   {
@@ -3312,9 +3312,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 5",
-    "Description": "Work on C9",
-    "Material": "C9",
-    "Material teacher": "C9",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C9"
   },
   {
@@ -3325,9 +3325,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "Work on C10",
-    "Material": "C10",
-    "Material teacher": "C10",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C10"
   },
   {
@@ -3338,9 +3338,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 5",
-    "Description": "Work on C10",
-    "Material": "C10",
-    "Material teacher": "C10",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C10"
   },
   {
@@ -3572,9 +3572,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 2",
-    "Description": "Class",
-    "Material": "C1",
-    "Material teacher": "C1",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C1"
   },
   {
@@ -3585,9 +3585,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 4",
-    "Description": "Work on C1",
-    "Material": "C1",
-    "Material teacher": "C1",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C1"
   },
   {
@@ -3598,9 +3598,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 2",
-    "Description": "Work on C1",
-    "Material": "C2",
-    "Material teacher": "C2",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
@@ -3611,9 +3611,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 4",
-    "Description": "Work on C2",
-    "Material": "C2",
-    "Material teacher": "C2",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
@@ -3624,9 +3624,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 2",
-    "Description": "Work on C2",
-    "Material": "C3",
-    "Material teacher": "C3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C3"
   },
   {
@@ -3637,9 +3637,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 4",
-    "Description": "Work on C3",
-    "Material": "C3",
-    "Material teacher": "C3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C3"
   },
   {
@@ -3650,9 +3650,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 2",
-    "Description": "Work on C3",
-    "Material": "C4",
-    "Material teacher": "C4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C4"
   },
   {
@@ -3663,9 +3663,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 4",
-    "Description": "Work on C4",
-    "Material": "C4",
-    "Material teacher": "C4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C4"
   },
   {
@@ -3676,9 +3676,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 2",
-    "Description": "Work on C4",
-    "Material": "C5",
-    "Material teacher": "C5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C5"
   },
   {
@@ -3689,9 +3689,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 4",
-    "Description": "Work on C5",
-    "Material": "C5",
-    "Material teacher": "C5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C5"
   },
   {
@@ -3702,9 +3702,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 2",
-    "Description": "Work on C5",
-    "Material": "C6",
-    "Material teacher": "C6",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C6"
   },
   {
@@ -3715,9 +3715,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "Work on C6",
-    "Material": "C6",
-    "Material teacher": "C6",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C6"
   },
   {
@@ -3728,9 +3728,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 2",
-    "Description": "Work on C6",
-    "Material": "C7",
-    "Material teacher": "C7",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C7"
   },
   {
@@ -3741,9 +3741,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "Work on C7",
-    "Material": "C7",
-    "Material teacher": "C7",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C7"
   },
   {
@@ -3754,9 +3754,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 2",
-    "Description": "Work on C7",
-    "Material": "C8",
-    "Material teacher": "C8",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C8"
   },
   {
@@ -3767,9 +3767,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 4",
-    "Description": "Work on C8",
-    "Material": "C8",
-    "Material teacher": "C8",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C8"
   },
   {
@@ -3780,9 +3780,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 2",
-    "Description": "Work on C8",
-    "Material": "C9",
-    "Material teacher": "C9",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C9"
   },
   {
@@ -3793,9 +3793,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 4",
-    "Description": "Work on C9",
-    "Material": "C9",
-    "Material teacher": "C9",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C9"
   },
   {
@@ -3806,9 +3806,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 2",
-    "Description": "Work on C9",
-    "Material": "C10",
-    "Material teacher": "C10",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C10"
   },
   {
@@ -3819,9 +3819,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 4",
-    "Description": "Work on C10",
-    "Material": "C10",
-    "Material teacher": "C10",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C10"
   },
   {
@@ -4066,9 +4066,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 4",
-    "Description": "Work on C1",
-    "Material": "C1",
-    "Material teacher": "C1",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C1"
   },
   {
@@ -4079,9 +4079,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C1",
-    "Material": "C2",
-    "Material teacher": "C2",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
@@ -4092,9 +4092,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 4",
-    "Description": "Work on C2",
-    "Material": "C2",
-    "Material teacher": "C2",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
@@ -4105,9 +4105,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C2",
-    "Material": "C3",
-    "Material teacher": "C3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C3"
   },
   {
@@ -4118,9 +4118,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 4",
-    "Description": "Work on C3",
-    "Material": "C3",
-    "Material teacher": "C3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C3"
   },
   {
@@ -4131,9 +4131,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C3",
-    "Material": "C4",
-    "Material teacher": "C4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C4"
   },
   {
@@ -4144,9 +4144,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 4",
-    "Description": "Work on C4",
-    "Material": "C4",
-    "Material teacher": "C4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C4"
   },
   {
@@ -4157,9 +4157,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C4",
-    "Material": "C5",
-    "Material teacher": "C5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C5"
   },
   {
@@ -4170,9 +4170,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 4",
-    "Description": "Work on C5",
-    "Material": "C5",
-    "Material teacher": "C5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C5"
   },
   {
@@ -4183,9 +4183,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Work on C5",
-    "Material": "C6",
-    "Material teacher": "C6",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C6"
   },
   {
@@ -4196,9 +4196,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "Work on C6",
-    "Material": "C6",
-    "Material teacher": "C6",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C6"
   },
   {
@@ -4209,9 +4209,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "Work on C6",
-    "Material": "C7",
-    "Material teacher": "C7",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C7"
   },
   {
@@ -4222,9 +4222,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "Work on C7",
-    "Material": "C7",
-    "Material teacher": "C7",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C7"
   },
   {
@@ -4235,9 +4235,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "Work on C7",
-    "Material": "C8",
-    "Material teacher": "C8",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C8"
   },
   {
@@ -4248,9 +4248,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 4",
-    "Description": "Work on C8",
-    "Material": "C8",
-    "Material teacher": "C8",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C8"
   },
   {
@@ -4261,9 +4261,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 1",
-    "Description": "Work on C8",
-    "Material": "C9",
-    "Material teacher": "C9",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C9"
   },
   {
@@ -4274,9 +4274,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 4",
-    "Description": "Work on C9",
-    "Material": "C9",
-    "Material teacher": "C9",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C9"
   },
   {
@@ -4287,9 +4287,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 1",
-    "Description": "Work on C9",
-    "Material": "C10",
-    "Material teacher": "C10",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C10"
   },
   {
@@ -4300,9 +4300,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 4",
-    "Description": "Work on C10",
-    "Material": "C10",
-    "Material teacher": "C10",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C10"
   },
   {
@@ -4534,9 +4534,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 2",
-    "Description": "Class",
-    "Material": "C1",
-    "Material teacher": "C1",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C1"
   },
   {
@@ -4547,9 +4547,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "Work on C1",
-    "Material": "C1",
-    "Material teacher": "C1",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C1"
   },
   {
@@ -4560,9 +4560,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 2",
-    "Description": "Work on C1",
-    "Material": "C2",
-    "Material teacher": "C2",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
@@ -4573,9 +4573,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C2",
-    "Material": "C2",
-    "Material teacher": "C2",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
@@ -4586,9 +4586,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 2",
-    "Description": "Work on C2",
-    "Material": "C3",
-    "Material teacher": "C3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C3"
   },
   {
@@ -4599,9 +4599,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C3",
-    "Material": "C3",
-    "Material teacher": "C3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C3"
   },
   {
@@ -4612,9 +4612,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 2",
-    "Description": "Work on C3",
-    "Material": "C4",
-    "Material teacher": "C4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C4"
   },
   {
@@ -4625,9 +4625,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C4",
-    "Material": "C4",
-    "Material teacher": "C4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C4"
   },
   {
@@ -4638,9 +4638,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 2",
-    "Description": "Work on C4",
-    "Material": "C5",
-    "Material teacher": "C5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C5"
   },
   {
@@ -4651,9 +4651,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C5",
-    "Material": "C5",
-    "Material teacher": "C5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C5"
   },
   {
@@ -4664,9 +4664,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 2",
-    "Description": "Work on C5",
-    "Material": "C6",
-    "Material teacher": "C6",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C6"
   },
   {
@@ -4677,9 +4677,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Work on C6",
-    "Material": "C6",
-    "Material teacher": "C6",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C6"
   },
   {
@@ -4690,9 +4690,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 2",
-    "Description": "Work on C6",
-    "Material": "C7",
-    "Material teacher": "C7",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C7"
   },
   {
@@ -4703,9 +4703,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "Work on C7",
-    "Material": "C7",
-    "Material teacher": "C7",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C7"
   },
   {
@@ -4716,9 +4716,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 2",
-    "Description": "Work on C7",
-    "Material": "C8",
-    "Material teacher": "C8",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C8"
   },
   {
@@ -4729,9 +4729,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "Work on C8",
-    "Material": "C8",
-    "Material teacher": "C8",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C8"
   },
   {
@@ -4742,9 +4742,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 2",
-    "Description": "Work on C8",
-    "Material": "C9",
-    "Material teacher": "C9",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C9"
   },
   {
@@ -4755,9 +4755,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "Work on C9",
-    "Material": "C9",
-    "Material teacher": "C9",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C9"
   },
   {
@@ -4768,9 +4768,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 2",
-    "Description": "Work on C9",
-    "Material": "C10",
-    "Material teacher": "C10",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C10"
   },
   {
@@ -4781,9 +4781,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "Work on C10",
-    "Material": "C10",
-    "Material teacher": "C10",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
     "Summary": "C10"
   }
 ];
