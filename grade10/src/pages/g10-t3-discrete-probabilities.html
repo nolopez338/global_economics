@@ -132,6 +132,15 @@
       text-align: left;
     }
     th { background: #f3f4f6; }
+    #pmfTableBody tr.boundary-row td {
+      background: #f8fbff;
+    }
+    #pmfTableBody tr.boundary-row-first td {
+      border-top: 1px solid #bfdbfe;
+    }
+    #pmfTableBody tr.boundary-row-last td {
+      border-bottom: 1px solid #bfdbfe;
+    }
     .table-icon-btn,
     .row-delete-btn,
     .table-add-btn {
@@ -533,10 +542,12 @@
           <td class="row-delete-cell"><button type="button" class="row-delete-btn" aria-label="Delete row">x</button></td>
         `;
         tableBody.appendChild(tr);
+        updateBoundaryRowHighlight();
       }
       function clearRows(keepOneRow = true) {
         tableBody.innerHTML = '';
         if (keepOneRow) addRow();
+        updateBoundaryRowHighlight();
       }
       function ensureAtLeastRows(n) {
         while (tableBody.rows.length < n) addRow();
@@ -984,6 +995,7 @@
         drawPMF(currentData, { showExpectedValueStem: showExpectedValueStem, expectedValue: ex });
       }
       function parseAndUpdate() {
+        updateBoundaryRowHighlight();
         const parsed = getMode() === 'table' ? parseTableInput() : parseTextInput();
         const variables = Array.from(parsed.detectedVariables).sort();
         const hasSingleVariable = variables.length === 1;
@@ -1129,11 +1141,41 @@
       function fillTextAreaFromRows(rows, probabilities, decimals = 6) {
         textArea.value = rows.map((pair, idx) => `${pair.xInput.value} ${probabilities[idx].toFixed(decimals)}`).join('\n');
       }
+      function updateBoundaryRowHighlight() {
+        const rows = Array.from(tableBody.querySelectorAll('tr'));
+        rows.forEach((row) => {
+          row.classList.remove('boundary-row', 'boundary-row-first', 'boundary-row-last');
+        });
+        if (!rows.length) return;
+        const firstRow = rows[0];
+        const lastRow = rows[rows.length - 1];
+        firstRow.classList.add('boundary-row', 'boundary-row-first');
+        if (lastRow !== firstRow) {
+          lastRow.classList.add('boundary-row', 'boundary-row-last');
+        } else {
+          firstRow.classList.add('boundary-row-last');
+        }
+      }
       function getLoadBounds() {
-        const minToken = variableMinInput.value.trim();
-        const maxToken = variableMaxInput.value.trim();
-        const minValue = minToken === '' ? null : Number(minToken);
-        const maxValue = maxToken === '' ? null : Number(maxToken);
+        const rows = Array.from(tableBody.querySelectorAll('tr'));
+        if (!rows.length) {
+          return { min: null, max: null };
+        }
+        const firstX = rows[0].querySelector('.x-input')?.value || '';
+        const lastX = rows[rows.length - 1].querySelector('.x-input')?.value || '';
+        const parsedFirst = parseNumericToken(firstX);
+        const parsedLast = parseNumericToken(lastX);
+        const hasMin = parsedFirst.ok && Number.isFinite(parsedFirst.value);
+        const hasMax = parsedLast.ok && Number.isFinite(parsedLast.value);
+        let minValue = hasMin ? parsedFirst.value : null;
+        let maxValue = hasMax ? parsedLast.value : null;
+        if (minValue != null && maxValue != null && minValue > maxValue) {
+          [minValue, maxValue] = [maxValue, minValue];
+        } else if (minValue != null && maxValue == null) {
+          maxValue = minValue + 10;
+        } else if (minValue == null && maxValue != null) {
+          minValue = maxValue - 10;
+        }
         return {
           min: Number.isFinite(minValue) ? minValue : null,
           max: Number.isFinite(maxValue) ? maxValue : null
@@ -1188,6 +1230,7 @@
       }
       function loadByMode() {
         const rows = getAvailablePairs();
+        updateBoundaryRowHighlight();
         const decimals = 6;
         const n = rows.length;
         const mode = document.getElementById('loadModeSelect').value;
@@ -1239,6 +1282,7 @@
         if (!row) return;
         row.remove();
         if (!tableBody.rows.length) addRow();
+        updateBoundaryRowHighlight();
         parseAndUpdate();
       });
       textArea.addEventListener('input', parseAndUpdate);
