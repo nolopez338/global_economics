@@ -187,34 +187,37 @@
       font-size: 1rem;
       margin-top: 0.2rem;
     }
-    .results-stack {
+    .results-row {
       margin-top: 0.5rem;
+      display: flex;
+      gap: 0.55rem;
+      flex-wrap: wrap;
+      align-items: stretch;
+    }
+    .result-card {
+      background: #fff;
       border: 1px solid #a7f3d0;
       border-radius: 8px;
-      overflow: hidden;
-      background: #ffffff;
-    }
-    .result-row {
-      display: flex;
-      gap: 0.6rem;
-      justify-content: space-between;
-      align-items: center;
       padding: 0.6rem 0.7rem;
-      border-top: 1px solid #d1fae5;
+      flex: 1 1 180px;
+      min-width: 0;
     }
-    .result-row:first-child { border-top: none; }
-    .result-row .label {
+    .result-card:first-child {
+      flex: 1.4 1 260px;
+    }
+    .result-card .label {
       color: var(--muted);
       font-size: 0.9rem;
       font-weight: 600;
     }
-    .result-row .value {
+    .result-card .value {
       font-weight: 700;
-      text-align: right;
+      margin-top: 0.2rem;
       word-break: break-word;
     }
-    .result-row-toggle {
-      justify-content: flex-start;
+    .result-card-toggle {
+      display: flex;
+      align-items: center;
     }
     .toggle-inline {
       display: inline-flex;
@@ -224,11 +227,9 @@
       color: #374151;
     }
     @media (max-width: 560px) {
-      .result-row {
+      .results-row {
         flex-direction: column;
-        align-items: flex-start;
       }
-      .result-row .value { text-align: left; }
     }
     .canvas-wrap {
       position: relative;
@@ -313,7 +314,6 @@
         <textarea id="pmfTextarea" placeholder="0, 0.2&#10;1, 0.5&#10;2, 0.3"></textarea>
       </div>
       <div class="controls">
-        <button type="button" id="updateGraphBtn" class="btn-primary">Update graph</button>
         <button type="button" id="loadExampleBtn" class="btn-secondary">Load example</button>
         <button type="button" id="loadUniformBtn" class="btn-secondary">Load Uniform</button>
       </div>
@@ -327,23 +327,23 @@
         </button>
       </h2>
       <div class="collapsible-content" id="computed-results-content" role="region" aria-labelledby="computed-results-toggle" hidden>
-        <div id="variableControlBox" class="result-box" style="display:none; margin-bottom:0.75rem;">
-          <div><strong>Variable value</strong></div>
-          <div class="result-grid">
-            <div class="metric">
-              <div class="label" id="variableNameLabel">t</div>
-              <div class="value" style="display:flex; gap:0.5rem; align-items:center;">
-                <input type="range" id="variableSlider" min="-5" max="5" step="0.1" value="1" style="flex:1;">
-                <input type="number" id="variableNumber" min="-5" max="5" step="0.1" value="1" style="width:110px;">
-              </div>
-            </div>
-          </div>
-        </div>
         <div id="resultBox" class="result-box" aria-live="polite"></div>
       </div>
     </section>
     <section class="card content-card">
       <h2>PMF Graph</h2>
+      <div id="variableControlBox" class="result-box" style="display:none; margin-bottom:0.75rem;">
+        <div><strong>Variable value</strong></div>
+        <div class="result-grid">
+          <div class="metric">
+            <div class="label" id="variableNameLabel">t</div>
+            <div class="value" style="display:flex; gap:0.5rem; align-items:center;">
+              <input type="range" id="variableSlider" min="-5" max="5" step="0.1" value="1" style="flex:1;">
+              <input type="number" id="variableNumber" min="-5" max="5" step="0.1" value="1" style="width:110px;">
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="canvas-wrap">
         <canvas id="pmfCanvas"></canvas>
         <div id="tooltip" class="tooltip"></div>
@@ -671,20 +671,20 @@
         const support = `{ ${data.map(d => formatNum(d.x, 6)).join(', ')} }`;
         resultBox.style.display = 'block';
         resultBox.innerHTML = `
-          <div class="results-stack">
-            <div class="result-row">
+          <div class="results-row">
+            <div class="result-card">
               <div class="label">Support set (sorted)</div>
               <div class="value">${support}</div>
             </div>
-            <div class="result-row">
+            <div class="result-card">
               <div class="label">Sum of probabilities</div>
               <div class="value">${formatNum(sumP, 6)}</div>
             </div>
-            <div class="result-row">
+            <div class="result-card">
               <div class="label">E[X]</div>
               <div class="value">${formatNum(ex, 6)}</div>
             </div>
-            <div class="result-row result-row-toggle">
+            <div class="result-card result-card-toggle">
               <label class="toggle-inline">
                 <input type="checkbox" id="showExpectedValueStem" ${showExpectedValueStem ? 'checked' : ''}>
                 <span>Show expected value on PMF graph</span>
@@ -722,7 +722,7 @@
         if (!data.length) {
           ctx.fillStyle = '#6b7280';
           ctx.font = '15px Arial';
-          ctx.fillText('No plottable points. Add numeric (x, p(x)) values, then click "Update graph".', 24, 34);
+          ctx.fillText('No plottable points. Add numeric (x, p(x)) values to view the graph.', 24, 34);
           return;
         }
         const minP = Math.min(...data.map(d => d.p));
@@ -1037,7 +1037,6 @@
         clearRows();
         parseAndUpdate();
       });
-      document.getElementById('updateGraphBtn').addEventListener('click', parseAndUpdate);
       document.getElementById('loadExampleBtn').addEventListener('click', loadExample);
       document.getElementById('loadUniformBtn').addEventListener('click', loadUniform);
       tableBody.addEventListener('input', parseAndUpdate);
