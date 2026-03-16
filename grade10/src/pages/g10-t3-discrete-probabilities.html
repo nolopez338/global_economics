@@ -132,6 +132,40 @@
       text-align: left;
     }
     th { background: #f3f4f6; }
+    .table-icon-btn,
+    .row-delete-btn,
+    .table-add-btn {
+      padding: 0.2rem 0.45rem;
+      min-width: 28px;
+      line-height: 1;
+      border-radius: 6px;
+    }
+    .table-icon-btn,
+    .row-delete-btn {
+      font-weight: 700;
+    }
+    .row-delete-cell,
+    .table-head-action {
+      text-align: center;
+      width: 10%;
+    }
+    .row-actions {
+      margin-top: 0.35rem;
+      justify-content: flex-end;
+    }
+    .load-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .load-mode-select {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.45rem 0.55rem;
+      font: inherit;
+      background: white;
+      color: var(--text);
+    }
     input[type="text"],
     input[type="number"],
     textarea {
@@ -321,23 +355,31 @@
         <p class="muted">Enter each pair (x, p(x)). x and p(x) can be decimals.</p>
         <table>
           <thead>
-            <tr><th style="width:50%">x</th><th style="width:50%">p(x)</th></tr>
+            <tr>
+              <th style="width:45%">x</th>
+              <th style="width:45%">p(x)</th>
+              <th class="table-head-action">
+                <button type="button" id="clearRowsBtn" class="table-icon-btn" aria-label="Clear all rows">x</button>
+              </th>
+            </tr>
           </thead>
           <tbody id="pmfTableBody"></tbody>
         </table>
         <div class="row-actions">
-          <button type="button" id="addRowBtn" class="btn-secondary">Add row</button>
-          <button type="button" id="removeRowBtn" class="btn-secondary">Remove last row</button>
-          <button type="button" id="clearRowsBtn" class="btn-secondary">Clear</button>
+          <button type="button" id="addRowBtn" class="btn-secondary table-add-btn" aria-label="Add row">+</button>
         </div>
       </div>
       <div id="textSection" class="input-section">
         <p class="muted">Paste one pair per line in either format: <code>x p</code> or <code>x, p</code>.</p>
         <textarea id="pmfTextarea" placeholder="0, 0.2&#10;1, 0.5&#10;2, 0.3"></textarea>
       </div>
-      <div class="controls">
-        <button type="button" id="loadExampleBtn" class="btn-secondary">Load example</button>
-        <button type="button" id="loadUniformBtn" class="btn-secondary">Load Uniform</button>
+      <div class="controls load-controls">
+        <button type="button" id="loadBtn" class="btn-secondary">Load</button>
+        <select id="loadModeSelect" class="load-mode-select" aria-label="Load mode">
+          <option value="uniform">Uniform</option>
+          <option value="random-probability">Random Probability</option>
+          <option value="random">Random</option>
+        </select>
       </div>
       <div id="errorBox" class="error-box" role="alert" aria-live="assertive"></div>
     </section>
@@ -488,11 +530,13 @@
         tr.innerHTML = `
           <td><input type="text" inputmode="decimal" class="x-input" value="${x}" placeholder="e.g. 2" /></td>
           <td><input type="text" inputmode="decimal" class="p-input" value="${p}" placeholder="e.g. 0.25" /></td>
+          <td class="row-delete-cell"><button type="button" class="row-delete-btn" aria-label="Delete row">x</button></td>
         `;
         tableBody.appendChild(tr);
       }
-      function clearRows() {
+      function clearRows(keepOneRow = true) {
         tableBody.innerHTML = '';
+        if (keepOneRow) addRow();
       }
       function ensureAtLeastRows(n) {
         while (tableBody.rows.length < n) addRow();
@@ -1085,35 +1129,87 @@
       function fillTextAreaFromRows(rows, probabilities, decimals = 6) {
         textArea.value = rows.map((pair, idx) => `${pair.xInput.value} ${probabilities[idx].toFixed(decimals)}`).join('\n');
       }
-      function loadExample() {
-        const rows = getAvailablePairs();
-        const decimals = 6;
-        rows.forEach((pair, idx) => {
-          pair.xInput.value = String(idx + 1);
-        });
-        const weights = rows.map(() => Math.random() + Number.EPSILON);
-        const weightSum = weights.reduce((acc, w) => acc + w, 0);
-        const rawProbabilities = weights.map(w => w / weightSum);
-        const probabilities = normalizedRoundedProbabilities(rawProbabilities, decimals);
-        rows.forEach((pair, idx) => {
-          pair.pInput.value = probabilities[idx].toFixed(decimals);
-        });
-        fillTextAreaFromRows(rows, probabilities, decimals);
-        showErrors([]);
-        parseAndUpdate();
+      function getLoadBounds() {
+        const minToken = variableMinInput.value.trim();
+        const maxToken = variableMaxInput.value.trim();
+        const minValue = minToken === '' ? null : Number(minToken);
+        const maxValue = maxToken === '' ? null : Number(maxToken);
+        return {
+          min: Number.isFinite(minValue) ? minValue : null,
+          max: Number.isFinite(maxValue) ? maxValue : null
+        };
       }
-      function loadUniform() {
+      function generateSequentialXValues(count, bounds) {
+        if (count <= 0) return [];
+        const { min, max } = bounds;
+        if (min != null && max != null) {
+          if (min > max) return [];
+          if (count === 1) return [Number(min.toFixed(6))];
+          const step = (max - min) / (count - 1);
+          return Array.from({ length: count }, (_, idx) => Number((min + step * idx).toFixed(6)));
+        }
+        if (min != null) {
+          return Array.from({ length: count }, (_, idx) => Number((min + idx).toFixed(6)));
+        }
+        if (max != null) {
+          const start = max - (count - 1);
+          return Array.from({ length: count }, (_, idx) => Number((start + idx).toFixed(6)));
+        }
+        return Array.from({ length: count }, (_, idx) => idx + 1);
+      }
+      function generateRandomXValues(count, bounds) {
+        if (count <= 0) return [];
+        const { min, max } = bounds;
+        if (min != null && max != null) {
+          if (min > max) return [];
+          const isIntegerBounds = Number.isInteger(min) && Number.isInteger(max);
+          if (isIntegerBounds) {
+            const range = max - min + 1;
+            if (range >= count && range > 0) {
+              const pool = Array.from({ length: range }, (_, idx) => min + idx);
+              for (let i = pool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [pool[i], pool[j]] = [pool[j], pool[i]];
+              }
+              return pool.slice(0, count).sort((a, b) => a - b);
+            }
+          }
+          return Array.from({ length: count }, () => Number((min + Math.random() * (max - min)).toFixed(6)));
+        }
+        if (min != null) {
+          return Array.from({ length: count }, (_, idx) => Number((min + Math.random() * Math.max(count, 10) + idx * 0.001).toFixed(6)));
+        }
+        if (max != null) {
+          return Array.from({ length: count }, (_, idx) => Number((max - Math.random() * Math.max(count, 10) - idx * 0.001).toFixed(6)));
+        }
+        const values = new Set();
+        while (values.size < count) values.add(Math.floor(Math.random() * 20) + 1);
+        return Array.from(values).sort((a, b) => a - b);
+      }
+      function loadByMode() {
         const rows = getAvailablePairs();
         const decimals = 6;
         const n = rows.length;
-        rows.forEach((pair, idx) => {
-          if (pair.xInput.value.trim() === '') {
-            pair.xInput.value = String(idx + 1);
-          }
-        });
-        const rawProbabilities = rows.map(() => 1 / n);
+        const mode = document.getElementById('loadModeSelect').value;
+        const bounds = getLoadBounds();
+        let xValues = [];
+        if (mode === 'random') xValues = generateRandomXValues(n, bounds);
+        else xValues = generateSequentialXValues(n, bounds);
+        if (xValues.length !== n) {
+          showErrors(['Cannot generate x values from the current min/max bounds.']);
+          parseAndUpdate();
+          return;
+        }
+        const rawProbabilities = mode === 'uniform'
+          ? rows.map(() => 1 / n)
+          : (() => {
+              const weights = rows.map(() => Math.random() + Number.EPSILON);
+              const weightSum = weights.reduce((acc, w) => acc + w, 0);
+              return weights.map(w => w / weightSum);
+            })();
         const probabilities = normalizedRoundedProbabilities(rawProbabilities, decimals);
         rows.forEach((pair, idx) => {
+          pair.xInput.value = String(xValues[idx]);
           pair.pInput.value = probabilities[idx].toFixed(decimals);
         });
         fillTextAreaFromRows(rows, probabilities, decimals);
@@ -1130,17 +1226,21 @@
         addRow();
         parseAndUpdate();
       });
-      document.getElementById('removeRowBtn').addEventListener('click', () => {
-        if (tableBody.lastElementChild) tableBody.removeChild(tableBody.lastElementChild);
-        parseAndUpdate();
-      });
       document.getElementById('clearRowsBtn').addEventListener('click', () => {
-        clearRows();
+        clearRows(true);
         parseAndUpdate();
       });
-      document.getElementById('loadExampleBtn').addEventListener('click', loadExample);
-      document.getElementById('loadUniformBtn').addEventListener('click', loadUniform);
+      document.getElementById('loadBtn').addEventListener('click', loadByMode);
       tableBody.addEventListener('input', parseAndUpdate);
+      tableBody.addEventListener('click', (evt) => {
+        const deleteBtn = evt.target.closest('.row-delete-btn');
+        if (!deleteBtn) return;
+        const row = deleteBtn.closest('tr');
+        if (!row) return;
+        row.remove();
+        if (!tableBody.rows.length) addRow();
+        parseAndUpdate();
+      });
       textArea.addEventListener('input', parseAndUpdate);
       function syncVariableInputs(fromSlider) {
         const source = fromSlider ? variableSlider : variableNumber;
