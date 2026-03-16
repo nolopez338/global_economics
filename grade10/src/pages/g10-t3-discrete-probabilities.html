@@ -334,24 +334,32 @@
 </head>
 <body class="theme-grade10">
   <div class="page term-layout">
-    <header class="header site-header content-card">
-      <a class="back-link page-link" href="../G10_T3.html">&larr; Back to pages</a>
+    <header class="site-header">
+      <a href="../G10_T3.html" class="page-link">&larr; Back to pages</a>
       <h1>Discrete Probability Distributions (PMF Explorer)</h1>
+      <p>Probability mass functions for discrete random variables, including support sets, expected value, and interactive PMF graph exploration.</p>
     </header>
-    <section class="card content-card">
-      <h2>Introduction</h2>
-      <p>
-        A <strong>discrete random variable</strong> takes separate countable values (for example 0, 1, 2, 3).
-        A <strong>probability mass function (PMF)</strong> tells us how likely each value is.
-      </p>
-      <p>For a valid PMF, two key properties must hold:</p>
-      <ul>
-        <li>Every probability is non-negative: <strong>p(x) &ge; 0</strong>.</li>
-        <li>The probabilities add to 1: <strong>&sum; p(x) = 1</strong>.</li>
-      </ul>
-      <div class="example-text">
-        <strong>Example:</strong> Suppose X is the number of correct answers out of 3 guesses.
-        One possible PMF is: p(0)=0.1, p(1)=0.3, p(2)=0.4, p(3)=0.2.
+    <section class="card content-card collapsible" id="introduction-section">
+      <h2>
+        <button class="collapse-toggle" type="button" aria-expanded="true" id="introduction-toggle" aria-controls="introduction-content">
+          <span class="toggle-label">Introduction</span>
+          <span class="toggle-icon" aria-hidden="true">−</span>
+        </button>
+      </h2>
+      <div class="collapsible-content" id="introduction-content" role="region" aria-labelledby="introduction-toggle">
+        <p>
+          A <strong>discrete random variable</strong> takes separate countable values (for example 0, 1, 2, 3).
+          A <strong>probability mass function (PMF)</strong> tells us how likely each value is.
+        </p>
+        <p>For a valid PMF, two key properties must hold:</p>
+        <ul>
+          <li>Every probability is non-negative: <strong>p(x) &ge; 0</strong>.</li>
+          <li>The probabilities add to 1: <strong>&sum; p(x) = 1</strong>.</li>
+        </ul>
+        <div class="example-text">
+          <strong>Example:</strong> Suppose X is the number of correct answers out of 3 guesses.
+          One possible PMF is: p(0)=0.1, p(1)=0.3, p(2)=0.4, p(3)=0.2.
+        </div>
       </div>
     </section>
     <section class="card content-card">
@@ -433,6 +441,8 @@
       const textArea = document.getElementById('pmfTextarea');
       const errorBox = document.getElementById('errorBox');
       const resultBox = document.getElementById('resultBox');
+      const introductionToggle = document.getElementById('introduction-toggle');
+      const introductionContent = document.getElementById('introduction-content');
       const computedResultsToggle = document.getElementById('computed-results-toggle');
       const computedResultsContent = document.getElementById('computed-results-content');
       const canvas = document.getElementById('pmfCanvas');
@@ -519,17 +529,21 @@
           if (next >= max) stopVariableAnimation();
         }, 70);
       }
-      function setComputedResultsExpanded(expanded) {
-        computedResultsToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-        const icon = computedResultsToggle.querySelector('.toggle-icon');
+      function setCollapsibleExpanded(toggleButton, contentElement, expanded) {
+        toggleButton.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        const icon = toggleButton.querySelector('.toggle-icon');
         if (icon) icon.textContent = expanded ? '−' : '+';
-        computedResultsContent.hidden = !expanded;
+        contentElement.hidden = !expanded;
       }
-      computedResultsToggle.addEventListener('click', function () {
-        const isExpanded = computedResultsToggle.getAttribute('aria-expanded') === 'true';
-        setComputedResultsExpanded(!isExpanded);
-      });
-      setComputedResultsExpanded(false);
+      function bindCollapsible(toggleButton, contentElement, startsExpanded) {
+        toggleButton.addEventListener('click', function () {
+          const isExpanded = toggleButton.getAttribute('aria-expanded') === 'true';
+          setCollapsibleExpanded(toggleButton, contentElement, !isExpanded);
+        });
+        setCollapsibleExpanded(toggleButton, contentElement, startsExpanded);
+      }
+      bindCollapsible(introductionToggle, introductionContent, true);
+      bindCollapsible(computedResultsToggle, computedResultsContent, false);
       function formatNum(n, digits = 6) {
         if (!Number.isFinite(n)) return '—';
         return Number(n).toFixed(digits).replace(/\.0+$/, '').replace(/(\.\d*?)0+$/, '$1');
