@@ -230,32 +230,44 @@
       font-size: 1rem;
       margin-top: 0.2rem;
     }
+    .variable-controls-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
     .variable-controls-row {
       display: grid;
-      grid-template-columns: auto auto minmax(180px, 1fr) auto;
+      grid-template-columns: auto auto auto minmax(180px, 1fr) auto;
       grid-template-rows: auto auto;
       gap: 0.45rem;
       align-items: center;
     }
-    .variable-controls-row #playVariableBtn {
+    .variable-symbol-label {
       grid-column: 1;
       grid-row: 1;
+      font-weight: 700;
+      min-width: 20px;
+      text-align: center;
     }
-    .variable-controls-row #variableMinInput {
+    .variable-controls-row .variable-play-btn {
       grid-column: 2;
       grid-row: 1;
     }
-    .variable-controls-row #variableSlider {
+    .variable-controls-row .variable-bound-input[data-role="min"] {
       grid-column: 3;
+      grid-row: 1;
+    }
+    .variable-controls-row .variable-slider {
+      grid-column: 4;
       grid-row: 1;
       width: 100%;
     }
-    .variable-controls-row #variableMaxInput {
-      grid-column: 4;
+    .variable-controls-row .variable-bound-input[data-role="max"] {
+      grid-column: 5;
       grid-row: 1;
     }
-    .variable-controls-row #variableNumber {
-      grid-column: 3;
+    .variable-controls-row .variable-current-input {
+      grid-column: 4;
       grid-row: 2;
     }
     .variable-bound-input {
@@ -432,13 +444,7 @@
     <section class="card content-card">
       <h2>PMF Graph</h2>
       <div id="variableControlBox" class="result-box" style="display:none; margin-bottom:0.75rem;">
-        <div class="variable-controls-row">
-          <button type="button" id="playVariableBtn" class="btn-secondary variable-play-btn" aria-label="Play variable animation">▶</button>
-          <input type="number" id="variableMinInput" step="0.1" value="-5" class="variable-bound-input" aria-label="Minimum slider value">
-          <input type="range" id="variableSlider" min="-5" max="5" step="0.1" value="1">
-          <input type="number" id="variableMaxInput" step="0.1" value="5" class="variable-bound-input" aria-label="Maximum slider value">
-          <input type="number" id="variableNumber" min="-5" max="5" step="0.1" value="1" class="variable-current-input" aria-label="Current variable value">
-        </div>
+        <div id="variableControlsList" class="variable-controls-list"></div>
       </div>
       <div class="canvas-wrap">
         <canvas id="pmfCanvas"></canvas>
@@ -459,11 +465,7 @@
       const computedResultsContent = document.getElementById('computed-results-content');
       const canvas = document.getElementById('pmfCanvas');
       const variableControlBox = document.getElementById('variableControlBox');
-      const playVariableBtn = document.getElementById('playVariableBtn');
-      const variableMinInput = document.getElementById('variableMinInput');
-      const variableSlider = document.getElementById('variableSlider');
-      const variableNumber = document.getElementById('variableNumber');
-      const variableMaxInput = document.getElementById('variableMaxInput');
+      const variableControlsList = document.getElementById('variableControlsList');
       const tooltip = document.getElementById('tooltip');
       const ctx = canvas.getContext('2d');
       let showExpectedValueStem = false;
@@ -474,54 +476,88 @@
       let dragRowIndex = -1;
       let dragScale = null;
       let resizeTimer = null;
-      let activeVariableName = null;
-      let variableValue = 1;
-      let variableAnimationFrameId = null;
-      let variableAnimationDirection = 1;
-      let variableAnimationLastTimestamp = null;
-      function setVariablePlayState(isPlaying) {
-        playVariableBtn.textContent = isPlaying ? '■' : '▶';
-        playVariableBtn.setAttribute('aria-label', isPlaying ? 'Stop variable animation' : 'Play variable animation');
+      const DEFAULT_VARIABLE_SETTINGS = { value: 1, min: -5, max: 5, step: 0.1 };
+      let variableStateByName = {};
+      let variableControlElementsByName = {};
+      let variableAnimationStateByName = {};
+      function createDefaultVariableState(previousState) {
+        return {
+          value: previousState && Number.isFinite(previousState.value) ? previousState.value : DEFAULT_VARIABLE_SETTINGS.value,
+          min: previousState && Number.isFinite(previousState.min) ? previousState.min : DEFAULT_VARIABLE_SETTINGS.min,
+          max: previousState && Number.isFinite(previousState.max) ? previousState.max : DEFAULT_VARIABLE_SETTINGS.max,
+          step: previousState && Number.isFinite(previousState.step) ? previousState.step : DEFAULT_VARIABLE_SETTINGS.step
+        };
       }
-      function isVariableAnimationRunning() {
-        return variableAnimationFrameId !== null;
+      function setVariablePlayState(variableName, isPlaying) {
+        const controls = variableControlElementsByName[variableName];
+        if (!controls) return;
+        controls.playButton.textContent = isPlaying ? '■' : '▶';
+        controls.playButton.setAttribute('aria-label', isPlaying ? `Stop ${variableName} animation` : `Play ${variableName} animation`);
       }
-      function stopVariableAnimation() {
-        if (!isVariableAnimationRunning()) return;
-        cancelAnimationFrame(variableAnimationFrameId);
-        variableAnimationFrameId = null;
-        variableAnimationLastTimestamp = null;
-        setVariablePlayState(isVariableAnimationRunning());
+      function isVariableAnimationRunning(variableName) {
+        const animation = variableAnimationStateByName[variableName];
+        return Boolean(animation && animation.frameId !== null);
       }
-      function setVariableValue(next, shouldParse = true) {
-        const min = Number(variableSlider.min);
-        const max = Number(variableSlider.max);
+      function stopVariableAnimation(variableName) {
+        const animation = variableAnimationStateByName[variableName];
+        if (!animation || animation.frameId === null) return;
+        cancelAnimationFrame(animation.frameId);
+        animation.frameId = null;
+        animation.lastTimestamp = null;
+        setVariablePlayState(variableName, false);
+      }
+      function stopRemovedVariableAnimations(activeVariables) {
+        Object.keys(variableAnimationStateByName).forEach((variableName) => {
+          if (!activeVariables.has(variableName)) {
+            stopVariableAnimation(variableName);
+            delete variableAnimationStateByName[variableName];
+          }
+        });
+      }
+      function updateVariableRowDisplay(variableName) {
+        const state = variableStateByName[variableName];
+        const controls = variableControlElementsByName[variableName];
+        if (!state || !controls) return;
+        controls.slider.min = String(state.min);
+        controls.slider.max = String(state.max);
+        controls.slider.step = String(state.step);
+        controls.slider.value = String(state.value);
+        controls.currentInput.min = String(state.min);
+        controls.currentInput.max = String(state.max);
+        controls.currentInput.step = String(state.step);
+        controls.currentInput.value = String(state.value);
+        controls.minInput.step = String(state.step);
+        controls.maxInput.step = String(state.step);
+        controls.minInput.value = String(state.min);
+        controls.maxInput.value = String(state.max);
+      }
+      function setVariableValue(variableName, next, shouldParse = true) {
+        const state = variableStateByName[variableName];
+        if (!state) return;
         let value = Number(next);
-        if (!Number.isFinite(value)) value = variableValue;
-        value = Math.max(min, Math.min(max, value));
-        variableValue = value;
-        variableSlider.value = String(value);
-        variableNumber.value = String(value);
+        if (!Number.isFinite(value)) value = state.value;
+        value = Math.max(state.min, Math.min(state.max, value));
+        state.value = value;
+        updateVariableRowDisplay(variableName);
         if (shouldParse) parseAndUpdate();
       }
-      function syncVariableBounds(fromMinInput) {
-        const previousMin = Number(variableSlider.min);
-        const previousMax = Number(variableSlider.max);
-        let nextMin = Number(variableMinInput.value);
-        let nextMax = Number(variableMaxInput.value);
+      function syncVariableBounds(variableName, fromMinInput) {
+        const state = variableStateByName[variableName];
+        const controls = variableControlElementsByName[variableName];
+        if (!state || !controls) return;
+        const previousMin = state.min;
+        const previousMax = state.max;
+        let nextMin = Number(controls.minInput.value);
+        let nextMax = Number(controls.maxInput.value);
         if (!Number.isFinite(nextMin)) nextMin = previousMin;
         if (!Number.isFinite(nextMax)) nextMax = previousMax;
         if (nextMin >= nextMax) {
           if (fromMinInput) nextMin = previousMin;
           else nextMax = previousMax;
         }
-        variableMinInput.value = String(nextMin);
-        variableMaxInput.value = String(nextMax);
-        variableSlider.min = String(nextMin);
-        variableSlider.max = String(nextMax);
-        variableNumber.min = String(nextMin);
-        variableNumber.max = String(nextMax);
-        setVariableValue(variableValue);
+        state.min = nextMin;
+        state.max = nextMax;
+        setVariableValue(variableName, state.value);
       }
       function computeVariableAnimationSpeed(value, min, max) {
         const range = max - min;
@@ -534,43 +570,51 @@
         const speedFactor = 1 - (normalizedDistance * normalizedDistance);
         return minSpeed + ((maxSpeed - minSpeed) * speedFactor);
       }
-      function stepVariableAnimation(timestamp) {
-        if (!isVariableAnimationRunning()) return;
-        const min = Number(variableSlider.min);
-        const max = Number(variableSlider.max);
+      function stepVariableAnimation(variableName, timestamp) {
+        if (!isVariableAnimationRunning(variableName)) return;
+        const state = variableStateByName[variableName];
+        const animation = variableAnimationStateByName[variableName];
+        if (!state || !animation) return;
+        const min = state.min;
+        const max = state.max;
         if (!(max > min)) {
-          stopVariableAnimation();
+          stopVariableAnimation(variableName);
           return;
         }
-        if (variableAnimationLastTimestamp === null) {
-          variableAnimationLastTimestamp = timestamp;
-          variableAnimationFrameId = requestAnimationFrame(stepVariableAnimation);
+        if (animation.lastTimestamp === null) {
+          animation.lastTimestamp = timestamp;
+          animation.frameId = requestAnimationFrame((nextTimestamp) => stepVariableAnimation(variableName, nextTimestamp));
           return;
         }
-        const elapsedSeconds = Math.min((timestamp - variableAnimationLastTimestamp) / 1000, 0.08);
-        variableAnimationLastTimestamp = timestamp;
-        const speed = computeVariableAnimationSpeed(variableValue, min, max);
-        let nextValue = variableValue + (variableAnimationDirection * speed * elapsedSeconds);
+        const elapsedSeconds = Math.min((timestamp - animation.lastTimestamp) / 1000, 0.08);
+        animation.lastTimestamp = timestamp;
+        const speed = computeVariableAnimationSpeed(state.value, min, max);
+        let nextValue = state.value + (animation.direction * speed * elapsedSeconds);
         if (nextValue >= max) {
           nextValue = max;
-          variableAnimationDirection = -1;
+          animation.direction = -1;
         } else if (nextValue <= min) {
           nextValue = min;
-          variableAnimationDirection = 1;
+          animation.direction = 1;
         }
-        setVariableValue(nextValue);
-        variableAnimationFrameId = requestAnimationFrame(stepVariableAnimation);
+        setVariableValue(variableName, nextValue);
+        animation.frameId = requestAnimationFrame((nextTimestamp) => stepVariableAnimation(variableName, nextTimestamp));
       }
-      function startVariableAnimation() {
-        if (!activeVariableName || isVariableAnimationRunning()) return;
-        const min = Number(variableSlider.min);
-        const max = Number(variableSlider.max);
+      function startVariableAnimation(variableName) {
+        const state = variableStateByName[variableName];
+        if (!state || isVariableAnimationRunning(variableName)) return;
+        const min = state.min;
+        const max = state.max;
         if (!(max > min)) return;
-        if (variableValue <= min) variableAnimationDirection = 1;
-        else if (variableValue >= max) variableAnimationDirection = -1;
-        setVariablePlayState(true);
-        variableAnimationLastTimestamp = null;
-        variableAnimationFrameId = requestAnimationFrame(stepVariableAnimation);
+        if (!variableAnimationStateByName[variableName]) {
+          variableAnimationStateByName[variableName] = { frameId: null, direction: 1, lastTimestamp: null };
+        }
+        const animation = variableAnimationStateByName[variableName];
+        if (state.value <= min) animation.direction = 1;
+        else if (state.value >= max) animation.direction = -1;
+        setVariablePlayState(variableName, true);
+        animation.lastTimestamp = null;
+        animation.frameId = requestAnimationFrame((timestamp) => stepVariableAnimation(variableName, timestamp));
       }
       function setCollapsibleExpanded(toggleButton, contentElement, expanded) {
         toggleButton.setAttribute('aria-expanded', expanded ? 'true' : 'false');
@@ -657,72 +701,98 @@
         if (!variableNames.length) {
           return { kind: 'invalid', error: 'invalid numeric expression.' };
         }
-        if (variableNames.length > 1) {
-          return { kind: 'invalid', error: `multiple variables (${variableNames.join(', ')}) in one expression.` };
-        }
-        const variable = variableNames[0];
-        const signed = cleaned[0] === '-' || cleaned[0] === '+' ? cleaned : `+${cleaned}`;
-        const termMatches = signed.match(/[+-][^+-]+/g);
-        if (!termMatches || !termMatches.length) {
-          return { kind: 'invalid', error: 'invalid polynomial syntax.' };
-        }
-        const terms = [];
-        for (const segment of termMatches) {
-          const sign = segment[0] === '-' ? -1 : 1;
-          const term = segment.slice(1);
-          if (!term) return { kind: 'invalid', error: 'invalid term in expression.' };
-          if (/[+\-]/.test(term)) return { kind: 'invalid', error: 'invalid polynomial syntax.' };
-          if (term.includes(variable)) {
-            const pattern = new RegExp(`^(?:(\\d+(?:\\.\\d+)?(?:e[+-]?\\d+)?)\\*?)?${variable}(?:\\^(\\d+))?$`, 'i');
-            const m = term.match(pattern) || term.match(new RegExp(`^(\\d+(?:\\.\\d+)?(?:e[+-]?\\d+)?)${variable}(?:\\^(\\d+))?$`, 'i'));
-            if (!m) {
-              return { kind: 'invalid', error: `unsupported term "${segment}".` };
-            }
-            const coeff = m[1] ? Number(m[1]) : 1;
-            const powRaw = m[2] == null ? '1' : m[2];
-            if (!/^\d+$/.test(powRaw)) return { kind: 'invalid', error: 'exponents must be nonnegative integers.' };
-            const power = Number(powRaw);
-            if (!Number.isInteger(power) || power < 0) return { kind: 'invalid', error: 'negative or fractional exponents are not allowed.' };
-            if (!Number.isFinite(coeff)) return { kind: 'invalid', error: 'invalid coefficient.' };
-            terms.push({ coefficient: sign * coeff, power });
-          } else {
-            const n = parseNumericToken(term);
-            if (!n.ok) return { kind: 'invalid', error: `invalid constant term "${segment}".` };
-            terms.push({ coefficient: sign * n.value, power: 0 });
-          }
-        }
-        return { kind: 'polynomial', variable, terms, raw: expression, label };
+        const expressionForEval = cleaned
+          .replace(/(\d)([A-Za-z])/g, '$1*$2')
+          .replace(/([A-Za-z])(\d)/g, '$1*$2')
+          .replace(/\^/g, '**');
+        return { kind: 'symbolic', variables: variableNames, expressionForEval, raw: expression, label };
       }
-      function evaluateParsedExpression(parsed, v) {
+      function evaluateParsedExpression(parsed, variableValuesMap) {
         if (parsed.kind === 'numeric') return { ok: true, value: parsed.value };
-        if (parsed.kind !== 'polynomial') return { ok: false, error: parsed.error || 'invalid expression' };
-        let sum = 0;
-        for (const t of parsed.terms) {
-          const val = t.coefficient * Math.pow(v, t.power);
-          if (!Number.isFinite(val)) return { ok: false, error: 'failed evaluation.' };
-          sum += val;
+        if (parsed.kind !== 'symbolic') return { ok: false, error: parsed.error || 'invalid expression' };
+        const args = [];
+        for (const variableName of parsed.variables) {
+          const value = variableValuesMap[variableName];
+          if (!Number.isFinite(value)) {
+            return { ok: false, error: `missing value for variable "${variableName}"` };
+          }
+          args.push(value);
         }
-        if (!Number.isFinite(sum)) return { ok: false, error: 'failed evaluation.' };
-        return { ok: true, value: sum };
+        try {
+          const fn = Function(...parsed.variables, '"use strict"; return (' + parsed.expressionForEval + ');');
+          const value = fn(...args);
+          if (!Number.isFinite(value)) return { ok: false, error: 'failed evaluation.' };
+          return { ok: true, value };
+        } catch (error) {
+          return { ok: false, error: 'failed evaluation.' };
+        }
       }
-      function updateVariableControls(variableName, forceHide = false) {
-        if (forceHide || !variableName) {
-          stopVariableAnimation();
+      function renderVariableControls(variableNames) {
+        const sortedVariableNames = variableNames.slice().sort();
+        const activeSet = new Set(sortedVariableNames);
+        stopRemovedVariableAnimations(activeSet);
+        const nextState = {};
+        sortedVariableNames.forEach((variableName) => {
+          nextState[variableName] = createDefaultVariableState(variableStateByName[variableName]);
+          nextState[variableName].value = Math.max(nextState[variableName].min, Math.min(nextState[variableName].max, nextState[variableName].value));
+        });
+        variableStateByName = nextState;
+        variableControlElementsByName = {};
+        variableControlsList.innerHTML = '';
+        if (!sortedVariableNames.length) {
           variableControlBox.style.display = 'none';
-          activeVariableName = null;
           return;
         }
-        activeVariableName = variableName;
-        variableSlider.value = String(variableValue);
-        variableNumber.value = String(variableValue);
-        variableMinInput.value = variableSlider.min;
-        variableMaxInput.value = variableSlider.max;
-        setVariablePlayState(isVariableAnimationRunning());
         variableControlBox.style.display = 'block';
+        sortedVariableNames.forEach((variableName) => {
+          const row = document.createElement('div');
+          row.className = 'variable-controls-row';
+          row.dataset.variable = variableName;
+          row.innerHTML = `
+            <span class="variable-symbol-label">${variableName}</span>
+            <button type="button" class="btn-secondary variable-play-btn" data-role="play">▶</button>
+            <input type="number" step="0.1" class="variable-bound-input" data-role="min" aria-label="Minimum ${variableName} value">
+            <input type="range" class="variable-slider" data-role="slider" aria-label="${variableName} slider">
+            <input type="number" step="0.1" class="variable-bound-input" data-role="max" aria-label="Maximum ${variableName} value">
+            <input type="number" class="variable-current-input" data-role="current" aria-label="Current ${variableName} value">
+          `;
+          variableControlsList.appendChild(row);
+          const controls = {
+            row,
+            playButton: row.querySelector('[data-role="play"]'),
+            minInput: row.querySelector('[data-role="min"]'),
+            slider: row.querySelector('[data-role="slider"]'),
+            maxInput: row.querySelector('[data-role="max"]'),
+            currentInput: row.querySelector('[data-role="current"]')
+          };
+          variableControlElementsByName[variableName] = controls;
+          controls.playButton.addEventListener('click', () => {
+            if (isVariableAnimationRunning(variableName)) stopVariableAnimation(variableName);
+            else startVariableAnimation(variableName);
+          });
+          controls.slider.addEventListener('input', () => {
+            stopVariableAnimation(variableName);
+            setVariableValue(variableName, Number(controls.slider.value));
+          });
+          controls.currentInput.addEventListener('input', () => {
+            stopVariableAnimation(variableName);
+            setVariableValue(variableName, Number(controls.currentInput.value));
+          });
+          controls.minInput.addEventListener('input', () => {
+            stopVariableAnimation(variableName);
+            syncVariableBounds(variableName, true);
+          });
+          controls.maxInput.addEventListener('input', () => {
+            stopVariableAnimation(variableName);
+            syncVariableBounds(variableName, false);
+          });
+          updateVariableRowDisplay(variableName);
+          setVariablePlayState(variableName, isVariableAnimationRunning(variableName));
+        });
       }
       function collectDetectedVariables(parsedX, parsedP, detectedVariables) {
-        if (parsedX.kind === 'polynomial') detectedVariables.add(parsedX.variable);
-        if (parsedP.kind === 'polynomial') detectedVariables.add(parsedP.variable);
+        if (parsedX.kind === 'symbolic') parsedX.variables.forEach(v => detectedVariables.add(v));
+        if (parsedP.kind === 'symbolic') parsedP.variables.forEach(v => detectedVariables.add(v));
       }
       function parseEntries(sourceItems) {
         const issues = [];
@@ -743,21 +813,26 @@
         });
         return { parsedEntries, issues, detectedVariables };
       }
-      function evaluateEntries(parsedEntries, issues, canEvaluateVariableExpressions) {
+      function getVariableValuesMap() {
+        const values = {};
+        Object.keys(variableStateByName).forEach((variableName) => {
+          values[variableName] = variableStateByName[variableName].value;
+        });
+        return values;
+      }
+      function evaluateEntries(parsedEntries, issues) {
         const entries = [];
         const seenX = new Map();
+        const variableValuesMap = getVariableValuesMap();
         parsedEntries.forEach((entry) => {
           const { sourceLabel, rowIndex, parsedX, parsedP, rawX } = entry;
           if (parsedX.kind === 'invalid' || parsedP.kind === 'invalid') return;
-          if (!canEvaluateVariableExpressions && (parsedX.kind === 'polynomial' || parsedP.kind === 'polynomial')) {
-            return;
-          }
-          const evaluatedX = evaluateParsedExpression(parsedX, variableValue);
+          const evaluatedX = evaluateParsedExpression(parsedX, variableValuesMap);
           if (!evaluatedX.ok) {
             issues.push(`${sourceLabel}: could not evaluate x (${evaluatedX.error}).`);
             return;
           }
-          const evaluatedP = evaluateParsedExpression(parsedP, variableValue);
+          const evaluatedP = evaluateParsedExpression(parsedP, variableValuesMap);
           if (!evaluatedP.ok) {
             issues.push(`${sourceLabel}: could not evaluate p(x) (${evaluatedP.error}).`);
             return;
@@ -1054,14 +1129,8 @@
         updateBoundaryRowHighlight();
         const parsed = getMode() === 'table' ? parseTableInput() : parseTextInput();
         const variables = Array.from(parsed.detectedVariables).sort();
-        const hasSingleVariable = variables.length === 1;
-        if (variables.length > 1) {
-          parsed.issues.push(`Multiple variables detected across x and p(x): ${variables.join(', ')}. Use one variable symbol only.`);
-        }
-        const chosenVariable = hasSingleVariable ? variables[0] : null;
-        updateVariableControls(chosenVariable, !hasSingleVariable);
-
-        const evaluatedEntries = evaluateEntries(parsed.parsedEntries, parsed.issues, hasSingleVariable || variables.length === 0);
+        renderVariableControls(variables);
+        const evaluatedEntries = evaluateEntries(parsed.parsedEntries, parsed.issues);
         const validated = validateAndNormalize(evaluatedEntries, parsed.issues);
         if (!validated.data.length) {
           validated.issues.push('No plottable numeric pairs were found. The graph shows axes only.');
@@ -1372,32 +1441,6 @@
         parseAndUpdate();
       });
       textArea.addEventListener('input', parseAndUpdate);
-      function syncVariableInputs(fromSlider) {
-        const source = fromSlider ? variableSlider : variableNumber;
-        let next = Number(source.value);
-        if (!Number.isFinite(next)) next = variableValue;
-        setVariableValue(next);
-      }
-      playVariableBtn.addEventListener('click', () => {
-        if (isVariableAnimationRunning()) stopVariableAnimation();
-        else startVariableAnimation();
-      });
-      variableSlider.addEventListener('input', () => {
-        stopVariableAnimation();
-        syncVariableInputs(true);
-      });
-      variableNumber.addEventListener('input', () => {
-        stopVariableAnimation();
-        syncVariableInputs(false);
-      });
-      variableMinInput.addEventListener('input', () => {
-        stopVariableAnimation();
-        syncVariableBounds(true);
-      });
-      variableMaxInput.addEventListener('input', () => {
-        stopVariableAnimation();
-        syncVariableBounds(false);
-      });
       canvas.addEventListener('mousemove', updateTooltip);
       canvas.addEventListener('mouseleave', hideTooltip);
       canvas.addEventListener('mousedown', (evt) => {
