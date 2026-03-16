@@ -458,16 +458,22 @@
       let resizeTimer = null;
       let activeVariableName = null;
       let variableValue = 1;
-      let variableAnimationTimer = null;
+      let variableAnimationFrameId = null;
+      let variableAnimationDirection = 1;
+      let variableAnimationLastTimestamp = null;
       function setVariablePlayState(isPlaying) {
         playVariableBtn.textContent = isPlaying ? '■' : '▶';
         playVariableBtn.setAttribute('aria-label', isPlaying ? 'Stop variable animation' : 'Play variable animation');
       }
+      function isVariableAnimationRunning() {
+        return variableAnimationFrameId !== null;
+      }
       function stopVariableAnimation() {
-        if (!variableAnimationTimer) return;
-        clearInterval(variableAnimationTimer);
-        variableAnimationTimer = null;
-        setVariablePlayState(false);
+        if (!isVariableAnimationRunning()) return;
+        cancelAnimationFrame(variableAnimationFrameId);
+        variableAnimationFrameId = null;
+        variableAnimationLastTimestamp = null;
+        setVariablePlayState(isVariableAnimationRunning());
       }
       function setVariableValue(next, shouldParse = true) {
         const min = Number(variableSlider.min);
@@ -499,24 +505,54 @@
         variableNumber.max = String(nextMax);
         setVariableValue(variableValue);
       }
-      function startVariableAnimation() {
-        if (!activeVariableName || variableAnimationTimer) return;
+      function computeVariableAnimationSpeed(value, min, max) {
+        const range = max - min;
+        if (!(range > 0)) return 0;
+        const midpoint = (min + max) / 2;
+        const halfRange = range / 2;
+        const normalizedDistance = Math.min(1, Math.abs(value - midpoint) / halfRange);
+        const minSpeed = range * 0.18;
+        const maxSpeed = range * 0.9;
+        const speedFactor = 1 - (normalizedDistance * normalizedDistance);
+        return minSpeed + ((maxSpeed - minSpeed) * speedFactor);
+      }
+      function stepVariableAnimation(timestamp) {
+        if (!isVariableAnimationRunning()) return;
         const min = Number(variableSlider.min);
         const max = Number(variableSlider.max);
-        const step = Math.abs(Number(variableSlider.step)) || 0.1;
-        if (variableValue < min) setVariableValue(min, false);
+        if (!(max > min)) {
+          stopVariableAnimation();
+          return;
+        }
+        if (variableAnimationLastTimestamp === null) {
+          variableAnimationLastTimestamp = timestamp;
+          variableAnimationFrameId = requestAnimationFrame(stepVariableAnimation);
+          return;
+        }
+        const elapsedSeconds = Math.min((timestamp - variableAnimationLastTimestamp) / 1000, 0.08);
+        variableAnimationLastTimestamp = timestamp;
+        const speed = computeVariableAnimationSpeed(variableValue, min, max);
+        let nextValue = variableValue + (variableAnimationDirection * speed * elapsedSeconds);
+        if (nextValue >= max) {
+          nextValue = max;
+          variableAnimationDirection = -1;
+        } else if (nextValue <= min) {
+          nextValue = min;
+          variableAnimationDirection = 1;
+        }
+        setVariableValue(nextValue);
+        variableAnimationFrameId = requestAnimationFrame(stepVariableAnimation);
+      }
+      function startVariableAnimation() {
+        if (!activeVariableName || isVariableAnimationRunning()) return;
+        const min = Number(variableSlider.min);
+        const max = Number(variableSlider.max);
+        if (!(max > min)) return;
+        if (variableValue <= min) variableAnimationDirection = 1;
+        else if (variableValue >= max) variableAnimationDirection = -1;
         setVariablePlayState(true);
-        variableAnimationTimer = setInterval(() => {
-          const remaining = max - variableValue;
-          if (remaining <= 0) {
-            setVariableValue(max);
-            stopVariableAnimation();
-            return;
-          }
-          const next = remaining <= step ? max : variableValue + step;
-          setVariableValue(next);
-          if (next >= max) stopVariableAnimation();
-        }, 70);
+        variableAnimationLastTimestamp = null;
+        variableAnimationFrameId = requestAnimationFrame(stepVariableAnimation);
       }
       function setCollapsibleExpanded(toggleButton, contentElement, expanded) {
         toggleButton.setAttribute('aria-expanded', expanded ? 'true' : 'false');
@@ -663,7 +699,7 @@
         variableNumber.value = String(variableValue);
         variableMinInput.value = variableSlider.min;
         variableMaxInput.value = variableSlider.max;
-        setVariablePlayState(false);
+        setVariablePlayState(isVariableAnimationRunning());
         variableControlBox.style.display = 'block';
       }
       function collectDetectedVariables(parsedX, parsedP, detectedVariables) {
@@ -1325,7 +1361,7 @@
         setVariableValue(next);
       }
       playVariableBtn.addEventListener('click', () => {
-        if (variableAnimationTimer) stopVariableAnimation();
+        if (isVariableAnimationRunning()) stopVariableAnimation();
         else startVariableAnimation();
       });
       variableSlider.addEventListener('input', () => {
