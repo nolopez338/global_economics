@@ -631,6 +631,24 @@
       let variableControlElementsByName = {};
       let variableAnimationStateByName = {};
       let currentFixedPlayYLimits = null;
+      let freezeErrorBoxDuringPlay = false;
+      let errorBoxRefreshQueued = false;
+      function queueErrorBoxRefreshAfterPlay() {
+        if (errorBoxRefreshQueued) return;
+        errorBoxRefreshQueued = true;
+        setTimeout(() => {
+          errorBoxRefreshQueued = false;
+          parseAndUpdate();
+        }, 0);
+      }
+      function syncErrorBoxFreezeState() {
+        const shouldFreeze = isAnyVariableAnimating();
+        const wasFrozen = freezeErrorBoxDuringPlay;
+        freezeErrorBoxDuringPlay = shouldFreeze;
+        if (wasFrozen && !shouldFreeze) {
+          queueErrorBoxRefreshAfterPlay();
+        }
+      }
       function createDefaultVariableState(previousState) {
         return {
           value: previousState && Number.isFinite(previousState.value) ? previousState.value : DEFAULT_VARIABLE_SETTINGS.value,
@@ -667,6 +685,7 @@
         animation.frameId = null;
         animation.lastTimestamp = null;
         setVariablePlayState(variableName, false);
+        syncErrorBoxFreezeState();
         if (!isAnyVariableAnimating()) {
           clearFixedPlayYLimits();
           redrawPMF();
@@ -840,6 +859,7 @@
           }
         }
         setVariablePlayState(variableName, true);
+        syncErrorBoxFreezeState();
         animation.lastTimestamp = null;
         redrawPMF();
         animation.frameId = requestAnimationFrame((timestamp) => stepVariableAnimation(variableName, timestamp));
@@ -1162,6 +1182,7 @@
         return { ok: issues.length === 0, issues, data: sorted };
       }
       function showErrors(issues) {
+        if (freezeErrorBoxDuringPlay) return;
         if (!issues.length) {
           errorBox.style.display = 'none';
           errorBox.innerHTML = '';
