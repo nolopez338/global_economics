@@ -187,21 +187,48 @@
       font-size: 1rem;
       margin-top: 0.2rem;
     }
-    .ev-graph {
-      margin-top: 0.75rem;
-      background: #fff;
+    .results-stack {
+      margin-top: 0.5rem;
       border: 1px solid #a7f3d0;
       border-radius: 8px;
-      padding: 0.5rem;
+      overflow: hidden;
+      background: #ffffff;
     }
-    .ev-graph h3 {
-      margin: 0 0 0.4rem;
-      font-size: 0.98rem;
+    .result-row {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 0.7rem;
+      border-top: 1px solid #d1fae5;
     }
-    #evCanvas {
-      width: 100%;
-      height: 140px;
-      display: block;
+    .result-row:first-child { border-top: none; }
+    .result-row .label {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .result-row .value {
+      font-weight: 700;
+      text-align: right;
+      word-break: break-word;
+    }
+    .result-row-toggle {
+      justify-content: flex-start;
+    }
+    .toggle-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: #374151;
+    }
+    @media (max-width: 560px) {
+      .result-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .result-row .value { text-align: left; }
     }
     .canvas-wrap {
       position: relative;
@@ -339,8 +366,7 @@
       const variableNumber = document.getElementById('variableNumber');
       const tooltip = document.getElementById('tooltip');
       const ctx = canvas.getContext('2d');
-      let evCanvas = null;
-      let evCtx = null;
+      let showExpectedValueStem = false;
       let currentData = [];
       let pointMeta = [];
       let hoveredIndex = -1;
@@ -635,73 +661,6 @@
         const ex = data.reduce((acc, d) => acc + d.x * d.p, 0);
         return { sumP, ex };
       }
-      function setupEvCanvas() {
-        if (!evCanvas) return { width: 0, height: 0 };
-        const dpr = window.devicePixelRatio || 1;
-        const rect = evCanvas.getBoundingClientRect();
-        const cssW = Math.max(260, Math.floor(rect.width));
-        const cssH = Math.max(120, Math.floor(rect.height));
-        evCanvas.width = Math.floor(cssW * dpr);
-        evCanvas.height = Math.floor(cssH * dpr);
-        evCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        return { width: cssW, height: cssH };
-      }
-      function renderExpectedValueGraph(data, ex) {
-        if (!evCanvas || !evCtx) return;
-        const { width, height } = setupEvCanvas();
-        evCtx.clearRect(0, 0, width, height);
-        if (!data.length) {
-          evCtx.fillStyle = '#6b7280';
-          evCtx.font = '14px Arial';
-          evCtx.fillText('Add points to view expected value on the number line.', 10, 24);
-          return;
-        }
-        const xs = data.map(d => d.x);
-        const xmin = Math.min(...xs);
-        const xmax = Math.max(...xs);
-        const axisMin = xmin - 1;
-        const axisMax = xmax + 1;
-        const range = Math.max(1e-9, axisMax - axisMin);
-        const m = { left: 24, right: 24, top: 26, bottom: 34 };
-        const axisY = Math.floor((height - m.bottom + m.top) / 2);
-        const innerW = width - m.left - m.right;
-        const xScale = (x) => m.left + ((x - axisMin) / range) * innerW;
-        evCtx.strokeStyle = '#111827';
-        evCtx.lineWidth = 1.4;
-        evCtx.beginPath();
-        evCtx.moveTo(m.left, axisY);
-        evCtx.lineTo(width - m.right, axisY);
-        evCtx.stroke();
-        if (range <= 30) {
-          const startTick = Math.ceil(axisMin);
-          const endTick = Math.floor(axisMax);
-          evCtx.font = '12px Arial';
-          evCtx.fillStyle = '#4b5563';
-          evCtx.textAlign = 'center';
-          evCtx.textBaseline = 'top';
-          for (let t = startTick; t <= endTick; t++) {
-            const tx = xScale(t);
-            evCtx.beginPath();
-            evCtx.moveTo(tx, axisY - 6);
-            evCtx.lineTo(tx, axisY + 6);
-            evCtx.strokeStyle = '#6b7280';
-            evCtx.stroke();
-            evCtx.fillText(String(t), tx, axisY + 10);
-          }
-        }
-        const exX = xScale(ex);
-        evCtx.fillStyle = '#2563eb';
-        evCtx.beginPath();
-        evCtx.arc(exX, axisY, 6, 0, Math.PI * 2);
-        evCtx.fill();
-        evCtx.strokeStyle = '#1e3a8a';
-        evCtx.stroke();
-        evCtx.fillStyle = '#111827';
-        evCtx.font = '12px Arial';
-        evCtx.textAlign = 'center';
-        evCtx.textBaseline = 'bottom';
-        evCtx.fillText(`E[X] = ${formatNum(ex, 6)}`, exX, axisY - 10);
-      }
       function renderResults(data) {
         if (!data.length) {
           resultBox.style.display = 'none';
@@ -712,19 +671,32 @@
         const support = `{ ${data.map(d => formatNum(d.x, 6)).join(', ')} }`;
         resultBox.style.display = 'block';
         resultBox.innerHTML = `
-          <div><strong>Support set (sorted):</strong> ${support}</div>
-          <div class="result-grid">
-            <div class="metric"><div class="label">Sum of probabilities</div><div class="value">${formatNum(sumP, 6)}</div></div>
-            <div class="metric"><div class="label">E[X]</div><div class="value">${formatNum(ex, 6)}</div></div>
-          </div>
-          <div class="ev-graph">
-            <h3>Expected Value</h3>
-            <canvas id="evCanvas"></canvas>
+          <div class="results-stack">
+            <div class="result-row">
+              <div class="label">Support set (sorted)</div>
+              <div class="value">${support}</div>
+            </div>
+            <div class="result-row">
+              <div class="label">Sum of probabilities</div>
+              <div class="value">${formatNum(sumP, 6)}</div>
+            </div>
+            <div class="result-row">
+              <div class="label">E[X]</div>
+              <div class="value">${formatNum(ex, 6)}</div>
+            </div>
+            <div class="result-row result-row-toggle">
+              <label class="toggle-inline">
+                <input type="checkbox" id="showExpectedValueStem" ${showExpectedValueStem ? 'checked' : ''}>
+                <span>Show expected value on PMF graph</span>
+              </label>
+            </div>
           </div>
         `;
-        evCanvas = document.getElementById('evCanvas');
-        evCtx = evCanvas.getContext('2d');
-        renderExpectedValueGraph(data, ex);
+        const showExpectedValueStemInput = document.getElementById('showExpectedValueStem');
+        showExpectedValueStemInput.addEventListener('change', function () {
+          showExpectedValueStem = showExpectedValueStemInput.checked;
+          redrawPMF();
+        });
       }
       function setupCanvasSize() {
         const dpr = window.devicePixelRatio || 1;
@@ -736,7 +708,9 @@
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         return { width: cssW, height: cssH };
       }
-      function drawPMF(data) {
+      function drawPMF(data, options = {}) {
+        const showExpectedStem = options.showExpectedValueStem === true;
+        const expectedValue = options.expectedValue;
         const { width, height } = setupCanvasSize();
         ctx.clearRect(0, 0, width, height);
         pointMeta = [];
@@ -841,6 +815,30 @@
           ctx.fillText(formatNum(d.x, 3), cx, m.top + ih + 6);
           pointMeta.push({ index: i, cx, pY, stemTop, data: d, rowIndex: d.rowIndex });
         });
+        if (showExpectedStem && Number.isFinite(expectedValue)) {
+          const exX = xScale(expectedValue);
+          const zeroY = yScale(0);
+          const oneY = yScale(1);
+          ctx.save();
+          ctx.strokeStyle = '#f97316';
+          ctx.lineWidth = 2;
+          ctx.setLineDash([5, 3]);
+          ctx.beginPath();
+          ctx.moveTo(exX, zeroY);
+          ctx.lineTo(exX, oneY);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = '#ea580c';
+          ctx.font = '12px Arial';
+          ctx.textAlign = 'left';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText('E[X]', exX + 4, Math.min(zeroY, oneY) - 4);
+          ctx.restore();
+        }
+      }
+      function redrawPMF() {
+        const { ex } = computeStats(currentData);
+        drawPMF(currentData, { showExpectedValueStem: showExpectedValueStem, expectedValue: ex });
       }
       function parseAndUpdate() {
         const parsed = getMode() === 'table' ? parseTableInput() : parseTextInput();
@@ -860,7 +858,7 @@
         currentData = validated.data;
         hoveredIndex = -1;
         renderResults(currentData);
-        drawPMF(currentData);
+        redrawPMF();
       }
       function nearestPoint(mouseX) {
         if (!pointMeta.length) return -1;
@@ -901,7 +899,7 @@
         const idx = nearestPoint(x);
         if (idx !== hoveredIndex) {
           hoveredIndex = idx;
-          drawPMF(currentData);
+          redrawPMF();
         }
         const bm = pointMeta.find(b => b.index === idx);
         if (!bm) {
@@ -921,7 +919,7 @@
         tooltip.style.opacity = '0';
         if (hoveredIndex !== -1) {
           hoveredIndex = -1;
-          drawPMF(currentData);
+          redrawPMF();
         }
       }
       function updateRowX(rowIndex, value) {
@@ -1082,15 +1080,11 @@
       window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
-          drawPMF(currentData);
-          if (currentData.length) {
-            const { ex } = computeStats(currentData);
-            renderExpectedValueGraph(currentData, ex);
-          }
+          redrawPMF();
         }, 140);
       });
       ensureAtLeastRows(4);
-      drawPMF([]);
+      redrawPMF();
       parseAndUpdate();
     })();
   </script>
