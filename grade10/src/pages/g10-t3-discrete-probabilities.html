@@ -630,6 +630,7 @@
       let variableStateByName = {};
       let variableControlElementsByName = {};
       let variableAnimationStateByName = {};
+      let currentFixedPlayYLimits = null;
       function createDefaultVariableState(previousState) {
         return {
           value: previousState && Number.isFinite(previousState.value) ? previousState.value : DEFAULT_VARIABLE_SETTINGS.value,
@@ -648,6 +649,17 @@
         const animation = variableAnimationStateByName[variableName];
         return Boolean(animation && animation.frameId !== null);
       }
+      function isAnyVariableAnimating() {
+        return Object.keys(variableAnimationStateByName).some((variableName) => isVariableAnimationRunning(variableName));
+      }
+      function applyFixedPlayYLimits(yMin, yMax) {
+        if (!Number.isFinite(yMin) || !Number.isFinite(yMax)) return;
+        const range = Math.max(1e-9, yMax - yMin);
+        currentFixedPlayYLimits = { min: yMin, max: yMin + range };
+      }
+      function clearFixedPlayYLimits() {
+        currentFixedPlayYLimits = null;
+      }
       function stopVariableAnimation(variableName) {
         const animation = variableAnimationStateByName[variableName];
         if (!animation || animation.frameId === null) return;
@@ -655,6 +667,10 @@
         animation.frameId = null;
         animation.lastTimestamp = null;
         setVariablePlayState(variableName, false);
+        if (!isAnyVariableAnimating()) {
+          clearFixedPlayYLimits();
+          redrawPMF();
+        }
       }
       function stopRemovedVariableAnimations(activeVariables) {
         Object.keys(variableAnimationStateByName).forEach((variableName) => {
@@ -720,6 +736,56 @@
         const speedFactor = 1 - (normalizedDistance * normalizedDistance);
         return minSpeed + ((maxSpeed - minSpeed) * speedFactor);
       }
+      function getSamplingValues(min, max, step) {
+        if (!(max > min)) return [min];
+        const span = max - min;
+        const usableStep = Number.isFinite(step) && step > 0 ? step : DEFAULT_VARIABLE_SETTINGS.step;
+        const estimatedCount = span / usableStep;
+        const maxSamples = 250;
+        const values = [];
+        if (estimatedCount <= maxSamples) {
+          for (let value = min; value <= max + (usableStep * 0.5); value += usableStep) {
+            values.push(Math.max(min, Math.min(max, value)));
+          }
+        } else {
+          const interval = span / maxSamples;
+          for (let i = 0; i <= maxSamples; i++) {
+            values.push(min + (i * interval));
+          }
+        }
+        values.push(min, max);
+        return Array.from(new Set(values.map((v) => Number(v.toFixed(10)))));
+      }
+      function computeYLimitsFromData(data) {
+        if (!data.length) return { min: -1, max: 1 };
+        const minP = Math.min(...data.map(d => d.p));
+        const maxP = Math.max(...data.map(d => d.p));
+        const yPadding = 0.15 * Math.max(1, Math.abs(maxP - minP));
+        const yMin = Math.min(0, minP - yPadding);
+        const yMax = Math.max(0, maxP + yPadding);
+        const yRange = Math.max(1e-9, yMax - yMin);
+        return { min: yMin, max: yMin + yRange };
+      }
+      function computeStaticPlayYLimits(variableName) {
+        const state = variableStateByName[variableName];
+        if (!state || !(state.max > state.min)) return null;
+        const parsed = getMode() === 'table' ? parseTableInput() : parseTextInput();
+        const baseMap = getVariableValuesMap();
+        const sampleValues = getSamplingValues(state.min, state.max, state.step);
+        let globalMin = Infinity;
+        let globalMax = -Infinity;
+        sampleValues.forEach((sampleValue) => {
+          const sampleMap = { ...baseMap, [variableName]: sampleValue };
+          const sampledEntries = evaluateEntries(parsed.parsedEntries, [], sampleMap);
+          if (!sampledEntries.length) return;
+          sampledEntries.forEach((entry) => {
+            if (entry.p < globalMin) globalMin = entry.p;
+            if (entry.p > globalMax) globalMax = entry.p;
+          });
+        });
+        if (!Number.isFinite(globalMin) || !Number.isFinite(globalMax)) return null;
+        return computeYLimitsFromData([{ p: globalMin }, { p: globalMax }]);
+      }
       function stepVariableAnimation(variableName, timestamp) {
         if (!isVariableAnimationRunning(variableName)) return;
         const state = variableStateByName[variableName];
@@ -762,8 +828,20 @@
         const animation = variableAnimationStateByName[variableName];
         if (state.value <= min) animation.direction = 1;
         else if (state.value >= max) animation.direction = -1;
+        const staticPlayYLimits = computeStaticPlayYLimits(variableName);
+        if (staticPlayYLimits) {
+          if (currentFixedPlayYLimits) {
+            applyFixedPlayYLimits(
+              Math.min(currentFixedPlayYLimits.min, staticPlayYLimits.min),
+              Math.max(currentFixedPlayYLimits.max, staticPlayYLimits.max)
+            );
+          } else {
+            applyFixedPlayYLimits(staticPlayYLimits.min, staticPlayYLimits.max);
+          }
+        }
         setVariablePlayState(variableName, true);
         animation.lastTimestamp = null;
+        redrawPMF();
         animation.frameId = requestAnimationFrame((timestamp) => stepVariableAnimation(variableName, timestamp));
       }
       function setCollapsibleExpanded(toggleButton, contentElement, expanded) {
@@ -977,10 +1055,10 @@
         });
         return values;
       }
-      function evaluateEntries(parsedEntries, issues) {
+      function evaluateEntries(parsedEntries, issues, variableValuesOverride) {
         const entries = [];
         const seenX = new Map();
-        const variableValuesMap = getVariableValuesMap();
+        const variableValuesMap = variableValuesOverride || getVariableValuesMap();
         parsedEntries.forEach((entry) => {
           const { sourceLabel, rowIndex, parsedX, parsedP, rawX } = entry;
           if (parsedX.kind === 'invalid' || parsedP.kind === 'invalid') return;
@@ -1153,6 +1231,7 @@
       function drawPMF(data, options = {}) {
         const showExpectedStem = options.showExpectedValueStem === true;
         const expectedValue = options.expectedValue;
+        const yRangeOverride = options.yRangeOverride;
         const { width, height } = setupCanvasSize();
         ctx.clearRect(0, 0, width, height);
         pointMeta = [];
@@ -1167,11 +1246,9 @@
           ctx.fillText('No plottable points. Add valid (x, p(x)) entries to view the graph.', 24, 34);
           return;
         }
-        const minP = Math.min(...data.map(d => d.p));
-        const maxP = Math.max(...data.map(d => d.p));
-        const yPadding = 0.15 * Math.max(1, Math.abs(maxP - minP));
-        const yMin = Math.min(0, minP - yPadding);
-        const yMax = Math.max(0, maxP + yPadding);
+        const computedYLimits = computeYLimitsFromData(data);
+        const yMin = yRangeOverride && Number.isFinite(yRangeOverride.min) ? yRangeOverride.min : computedYLimits.min;
+        const yMax = yRangeOverride && Number.isFinite(yRangeOverride.max) ? yRangeOverride.max : computedYLimits.max;
         const yRange = Math.max(1e-9, yMax - yMin);
         const xValues = data.map(d => d.x);
         const xmin = Math.min(...xValues);
@@ -1280,7 +1357,11 @@
       }
       function redrawPMF() {
         const { ex } = computeStats(currentData);
-        drawPMF(currentData, { showExpectedValueStem: showExpectedValueStem, expectedValue: ex });
+        drawPMF(currentData, {
+          showExpectedValueStem: showExpectedValueStem,
+          expectedValue: ex,
+          yRangeOverride: currentFixedPlayYLimits
+        });
       }
       function parseAndUpdate() {
         updateBoundaryRowHighlight();
