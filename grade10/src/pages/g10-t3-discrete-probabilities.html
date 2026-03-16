@@ -187,6 +187,28 @@
       font-size: 1rem;
       margin-top: 0.2rem;
     }
+    .variable-controls-row {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+    .variable-controls-row input[type="range"] {
+      flex: 1;
+      min-width: 180px;
+    }
+    .variable-bound-input {
+      width: 82px;
+    }
+    .variable-current-input {
+      width: 110px;
+    }
+    .variable-play-btn {
+      min-width: 40px;
+      padding: 0.45rem 0.5rem;
+      line-height: 1;
+      font-size: 1rem;
+    }
     .results-row {
       margin-top: 0.5rem;
       display: flex;
@@ -337,9 +359,12 @@
         <div class="result-grid">
           <div class="metric">
             <div class="label" id="variableNameLabel">t</div>
-            <div class="value" style="display:flex; gap:0.5rem; align-items:center;">
-              <input type="range" id="variableSlider" min="-5" max="5" step="0.1" value="1" style="flex:1;">
-              <input type="number" id="variableNumber" min="-5" max="5" step="0.1" value="1" style="width:110px;">
+            <div class="value variable-controls-row">
+              <button type="button" id="playVariableBtn" class="btn-secondary variable-play-btn" aria-label="Play variable animation">▶</button>
+              <input type="number" id="variableMinInput" step="0.1" value="-5" class="variable-bound-input" aria-label="Minimum slider value">
+              <input type="range" id="variableSlider" min="-5" max="5" step="0.1" value="1">
+              <input type="number" id="variableNumber" min="-5" max="5" step="0.1" value="1" class="variable-current-input" aria-label="Current variable value">
+              <input type="number" id="variableMaxInput" step="0.1" value="5" class="variable-bound-input" aria-label="Maximum slider value">
             </div>
           </div>
         </div>
@@ -362,8 +387,11 @@
       const canvas = document.getElementById('pmfCanvas');
       const variableControlBox = document.getElementById('variableControlBox');
       const variableNameLabel = document.getElementById('variableNameLabel');
+      const playVariableBtn = document.getElementById('playVariableBtn');
+      const variableMinInput = document.getElementById('variableMinInput');
       const variableSlider = document.getElementById('variableSlider');
       const variableNumber = document.getElementById('variableNumber');
+      const variableMaxInput = document.getElementById('variableMaxInput');
       const tooltip = document.getElementById('tooltip');
       const ctx = canvas.getContext('2d');
       let showExpectedValueStem = false;
@@ -376,6 +404,70 @@
       let resizeTimer = null;
       let activeVariableName = null;
       let variableValue = 1;
+      let variableAnimationTimer = null;
+      function updateVariableLabel() {
+        if (activeVariableName) variableNameLabel.textContent = `${activeVariableName} = ${formatNum(variableValue, 3)}`;
+      }
+      function setVariablePlayState(isPlaying) {
+        playVariableBtn.textContent = isPlaying ? '■' : '▶';
+        playVariableBtn.setAttribute('aria-label', isPlaying ? 'Stop variable animation' : 'Play variable animation');
+      }
+      function stopVariableAnimation() {
+        if (!variableAnimationTimer) return;
+        clearInterval(variableAnimationTimer);
+        variableAnimationTimer = null;
+        setVariablePlayState(false);
+      }
+      function setVariableValue(next, shouldParse = true) {
+        const min = Number(variableSlider.min);
+        const max = Number(variableSlider.max);
+        let value = Number(next);
+        if (!Number.isFinite(value)) value = variableValue;
+        value = Math.max(min, Math.min(max, value));
+        variableValue = value;
+        variableSlider.value = String(value);
+        variableNumber.value = String(value);
+        updateVariableLabel();
+        if (shouldParse) parseAndUpdate();
+      }
+      function syncVariableBounds(fromMinInput) {
+        const previousMin = Number(variableSlider.min);
+        const previousMax = Number(variableSlider.max);
+        let nextMin = Number(variableMinInput.value);
+        let nextMax = Number(variableMaxInput.value);
+        if (!Number.isFinite(nextMin)) nextMin = previousMin;
+        if (!Number.isFinite(nextMax)) nextMax = previousMax;
+        if (nextMin >= nextMax) {
+          if (fromMinInput) nextMin = previousMin;
+          else nextMax = previousMax;
+        }
+        variableMinInput.value = String(nextMin);
+        variableMaxInput.value = String(nextMax);
+        variableSlider.min = String(nextMin);
+        variableSlider.max = String(nextMax);
+        variableNumber.min = String(nextMin);
+        variableNumber.max = String(nextMax);
+        setVariableValue(variableValue);
+      }
+      function startVariableAnimation() {
+        if (!activeVariableName || variableAnimationTimer) return;
+        const min = Number(variableSlider.min);
+        const max = Number(variableSlider.max);
+        const step = Math.abs(Number(variableSlider.step)) || 0.1;
+        if (variableValue < min) setVariableValue(min, false);
+        setVariablePlayState(true);
+        variableAnimationTimer = setInterval(() => {
+          const remaining = max - variableValue;
+          if (remaining <= 0) {
+            setVariableValue(max);
+            stopVariableAnimation();
+            return;
+          }
+          const next = remaining <= step ? max : variableValue + step;
+          setVariableValue(next);
+          if (next >= max) stopVariableAnimation();
+        }, 70);
+      }
       function setComputedResultsExpanded(expanded) {
         computedResultsToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
         const icon = computedResultsToggle.querySelector('.toggle-icon');
@@ -503,14 +595,18 @@
       }
       function updateVariableControls(variableName, forceHide = false) {
         if (forceHide || !variableName) {
+          stopVariableAnimation();
           variableControlBox.style.display = 'none';
           activeVariableName = null;
           return;
         }
         activeVariableName = variableName;
-        variableNameLabel.textContent = `${variableName} = ${formatNum(variableValue, 3)}`;
+        updateVariableLabel();
         variableSlider.value = String(variableValue);
         variableNumber.value = String(variableValue);
+        variableMinInput.value = variableSlider.min;
+        variableMaxInput.value = variableSlider.max;
+        setVariablePlayState(false);
         variableControlBox.style.display = 'block';
       }
       function collectDetectedVariables(parsedX, parsedP, detectedVariables) {
@@ -1048,19 +1144,30 @@
       textArea.addEventListener('input', parseAndUpdate);
       function syncVariableInputs(fromSlider) {
         const source = fromSlider ? variableSlider : variableNumber;
-        const min = Number(variableSlider.min);
-        const max = Number(variableSlider.max);
         let next = Number(source.value);
         if (!Number.isFinite(next)) next = variableValue;
-        next = Math.max(min, Math.min(max, next));
-        variableValue = next;
-        variableSlider.value = String(next);
-        variableNumber.value = String(next);
-        if (activeVariableName) variableNameLabel.textContent = `${activeVariableName} = ${formatNum(variableValue, 3)}`;
-        parseAndUpdate();
+        setVariableValue(next);
       }
-      variableSlider.addEventListener('input', () => syncVariableInputs(true));
-      variableNumber.addEventListener('input', () => syncVariableInputs(false));
+      playVariableBtn.addEventListener('click', () => {
+        if (variableAnimationTimer) stopVariableAnimation();
+        else startVariableAnimation();
+      });
+      variableSlider.addEventListener('input', () => {
+        stopVariableAnimation();
+        syncVariableInputs(true);
+      });
+      variableNumber.addEventListener('input', () => {
+        stopVariableAnimation();
+        syncVariableInputs(false);
+      });
+      variableMinInput.addEventListener('input', () => {
+        stopVariableAnimation();
+        syncVariableBounds(true);
+      });
+      variableMaxInput.addEventListener('input', () => {
+        stopVariableAnimation();
+        syncVariableBounds(false);
+      });
       canvas.addEventListener('mousemove', updateTooltip);
       canvas.addEventListener('mouseleave', hideTooltip);
       canvas.addEventListener('mousedown', (evt) => {
