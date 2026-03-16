@@ -1199,6 +1199,17 @@
         }
         return Array.from({ length: count }, (_, idx) => idx + 1);
       }
+      function generateSequentialXValuesForIndices(indices, totalCount, bounds) {
+        if (!indices.length) return [];
+        const { min, max } = bounds;
+        if (min != null && max != null) {
+          if (min > max) return [];
+          if (totalCount <= 1) return [Number(min.toFixed(6))];
+          const step = (max - min) / (totalCount - 1);
+          return indices.map(idx => Number((min + step * idx).toFixed(6)));
+        }
+        return generateSequentialXValues(indices.length, bounds);
+      }
       function generateRandomXValues(count, bounds) {
         if (count <= 0) return [];
         const { min, max } = bounds;
@@ -1228,6 +1239,20 @@
         while (values.size < count) values.add(Math.floor(Math.random() * 20) + 1);
         return Array.from(values).sort((a, b) => a - b);
       }
+      function getProtectedBoundaryIndices(rows) {
+        const protectedIndices = new Set();
+        if (!rows.length) return protectedIndices;
+        const firstParsed = parseNumericToken(rows[0].xInput.value || '');
+        if (firstParsed.ok && Number.isFinite(firstParsed.value)) {
+          protectedIndices.add(0);
+        }
+        const lastIndex = rows.length - 1;
+        const lastParsed = parseNumericToken(rows[lastIndex].xInput.value || '');
+        if (lastParsed.ok && Number.isFinite(lastParsed.value)) {
+          protectedIndices.add(lastIndex);
+        }
+        return protectedIndices;
+      }
       function loadByMode() {
         const rows = getAvailablePairs();
         updateBoundaryRowHighlight();
@@ -1235,10 +1260,12 @@
         const n = rows.length;
         const mode = document.getElementById('loadModeSelect').value;
         const bounds = getLoadBounds();
-        let xValues = [];
-        if (mode === 'random') xValues = generateRandomXValues(n, bounds);
-        else xValues = generateSequentialXValues(n, bounds);
-        if (xValues.length !== n) {
+        const protectedIndices = getProtectedBoundaryIndices(rows);
+        const editableIndices = Array.from({ length: n }, (_, idx) => idx).filter(idx => !protectedIndices.has(idx));
+        let generatedXValues = [];
+        if (mode === 'random') generatedXValues = generateRandomXValues(editableIndices.length, bounds);
+        else generatedXValues = generateSequentialXValuesForIndices(editableIndices, n, bounds);
+        if (generatedXValues.length !== editableIndices.length) {
           showErrors(['Cannot generate x values from the current min/max bounds.']);
           parseAndUpdate();
           return;
@@ -1252,7 +1279,10 @@
             })();
         const probabilities = normalizedRoundedProbabilities(rawProbabilities, decimals);
         rows.forEach((pair, idx) => {
-          pair.xInput.value = String(xValues[idx]);
+          const editablePosition = editableIndices.indexOf(idx);
+          if (editablePosition !== -1) {
+            pair.xInput.value = String(generatedXValues[editablePosition]);
+          }
           pair.pInput.value = probabilities[idx].toFixed(decimals);
         });
         fillTextAreaFromRows(rows, probabilities, decimals);
