@@ -231,7 +231,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "From discrete probabilities to continuous probabilities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1"
@@ -699,7 +699,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 5",
-    "Description": "-",
+    "Description": "From discrete probabilities to continuous probabilities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1"
@@ -1167,7 +1167,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 5",
-    "Description": "-",
+    "Description": "From discrete probabilities to continuous probabilities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1"
@@ -1617,6 +1617,32 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "D",
+    "Class #": "1-1",
+    "Date": "2026-03-18",
+    "Term": 3,
+    "Weekday": "Wednesday",
+    "Day": "Day 3",
+    "Description": "From discrete probabilities to continuous probabilities",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C1"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "1-2",
+    "Date": "2026-03-19",
+    "Term": 3,
+    "Weekday": "Thursday",
+    "Day": "Day 4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C1"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
     "Class #": "2-1",
     "Date": "2026-03-26",
     "Term": 3,
@@ -1625,7 +1651,7 @@ window.SCHEDULE_DATA = [
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1"
+    "Summary": "C2"
   },
   {
     "Grade": 10,
@@ -1638,7 +1664,189 @@ window.SCHEDULE_DATA = [
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1"
+    "Summary": "C2"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "3-1",
+    "Date": "2026-04-09",
+    "Term": 3,
+    "Weekday": "Thursday",
+    "Day": "Day 3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C3"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "3-2",
+    "Date": "2026-04-10",
+    "Term": 3,
+    "Weekday": "Friday",
+    "Day": "Day 4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C3"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "4-1",
+    "Date": "2026-04-16",
+    "Term": 3,
+    "Weekday": "Thursday",
+    "Day": "Day 3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C4"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "4-2",
+    "Date": "2026-04-17",
+    "Term": 3,
+    "Weekday": "Friday",
+    "Day": "Day 4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C4"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "5-1",
+    "Date": "2026-04-23",
+    "Term": 3,
+    "Weekday": "Thursday",
+    "Day": "Day 3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C5"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "5-2",
+    "Date": "2026-04-24",
+    "Term": 3,
+    "Weekday": "Friday",
+    "Day": "Day 4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C5"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "6-1",
+    "Date": "2026-04-30",
+    "Term": 3,
+    "Weekday": "Thursday",
+    "Day": "Day 3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C6"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "6-2",
+    "Date": "2026-05-04",
+    "Term": 3,
+    "Weekday": "Monday",
+    "Day": "Day 4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C6"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "7-1",
+    "Date": "2026-05-08",
+    "Term": 3,
+    "Weekday": "Friday",
+    "Day": "Day 3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C7"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "7-2",
+    "Date": "2026-05-11",
+    "Term": 3,
+    "Weekday": "Monday",
+    "Day": "Day 4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C7"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "8-1",
+    "Date": "2026-05-15",
+    "Term": 3,
+    "Weekday": "Friday",
+    "Day": "Day 3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C8"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "8-2",
+    "Date": "2026-05-19",
+    "Term": 3,
+    "Weekday": "Tuesday",
+    "Day": "Day 4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C8"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "9-1",
+    "Date": "2026-05-25",
+    "Term": 3,
+    "Weekday": "Monday",
+    "Day": "Day 3",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C9"
+  },
+  {
+    "Grade": 10,
+    "Section": "D",
+    "Class #": "9-2",
+    "Date": "2026-05-26",
+    "Term": 3,
+    "Weekday": "Tuesday",
+    "Day": "Day 4",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C9"
   },
   {
     "Grade": 10,
@@ -1651,7 +1859,7 @@ window.SCHEDULE_DATA = [
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "C10"
   },
   {
     "Grade": 10,
@@ -1664,7 +1872,7 @@ window.SCHEDULE_DATA = [
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "C10"
   },
   {
     "Grade": 10,
@@ -1674,19 +1882,6 @@ window.SCHEDULE_DATA = [
     "Term": null,
     "Weekday": " ",
     "Day": " ",
-    "Description": "-",
-    "Material": "-",
-    "Material teacher": "-",
-    "Summary": "C3"
-  },
-  {
-    "Grade": 10,
-    "Section": "D",
-    "Class #": "11-2",
-    "Date": "2026-06-10",
-    "Term": 3,
-    "Weekday": "Wednesday",
-    "Day": "Day 4",
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
@@ -2116,7 +2311,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "From discrete probabilities to continuous probabilities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1"
