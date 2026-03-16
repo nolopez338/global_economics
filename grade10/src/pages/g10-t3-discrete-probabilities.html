@@ -426,11 +426,11 @@
         if (!Number.isFinite(numeric)) return { ok: false, reason: 'not numeric' };
         return { ok: true, value: numeric };
       }
-      function analyzePExpression(rawP) {
-        const expression = String(rawP || '').trim();
-        if (!expression) return { kind: 'invalid', error: 'p(x) is empty.' };
+      function analyzeExpression(rawValue, label = 'expression') {
+        const expression = String(rawValue || '').trim();
+        if (!expression) return { kind: 'invalid', error: `${label} is empty.` };
         if (/[()]/.test(expression)) {
-          return { kind: 'invalid', error: 'parentheses are not supported in p(x) expressions.' };
+          return { kind: 'invalid', error: `parentheses are not supported in ${label}.` };
         }
         if (/\/(?=.*[A-Za-z])/.test(expression)) {
           return { kind: 'invalid', error: 'division with variables is not supported.' };
@@ -439,11 +439,11 @@
           return { kind: 'invalid', error: 'functions and multi-letter symbols are not supported.' };
         }
         const numeric = parseNumericToken(expression);
-        if (numeric.ok) return { kind: 'numeric', value: numeric.value, raw: expression };
+        if (numeric.ok) return { kind: 'numeric', value: numeric.value, raw: expression, label };
         const cleaned = expression.replace(/\s+/g, '');
-        if (!cleaned) return { kind: 'invalid', error: 'p(x) is empty.' };
+        if (!cleaned) return { kind: 'invalid', error: `${label} is empty.` };
         if (/[^0-9A-Za-z+\-*.^]/.test(cleaned)) {
-          return { kind: 'invalid', error: 'unsupported symbol found in p(x).' };
+          return { kind: 'invalid', error: `unsupported symbol found in ${label}.` };
         }
         if (cleaned.includes('/')) {
           return { kind: 'invalid', error: 'division is only allowed for purely numeric values.' };
@@ -469,8 +469,8 @@
           if (!term) return { kind: 'invalid', error: 'invalid term in expression.' };
           if (/[+\-]/.test(term)) return { kind: 'invalid', error: 'invalid polynomial syntax.' };
           if (term.includes(variable)) {
-            const pattern = new RegExp(`^(?:(\d+(?:\.\d+)?(?:e[+-]?\d+)?)\*?)?${variable}(?:\^(\d+))?$`, 'i');
-            const m = term.match(pattern) || term.match(new RegExp(`^(\d+(?:\.\d+)?(?:e[+-]?\d+)?)${variable}(?:\^(\d+))?$`, 'i'));
+            const pattern = new RegExp(`^(?:(\\d+(?:\\.\\d+)?(?:e[+-]?\\d+)?)\\*?)?${variable}(?:\\^(\\d+))?$`, 'i');
+            const m = term.match(pattern) || term.match(new RegExp(`^(\\d+(?:\\.\\d+)?(?:e[+-]?\\d+)?)${variable}(?:\\^(\\d+))?$`, 'i'));
             if (!m) {
               return { kind: 'invalid', error: `unsupported term "${segment}".` };
             }
@@ -487,9 +487,9 @@
             terms.push({ coefficient: sign * n.value, power: 0 });
           }
         }
-        return { kind: 'polynomial', variable, terms, raw: expression };
+        return { kind: 'polynomial', variable, terms, raw: expression, label };
       }
-      function evaluateParsedP(parsed, v) {
+      function evaluateParsedExpression(parsed, v) {
         if (parsed.kind === 'numeric') return { ok: true, value: parsed.value };
         if (parsed.kind !== 'polynomial') return { ok: false, error: parsed.error || 'invalid expression' };
         let sum = 0;
@@ -513,59 +513,92 @@
         variableNumber.value = String(variableValue);
         variableControlBox.style.display = 'block';
       }
-      function parseTableInput() {
+      function collectDetectedVariables(parsedX, parsedP, detectedVariables) {
+        if (parsedX.kind === 'polynomial') detectedVariables.add(parsedX.variable);
+        if (parsedP.kind === 'polynomial') detectedVariables.add(parsedP.variable);
+      }
+      function parseEntries(sourceItems) {
         const issues = [];
+        const parsedEntries = [];
+        const detectedVariables = new Set();
+        sourceItems.forEach((item) => {
+          const { sourceLabel, xToken, pToken, rowIndex } = item;
+          const parsedX = analyzeExpression(xToken, 'x');
+          const parsedP = analyzeExpression(pToken, 'p(x)');
+          collectDetectedVariables(parsedX, parsedP, detectedVariables);
+          if (parsedX.kind === 'invalid') {
+            issues.push(`${sourceLabel}: invalid x expression (${parsedX.error}) This entry was excluded from the graph.`);
+          }
+          if (parsedP.kind === 'invalid') {
+            issues.push(`${sourceLabel}: invalid p(x) expression (${parsedP.error}) This entry was excluded from the graph.`);
+          }
+          parsedEntries.push({ sourceLabel, rowIndex, rawX: xToken, rawP: pToken, parsedX, parsedP });
+        });
+        return { parsedEntries, issues, detectedVariables };
+      }
+      function evaluateEntries(parsedEntries, issues, canEvaluateVariableExpressions) {
         const entries = [];
         const seenX = new Map();
+        parsedEntries.forEach((entry) => {
+          const { sourceLabel, rowIndex, parsedX, parsedP, rawX } = entry;
+          if (parsedX.kind === 'invalid' || parsedP.kind === 'invalid') return;
+          if (!canEvaluateVariableExpressions && (parsedX.kind === 'polynomial' || parsedP.kind === 'polynomial')) {
+            return;
+          }
+          const evaluatedX = evaluateParsedExpression(parsedX, variableValue);
+          if (!evaluatedX.ok) {
+            issues.push(`${sourceLabel}: could not evaluate x (${evaluatedX.error}).`);
+            return;
+          }
+          const evaluatedP = evaluateParsedExpression(parsedP, variableValue);
+          if (!evaluatedP.ok) {
+            issues.push(`${sourceLabel}: could not evaluate p(x) (${evaluatedP.error}).`);
+            return;
+          }
+          const xValue = evaluatedX.value;
+          const pValue = evaluatedP.value;
+          if (!Number.isFinite(xValue)) {
+            issues.push(`${sourceLabel}: x does not evaluate to a finite numeric value.`);
+            return;
+          }
+          if (!Number.isFinite(pValue)) {
+            issues.push(`${sourceLabel}: p(x) does not evaluate to a finite numeric value.`);
+            return;
+          }
+          if (pValue < 0 || pValue > 1) {
+            issues.push(`${sourceLabel}: p(x) = ${formatNum(pValue, 6)} is outside 0 ≤ p(x) ≤ 1.`);
+          }
+          if (seenX.has(xValue)) {
+            issues.push(`${sourceLabel}: duplicate x = ${formatNum(xValue)} (already used in ${seenX.get(xValue)}).`);
+          } else {
+            seenX.set(xValue, sourceLabel.toLowerCase());
+          }
+          entries.push({
+            x: xValue,
+            p: pValue,
+            source: sourceLabel,
+            rowIndex,
+            isXRawNumeric: parseNumericToken(rawX).ok
+          });
+        });
+        return entries;
+      }
+      function parseTableInput() {
         const rows = Array.from(tableBody.querySelectorAll('tr'));
-        const detectedVariables = new Set();
+        const sourceItems = [];
         rows.forEach((row, idx) => {
           const rowNumber = idx + 1;
           const xStr = row.querySelector('.x-input').value.trim();
           const pStr = row.querySelector('.p-input').value.trim();
           if (xStr === '' && pStr === '') return;
-          const parsedX = parseNumericToken(xStr);
-          const parsedP = analyzePExpression(pStr);
-          if (!parsedX.ok) {
-            issues.push(`Row ${rowNumber}: x must be a numeric value. This entry was excluded from the graph.`);
-          }
-          if (parsedP.kind === 'invalid') {
-            issues.push(`Row ${rowNumber}: invalid p(x) expression (${parsedP.error}) This entry was excluded from the graph.`);
-          } else if (parsedP.kind === 'polynomial') {
-            detectedVariables.add(parsedP.variable);
-          }
-          let pValue = null;
-          if (parsedP.kind !== 'invalid') {
-            const evaluated = evaluateParsedP(parsedP, variableValue);
-            if (!evaluated.ok) {
-              issues.push(`Row ${rowNumber}: could not evaluate p(x) (${evaluated.error}).`);
-            } else {
-              pValue = evaluated.value;
-              if (pValue < 0 || pValue > 1) {
-                issues.push(`Row ${rowNumber}: p(x) = ${formatNum(pValue, 6)} is outside 0 ≤ p(x) ≤ 1.`);
-              }
-            }
-          }
-          const x = parsedX.ok ? parsedX.value : NaN;
-          if (Number.isFinite(x)) {
-            if (seenX.has(x)) {
-              issues.push(`Row ${rowNumber}: duplicate x = ${formatNum(x)} (already used in row ${seenX.get(x)}).`);
-            } else {
-              seenX.set(x, rowNumber);
-            }
-          }
-          if (Number.isFinite(x) && Number.isFinite(pValue)) {
-            entries.push({ x, p: pValue, rawP: pStr, source: `Row ${rowNumber}`, rowIndex: idx });
-          }
+          sourceItems.push({ sourceLabel: `Row ${rowNumber}`, xToken: xStr, pToken: pStr, rowIndex: idx });
         });
-        return { entries, issues, detectedVariables };
+        return parseEntries(sourceItems);
       }
       function parseTextInput() {
         const issues = [];
-        const entries = [];
-        const seenX = new Map();
+        const sourceItems = [];
         const lines = textArea.value.split(/\r?\n/);
-        const detectedVariables = new Set();
         lines.forEach((raw, i) => {
           const lineNumber = i + 1;
           const line = raw.trim();
@@ -589,41 +622,11 @@
             issues.push(`Line ${lineNumber}: expected exactly two values (x and p).`);
             return;
           }
-          const parsedX = parseNumericToken(xToken);
-          const parsedP = analyzePExpression(pToken);
-          if (!parsedX.ok) {
-            issues.push(`Line ${lineNumber}: x must be numeric. This entry was excluded from the graph.`);
-          }
-          if (parsedP.kind === 'invalid') {
-            issues.push(`Line ${lineNumber}: invalid p(x) expression (${parsedP.error}) This entry was excluded from the graph.`);
-          } else if (parsedP.kind === 'polynomial') {
-            detectedVariables.add(parsedP.variable);
-          }
-          let pValue = null;
-          if (parsedP.kind !== 'invalid') {
-            const evaluated = evaluateParsedP(parsedP, variableValue);
-            if (!evaluated.ok) {
-              issues.push(`Line ${lineNumber}: could not evaluate p(x) (${evaluated.error}).`);
-            } else {
-              pValue = evaluated.value;
-              if (pValue < 0 || pValue > 1) {
-                issues.push(`Line ${lineNumber}: p(x) = ${formatNum(pValue, 6)} is outside 0 ≤ p(x) ≤ 1.`);
-              }
-            }
-          }
-          const x = parsedX.ok ? parsedX.value : NaN;
-          if (Number.isFinite(x)) {
-            if (seenX.has(x)) {
-              issues.push(`Line ${lineNumber}: duplicate x = ${formatNum(x)} (already used in line ${seenX.get(x)}).`);
-            } else {
-              seenX.set(x, lineNumber);
-            }
-          }
-          if (Number.isFinite(x) && Number.isFinite(pValue)) {
-            entries.push({ x, p: pValue, rawP: pToken, source: `Line ${lineNumber}`, rowIndex: -1 });
-          }
+          sourceItems.push({ sourceLabel: `Line ${lineNumber}`, xToken, pToken, rowIndex: -1 });
         });
-        return { entries, issues, detectedVariables };
+        const parsed = parseEntries(sourceItems);
+        parsed.issues = issues.concat(parsed.issues);
+        return parsed;
       }
       function validateAndNormalize(entries, issues) {
         if (entries.length > 0) {
@@ -638,7 +641,7 @@
             issues.push(`Sum of probabilities is ${formatNum(sumP, 6)}, not 1 (tolerance ${TOLERANCE}). Raw values are graphed without normalization.`);
           }
         }
-        const sorted = entries.slice().sort((a, b) => a.x - b.x).map(({ x, p, rowIndex }) => ({ x, p, rowIndex }));
+        const sorted = entries.slice().sort((a, b) => a.x - b.x).map(({ x, p, rowIndex, isXRawNumeric }) => ({ x, p, rowIndex, isXRawNumeric }));
         return { ok: issues.length === 0, issues, data: sorted };
       }
       function showErrors(issues) {
@@ -722,7 +725,7 @@
         if (!data.length) {
           ctx.fillStyle = '#6b7280';
           ctx.font = '15px Arial';
-          ctx.fillText('No plottable points. Add numeric (x, p(x)) values to view the graph.', 24, 34);
+          ctx.fillText('No plottable points. Add valid (x, p(x)) entries to view the graph.', 24, 34);
           return;
         }
         const minP = Math.min(...data.map(d => d.p));
@@ -813,7 +816,7 @@
           ctx.textAlign = 'center';
           ctx.textBaseline = 'top';
           ctx.fillText(formatNum(d.x, 3), cx, m.top + ih + 6);
-          pointMeta.push({ index: i, cx, pY, stemTop, data: d, rowIndex: d.rowIndex });
+          pointMeta.push({ index: i, cx, pY, stemTop, data: d, rowIndex: d.rowIndex, draggable: d.isXRawNumeric === true });
         });
         if (showExpectedStem && Number.isFinite(expectedValue)) {
           const exX = xScale(expectedValue);
@@ -842,14 +845,16 @@
       }
       function parseAndUpdate() {
         const parsed = getMode() === 'table' ? parseTableInput() : parseTextInput();
-        const variables = Array.from(parsed.detectedVariables);
+        const variables = Array.from(parsed.detectedVariables).sort();
+        const hasSingleVariable = variables.length === 1;
         if (variables.length > 1) {
-          parsed.issues.push(`Multiple variables detected across p(x): ${variables.join(', ')}. Use one variable symbol only.`);
+          parsed.issues.push(`Multiple variables detected across x and p(x): ${variables.join(', ')}. Use one variable symbol only.`);
         }
-        const chosenVariable = variables.length === 1 ? variables[0] : null;
-        updateVariableControls(chosenVariable, variables.length !== 1);
+        const chosenVariable = hasSingleVariable ? variables[0] : null;
+        updateVariableControls(chosenVariable, !hasSingleVariable);
 
-        const validated = validateAndNormalize(parsed.entries, parsed.issues);
+        const evaluatedEntries = evaluateEntries(parsed.parsedEntries, parsed.issues, hasSingleVariable || variables.length === 0);
+        const validated = validateAndNormalize(evaluatedEntries, parsed.issues);
         if (!validated.data.length) {
           validated.issues.push('No plottable numeric pairs were found. The graph shows axes only.');
         }
@@ -1066,7 +1071,7 @@
         const idx = nearestPointByDistance(x, y);
         if (idx === -1) return;
         const pt = pointMeta.find(p => p.index === idx);
-        if (!pt || pt.rowIndex < 0) return;
+        if (!pt || pt.rowIndex < 0 || !pt.draggable) return;
         dragIndex = idx;
         dragRowIndex = pt.rowIndex;
       });
