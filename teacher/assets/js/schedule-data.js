@@ -2805,7 +2805,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "Vectors and Degrees of Freedom videos",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1"
@@ -3286,7 +3286,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "Vectors and Degrees of Freedom videos",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1"
@@ -3767,7 +3767,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 2",
-    "Description": "-",
+    "Description": "Vectors and Degrees of Freedom videos",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1"
@@ -4261,7 +4261,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 4",
-    "Description": "-",
+    "Description": "Vectors and Degrees of Freedom videos",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1"
@@ -4729,7 +4729,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 2",
-    "Description": "-",
+    "Description": "Vectors and Degrees of Freedom videos",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1"
