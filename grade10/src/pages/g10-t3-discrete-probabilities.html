@@ -630,6 +630,7 @@
       let variableStateByName = {};
       let variableControlElementsByName = {};
       let variableAnimationStateByName = {};
+      let renderedVariableNames = [];
       let currentFixedPlayYLimits = null;
       let freezeErrorBoxDuringPlay = false;
       let errorBoxRefreshQueued = false;
@@ -1384,11 +1385,22 @@
           yRangeOverride: currentFixedPlayYLimits
         });
       }
+      function areStringArraysEqual(a, b) {
+        if (a === b) return true;
+        if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
+        for (let i = 0; i < a.length; i++) {
+          if (a[i] !== b[i]) return false;
+        }
+        return true;
+      }
       function parseAndUpdate() {
         updateBoundaryRowHighlight();
         const parsed = getMode() === 'table' ? parseTableInput() : parseTextInput();
         const variables = Array.from(parsed.detectedVariables).sort();
-        renderVariableControls(variables);
+        if (!areStringArraysEqual(renderedVariableNames, variables)) {
+          renderVariableControls(variables);
+          renderedVariableNames = variables.slice();
+        }
         const evaluatedEntries = evaluateEntries(parsed.parsedEntries, parsed.issues);
         const validated = validateAndNormalize(evaluatedEntries, parsed.issues);
         if (!validated.data.length) {
