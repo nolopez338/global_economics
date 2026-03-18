@@ -178,6 +178,63 @@
       padding: 0.1rem;
     }
 
+    .graph-overlay-controls {
+      position: absolute;
+      top: 0.75rem;
+      left: 0.75rem;
+      z-index: 6;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.45rem 0.55rem;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+      max-width: 280px;
+    }
+
+    .graph-overlay-controls label {
+      font-size: 0.82rem;
+      line-height: 1.2;
+    }
+
+    .graph-overlay-controls input[type="number"] {
+      width: 112px;
+      padding: 0.35rem 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .toggle-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .graph-x-range {
+      margin-top: 0.7rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.9rem;
+    }
+
+    .graph-x-range .field {
+      min-width: 160px;
+      max-width: 220px;
+    }
+
+    .graph-x-range .field:last-child {
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .graph-x-range .field:last-child input {
+      margin-left: auto;
+    }
+
     canvas {
       width: 100%;
       height: 420px;
@@ -229,6 +286,21 @@
     @media (max-width: 840px) {
       .col-6, .col-4, .col-3 { grid-column: span 12; }
       canvas { height: 340px; }
+      .graph-overlay-controls {
+        position: static;
+        margin: 0.6rem;
+        max-width: none;
+      }
+      .graph-x-range {
+        flex-direction: column;
+      }
+      .graph-x-range .field:last-child {
+        margin-left: 0;
+        text-align: left;
+      }
+      .graph-x-range .field:last-child input {
+        margin-left: 0;
+      }
     }
   </style>
 </head>
@@ -346,14 +418,30 @@
     <section class="card content-card">
       <h2>Computed results</h2>
       <div id="results" class="results-grid"></div>
-      <p class="muted" style="margin-top:0.7rem;">The system samples the selected PDF internally and normalizes it where required.</p>
     </section>
 
     <section class="card content-card">
       <h2>PDF graph</h2>
       <div class="graph-wrap" id="graphWrap">
+        <div class="graph-overlay-controls">
+          <div class="field">
+            <label for="yTopInput">y-top</label>
+            <input id="yTopInput" type="number" step="any" value="1" />
+          </div>
+          <label class="toggle-inline"><input id="autoYTopToggle" type="checkbox" checked /> Auto-adjust y-top from PDF</label>
+        </div>
         <canvas id="pdfCanvas"></canvas>
         <div class="tooltip" id="tooltip"></div>
+      </div>
+      <div class="graph-x-range">
+        <div class="field">
+          <label for="xMinInput">x-min</label>
+          <input id="xMinInput" type="number" step="any" value="-1" />
+        </div>
+        <div class="field">
+          <label for="xMaxInput">x-max</label>
+          <input id="xMaxInput" type="number" step="any" value="3" />
+        </div>
       </div>
     </section>
   </main>
@@ -388,7 +476,11 @@
         canvas: document.getElementById('pdfCanvas'),
         graphWrap: document.getElementById('graphWrap'),
         tooltip: document.getElementById('tooltip'),
-        errorBox: document.getElementById('errorBox')
+        errorBox: document.getElementById('errorBox'),
+        xMinInput: document.getElementById('xMinInput'),
+        xMaxInput: document.getElementById('xMaxInput'),
+        yTopInput: document.getElementById('yTopInput'),
+        autoYTopToggle: document.getElementById('autoYTopToggle')
       };
 
       const defaults = {
@@ -415,6 +507,8 @@
         points: [],
         controlPoints: [],
         drag: null,
+        yAutoTop: 1,
+        autoYTopEnabled: true,
         plot: { m: { l: 62, r: 20, t: 18, b: 46 }, w: 1, h: 1, rectWidth: 1, rectHeight: 420 }
       };
 
@@ -483,18 +577,42 @@
         return { ok: true, value: area };
       }
 
-      function updateResults({ type, xmin, xmax, minY, maxY, area, mean, variance }) {
+      function updateResults({ type, mean, variance }) {
         const std = Number.isFinite(variance) && variance >= 0 ? Math.sqrt(variance) : NaN;
         const cards = [
           ['Type', type],
-          ['x-range used', `${fmt(xmin, 3)} to ${fmt(xmax, 3)}`],
-          ['y-range sampled', `${fmt(minY, 3)} to ${fmt(maxY, 3)}`],
-          ['Area under PDF', fmt(area)],
           ['Mean E[X]', fmt(mean)],
           ['Variance Var(X)', fmt(variance)],
           ['Std dev σ', fmt(std)]
         ];
         els.results.innerHTML = cards.map(([k, v]) => `<div class="metric"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
+      }
+
+      function resolveXAxisRange(defaultMin, defaultMax, errors) {
+        let xmin = Number(els.xMinInput.value);
+        let xmax = Number(els.xMaxInput.value);
+        const hasValid = Number.isFinite(xmin) && Number.isFinite(xmax) && (xmax - xmin > EPS);
+
+        if (!hasValid) {
+          if (els.xMinInput.value !== '' || els.xMaxInput.value !== '') {
+            errors.push('x-range inputs must satisfy x-max > x-min. Auto range was used.');
+          }
+          xmin = defaultMin;
+          xmax = defaultMax;
+        }
+
+        els.xMinInput.value = toInputNumber(xmin);
+        els.xMaxInput.value = toInputNumber(xmax);
+        return { xmin, xmax };
+      }
+
+      function syncYTopInput(autoTop) {
+        const autoEnabled = els.autoYTopToggle.checked;
+        state.autoYTopEnabled = autoEnabled;
+        els.yTopInput.disabled = autoEnabled;
+        if (autoEnabled) {
+          els.yTopInput.value = toInputNumber(autoTop);
+        }
       }
 
       function normalizePoints(points, errors) {
@@ -681,22 +799,19 @@
         const pMin = points[0].x;
         const pMax = points[points.length - 1].x;
         const width = Math.max(1, pMax - pMin);
-        const xmin = pMin - 0.15 * width;
-        const xmax = pMax + 0.15 * width;
+        const defaultXMin = pMin - 0.15 * width;
+        const defaultXMax = pMax + 0.15 * width;
+        const { xmin, xmax } = resolveXAxisRange(defaultXMin, defaultXMax, errors);
 
         const x = new Array(INTERNAL_SAMPLES);
         const y = new Array(INTERNAL_SAMPLES);
         const step = (xmax - xmin) / (INTERNAL_SAMPLES - 1);
-        let minY = Infinity;
-        let maxY = -Infinity;
 
         for (let i = 0; i < INTERNAL_SAMPLES; i++) {
           const xv = xmin + i * step;
           const yv = evaluatePiecewise(points, xv);
           x[i] = xv;
           y[i] = yv;
-          if (yv < minY) minY = yv;
-          if (yv > maxY) maxY = yv;
         }
 
         const areaRes = trapezoidIntegralSafe(x, y);
@@ -716,14 +831,11 @@
         state.xmax = xmax;
         state.points = points;
         state.controlPoints = makeControlPoints(model);
+        state.yAutoTop = Math.max(1e-6, Math.max(...y) * 1.08);
+        syncYTopInput(state.yAutoTop);
 
         updateResults({
           type: model.type,
-          xmin,
-          xmax,
-          minY,
-          maxY,
-          area: areaRes.value,
           mean,
           variance: varianceRes.value
         });
@@ -782,8 +894,19 @@
         const xmax = state.xmax;
         let ymax = Math.max(...y);
         let ymin = Math.min(...y);
-        ymax = Math.max(1e-6, ymax * 1.08);
+        const autoTop = Math.max(1e-6, ymax * 1.08);
         ymin = Math.min(0, ymin * 1.08);
+        const requestedTop = Number(els.yTopInput.value);
+        const manualTopIsValid = Number.isFinite(requestedTop) && requestedTop > ymin + EPS;
+        if (state.autoYTopEnabled) {
+          ymax = autoTop;
+          els.yTopInput.value = toInputNumber(autoTop);
+        } else if (manualTopIsValid) {
+          ymax = requestedTop;
+        } else {
+          ymax = autoTop;
+          els.yTopInput.value = toInputNumber(autoTop);
+        }
         if (Math.abs(ymax - ymin) < 1e-9) ymax = ymin + 1;
         state.ymin = ymin;
         state.ymax = ymax;
@@ -1083,6 +1206,10 @@
         els.trapC.value = defaults.trapezoid.c;
         els.trapD.value = defaults.trapezoid.d;
         els.shadeToggle.checked = defaults.shade;
+        els.autoYTopToggle.checked = true;
+        els.yTopInput.value = '1';
+        els.xMinInput.value = '-1';
+        els.xMaxInput.value = '3';
         els.piecewiseRows.innerHTML = '';
         defaults.piecewise.forEach((p) => addPiecewiseRow(p.x, p.y));
         evaluateAndDraw();
@@ -1120,6 +1247,13 @@
       els.updateBtn.addEventListener('click', evaluateAndDraw);
       els.resetBtn.addEventListener('click', resetAll);
       els.shadeToggle.addEventListener('change', drawGraph);
+      els.xMinInput.addEventListener('change', evaluateAndDraw);
+      els.xMinInput.addEventListener('input', evaluateAndDraw);
+      els.xMaxInput.addEventListener('change', evaluateAndDraw);
+      els.xMaxInput.addEventListener('input', evaluateAndDraw);
+      els.autoYTopToggle.addEventListener('change', evaluateAndDraw);
+      els.yTopInput.addEventListener('change', evaluateAndDraw);
+      els.yTopInput.addEventListener('input', evaluateAndDraw);
       els.canvas.addEventListener('mousemove', movePointer);
       els.canvas.addEventListener('mousedown', startDrag);
       els.canvas.addEventListener('mouseup', endDrag);
