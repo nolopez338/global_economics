@@ -167,6 +167,43 @@
       align-items: center;
       gap: 0.4rem;
     }
+    .load-feedback-subsection {
+      margin-top: 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #f8fafc;
+      overflow: hidden;
+    }
+    .subsection-toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.6rem 0.8rem;
+      border: none;
+      border-bottom: 1px solid transparent;
+      border-radius: 0;
+      background: transparent;
+      font-weight: 700;
+      text-align: left;
+    }
+    .subsection-toggle:hover {
+      background: #eef2ff;
+      border-color: transparent;
+    }
+    .subsection-content {
+      padding: 0.2rem 0.8rem 0.8rem;
+    }
+    .math-col-head {
+      width: 9%;
+    }
+    .math-notation-cell {
+      text-align: center;
+      white-space: nowrap;
+      background: #fafcff;
+      font-family: "Cambria Math", "Times New Roman", serif;
+    }
     .load-mode-select {
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -396,16 +433,17 @@
       <h2>PMF Input</h2>
       <div class="mode-picker">
         <label><input type="radio" name="inputMode" value="table" checked /> Table input</label>
+        <label><input type="checkbox" id="mathNotationToggle" /> Math notation</label>
         <label><input type="radio" name="inputMode" value="text" /> Text input</label>
       </div>
       <div id="tableSection" class="input-section active">
         <p class="muted">Enter each pair (x, p(x)). x and p(x) can be decimals.</p>
-        <table>
+        <table id="pmfInputTable">
           <thead>
-            <tr>
+            <tr id="pmfTableHeadRow">
               <th style="width:45%">x</th>
               <th style="width:45%">p(x)</th>
-              <th class="table-head-action">
+              <th class="table-head-action" id="pmfTableActionHead">
                 <button type="button" id="clearRowsBtn" class="table-icon-btn" aria-label="Clear all rows">x</button>
               </th>
             </tr>
@@ -420,35 +458,45 @@
         <p class="muted">Paste one pair per line in either format: <code>x p</code> or <code>x, p</code>.</p>
         <textarea id="pmfTextarea" placeholder="0, 0.2&#10;1, 0.5&#10;2, 0.3"></textarea>
       </div>
-      <div class="controls load-controls">
-        <button type="button" id="loadBtn" class="btn-secondary">Load</button>
-        <select id="loadModeSelect" class="load-mode-select" aria-label="Load mode">
-          <option value="uniform">Uniform</option>
-          <option value="random-probability">Random Probability</option>
-          <option value="random">Random</option>
-          <option value="example-1">Example 1</option>
-          <option value="example-2">Example 2</option>
-          <option value="example-3">Example 3</option>
-          <option value="example-4">Example 4</option>
-          <option value="example-5">Example 5</option>
-          <option value="example-6">Example 6</option>
-          <option value="example-7">Example 7</option>
-          <option value="example-8">Example 8</option>
-          <option value="example-9">Example 9</option>
-          <option value="example-10">Example 10</option>
-          <option value="example-11">Example 11</option>
-          <option value="example-12">Example 12</option>
-          <option value="example-13">Example 13</option>
-          <option value="example-14">Example 14</option>
-          <option value="example-15">Example 15</option>
-          <option value="example-16">Example 16</option>
-          <option value="example-17">Example 17</option>
-          <option value="example-18">Example 18</option>
-          <option value="example-19">Example 19</option>
-          <option value="example-20">Example 20</option>
-        </select>
+      <div class="load-feedback-subsection collapsible">
+        <h3 style="margin:0;">
+          <button class="subsection-toggle" type="button" aria-expanded="false" id="load-feedback-toggle" aria-controls="load-feedback-content">
+            <span class="toggle-label">Examples &amp; Validation</span>
+            <span class="toggle-icon" aria-hidden="true">+</span>
+          </button>
+        </h3>
+        <div class="subsection-content collapsible-content" id="load-feedback-content" role="region" aria-labelledby="load-feedback-toggle" hidden>
+          <div class="controls load-controls">
+            <button type="button" id="loadBtn" class="btn-secondary">Load</button>
+            <select id="loadModeSelect" class="load-mode-select" aria-label="Load mode">
+              <option value="uniform">Uniform</option>
+              <option value="random-probability">Random Probability</option>
+              <option value="random">Random</option>
+              <option value="example-1">Example 1</option>
+              <option value="example-2">Example 2</option>
+              <option value="example-3">Example 3</option>
+              <option value="example-4">Example 4</option>
+              <option value="example-5">Example 5</option>
+              <option value="example-6">Example 6</option>
+              <option value="example-7">Example 7</option>
+              <option value="example-8">Example 8</option>
+              <option value="example-9">Example 9</option>
+              <option value="example-10">Example 10</option>
+              <option value="example-11">Example 11</option>
+              <option value="example-12">Example 12</option>
+              <option value="example-13">Example 13</option>
+              <option value="example-14">Example 14</option>
+              <option value="example-15">Example 15</option>
+              <option value="example-16">Example 16</option>
+              <option value="example-17">Example 17</option>
+              <option value="example-18">Example 18</option>
+              <option value="example-19">Example 19</option>
+              <option value="example-20">Example 20</option>
+            </select>
+          </div>
+          <div id="errorBox" class="error-box" role="alert" aria-live="assertive"></div>
+        </div>
       </div>
-      <div id="errorBox" class="error-box" role="alert" aria-live="assertive"></div>
     </section>
     <section class="card content-card collapsible" id="computed-results">
       <h2>
@@ -483,6 +531,11 @@
       const introductionContent = document.getElementById('introduction-content');
       const computedResultsToggle = document.getElementById('computed-results-toggle');
       const computedResultsContent = document.getElementById('computed-results-content');
+      const loadFeedbackToggle = document.getElementById('load-feedback-toggle');
+      const loadFeedbackContent = document.getElementById('load-feedback-content');
+      const mathNotationToggle = document.getElementById('mathNotationToggle');
+      const tableHeadRow = document.getElementById('pmfTableHeadRow');
+      const actionHeader = document.getElementById('pmfTableActionHead');
       const canvas = document.getElementById('pmfCanvas');
       const variableControlBox = document.getElementById('variableControlBox');
       const variableControlsList = document.getElementById('variableControlsList');
@@ -634,6 +687,7 @@
       let currentFixedPlayYLimits = null;
       let freezeErrorBoxDuringPlay = false;
       let errorBoxRefreshQueued = false;
+      let showMathNotation = false;
       function queueErrorBoxRefreshAfterPlay() {
         if (errorBoxRefreshQueued) return;
         errorBoxRefreshQueued = true;
@@ -914,9 +968,66 @@
       }
       bindCollapsible(introductionToggle, introductionContent, true);
       bindCollapsible(computedResultsToggle, computedResultsContent, false);
+      bindCollapsible(loadFeedbackToggle, loadFeedbackContent, false);
       function formatNum(n, digits = 6) {
         if (!Number.isFinite(n)) return '—';
         return Number(n).toFixed(digits).replace(/\.0+$/, '').replace(/(\.\d*?)0+$/, '$1');
+      }
+      function mathNotationMarkup(type, idx) {
+        if (type === 'x') {
+          return `<math aria-label="x sub ${idx}"><msub><mi>x</mi><mn>${idx}</mn></msub></math>`;
+        }
+        return `<math aria-label="p of x sub ${idx}"><mi>p</mi><mo>(</mo><msub><mi>x</mi><mn>${idx}</mn></msub><mo>)</mo></math>`;
+      }
+      function updateMathNotationCells() {
+        if (!showMathNotation) return;
+        const rows = Array.from(tableBody.querySelectorAll('tr'));
+        rows.forEach((row, idx) => {
+          const ordinal = idx + 1;
+          const xCell = row.querySelector('.math-x-cell');
+          const pCell = row.querySelector('.math-p-cell');
+          if (xCell) xCell.innerHTML = mathNotationMarkup('x', ordinal);
+          if (pCell) pCell.innerHTML = mathNotationMarkup('p', ordinal);
+        });
+      }
+      function syncMathNotationColumns() {
+        const rows = Array.from(tableBody.querySelectorAll('tr'));
+        if (showMathNotation) {
+          if (!tableHeadRow.querySelector('.math-head-first')) {
+            const firstMathHead = document.createElement('th');
+            firstMathHead.className = 'math-col-head math-head-first';
+            firstMathHead.textContent = '';
+            tableHeadRow.insertBefore(firstMathHead, tableHeadRow.firstElementChild);
+          }
+          if (!tableHeadRow.querySelector('.math-head-third')) {
+            const thirdMathHead = document.createElement('th');
+            thirdMathHead.className = 'math-col-head math-head-third';
+            thirdMathHead.textContent = '';
+            tableHeadRow.insertBefore(thirdMathHead, actionHeader);
+          }
+          rows.forEach((row) => {
+            if (!row.querySelector('.math-x-cell')) {
+              const xMathCell = row.insertCell(0);
+              xMathCell.className = 'math-notation-cell math-x-cell';
+            }
+            if (!row.querySelector('.math-p-cell')) {
+              const pMathCell = row.insertCell(2);
+              pMathCell.className = 'math-notation-cell math-p-cell';
+            }
+          });
+          updateMathNotationCells();
+          return;
+        }
+        const firstMathHead = tableHeadRow.querySelector('.math-head-first');
+        const thirdMathHead = tableHeadRow.querySelector('.math-head-third');
+        if (firstMathHead) firstMathHead.remove();
+        if (thirdMathHead) thirdMathHead.remove();
+        rows.forEach((row) => {
+          const xCell = row.querySelector('.math-x-cell');
+          const pCell = row.querySelector('.math-p-cell');
+          if (xCell) xCell.remove();
+          if (pCell) pCell.remove();
+        });
       }
       function addRow(x = '', p = '') {
         const tr = document.createElement('tr');
@@ -926,6 +1037,7 @@
           <td class="row-delete-cell"><button type="button" class="row-delete-btn" aria-label="Delete row">x</button></td>
         `;
         tableBody.appendChild(tr);
+        syncMathNotationColumns();
         updateBoundaryRowHighlight();
       }
       function clearRows(keepOneRow = true) {
@@ -1618,6 +1730,7 @@
         } else {
           firstRow.classList.add('boundary-row-last');
         }
+        updateMathNotationCells();
       }
       function getLoadBounds() {
         const rows = Array.from(tableBody.querySelectorAll('tr'));
@@ -1792,6 +1905,10 @@
         parseAndUpdate();
       });
       document.getElementById('loadBtn').addEventListener('click', loadByMode);
+      mathNotationToggle.addEventListener('change', () => {
+        showMathNotation = mathNotationToggle.checked;
+        syncMathNotationColumns();
+      });
       tableBody.addEventListener('input', parseAndUpdate);
       tableBody.addEventListener('click', (evt) => {
         const deleteBtn = evt.target.closest('.row-delete-btn');
@@ -1831,6 +1948,7 @@
         }, 140);
       });
       ensureAtLeastRows(4);
+      syncMathNotationColumns();
       redrawPMF();
       const preloadedFromUrl = preloadLoadModeFromUrl();
       if (!preloadedFromUrl) parseAndUpdate();
