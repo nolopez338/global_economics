@@ -32,13 +32,28 @@
     return `${grade}${group}`.trim().toUpperCase();
   };
 
+  const normalizeScheduleDate = (raw) => {
+    if (!raw) {
+      return null;
+    }
+
+    const match = String(raw).trim().match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
+    if (!match) {
+      return null;
+    }
+
+    const [, year, month, day] = match;
+    return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+  };
+
   const toTimestamp = (dateValue) => {
-    if (!dateValue) {
+    const normalizedDate = normalizeScheduleDate(dateValue);
+    if (!normalizedDate) {
       return Number.POSITIVE_INFINITY;
     }
 
-    const [year, month, day] = String(dateValue).split("/");
-    const asDate = new Date(Number(year), Number(month) - 1, Number(day));
+    const [year, month, day] = normalizedDate.split("-").map(Number);
+    const asDate = new Date(year, month - 1, day);
     const time = asDate.getTime();
 
     return Number.isNaN(time) ? Number.POSITIVE_INFINITY : time;
@@ -118,12 +133,21 @@
   };
 
   const formatScheduleDate = (value) => {
-    const [year, month, day] = String(value || "").split("/");
-    if (!year || !month || !day) {
+    const normalizedDate = normalizeScheduleDate(value);
+    if (!normalizedDate) {
       return value || "";
     }
 
+    const [year, month, day] = normalizedDate.split("-");
     return `${year} / ${month} / ${day}`;
+  };
+
+  const getTodayISODate = () => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
   };
 
   const createBreadcrumbs = () => {
@@ -193,6 +217,59 @@
 
     const tbody = document.createElement("tbody");
 
+    const getColumnCount = () => table.tHead?.rows[0]?.cells.length ?? 1;
+
+    const appendEntryRow = (entry, body) => {
+      const row = document.createElement("tr");
+      row.dataset.date = entry.Date || "";
+      row.dataset.weekday = entry.Weekday || "";
+      row.dataset.description = entry.Description || "";
+      row.dataset.classId = entry.class_id || "";
+      if (entry.Summary) {
+        row.dataset.summary = entry.Summary;
+        row.dataset.title = entry.Summary;
+      }
+
+      const gradeCell = document.createElement("td");
+      gradeCell.textContent = entry.grade;
+
+      const groupCell = document.createElement("td");
+      groupCell.textContent = entry.group;
+
+      const classCell = document.createElement("th");
+      classCell.scope = "row";
+      classCell.textContent = entry["Class #"] || "";
+
+      const dateCell = document.createElement("td");
+      dateCell.textContent = formatScheduleDate(entry.Date);
+
+      const weekdayCell = document.createElement("td");
+      weekdayCell.textContent = entry.Weekday || "";
+
+      const dayCell = document.createElement("td");
+      dayCell.textContent = entry.Day ?? "";
+
+      const descriptionCell = document.createElement("td");
+      descriptionCell.textContent = entry.Description || "";
+
+      const materialCell = document.createElement("td");
+      materialCell.textContent = entry.Material || "";
+
+      row.append(
+        gradeCell,
+        groupCell,
+        classCell,
+        dateCell,
+        weekdayCell,
+        dayCell,
+        descriptionCell,
+        materialCell
+      );
+
+      body.append(row);
+      return row;
+    };
+
     if (entries.length === 0) {
       const row = document.createElement("tr");
       const cell = document.createElement("td");
@@ -201,55 +278,100 @@
       row.append(cell);
       tbody.append(row);
     } else {
-      entries.forEach((entry) => {
-        const row = document.createElement("tr");
-        row.dataset.date = entry.Date || "";
-        row.dataset.weekday = entry.Weekday || "";
-        row.dataset.description = entry.Description || "";
-        row.dataset.classId = entry.class_id || "";
-        if (entry.Summary) {
-          row.dataset.summary = entry.Summary;
-          row.dataset.title = entry.Summary;
+      const todayISO = getTodayISODate();
+      const classifiedEntries = entries.map((entry) => {
+        const normalizedDate = normalizeScheduleDate(entry.Date);
+        return {
+          entry,
+          normalizedDate,
+          isPast: Boolean(normalizedDate && normalizedDate < todayISO),
+        };
+      });
+
+      const uniquePastDates = Array.from(
+        new Set(
+          classifiedEntries
+            .filter((item) => item.isPast)
+            .map((item) => item.normalizedDate)
+        )
+      ).sort();
+
+      const olderPastDates = new Set(
+        uniquePastDates.length > 2
+          ? uniquePastDates.slice(0, uniquePastDates.length - 2)
+          : []
+      );
+
+      const olderPastEntries = [];
+      const visibleEntries = [];
+
+      classifiedEntries.forEach((item) => {
+        if (item.isPast && olderPastDates.has(item.normalizedDate)) {
+          olderPastEntries.push(item.entry);
+          return;
         }
 
-        const gradeCell = document.createElement("td");
-        gradeCell.textContent = entry.grade;
-
-        const groupCell = document.createElement("td");
-        groupCell.textContent = entry.group;
-
-        const classCell = document.createElement("th");
-        classCell.scope = "row";
-        classCell.textContent = entry["Class #"] || "";
-
-        const dateCell = document.createElement("td");
-        dateCell.textContent = formatScheduleDate(entry.Date);
-
-        const weekdayCell = document.createElement("td");
-        weekdayCell.textContent = entry.Weekday || "";
-
-        const dayCell = document.createElement("td");
-        dayCell.textContent = entry.Day ?? "";
-
-        const descriptionCell = document.createElement("td");
-        descriptionCell.textContent = entry.Description || "";
-
-        const materialCell = document.createElement("td");
-        materialCell.textContent = entry.Material || "";
-
-        row.append(
-          gradeCell,
-          groupCell,
-          classCell,
-          dateCell,
-          weekdayCell,
-          dayCell,
-          descriptionCell,
-          materialCell
-        );
-
-        tbody.append(row);
+        visibleEntries.push(item.entry);
       });
+
+      if (olderPastEntries.length > 0) {
+        const sectionId = "full-schedule-past-dates";
+        const toggleRow = document.createElement("tr");
+        toggleRow.className = "past-dates-toggle-row";
+
+        const toggleCell = document.createElement("td");
+        toggleCell.colSpan = getColumnCount();
+
+        const toggleButton = document.createElement("button");
+        toggleButton.type = "button";
+        toggleButton.className = "past-dates-toggle";
+        toggleButton.setAttribute("aria-expanded", "false");
+        toggleButton.setAttribute("aria-controls", sectionId);
+
+        const label = document.createElement("span");
+        label.className = "toggle-label";
+        label.textContent = "Past dates";
+
+        const icon = document.createElement("span");
+        icon.className = "toggle-icon";
+        icon.setAttribute("aria-hidden", "true");
+        icon.textContent = "+";
+
+        toggleButton.append(label, icon);
+        toggleCell.append(toggleButton);
+        toggleRow.append(toggleCell);
+        tbody.append(toggleRow);
+
+        const pastRows = olderPastEntries.map((entry, index) => {
+          const row = appendEntryRow(entry, tbody);
+          if (index === 0) {
+            row.id = sectionId;
+          }
+          row.hidden = true;
+          return row;
+        });
+
+        toggleButton.addEventListener("click", () => {
+          const isExpanded = toggleButton.getAttribute("aria-expanded") === "true";
+          const nextExpanded = !isExpanded;
+          toggleButton.setAttribute("aria-expanded", nextExpanded ? "true" : "false");
+          icon.textContent = nextExpanded ? "−" : "+";
+          pastRows.forEach((row) => {
+            row.hidden = !nextExpanded;
+          });
+        });
+      }
+
+      visibleEntries.forEach((entry) => appendEntryRow(entry, tbody));
+
+      if (tbody.rows.length === 0) {
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.colSpan = getColumnCount();
+        cell.textContent = "No current or upcoming entries.";
+        row.append(cell);
+        tbody.append(row);
+      }
     }
 
     table.append(tbody);
