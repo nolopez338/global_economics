@@ -496,7 +496,7 @@
       let dragRowIndex = -1;
       let dragScale = null;
       let resizeTimer = null;
-      const DEFAULT_VARIABLE_SETTINGS = { value: 1, min: -5, max: 5, step: 0.1 };
+      const DEFAULT_VARIABLE_SETTINGS = { value: 1, min: 0, max: 1, step: 0.001 };
       const examplePMFs = {
         'example-1': [
           { x: '0', p: '0.2' },
@@ -727,16 +727,33 @@
         updateVariableRowDisplay(variableName);
         if (shouldParse) parseAndUpdate();
       }
-      function syncVariableBounds(variableName, fromMinInput) {
+      function isIncompleteNumericInput(rawValue) {
+        return rawValue === '' || rawValue === '.' || rawValue === '-' || rawValue === '+' || rawValue === '-.' || rawValue === '+.';
+      }
+      function parseNumericInputValue(rawValue) {
+        if (isIncompleteNumericInput(rawValue)) return null;
+        const parsed = Number(rawValue);
+        return Number.isFinite(parsed) ? parsed : null;
+      }
+      function syncVariableBounds(variableName, fromMinInput, commit = false) {
         const state = variableStateByName[variableName];
         const controls = variableControlElementsByName[variableName];
         if (!state || !controls) return;
         const previousMin = state.min;
         const previousMax = state.max;
-        let nextMin = Number(controls.minInput.value);
-        let nextMax = Number(controls.maxInput.value);
-        if (!Number.isFinite(nextMin)) nextMin = previousMin;
-        if (!Number.isFinite(nextMax)) nextMax = previousMax;
+        const typedMin = controls.minInput.value.trim();
+        const typedMax = controls.maxInput.value.trim();
+        const parsedMin = parseNumericInputValue(typedMin);
+        const parsedMax = parseNumericInputValue(typedMax);
+        if (!commit) {
+          if (!Number.isFinite(parsedMin) || !Number.isFinite(parsedMax) || parsedMin >= parsedMax) return;
+          state.min = parsedMin;
+          state.max = parsedMax;
+          setVariableValue(variableName, state.value);
+          return;
+        }
+        let nextMin = Number.isFinite(parsedMin) ? parsedMin : previousMin;
+        let nextMax = Number.isFinite(parsedMax) ? parsedMax : previousMax;
         if (nextMin >= nextMax) {
           if (fromMinInput) nextMin = previousMin;
           else nextMax = previousMax;
@@ -744,6 +761,23 @@
         state.min = nextMin;
         state.max = nextMax;
         setVariableValue(variableName, state.value);
+      }
+      function syncVariableCurrentInput(variableName, commit = false) {
+        const state = variableStateByName[variableName];
+        const controls = variableControlElementsByName[variableName];
+        if (!state || !controls) return;
+        const typedCurrent = controls.currentInput.value.trim();
+        const parsedCurrent = parseNumericInputValue(typedCurrent);
+        if (!commit) {
+          if (!Number.isFinite(parsedCurrent)) return;
+          setVariableValue(variableName, parsedCurrent);
+          return;
+        }
+        if (Number.isFinite(parsedCurrent)) {
+          setVariableValue(variableName, parsedCurrent);
+          return;
+        }
+        updateVariableRowDisplay(variableName);
       }
       function computeVariableAnimationSpeed(value, min, max) {
         const range = max - min;
@@ -1007,10 +1041,10 @@
           row.innerHTML = `
             <span class="variable-symbol-label">${variableName}</span>
             <button type="button" class="btn-secondary variable-play-btn" data-role="play">▶</button>
-            <input type="number" step="0.1" class="variable-bound-input" data-role="min" aria-label="Minimum ${variableName} value">
+            <input type="number" step="0.001" class="variable-bound-input" data-role="min" aria-label="Minimum ${variableName} value">
             <input type="range" class="variable-slider" data-role="slider" aria-label="${variableName} slider">
-            <input type="number" step="0.1" class="variable-bound-input" data-role="max" aria-label="Maximum ${variableName} value">
-            <input type="number" class="variable-current-input" data-role="current" aria-label="Current ${variableName} value">
+            <input type="number" step="0.001" class="variable-bound-input" data-role="max" aria-label="Maximum ${variableName} value">
+            <input type="number" step="0.001" class="variable-current-input" data-role="current" aria-label="Current ${variableName} value">
           `;
           variableControlsList.appendChild(row);
           const controls = {
@@ -1032,15 +1066,45 @@
           });
           controls.currentInput.addEventListener('input', () => {
             stopVariableAnimation(variableName);
-            setVariableValue(variableName, Number(controls.currentInput.value));
+            syncVariableCurrentInput(variableName, false);
+          });
+          controls.currentInput.addEventListener('blur', () => {
+            stopVariableAnimation(variableName);
+            syncVariableCurrentInput(variableName, true);
+          });
+          controls.currentInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              controls.currentInput.blur();
+            }
           });
           controls.minInput.addEventListener('input', () => {
             stopVariableAnimation(variableName);
-            syncVariableBounds(variableName, true);
+            syncVariableBounds(variableName, true, false);
+          });
+          controls.minInput.addEventListener('blur', () => {
+            stopVariableAnimation(variableName);
+            syncVariableBounds(variableName, true, true);
+          });
+          controls.minInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              controls.minInput.blur();
+            }
           });
           controls.maxInput.addEventListener('input', () => {
             stopVariableAnimation(variableName);
-            syncVariableBounds(variableName, false);
+            syncVariableBounds(variableName, false, false);
+          });
+          controls.maxInput.addEventListener('blur', () => {
+            stopVariableAnimation(variableName);
+            syncVariableBounds(variableName, false, true);
+          });
+          controls.maxInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              controls.maxInput.blur();
+            }
           });
           updateVariableRowDisplay(variableName);
           setVariablePlayState(variableName, isVariableAnimationRunning(variableName));
