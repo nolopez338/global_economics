@@ -284,6 +284,51 @@
       color: #991b1b;
     }
 
+    .probability-summary {
+      margin-top: 0.9rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 0.55rem;
+    }
+
+    .prob-box {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.65rem 0.7rem;
+      background: #f8fafc;
+      position: relative;
+    }
+
+    .prob-box .expr {
+      font-size: 0.86rem;
+      color: var(--muted);
+      margin-bottom: 0.28rem;
+      padding-right: 1.5rem;
+    }
+
+    .prob-box .value {
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .prob-delete {
+      position: absolute;
+      top: 0.35rem;
+      right: 0.35rem;
+      border: 1px solid #fecaca;
+      background: #fff1f2;
+      color: #b91c1c;
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      line-height: 1;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     @media (max-width: 840px) {
       .col-6, .col-4, .col-3 { grid-column: span 12; }
       canvas { height: 340px; }
@@ -444,6 +489,7 @@
           <input id="xMaxInput" type="number" step="any" value="3" />
         </div>
       </div>
+      <div id="probabilitySummary" class="probability-summary" aria-live="polite"></div>
     </section>
   </main>
 
@@ -482,7 +528,8 @@
         xMinInput: document.getElementById('xMinInput'),
         xMaxInput: document.getElementById('xMaxInput'),
         yTopInput: document.getElementById('yTopInput'),
-        autoYTopToggle: document.getElementById('autoYTopToggle')
+        autoYTopToggle: document.getElementById('autoYTopToggle'),
+        probabilitySummary: document.getElementById('probabilitySummary')
       };
 
       const defaults = {
@@ -512,6 +559,7 @@
         drag: null,
         yAutoTop: 1,
         autoYTopEnabled: true,
+        probabilityMarkers: [],
         plot: { m: { l: 62, r: 20, t: 18, b: 46 }, w: 1, h: 1, rectWidth: 1, rectHeight: 420 }
       };
 
@@ -770,6 +818,102 @@
         return 0;
       }
 
+      function cdfAtX(xVal) {
+        if (!state.x.length || !state.y.length) return 0;
+        if (xVal <= state.x[0]) return 0;
+        if (xVal >= state.x[state.x.length - 1]) return 1;
+
+        let area = 0;
+        for (let i = 0; i < state.x.length - 1; i++) {
+          const xa = state.x[i];
+          const xb = state.x[i + 1];
+          const ya = state.y[i];
+          const yb = state.y[i + 1];
+          if (xVal >= xb) {
+            area += (xb - xa) * (ya + yb) / 2;
+            continue;
+          }
+          if (xVal > xa) {
+            const t = (xVal - xa) / (xb - xa || 1);
+            const yx = ya + t * (yb - ya);
+            area += (xVal - xa) * (ya + yx) / 2;
+          }
+          break;
+        }
+        return clamp(area, 0, 1);
+      }
+
+      function clampMarkersToRange() {
+        if (!state.probabilityMarkers.length) return;
+        state.probabilityMarkers = state.probabilityMarkers
+          .slice(0, 2)
+          .map((marker) => ({ ...marker, x: clamp(marker.x, state.xmin, state.xmax) }));
+      }
+
+      function removeProbabilityMarker(id) {
+        const before = state.probabilityMarkers.length;
+        state.probabilityMarkers = state.probabilityMarkers.filter((m) => m.id !== id);
+        if (state.drag && state.drag.id === id) state.drag = null;
+        if (state.hoverTargetId === id) state.hoverTargetId = null;
+        if (state.probabilityMarkers.length !== before) evaluateAndDraw();
+      }
+
+      function markerLabel(index) {
+        return index === 0 ? 'x₁' : 'x₂';
+      }
+
+      function renderProbabilitySummary() {
+        const markers = state.probabilityMarkers;
+        if (!markers.length) {
+          els.probabilitySummary.innerHTML = '';
+          return;
+        }
+
+        const markerBoxes = markers.map((marker, index) => {
+          const p = cdfAtX(marker.x);
+          const label = markerLabel(index);
+          return `
+            <div class="prob-box">
+              <button type="button" class="prob-delete" data-delete-marker="${marker.id}" aria-label="Delete probability marker ${index + 1}">×</button>
+              <div class="expr">Probability of X ≤ ${label} (${fmt(marker.x, 3)})</div>
+              <div class="value">${fmt(p, 4)}</div>
+            </div>
+          `;
+        });
+
+        if (markers.length === 2) {
+          const ordered = [...markers].sort((a, b) => a.x - b.x);
+          const lo = ordered[0].x;
+          const hi = ordered[1].x;
+          const p = clamp(cdfAtX(hi) - cdfAtX(lo), 0, 1);
+          markerBoxes.push(`
+            <div class="prob-box">
+              <div class="expr">Probability of ${fmt(lo, 3)} ≤ X ≤ ${fmt(hi, 3)}</div>
+              <div class="value">${fmt(p, 4)}</div>
+            </div>
+          `);
+        }
+
+        els.probabilitySummary.innerHTML = markerBoxes.join('');
+      }
+
+      function createProbabilityMarker(clientX) {
+        if (state.probabilityMarkers.length >= 2) {
+          setStatus('warn', 'Only two probability markers can be shown at once. Delete one to add another.');
+          return;
+        }
+        const data = pixelToData(clientX, 0);
+        let xVal = clamp(data.xVal, state.xmin, state.xmax);
+        const selectedLine = state.interactionTargets.find((t) => t.id === state.hoverTargetId && t.kind === 'line');
+        if (selectedLine) xVal = clamp(selectedLine.x, state.xmin, state.xmax);
+        const marker = {
+          id: `prob-marker-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
+          x: xVal
+        };
+        state.probabilityMarkers.push(marker);
+        evaluateAndDraw();
+      }
+
       function buildInteractionTargets(model) {
         const targets = [];
         if (!model.points.length) return targets;
@@ -820,6 +964,32 @@
           });
         }
 
+        state.probabilityMarkers.forEach((marker, index) => {
+          const xVal = clamp(marker.x, state.xmin, state.xmax);
+          const yVal = evaluatePiecewise(model.points, xVal);
+          targets.push({
+            id: marker.id,
+            kind: 'line',
+            x: xVal,
+            y: yVal,
+            label: `p${index + 1}`,
+            draggableX: true,
+            draggableY: false,
+            markerKind: 'probability'
+          });
+          targets.push({
+            id: `${marker.id}-point`,
+            markerId: marker.id,
+            kind: 'point',
+            x: xVal,
+            y: yVal,
+            label: `p${index + 1}`,
+            draggableX: true,
+            draggableY: false,
+            markerKind: 'probability'
+          });
+        });
+
         return targets;
       }
 
@@ -863,6 +1033,7 @@
         state.xmin = xmin;
         state.xmax = xmax;
         state.points = points;
+        clampMarkersToRange();
         state.interactionTargets = buildInteractionTargets(model);
         if (!state.interactionTargets.some((t) => t.id === state.hoverTargetId)) state.hoverTargetId = null;
         state.yAutoTop = Math.max(1e-6, Math.max(...y) * 1.08);
@@ -877,6 +1048,7 @@
         if (errors.length) setStatus('error', 'Graph rendered with validation errors. See details below.');
         else setStatus('ok', `Valid PDF rendered. Area ≈ ${fmt(areaRes.value)}.`);
         setErrors(errors);
+        renderProbabilitySummary();
         drawGraph();
       }
 
@@ -978,14 +1150,17 @@
           if (!Number.isFinite(linePx)) return;
           const active = state.drag && state.drag.id === line.id;
           const hovered = state.hoverTargetId === line.id;
+          const isProb = line.markerKind === 'probability';
+          const baseColor = isProb ? 'rgba(124, 58, 237, 0.55)' : 'rgba(37, 99, 235, 0.45)';
+          const hoverColor = isProb ? 'rgba(124, 58, 237, 0.92)' : 'rgba(37, 99, 235, 0.88)';
           ctx.beginPath();
           ctx.moveTo(linePx, topY);
           ctx.lineTo(linePx, bottomY);
-          ctx.strokeStyle = active ? 'rgba(245, 158, 11, 0.95)' : hovered ? 'rgba(37, 99, 235, 0.88)' : 'rgba(37, 99, 235, 0.45)';
+          ctx.strokeStyle = active ? 'rgba(245, 158, 11, 0.95)' : hovered ? hoverColor : baseColor;
           ctx.lineWidth = active ? 3 : hovered ? 2.4 : 1.6;
           ctx.stroke();
 
-          ctx.fillStyle = active ? '#b45309' : '#1d4ed8';
+          ctx.fillStyle = active ? '#b45309' : isProb ? '#6d28d9' : '#1d4ed8';
           ctx.font = '11px sans-serif';
           ctx.textAlign = 'center';
           ctx.fillText(line.label, linePx, m.t + 12);
@@ -993,12 +1168,13 @@
 
         state.interactionTargets.filter((t) => t.kind === 'point').forEach((point) => {
           const pxy = dataToPixel(point.x, point.y);
-          const active = state.drag && state.drag.id === point.id;
-          const hovered = state.hoverTargetId === point.id;
+          const active = state.drag && (state.drag.id === point.id || state.drag.id === point.markerId);
+          const hovered = state.hoverTargetId === point.id || state.hoverTargetId === point.markerId;
+          const isProb = point.markerKind === 'probability';
           const radius = active ? 7 : hovered ? 6 : 5;
           ctx.beginPath();
           ctx.arc(pxy.px, pxy.py, radius, 0, Math.PI * 2);
-          ctx.fillStyle = active ? '#f59e0b' : hovered ? '#2563eb' : '#0f172a';
+          ctx.fillStyle = active ? '#f59e0b' : hovered ? (isProb ? '#7c3aed' : '#2563eb') : (isProb ? '#5b21b6' : '#0f172a');
           ctx.globalAlpha = 0.96;
           ctx.fill();
           ctx.globalAlpha = 1;
@@ -1122,6 +1298,14 @@
         const { xVal, yVal } = pixelToData(clientX, clientY);
         const type = els.distributionType.value;
         const dragId = state.drag.id;
+        const markerFromPoint = dragId.endsWith('-point') ? dragId.slice(0, -6) : null;
+        const markerId = markerFromPoint || dragId;
+        const marker = state.probabilityMarkers.find((m) => m.id === markerId);
+        if (marker) {
+          marker.x = clamp(xVal, state.xmin, state.xmax);
+          evaluateAndDraw();
+          return;
+        }
 
         if (type === 'uniform') {
           let a = Number(els.uniformA.value);
@@ -1188,10 +1372,12 @@
       }
 
       function startDrag(evt) {
+        if (evt.button !== 0) return;
         const target = hitTestTarget(evt.clientX, evt.clientY);
         if (!target) return;
-        state.drag = { id: target.id, pointerId: evt.pointerId };
-        state.hoverTargetId = target.id;
+        const dragId = target.markerId || target.id;
+        state.drag = { id: dragId, pointerId: evt.pointerId };
+        state.hoverTargetId = dragId;
         els.tooltip.style.display = 'none';
         els.canvas.style.cursor = 'grabbing';
         if (els.canvas.setPointerCapture) els.canvas.setPointerCapture(evt.pointerId);
@@ -1206,7 +1392,7 @@
           return;
         }
         const hit = hitTestTarget(evt.clientX, evt.clientY);
-        state.hoverTargetId = hit ? hit.id : null;
+        state.hoverTargetId = hit ? (hit.markerId || hit.id) : null;
         setCursor(evt.clientX, evt.clientY);
         if (hit) {
           state.hoverIndex = -1;
@@ -1266,6 +1452,20 @@
         tip.textContent = `x=${fmt(state.x[idx])}, f(x)=${fmt(state.y[idx])}`;
       }
 
+      function handleGraphRightClick(evt) {
+        if (evt.cancelable) evt.preventDefault();
+        const hit = hitTestTarget(evt.clientX, evt.clientY);
+        if (hit) {
+          const markerId = hit.markerId || hit.id;
+          const marker = state.probabilityMarkers.find((m) => m.id === markerId);
+          if (marker) {
+            removeProbabilityMarker(marker.id);
+            return;
+          }
+        }
+        createProbabilityMarker(evt.clientX);
+      }
+
       function addPiecewiseRow(x = 0, y = 0) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -1304,6 +1504,7 @@
         els.yTopInput.value = '1';
         els.xMinInput.value = '-1';
         els.xMaxInput.value = '3';
+        state.probabilityMarkers = [];
         els.piecewiseRows.innerHTML = '';
         defaults.piecewise.forEach((p) => addPiecewiseRow(p.x, p.y));
         evaluateAndDraw();
@@ -1352,6 +1553,13 @@
       els.canvas.addEventListener('pointerdown', startDrag);
       els.canvas.addEventListener('pointerup', endDrag);
       els.canvas.addEventListener('pointercancel', endDrag);
+      els.canvas.addEventListener('contextmenu', handleGraphRightClick);
+      els.graphWrap.addEventListener('contextmenu', (evt) => evt.preventDefault());
+      els.probabilitySummary.addEventListener('click', (evt) => {
+        const btn = evt.target.closest('[data-delete-marker]');
+        if (!btn) return;
+        removeProbabilityMarker(btn.getAttribute('data-delete-marker'));
+      });
       els.canvas.addEventListener('mouseleave', () => {
         state.hoverIndex = -1;
         state.hoverTargetId = null;
