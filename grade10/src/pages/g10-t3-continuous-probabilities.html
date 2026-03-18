@@ -239,6 +239,7 @@
       width: 100%;
       height: 420px;
       display: block;
+      touch-action: none;
     }
 
     .tooltip {
@@ -450,7 +451,8 @@
     (() => {
       const INTERNAL_SAMPLES = 500;
       const EPS = 1e-3;
-      const DRAG_RADIUS = 10;
+      const HIT_RADIUS_POINT = 10;
+      const HIT_RADIUS_LINE = 8;
       const els = {
         distributionType: document.getElementById('distributionType'),
         uniformParams: document.getElementById('uniformParams'),
@@ -505,7 +507,8 @@
         ymax: 1,
         hoverIndex: -1,
         points: [],
-        controlPoints: [],
+        interactionTargets: [],
+        hoverTargetId: null,
         drag: null,
         yAutoTop: 1,
         autoYTopEnabled: true,
@@ -642,6 +645,13 @@
         input.value = toInputNumber(value);
       }
 
+      function setPiecewiseY(index, value) {
+        const row = els.piecewiseRows.querySelectorAll('tr')[index];
+        if (!row) return;
+        const input = row.querySelector('.pw-y');
+        input.value = toInputNumber(Math.max(0, value));
+      }
+
       function clamp(v, lo, hi) {
         return Math.min(hi, Math.max(lo, v));
       }
@@ -760,34 +770,57 @@
         return 0;
       }
 
-      function makeControlPoints(model) {
-        const cps = [];
-        const p = model.points;
-        if (!p.length) return cps;
+      function buildInteractionTargets(model) {
+        const targets = [];
+        if (!model.points.length) return targets;
+
+        const pushLine = (id, x, label) => targets.push({
+          id,
+          kind: 'line',
+          x,
+          label,
+          draggableX: true,
+          draggableY: false
+        });
+        const pushPoint = (id, x, y, label, index) => targets.push({
+          id,
+          kind: 'point',
+          x,
+          y,
+          label,
+          index,
+          draggableX: true,
+          draggableY: true
+        });
+
         if (model.type === 'uniform') {
-          const k = p[0].y;
-          cps.push({ id: 'ua0', x: model.params.a, y: 0, draggable: true });
-          cps.push({ id: 'uak', x: model.params.a, y: k, draggable: false });
-          cps.push({ id: 'ubk', x: model.params.b, y: k, draggable: false });
-          cps.push({ id: 'ub0', x: model.params.b, y: 0, draggable: true });
+          pushLine('uniform-a', model.params.a, 'a');
+          pushLine('uniform-b', model.params.b, 'b');
         }
+
         if (model.type === 'triangular') {
-          cps.push({ id: 'ta0', x: model.params.a, y: 0, draggable: true });
-          cps.push({ id: 'tmh', x: model.params.m, y: p[1].y, draggable: false });
-          cps.push({ id: 'tb0', x: model.params.b, y: 0, draggable: true });
+          pushLine('triangular-a', model.params.a, 'a');
+          pushLine('triangular-m', model.params.m, 'm');
+          pushLine('triangular-b', model.params.b, 'b');
         }
+
         if (model.type === 'trapezoid') {
-          cps.push({ id: 'za0', x: model.params.a, y: 0, draggable: true });
-          cps.push({ id: 'zbh', x: model.params.b, y: p[1].y, draggable: false });
-          cps.push({ id: 'zch', x: model.params.c, y: p[2].y, draggable: false });
-          cps.push({ id: 'zd0', x: model.params.d, y: 0, draggable: true });
+          pushLine('trapezoid-a', model.params.a, 'a');
+          pushLine('trapezoid-b', model.params.b, 'b');
+          pushLine('trapezoid-c', model.params.c, 'c');
+          pushLine('trapezoid-d', model.params.d, 'd');
         }
+
         if (model.type === 'piecewise') {
-          p.forEach((pt, i) => cps.push({ id: `pw-${i}`, x: pt.x, y: pt.y, draggable: false }));
-          cps.push({ id: 'pw-start', x: p[0].x, y: 0, draggable: true });
-          cps.push({ id: 'pw-end', x: p[p.length - 1].x, y: 0, draggable: true });
+          const raw = model.params.raw || [];
+          raw.forEach((pt, i) => {
+            pushLine(`piecewise-line-${i}`, pt.x, `x${i + 1}`);
+            const normalizedY = model.points[i] ? model.points[i].y : 0;
+            pushPoint(`piecewise-point-${i}`, pt.x, normalizedY, `P${i + 1}`, i);
+          });
         }
-        return cps;
+
+        return targets;
       }
 
       function evaluateAndDraw() {
@@ -830,7 +863,8 @@
         state.xmin = xmin;
         state.xmax = xmax;
         state.points = points;
-        state.controlPoints = makeControlPoints(model);
+        state.interactionTargets = buildInteractionTargets(model);
+        if (!state.interactionTargets.some((t) => t.id === state.hoverTargetId)) state.hoverTargetId = null;
         state.yAutoTop = Math.max(1e-6, Math.max(...y) * 1.08);
         syncYTopInput(state.yAutoTop);
 
@@ -937,18 +971,39 @@
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        state.controlPoints.forEach((cp) => {
-          const pxy = dataToPixel(cp.x, cp.y);
-          const active = state.drag && state.drag.id === cp.id;
-          const radius = active ? 6.5 : 4.5;
+        const topY = m.t;
+        const bottomY = m.t + h;
+        state.interactionTargets.filter((t) => t.kind === 'line').forEach((line) => {
+          const linePx = dataToPixel(line.x, 0).px;
+          if (!Number.isFinite(linePx)) return;
+          const active = state.drag && state.drag.id === line.id;
+          const hovered = state.hoverTargetId === line.id;
+          ctx.beginPath();
+          ctx.moveTo(linePx, topY);
+          ctx.lineTo(linePx, bottomY);
+          ctx.strokeStyle = active ? 'rgba(245, 158, 11, 0.95)' : hovered ? 'rgba(37, 99, 235, 0.88)' : 'rgba(37, 99, 235, 0.45)';
+          ctx.lineWidth = active ? 3 : hovered ? 2.4 : 1.6;
+          ctx.stroke();
+
+          ctx.fillStyle = active ? '#b45309' : '#1d4ed8';
+          ctx.font = '11px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(line.label, linePx, m.t + 12);
+        });
+
+        state.interactionTargets.filter((t) => t.kind === 'point').forEach((point) => {
+          const pxy = dataToPixel(point.x, point.y);
+          const active = state.drag && state.drag.id === point.id;
+          const hovered = state.hoverTargetId === point.id;
+          const radius = active ? 7 : hovered ? 6 : 5;
           ctx.beginPath();
           ctx.arc(pxy.px, pxy.py, radius, 0, Math.PI * 2);
-          ctx.fillStyle = cp.draggable ? '#2563eb' : '#0f172a';
-          ctx.globalAlpha = cp.draggable ? 0.95 : 0.75;
+          ctx.fillStyle = active ? '#f59e0b' : hovered ? '#2563eb' : '#0f172a';
+          ctx.globalAlpha = 0.96;
           ctx.fill();
           ctx.globalAlpha = 1;
-          ctx.lineWidth = active ? 2 : 1.25;
-          ctx.strokeStyle = active ? '#f59e0b' : '#ffffff';
+          ctx.lineWidth = active ? 2.3 : 1.5;
+          ctx.strokeStyle = '#ffffff';
           ctx.stroke();
         });
 
@@ -1027,17 +1082,30 @@
         ctx.restore();
       }
 
-      function nearestDraggable(clientX, clientY) {
-        let hit = null;
-        state.controlPoints.forEach((cp) => {
-          if (!cp.draggable) return;
-          const pxy = dataToPixel(cp.x, cp.y);
-          const dx = pxy.px - (clientX - els.canvas.getBoundingClientRect().left);
-          const dy = pxy.py - (clientY - els.canvas.getBoundingClientRect().top);
-          const dist = Math.hypot(dx, dy);
-          if (dist <= DRAG_RADIUS && (!hit || dist < hit.dist)) hit = { cp, dist };
+      function hitTestTarget(clientX, clientY) {
+        const rect = els.canvas.getBoundingClientRect();
+        const xPix = clientX - rect.left;
+        const yPix = clientY - rect.top;
+        const { m, h } = state.plot;
+        const topY = m.t;
+        const bottomY = m.t + h;
+        let best = null;
+
+        state.interactionTargets.filter((t) => t.kind === 'point').forEach((target) => {
+          const p = dataToPixel(target.x, target.y);
+          const d = Math.hypot(p.px - xPix, p.py - yPix);
+          if (d <= HIT_RADIUS_POINT && (!best || d < best.score)) best = { target, score: d };
         });
-        return hit ? hit.cp : null;
+        if (best) return best.target;
+
+        if (yPix >= topY - 8 && yPix <= bottomY + 8) {
+          state.interactionTargets.filter((t) => t.kind === 'line').forEach((target) => {
+            const lineX = dataToPixel(target.x, 0).px;
+            const d = Math.abs(lineX - xPix);
+            if (d <= HIT_RADIUS_LINE && (!best || d < best.score)) best = { target, score: d };
+          });
+        }
+        return best ? best.target : null;
       }
 
       function setCursor(clientX, clientY) {
@@ -1045,55 +1113,73 @@
           els.canvas.style.cursor = 'grabbing';
           return;
         }
-        const cp = nearestDraggable(clientX, clientY);
-        els.canvas.style.cursor = cp ? 'grab' : 'default';
+        const target = hitTestTarget(clientX, clientY);
+        els.canvas.style.cursor = target ? 'grab' : 'default';
       }
 
-      function applyDrag(clientX) {
+      function applyDrag(clientX, clientY) {
         if (!state.drag) return;
-        const { xVal } = pixelToData(clientX, 0);
+        const { xVal, yVal } = pixelToData(clientX, clientY);
         const type = els.distributionType.value;
+        const dragId = state.drag.id;
 
         if (type === 'uniform') {
           let a = Number(els.uniformA.value);
           let b = Number(els.uniformB.value);
-          if (state.drag.id === 'ua0') a = clamp(xVal, -Infinity, b - EPS);
-          if (state.drag.id === 'ub0') b = clamp(xVal, a + EPS, Infinity);
+          if (dragId === 'uniform-a') a = clamp(xVal, -Infinity, b - EPS);
+          if (dragId === 'uniform-b') b = clamp(xVal, a + EPS, Infinity);
           els.uniformA.value = toInputNumber(a);
           els.uniformB.value = toInputNumber(b);
         }
 
         if (type === 'triangular') {
-          const m = Number(els.triM.value);
           let a = Number(els.triA.value);
+          const m = Number(els.triM.value);
           let b = Number(els.triB.value);
-          if (state.drag.id === 'ta0') a = clamp(xVal, -Infinity, m - EPS);
-          if (state.drag.id === 'tb0') b = clamp(xVal, m + EPS, Infinity);
+          let mode = m;
+          if (dragId === 'triangular-a') a = clamp(xVal, -Infinity, mode - EPS);
+          if (dragId === 'triangular-m') mode = clamp(xVal, a + EPS, b - EPS);
+          if (dragId === 'triangular-b') b = clamp(xVal, mode + EPS, Infinity);
+          if (dragId === 'triangular-m') {
+            a = clamp(a, -Infinity, mode - EPS);
+            b = clamp(b, mode + EPS, Infinity);
+          }
           els.triA.value = toInputNumber(a);
+          els.triM.value = toInputNumber(mode);
           els.triB.value = toInputNumber(b);
         }
 
         if (type === 'trapezoid') {
+          let a = Number(els.trapA.value);
           const b = Number(els.trapB.value);
           const c = Number(els.trapC.value);
-          let a = Number(els.trapA.value);
+          let bb = b;
+          let cc = c;
           let d = Number(els.trapD.value);
-          if (state.drag.id === 'za0') a = clamp(xVal, -Infinity, b - EPS);
-          if (state.drag.id === 'zd0') d = clamp(xVal, c + EPS, Infinity);
+          if (dragId === 'trapezoid-a') a = clamp(xVal, -Infinity, bb - EPS);
+          if (dragId === 'trapezoid-b') bb = clamp(xVal, a + EPS, cc);
+          if (dragId === 'trapezoid-c') cc = clamp(xVal, bb, d - EPS);
+          if (dragId === 'trapezoid-d') d = clamp(xVal, cc + EPS, Infinity);
+          if (dragId === 'trapezoid-b') cc = clamp(cc, bb, d - EPS);
+          if (dragId === 'trapezoid-c') bb = clamp(bb, a + EPS, cc);
           els.trapA.value = toInputNumber(a);
+          els.trapB.value = toInputNumber(bb);
+          els.trapC.value = toInputNumber(cc);
           els.trapD.value = toInputNumber(d);
         }
 
         if (type === 'piecewise') {
           const rows = getPiecewiseRows();
-          if (rows.length >= 2) {
-            if (state.drag.id === 'pw-start') {
-              const next = rows[1].x;
-              setPiecewiseX(0, clamp(xVal, -Infinity, next - EPS));
-            }
-            if (state.drag.id === 'pw-end') {
-              const prev = rows[rows.length - 2].x;
-              setPiecewiseX(rows.length - 1, clamp(xVal, prev + EPS, Infinity));
+          const idxMatch = dragId.match(/piecewise-(?:line|point)-(\d+)/);
+          if (idxMatch) {
+            const i = Number(idxMatch[1]);
+            if (Number.isInteger(i) && i >= 0 && i < rows.length) {
+              const prevX = i === 0 ? -Infinity : rows[i - 1].x + EPS;
+              const nextX = i === rows.length - 1 ? Infinity : rows[i + 1].x - EPS;
+              setPiecewiseX(i, clamp(xVal, prevX, nextX));
+              if (dragId.startsWith('piecewise-point-')) {
+                setPiecewiseY(i, Math.max(0, yVal));
+              }
             }
           }
         }
@@ -1101,36 +1187,44 @@
         evaluateAndDraw();
       }
 
-      function pointFromEvent(evt) {
-        if (evt.touches && evt.touches.length) return { clientX: evt.touches[0].clientX, clientY: evt.touches[0].clientY };
-        if (evt.changedTouches && evt.changedTouches.length) return { clientX: evt.changedTouches[0].clientX, clientY: evt.changedTouches[0].clientY };
-        return { clientX: evt.clientX, clientY: evt.clientY };
-      }
-
       function startDrag(evt) {
-        const p = pointFromEvent(evt);
-        const cp = nearestDraggable(p.clientX, p.clientY);
-        if (!cp) return;
-        state.drag = { id: cp.id };
+        const target = hitTestTarget(evt.clientX, evt.clientY);
+        if (!target) return;
+        state.drag = { id: target.id, pointerId: evt.pointerId };
+        state.hoverTargetId = target.id;
         els.tooltip.style.display = 'none';
         els.canvas.style.cursor = 'grabbing';
+        if (els.canvas.setPointerCapture) els.canvas.setPointerCapture(evt.pointerId);
         if (evt.cancelable) evt.preventDefault();
+        drawGraph();
       }
 
       function movePointer(evt) {
-        const p = pointFromEvent(evt);
         if (state.drag) {
-          applyDrag(p.clientX);
+          applyDrag(evt.clientX, evt.clientY);
           if (evt.cancelable) evt.preventDefault();
           return;
         }
-        setCursor(p.clientX, p.clientY);
-        handleHover(p.clientX, p.clientY);
+        const hit = hitTestTarget(evt.clientX, evt.clientY);
+        state.hoverTargetId = hit ? hit.id : null;
+        setCursor(evt.clientX, evt.clientY);
+        if (hit) {
+          state.hoverIndex = -1;
+          els.tooltip.style.display = 'none';
+          drawGraph();
+          return;
+        }
+        handleHover(evt.clientX, evt.clientY);
       }
 
-      function endDrag() {
+      function endDrag(evt) {
+        if (state.drag && evt && els.canvas.releasePointerCapture && Number.isInteger(evt.pointerId)) {
+          try { els.canvas.releasePointerCapture(evt.pointerId); } catch (_) {}
+        }
         state.drag = null;
+        state.hoverTargetId = null;
         els.canvas.style.cursor = 'default';
+        evaluateAndDraw();
       }
 
       function handleHover(clientX, clientY) {
@@ -1254,21 +1348,18 @@
       els.autoYTopToggle.addEventListener('change', evaluateAndDraw);
       els.yTopInput.addEventListener('change', evaluateAndDraw);
       els.yTopInput.addEventListener('input', evaluateAndDraw);
-      els.canvas.addEventListener('mousemove', movePointer);
-      els.canvas.addEventListener('mousedown', startDrag);
-      els.canvas.addEventListener('mouseup', endDrag);
+      els.canvas.addEventListener('pointermove', movePointer);
+      els.canvas.addEventListener('pointerdown', startDrag);
+      els.canvas.addEventListener('pointerup', endDrag);
+      els.canvas.addEventListener('pointercancel', endDrag);
       els.canvas.addEventListener('mouseleave', () => {
         state.hoverIndex = -1;
+        state.hoverTargetId = null;
         els.tooltip.style.display = 'none';
         if (!state.drag) els.canvas.style.cursor = 'default';
         drawGraph();
       });
-
-      els.canvas.addEventListener('touchstart', startDrag, { passive: false });
-      els.canvas.addEventListener('touchmove', movePointer, { passive: false });
-      els.canvas.addEventListener('touchend', endDrag);
-      els.canvas.addEventListener('touchcancel', endDrag);
-      window.addEventListener('mouseup', endDrag);
+      window.addEventListener('pointerup', endDrag);
 
       resetAll();
     })();
