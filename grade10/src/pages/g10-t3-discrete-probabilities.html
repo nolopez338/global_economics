@@ -1766,6 +1766,17 @@
         showErrors([]);
         parseAndUpdate();
       }
+      function preloadLoadModeFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const requestedMode = params.get('loadMode');
+        if (!requestedMode) return false;
+        const select = document.getElementById('loadModeSelect');
+        const hasMatchingOption = Array.from(select.options).some(option => option.value === requestedMode);
+        if (!hasMatchingOption) return false;
+        select.value = requestedMode;
+        loadByMode();
+        return true;
+      }
       document.getElementsByName('inputMode').forEach(r => {
         r.addEventListener('change', () => {
           setMode(getMode());
@@ -1821,7 +1832,8 @@
       });
       ensureAtLeastRows(4);
       redrawPMF();
-      parseAndUpdate();
+      const preloadedFromUrl = preloadLoadModeFromUrl();
+      if (!preloadedFromUrl) parseAndUpdate();
     })();
   </script>
 </body>
