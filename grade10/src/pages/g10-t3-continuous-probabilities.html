@@ -443,6 +443,23 @@
           </select>
         </div>
 
+        <div class="field col-12">
+          <label for="exampleSelector">Practice example</label>
+          <select id="exampleSelector">
+            <option value="none">None</option>
+            <option value="1">Problem 1</option>
+            <option value="2">Problem 2</option>
+            <option value="3">Problem 3</option>
+            <option value="4">Problem 4</option>
+            <option value="5">Problem 5</option>
+            <option value="6">Problem 6</option>
+            <option value="7">Problem 7</option>
+            <option value="8">Problem 8</option>
+            <option value="9">Problem 9</option>
+            <option value="10">Problem 10</option>
+          </select>
+        </div>
+
         <div id="uniformParams" class="params-panel col-12">
           <div class="grid">
             <div class="field col-6">
@@ -577,6 +594,7 @@
       const HIT_RADIUS_LINE = 8;
       const els = {
         distributionType: document.getElementById('distributionType'),
+        exampleSelector: document.getElementById('exampleSelector'),
         uniformParams: document.getElementById('uniformParams'),
         triangularParams: document.getElementById('triangularParams'),
         trapezoidParams: document.getElementById('trapezoidParams'),
@@ -617,6 +635,7 @@
 
       const defaults = {
         distributionType: 'uniform',
+        exampleSelector: 'none',
         uniform: { a: 0, b: 1 },
         triangular: { a: 0, m: 1, b: 2 },
         trapezoid: { a: 0, b: 1, c: 2, d: 3 },
@@ -633,6 +652,91 @@
         autoadjust: true,
         shade: true
       };
+
+
+      const EXAMPLE_POINT_EPS = 1e-6;
+      const problemExamples = {
+        '1': {
+          distributionType: 'uniform',
+          uniform: { a: 0, b: 5 },
+          xRange: { min: -1, max: 6 }
+        },
+        '2': {
+          distributionType: 'piecewise',
+          piecewise: [
+            { x: 2, y: 0 },
+            { x: 8, y: 1 / 3 }
+          ],
+          xRange: { min: 1, max: 9 }
+        },
+        '3': {
+          distributionType: 'piecewise',
+          piecewise: [
+            { x: 0, y: 1 / 6 },
+            { x: 1, y: 1 / 6 },
+            { x: 1 + EXAMPLE_POINT_EPS, y: 1 / 3 },
+            { x: 3, y: 1 / 3 },
+            { x: 3 + EXAMPLE_POINT_EPS, y: 1 / 6 },
+            { x: 4, y: 1 / 6 }
+          ],
+          xRange: { min: -1, max: 5 }
+        },
+        '4': {
+          distributionType: 'triangular',
+          triangular: { a: -1, m: 1, b: 3 },
+          xRange: { min: -2, max: 4 }
+        },
+        '5': {
+          distributionType: 'piecewise',
+          piecewise: [
+            { x: 0, y: 1 / 10 },
+            { x: 2, y: 1 / 10 },
+            { x: 2 + EXAMPLE_POINT_EPS, y: 1 / 5 },
+            { x: 6, y: 1 / 5 }
+          ],
+          xRange: { min: -1, max: 7 }
+        },
+        '6': {
+          distributionType: 'piecewise',
+          piecewise: [
+            { x: 1, y: 1 / 2 },
+            { x: 5, y: 0 }
+          ],
+          xRange: { min: 0, max: 6 }
+        },
+        '7': {
+          distributionType: 'trapezoid',
+          trapezoid: { a: 0, b: 2, c: 4, d: 6 },
+          xRange: { min: -1, max: 7 }
+        },
+        '8': {
+          distributionType: 'piecewise',
+          piecewise: [
+            { x: 2, y: 1 / 12 },
+            { x: 8, y: 1 / 4 }
+          ],
+          xRange: { min: 1, max: 9 }
+        },
+        '9': {
+          distributionType: 'triangular',
+          triangular: { a: -2, m: 0, b: 2 },
+          xRange: { min: -3, max: 3 }
+        },
+        '10': {
+          distributionType: 'piecewise',
+          piecewise: [
+            { x: 0, y: 1 / 9 },
+            { x: 4, y: 1 / 9 },
+            { x: 4 + EXAMPLE_POINT_EPS, y: 1 / 18 },
+            { x: 8, y: 1 / 18 },
+            { x: 8 + EXAMPLE_POINT_EPS, y: 1 / 6 },
+            { x: 10, y: 1 / 6 }
+          ],
+          xRange: { min: -1, max: 11 }
+        }
+      };
+
+      let applyingExampleSelection = false;
 
       const state = {
         x: [],
@@ -1852,6 +1956,50 @@
         createProbabilityMarker(evt.clientX);
       }
 
+
+      function replacePiecewiseRows(points) {
+        els.piecewiseRows.innerHTML = '';
+        points.forEach((p) => addPiecewiseRow(p.x, p.y));
+      }
+
+      function applyExampleSelection(problemId) {
+        const config = problemExamples[problemId];
+        if (!config) return;
+
+        applyingExampleSelection = true;
+        els.distributionType.value = config.distributionType;
+
+        if (config.uniform) {
+          els.uniformA.value = toInputNumber(config.uniform.a);
+          els.uniformB.value = toInputNumber(config.uniform.b);
+        }
+
+        if (config.triangular) {
+          els.triA.value = toInputNumber(config.triangular.a);
+          els.triM.value = toInputNumber(config.triangular.m);
+          els.triB.value = toInputNumber(config.triangular.b);
+        }
+
+        if (config.trapezoid) {
+          els.trapA.value = toInputNumber(config.trapezoid.a);
+          els.trapB.value = toInputNumber(config.trapezoid.b);
+          els.trapC.value = toInputNumber(config.trapezoid.c);
+          els.trapD.value = toInputNumber(config.trapezoid.d);
+        }
+
+        if (config.piecewise) {
+          replacePiecewiseRows(config.piecewise);
+        }
+
+        if (config.xRange) {
+          els.xMinInput.value = toInputNumber(config.xRange.min);
+          els.xMaxInput.value = toInputNumber(config.xRange.max);
+        }
+
+        applyingExampleSelection = false;
+        evaluateAndDraw();
+      }
+
       function addPiecewiseRow(x = 0, y = 0) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -1876,6 +2024,7 @@
 
       function resetAll() {
         els.distributionType.value = defaults.distributionType;
+        els.exampleSelector.value = defaults.exampleSelector;
         els.uniformA.value = defaults.uniform.a;
         els.uniformB.value = defaults.uniform.b;
         els.triA.value = defaults.triangular.a;
@@ -1912,7 +2061,6 @@
       });
 
       [
-        els.distributionType,
         els.uniformA,
         els.uniformB,
         els.triA,
@@ -1928,6 +2076,19 @@
       ].forEach((el) => {
         el.addEventListener('change', evaluateAndDraw);
         el.addEventListener('input', evaluateAndDraw);
+      });
+
+      els.distributionType.addEventListener('change', () => {
+        if (!applyingExampleSelection) {
+          els.exampleSelector.value = defaults.exampleSelector;
+        }
+        evaluateAndDraw();
+      });
+
+      els.exampleSelector.addEventListener('change', () => {
+        const problemId = els.exampleSelector.value;
+        if (problemId === 'none') return;
+        applyExampleSelection(problemId);
       });
 
       els.addPointBtn.addEventListener('click', () => {
