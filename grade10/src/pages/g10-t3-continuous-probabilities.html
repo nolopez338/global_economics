@@ -393,6 +393,10 @@
               <label for="uniformB">b (right bound)</label>
               <input id="uniformB" type="number" step="any" value="1" />
             </div>
+            <div class="field col-6" id="uniformHeightField" hidden>
+              <label for="uniformHeight">Height</label>
+              <input id="uniformHeight" type="number" step="any" value="1" min="0" />
+            </div>
           </div>
         </div>
 
@@ -409,6 +413,10 @@
             <div class="field col-4">
               <label for="triB">b (right bound)</label>
               <input id="triB" type="number" step="any" value="2" />
+            </div>
+            <div class="field col-4" id="triHeightField" hidden>
+              <label for="triHeight">Height of m</label>
+              <input id="triHeight" type="number" step="any" value="1" min="0" />
             </div>
           </div>
         </div>
@@ -431,6 +439,10 @@
               <label for="trapD">d (right bound)</label>
               <input id="trapD" type="number" step="any" value="3" />
             </div>
+            <div class="field col-3" id="trapHeightField" hidden>
+              <label for="trapHeight">Height of plateau</label>
+              <input id="trapHeight" type="number" step="any" value="1" min="0" />
+            </div>
           </div>
         </div>
 
@@ -445,6 +457,10 @@
           <div class="actions" style="margin-top:0.6rem;">
             <button id="addPointBtn" class="btn-secondary" type="button">Add row</button>
           </div>
+        </div>
+
+        <div class="field col-12">
+          <label><input id="autoadjustToggle" type="checkbox" checked /> autoadjust</label>
         </div>
 
         <div class="field col-12">
@@ -514,10 +530,17 @@
         trapB: document.getElementById('trapB'),
         trapC: document.getElementById('trapC'),
         trapD: document.getElementById('trapD'),
+        uniformHeightField: document.getElementById('uniformHeightField'),
+        triHeightField: document.getElementById('triHeightField'),
+        trapHeightField: document.getElementById('trapHeightField'),
+        uniformHeight: document.getElementById('uniformHeight'),
+        triHeight: document.getElementById('triHeight'),
+        trapHeight: document.getElementById('trapHeight'),
         piecewiseRows: document.getElementById('piecewiseRows'),
         addPointBtn: document.getElementById('addPointBtn'),
         updateBtn: document.getElementById('updateBtn'),
         resetBtn: document.getElementById('resetBtn'),
+        autoadjustToggle: document.getElementById('autoadjustToggle'),
         shadeToggle: document.getElementById('shadeToggle'),
         status: document.getElementById('status'),
         results: document.getElementById('results'),
@@ -537,11 +560,17 @@
         uniform: { a: 0, b: 1 },
         triangular: { a: 0, m: 1, b: 2 },
         trapezoid: { a: 0, b: 1, c: 2, d: 3 },
+        manualHeight: {
+          uniform: 1,
+          triangular: 1,
+          trapezoid: 1
+        },
         piecewise: [
           { x: 0, y: 0 },
           { x: 1, y: 1 },
           { x: 2, y: 0 }
         ],
+        autoadjust: true,
         shade: true
       };
 
@@ -577,10 +606,14 @@
 
       function showPanels() {
         const t = els.distributionType.value;
+        const autoadjust = els.autoadjustToggle.checked;
         els.uniformParams.hidden = t !== 'uniform';
         els.triangularParams.hidden = t !== 'triangular';
         els.trapezoidParams.hidden = t !== 'trapezoid';
         els.piecewiseParams.hidden = t !== 'piecewise';
+        els.uniformHeightField.hidden = !(t === 'uniform' && !autoadjust);
+        els.triHeightField.hidden = !(t === 'triangular' && !autoadjust);
+        els.trapHeightField.hidden = !(t === 'trapezoid' && !autoadjust);
       }
 
       function setStatus(kind, message) {
@@ -706,6 +739,7 @@
 
       function readAndSanitize() {
         const type = els.distributionType.value;
+        const autoadjust = els.autoadjustToggle.checked;
         const errors = [];
         let params = {};
         let points = [];
@@ -722,8 +756,19 @@
           }
           els.uniformA.value = toInputNumber(a);
           els.uniformB.value = toInputNumber(b);
-          params = { a, b };
-          points = normalizePoints([{ x: a, y: 1 }, { x: b, y: 1 }], errors);
+          let height = Number(els.uniformHeight.value);
+          if (!Number.isFinite(height)) {
+            errors.push('Uniform height must be numeric.');
+            height = defaults.manualHeight.uniform;
+          }
+          if (height < 0) {
+            errors.push('Uniform height must be ≥ 0.');
+            height = 0;
+          }
+          els.uniformHeight.value = toInputNumber(height);
+          params = { a, b, height };
+          points = [{ x: a, y: height }, { x: b, y: height }];
+          if (autoadjust) points = normalizePoints(points, errors);
         }
 
         if (type === 'triangular') {
@@ -746,8 +791,19 @@
           els.triA.value = toInputNumber(a);
           els.triM.value = toInputNumber(m);
           els.triB.value = toInputNumber(b);
-          params = { a, m, b };
-          points = normalizePoints([{ x: a, y: 0 }, { x: m, y: 1 }, { x: b, y: 0 }], errors);
+          let height = Number(els.triHeight.value);
+          if (!Number.isFinite(height)) {
+            errors.push('Triangular height of m must be numeric.');
+            height = defaults.manualHeight.triangular;
+          }
+          if (height < 0) {
+            errors.push('Triangular height of m must be ≥ 0.');
+            height = 0;
+          }
+          els.triHeight.value = toInputNumber(height);
+          params = { a, m, b, height };
+          points = [{ x: a, y: 0 }, { x: m, y: height }, { x: b, y: 0 }];
+          if (autoadjust) points = normalizePoints(points, errors);
         }
 
         if (type === 'trapezoid') {
@@ -770,8 +826,19 @@
           els.trapB.value = toInputNumber(b);
           els.trapC.value = toInputNumber(c);
           els.trapD.value = toInputNumber(d);
-          params = { a, b, c, d };
-          points = normalizePoints([{ x: a, y: 0 }, { x: b, y: 1 }, { x: c, y: 1 }, { x: d, y: 0 }], errors);
+          let height = Number(els.trapHeight.value);
+          if (!Number.isFinite(height)) {
+            errors.push('Trapezoid height of plateau must be numeric.');
+            height = defaults.manualHeight.trapezoid;
+          }
+          if (height < 0) {
+            errors.push('Trapezoid height of plateau must be ≥ 0.');
+            height = 0;
+          }
+          els.trapHeight.value = toInputNumber(height);
+          params = { a, b, c, d, height };
+          points = [{ x: a, y: 0 }, { x: b, y: height }, { x: c, y: height }, { x: d, y: 0 }];
+          if (autoadjust) points = normalizePoints(points, errors);
         }
 
         if (type === 'piecewise') {
@@ -797,7 +864,7 @@
             if (row) row.querySelector('.pw-y').value = toInputNumber(p.y);
           });
           params = { raw: points.map((p) => ({ ...p })) };
-          points = normalizePoints(points, errors);
+          if (autoadjust) points = normalizePoints(points, errors);
         }
 
         return { type, params, points, errors };
@@ -917,6 +984,7 @@
       function buildInteractionTargets(model) {
         const targets = [];
         if (!model.points.length) return targets;
+        const autoadjust = els.autoadjustToggle.checked;
 
         const pushLine = (id, x, label) => targets.push({
           id,
@@ -959,8 +1027,8 @@
           const raw = model.params.raw || [];
           raw.forEach((pt, i) => {
             pushLine(`piecewise-line-${i}`, pt.x, `x${i + 1}`);
-            const normalizedY = model.points[i] ? model.points[i].y : 0;
-            pushPoint(`piecewise-point-${i}`, pt.x, normalizedY, `P${i + 1}`, i);
+            const pointY = autoadjust ? (model.points[i] ? model.points[i].y : 0) : pt.y;
+            pushPoint(`piecewise-point-${i}`, pt.x, pointY, `P${i + 1}`, i);
           });
         }
 
@@ -1045,8 +1113,19 @@
           variance: varianceRes.value
         });
 
-        if (errors.length) setStatus('error', 'Graph rendered with validation errors. See details below.');
-        else setStatus('ok', `Valid PDF rendered. Area ≈ ${fmt(areaRes.value)}.`);
+        const autoadjust = els.autoadjustToggle.checked;
+        if (errors.length) {
+          setStatus('error', 'Graph rendered with validation errors. See details below.');
+        } else if (!autoadjust) {
+          const areaText = areaRes.ok ? fmt(areaRes.value) : 'NaN';
+          if (areaRes.ok && Math.abs(areaRes.value - 1) <= 0.01) {
+            setStatus('ok', `Manual heights enabled. Area ≈ ${areaText} (close to a valid PDF).`);
+          } else {
+            setStatus('warn', `Manual heights enabled. Area ≈ ${areaText}; adjust heights if you want a valid PDF.`);
+          }
+        } else {
+          setStatus('ok', `Valid PDF rendered. Area ≈ ${fmt(areaRes.value)}.`);
+        }
         setErrors(errors);
         renderProbabilitySummary();
         drawGraph();
@@ -1499,6 +1578,10 @@
         els.trapB.value = defaults.trapezoid.b;
         els.trapC.value = defaults.trapezoid.c;
         els.trapD.value = defaults.trapezoid.d;
+        els.uniformHeight.value = defaults.manualHeight.uniform;
+        els.triHeight.value = defaults.manualHeight.triangular;
+        els.trapHeight.value = defaults.manualHeight.trapezoid;
+        els.autoadjustToggle.checked = defaults.autoadjust;
         els.shadeToggle.checked = defaults.shade;
         els.autoYTopToggle.checked = true;
         els.yTopInput.value = '1';
@@ -1526,7 +1609,10 @@
         els.trapA,
         els.trapB,
         els.trapC,
-        els.trapD
+        els.trapD,
+        els.uniformHeight,
+        els.triHeight,
+        els.trapHeight
       ].forEach((el) => {
         el.addEventListener('change', evaluateAndDraw);
         el.addEventListener('input', evaluateAndDraw);
@@ -1541,6 +1627,7 @@
 
       els.updateBtn.addEventListener('click', evaluateAndDraw);
       els.resetBtn.addEventListener('click', resetAll);
+      els.autoadjustToggle.addEventListener('change', evaluateAndDraw);
       els.shadeToggle.addEventListener('change', drawGraph);
       els.xMinInput.addEventListener('change', evaluateAndDraw);
       els.xMinInput.addEventListener('input', evaluateAndDraw);
