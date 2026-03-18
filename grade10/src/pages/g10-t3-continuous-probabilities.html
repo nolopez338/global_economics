@@ -2000,6 +2000,19 @@
         evaluateAndDraw();
       }
 
+      function getExampleIdFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const fromQuery = params.get('example') || params.get('problem');
+        if (fromQuery && problemExamples[fromQuery]) return fromQuery;
+
+        const hash = window.location.hash.replace(/^#/, '').trim();
+        if (!hash) return null;
+        const hashMatch = hash.match(/^(?:example-?|problem-?)?(\d+)$/i);
+        if (!hashMatch) return null;
+        const fromHash = hashMatch[1];
+        return problemExamples[fromHash] ? fromHash : null;
+      }
+
       function addPiecewiseRow(x = 0, y = 0) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -2130,6 +2143,11 @@
       window.addEventListener('pointerup', endDrag);
 
       resetAll();
+      const initialExampleId = getExampleIdFromUrl();
+      if (initialExampleId) {
+        els.exampleSelector.value = initialExampleId;
+        applyExampleSelection(initialExampleId);
+      }
     })();
   </script>
 </body>
