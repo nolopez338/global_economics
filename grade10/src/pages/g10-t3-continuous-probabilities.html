@@ -1233,16 +1233,32 @@
           draggableX: true,
           draggableY: true
         });
+        const pushHorizontal = (id, y, xMin, xMax, label) => targets.push({
+          id,
+          kind: 'hline',
+          y,
+          xMin,
+          xMax,
+          label,
+          draggableX: false,
+          draggableY: true
+        });
 
         if (model.type === 'uniform') {
           pushLine('uniform-a', model.params.a, 'a');
           pushLine('uniform-b', model.params.b, 'b');
+          if (!autoadjust) {
+            pushHorizontal('uniform-height', model.params.height, model.params.a, model.params.b, 'h');
+          }
         }
 
         if (model.type === 'triangular') {
           pushLine('triangular-a', model.params.a, 'a');
           pushLine('triangular-m', model.params.m, 'm');
           pushLine('triangular-b', model.params.b, 'b');
+          if (!autoadjust) {
+            pushHorizontal('triangular-height', model.params.height, model.params.a, model.params.b, 'hₘ');
+          }
         }
 
         if (model.type === 'trapezoid') {
@@ -1250,6 +1266,9 @@
           pushLine('trapezoid-b', model.params.b, 'b');
           pushLine('trapezoid-c', model.params.c, 'c');
           pushLine('trapezoid-d', model.params.d, 'd');
+          if (!autoadjust) {
+            pushHorizontal('trapezoid-height', model.params.height, model.params.a, model.params.d, 'hₚ');
+          }
         }
 
         if (model.type === 'piecewise') {
@@ -1258,6 +1277,11 @@
             pushLine(`piecewise-line-${i}`, pt.x, `x${i + 1}`);
             const pointY = autoadjust ? (model.points[i] ? model.points[i].y : 0) : pt.y;
             pushPoint(`piecewise-point-${i}`, pt.x, pointY, `P${i + 1}`, i);
+            if (!autoadjust) {
+              const xMin = i === 0 ? pt.x : raw[i - 1].x;
+              const xMax = i === raw.length - 1 ? pt.x : raw[i + 1].x;
+              pushHorizontal(`piecewise-height-${i}`, pt.y, xMin, xMax, `y${i + 1}`);
+            }
           });
         }
 
@@ -1474,6 +1498,29 @@
           ctx.fillText(line.label, linePx, m.t + 12);
         });
 
+        state.interactionTargets.filter((t) => t.kind === 'hline').forEach((line) => {
+          const from = dataToPixel(line.xMin, line.y);
+          const to = dataToPixel(line.xMax, line.y);
+          if (!Number.isFinite(from.py) || !Number.isFinite(from.px) || !Number.isFinite(to.px)) return;
+          const active = state.drag && state.drag.id === line.id;
+          const hovered = state.hoverTargetId === line.id;
+          if (!active && !hovered) return;
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(from.px, from.py);
+          ctx.lineTo(to.px, to.py);
+          ctx.setLineDash([7, 5]);
+          ctx.strokeStyle = active ? 'rgba(245, 158, 11, 0.96)' : 'rgba(16, 185, 129, 0.88)';
+          ctx.lineWidth = active ? 3 : 2.2;
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = active ? '#b45309' : '#047857';
+          ctx.font = '11px sans-serif';
+          ctx.textAlign = 'left';
+          ctx.fillText(line.label, Math.min(to.px - 18, from.px + 6), from.py - 6);
+          ctx.restore();
+        });
+
         state.interactionTargets.filter((t) => t.kind === 'point').forEach((point) => {
           const pxy = dataToPixel(point.x, point.y);
           const active = state.drag && (state.drag.id === point.id || state.drag.id === point.markerId);
@@ -1593,6 +1640,16 @@
             if (d <= HIT_RADIUS_LINE && (!best || d < best.score)) best = { target, score: d };
           });
         }
+
+        state.interactionTargets.filter((t) => t.kind === 'hline').forEach((target) => {
+          const pStart = dataToPixel(target.xMin, target.y);
+          const pEnd = dataToPixel(target.xMax, target.y);
+          const left = Math.min(pStart.px, pEnd.px);
+          const right = Math.max(pStart.px, pEnd.px);
+          if (xPix < left || xPix > right) return;
+          const d = Math.abs(pStart.py - yPix);
+          if (d <= HIT_RADIUS_LINE && (!best || d < best.score)) best = { target, score: d };
+        });
         return best ? best.target : null;
       }
 
@@ -1624,6 +1681,9 @@
           let b = Number(els.uniformB.value);
           if (dragId === 'uniform-a') a = clamp(xVal, -Infinity, b - EPS);
           if (dragId === 'uniform-b') b = clamp(xVal, a + EPS, Infinity);
+          if (dragId === 'uniform-height') {
+            els.uniformHeight.value = toInputNumber(Math.max(0, yVal));
+          }
           els.uniformA.value = toInputNumber(a);
           els.uniformB.value = toInputNumber(b);
         }
@@ -1639,6 +1699,9 @@
           if (dragId === 'triangular-m') {
             a = clamp(a, -Infinity, mode - EPS);
             b = clamp(b, mode + EPS, Infinity);
+          }
+          if (dragId === 'triangular-height') {
+            els.triHeight.value = toInputNumber(Math.max(0, yVal));
           }
           els.triA.value = toInputNumber(a);
           els.triM.value = toInputNumber(mode);
@@ -1658,6 +1721,9 @@
           if (dragId === 'trapezoid-d') d = clamp(xVal, cc + EPS, Infinity);
           if (dragId === 'trapezoid-b') cc = clamp(cc, bb, d - EPS);
           if (dragId === 'trapezoid-c') bb = clamp(bb, a + EPS, cc);
+          if (dragId === 'trapezoid-height') {
+            els.trapHeight.value = toInputNumber(Math.max(0, yVal));
+          }
           els.trapA.value = toInputNumber(a);
           els.trapB.value = toInputNumber(bb);
           els.trapC.value = toInputNumber(cc);
@@ -1676,6 +1742,13 @@
               if (dragId.startsWith('piecewise-point-')) {
                 setPiecewiseY(i, Math.max(0, yVal));
               }
+            }
+          }
+          const heightMatch = dragId.match(/piecewise-height-(\d+)/);
+          if (heightMatch) {
+            const i = Number(heightMatch[1]);
+            if (Number.isInteger(i) && i >= 0 && i < rows.length) {
+              setPiecewiseY(i, Math.max(0, yVal));
             }
           }
         }
