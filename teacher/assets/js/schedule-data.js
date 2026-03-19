@@ -1180,7 +1180,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "-",
+    "Description": "Problems for Discrete probabilities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C2"
@@ -1635,7 +1635,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 4",
-    "Description": "Problems for discrete probabilities and continuous probabilities",
+    "Description": "Problems for Discrete probabilities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1"
@@ -2324,7 +2324,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 4",
-    "Description": "Problems for discrete probabilities and continuous probabilities",
+    "Description": "Problems for Discrete probabilities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1"
