@@ -3780,7 +3780,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 4",
-    "Description": "Introduction and C1 C2 C3 Examples",
+    "Description": "No Class: Interdisciplinary project of other subjects",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1"
@@ -3793,7 +3793,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 2",
-    "Description": "-",
+    "Description": "Introduction and C1 C2 C3 Examples",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C2"
@@ -4249,9 +4249,9 @@ window.SCHEDULE_DATA = [
     "Weekday": "Monday",
     "Day": "Day 1",
     "Description": "Resting from ICFES",
-    "Material": "C1",
-    "Material teacher": "C1",
-    "Summary": "C1"
+    "Material": "",
+    "Material teacher": "",
+    "Summary": "Rest ICFES"
   },
   {
     "Grade": 11,
@@ -4261,7 +4261,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 4",
-    "Description": "Vectors and Degrees of Freedom videos",
+    "Description": "No Class: Interdisciplinary project of other subjects",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1"
@@ -4274,7 +4274,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "-",
+    "Description": "Vectors and Degrees of Freedom videos / Introduction and C1 C2 C3 Examples",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C2"
