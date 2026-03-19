@@ -300,6 +300,13 @@
       padding: 0.65rem 0.7rem;
       background: #f8fafc;
       position: relative;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+    }
+
+    .prob-box:hover {
+      border-color: #a78bfa;
+      background: #f5f3ff;
+      box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.2);
     }
 
     .prob-box .expr {
@@ -545,9 +552,6 @@
           <label><input id="autoadjustToggle" type="checkbox" checked /> autoadjust</label>
         </div>
 
-        <div class="field col-12">
-          <label><input id="shadeToggle" type="checkbox" checked /> Shade area</label>
-        </div>
 
         <div class="actions col-12">
           <button id="updateBtn" class="btn-primary" type="button">Update graph</button>
@@ -624,7 +628,6 @@
         updateBtn: document.getElementById('updateBtn'),
         resetBtn: document.getElementById('resetBtn'),
         autoadjustToggle: document.getElementById('autoadjustToggle'),
-        shadeToggle: document.getElementById('shadeToggle'),
         status: document.getElementById('status'),
         results: document.getElementById('results'),
         canvas: document.getElementById('pdfCanvas'),
@@ -654,8 +657,7 @@
           { x: 1, y: 1 },
           { x: 2, y: 0 }
         ],
-        autoadjust: true,
-        shade: true
+        autoadjust: true
       };
 
 
@@ -758,6 +760,7 @@
         yAutoTop: 1,
         autoYTopEnabled: true,
         probabilityMarkers: [],
+        hoveredProbabilityRegion: null,
         cdfViews: {},
         currentProbabilitySections: [],
         plot: { m: { l: 62, r: 20, t: 18, b: 46 }, w: 1, h: 1, rectWidth: 1, rectHeight: 420 }
@@ -1122,7 +1125,8 @@
             expression: `Probability of X ≤ ${label} (${fmt(marker.x, 3)})`,
             value: fmt(p, 4),
             dots: [{ x: marker.x, y: p }],
-            deletableMarkerId: marker.id
+            deletableMarkerId: marker.id,
+            graphRegion: { mode: 'left', x: marker.x }
           });
         });
 
@@ -1137,7 +1141,8 @@
             id: `interval-${ordered.map((m) => m.id).join('-')}`,
             expression: `Probability of ${fmt(lo, 3)} ≤ X ≤ ${fmt(hi, 3)}`,
             value: fmt(p, 4),
-            dots: [{ x: lo, y: fLo }, { x: hi, y: fHi }]
+            dots: [{ x: lo, y: fLo }, { x: hi, y: fHi }],
+            graphRegion: { mode: 'between', x1: lo, x2: hi }
           });
         }
 
@@ -1255,6 +1260,7 @@
       function renderProbabilitySummary() {
         const sections = buildProbabilitySections();
         state.currentProbabilitySections = sections;
+        state.hoveredProbabilityRegion = null;
 
         if (!sections.length) {
           state.cdfViews = {};
@@ -1269,7 +1275,7 @@
 
         els.probabilitySummary.innerHTML = sections.map((section) => `
           <div class="prob-result-section">
-            <div class="prob-box">
+            <div class="prob-box" data-graph-region='${JSON.stringify(section.graphRegion || null)}'>
               ${section.deletableMarkerId ? `<button type="button" class="prob-delete" data-delete-marker="${section.deletableMarkerId}" aria-label="Delete probability marker">×</button>` : ''}
               <div class="expr">${section.expression}</div>
               <div class="value">${section.value}</div>
@@ -1564,17 +1570,46 @@
         const px = (v) => m.l + ((v - xmin) / (xmax - xmin || 1)) * w;
         const py = (v) => m.t + h - ((v - ymin) / (ymax - ymin)) * h;
 
+        const drawFilledRegion = (region, fillStyle) => {
+          if (!region || !x.length) return;
+          const isBetween = region.mode === 'between';
+          const lo = isBetween ? Math.max(xmin, Math.min(region.x1, region.x2)) : xmin;
+          const hi = isBetween ? Math.min(xmax, Math.max(region.x1, region.x2)) : Math.min(xmax, region.x);
+          if (!Number.isFinite(lo) || !Number.isFinite(hi) || hi <= lo) return;
+          const segment = [];
+          if (lo > x[0]) segment.push({ x: lo, y: evaluatePiecewise(state.points, lo) });
+          for (let i = 0; i < x.length; i++) {
+            if (x[i] >= lo && x[i] <= hi) segment.push({ x: x[i], y: y[i] });
+          }
+          if (hi < x[x.length - 1]) segment.push({ x: hi, y: evaluatePiecewise(state.points, hi) });
+          if (segment.length < 2) return;
+          const baseY = py(0);
+          ctx.beginPath();
+          ctx.moveTo(px(segment[0].x), baseY);
+          segment.forEach((pt) => ctx.lineTo(px(pt.x), py(pt.y)));
+          ctx.lineTo(px(segment[segment.length - 1].x), baseY);
+          ctx.closePath();
+          ctx.fillStyle = fillStyle;
+          ctx.fill();
+        };
+
+        const activeMarkerRegion = (() => {
+          if (state.probabilityMarkers.length === 1) {
+            return { mode: 'left', x: state.probabilityMarkers[0].x };
+          }
+          if (state.probabilityMarkers.length === 2) {
+            const sorted = [...state.probabilityMarkers].sort((a, b) => a.x - b.x);
+            return { mode: 'between', x1: sorted[0].x, x2: sorted[1].x };
+          }
+          return null;
+        })();
+
         drawAxes(ctx, m, w, h, xmin, xmax, ymin, ymax);
 
-        const baseY = py(0);
-        if (els.shadeToggle.checked) {
-          ctx.beginPath();
-          ctx.moveTo(px(x[0]), baseY);
-          for (let i = 0; i < x.length; i++) ctx.lineTo(px(x[i]), py(y[i]));
-          ctx.lineTo(px(x[x.length - 1]), baseY);
-          ctx.closePath();
-          ctx.fillStyle = 'rgba(37,99,235,0.18)';
-          ctx.fill();
+        drawFilledRegion({ mode: 'between', x1: x[0], x2: x[x.length - 1] }, 'rgba(147, 197, 253, 0.3)');
+        drawFilledRegion(activeMarkerRegion, 'rgba(167, 139, 250, 0.34)');
+        if (state.hoveredProbabilityRegion) {
+          drawFilledRegion(state.hoveredProbabilityRegion, 'rgba(126, 34, 206, 0.26)');
         }
 
         ctx.beginPath();
@@ -2058,12 +2093,12 @@
         els.triHeight.value = defaults.manualHeight.triangular;
         els.trapHeight.value = defaults.manualHeight.trapezoid;
         els.autoadjustToggle.checked = defaults.autoadjust;
-        els.shadeToggle.checked = defaults.shade;
         els.autoYTopToggle.checked = true;
         els.yTopInput.value = '1';
         els.xMinInput.value = '-1';
         els.xMaxInput.value = '3';
         state.probabilityMarkers = [];
+        state.hoveredProbabilityRegion = null;
         state.cdfViews = {};
         state.currentProbabilitySections = [];
         els.piecewiseRows.innerHTML = '';
@@ -2121,7 +2156,6 @@
       els.updateBtn.addEventListener('click', evaluateAndDraw);
       els.resetBtn.addEventListener('click', resetAll);
       els.autoadjustToggle.addEventListener('change', evaluateAndDraw);
-      els.shadeToggle.addEventListener('change', drawGraph);
       els.xMinInput.addEventListener('change', evaluateAndDraw);
       els.xMinInput.addEventListener('input', evaluateAndDraw);
       els.xMaxInput.addEventListener('change', evaluateAndDraw);
@@ -2139,6 +2173,26 @@
         const btn = evt.target.closest('[data-delete-marker]');
         if (!btn) return;
         removeProbabilityMarker(btn.getAttribute('data-delete-marker'));
+      });
+      els.probabilitySummary.addEventListener('mouseover', (evt) => {
+        const box = evt.target.closest('.prob-box[data-graph-region]');
+        if (!box) return;
+        const region = box.dataset.graphRegion;
+        if (!region) return;
+        try {
+          state.hoveredProbabilityRegion = JSON.parse(region);
+        } catch (_) {
+          state.hoveredProbabilityRegion = null;
+        }
+        drawGraph();
+      });
+      els.probabilitySummary.addEventListener('mouseout', (evt) => {
+        const box = evt.target.closest('.prob-box[data-graph-region]');
+        if (!box) return;
+        const next = evt.relatedTarget;
+        if (next && box.contains(next)) return;
+        state.hoveredProbabilityRegion = null;
+        drawGraph();
       });
       els.canvas.addEventListener('mouseleave', () => {
         state.hoverIndex = -1;
