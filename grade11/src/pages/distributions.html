@@ -72,6 +72,37 @@ body {
 /* Rest of layout */
 .param-row { margin: 10px 0; }
 
+.collapsible-section {
+  margin: 12px 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.collapsible-toggle {
+  width: 100%;
+  margin: 0;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px 8px 0 0;
+  background: #e5e7eb;
+  color: #111827;
+  font-weight: 600;
+  text-align: left;
+}
+
+.collapsible-toggle:hover {
+  background: #d1d5db;
+}
+
+.collapsible-content {
+  padding: 10px 12px 12px;
+}
+
+.collapsible-content.is-collapsed {
+  display: none;
+}
+
 .toggle-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -309,6 +340,87 @@ window.MathJax = {
     </div>
   </div>
 
+  <div class="collapsible-section">
+    <button
+      id="controlsToggleButton"
+      class="collapsible-toggle"
+      type="button"
+      data-target="controlsSectionContent"
+      aria-expanded="true"
+    >
+      ▼ Display controls
+    </button>
+    <div id="controlsSectionContent" class="collapsible-content">
+      <!-- Point size slider -->
+      <div class="param-row" id="pointSizeRow" style="display:none;">
+        <label class="control-label" for="pointSizeSlider">Circle size</label>
+        <input id="pointSizeSlider" class="slider-medium" type="range" min="2" max="12" value="4">
+        <input id="pointSizeInput" class="numeric-input-compact" type="number" min="2" max="12" step="1" value="4">
+        <span id="pointSizeLabel">4</span> px
+        <div class="points-adjust">
+          <span>Adjust size</span>
+          <button id="pointSizeDec" class="arrow-btn" type="button" aria-label="Decrease circle size">-</button>
+          <button id="pointSizeInc" class="arrow-btn" type="button" aria-label="Increase circle size">+</button>
+        </div>
+      </div>
+
+      <div class="param-row" id="flattenRow" style="display:none;">
+        <button id="flattenButton" type="button" aria-pressed="false">Flatten</button>
+      </div>
+
+      <!-- Legend + toggles for running lines -->
+      <div class="param-row" id="linesToggleRow" style="display:none;">
+        <div class="toggle-grid">
+          <label>
+            <input type="checkbox" id="toggleOverallMean">
+            True Mean
+          </label>
+          <label>
+            <input type="checkbox" id="toggleOverallStd">
+            True SD
+          </label>
+          <label>
+            <input type="checkbox" id="toggleSampleMean" checked>
+            Sample Mean
+          </label>
+          <label>
+            <input type="checkbox" id="toggleSampleStd" checked>
+            Sample SD
+          </label>
+          <label class="span-2">
+            <input type="checkbox" id="toggleCI">
+            Confidence Interval
+          </label>
+          <label>
+            <input type="checkbox" id="toggleRunningMean" checked>
+            <span class="legend-box legend-mean"></span> Running Sample Mean
+          </label>
+          <label>
+            <input type="checkbox" id="toggleRunningStd" checked>
+            <span class="legend-box legend-std"></span> Running Sample SD
+          </label>
+        </div>
+      </div>
+
+      <!-- Confidence interval controls -->
+      <div class="param-row" id="extraLinesRow" style="display:none;">
+        <div class="toggle-row">
+          <div class="ci-controls" id="ciSliderRow" style="display:none;" aria-hidden="true">
+            <span>Confidence level</span>
+            <input id="ciSlider" class="slider-wide" type="range" min="30" max="99.99" step="0.01" value="95">
+            <input id="ciInput" class="numeric-input" type="number" min="30" max="99.99" step="0.01" value="95">
+            <span id="ciLabel">95%</span>
+            <div class="points-adjust">
+              <span>Adjust level</span>
+              <button id="ciDec" class="arrow-btn" type="button" aria-label="Decrease confidence level">-</button>
+              <button id="ciInc" class="arrow-btn" type="button" aria-label="Increase confidence level">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="param-row">
     <label>Category</label>
     <select id="category">
@@ -352,86 +464,31 @@ window.MathJax = {
     <span id="displayRangeLabel"></span>
   </div>
 
-  <!-- Point size slider -->
-  <div class="param-row" id="pointSizeRow" style="display:none;">
-    <label class="control-label" for="pointSizeSlider">Circle size</label>
-    <input id="pointSizeSlider" class="slider-medium" type="range" min="2" max="12" value="4">
-    <input id="pointSizeInput" class="numeric-input-compact" type="number" min="2" max="12" step="1" value="4">
-    <span id="pointSizeLabel">4</span> px
-    <div class="points-adjust">
-      <span>Adjust size</span>
-      <button id="pointSizeDec" class="arrow-btn" type="button" aria-label="Decrease circle size">-</button>
-      <button id="pointSizeInc" class="arrow-btn" type="button" aria-label="Increase circle size">+</button>
-    </div>
-  </div>
-
-  <div class="param-row" id="flattenRow" style="display:none;">
-    <button id="flattenButton" type="button" aria-pressed="false">Flatten</button>
-  </div>
-
-  <!-- Legend + toggles for running lines -->
-  <div class="param-row" id="linesToggleRow" style="display:none;">
-    <div class="toggle-grid">
-      <label>
-        <input type="checkbox" id="toggleOverallMean">
-        True Mean
-      </label>
-      <label>
-        <input type="checkbox" id="toggleOverallStd">
-        True SD
-      </label>
-      <label>
-        <input type="checkbox" id="toggleSampleMean" checked>
-        Sample Mean
-      </label>
-      <label>
-        <input type="checkbox" id="toggleSampleStd" checked>
-        Sample SD
-      </label>
-      <label class="span-2">
-        <input type="checkbox" id="toggleCI">
-        Confidence Interval
-      </label>
-      <label>
-        <input type="checkbox" id="toggleRunningMean" checked>
-        <span class="legend-box legend-mean"></span> Running Sample Mean
-      </label>
-      <label>
-        <input type="checkbox" id="toggleRunningStd" checked>
-        <span class="legend-box legend-std"></span> Running Sample SD
-      </label>
-    </div>
-  </div>
-
-  <!-- Confidence interval controls -->
-  <div class="param-row" id="extraLinesRow" style="display:none;">
-    <div class="toggle-row">
-      <div class="ci-controls" id="ciSliderRow" style="display:none;" aria-hidden="true">
-        <span>Confidence level</span>
-        <input id="ciSlider" class="slider-wide" type="range" min="30" max="99.99" step="0.01" value="95">
-        <input id="ciInput" class="numeric-input" type="number" min="30" max="99.99" step="0.01" value="95">
-        <span id="ciLabel">95%</span>
-        <div class="points-adjust">
-          <span>Adjust level</span>
-          <button id="ciDec" class="arrow-btn" type="button" aria-label="Decrease confidence level">-</button>
-          <button id="ciInc" class="arrow-btn" type="button" aria-label="Increase confidence level">+</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="graph-container">
     <canvas id="scatterCanvas"></canvas>
     <div id="tooltip" class="tooltip"></div>
   </div>
 
-  <div class="hist-container">
-    <canvas id="histCanvas"></canvas>
-  </div>
-  <div class="param-row" id="histTransposeRow">
-    <button id="transposeHistButton" type="button" aria-pressed="false">
-      Transpose histogram
+  <div class="collapsible-section">
+    <button
+      id="histogramToggleButton"
+      class="collapsible-toggle"
+      type="button"
+      data-target="histogramSectionContent"
+      aria-expanded="true"
+    >
+      ▼ Histogram
     </button>
+    <div id="histogramSectionContent" class="collapsible-content">
+      <div class="hist-container">
+        <canvas id="histCanvas"></canvas>
+      </div>
+      <div class="param-row" id="histTransposeRow">
+        <button id="transposeHistButton" type="button" aria-pressed="false">
+          Transpose histogram
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2089,6 +2146,27 @@ const ciSlider = document.getElementById("ciSlider");
 const ciInput = document.getElementById("ciInput");
 const ciLabel = document.getElementById("ciLabel");
 const ciSliderRow = document.getElementById("ciSliderRow");
+
+function setupCollapsibleSection(toggleButton) {
+  const targetId = toggleButton.dataset.target;
+  const content = document.getElementById(targetId);
+  if (!content) return;
+
+  const update = (expanded) => {
+    toggleButton.setAttribute("aria-expanded", expanded ? "true" : "false");
+    toggleButton.textContent = `${expanded ? "▼" : "▶"} ${toggleButton.textContent.replace(/^[▼▶]\s*/, "")}`;
+    content.classList.toggle("is-collapsed", !expanded);
+  };
+
+  update(true);
+  toggleButton.addEventListener("click", () => {
+    const expanded = toggleButton.getAttribute("aria-expanded") === "true";
+    update(!expanded);
+  });
+}
+
+setupCollapsibleSection(document.getElementById("controlsToggleButton"));
+setupCollapsibleSection(document.getElementById("histogramToggleButton"));
 
 const pointSizeStep = parseFloat(pointSizeSlider.step || "1");
 const ciMax = parseFloat(ciSlider.max);
