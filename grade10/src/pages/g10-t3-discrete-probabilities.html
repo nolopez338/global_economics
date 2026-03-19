@@ -1065,69 +1065,190 @@
         textSection.classList.toggle('active', mode === 'text');
       }
       function parseNumericToken(token) {
-        const trimmed = String(token || '').trim();
-        if (!trimmed) return { ok: false, reason: 'empty value' };
-        if (/^[+-]?\d+(?:\.\d+)?\/[+-]?\d+(?:\.\d+)?$/.test(trimmed)) {
-          const [a, b] = trimmed.split('/').map(Number);
-          if (!Number.isFinite(a) || !Number.isFinite(b) || b === 0) return { ok: false, reason: 'invalid fraction' };
-          return { ok: true, value: a / b };
+        const parsed = analyzeExpression(token, 'value');
+        if (parsed.kind !== 'numeric') return { ok: false, reason: 'not numeric' };
+        return { ok: true, value: parsed.value };
+      }
+      function tokenizeExpression(expression, label) {
+        const tokens = [];
+        let index = 0;
+        while (index < expression.length) {
+          const char = expression[index];
+          if (/\s/.test(char)) {
+            index += 1;
+            continue;
+          }
+          if (/\d|\./.test(char)) {
+            let end = index + 1;
+            while (end < expression.length && /[\d.]/.test(expression[end])) end += 1;
+            const numberText = expression.slice(index, end);
+            if (!/^(?:\d+\.?\d*|\.\d+)$/.test(numberText)) {
+              return { ok: false, error: `invalid number "${numberText}" in ${label}.` };
+            }
+            const value = Number(numberText);
+            if (!Number.isFinite(value)) {
+              return { ok: false, error: `invalid number "${numberText}" in ${label}.` };
+            }
+            tokens.push({ type: 'number', value });
+            index = end;
+            continue;
+          }
+          if (/[A-Za-z_]/.test(char)) {
+            let end = index + 1;
+            while (end < expression.length && /[A-Za-z0-9_]/.test(expression[end])) end += 1;
+            tokens.push({ type: 'variable', name: expression.slice(index, end) });
+            index = end;
+            continue;
+          }
+          if ('+-*/^()'.includes(char)) {
+            tokens.push({ type: 'operator', value: char });
+            index += 1;
+            continue;
+          }
+          return { ok: false, error: `unsupported symbol "${char}" found in ${label}.` };
         }
-        const numeric = Number(trimmed);
-        if (!Number.isFinite(numeric)) return { ok: false, reason: 'not numeric' };
-        return { ok: true, value: numeric };
+        return { ok: true, tokens };
+      }
+      function shouldInsertImplicitMultiplication(prev, next) {
+        if (!prev || !next) return false;
+        const prevCanEndValue = prev.type === 'number' || prev.type === 'variable' || (prev.type === 'operator' && prev.value === ')');
+        const nextCanStartValue = next.type === 'number' || next.type === 'variable' || (next.type === 'operator' && next.value === '(');
+        return prevCanEndValue && nextCanStartValue;
+      }
+      function normalizeExpressionTokens(tokens) {
+        const normalized = [];
+        tokens.forEach((token, idx) => {
+          const prev = normalized.length ? normalized[normalized.length - 1] : null;
+          if (shouldInsertImplicitMultiplication(prev, token)) {
+            normalized.push({ type: 'operator', value: '*' });
+          }
+          const previousRaw = idx > 0 ? tokens[idx - 1] : null;
+          if (token.type === 'operator' && (token.value === '+' || token.value === '-')) {
+            const unaryContext = !previousRaw || (previousRaw.type === 'operator' && previousRaw.value !== ')');
+            if (unaryContext) {
+              normalized.push({ type: 'number', value: 0 });
+            }
+          }
+          normalized.push(token);
+        });
+        return normalized;
+      }
+      function parseTokensToRpn(tokens, label) {
+        const precedence = { '+': 1, '-': 1, '*': 2, '/': 2, '^': 3 };
+        const rightAssociative = { '^': true };
+        const output = [];
+        const operators = [];
+        let previous = null;
+        for (const token of tokens) {
+          if (token.type === 'number' || token.type === 'variable') {
+            output.push(token);
+            previous = token;
+            continue;
+          }
+          const value = token.value;
+          if (value === '(') {
+            operators.push(token);
+            previous = token;
+            continue;
+          }
+          if (value === ')') {
+            let foundOpen = false;
+            while (operators.length) {
+              const top = operators.pop();
+              if (top.value === '(') {
+                foundOpen = true;
+                break;
+              }
+              output.push(top);
+            }
+            if (!foundOpen) return { ok: false, error: `mismatched parentheses in ${label}.` };
+            previous = token;
+            continue;
+          }
+          if (!(value in precedence)) {
+            return { ok: false, error: `unsupported operator "${value}" in ${label}.` };
+          }
+          if (!previous || (previous.type === 'operator' && previous.value !== ')')) {
+            return { ok: false, error: `operator "${value}" cannot appear here in ${label}.` };
+          }
+          while (operators.length) {
+            const top = operators[operators.length - 1];
+            if (top.value === '(') break;
+            const currentPrecedence = precedence[value];
+            const topPrecedence = precedence[top.value];
+            if (topPrecedence > currentPrecedence || (topPrecedence === currentPrecedence && !rightAssociative[value])) {
+              output.push(operators.pop());
+            } else {
+              break;
+            }
+          }
+          operators.push(token);
+          previous = token;
+        }
+        if (previous && previous.type === 'operator' && previous.value !== ')') {
+          return { ok: false, error: `expression cannot end with "${previous.value}" in ${label}.` };
+        }
+        while (operators.length) {
+          const top = operators.pop();
+          if (top.value === '(' || top.value === ')') {
+            return { ok: false, error: `mismatched parentheses in ${label}.` };
+          }
+          output.push(top);
+        }
+        return { ok: true, rpn: output };
+      }
+      function evaluateRpnExpression(rpn, variableValuesMap) {
+        const stack = [];
+        for (const token of rpn) {
+          if (token.type === 'number') {
+            stack.push(token.value);
+            continue;
+          }
+          if (token.type === 'variable') {
+            const value = variableValuesMap[token.name];
+            if (!Number.isFinite(value)) return { ok: false, error: `missing value for variable "${token.name}"` };
+            stack.push(value);
+            continue;
+          }
+          const right = stack.pop();
+          const left = stack.pop();
+          if (!Number.isFinite(left) || !Number.isFinite(right)) {
+            return { ok: false, error: 'invalid expression stack state.' };
+          }
+          let computed = NaN;
+          if (token.value === '+') computed = left + right;
+          else if (token.value === '-') computed = left - right;
+          else if (token.value === '*') computed = left * right;
+          else if (token.value === '/') computed = right === 0 ? NaN : left / right;
+          else if (token.value === '^') computed = left ** right;
+          if (!Number.isFinite(computed)) return { ok: false, error: 'failed evaluation.' };
+          stack.push(computed);
+        }
+        if (stack.length !== 1 || !Number.isFinite(stack[0])) return { ok: false, error: 'failed evaluation.' };
+        return { ok: true, value: stack[0] };
       }
       function analyzeExpression(rawValue, label = 'expression') {
         const expression = String(rawValue || '').trim();
         if (!expression) return { kind: 'invalid', error: `${label} is empty.` };
-        if (/[()]/.test(expression)) {
-          return { kind: 'invalid', error: `parentheses are not supported in ${label}.` };
+        const tokenized = tokenizeExpression(expression, label);
+        if (!tokenized.ok) return { kind: 'invalid', error: tokenized.error };
+        const normalizedTokens = normalizeExpressionTokens(tokenized.tokens);
+        const parsed = parseTokensToRpn(normalizedTokens, label);
+        if (!parsed.ok) return { kind: 'invalid', error: parsed.error };
+        const variableNames = Array.from(new Set(normalizedTokens.filter(t => t.type === 'variable').map(t => t.name)));
+        const kind = variableNames.length ? 'symbolic' : 'numeric';
+        const result = { kind, variables: variableNames, rpn: parsed.rpn, raw: expression, label };
+        if (kind === 'numeric') {
+          const evaluated = evaluateRpnExpression(parsed.rpn, {});
+          if (!evaluated.ok) return { kind: 'invalid', error: 'invalid numeric expression.' };
+          result.value = evaluated.value;
         }
-        if (/\/(?=.*[A-Za-z])/.test(expression)) {
-          return { kind: 'invalid', error: 'division with variables is not supported.' };
-        }
-        if (/[A-Za-z]{2,}/.test(expression) || /(?:sin|cos|sqrt|log|exp)/i.test(expression)) {
-          return { kind: 'invalid', error: 'functions and multi-letter symbols are not supported.' };
-        }
-        const numeric = parseNumericToken(expression);
-        if (numeric.ok) return { kind: 'numeric', value: numeric.value, raw: expression, label };
-        const cleaned = expression.replace(/\s+/g, '');
-        if (!cleaned) return { kind: 'invalid', error: `${label} is empty.` };
-        if (/[^0-9A-Za-z+\-*.^]/.test(cleaned)) {
-          return { kind: 'invalid', error: `unsupported symbol found in ${label}.` };
-        }
-        if (cleaned.includes('/')) {
-          return { kind: 'invalid', error: 'division is only allowed for purely numeric values.' };
-        }
-        const variableMatches = cleaned.match(/[A-Za-z]/g) || [];
-        const variableNames = Array.from(new Set(variableMatches));
-        if (!variableNames.length) {
-          return { kind: 'invalid', error: 'invalid numeric expression.' };
-        }
-        const expressionForEval = cleaned
-          .replace(/(\d)([A-Za-z])/g, '$1*$2')
-          .replace(/([A-Za-z])(\d)/g, '$1*$2')
-          .replace(/\^/g, '**');
-        return { kind: 'symbolic', variables: variableNames, expressionForEval, raw: expression, label };
+        return result;
       }
       function evaluateParsedExpression(parsed, variableValuesMap) {
+        if (parsed.kind === 'invalid') return { ok: false, error: parsed.error || 'invalid expression' };
         if (parsed.kind === 'numeric') return { ok: true, value: parsed.value };
-        if (parsed.kind !== 'symbolic') return { ok: false, error: parsed.error || 'invalid expression' };
-        const args = [];
-        for (const variableName of parsed.variables) {
-          const value = variableValuesMap[variableName];
-          if (!Number.isFinite(value)) {
-            return { ok: false, error: `missing value for variable "${variableName}"` };
-          }
-          args.push(value);
-        }
-        try {
-          const fn = Function(...parsed.variables, '"use strict"; return (' + parsed.expressionForEval + ');');
-          const value = fn(...args);
-          if (!Number.isFinite(value)) return { ok: false, error: 'failed evaluation.' };
-          return { ok: true, value };
-        } catch (error) {
-          return { ok: false, error: 'failed evaluation.' };
-        }
+        return evaluateRpnExpression(parsed.rpn, variableValuesMap || {});
       }
       function renderVariableControls(variableNames) {
         const sortedVariableNames = variableNames.slice().sort();
@@ -1324,13 +1445,18 @@
             xToken = line.slice(0, firstComma).trim();
             pToken = line.slice(firstComma + 1).trim();
           } else {
-            const parts = line.split(/\s+/);
-            if (parts.length < 2) {
-              issues.push(`Line ${lineNumber}: expected exactly two values (x and p).`);
-              return;
+            const columnSplit = line.split(/\s{2,}|\t+/).filter(Boolean);
+            if (columnSplit.length === 2) {
+              [xToken, pToken] = columnSplit.map(part => part.trim());
+            } else {
+              const parts = line.split(/\s+/);
+              if (parts.length < 2) {
+                issues.push(`Line ${lineNumber}: expected exactly two values (x and p).`);
+                return;
+              }
+              xToken = parts[0].trim();
+              pToken = parts.slice(1).join('').trim();
             }
-            xToken = parts[0].trim();
-            pToken = parts.slice(1).join('').trim();
           }
           if (!xToken || !pToken) {
             issues.push(`Line ${lineNumber}: expected exactly two values (x and p).`);
