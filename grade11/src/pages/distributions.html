@@ -72,24 +72,21 @@ body {
 /* Rest of layout */
 .param-row { margin: 10px 0; }
 
-.toggle-pairs {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+.toggle-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 16px;
 }
 
-.toggle-pair {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  align-items: center;
-}
-
-.toggle-pair label,
+.toggle-grid label,
 .toggle-row label {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+
+.toggle-grid .span-2 {
+  grid-column: 1 / -1;
 }
 
 .toggle-row {
@@ -374,37 +371,41 @@ window.MathJax = {
 
   <!-- Legend + toggles for running lines -->
   <div class="param-row" id="linesToggleRow" style="display:none;">
-    <div class="toggle-pairs">
-      <div class="toggle-pair">
-        <label>
-          <input type="checkbox" id="toggleOverallMean">
-          True average line
-        </label>
-        <label>
-          <input type="checkbox" id="toggleMean" checked>
-          <span class="legend-box legend-mean"></span> Running average
-        </label>
-      </div>
-      <div class="toggle-pair">
-        <label>
-          <input type="checkbox" id="toggleOverallStd">
-          True std dev
-        </label>
-        <label>
-          <input type="checkbox" id="toggleStd" checked>
-          <span class="legend-box legend-std"></span> Running std dev
-        </label>
-      </div>
+    <div class="toggle-grid">
+      <label>
+        <input type="checkbox" id="toggleOverallMean">
+        True Mean
+      </label>
+      <label>
+        <input type="checkbox" id="toggleOverallStd">
+        True SD
+      </label>
+      <label>
+        <input type="checkbox" id="toggleSampleMean" checked>
+        Sample Mean
+      </label>
+      <label>
+        <input type="checkbox" id="toggleSampleStd" checked>
+        Sample SD
+      </label>
+      <label class="span-2">
+        <input type="checkbox" id="toggleCI">
+        Confidence Interval
+      </label>
+      <label>
+        <input type="checkbox" id="toggleRunningMean" checked>
+        <span class="legend-box legend-mean"></span> Running Sample Mean
+      </label>
+      <label>
+        <input type="checkbox" id="toggleRunningStd" checked>
+        <span class="legend-box legend-std"></span> Running Sample SD
+      </label>
     </div>
   </div>
 
-  <!-- Extra toggles (CI only) -->
+  <!-- Confidence interval controls -->
   <div class="param-row" id="extraLinesRow" style="display:none;">
     <div class="toggle-row">
-      <label>
-        <input type="checkbox" id="toggleCI">
-        Confidence interval
-      </label>
       <div class="ci-controls" id="ciSliderRow" style="display:none;" aria-hidden="true">
         <span>Confidence level</span>
         <input id="ciSlider" class="slider-wide" type="range" min="30" max="99.99" step="0.01" value="95">
@@ -447,8 +448,10 @@ let pointPositions = [];
 let hoveredBinRange = null;
 
 // running-line toggles and point size
-let showMean = true;
-let showStd = true;
+let showRunningMean = true;
+let showRunningStd = true;
+let showSampleMean = true;
+let showSampleStd = true;
 let pointSize = 4;
 
 // flatten animation state
@@ -1056,11 +1059,11 @@ function getScatterStats() {
 
     if (v < minY) minY = v;
     if (v > maxY) maxY = v;
-    if (showMean) {
+    if (showRunningMean || showSampleMean) {
       if (mean < minY) minY = mean;
       if (mean > maxY) maxY = mean;
     }
-    if (showStd) {
+    if (showRunningStd || showSampleStd) {
       if (std < minY) minY = std;
       if (std > maxY) maxY = std;
     }
@@ -1075,8 +1078,10 @@ function getScatterStats() {
   }
 
   let sampleMean = null;
+  let sampleStd = null;
   if (N > 0) {
     sampleMean = runningMean[N - 1];
+    sampleStd = runningStd[N - 1];
   }
 
   let ciLower = null;
@@ -1116,6 +1121,7 @@ function getScatterStats() {
     trueMean,
     trueStd,
     sampleMean,
+    sampleStd,
     ciLower,
     ciUpper
   };
@@ -1439,6 +1445,7 @@ function drawScatter() {
     runningMean,
     runningStd,
     sampleMean,
+    sampleStd,
     trueMean,
     trueStd,
     ciLower,
@@ -1546,8 +1553,8 @@ function drawScatter() {
     pointPositions.push({ x, y, index: globalIndex, value: data[globalIndex], r: hoverRadius });
   }
 
-  // Running mean line
-  if (showMean) {
+  // Running sample mean line
+  if (showRunningMean) {
     ctx.strokeStyle = "#2563eb";
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -1561,20 +1568,6 @@ function drawScatter() {
       else ctx.lineTo(x, y);
     }
     ctx.stroke();
-
-    if (sampleMean != null && isFinite(sampleMean)) {
-      const ySampleMean = valueToY(sampleMean);
-      ctx.strokeStyle = "#93c5fd";
-      ctx.lineWidth = 1.5;
-      ctx.setLineDash([2, 4]);
-      ctx.beginPath();
-      const lineStart = transformX(marginLeft);
-      const lineEnd = transformX(marginLeft + effectiveW);
-      ctx.moveTo(lineStart, ySampleMean);
-      ctx.lineTo(lineEnd, ySampleMean);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
 
     if (N > 0) {
       const lastIndexLocal = N - 1;
@@ -1592,13 +1585,13 @@ function drawScatter() {
       ctx.strokeStyle = "#ffffff";
       ctx.stroke();
 
-      const labelText = "Mean: " + runningMean[lastIndexLocal].toFixed(3);
+      const labelText = "Running Mean: " + runningMean[lastIndexLocal].toFixed(3);
       drawLabel(ctx, xLastMean + 10, yLastMean - 12, labelText, W, H);
     }
   }
 
-  // Running std line
-  if (showStd) {
+  // Running sample std line
+  if (showRunningStd) {
     ctx.strokeStyle = "#16a34a";
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -1629,9 +1622,47 @@ function drawScatter() {
       ctx.strokeStyle = "#ffffff";
       ctx.stroke();
 
-      const labelText = "Std: " + runningStd[lastIndexLocal].toFixed(3);
+      const labelText = "Running SD: " + runningStd[lastIndexLocal].toFixed(3);
       drawLabel(ctx, xLastStd + 10, yLastStd + 12, labelText, W, H);
     }
+  }
+
+  // Current sample mean line
+  if (showSampleMean && sampleMean != null && isFinite(sampleMean)) {
+    const ySampleMean = valueToY(sampleMean);
+    ctx.strokeStyle = "#93c5fd";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    const lineStart = transformX(marginLeft);
+    const lineEnd = transformX(marginLeft + effectiveW);
+    ctx.moveTo(lineStart, ySampleMean);
+    ctx.lineTo(lineEnd, ySampleMean);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    const labelText = "Sample μ: " + sampleMean.toFixed(3);
+    const xLabel = transformX(marginLeft + 10);
+    drawLabel(ctx, xLabel, ySampleMean, labelText, W, H);
+  }
+
+  // Current sample std line
+  if (showSampleStd && sampleStd != null && isFinite(sampleStd)) {
+    const ySampleStd = valueToY(sampleStd);
+    ctx.strokeStyle = "#86efac";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    const lineStart = transformX(marginLeft);
+    const lineEnd = transformX(marginLeft + effectiveW);
+    ctx.moveTo(lineStart, ySampleStd);
+    ctx.lineTo(lineEnd, ySampleStd);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    const labelText = "Sample σ: " + sampleStd.toFixed(3);
+    const xLabel = transformX(marginLeft + 10);
+    drawLabel(ctx, xLabel, ySampleStd, labelText, W, H);
   }
 
   // True average line
@@ -2042,8 +2073,10 @@ function setupHoldAdjustButton(button, action) {
 }
 
 // Toggles and sliders
-const toggleMean = document.getElementById("toggleMean");
-const toggleStd = document.getElementById("toggleStd");
+const toggleRunningMean = document.getElementById("toggleRunningMean");
+const toggleRunningStd = document.getElementById("toggleRunningStd");
+const toggleSampleMean = document.getElementById("toggleSampleMean");
+const toggleSampleStd = document.getElementById("toggleSampleStd");
 const toggleOverallStd = document.getElementById("toggleOverallStd");
 const pointSizeSlider = document.getElementById("pointSizeSlider");
 const pointSizeInput = document.getElementById("pointSizeInput");
@@ -2217,13 +2250,23 @@ function runUnflattenSequence() {
   });
 }
 
-toggleMean.addEventListener("change", () => {
-  showMean = toggleMean.checked;
+toggleRunningMean.addEventListener("change", () => {
+  showRunningMean = toggleRunningMean.checked;
   drawScatter();
 });
 
-toggleStd.addEventListener("change", () => {
-  showStd = toggleStd.checked;
+toggleRunningStd.addEventListener("change", () => {
+  showRunningStd = toggleRunningStd.checked;
+  drawScatter();
+});
+
+toggleSampleMean.addEventListener("change", () => {
+  showSampleMean = toggleSampleMean.checked;
+  drawScatter();
+});
+
+toggleSampleStd.addEventListener("change", () => {
+  showSampleStd = toggleSampleStd.checked;
   drawScatter();
 });
 
