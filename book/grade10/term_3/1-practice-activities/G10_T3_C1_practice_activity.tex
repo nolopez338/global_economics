@@ -13,44 +13,49 @@
     
     \textbf{Problem.}
     This first task is a \emph{template} for all the density-function problems in this activity.
-    Let $X$ be a continuous random variable with bounded support $[a,b]$, where $a<b$.
-    Suppose a proposed model is
+    Let $X$ be a continuous random variable with bounded support $[a,b]$, where $a<m<b$.
+    Suppose a proposed piecewise linear model is
     \[
     f(x)=\begin{cases}
-    k\,g(x), & a\le x\le b,\\
+    \dfrac{k}{m-a}(x-a), & a\le x\le m,\\[4pt]
+    \dfrac{k}{b-m}(b-x), & m<x\le b,\\
     0, & \text{otherwise,}
     \end{cases}
     \]
-    where $g(x)$ is a known nonnegative profile on $[a,b]$ (it may be constant, linear, triangular, piecewise, symmetric, etc.) and $k$ is an unknown constant.
+    where $k>0$ is unknown.
     
     \textbf{Question.}
     \begin{itemize}
       \item \textbf{C1 Calculations:} Determine the value of $k$ that makes $f(x)$ a valid PDF on $[a,b]$.
       \item \textbf{C1 Interpretation:} Explain what this normalization means for the random variable $X$ and why the model is valid.
-      \item \textbf{Extra analysis:} For any subinterval $[c,d]\subseteq[a,b]$ with $a\le c<d\le b$, express $P(c\le X\le d)$ and indicate this probability region on a graph.
+      \item \textbf{Extra analysis:} For any interval $[c,d]$ with $a\le c<m<d\le b$, express $P(c\le X\le d)$ using geometric areas and indicate this probability region on a graph.
     \end{itemize}
     
     \textbf{Solution.}
     \textbf{C1 Calculations.}
-    A valid density must satisfy two general conditions:
+    A valid density must satisfy two conditions:
     \begin{enumerate}
-      \item $f(x)\ge 0$ on its support (true here when $k\ge 0$ because $g(x)\ge 0$),
-      \item total area over $[a,b]$ is $1$.
+      \item $f(x)\ge 0$ on its support,
+      \item total area under the graph on $[a,b]$ is $1$.
     \end{enumerate}
-    Let
+    Here the graph is a single triangle with base $b-a$ and peak height $k$ at $x=m$, so
     \[
-    A_{\text{total}}=\text{area under }g(x)\text{ on }[a,b].
+    A_{\text{total}}=\frac{1}{2}(b-a)k.
     \]
-    Then
+    Set this total area equal to $1$:
     \[
-    \int_a^b f(x)\,dx=\int_a^b k\,g(x)\,dx=k\,A_{\text{total}}=1,
+    \frac{1}{2}(b-a)k=1
+    \quad\Rightarrow\quad
+    k=\frac{2}{b-a}.
     \]
-    so the normalizing constant is
+    So the normalized piecewise linear PDF is
     \[
-    k=\frac{1}{A_{\text{total}}},\qquad
-    f(x)=\frac{g(x)}{A_{\text{total}}}\text{ on }[a,b].
+    f(x)=\begin{cases}
+    \dfrac{2(x-a)}{(b-a)(m-a)}, & a\le x\le m,\\[4pt]
+    \dfrac{2(b-x)}{(b-a)(b-m)}, & m<x\le b,\\
+    0, & \text{otherwise.}
+    \end{cases}
     \]
-    (For each specific problem later, $A_{\text{total}}$ is found by geometry from that problem's shape.)
     
     \begin{center}
     \begin{tikzpicture}
@@ -65,27 +70,34 @@
       ymin=-0.02,
       ymax=0.55,
       grid=both,
-      xtick={0,6},
-      xticklabels={$a$,$b$}
+      xtick={0,3,6},
+      xticklabels={$a$,$m$,$b$}
     ]
-    \addplot[draw=none, fill=blue!20, fill opacity=0.35] coordinates {(0,0) (1.2,0.25) (3,0.45) (4.4,0.2) (6,0.35) (6,0)} \closedcycle;
-    \addplot[smooth] coordinates {(0,0) (1.2,0.25) (3,0.45) (4.4,0.2) (6,0.35)};
+    \addplot[draw=none, fill=blue!20, fill opacity=0.35] coordinates {(0,0) (3,0.45) (6,0) (6,0)} \closedcycle;
+    \addplot[thick] coordinates {(0,0) (3,0.45) (6,0)};
+    \addplot[only marks, mark=*, mark size=2pt] coordinates {(3,0.45)};
+    \node[font=\scriptsize, anchor=south] at (axis cs:3,0.45) {$\left(m,k\right)$};
     \end{axis}
     \end{tikzpicture}
     \end{center}
     
     \textbf{C1 Interpretation.}
-    The computation of $k$ rescales the proposed shape $g(x)$ so that the entire probability over the support $[a,b]$ is exactly $1$. In other words, the graph of $f(x)$ keeps the same relative shape as $g(x)$, but its total area is normalized to represent a complete probability model for the continuous variable $X$.
+    The value of $k$ sets the peak height so that the full triangular area is exactly $1$. That means all probabilities over the support $[a,b]$ add to a complete whole, so this piecewise linear graph is a valid PDF for $X$. The left and right line segments describe how density increases up to $m$ and then decreases after $m$.
     
     \textbf{Extra analysis.}
-    For any event interval $[c,d]\subseteq[a,b]$,
+    For $a\le c<m<d\le b$, split $[c,d]$ at $m$.
+    Let
     \[
-    P(c\le X\le d)=\int_c^d f(x)\,dx
-    =\frac{1}{A_{\text{total}}}\int_c^d g(x)\,dx
-    =\frac{A_{[c,d]}}{A_{\text{total}}},
+    f(c)=\frac{k}{m-a}(c-a),
+    \qquad
+    f(d)=\frac{k}{b-m}(b-d).
     \]
-    where $A_{[c,d]}$ is the geometric area under $g(x)$ from $c$ to $d$.
-    So every later problem follows the same pattern: normalize total area first, then compute subinterval probability as a shaded area fraction.
+    Then the event area is the sum of two trapezoids:
+    \[
+    P(c\le X\le d)
+    =\frac{f(c)+k}{2}(m-c)+\frac{k+f(d)}{2}(d-m).
+    \]
+    Substituting $k=\frac{2}{b-a}$ gives a fully normalized expression.
     
     \begin{center}
     \begin{tikzpicture}
@@ -100,19 +112,20 @@
       ymin=0,
       ymax=0.55,
       grid=both,
-      xtick={0,2,5,6},
-      xticklabels={$a$,$c$,$d$,$b$}
+      xtick={0,2,3,5,6},
+      xticklabels={$a$,$c$,$m$,$d$,$b$}
     ]
-    \addplot[draw=none, fill=blue!20, fill opacity=0.35] coordinates {(0,0) (1.2,0.25) (3,0.45) (4.4,0.2) (6,0.35) (6,0)} \closedcycle;
-    \addplot[draw=none, fill=blue!60, fill opacity=0.55] coordinates {(2,0) (2,0.3389) (3,0.45) (4.4,0.2) (5,0.2563) (5,0)} \closedcycle;
-    \addplot[smooth] coordinates {(0,0) (1.2,0.25) (3,0.45) (4.4,0.2) (6,0.35)};
-    \addplot[only marks, mark=*, mark size=2pt] coordinates {(2,0.3389) (5,0.2563)};
-    \node[font=\scriptsize, anchor=south east] at (axis cs:2,0.3389) {$\left(c,f(c)\right)$};
-    \node[font=\scriptsize, anchor=south west] at (axis cs:5,0.2563) {$\left(d,f(d)\right)$};
+    \addplot[draw=none, fill=blue!20, fill opacity=0.35] coordinates {(0,0) (3,0.45) (6,0) (6,0)} \closedcycle;
+    \addplot[draw=none, fill=blue!60, fill opacity=0.55] coordinates {(2,0) (2,0.30) (3,0.45) (5,0.15) (5,0)} \closedcycle;
+    \addplot[thick] coordinates {(0,0) (3,0.45) (6,0)};
+    \addplot[only marks, mark=*, mark size=2pt] coordinates {(2,0.30) (3,0.45) (5,0.15)};
+    \node[font=\scriptsize, anchor=south east] at (axis cs:2,0.30) {$\left(c,f(c)\right)$};
+    \node[font=\scriptsize, anchor=south] at (axis cs:3,0.45) {$\left(m,k\right)$};
+    \node[font=\scriptsize, anchor=south west] at (axis cs:5,0.15) {$\left(d,f(d)\right)$};
     \end{axis}
     \end{tikzpicture}
     \end{center}
-    
+
 		% --------------------------------------------------
 		
 		\item
