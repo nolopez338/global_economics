@@ -244,7 +244,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "Problems for Discrete probabilities",
+    "Description": "No Class: CREAR Laboratory",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C2"
@@ -257,7 +257,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "Problems for Discrete Probabilities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C2"
@@ -268,7 +268,7 @@ window.SCHEDULE_DATA = [
     "Class #": "3-1",
     "Date": "2026-04-07",
     "Term": 3,
-    "Weekday": "Tuesday",
+    "Weekday": "Problems for Continuous Probabilities",
     "Day": "Day 1",
     "Description": "-",
     "Material": "-",
