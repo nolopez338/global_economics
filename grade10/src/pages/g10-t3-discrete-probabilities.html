@@ -307,6 +307,17 @@
       grid-column: 4;
       grid-row: 2;
     }
+    .variable-controls-row .variable-speed-controls {
+      grid-column: 3;
+      grid-row: 2;
+      display: inline-flex;
+      align-items: center;
+      justify-self: start;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      overflow: hidden;
+      background: #fff;
+    }
     .variable-controls-row .variable-precision-controls {
       grid-column: 5 / span 2;
       grid-row: 2;
@@ -347,6 +358,29 @@
       border-color: var(--border);
     }
     .variable-precision-btn.active {
+      background: var(--primary);
+      color: #fff;
+    }
+    .variable-speed-btn {
+      border: none;
+      border-right: 1px solid var(--border);
+      border-radius: 0;
+      padding: 0.34rem 0.42rem;
+      min-width: 34px;
+      background: #fff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #334155;
+      line-height: 1;
+    }
+    .variable-speed-btn:last-child {
+      border-right: none;
+    }
+    .variable-speed-btn:hover {
+      background: #eff6ff;
+      border-color: var(--border);
+    }
+    .variable-speed-btn.active {
       background: var(--primary);
       color: #fff;
     }
@@ -587,6 +621,12 @@
       let dragScale = null;
       let resizeTimer = null;
       const DEFAULT_VARIABLE_SETTINGS = { value: 1, min: 0, max: 1, step: 0.001 };
+      const VARIABLE_SPEED_OPTIONS = [
+        { label: '10x', factor: 1 },
+        { label: '5x', factor: 0.5 },
+        { label: '2x', factor: 0.2 }
+      ];
+      const DEFAULT_VARIABLE_SPEED_LABEL = '10x';
       const examplePMFs = {
         'example-1': [
           { x: '0', p: '0.2' },
@@ -743,11 +783,16 @@
         }
       }
       function createDefaultVariableState(previousState) {
+        const speedLabel = previousState && typeof previousState.speedLabel === 'string'
+          ? previousState.speedLabel
+          : DEFAULT_VARIABLE_SPEED_LABEL;
+        const hasSpeedOption = VARIABLE_SPEED_OPTIONS.some((option) => option.label === speedLabel);
         return {
           value: previousState && Number.isFinite(previousState.value) ? previousState.value : DEFAULT_VARIABLE_SETTINGS.value,
           min: previousState && Number.isFinite(previousState.min) ? previousState.min : DEFAULT_VARIABLE_SETTINGS.min,
           max: previousState && Number.isFinite(previousState.max) ? previousState.max : DEFAULT_VARIABLE_SETTINGS.max,
-          step: previousState && Number.isFinite(previousState.step) ? previousState.step : DEFAULT_VARIABLE_SETTINGS.step
+          step: previousState && Number.isFinite(previousState.step) ? previousState.step : DEFAULT_VARIABLE_SETTINGS.step,
+          speedLabel: hasSpeedOption ? speedLabel : DEFAULT_VARIABLE_SPEED_LABEL
         };
       }
       function setVariablePlayState(variableName, isPlaying) {
@@ -806,6 +851,30 @@
             button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
           });
         });
+      }
+      function refreshVariableSpeedButtons(variableName) {
+        const state = variableStateByName[variableName];
+        const controls = variableControlElementsByName[variableName];
+        if (!state || !controls || !controls.speedButtons) return;
+        controls.speedButtons.forEach((button) => {
+          const isActive = button.dataset.speed === state.speedLabel;
+          button.classList.toggle('active', isActive);
+          button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+      }
+      function setVariableAnimationSpeed(variableName, speedLabel) {
+        const state = variableStateByName[variableName];
+        if (!state) return;
+        const hasSpeedOption = VARIABLE_SPEED_OPTIONS.some((option) => option.label === speedLabel);
+        if (!hasSpeedOption || speedLabel === state.speedLabel) return;
+        state.speedLabel = speedLabel;
+        refreshVariableSpeedButtons(variableName);
+      }
+      function getVariableAnimationSpeedScale(variableName) {
+        const state = variableStateByName[variableName];
+        const selectedLabel = state && typeof state.speedLabel === 'string' ? state.speedLabel : DEFAULT_VARIABLE_SPEED_LABEL;
+        const matched = VARIABLE_SPEED_OPTIONS.find((option) => option.label === selectedLabel);
+        return matched ? matched.factor : 1;
       }
       function setVariableDisplayPrecision(decimals) {
         const nextDecimals = Number(decimals);
@@ -974,7 +1043,7 @@
         }
         const elapsedSeconds = Math.min((timestamp - animation.lastTimestamp) / 1000, 0.08);
         animation.lastTimestamp = timestamp;
-        const speed = computeVariableAnimationSpeed(state.value, min, max);
+        const speed = computeVariableAnimationSpeed(state.value, min, max) * getVariableAnimationSpeedScale(variableName);
         let nextValue = state.value + (animation.direction * speed * elapsedSeconds);
         if (nextValue >= max) {
           nextValue = max;
@@ -1339,6 +1408,11 @@
             <input type="number" step="0.001" class="variable-bound-input" data-role="min" aria-label="Minimum ${variableName} value">
             <input type="range" class="variable-slider" data-role="slider" aria-label="${variableName} slider">
             <input type="number" step="0.001" class="variable-bound-input" data-role="max" aria-label="Maximum ${variableName} value">
+            <div class="variable-speed-controls" role="group" aria-label="${variableName} animation speed">
+              <button type="button" class="variable-speed-btn active" data-role="speed" data-speed="10x" aria-pressed="true">10x</button>
+              <button type="button" class="variable-speed-btn" data-role="speed" data-speed="5x" aria-pressed="false">5x</button>
+              <button type="button" class="variable-speed-btn" data-role="speed" data-speed="2x" aria-pressed="false">2x</button>
+            </div>
             <input type="number" step="0.001" class="variable-current-input" data-role="current" aria-label="Current ${variableName} value">
             <div class="variable-precision-controls" role="group" aria-label="Current value display decimals">
               <button type="button" class="variable-precision-btn" data-role="precision" data-decimals="2" aria-pressed="false">2dp</button>
@@ -1354,6 +1428,7 @@
             slider: row.querySelector('[data-role="slider"]'),
             maxInput: row.querySelector('[data-role="max"]'),
             currentInput: row.querySelector('[data-role="current"]'),
+            speedButtons: Array.from(row.querySelectorAll('[data-role="speed"]')),
             precisionButtons: Array.from(row.querySelectorAll('[data-role="precision"]'))
           };
           variableControlElementsByName[variableName] = controls;
@@ -1378,6 +1453,11 @@
               event.preventDefault();
               controls.currentInput.blur();
             }
+          });
+          controls.speedButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+              setVariableAnimationSpeed(variableName, button.dataset.speed);
+            });
           });
           controls.precisionButtons.forEach((button) => {
             button.addEventListener('click', () => {
@@ -1413,6 +1493,7 @@
             }
           });
           updateVariableRowDisplay(variableName, true);
+          refreshVariableSpeedButtons(variableName);
           setVariablePlayState(variableName, isVariableAnimationRunning(variableName));
         });
         refreshVariablePrecisionButtons();
