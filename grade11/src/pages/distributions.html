@@ -161,6 +161,74 @@ body {
   margin-left: 6px;
 }
 
+.graph-action-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.precision-group {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.precision-label {
+  font-size: 12px;
+  color: #374151;
+  margin-right: 2px;
+}
+
+.precision-btn {
+  padding: 5px 9px;
+  margin: 0;
+  background: #e5e7eb;
+  color: #111827;
+  border: 1px solid #d1d5db;
+}
+
+.precision-btn:hover {
+  background: #d1d5db;
+}
+
+.precision-btn.is-active {
+  background: #4a7bd1;
+  color: #ffffff;
+  border-color: #3759a3;
+}
+
+.ytop-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 10px 16px;
+}
+
+.ytop-card {
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.ytop-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.ytop-header-title {
+  font-weight: 600;
+}
+
+.ytop-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 button {
   padding: 8px 15px;
   margin: 5px;
@@ -437,6 +505,46 @@ window.MathJax = {
   <!-- Parameter controls -->
   <div id="parameters"></div>
 
+  <div class="param-row ytop-grid">
+    <div class="ytop-card">
+      <div class="ytop-header">
+        <span class="ytop-header-title">PDF y-top</span>
+        <label>
+          <input type="checkbox" id="pdfAutoYTop" checked>
+          Auto-adjust
+        </label>
+      </div>
+      <div class="ytop-input-row">
+        <label for="pdfYTopInput">y-top</label>
+        <input id="pdfYTopInput" class="numeric-input" type="number" min="0" step="any" value="1">
+      </div>
+    </div>
+    <div class="ytop-card">
+      <div class="ytop-header">
+        <span class="ytop-header-title">CDF y-top</span>
+        <label>
+          <input type="checkbox" id="cdfAutoYTop" checked>
+          Auto-adjust
+        </label>
+      </div>
+      <div class="ytop-input-row">
+        <label for="cdfYTopInput">y-top</label>
+        <input id="cdfYTopInput" class="numeric-input" type="number" min="0" step="any" value="1">
+      </div>
+    </div>
+  </div>
+
+  <div class="param-row graph-action-row">
+    <button id="updateGraphButton" type="button">Update Graph</button>
+    <button id="resetGraphButton" type="button">Reset</button>
+    <div class="precision-group" role="group" aria-label="Decimal precision">
+      <span class="precision-label">Precision</span>
+      <button id="precision2Btn" class="precision-btn" type="button" aria-pressed="false">2d</button>
+      <button id="precision3Btn" class="precision-btn is-active" type="button" aria-pressed="true">3d</button>
+      <button id="precision4Btn" class="precision-btn" type="button" aria-pressed="false">4d</button>
+    </div>
+  </div>
+
   <div class="param-row">
     <button onclick="generate(100)">100</button>
     <button onclick="generate(1000)">1,000</button>
@@ -523,6 +631,12 @@ let showCI = false;
 let showOverallMean = false;
 let showOverallStd = false;
 let ciLevel = 95; // percent
+let decimalPrecision = 3;
+
+let pdfAutoYTop = true;
+let cdfAutoYTop = true;
+let pdfManualYTop = 1;
+let cdfManualYTop = 1;
 
 // histogram orientation
 let isHistogramTransposed = false;
@@ -557,6 +671,15 @@ const pointSizeIncBtn = document.getElementById("pointSizeInc");
 const ciDecBtn = document.getElementById("ciDec");
 const ciIncBtn = document.getElementById("ciInc");
 const transposeHistButton = document.getElementById("transposeHistButton");
+const updateGraphButton = document.getElementById("updateGraphButton");
+const resetGraphButton = document.getElementById("resetGraphButton");
+const pdfAutoYTopCheckbox = document.getElementById("pdfAutoYTop");
+const cdfAutoYTopCheckbox = document.getElementById("cdfAutoYTop");
+const pdfYTopInput = document.getElementById("pdfYTopInput");
+const cdfYTopInput = document.getElementById("cdfYTopInput");
+const precision2Btn = document.getElementById("precision2Btn");
+const precision3Btn = document.getElementById("precision3Btn");
+const precision4Btn = document.getElementById("precision4Btn");
 
 // Distribution equations in TeX for MathJax
 const distributionEquations = {
@@ -610,6 +733,11 @@ function updateDistributionEquation() {
   if (window.MathJax && window.MathJax.typesetPromise) {
     MathJax.typesetPromise([equationBoxEl]);
   }
+}
+
+function formatValue(value, precision = decimalPrecision) {
+  if (!Number.isFinite(value)) return "";
+  return value.toFixed(precision);
 }
 
 function attachParamListenersForPDF() {
@@ -920,6 +1048,12 @@ function drawPDF() {
     xMin -= 1;
   }
   if (yMax <= 0) yMax = 1;
+  if (!pdfAutoYTop) {
+    const requestedTop = Number(pdfManualYTop);
+    if (Number.isFinite(requestedTop) && requestedTop > yMin) {
+      yMax = requestedTop;
+    }
+  }
 
   ctx.strokeStyle = "#cccccc";
   ctx.lineWidth = 1;
@@ -953,7 +1087,7 @@ function drawPDF() {
     ctx.moveTo(xPix, xAxisY);
     ctx.lineTo(xPix, xAxisY + 4);
     ctx.stroke();
-    ctx.fillText(xVal.toFixed(2), xPix, xAxisY + 6);
+    ctx.fillText(formatValue(xVal), xPix, xAxisY + 6);
   }
 
   const yTicks = 3;
@@ -967,7 +1101,7 @@ function drawPDF() {
     ctx.moveTo(yAxisX - 4, yPix);
     ctx.lineTo(yAxisX, yPix);
     ctx.stroke();
-    ctx.fillText(yVal.toFixed(2), yAxisX - 6, yPix);
+    ctx.fillText(formatValue(yVal), yAxisX - 6, yPix);
   }
 
   ctx.strokeStyle = "#4a7bd1";
@@ -1185,17 +1319,25 @@ function getScatterStats() {
 }
 
 function getScatterAxisConfig(stats) {
+  let minY = stats.minY;
+  let maxY = stats.maxY;
+  if (!cdfAutoYTop) {
+    const requestedTop = Number(cdfManualYTop);
+    if (Number.isFinite(requestedTop) && requestedTop > minY) {
+      maxY = requestedTop;
+    }
+  }
   const tickCount = 5;
   const tickValues = [];
   for (let i = 0; i <= tickCount; i++) {
     const t = i / tickCount;
-    tickValues.push(stats.minY + t * (stats.maxY - stats.minY));
+    tickValues.push(minY + t * (maxY - minY));
   }
   return {
-    minY: stats.minY,
-    maxY: stats.maxY,
+    minY,
+    maxY,
     tickValues,
-    tickFormat: (val) => val.toFixed(3),
+    tickFormat: (val) => formatValue(val),
     label: "Value"
   };
 }
@@ -1642,7 +1784,7 @@ function drawScatter() {
       ctx.strokeStyle = "#ffffff";
       ctx.stroke();
 
-      const labelText = "Running Mean: " + runningMean[lastIndexLocal].toFixed(3);
+      const labelText = "Running Mean: " + formatValue(runningMean[lastIndexLocal]);
       drawLabel(ctx, xLastMean + 10, yLastMean - 12, labelText, W, H);
     }
   }
@@ -1679,7 +1821,7 @@ function drawScatter() {
       ctx.strokeStyle = "#ffffff";
       ctx.stroke();
 
-      const labelText = "Running SD: " + runningStd[lastIndexLocal].toFixed(3);
+      const labelText = "Running SD: " + formatValue(runningStd[lastIndexLocal]);
       drawLabel(ctx, xLastStd + 10, yLastStd + 12, labelText, W, H);
     }
   }
@@ -1698,7 +1840,7 @@ function drawScatter() {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    const labelText = "Sample μ: " + sampleMean.toFixed(3);
+    const labelText = "Sample μ: " + formatValue(sampleMean);
     const xLabel = transformX(marginLeft + 10);
     drawLabel(ctx, xLabel, ySampleMean, labelText, W, H);
   }
@@ -1717,7 +1859,7 @@ function drawScatter() {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    const labelText = "Sample σ: " + sampleStd.toFixed(3);
+    const labelText = "Sample σ: " + formatValue(sampleStd);
     const xLabel = transformX(marginLeft + 10);
     drawLabel(ctx, xLabel, ySampleStd, labelText, W, H);
   }
@@ -1736,7 +1878,7 @@ function drawScatter() {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    const labelText = "True μ: " + trueMean.toFixed(3);
+    const labelText = "True μ: " + formatValue(trueMean);
     const xLabel = transformX(marginLeft + 10);
     drawLabel(ctx, xLabel, yTrue, labelText, W, H);
   }
@@ -1755,15 +1897,15 @@ function drawScatter() {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    const labelText = "True σ: " + trueStd.toFixed(3);
+    const labelText = "True σ: " + formatValue(trueStd);
     const xLabel = transformX(marginLeft + 10);
     drawLabel(ctx, xLabel, yTrueStd, labelText, W, H);
   }
 
   // CI labels
   if (showCI && N > 1 && ciLower != null && ciUpper != null) {
-    const labelLow = "CI low: " + ciLower.toFixed(3);
-    const labelHigh = "CI high: " + ciUpper.toFixed(3);
+    const labelLow = "CI low: " + formatValue(ciLower);
+    const labelHigh = "CI high: " + formatValue(ciUpper);
     const xLabel = transformX(marginLeft + 10);
 
     const yLowPix = valueToY(ciLower);
@@ -1913,7 +2055,7 @@ scatterCanvas.addEventListener("mousemove", e => {
 
   if (found) {
     tooltip.style.display = "block";
-    tooltip.textContent = `Index ${found.index} | Value ${found.value.toFixed(4)}`;
+    tooltip.textContent = `Index ${found.index} | Value ${formatValue(found.value)}`;
     tooltip.style.left = (e.clientX + 12) + "px";
     tooltip.style.top  = (e.clientY + 12) + "px";
   } else {
@@ -1940,7 +2082,7 @@ histCanvas.addEventListener("mousemove", e => {
     tooltip.style.display = "block";
     tooltip.textContent =
       `Bin ${found.binIndex}
-Value range: [${found.minVal.toFixed(4)}, ${found.maxVal.toFixed(4)}]
+Value range: [${formatValue(found.minVal)}, ${formatValue(found.maxVal)}]
 Count: ${found.count}`;
     tooltip.style.left = (e.clientX + 12) + "px";
     tooltip.style.top  = (e.clientY + 12) + "px";
@@ -2402,6 +2544,42 @@ transposeHistButton.addEventListener("click", () => {
   drawHistogram();
 });
 
+function renderAllGraphs() {
+  drawPDF();
+  drawScatter();
+  drawHistogram();
+}
+
+function setPrecision(nextPrecision) {
+  decimalPrecision = nextPrecision;
+  const buttons = [
+    [precision2Btn, 2],
+    [precision3Btn, 3],
+    [precision4Btn, 4]
+  ];
+  buttons.forEach(([btn, value]) => {
+    const isActive = value === decimalPrecision;
+    btn.classList.toggle("is-active", isActive);
+    btn.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
+  renderAllGraphs();
+}
+
+function resetGraphControls() {
+  pdfAutoYTop = true;
+  cdfAutoYTop = true;
+  pdfManualYTop = 1;
+  cdfManualYTop = 1;
+  pdfAutoYTopCheckbox.checked = true;
+  cdfAutoYTopCheckbox.checked = true;
+  pdfYTopInput.value = "1";
+  cdfYTopInput.value = "1";
+  pdfYTopInput.disabled = true;
+  cdfYTopInput.disabled = true;
+  setPrecision(3);
+  renderAllGraphs();
+}
+
 ciSlider.addEventListener("input", () => {
   applyCiLevelValue(parseFloat(ciSlider.value));
 });
@@ -2418,11 +2596,52 @@ ciInput.addEventListener("change", () => {
   }
 });
 
+precision2Btn.addEventListener("click", () => setPrecision(2));
+precision3Btn.addEventListener("click", () => setPrecision(3));
+precision4Btn.addEventListener("click", () => setPrecision(4));
+
+pdfAutoYTopCheckbox.addEventListener("change", () => {
+  pdfAutoYTop = pdfAutoYTopCheckbox.checked;
+  pdfYTopInput.disabled = pdfAutoYTop;
+  drawPDF();
+});
+
+cdfAutoYTopCheckbox.addEventListener("change", () => {
+  cdfAutoYTop = cdfAutoYTopCheckbox.checked;
+  cdfYTopInput.disabled = cdfAutoYTop;
+  drawScatter();
+  drawHistogram();
+});
+
+pdfYTopInput.addEventListener("input", () => {
+  const next = parseFloat(pdfYTopInput.value);
+  if (Number.isFinite(next) && next > 0) {
+    pdfManualYTop = next;
+    if (!pdfAutoYTop) drawPDF();
+  }
+});
+
+cdfYTopInput.addEventListener("input", () => {
+  const next = parseFloat(cdfYTopInput.value);
+  if (Number.isFinite(next) && next > 0) {
+    cdfManualYTop = next;
+    if (!cdfAutoYTop) {
+      drawScatter();
+      drawHistogram();
+    }
+  }
+});
+
+updateGraphButton.addEventListener("click", renderAllGraphs);
+resetGraphButton.addEventListener("click", resetGraphControls);
+
 // Keep manual inputs synchronized with the current state on load.
 applyPointSizeValue(pointSize);
 applyCiLevelValue(ciLevel);
 setFlattenButtonState();
 updateTransposeButtonState();
+pdfYTopInput.disabled = true;
+cdfYTopInput.disabled = true;
 
 // init (default: Continuous / Normal)
 categorySel.addEventListener("change", updateDistributionOptions);
