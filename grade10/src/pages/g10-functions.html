@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Functions as a Machine</title>
+  <style>
+    :root {
+      --green: #2f9e44;
+      --green-dark: #1f6f30;
+      --purple: #7048e8;
+      --purple-dark: #4b2da6;
+      --red: #e03131;
+      --red-dark: #a61e1e;
+      --ink: #1f2937;
+      --soft: #f5f3ff;
+      --line: #d1d5db;
+      --panel: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(180deg, #f8fafc, #eef2ff);
+      min-height: 100vh;
+      line-height: 1.45;
+    }
+
+    .page {
+      max-width: 1024px;
+      margin: 0 auto;
+      padding: 1.25rem;
+    }
+
+    h1 {
+      margin: 0 0 0.5rem;
+      font-size: clamp(1.7rem, 2.5vw, 2.4rem);
+      color: #312e81;
+    }
+
+    .intro {
+      margin: 0 0 1rem;
+      font-size: 1.05rem;
+      color: #4338ca;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(37, 99, 235, 0.08);
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.85rem;
+      align-items: end;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 0.35rem;
+      font-weight: 600;
+    }
+
+    .field input {
+      width: 100%;
+      border: 2px solid #c7d2fe;
+      border-radius: 10px;
+      padding: 0.65rem 0.75rem;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+
+    .field input:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16);
+    }
+
+    .button-row {
+      display: flex;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 0.65rem 1rem;
+      min-width: 110px;
+    }
+
+    #playBtn {
+      background: #4f46e5;
+      color: white;
+    }
+
+    #resetBtn {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .status {
+      min-height: 1.6rem;
+      margin-top: 0.5rem;
+      font-size: 0.98rem;
+      font-weight: 600;
+    }
+
+    .status.error { color: #b91c1c; }
+    .status.info { color: #3730a3; }
+    .status.success { color: #166534; }
+
+    .machine-stage {
+      margin-top: 0.25rem;
+      position: relative;
+      min-height: 300px;
+      border-radius: 14px;
+      border: 2px dashed #c7d2fe;
+      background: #f8faff;
+      padding: 1rem;
+      overflow: hidden;
+    }
+
+    .flow-label {
+      text-align: center;
+      font-size: 1.05rem;
+      margin-bottom: 0.7rem;
+      color: #312e81;
+      font-weight: 700;
+    }
+
+    .lane {
+      position: relative;
+      height: 170px;
+    }
+
+    .anchor {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 130px;
+      height: 88px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-weight: 800;
+      font-size: 1.05rem;
+      padding: 0.4rem;
+      color: #fff;
+    }
+
+    .anchor.left {
+      left: 12%;
+      background: linear-gradient(145deg, #40c057, var(--green));
+      box-shadow: 0 10px 16px rgba(47, 158, 68, 0.28);
+    }
+
+    .anchor.middle {
+      left: 50%;
+      width: 220px;
+      height: 112px;
+      background: linear-gradient(145deg, #845ef7, var(--purple));
+      box-shadow: 0 10px 18px rgba(112, 72, 232, 0.28);
+      border: 2px solid rgba(255, 255, 255, 0.45);
+      flex-direction: column;
+      gap: 0.3rem;
+      padding: 0.65rem;
+    }
+
+    .anchor.middle .machine-title { font-size: 1rem; }
+    .anchor.middle .machine-rule {
+      font-size: 1.02rem;
+      line-height: 1.15;
+      font-weight: 900;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+    }
+
+    .anchor.right {
+      left: 88%;
+      background: linear-gradient(145deg, #fa5252, var(--red));
+      box-shadow: 0 10px 16px rgba(224, 49, 49, 0.3);
+    }
+
+    .moving-box {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 110px;
+      height: 72px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #fff;
+      opacity: 0;
+      transition: left 2s ease-in-out, opacity 0.4s ease;
+      z-index: 4;
+      padding: 0.2rem;
+    }
+
+    .moving-box.input-token {
+      background: linear-gradient(145deg, #40c057, var(--green-dark));
+      left: 12%;
+    }
+
+    .moving-box.output-token {
+      background: linear-gradient(145deg, #ff6b6b, var(--red-dark));
+      left: 50%;
+    }
+
+    .moving-box.show { opacity: 1; }
+    .moving-box.enter-machine { left: 50%; }
+    .moving-box.exit-machine { left: 88%; }
+
+    .steps {
+      margin-top: 1rem;
+      background: var(--soft);
+      border: 1px solid #ddd6fe;
+      border-radius: 10px;
+      padding: 0.8rem;
+    }
+
+    .steps h2 {
+      margin: 0 0 0.5rem;
+      font-size: 1.1rem;
+      color: #4c1d95;
+    }
+
+    .steps p {
+      margin: 0.33rem 0;
+      font-size: 1rem;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-weight: 700;
+    }
+
+    @media (max-width: 720px) {
+      .machine-stage { min-height: 340px; }
+      .lane { height: 190px; }
+      .anchor { width: 105px; height: 70px; font-size: 0.95rem; }
+      .anchor.middle { width: 170px; height: 118px; }
+      .anchor.middle .machine-rule { font-size: 0.92rem; }
+      .moving-box { width: 88px; height: 62px; font-size: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <h1>Functions as a Machine</h1>
+    <p class="intro">A function takes an input, applies a rule, and produces an output.</p>
+
+    <section class="card">
+      <div class="controls">
+        <div class="field">
+          <label for="numberInput">Input number</label>
+          <input id="numberInput" type="number" step="any" placeholder="e.g., 4" aria-describedby="statusMsg" />
+        </div>
+
+        <div class="field">
+          <label for="ruleInput">Transformation rule (polynomial in one variable)</label>
+          <input id="ruleInput" type="text" placeholder="e.g., Number^2 + 3*Number - 1" aria-describedby="statusMsg" />
+        </div>
+
+        <div class="button-row">
+          <button id="playBtn" type="button">Play</button>
+          <button id="resetBtn" type="button">Reset</button>
+        </div>
+      </div>
+      <div id="statusMsg" class="status info" role="status" aria-live="polite">Enter a number and a polynomial rule, then press Play.</div>
+    </section>
+
+    <section class="card machine-stage" aria-label="Function machine animation area">
+      <div class="flow-label">input &rarr; function rule &rarr; output</div>
+      <div class="lane" id="lane">
+        <div class="anchor left">Input</div>
+
+        <div class="anchor middle">
+          <div class="machine-title">Function Machine</div>
+          <div class="machine-rule" id="machineRule">rule: f(x)</div>
+        </div>
+
+        <div class="anchor right">Output</div>
+
+        <div id="movingInput" class="moving-box input-token" aria-hidden="true"></div>
+        <div id="movingOutput" class="moving-box output-token" aria-hidden="true"></div>
+      </div>
+
+      <div class="steps" aria-live="polite">
+        <h2>Substitution Steps</h2>
+        <p id="stepVar">Variable: <span class="mono">-</span></p>
+        <p id="stepSub">Substitution: <span class="mono">-</span></p>
+        <p id="stepOut">Output: <span class="mono">-</span></p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const numberInput = document.getElementById('numberInput');
+    const ruleInput = document.getElementById('ruleInput');
+    const playBtn = document.getElementById('playBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const statusMsg = document.getElementById('statusMsg');
+
+    const movingInput = document.getElementById('movingInput');
+    const movingOutput = document.getElementById('movingOutput');
+
+    const machineRule = document.getElementById('machineRule');
+    const stepVar = document.getElementById('stepVar');
+    const stepSub = document.getElementById('stepSub');
+    const stepOut = document.getElementById('stepOut');
+
+    let isAnimating = false;
+
+    function setStatus(message, type = 'info') {
+      statusMsg.className = `status ${type}`;
+      statusMsg.textContent = message;
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function resetAnimation() {
+      isAnimating = false;
+      playBtn.disabled = false;
+      movingInput.className = 'moving-box input-token';
+      movingOutput.className = 'moving-box output-token';
+      movingInput.textContent = '';
+      movingOutput.textContent = '';
+      machineRule.textContent = 'rule: f(x)';
+      stepVar.innerHTML = 'Variable: <span class="mono">-</span>';
+      stepSub.innerHTML = 'Substitution: <span class="mono">-</span>';
+      stepOut.innerHTML = 'Output: <span class="mono">-</span>';
+      setStatus('Enter a number and a polynomial rule, then press Play.', 'info');
+    }
+
+    function tokenize(expr) {
+      const tokens = [];
+      let i = 0;
+
+      while (i < expr.length) {
+        const ch = expr[i];
+
+        if (/\s/.test(ch)) { i += 1; continue; }
+
+        if (/[0-9.]/.test(ch)) {
+          let start = i;
+          let dotCount = 0;
+          while (i < expr.length && /[0-9.]/.test(expr[i])) {
+            if (expr[i] === '.') dotCount += 1;
+            i += 1;
+          }
+          const raw = expr.slice(start, i);
+          if (dotCount > 1 || raw === '.') throw new Error(`Invalid number: ${raw}`);
+          tokens.push({ type: 'number', value: Number(raw), raw });
+          continue;
+        }
+
+        if (/[A-Za-z_]/.test(ch)) {
+          let start = i;
+          i += 1;
+          while (i < expr.length && /[A-Za-z0-9_]/.test(expr[i])) i += 1;
+          tokens.push({ type: 'identifier', value: expr.slice(start, i) });
+          continue;
+        }
+
+        if ('+-*^()'.includes(ch)) {
+          tokens.push({ type: 'operator', value: ch });
+          i += 1;
+          continue;
+        }
+
+        throw new Error(`Invalid character: ${ch}`);
+      }
+
+      if (tokens.length === 0) throw new Error('Expression cannot be empty.');
+      return tokens;
+    }
+
+    function toRpn(tokens) {
+      const output = [];
+      const stack = [];
+      const precedence = { '+': 1, '-': 1, '*': 2, '^': 3, 'u-': 4 };
+      const rightAssoc = { '^': true, 'u-': true };
+
+      let prevType = 'start';
+
+      for (const token of tokens) {
+        if (token.type === 'number' || token.type === 'identifier') {
+          output.push(token);
+          prevType = token.type;
+          continue;
+        }
+
+        const op = token.value;
+
+        if (op === '(') {
+          stack.push({ type: 'paren', value: op });
+          prevType = 'leftParen';
+          continue;
+        }
+
+        if (op === ')') {
+          let foundLeft = false;
+          while (stack.length > 0) {
+            const top = stack.pop();
+            if (top.type === 'paren' && top.value === '(') {
+              foundLeft = true;
+              break;
+            }
+            output.push(top);
+          }
+          if (!foundLeft) throw new Error('Mismatched parentheses.');
+          prevType = 'rightParen';
+          continue;
+        }
+
+        let opVal = op;
+        if (op === '-' && (prevType === 'start' || prevType === 'operator' || prevType === 'leftParen')) {
+          opVal = 'u-';
+        }
+
+        const current = { type: 'operator', value: opVal };
+
+        while (stack.length > 0) {
+          const top = stack[stack.length - 1];
+          if (top.type !== 'operator') break;
+          const topPrec = precedence[top.value];
+          const curPrec = precedence[current.value];
+          if (
+            (rightAssoc[current.value] && curPrec < topPrec) ||
+            (!rightAssoc[current.value] && curPrec <= topPrec)
+          ) {
+            output.push(stack.pop());
+          } else {
+            break;
+          }
+        }
+
+        stack.push(current);
+        prevType = 'operator';
+      }
+
+      while (stack.length > 0) {
+        const top = stack.pop();
+        if (top.type === 'paren') throw new Error('Mismatched parentheses.');
+        output.push(top);
+      }
+
+      return output;
+    }
+
+    function evaluateRpn(rpn, variableValueMap) {
+      const stack = [];
+
+      for (const token of rpn) {
+        if (token.type === 'number') {
+          stack.push(token.value);
+          continue;
+        }
+
+        if (token.type === 'identifier') {
+          if (!(token.value in variableValueMap)) {
+            throw new Error(`Unknown variable: ${token.value}`);
+          }
+          stack.push(variableValueMap[token.value]);
+          continue;
+        }
+
+        if (token.type === 'operator') {
+          if (token.value === 'u-') {
+            if (stack.length < 1) throw new Error('Invalid unary minus usage.');
+            const a = stack.pop();
+            stack.push(-a);
+            continue;
+          }
+
+          if (stack.length < 2) throw new Error('Invalid expression structure.');
+          const b = stack.pop();
+          const a = stack.pop();
+
+          switch (token.value) {
+            case '+': stack.push(a + b); break;
+            case '-': stack.push(a - b); break;
+            case '*': stack.push(a * b); break;
+            case '^':
+              if (!Number.isInteger(b)) {
+                throw new Error('Polynomial exponents must be integers.');
+              }
+              if (b < 0) {
+                throw new Error('Negative exponents are not allowed for this polynomial model.');
+              }
+              stack.push(a ** b);
+              break;
+            default:
+              throw new Error(`Unsupported operator: ${token.value}`);
+          }
+        }
+      }
+
+      if (stack.length !== 1) throw new Error('Expression could not be evaluated.');
+      const result = stack[0];
+      if (!Number.isFinite(result)) throw new Error('Result is not finite.');
+      return result;
+    }
+
+    function extractSingleVariable(tokens) {
+      const vars = [...new Set(tokens.filter(t => t.type === 'identifier').map(t => t.value))];
+      if (vars.length === 0) {
+        throw new Error('Use one variable in the rule, such as x, Number, or value.');
+      }
+      if (vars.length > 1) {
+        throw new Error(`Only one variable is allowed. Found: ${vars.join(', ')}`);
+      }
+      return vars[0];
+    }
+
+    function substituteExpression(expression, variableName, value) {
+      const escaped = variableName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const pattern = new RegExp(`\\b${escaped}\\b`, 'g');
+      return expression.replace(pattern, `(${value})`);
+    }
+
+    async function runAnimation(inputValue, ruleText, variableName, outputValue, substituted) {
+      isAnimating = true;
+      playBtn.disabled = true;
+
+      machineRule.textContent = `rule: ${ruleText}`;
+      stepVar.innerHTML = `Variable: <span class="mono">${variableName} = ${inputValue}</span>`;
+      stepSub.innerHTML = 'Substitution: <span class="mono">waiting...</span>';
+      stepOut.innerHTML = 'Output: <span class="mono">waiting...</span>';
+
+      movingInput.textContent = String(inputValue);
+      movingInput.classList.add('show');
+      setStatus('Input appears on the left.', 'info');
+      await sleep(600);
+
+      movingInput.classList.add('enter-machine');
+      setStatus('Input is moving into the function machine...', 'info');
+      await sleep(2200);
+
+      setStatus('Inside the machine: applying the rule to the input.', 'info');
+      stepSub.innerHTML = `Substitution: <span class="mono">${ruleText} &rarr; ${substituted}</span>`;
+      machineRule.textContent = `working: ${substituted}`;
+      await sleep(1500);
+
+      movingInput.classList.remove('show');
+      movingOutput.textContent = String(outputValue);
+      movingOutput.classList.add('show');
+      await sleep(250);
+      movingOutput.classList.add('exit-machine');
+      stepOut.innerHTML = `Output: <span class="mono">f(${inputValue}) = ${outputValue}</span>`;
+      setStatus('Output emerges from the machine on the right!', 'success');
+      await sleep(2200);
+
+      machineRule.textContent = `rule: ${ruleText}`;
+      playBtn.disabled = false;
+      isAnimating = false;
+    }
+
+    function roundForDisplay(value) {
+      const rounded = Math.round((value + Number.EPSILON) * 1e10) / 1e10;
+      return Number.isInteger(rounded) ? String(rounded) : String(rounded);
+    }
+
+    async function handlePlay() {
+      if (isAnimating) return;
+
+      const numText = numberInput.value.trim();
+      const ruleText = ruleInput.value.trim();
+
+      if (numText === '' || Number.isNaN(Number(numText))) {
+        setStatus('Please enter a valid numeric input value.', 'error');
+        return;
+      }
+
+      if (ruleText === '') {
+        setStatus('Please enter a polynomial transformation rule.', 'error');
+        return;
+      }
+
+      const inputValue = Number(numText);
+
+      try {
+        movingInput.className = 'moving-box input-token';
+        movingOutput.className = 'moving-box output-token';
+
+        const tokens = tokenize(ruleText);
+        const variableName = extractSingleVariable(tokens);
+        const rpn = toRpn(tokens);
+        const output = evaluateRpn(rpn, { [variableName]: inputValue });
+
+        const displayOutput = roundForDisplay(output);
+        const substituted = substituteExpression(ruleText, variableName, inputValue);
+
+        await runAnimation(inputValue, ruleText, variableName, displayOutput, substituted);
+      } catch (error) {
+        setStatus(error.message || 'Could not parse the transformation rule.', 'error');
+      }
+    }
+
+    playBtn.addEventListener('click', handlePlay);
+    resetBtn.addEventListener('click', resetAnimation);
+
+    resetAnimation();
+  </script>
+</body>
+</html>
