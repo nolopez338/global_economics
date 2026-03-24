@@ -274,7 +274,7 @@
     }
     .variable-controls-row {
       display: grid;
-      grid-template-columns: auto auto auto minmax(180px, 1fr) auto;
+      grid-template-columns: auto auto auto minmax(180px, 1fr) auto auto;
       grid-template-rows: auto auto;
       gap: 0.45rem;
       align-items: center;
@@ -307,11 +307,48 @@
       grid-column: 4;
       grid-row: 2;
     }
+    .variable-controls-row .variable-precision-controls {
+      grid-column: 5 / span 2;
+      grid-row: 2;
+      display: inline-flex;
+      align-items: center;
+      justify-self: start;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      overflow: hidden;
+      background: #fff;
+    }
     .variable-bound-input {
       width: 82px;
     }
     .variable-current-input {
       width: 110px;
+      font-size: 1.08rem;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    .variable-precision-btn {
+      border: none;
+      border-right: 1px solid var(--border);
+      border-radius: 0;
+      padding: 0.34rem 0.42rem;
+      min-width: 34px;
+      background: #fff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #334155;
+      line-height: 1;
+    }
+    .variable-precision-btn:last-child {
+      border-right: none;
+    }
+    .variable-precision-btn:hover {
+      background: #eff6ff;
+      border-color: var(--border);
+    }
+    .variable-precision-btn.active {
+      background: var(--primary);
+      color: #fff;
     }
     .variable-play-btn {
       min-width: 40px;
@@ -687,6 +724,7 @@
       let currentFixedPlayYLimits = null;
       let freezeErrorBoxDuringPlay = false;
       let errorBoxRefreshQueued = false;
+      let variableDisplayDecimals = 3;
       let showMathNotation = false;
       function queueErrorBoxRefreshAfterPlay() {
         if (errorBoxRefreshQueued) return;
@@ -754,7 +792,29 @@
           }
         });
       }
-      function updateVariableRowDisplay(variableName) {
+      function getFormattedVariableDisplayValue(value) {
+        if (!Number.isFinite(value)) return '';
+        return value.toFixed(variableDisplayDecimals);
+      }
+      function refreshVariablePrecisionButtons() {
+        Object.values(variableControlElementsByName).forEach((controls) => {
+          if (!controls || !controls.precisionButtons) return;
+          controls.precisionButtons.forEach((button) => {
+            const buttonDecimals = Number(button.dataset.decimals);
+            const isActive = buttonDecimals === variableDisplayDecimals;
+            button.classList.toggle('active', isActive);
+            button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+          });
+        });
+      }
+      function setVariableDisplayPrecision(decimals) {
+        const nextDecimals = Number(decimals);
+        if (![2, 3, 4].includes(nextDecimals) || nextDecimals === variableDisplayDecimals) return;
+        variableDisplayDecimals = nextDecimals;
+        Object.keys(variableStateByName).forEach((variableName) => updateVariableRowDisplay(variableName, true));
+        refreshVariablePrecisionButtons();
+      }
+      function updateVariableRowDisplay(variableName, forceCurrentInputDisplay = false) {
         const state = variableStateByName[variableName];
         const controls = variableControlElementsByName[variableName];
         if (!state || !controls) return;
@@ -765,7 +825,9 @@
         controls.currentInput.min = String(state.min);
         controls.currentInput.max = String(state.max);
         controls.currentInput.step = String(state.step);
-        controls.currentInput.value = String(state.value);
+        if (forceCurrentInputDisplay || document.activeElement !== controls.currentInput) {
+          controls.currentInput.value = getFormattedVariableDisplayValue(state.value);
+        }
         controls.minInput.step = String(state.step);
         controls.maxInput.step = String(state.step);
         controls.minInput.value = String(state.min);
@@ -1278,6 +1340,11 @@
             <input type="range" class="variable-slider" data-role="slider" aria-label="${variableName} slider">
             <input type="number" step="0.001" class="variable-bound-input" data-role="max" aria-label="Maximum ${variableName} value">
             <input type="number" step="0.001" class="variable-current-input" data-role="current" aria-label="Current ${variableName} value">
+            <div class="variable-precision-controls" role="group" aria-label="Current value display decimals">
+              <button type="button" class="variable-precision-btn" data-role="precision" data-decimals="2" aria-pressed="false">2dp</button>
+              <button type="button" class="variable-precision-btn active" data-role="precision" data-decimals="3" aria-pressed="true">3dp</button>
+              <button type="button" class="variable-precision-btn" data-role="precision" data-decimals="4" aria-pressed="false">4dp</button>
+            </div>
           `;
           variableControlsList.appendChild(row);
           const controls = {
@@ -1286,7 +1353,8 @@
             minInput: row.querySelector('[data-role="min"]'),
             slider: row.querySelector('[data-role="slider"]'),
             maxInput: row.querySelector('[data-role="max"]'),
-            currentInput: row.querySelector('[data-role="current"]')
+            currentInput: row.querySelector('[data-role="current"]'),
+            precisionButtons: Array.from(row.querySelectorAll('[data-role="precision"]'))
           };
           variableControlElementsByName[variableName] = controls;
           controls.playButton.addEventListener('click', () => {
@@ -1310,6 +1378,11 @@
               event.preventDefault();
               controls.currentInput.blur();
             }
+          });
+          controls.precisionButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+              setVariableDisplayPrecision(button.dataset.decimals);
+            });
           });
           controls.minInput.addEventListener('input', () => {
             stopVariableAnimation(variableName);
@@ -1339,9 +1412,10 @@
               controls.maxInput.blur();
             }
           });
-          updateVariableRowDisplay(variableName);
+          updateVariableRowDisplay(variableName, true);
           setVariablePlayState(variableName, isVariableAnimationRunning(variableName));
         });
+        refreshVariablePrecisionButtons();
       }
       function collectDetectedVariables(parsedX, parsedP, detectedVariables) {
         if (parsedX.kind === 'symbolic') parsedX.variables.forEach(v => detectedVariables.add(v));
