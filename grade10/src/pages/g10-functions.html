@@ -171,6 +171,7 @@
       left: 12%;
       background: linear-gradient(145deg, #40c057, var(--green));
       box-shadow: 0 10px 16px rgba(47, 158, 68, 0.28);
+      z-index: 2;
     }
 
     .anchor.middle {
@@ -183,6 +184,7 @@
       flex-direction: column;
       gap: 0.3rem;
       padding: 0.65rem;
+      z-index: 10;
     }
 
     .anchor.middle .machine-title { font-size: 1rem; }
@@ -198,6 +200,7 @@
       left: 88%;
       background: linear-gradient(145deg, #fa5252, var(--red));
       box-shadow: 0 10px 16px rgba(224, 49, 49, 0.3);
+      z-index: 2;
     }
 
     .moving-box {
@@ -216,7 +219,7 @@
       color: #fff;
       opacity: 0;
       transition: left 2s ease-in-out, opacity 0.4s ease;
-      z-index: 4;
+      z-index: 3;
       padding: 0.2rem;
     }
 
@@ -294,13 +297,13 @@
     </section>
 
     <section class="card machine-stage" aria-label="Function machine animation area">
-      <div class="flow-label">input &rarr; function rule &rarr; output</div>
+      <div class="flow-label">input &rarr; function / transformation &rarr; output</div>
       <div class="lane" id="lane">
-        <div class="anchor left">Input</div>
+        <div id="inputAnchor" class="anchor left">Input</div>
 
         <div class="anchor middle">
           <div class="machine-title">Function Machine</div>
-          <div class="machine-rule" id="machineRule">rule: f(x)</div>
+          <div class="machine-rule" id="machineRule">f(x)</div>
         </div>
 
         <div class="anchor right">Output</div>
@@ -327,6 +330,7 @@
 
     const movingInput = document.getElementById('movingInput');
     const movingOutput = document.getElementById('movingOutput');
+    const inputAnchor = document.getElementById('inputAnchor');
 
     const machineRule = document.getElementById('machineRule');
     const stepVar = document.getElementById('stepVar');
@@ -351,7 +355,8 @@
       movingOutput.className = 'moving-box output-token';
       movingInput.textContent = '';
       movingOutput.textContent = '';
-      machineRule.textContent = 'rule: f(x)';
+      inputAnchor.textContent = 'Input';
+      machineRule.textContent = 'f(x)';
       stepVar.innerHTML = 'Variable: <span class="mono">-</span>';
       stepSub.innerHTML = 'Substitution: <span class="mono">-</span>';
       stepOut.innerHTML = 'Output: <span class="mono">-</span>';
@@ -549,7 +554,8 @@
       isAnimating = true;
       playBtn.disabled = true;
 
-      machineRule.textContent = `rule: ${ruleText}`;
+      inputAnchor.textContent = String(inputValue);
+      machineRule.textContent = ruleText;
       stepVar.innerHTML = `Variable: <span class="mono">${variableName} = ${inputValue}</span>`;
       stepSub.innerHTML = 'Substitution: <span class="mono">waiting...</span>';
       stepOut.innerHTML = 'Output: <span class="mono">waiting...</span>';
@@ -565,7 +571,7 @@
 
       setStatus('Inside the machine: applying the rule to the input.', 'info');
       stepSub.innerHTML = `Substitution: <span class="mono">${ruleText} &rarr; ${substituted}</span>`;
-      machineRule.textContent = `working: ${substituted}`;
+      machineRule.textContent = substituted;
       await sleep(1500);
 
       movingInput.classList.remove('show');
@@ -577,7 +583,7 @@
       setStatus('Output emerges from the machine on the right!', 'success');
       await sleep(2200);
 
-      machineRule.textContent = `rule: ${ruleText}`;
+      machineRule.textContent = ruleText;
       playBtn.disabled = false;
       isAnimating = false;
     }
