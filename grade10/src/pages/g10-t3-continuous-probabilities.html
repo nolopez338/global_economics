@@ -611,6 +611,24 @@
         </div>
       </div>
       <div id="probabilitySummary" class="probability-summary" aria-live="polite"></div>
+      <details id="sharedCdfDetails" class="prob-cdf-details">
+        <summary>CDF view</summary>
+        <div class="prob-cdf-body">
+          <div class="prob-cdf-controls">
+            <div class="field">
+              <label for="cdfYTopInput">y-top (CDF)</label>
+              <input id="cdfYTopInput" type="number" step="any" value="1.05" />
+            </div>
+            <label class="toggle-inline" for="cdfAutoYTopToggle">
+              <input id="cdfAutoYTopToggle" type="checkbox" checked />
+              Auto-adjust local y-top
+            </label>
+          </div>
+          <div class="prob-cdf-wrap">
+            <canvas id="sharedCdfCanvas" class="prob-cdf-canvas"></canvas>
+          </div>
+        </div>
+      </details>
     </section>
   </main>
 
@@ -657,7 +675,11 @@
         xMaxInput: document.getElementById('xMaxInput'),
         yTopInput: document.getElementById('yTopInput'),
         autoYTopToggle: document.getElementById('autoYTopToggle'),
-        probabilitySummary: document.getElementById('probabilitySummary')
+        probabilitySummary: document.getElementById('probabilitySummary'),
+        sharedCdfDetails: document.getElementById('sharedCdfDetails'),
+        cdfYTopInput: document.getElementById('cdfYTopInput'),
+        cdfAutoYTopToggle: document.getElementById('cdfAutoYTopToggle'),
+        sharedCdfCanvas: document.getElementById('sharedCdfCanvas')
       };
 
       const defaults = {
@@ -780,8 +802,7 @@
         autoYTopEnabled: true,
         probabilityMarkers: [],
         hoveredProbabilityRegion: null,
-        cdfViews: {},
-        currentProbabilitySections: [],
+        cdfView: { autoYTopEnabled: true, yTop: 1.05 },
         plot: { m: { l: 62, r: 20, t: 18, b: 46 }, w: 1, h: 1, rectWidth: 1, rectHeight: 420 }
       };
 
@@ -1162,16 +1183,6 @@
         return index === 0 ? 'x₁' : 'x₂';
       }
 
-      function ensureCdfViewState(sectionId) {
-        if (!state.cdfViews[sectionId]) {
-          state.cdfViews[sectionId] = {
-            autoYTopEnabled: true,
-            yTop: 1.05
-          };
-        }
-        return state.cdfViews[sectionId];
-      }
-
       function buildProbabilitySections() {
         const markers = state.probabilityMarkers;
         const sections = [];
@@ -1208,40 +1219,22 @@
         return sections;
       }
 
-      function renderCdfSectionMarkup(section) {
-        const controlId = `cdf-y-top-${section.id}`;
-        const autoId = `cdf-auto-y-top-${section.id}`;
-        return `
-          <details class="prob-cdf-details">
-            <summary>CDF view</summary>
-            <div class="prob-cdf-body" data-cdf-section="${section.id}">
-              <div class="prob-cdf-controls">
-                <div class="field">
-                  <label for="${controlId}">y-top (CDF)</label>
-                  <input id="${controlId}" data-cdf-y-top="${section.id}" type="number" step="any" value="1.05" />
-                </div>
-                <label class="toggle-inline" for="${autoId}">
-                  <input id="${autoId}" data-cdf-auto-y-top="${section.id}" type="checkbox" checked />
-                  Auto-adjust local y-top
-                </label>
-              </div>
-              <div class="prob-cdf-wrap">
-                <canvas class="prob-cdf-canvas" data-cdf-canvas="${section.id}"></canvas>
-              </div>
-            </div>
-          </details>
-        `;
+      function getSharedCdfDots() {
+        if (!state.probabilityMarkers.length) return [];
+        return [...state.probabilityMarkers]
+          .slice(0, 2)
+          .map((marker) => ({ x: marker.x, y: cdfAtX(marker.x) }))
+          .sort((a, b) => a.x - b.x);
       }
 
-      function drawCdfSection(sectionId) {
-        const section = state.currentProbabilitySections.find((s) => s.id === sectionId);
-        if (!section) return;
-        const canvas = els.probabilitySummary.querySelector(`[data-cdf-canvas="${sectionId}"]`);
-        const yTopInput = els.probabilitySummary.querySelector(`[data-cdf-y-top="${sectionId}"]`);
-        const autoToggle = els.probabilitySummary.querySelector(`[data-cdf-auto-y-top="${sectionId}"]`);
+      function drawSharedCdfSection() {
+        if (!els.sharedCdfDetails.open) return;
+        const canvas = els.sharedCdfCanvas;
+        const yTopInput = els.cdfYTopInput;
+        const autoToggle = els.cdfAutoYTopToggle;
         if (!canvas || !yTopInput || !autoToggle) return;
 
-        const viewState = ensureCdfViewState(sectionId);
+        const viewState = state.cdfView;
         viewState.autoYTopEnabled = autoToggle.checked;
         yTopInput.disabled = viewState.autoYTopEnabled;
 
@@ -1263,7 +1256,8 @@
         const xmin = state.xmin;
         const xmax = state.xmax;
         const ymin = 0;
-        const dotsMaxY = section.dots.length ? Math.max(...section.dots.map((d) => d.y)) : 1;
+        const dots = getSharedCdfDots();
+        const dotsMaxY = dots.length ? Math.max(...dots.map((d) => d.y)) : 1;
         const autoTop = Math.max(1.02, dotsMaxY * 1.05);
         const requestedTop = Number(yTopInput.value);
         const manualValid = Number.isFinite(requestedTop) && requestedTop > ymin + EPS;
@@ -1299,7 +1293,7 @@
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        section.dots.forEach((dot, index) => {
+        dots.forEach((dot, index) => {
           const dx = px(dot.x);
           const dy = py(dot.y);
           ctx.beginPath();
@@ -1312,25 +1306,15 @@
         });
       }
 
-      function drawAllCdfSections() {
-        state.currentProbabilitySections.forEach((section) => drawCdfSection(section.id));
-      }
-
       function renderProbabilitySummary() {
         const sections = buildProbabilitySections();
-        state.currentProbabilitySections = sections;
         state.hoveredProbabilityRegion = null;
 
         if (!sections.length) {
-          state.cdfViews = {};
           els.probabilitySummary.innerHTML = '';
+          drawSharedCdfSection();
           return;
         }
-
-        const validIds = new Set(sections.map((section) => section.id));
-        Object.keys(state.cdfViews).forEach((key) => {
-          if (!validIds.has(key)) delete state.cdfViews[key];
-        });
 
         els.probabilitySummary.innerHTML = sections.map((section) => `
           <div class="prob-result-section">
@@ -1339,35 +1323,9 @@
               <div class="expr">${section.expression}</div>
               <div class="value">${section.value}</div>
             </div>
-            ${renderCdfSectionMarkup(section)}
           </div>
         `).join('');
-
-        sections.forEach((section) => {
-          const viewState = ensureCdfViewState(section.id);
-          const yTopInput = els.probabilitySummary.querySelector(`[data-cdf-y-top="${section.id}"]`);
-          const autoToggle = els.probabilitySummary.querySelector(`[data-cdf-auto-y-top="${section.id}"]`);
-          if (!yTopInput || !autoToggle) return;
-          autoToggle.checked = viewState.autoYTopEnabled;
-          yTopInput.value = toInputNumber(viewState.yTop);
-          yTopInput.disabled = viewState.autoYTopEnabled;
-          autoToggle.addEventListener('change', () => {
-            viewState.autoYTopEnabled = autoToggle.checked;
-            drawCdfSection(section.id);
-          });
-          yTopInput.addEventListener('input', () => {
-            viewState.autoYTopEnabled = false;
-            autoToggle.checked = false;
-            drawCdfSection(section.id);
-          });
-          yTopInput.addEventListener('change', () => {
-            viewState.autoYTopEnabled = false;
-            autoToggle.checked = false;
-            drawCdfSection(section.id);
-          });
-        });
-
-        drawAllCdfSections();
+        drawSharedCdfSection();
       }
 
       function createProbabilityMarker(clientX) {
@@ -2170,8 +2128,10 @@
         els.xMaxInput.value = '3';
         state.probabilityMarkers = [];
         state.hoveredProbabilityRegion = null;
-        state.cdfViews = {};
-        state.currentProbabilitySections = [];
+        state.cdfView = { autoYTopEnabled: true, yTop: 1.05 };
+        els.cdfAutoYTopToggle.checked = true;
+        els.cdfYTopInput.value = '1.05';
+        els.cdfYTopInput.disabled = true;
         els.piecewiseRows.innerHTML = '';
         defaults.piecewise.forEach((p) => addPiecewiseRow(p.x, p.y));
         evaluateAndDraw();
@@ -2182,7 +2142,7 @@
         if (resizeTimer) clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
           drawGraph();
-          drawAllCdfSections();
+          drawSharedCdfSection();
         }, 140);
       });
 
@@ -2239,6 +2199,21 @@
       els.autoYTopToggle.addEventListener('change', evaluateAndDraw);
       els.yTopInput.addEventListener('change', evaluateAndDraw);
       els.yTopInput.addEventListener('input', evaluateAndDraw);
+      els.sharedCdfDetails.addEventListener('toggle', drawSharedCdfSection);
+      els.cdfAutoYTopToggle.addEventListener('change', () => {
+        state.cdfView.autoYTopEnabled = els.cdfAutoYTopToggle.checked;
+        drawSharedCdfSection();
+      });
+      els.cdfYTopInput.addEventListener('input', () => {
+        state.cdfView.autoYTopEnabled = false;
+        els.cdfAutoYTopToggle.checked = false;
+        drawSharedCdfSection();
+      });
+      els.cdfYTopInput.addEventListener('change', () => {
+        state.cdfView.autoYTopEnabled = false;
+        els.cdfAutoYTopToggle.checked = false;
+        drawSharedCdfSection();
+      });
       els.canvas.addEventListener('pointermove', movePointer);
       els.canvas.addEventListener('pointerdown', startDrag);
       els.canvas.addEventListener('pointerup', endDrag);
