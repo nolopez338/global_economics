@@ -1,5 +1,7 @@
 \input{../preamble/preamble_exams.tex}
 \usetikzlibrary{calc}
+\usetikzlibrary{angles,quotes}
+\usetikzlibrary{shapes.geometric}
 
 \begin{document}
 
@@ -252,49 +254,74 @@
 	\item Six woodworms made their home in an old wooden cube made up of identical small cubes. Each one drilled a tunnel all the way through the cube, parallel to one of its edges. The diagram shows the entrances to the six tunnels. How many small cubes do not have a tunnel drilled through them?
 
 	\begin{center}
-		\begin{tikzpicture}[scale=0.9]
-			% top face
-			\coordinate (A) at (0,3);
-			\coordinate (B) at (2,4.2);
-			\coordinate (C) at (4,3);
-			\coordinate (D) at (2,1.8);
-
-			% left face down vector and right/front face down vector
-			\coordinate (vL) at (0,-3);
-			\coordinate (vR) at (0,-3);
-
-			% cube outline
-			\draw (A)--(B)--(C)--($(C)+(0,-3)$)--($(D)+(0,-3)$)--($(A)+(0,-3)$)--cycle;
-			\draw (A)--(D)--(C);
-			\draw (D)--($(D)+(0,-3)$);
-			\draw (A)--($(A)+(0,-3)$);
-			\draw (C)--($(C)+(0,-3)$);
-
-			% top face grid
-			\draw ($(A)!1/3!(B)$)--($(A)!1/3!(B)+(2, -1.2)$);
-			\draw ($(A)!2/3!(B)$)--($(A)!2/3!(B)+(2, -1.2)$);
-			\draw ($(A)!1/3!(D)$)--($(A)!1/3!(D)+(2,1.2)$);
-			\draw ($(A)!2/3!(D)$)--($(A)!2/3!(D)+(2,1.2)$);
-
-			% left face grid
-			\draw ($(A)+(0,-1)$)--($(D)+(0,-1)$);
-			\draw ($(A)+(0,-2)$)--($(D)+(0,-2)$);
-			\draw ($(A)!1/3!(D)$)--($(A)!1/3!(D)+(0,-3)$);
-			\draw ($(A)!2/3!(D)$)--($(A)!2/3!(D)+(0,-3)$);
-
-			% right face grid
-			\draw ($(D)+(0,-1)$)--($(C)+(0,-1)$);
-			\draw ($(D)+(0,-2)$)--($(C)+(0,-2)$);
-			\draw ($(D)!1/3!(C)$)--($(D)!1/3!(C)+(0,-3)$);
-			\draw ($(D)!2/3!(C)$)--($(D)!2/3!(C)+(0,-3)$);
-
-			% tunnel entrances (schematic placement matching the printed figure)
-			\fill ($(A)!0.52!(B)!0.62!(C)$) circle (0.12);
-			\fill ($(A)!0.48!(D)!0.55!(C)$) circle (0.12);
-			\fill ($(A)!0.62!(D)+(0,-1.3)$) circle (0.12);
-			\fill ($(D)!0.28!(C)+(0,-0.9)$) circle (0.12);
-			\fill ($(D)!0.70!(C)+(0,-1.6)$) circle (0.12);
-			\fill ($(A)!0.35!(D)+(0,-1.8)$) circle (0.12);
+		\begin{tikzpicture}[scale=0.525,line cap=round,line join=round]
+			% Key vertices
+			\coordinate (F)  at (0,0);        % front top corner
+			\coordinate (L)  at (-4.1,2.15);  % left top outer corner
+			\coordinate (R)  at ( 4.1,2.15);  % right top outer corner
+			\coordinate (B)  at (0,4.30);     % back top corner
+			
+			\coordinate (F0) at (0,-4.55);    % front bottom corner
+			\coordinate (L0) at (-4.1,-2.40); % left bottom outer corner
+			\coordinate (R0) at ( 4.1,-2.40); % right bottom outer corner
+			
+			% Outer cube
+			\draw[line width=1.1pt] (L)--(B)--(R)--(R0)--(F0)--(L0)--cycle;
+			\draw[line width=1.1pt] (F)--(L);
+			\draw[line width=1.1pt] (F)--(R);
+			\draw[line width=1.1pt] (F)--(F0);
+			
+			% Top face 3x3 grid
+			\foreach \t in {1/3,2/3}{
+				\draw[line width=0.9pt] ($(F)!\t!(L)$) -- ($(R)!\t!(B)$);
+				\draw[line width=0.9pt] ($(F)!\t!(R)$) -- ($(L)!\t!(B)$);
+			}
+			
+			% Left face 3x3 grid
+			\foreach \t in {1/3,2/3}{
+				\draw[line width=0.9pt] ($(L)!\t!(F)$) -- ($(L0)!\t!(F0)$);
+				\draw[line width=0.9pt] ($(L)!\t!(L0)$) -- ($(F)!\t!(F0)$);
+			}
+			
+			% Right face 3x3 grid
+			\foreach \t in {1/3,2/3}{
+				\draw[line width=0.9pt] ($(F)!\t!(R)$) -- ($(F0)!\t!(R0)$);
+				\draw[line width=0.9pt] ($(F)!\t!(F0)$) -- ($(R)!\t!(R0)$);
+			}
+			
+			% Dot locations on top face
+			\coordinate (Tmid) at ($(F)!1/2!(B)$);
+			\coordinate (Ttop) at ($(F)!5/6!(B)$);
+			
+			% Dot locations on left face
+			\coordinate (LMtop) at ($(L)!1/2!(F)$);
+			\coordinate (LMbot) at ($(L0)!1/2!(F0)$);
+			\coordinate (LdotA) at ($(LMtop)!1/2!(LMbot)$);
+			
+			\coordinate (LRtop) at ($(L)!5/6!(F)$);
+			\coordinate (LRbot) at ($(L0)!5/6!(F0)$);
+			\coordinate (LdotB) at ($(LRtop)!1/6!(LRbot)$);
+			
+			% Dot locations on right face
+			\coordinate (RMtop) at ($(F)!1/2!(R)$);
+			\coordinate (RMbot) at ($(F0)!1/2!(R0)$);
+			\coordinate (RdotA) at ($(RMtop)!1/2!(RMbot)$);
+			
+			\coordinate (RRtop) at ($(F)!5/6!(R)$);
+			\coordinate (RRbot) at ($(F0)!5/6!(R0)$);
+			\coordinate (RdotB) at ($(RRtop)!5/6!(RRbot)$);
+			
+			% Top dots
+			\fill (Ttop) ellipse [x radius=0.42, y radius=0.24];
+			\fill (Tmid) ellipse [x radius=0.42, y radius=0.24];
+			
+			% Left-face dots
+			\fill[rotate around={-28:(LdotA)}] (LdotA) ellipse [x radius=0.24, y radius=0.42];
+			\fill[rotate around={-28:(LdotB)}] (LdotB) ellipse [x radius=0.24, y radius=0.42];
+			
+			% Right-face dots
+			\fill[rotate around={28:(RdotA)}] (RdotA) ellipse [x radius=0.24, y radius=0.42];
+			\fill[rotate around={28:(RdotB)}] (RdotB) ellipse [x radius=0.24, y radius=0.42];
 		\end{tikzpicture}
 	\end{center}
 
@@ -307,21 +334,30 @@
 	\item Ali wants to fill each cell with the number $-1$ or $+1$. Apart from the numbers in the bottom row, the number in each cell is equal to the product of the two numbers directly below it. The number in the topmost cell is $-1$, as shown. In how many different ways can Ali do this?
 
 	\begin{center}
-		\begin{tikzpicture}[scale=0.9]
-			\draw (3,3) rectangle (4.4,3.8);
-			\node at (3.7,3.4) {$-1$};
-
-			\draw (2,2.1) rectangle (3.4,2.9);
-			\draw (3.4,2.1) rectangle (4.8,2.9);
-
-			\draw (1,1.2) rectangle (2.4,2);
-			\draw (2.4,1.2) rectangle (3.8,2);
-			\draw (3.8,1.2) rectangle (5.2,2);
-
-			\draw (0,0.3) rectangle (1.4,1.1);
-			\draw (1.4,0.3) rectangle (2.8,1.1);
-			\draw (2.8,0.3) rectangle (4.2,1.1);
-			\draw (4.2,0.3) rectangle (5.6,1.1);
+		\begin{tikzpicture}[line width=1.2pt, scale=0.5, transform shape]
+			\def\w{3.2}   % block width
+			\def\h{1.8}   % block height
+			
+			% Bottom row
+			\foreach \i in {0,1,2,3}{
+				\draw (\i*\w,0) rectangle ++(\w,\h);
+			}
+			
+			% Third row from bottom
+			\foreach \i in {0,1,2}{
+				\draw ({(\i+0.5)*\w},\h) rectangle ++(\w,\h);
+			}
+			
+			% Second row from bottom
+			\foreach \i in {0,1}{
+				\draw ({(\i+1)*\w},{2*\h}) rectangle ++(\w,\h);
+			}
+			
+			% Top block
+			\draw ({1.5*\w},{3*\h}) rectangle ++(\w,\h);
+			
+			% Label
+			\node[font=\fontsize{28}{32}\selectfont] at ({2*\w},{3.5*\h}) {$-1$};
 		\end{tikzpicture}
 	\end{center}
 
@@ -334,33 +370,36 @@
 	\item The diagram shows a shape with ten equal angles marked. What is the size of each of these angles?
 
 	\begin{center}
-		\begin{tikzpicture}[scale=1]
-			% outer shape
-			\coordinate (A) at (-2.2,0.4);
-			\coordinate (B) at (-0.3,1.1);
-			\coordinate (C) at (1.8,0.5);
-			\coordinate (D) at (1.9,-1.2);
-			\coordinate (E) at (0.9,-2.0);
-			\coordinate (F) at (0.0,-1.2);
-			\coordinate (G) at (-0.8,-2.0);
-			\coordinate (H) at (-2.0,-1.5);
-
-			\draw (A)--(B)--(C)--(D)--(E)--(F)--(G)--(H)--cycle;
-
-			% inner diamond and connecting segments
-			\coordinate (P) at (-0.1,-0.1);
-			\coordinate (Q) at (0.6,-0.5);
-			\coordinate (R) at (0.2,-1.0);
-			\coordinate (S) at (-0.5,-0.6);
-
-			\draw (P)--(Q)--(R)--(S)--cycle;
-			\draw (R)--(F);
-
-			% marked equal angles (schematic)
-			\foreach \pt/\ang in {A/330,B/270,C/210,D/160,E/120,F/80,G/40,H/20,P/260,Q/200}
-			{
-				\draw[gray!70] (\pt) ++(\ang:0.18) arc (\ang:\ang+55:0.18);
-			}
+		\begin{tikzpicture}[scale=1.05,line cap=round,line join=round]
+			% Vertices
+			\coordinate (K) at (-4.2, 1.2);
+			\coordinate (A) at ( 0.0, 3.4);
+			\coordinate (B) at ( 4.1, 1.7);
+			\coordinate (C) at ( 4.05,-1.35);
+			\coordinate (D) at ( 1.85,-3.05);
+			\coordinate (H) at (-1.35, 0.15);
+			\coordinate (G) at ( 0.00, 1.25);
+			\coordinate (F) at ( 1.35, 0.15);
+			\coordinate (I) at (-1.10,-3.25);
+			\coordinate (J) at (-3.75,-1.95);
+			
+			% Main self-intersecting outline
+			\draw[line width=1pt]
+			(K)--(A)--(B)--(C)--(D)--(H)--(G)--(F)--(I)--(J)--cycle;
+			
+			% Filled angle marks
+			\pic[draw,fill=gray!50,line width=0.8pt,angle radius=0.42cm] {angle=J--K--A};
+			\pic[draw,fill=gray!50,line width=0.8pt,angle radius=0.46cm] {angle=K--A--B};
+			\pic[draw,fill=gray!50,line width=0.8pt,angle radius=0.42cm] {angle=A--B--C};
+			\pic[draw,fill=gray!50,line width=0.8pt,angle radius=0.46cm] {angle=B--C--D};
+			\pic[draw,fill=gray!50,line width=0.8pt,angle radius=0.42cm] {angle=C--D--H};
+			
+			\pic[draw,fill=gray!50,line width=0.8pt,angle radius=0.40cm] {angle=D--H--G};
+			\pic[draw,fill=gray!50,line width=0.8pt,angle radius=0.42cm] {angle=H--G--F};
+			\pic[draw,fill=gray!50,line width=0.8pt,angle radius=0.40cm] {angle=G--F--I};
+			
+			\pic[draw,fill=gray!50,line width=0.8pt,angle radius=0.46cm] {angle=F--I--J};
+			\pic[draw,fill=gray!50,line width=0.8pt,angle radius=0.42cm] {angle=I--J--K};
 		\end{tikzpicture}
 	\end{center}
 
@@ -388,61 +427,136 @@
 	\end{center}
 
 	\item The diagram shows how the depth of water in a bottle changes when it is flipped upside down. The bottle's capacity is $4.5$ liters and the entire water-filled part in the first diagram is cylindrical in shape. What is the volume of water, in liters, in the bottle?
-
+	
 	\begin{center}
-		\begin{tikzpicture}[scale=0.9]
-			% left bottle
-			\draw[line width=0.8pt]
-			(-3.7,0) -- (-3.7,2.4)
-			.. controls (-3.7,3.2) and (-3.3,3.8) .. (-2.9,4.0)
-			-- (-2.75,4.5) -- (-2.15,4.5) -- (-2.0,4.0)
-			.. controls (-1.6,3.8) and (-1.2,3.2) .. (-1.2,2.4)
-			-- (-1.2,0)
-			.. controls (-1.2,-0.2) and (-1.35,-0.3) .. (-1.6,-0.3)
-			-- (-3.3,-0.3)
-			.. controls (-3.55,-0.3) and (-3.7,-0.2) .. (-3.7,0);
-
-			\draw[fill=black!70] (-2.8,4.5) .. controls (-2.75,4.75) and (-2.15,4.75) .. (-2.1,4.5)
-			-- (-2.1,4.3) -- (-2.8,4.3) -- cycle;
-
-			\fill[gray!45] (-3.65,0) rectangle (-1.25,2.4);
-
-			% right bottle (upside down)
-			\begin{scope}[shift={(4.3,0)}, rotate=180]
-				\draw[line width=0.8pt]
-				(-3.7,0) -- (-3.7,2.4)
-				.. controls (-3.7,3.2) and (-3.3,3.8) .. (-2.9,4.0)
-				-- (-2.75,4.5) -- (-2.15,4.5) -- (-2.0,4.0)
-				.. controls (-1.6,3.8) and (-1.2,3.2) .. (-1.2,2.4)
-				-- (-1.2,0)
-				.. controls (-1.2,-0.2) and (-1.35,-0.3) .. (-1.6,-0.3)
-				-- (-3.3,-0.3)
-				.. controls (-3.55,-0.3) and (-3.7,-0.2) .. (-3.7,0);
-
-				\draw[fill=black!70] (-2.8,4.5) .. controls (-2.75,4.75) and (-2.15,4.75) .. (-2.1,4.5)
-				-- (-2.1,4.3) -- (-2.8,4.3) -- cycle;
-
-				\fill[gray!45]
-				(-3.65,1.2) -- (-3.65,4.2) -- (-1.25,4.2) -- (-1.25,1.2)
-				.. controls (-1.25,0.5) and (-1.6,0.0) .. (-2.45,-0.15)
-				.. controls (-3.2,0.0) and (-3.65,0.5) .. (-3.65,1.2) -- cycle;
+	\begin{tikzpicture}[scale=0.18,line cap=round,line join=round]
+		
+		% background
+		\fill[gray!15] (-10,-4) rectangle (52,50);
+		
+		% common dimensions
+		\def\baseY{2}
+		\def\topY{44}
+		\def\liqLeft{26}   % 24 cm above base
+		\def\liqRight{32}  % 30 cm above base
+		\def\capH{4}
+		
+		% bottle style parameters
+		\def\bodyL{0}
+		\def\bodyR{10}
+		\def\neckL{2.6}
+		\def\neckR{7.4}
+		\def\shoulderY{36}
+		
+		% positions
+		\def\xshiftL{6}
+		\def\xshiftR{34}
+		
+		% --------------------------------
+		% left bottle (upright)
+		% --------------------------------
+		\begin{scope}[shift={(\xshiftL,0)}]
+			
+			% bottle outline
+			\draw[line width=1.2pt]
+			(\bodyL,\baseY) --
+			(\bodyL,31)
+			.. controls (\bodyL,34) and (1.2,35.3) .. (\neckL,\shoulderY)
+			-- (\neckL,\topY)
+			-- (\neckR,\topY)
+			-- (\neckR,\shoulderY)
+			.. controls (8.8,35.3) and (\bodyR,34) .. (\bodyR,31)
+			-- (\bodyR,\baseY)
+			-- cycle;
+			
+			% cap
+			\fill[black] (\neckL,\topY) rectangle (\neckR,\topY+\capH);
+			\draw[line width=1.2pt] (\neckL,\topY) rectangle (\neckR,\topY+\capH);
+			
+			% liquid fill
+			\begin{scope}
+				\clip
+				(\bodyL,\baseY) --
+				(\bodyL,31)
+				.. controls (\bodyL,34) and (1.2,35.3) .. (\neckL,\shoulderY)
+				-- (\neckL,\topY)
+				-- (\neckR,\topY)
+				-- (\neckR,\shoulderY)
+				.. controls (8.8,35.3) and (\bodyR,34) .. (\bodyR,31)
+				-- (\bodyR,\baseY)
+				-- cycle;
+				\fill[gray!35] (\bodyL+0.5,\baseY+0.5) rectangle (\bodyR-0.5,\liqLeft);
 			\end{scope}
-
-			% dimension lines
-			\draw[dashed] (-4.6,-0.3) -- (2.2,-0.3);
-			\draw[dashed] (-4.6,4.5) -- (2.2,4.5);
-
-			\draw[<->] (-4.2,-0.3) -- (-4.2,2.4);
-			\node[left] at (-4.2,1.05) {$24\text{ cm}$};
-
-			\draw[<->] (-0.2,-0.3) -- (-0.2,4.5);
-			\node[right] at (-0.2,2.1) {$42\text{ cm}$};
-
-			\draw[<->] (2.0,-0.3) -- (2.0,3.0);
-			\node[right] at (2.0,1.35) {$30\text{ cm}$};
-		\end{tikzpicture}
+			
+			% liquid surface
+			\draw[line width=1pt] (\bodyL+0.5,\liqLeft) -- (\bodyR-0.5,\liqLeft);
+			
+			% 24 cm measurement
+			\draw[densely dotted,line width=0.9pt] (\bodyL,\liqLeft) -- (-6,\liqLeft);
+			\draw[densely dotted,line width=0.9pt] (\bodyL,\baseY) -- (-6,\baseY);
+			\draw[<->,line width=1pt] (-7.5,\baseY) -- (-7.5,\liqLeft);
+			\node[rotate=90] at (-9.5,{(\baseY+\liqLeft)/2}) {24 cm};
+			
+		\end{scope}
+		
+		% --------------------------------
+		% full-height measurement between bottles
+		% --------------------------------
+		\draw[densely dotted,line width=0.9pt] (\xshiftL+\bodyR,\topY) -- (28,\topY);
+		\draw[densely dotted,line width=0.9pt] (\xshiftL+\bodyR,\baseY) -- (28,\baseY);
+		\draw[<->,line width=1pt] (29.5,\baseY) -- (29.5,\topY);
+		\node[rotate=90] at (31.5,{(\baseY+\topY)/2}) {42 cm};
+		
+		% --------------------------------
+		% right bottle (upside down, same style and height)
+		% --------------------------------
+		\begin{scope}[shift={(\xshiftR,0)}]
+			
+			% bottle outline
+			\draw[line width=1.2pt]
+			(\neckL,\baseY+\capH) --
+			(\neckL,10)
+			.. controls (\neckL,11.3) and (1.2,12.0) .. (\bodyL,12)
+			-- (\bodyL,40)
+			.. controls (\bodyL,42.4) and (2.0,\topY) .. (5,\topY)
+			.. controls (8.0,\topY) and (\bodyR,42.4) .. (\bodyR,40)
+			-- (\bodyR,12)
+			.. controls (8.8,12.0) and (\neckR,11.3) .. (\neckR,10)
+			-- (\neckR,\baseY+\capH);
+			
+			% cap
+			\fill[black] (\neckL,\baseY) rectangle (\neckR,\baseY+\capH);
+			\draw[line width=1.2pt] (\neckL,\baseY) rectangle (\neckR,\baseY+\capH);
+			
+			% liquid fill
+			\begin{scope}
+				\clip
+				(\neckL,\baseY+\capH) --
+				(\neckL,10)
+				.. controls (\neckL,11.3) and (1.2,12.0) .. (\bodyL,12)
+				-- (\bodyL,40)
+				.. controls (\bodyL,42.4) and (2.0,\topY) .. (5,\topY)
+				.. controls (8.0,\topY) and (\bodyR,42.4) .. (\bodyR,40)
+				-- (\bodyR,12)
+				.. controls (8.8,12.0) and (\neckR,11.3) .. (\neckR,10)
+				-- (\neckR,\baseY+\capH) -- cycle;
+				\fill[gray!35] (-1,\liqRight) rectangle (11,\topY+2);
+			\end{scope}
+			
+			% liquid surface
+			\draw[line width=1pt] (\bodyL+0.2,\liqRight) -- (\bodyR-0.2,\liqRight);
+			
+			% 30 cm measurement
+			\draw[densely dotted,line width=0.9pt] (\bodyR,\liqRight) -- (16,\liqRight);
+			\draw[densely dotted,line width=0.9pt] (\neckR,\baseY) -- (16,\baseY);
+			\draw[<->,line width=1pt] (17.5,\baseY) -- (17.5,\liqRight);
+			\node[rotate=90] at (19.5,{(\baseY+\liqRight)/2}) {30 cm};
+			
+		\end{scope}
+		
+	\end{tikzpicture}
 	\end{center}
-
+	
 	\begin{center}
 		\begin{tabular}{ccccc}
 			(A) $2.4$ & (B) $2.5$ & (C) $2.7$ & (D) $3.0$ & (E) $3.5$
@@ -460,11 +574,11 @@
 			\coordinate (E) at (4,4);
 			\coordinate (F) at (4,0);
 			\coordinate (O) at (3,2);
-
-			\draw (A)--(B)--(E)--(F)--cycle;
-			\draw (C)--(D);
-			\fill[gray!65] (A)--(C)--(O)--cycle;
-
+			
+			\draw[black] (A)--(B)--(E)--(F)--cycle;
+			\filldraw[fill=gray!65, draw=black] (A)--(C)--(O)--cycle;
+			\draw[black] (C)--(D);
+			
 			\node[below left] at (A) {$A$};
 			\node[above left] at (B) {$B$};
 			\node[above] at (C) {$C$};
@@ -488,36 +602,58 @@
 	What will the numbers he places in the three shaded boxes add up to?
 
 	\begin{center}
-		\begin{tikzpicture}[scale=0.9, line width=0.8pt]
-			\def\s{0.45}
-
-			% vertical boxes
-			\foreach \y/\shade in {2/0,1/1,0/0,-1/1,-2/0}{
-				\ifnum\shade=1
-				\fill[gray!60] (0-\s,\y-\s) rectangle (0+\s,\y+\s);
-				\fi
-				\draw (0-\s,\y-\s) rectangle (0+\s,\y+\s);
-			}
-
-			% center shaded box
-			\fill[gray!60] (1.7-\s,0-\s) rectangle (1.7+\s,0+\s);
-			\draw (1.7-\s,0-\s) rectangle (1.7+\s,0+\s);
-
-			% upper diagonal boxes
-			\draw (3.0-\s,0.9-\s) rectangle (3.0+\s,0.9+\s);
-			\draw (4.3-\s,1.8-\s) rectangle (4.3+\s,1.8+\s);
-
-			% lower diagonal boxes
-			\draw (3.0-\s,-0.9-\s) rectangle (3.0+\s,-0.9+\s);
-			\draw (4.3-\s,-1.8-\s) rectangle (4.3+\s,-1.8+\s);
-
-			% thick connectors
-			\draw[line width=6pt] (0.45,1) -- (1.25,0.25);
-			\draw[line width=6pt] (0.45,-1) -- (1.25,-0.25);
-			\draw[line width=6pt] (2.15,0.25) -- (2.55,0.65);
-			\draw[line width=6pt] (3.45,1.15) -- (3.85,1.55);
-			\draw[line width=6pt] (2.15,-0.25) -- (2.55,-0.65);
-			\draw[line width=6pt] (3.45,-1.15) -- (3.85,-1.55);
+		\begin{tikzpicture}[
+			x=1cm,y=1cm,
+			edge/.style={draw=black,line width=10pt,line cap=round},
+			box/.style={
+				draw=black,
+				fill=white,
+				line width=1.4pt,
+				rounded corners=0.18cm,
+				minimum width=1.25cm,
+				minimum height=1.25cm,
+				inner sep=0pt
+			},
+			gbox/.style={box, fill=gray!35}
+			]
+			
+			% Coordinates
+			\coordinate (L1) at (0,5.0);
+			\coordinate (L2) at (0,3.2);
+			\coordinate (L3) at (0,1.4);
+			\coordinate (L4) at (0,-0.4);
+			\coordinate (L5) at (0,-2.2);
+			
+			\coordinate (C)  at (2.1,1.4);
+			
+			\coordinate (U1) at (4.4,3.2);
+			\coordinate (U2) at (6.7,5.0);
+			
+			\coordinate (D1) at (4.4,-0.2);
+			\coordinate (D2) at (6.7,-2.1);
+			
+			% Thick connections
+			\draw[edge] (L1)--(L2)--(L3)--(L4)--(L5);
+			\draw[edge] (L2)--(C);
+			\draw[edge] (L4)--(C);
+			\draw[edge] (C)--(U1)--(U2);
+			\draw[edge] (C)--(D1)--(D2);
+			
+			% Nodes
+			\node[box]  at (L1) {};
+			\node[gbox] at (L2) {};
+			\node[box] at (L3) {};
+			\node[gbox]  at (L4) {};
+			\node[box]  at (L5) {};
+			
+			\node[gbox] at (C)  {};
+			
+			\node[box]  at (U1) {};
+			\node[box]  at (U2) {};
+			
+			\node[box]  at (D1) {};
+			\node[box]  at (D2) {};
+			
 		\end{tikzpicture}
 	\end{center}
 
@@ -540,44 +676,36 @@
 	\item The diagram shows a large circle of radius $10$ and nine smaller circles, each tangential to two other small circles and also tangential to the large circle. The sum of the distances between centers of the smaller circles and the centre of the large circle, is equal to $d$. What is the perimeter of the shaded polygon in terms of $d$?
 
 	\begin{center}
-		\begin{tikzpicture}[scale=0.95, line width=0.8pt]
-			% outer circle
-			\draw (0,0) circle (2.7);
-
-			% approximate inner circles
-			\draw (-1.55,1.25) circle (0.72);
-			\draw (-0.35,2.00) circle (0.55);
-			\draw (1.25,1.55) circle (0.95);
-			\draw (2.00,0.20) circle (0.55);
-			\draw (1.65,-1.00) circle (0.62);
-			\draw (0.00,-1.75) circle (0.92);
-			\draw (-1.75,-0.95) circle (1.00);
-			\draw (-2.05,0.35) circle (0.55);
-			\draw (-0.95,0.10) circle (1.05);
-
-			% shaded polygon (schematic)
-			\fill[gray!60]
-			(-1.10,1.60) --
-			(-0.10,2.05) --
-			(1.25,1.55) --
-			(2.05,0.35) --
-			(1.45,-1.05) --
-			(0.00,-1.70) --
-			(-1.45,-0.95) --
-			(-2.00,0.20) --
-			cycle;
-
-			% visible boundary
-			\draw
-			(-1.10,1.60) --
-			(-0.10,2.05) --
-			(1.25,1.55) --
-			(2.05,0.35) --
-			(1.45,-1.05) --
-			(0.00,-1.70) --
-			(-1.45,-0.95) --
-			(-2.00,0.20) --
-			cycle;
+		\begin{tikzpicture}[scale=0.95,line cap=round,line join=round]
+			\def\R{5.2}
+			
+			\coordinate (P1) at (-4.15, 0.90);
+			\coordinate (P2) at (-2.85, 2.35);
+			\coordinate (P3) at (-1.75, 3.75);
+			\coordinate (P4) at (-0.35, 3.73);
+			\coordinate (P5) at ( 2.35, 1.95);
+			\coordinate (P6) at ( 4.05,-0.10);
+			\coordinate (P7) at ( 3.45,-2.05);
+			\coordinate (P8) at ( 0.60,-3.15);
+			\coordinate (P9) at (-2.75,-1.30);
+			
+			\fill[gray!25] (P1)--(P2)--(P3)--(P4)--(P5)--(P6)--(P7)--(P8)--(P9)--cycle;
+			\draw[line width=1.2pt] (P1)--(P2)--(P3)--(P4)--(P5)--(P6)--(P7)--(P8)--(P9)--cycle;
+			
+			\begin{scope}
+				\clip (0,0) circle (\R);
+				\draw[line width=1.2pt] (P1) circle (0.3959);
+				\draw[line width=1.2pt] (P2) circle (1.5515);
+				\draw[line width=1.2pt] (P3) circle (0.2289);
+				\draw[line width=1.2pt] (P4) circle (1.1712);
+				\draw[line width=1.2pt] (P5) circle (2.0627);
+				\draw[line width=1.2pt] (P6) circle (0.6004);
+				\draw[line width=1.2pt] (P7) circle (1.4398);
+				\draw[line width=1.2pt] (P8) circle (1.6151);
+				\draw[line width=1.2pt] (P9) circle (2.2118);
+			\end{scope}
+			
+			\draw[line width=1.2pt] (0,0) circle (\R);
 		\end{tikzpicture}
 	\end{center}
 
@@ -592,7 +720,7 @@
 	a^b-ab=2026
 	\]
 	is true. What is the value of $a+b$?
-
+	%
 	\begin{center}
 		\begin{tabular}{ccccc}
 			(A) $10$ & (B) $13$ & (C) $15$ & (D) $1013$ & (E) $1015$
@@ -604,119 +732,121 @@
 	What might the track that she leaves behind look like?
 
 	\begin{center}
-		\begin{tikzpicture}[scale=0.9, line width=0.8pt]
-
-			% Penny-farthing
-			\draw (1.8,2.5) circle (0.9);
-			\draw (0.4,1.6) circle (0.35);
-			\fill (1.8,2.5) circle (0.12);
-			\fill (0.4,1.6) circle (0.06);
-			\foreach \a in {0,15,...,345}{
-				\draw (1.8,2.5) -- ++(\a:0.9);
-			}
+		\begin{tikzpicture}[scale=0.9,line cap=round,line join=round]
+			% Background
+			\fill[gray!15] (-0.8,-4.8) rectangle (14.5,4.8);
+			
+			% Wheel parameters
+			\coordinate (S) at (2.0,-2.0);   % small wheel center
+			\coordinate (B) at (8.0, 0.2);   % big wheel center
+			\def\rs{1.25}
+			\def\rb{3.25}
+			
+			% Wheels
+			\draw[line width=2.2pt] (S) circle (\rs);
+			\draw[line width=2.2pt] (B) circle (\rb);
+			
+			% Simple hubs
+			\fill[black] (S) circle (0.18);
+			\fill[black] (B) circle (0.48);
+			
+			% Very simple spokes
 			\foreach \a in {0,30,...,330}{
-				\draw (0.4,1.6) -- ++(\a:0.35);
+				\draw[line width=0.7pt] (S) -- ++(\a:\rs);
 			}
-			\draw[line width=1.2pt] (0.65,1.85) .. controls (0.95,2.9) and (1.05,3.25) .. (1.75,3.35);
-			\draw[line width=1.2pt] (1.78,3.35) -- (1.78,1.95);
-			\draw[line width=1.2pt] (1.62,3.38) -- (1.15,3.38);
-			\draw[line width=1.2pt] (1.55,3.05) -- (1.95,3.05);
-			\fill[black!80, rounded corners=1pt] (3.05,1.45) rectangle (3.7,1.8);
-
-			\node[anchor=west] at (0,0.95) {What might the track that she leaves behind look like?};
-
-			% helper macros by manual drawing
-			% Option A
-			\node[left] at (0.3,0.3) {(A)};
-			\fill[black!80, rounded corners=1pt] (0.55,0.17) rectangle (0.9,0.43);
-			\draw[line width=1pt] (1.25,0.3)--(1.65,0.3);
-			\draw[line width=1pt] (2.05,0.3)--(2.45,0.3);
-			\draw[line width=1pt] (3.55,0.3)--(3.95,0.3);
-			\draw[line width=1pt] (4.35,0.3)--(4.75,0.3);
-			\draw[line width=1pt] (5.15,0.3)--(5.55,0.3);
-			\draw[line width=1pt] (6.55,0.3)--(6.95,0.3);
-			\draw[line width=1pt] (7.35,0.3)--(7.75,0.3);
-			\draw[line width=1pt] (8.15,0.3)--(8.55,0.3);
-
-			% Option B
-			\node[left] at (0.3,-0.45) {(B)};
-			\fill[black!80, rounded corners=1pt] (0.55,-0.58) rectangle (0.9,-0.32);
-			\draw[line width=1pt] (1.6,-0.45)--(2.35,-0.45);
-			\draw[line width=1pt] (2.75,-0.45)--(3.1,-0.45);
-			\draw[line width=1pt] (4.3,-0.45)--(5.0,-0.45);
-			\draw[line width=1pt] (5.35,-0.45)--(5.7,-0.45);
-			\draw[line width=1pt] (6.2,-0.45)--(6.85,-0.45);
-			\draw[line width=1pt] (7.25,-0.45)--(7.6,-0.45);
-			\draw[line width=1pt] (8.15,-0.45)--(8.95,-0.45);
-
-			% Option C
-			\node[left] at (0.3,-1.2) {(C)};
-			\fill[black!80, rounded corners=1pt] (0.55,-1.33) rectangle (0.9,-1.07);
-			\draw[line width=1pt] (1.7,-1.2)--(2.05,-1.2);
-			\draw[line width=1pt] (2.8,-1.2)--(4.35,-1.2);
-			\draw[line width=1pt] (5.15,-1.2)--(5.5,-1.2);
-			\draw[line width=1pt] (6.55,-1.2)--(6.9,-1.2);
-			\draw[line width=1pt] (7.35,-1.2)--(8.7,-1.2);
-
-			% Option D
-			\node[left] at (0.3,-1.95) {(D)};
-			\fill[black!80, rounded corners=1pt] (0.55,-2.08) rectangle (0.9,-1.82);
-			\draw[line width=1pt] (1.25,-1.95)--(1.65,-1.95);
-			\draw[line width=1pt] (2.85,-1.95)--(3.2,-1.95);
-			\draw[line width=1pt] (3.6,-1.95)--(3.95,-1.95);
-			\draw[line width=1pt] (5.15,-1.95)--(5.5,-1.95);
-			\draw[line width=1pt] (5.85,-1.95)--(6.2,-1.95);
-			\draw[line width=1pt] (7.1,-1.95)--(7.45,-1.95);
-			\draw[line width=1pt] (7.8,-1.95)--(8.15,-1.95);
-
-			% Option E
-			\node[left] at (0.3,-2.7) {(E)};
-			\fill[black!80, rounded corners=1pt] (0.55,-2.83) rectangle (0.9,-2.57);
-			\draw[line width=1pt] (1.6,-2.7)--(1.95,-2.7);
-			\draw[line width=1pt] (2.85,-2.7)--(3.55,-2.7);
-			\draw[line width=1pt] (3.95,-2.7)--(4.3,-2.7);
-			\draw[line width=1pt] (5.15,-2.7)--(5.5,-2.7);
-			\draw[line width=1pt] (5.9,-2.7)--(6.75,-2.7);
-			\draw[line width=1pt] (7.35,-2.7)--(7.7,-2.7);
-			\draw[line width=1pt] (8.15,-2.7)--(8.5,-2.7);
-
+			\foreach \a in {0,15,...,345}{
+				\draw[line width=0.8pt] (B) -- ++(\a:\rb);
+			}
+			
+			% Main curved frame, now connected to the center of the back wheel
+			\draw[line width=8pt]
+			(S)
+			.. controls (3.05,-1.0) and (3.4,2.2) ..
+			(5.3,3.25)
+			.. controls (6.3,3.9) and (7.2,3.95) ..
+			(8.1,3.25);
+			
+			% Fork
+			\draw[line width=8pt] (8.1,4.55) -- (8.1,0.2);
+			
+			% Simple pedal/axle block
+			\draw[line width=8pt] (8.1,2.9) -- (8.1,2.25);
+			
+			% Seat support
+			\draw[line width=5pt] (6.35,3.80) -- (5.95,3.32);
+			\draw[line width=4pt] (6.05,3.55) -- (5.72,3.44);
+			
+			% More chair-like saddle
+			\fill[black]
+			(4.95,4.00)
+			.. controls (5.25,4.16) and (5.80,4.16) .. (6.45,4.10)
+			.. controls (6.80,4.07) and (7.00,3.98) .. (7.02,3.90)
+			.. controls (6.92,3.84) and (6.68,3.82) .. (6.35,3.82)
+			.. controls (6.00,3.82) and (5.70,3.78) .. (5.42,3.73)
+			.. controls (5.18,3.69) and (5.00,3.73) .. (4.93,3.84)
+			.. controls (4.90,3.91) and (4.91,3.97) .. (4.95,4.00)
+			-- cycle;
+			
+			% Simple handlebar
+			\draw[line width=5pt] (7.45,0.8) -- (7.7,0.75);
+			\draw[line width=5pt] (8.75,-0.3) -- (9.0,-0.35);
+			
+			% Small black shape on the right
+			\fill[black,rounded corners=10pt]
+			(11.2,-3.55) .. controls (11.7,-3.8) and (12.5,-3.8) .. (13.2,-3.6)
+			-- (13.75,-3.55)
+			.. controls (14.0,-3.45) and (14.0,-3.05) .. (13.8,-2.95)
+			.. controls (13.2,-2.75) and (12.2,-2.75) .. (11.4,-2.95)
+			.. controls (11.1,-3.05) and (11.0,-3.35) .. (11.2,-3.55)
+			-- cycle;
 		\end{tikzpicture}
 	\end{center}
 
 	\item Two regular hexagons with side-lengths of $60$ are shown in the diagram which is not drawn to scale. The right-hand hexagon was created by shifting the left-hand hexagon horizontally by the length of the segment $AB$. This creates three regions of equal area. What is the length of $AB$?
 
 	\begin{center}
-		\begin{tikzpicture}[scale=1.2, line width=0.8pt]
-			\def\s{1.3}
-			\def\h{1.125833} % sqrt(3)/2 * 1.3 approximately
-			\def\t{0.85}     % horizontal shift, schematic only
-
-			% Left hexagon vertices
+		\begin{tikzpicture}[scale=0.9,line cap=round,line join=round]
+			% Background
+			\fill[gray!15] (-6.2,-5.0) rectangle (6.2,5.0);
+			
+			% Parameters
+			\def\s{3.2} % side length used only for drawing
+			\pgfmathsetmacro{\h}{sqrt(3)/2*\s}
+			\def\d{1.65} % horizontal shift AB (not to scale)
+			
+			% Left hexagon
 			\coordinate (L1) at (-\s,0);
 			\coordinate (L2) at (-0.5*\s,\h);
-			\coordinate (L3) at (0.5*\s,\h);
-			\coordinate (L4) at (\s,0);
-			\coordinate (L5) at (0.5*\s,-\h);
+			\coordinate (L3) at ( 0.5*\s,\h);
+			\coordinate (L4) at ( \s,0);
+			\coordinate (L5) at ( 0.5*\s,-\h);
 			\coordinate (L6) at (-0.5*\s,-\h);
-
-			% Right hexagon vertices
-			\coordinate (R1) at ({-\s+\t},0);
-			\coordinate (R2) at ({-0.5*\s+\t},\h);
-			\coordinate (R3) at ({0.5*\s+\t},\h);
-			\coordinate (R4) at ({\s+\t},0);
-			\coordinate (R5) at ({0.5*\s+\t},-\h);
-			\coordinate (R6) at ({-0.5*\s+\t},-\h);
-
-			% Shade overlap region
-			\fill[gray!65] (R2)--(L3)--(R4)--(R5)--(L6)--(R1)--cycle;
-
-			% Draw both hexagons
-			\draw (L1)--(L2)--(L3)--(L4)--(L5)--(L6)--cycle;
-			\draw (R1)--(R2)--(R3)--(R4)--(R5)--(R6)--cycle;
-
-			% Labels A and B on top edge of the left hexagon
-			\node[above] at (L2) {$A$};
-			\node[above] at (R2) {$B$};
+			
+			% Right hexagon = left hexagon shifted horizontally by AB
+			\coordinate (R1) at ({\d-\s},0);
+			\coordinate (R2) at ({\d-0.5*\s},\h);
+			\coordinate (R3) at ({\d+0.5*\s},\h);
+			\coordinate (R4) at ({\d+\s},0);
+			\coordinate (R5) at ({\d+0.5*\s},-\h);
+			\coordinate (R6) at ({\d-0.5*\s},-\h);
+			
+			% Overlap region
+			\fill[gray!35] (R1)--(R2)--(L3)--(L4)--(L5)--(R6)--cycle;
+			
+			% Hexagon outlines
+			\draw[line width=1.6pt] (L1)--(L2)--(L3)--(L4)--(L5)--(L6)--cycle;
+			\draw[line width=1.6pt] (R1)--(R2)--(R3)--(R4)--(R5)--(R6)--cycle;
+			
+			% Overlap outline
+			\draw[line width=1.6pt] (R1)--(R2)--(L3)--(L4)--(L5)--(R6)--cycle;
+			
+			% Labels A and B
+			\node[above=6pt] at (L2) {$A$};
+			\node[above=6pt] at (R2) {$B$};
+			
+			% Side-length labels
+			\path (L1) -- node[midway,sloped,above] {$60$} (L2);
+			\path (R3) -- node[midway,sloped,above] {$60$} (R4);
 		\end{tikzpicture}
 	\end{center}
 
@@ -746,25 +876,25 @@
 			\coordinate (D) at (2,3.464);
 			\coordinate (E) at (0,3.464);
 			\coordinate (F) at (-1,1.732);
-
+			
 			\draw (A)--(B)--(C)--(D)--(E)--(F)--cycle;
-
+			
 			% Square ABGH
 			\coordinate (G) at (2,2);
 			\coordinate (H) at (0,2);
 			\draw (A)--(B)--(G)--(H)--cycle;
-
+			
 			% Square BCIJ
 			\coordinate (I) at (1.268,2.732);
-			\coordinate (J) at (0.536,1.000);
+			\coordinate (J) at (0.268,1.000);
 			\draw (B)--(C)--(I)--(J)--cycle;
-
+			
 			% Intersection point P of GH and IJ
 			\coordinate (P) at (0.845,2);
 			\draw (H)--(G);
 			\draw (I)--(J);
 			\draw (J)--(G);
-
+			
 			\node[below] at (A) {$A$};
 			\node[below] at (B) {$B$};
 			\node[right] at (C) {$C$};
@@ -774,7 +904,7 @@
 			\node[right] at (G) {$G$};
 			\node[left] at (H) {$H$};
 			\node[above] at (I) {$I$};
-			\node[left] at (J) {$J$};
+			\node[below] at (J) {$J$};
 			\node[above] at (P) {$P$};
 		\end{tikzpicture}
 	\end{center}
@@ -788,22 +918,27 @@
 	\item Two perpendicular chords are drawn in a circle with radius $12$ cm, dividing the circle into four regions, as labeled in the diagram. One chord lies $3$ cm from the center, and the other lies $4$ cm from the center. The sum of the areas of regions $A$ and $C$ is $X$ cm$^2$ larger than the sum of the areas of regions $B$ and $D$. What is the value of $X$?
 
 	\begin{center}
-		\begin{tikzpicture}[scale=1]
-			\draw (0,0) circle (2);
-
-			% Chords
-			\draw (-0.4,2) -- (-0.4,-2);
-			\draw (-1.72,0.6) -- (1.72,0.6);
-
-			% Labels
-			\node at (-1.0,1.0) {$A$};
-			\node at (0.7,1.0) {$B$};
-			\node at (0.5,-0.8) {$C$};
-			\node at (-1.0,-0.8) {$D$};
-
-			% center
-			\fill (0,0) circle (0.04);
-		\end{tikzpicture}
+		\begin{center}
+			\begin{tikzpicture}[scale=1]
+				\pgfmathsetmacro{\yv}{sqrt(4-0.4^2)}
+				\pgfmathsetmacro{\xh}{sqrt(4-0.6^2)}
+				
+				\draw (0,0) circle (2);
+				
+				% Chords touching the circle exactly
+				\draw (-0.4,\yv) -- (-0.4,-\yv);
+				\draw (-\xh,0.6) -- (\xh,0.6);
+				
+				% Labels
+				\node at (-1.0,1.0) {$A$};
+				\node at (0.7,1.0) {$B$};
+				\node at (0.5,-0.8) {$C$};
+				\node at (-1.0,-0.8) {$D$};
+				
+				% Center
+				\fill (0,0) circle (0.04);
+			\end{tikzpicture}
+		\end{center}
 	\end{center}
 
 	\begin{center}
@@ -823,19 +958,53 @@
 	\item Ann places the digits $1,2,\ldots,9$ on a circle in some order. She reads three adjacent digits clockwise to form a three-digit number, such as $\triangle\square\star$ as in the diagram, and writes down all nine such numbers. One of these numbers is $a$, which is a factor of the sum of the remaining $8$ numbers. How many possible values of $a$ are there?
 
 	\begin{center}
-		\begin{tikzpicture}[scale=1]
+		\begin{tikzpicture}[scale=1,line cap=round,line join=round]
+			\def\R{1.8}
+			\def\r{0.17}
+			
+			% centers of the 9 circles
 			\foreach \k in {0,1,...,8}{
-				\coordinate (P\k) at ({90-40*\k}:1.8);
-				\draw (P\k) circle (0.17);
+				\coordinate (P\k) at ({90-40*\k}:\R);
 			}
-
-			% mark three adjacent positions
-			\node at (P0) {$\blacksquare$};
-			\node at (P1) {$\star$};
-			\node at (P8) {$\blacktriangle$};
-
-			% small connecting arc cues
-			\draw (P8) -- (P0) -- (P1);
+			
+			% edges between consecutive circles
+			\draw[line width=0.8pt] (P0)--(P1)--(P2)--(P3)--(P4)--(P5)--(P6)--(P7)--(P8)--cycle;
+			
+			% circles drawn on top of the edges
+			\foreach \k in {0,1,...,8}{
+				\filldraw[fill=white,draw=black,line width=0.8pt] (P\k) circle (\r);
+			}
+			
+			% symbols in three consecutive circles
+			\node[
+			regular polygon,
+			regular polygon sides=3,
+			fill=black,
+			draw=black,
+			minimum size=0.20cm,
+			inner sep=0pt,
+			rotate=90
+			] at (P8) {};
+			
+			\node[
+			regular polygon,
+			regular polygon sides=4,
+			fill=black,
+			draw=black,
+			minimum size=0.19cm,
+			inner sep=0pt,
+			rotate=45
+			] at (P0) {};
+			
+			\node[
+			star,
+			star points=5,
+			star point ratio=2.2,
+			fill=black,
+			draw=black,
+			minimum size=0.22cm,
+			inner sep=0pt
+			] at (P1) {};
 		\end{tikzpicture}
 	\end{center}
 
