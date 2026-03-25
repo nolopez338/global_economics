@@ -124,7 +124,7 @@
     .slider-row {
       width: 100%;
       display: grid;
-      grid-template-columns: minmax(56px, 72px) minmax(0, 1fr) minmax(56px, 72px);
+      grid-template-columns: minmax(56px, 72px) minmax(0, 1fr) minmax(56px, 72px) auto;
       align-items: center;
       gap: 0.45rem;
     }
@@ -132,6 +132,17 @@
     .slider-row input[type="number"] {
       padding: 0.5rem 0.55rem;
       text-align: center;
+    }
+
+    .slider-autoplay-btn {
+      min-width: 44px;
+      width: 44px;
+      padding: 0.5rem 0.4rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      background: #6366f1;
+      color: #fff;
+      line-height: 1;
     }
 
     .slider-shell {
@@ -368,13 +379,14 @@
               <input id="sliderVisibilityToggle" type="checkbox" checked />
             </label>
           </div>
-          <input id="numberInput" type="number" step="any" placeholder="e.g., 4" aria-describedby="statusMsg" />
+          <input id="numberInput" type="number" step="0.01" placeholder="e.g., 4.00" aria-describedby="statusMsg" />
           <div class="slider-row">
-            <input id="sliderMinInput" type="number" step="any" aria-label="Slider minimum" aria-describedby="statusMsg" />
+            <input id="sliderMinInput" type="number" step="0.01" aria-label="Slider minimum" aria-describedby="statusMsg" />
             <div id="sliderShell" class="slider-shell">
               <input id="valueSlider" class="value-slider" type="range" aria-label="Input value slider" />
             </div>
-            <input id="sliderMaxInput" type="number" step="any" aria-label="Slider maximum" aria-describedby="statusMsg" />
+            <input id="sliderMaxInput" type="number" step="0.01" aria-label="Slider maximum" aria-describedby="statusMsg" />
+            <button id="sliderSweepBtn" class="slider-autoplay-btn" type="button" aria-label="Autoplay slider sweep">▶</button>
           </div>
           <div class="button-row">
             <button id="playBtn" type="button">Play</button>
@@ -383,7 +395,13 @@
         </div>
 
         <div class="field">
-          <label for="ruleInput">Transformation rule</label>
+          <div class="input-label-row">
+            <label for="ruleInput">Transformation rule</label>
+            <label for="automaticToggle" class="inline-toggle">
+              <span>Automatic</span>
+              <input id="automaticToggle" type="checkbox" checked />
+            </label>
+          </div>
           <input id="ruleInput" type="text" placeholder="e.g., Number^2 + 3*Number - 1" aria-describedby="statusMsg" />
         </div>
       </div>
@@ -399,7 +417,7 @@
           <div class="machine-rule" id="machineRule">f(x)</div>
         </div>
 
-        <div class="anchor right">Output</div>
+        <div id="outputAnchor" class="anchor right">Output</div>
 
         <div id="movingInput" class="moving-box input-token" aria-hidden="true"></div>
         <div id="movingOutput" class="moving-box output-token" aria-hidden="true"></div>
@@ -425,10 +443,13 @@
     const sliderMaxInput = document.getElementById('sliderMaxInput');
     const sliderVisibilityToggle = document.getElementById('sliderVisibilityToggle');
     const sliderShell = document.getElementById('sliderShell');
+    const sliderSweepBtn = document.getElementById('sliderSweepBtn');
+    const automaticToggle = document.getElementById('automaticToggle');
 
     const movingInput = document.getElementById('movingInput');
     const movingOutput = document.getElementById('movingOutput');
     const inputAnchor = document.getElementById('inputAnchor');
+    const outputAnchor = document.getElementById('outputAnchor');
 
     const machineRule = document.getElementById('machineRule');
     const stepVar = document.getElementById('stepVar');
@@ -436,7 +457,9 @@
     const stepOut = document.getElementById('stepOut');
 
     let isAnimating = false;
+    let autoSweepIntervalId = null;
     const FALLBACK_BOUNDS = { min: 0, max: 10 };
+    const AUTO_SWEEP_INTERVAL_MS = 400;
 
     function setStatus(message, type = 'info') {
       statusMsg.className = `status ${type}`;
@@ -460,7 +483,7 @@
     }
 
     function determineStepValue() {
-      return numberInput.step && numberInput.step !== 'any' ? numberInput.step : 'any';
+      return numberInput.step && numberInput.step !== 'any' ? numberInput.step : '0.01';
     }
 
     function getCurrentBounds() {
@@ -469,19 +492,27 @@
       return { min, max };
     }
 
+    function formatToTwoDecimals(value) {
+      return Number(value).toFixed(2);
+    }
+
+    function setNumberInputValue(value) {
+      numberInput.value = formatToTwoDecimals(value);
+    }
+
     function syncSliderToInputValue() {
       const numericValue = parseNumberOrNull(numberInput.value);
       if (numericValue === null) return;
       const { min, max } = getCurrentBounds();
       const clamped = clamp(numericValue, min, max);
-      if (clamped !== numericValue) {
-        numberInput.value = String(clamped);
-      }
-      valueSlider.value = String(clamped);
+      setNumberInputValue(clamped);
+      valueSlider.value = formatToTwoDecimals(clamped);
     }
 
     function syncInputToSliderValue() {
-      numberInput.value = valueSlider.value;
+      const sliderValue = parseNumberOrNull(valueSlider.value);
+      if (sliderValue === null) return;
+      setNumberInputValue(sliderValue);
     }
 
     function applySliderBounds(nextMin, nextMax) {
@@ -497,6 +528,7 @@
       sliderMinInput.value = String(min);
       sliderMaxInput.value = String(max);
       syncSliderToInputValue();
+      syncAutoSweepButtonState();
     }
 
     function applyBoundsFromControlInput(changedControl) {
@@ -540,8 +572,18 @@
       const initialMax = attrMax ?? (initialValue + inferredPadding);
       applySliderBounds(initialMin, initialMax);
 
-      numberInput.addEventListener('input', syncSliderToInputValue);
-      valueSlider.addEventListener('input', syncInputToSliderValue);
+      numberInput.addEventListener('input', () => {
+        syncSliderToInputValue();
+        if (isAutomaticMode()) {
+          applyImmediateTransformation();
+        }
+      });
+      valueSlider.addEventListener('input', () => {
+        syncInputToSliderValue();
+        if (isAutomaticMode()) {
+          applyImmediateTransformation();
+        }
+      });
       sliderMinInput.addEventListener('input', () => applyBoundsFromControlInput('min'));
       sliderMaxInput.addEventListener('input', () => applyBoundsFromControlInput('max'));
       sliderVisibilityToggle.addEventListener('change', () => {
@@ -552,6 +594,23 @@
       syncSliderToInputValue();
     }
 
+    function isAutomaticMode() {
+      return automaticToggle.checked;
+    }
+
+    function stopAutoSweep() {
+      if (autoSweepIntervalId !== null) {
+        clearInterval(autoSweepIntervalId);
+        autoSweepIntervalId = null;
+      }
+      syncAutoSweepButtonState();
+    }
+
+    function syncAutoSweepButtonState() {
+      sliderSweepBtn.textContent = autoSweepIntervalId === null ? '▶' : '⏸';
+      sliderSweepBtn.title = autoSweepIntervalId === null ? 'Start automatic sweep' : 'Stop automatic sweep';
+    }
+
     function resetAnimation() {
       isAnimating = false;
       playBtn.disabled = false;
@@ -560,10 +619,12 @@
       movingInput.textContent = '';
       movingOutput.textContent = '';
       inputAnchor.textContent = 'Input';
+      outputAnchor.textContent = 'Output';
       machineRule.textContent = 'f(x)';
       stepVar.innerHTML = 'Variable: <span class="mono">-</span>';
       stepSub.innerHTML = 'Substitution: <span class="mono">-</span>';
       stepOut.innerHTML = 'Output: <span class="mono">-</span>';
+      stopAutoSweep();
       setStatus('Enter a number and a polynomial rule, then press Play.', 'info');
     }
 
@@ -797,6 +858,92 @@
       return Number.isInteger(rounded) ? String(rounded) : String(rounded);
     }
 
+    function computeTransformation(ruleText, inputValue) {
+      const tokens = tokenize(ruleText);
+      const variableName = extractSingleVariable(tokens);
+      const rpn = toRpn(tokens);
+      const output = evaluateRpn(rpn, { [variableName]: inputValue });
+      const displayOutput = roundForDisplay(output);
+      const substituted = substituteExpression(ruleText, variableName, inputValue);
+      return { variableName, displayOutput, substituted };
+    }
+
+    function applyImmediateTransformation() {
+      if (isAnimating) return;
+
+      const numValue = parseNumberOrNull(numberInput.value);
+      const ruleText = ruleInput.value.trim();
+
+      if (numValue === null) {
+        return;
+      }
+      if (ruleText === '') {
+        return;
+      }
+
+      const { min, max } = getCurrentBounds();
+      const clampedInput = clamp(numValue, min, max);
+      setNumberInputValue(clampedInput);
+      valueSlider.value = formatToTwoDecimals(clampedInput);
+
+      try {
+        const result = computeTransformation(ruleText, clampedInput);
+
+        movingInput.className = 'moving-box input-token';
+        movingOutput.className = 'moving-box output-token';
+        movingInput.textContent = '';
+        movingOutput.textContent = '';
+
+        inputAnchor.textContent = formatToTwoDecimals(clampedInput);
+        outputAnchor.textContent = result.displayOutput;
+        machineRule.textContent = ruleText;
+        stepVar.innerHTML = `Variable: <span class="mono">${result.variableName} = ${formatToTwoDecimals(clampedInput)}</span>`;
+        stepSub.innerHTML = `Substitution: <span class="mono">${ruleText} &rarr; ${result.substituted}</span>`;
+        stepOut.innerHTML = `Output: <span class="mono">f(${formatToTwoDecimals(clampedInput)}) = ${result.displayOutput}</span>`;
+        setStatus('Automatic mode: transformation applied instantly.', 'success');
+      } catch (error) {
+        setStatus(error.message || 'Could not parse the transformation rule.', 'error');
+      }
+    }
+
+    function startAutoSweep() {
+      stopAutoSweep();
+
+      if (!isAutomaticMode()) {
+        setStatus('Turn on Automatic mode to use slider sweep.', 'error');
+        return;
+      }
+
+      const step = parseNumberOrNull(valueSlider.step) ?? 0.01;
+      const safeStep = step > 0 ? step : 0.01;
+
+      autoSweepIntervalId = setInterval(() => {
+        const { min, max } = getCurrentBounds();
+        const current = parseNumberOrNull(numberInput.value) ?? min;
+        const startValue = clamp(current, min, max);
+        let next = startValue + safeStep;
+        if (next > max + 1e-9) {
+          next = min;
+        }
+        const clampedNext = clamp(next, min, max);
+        setNumberInputValue(clampedNext);
+        valueSlider.value = formatToTwoDecimals(clampedNext);
+        applyImmediateTransformation();
+      }, AUTO_SWEEP_INTERVAL_MS);
+
+      syncAutoSweepButtonState();
+      setStatus('Automatic slider sweep started.', 'info');
+    }
+
+    function toggleAutoSweep() {
+      if (autoSweepIntervalId !== null) {
+        stopAutoSweep();
+        setStatus('Automatic slider sweep stopped.', 'info');
+        return;
+      }
+      startAutoSweep();
+    }
+
     async function handlePlay() {
       if (isAnimating) return;
 
@@ -814,18 +961,19 @@
       }
 
       const inputValue = Number(numText);
+      setNumberInputValue(inputValue);
+      syncSliderToInputValue();
+
+      if (isAutomaticMode()) {
+        applyImmediateTransformation();
+        return;
+      }
 
       try {
         movingInput.className = 'moving-box input-token';
         movingOutput.className = 'moving-box output-token';
 
-        const tokens = tokenize(ruleText);
-        const variableName = extractSingleVariable(tokens);
-        const rpn = toRpn(tokens);
-        const output = evaluateRpn(rpn, { [variableName]: inputValue });
-
-        const displayOutput = roundForDisplay(output);
-        const substituted = substituteExpression(ruleText, variableName, inputValue);
+        const { variableName, displayOutput, substituted } = computeTransformation(ruleText, inputValue);
 
         await runAnimation(inputValue, ruleText, variableName, displayOutput, substituted);
       } catch (error) {
@@ -835,9 +983,24 @@
 
     playBtn.addEventListener('click', handlePlay);
     resetBtn.addEventListener('click', resetAnimation);
+    sliderSweepBtn.addEventListener('click', toggleAutoSweep);
+    ruleInput.addEventListener('input', () => {
+      if (isAutomaticMode()) {
+        applyImmediateTransformation();
+      }
+    });
+    automaticToggle.addEventListener('change', () => {
+      if (!isAutomaticMode()) {
+        stopAutoSweep();
+        setStatus('Automatic mode off. Use Play to run animation.', 'info');
+        return;
+      }
+      applyImmediateTransformation();
+    });
 
     initValueControls();
     resetAnimation();
+    applyImmediateTransformation();
   </script>
 </body>
 </html>
