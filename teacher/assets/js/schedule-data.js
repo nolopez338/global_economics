@@ -4755,7 +4755,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 2",
-    "Description": "-",
+    "Description": "C1 C2 C3 Practice activity",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C2"
