@@ -111,9 +111,23 @@
 
     .inline-toggle--icon-only {
       min-height: 30px;
-      align-self: start;
-      justify-content: flex-start;
-      padding: 0 0.1rem;
+      align-self: center;
+      justify-content: flex-end;
+      margin-left: auto;
+      padding: 0;
+    }
+
+    .transformation-name-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.35rem;
+      flex-wrap: wrap;
+    }
+
+    .transformation-name-row label {
+      margin: 0;
     }
 
     .input-number-label-row {
@@ -394,11 +408,13 @@
     <section class="card">
       <div class="controls">
         <div class="field control-column transformation-column">
-          <label for="transformationNameInput">Transformation Name</label>
-          <label for="machineDisplayToggle" class="inline-toggle inline-toggle--icon-only" aria-label="Show transformation name in machine">
-            <input id="machineDisplayToggle" type="checkbox" />
-          </label>
-          <input id="transformationNameInput" type="text" value="f(x)" placeholder="e.g., Square and add 3" aria-describedby="statusMsg" />
+          <div class="transformation-name-row">
+            <label for="transformationNameInput">Transformation Name</label>
+            <label for="machineDisplayToggle" class="inline-toggle inline-toggle--icon-only" aria-label="Show transformation name in machine">
+              <input id="machineDisplayToggle" type="checkbox" />
+            </label>
+          </div>
+          <input id="transformationNameInput" type="text" value="f" placeholder="e.g., square_and_add_3" pattern="[A-Za-z][A-Za-z0-9_]*" inputmode="text" autocapitalize="none" autocomplete="off" spellcheck="false" aria-describedby="statusMsg" />
           <div class="button-row">
             <button id="playBtn" type="button">Play</button>
             <button id="resetBtn" type="button">Reset</button>
@@ -491,10 +507,38 @@
 
     let isAnimating = false;
     let autoSweepIntervalId = null;
-    let transformationNameValue = transformationNameInput.value;
+    const DEFAULT_TRANSFORMATION_NAME = 'f';
+    let transformationNameValue = DEFAULT_TRANSFORMATION_NAME;
     let isShowingTransformationName = machineDisplayToggle.checked;
     const FALLBACK_BOUNDS = { min: 0, max: 10 };
     const AUTO_SWEEP_INTERVAL_MS = 400;
+
+
+    function sanitizeTransformationName(value) {
+      const raw = String(value ?? '');
+      const cleaned = raw.replace(/[^A-Za-z0-9_]/g, '');
+      const firstLetterIndex = cleaned.search(/[A-Za-z]/);
+      if (firstLetterIndex === -1) return '';
+      const fromFirstLetter = cleaned.slice(firstLetterIndex);
+      return fromFirstLetter.replace(/[^A-Za-z0-9_]/g, '');
+    }
+
+    function normalizeTransformationName(value) {
+      const sanitized = sanitizeTransformationName(value);
+      return sanitized === '' ? DEFAULT_TRANSFORMATION_NAME : sanitized;
+    }
+
+    function getCurrentVariableName() {
+      const ruleText = ruleInput.value.trim();
+      if (ruleText === '') return 'x';
+
+      try {
+        const tokens = tokenize(ruleText);
+        return extractSingleVariable(tokens);
+      } catch (error) {
+        return 'x';
+      }
+    }
 
     function getExpressionDisplayText(ruleText = ruleInput.value.trim()) {
       const trimmedRule = String(ruleText ?? '').trim();
@@ -503,7 +547,8 @@
 
     function getMachineRuleDisplayText(ruleText) {
       if (isShowingTransformationName) {
-        return transformationNameValue;
+        const variableName = getCurrentVariableName();
+        return `${transformationNameValue}(${variableName})`;
       }
       return getExpressionDisplayText(ruleText);
     }
@@ -1064,7 +1109,17 @@
     resetBtn.addEventListener('click', resetAnimation);
     sliderSweepBtn.addEventListener('click', toggleAutoSweep);
     transformationNameInput.addEventListener('input', () => {
-      transformationNameValue = transformationNameInput.value;
+      const start = transformationNameInput.selectionStart;
+      const before = transformationNameInput.value;
+      const sanitized = sanitizeTransformationName(before);
+      if (before !== sanitized) {
+        transformationNameInput.value = sanitized;
+        if (typeof start === 'number') {
+          const nextPos = Math.max(0, Math.min(sanitized.length, start - (before.length - sanitized.length)));
+          transformationNameInput.setSelectionRange(nextPos, nextPos);
+        }
+      }
+      transformationNameValue = normalizeTransformationName(transformationNameInput.value);
       refreshMachineRuleDisplay();
     });
     machineDisplayToggle.addEventListener('change', () => {
@@ -1088,6 +1143,9 @@
       applyImmediateTransformation();
     });
     machineBox.addEventListener('click', handlePlay);
+
+    transformationNameInput.value = sanitizeTransformationName(transformationNameInput.value);
+    transformationNameValue = normalizeTransformationName(transformationNameInput.value);
 
     initValueControls();
     resetAnimation();
