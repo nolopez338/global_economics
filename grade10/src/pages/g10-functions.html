@@ -163,7 +163,7 @@
     .slider-row {
       width: 100%;
       display: grid;
-      grid-template-columns: minmax(56px, 72px) minmax(0, 1fr) minmax(56px, 72px) auto;
+      grid-template-columns: minmax(56px, 72px) minmax(0, 1fr) minmax(56px, 72px);
       align-items: center;
       gap: 0.45rem;
     }
@@ -182,6 +182,38 @@
       background: #6366f1;
       color: #fff;
       line-height: 1;
+    }
+
+    .sweep-status-row {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      margin-top: 0.55rem;
+      min-height: 1.7rem;
+    }
+
+    .sweep-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      flex-shrink: 0;
+    }
+
+    .speed-btn {
+      min-width: 44px;
+      padding: 0.45rem 0.55rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      background: #e5e7eb;
+      color: #111827;
+      line-height: 1;
+    }
+
+    .speed-btn.is-active {
+      background: #4f46e5;
+      color: #fff;
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
     }
 
     .slider-shell {
@@ -253,9 +285,11 @@
 
     .status {
       min-height: 1.6rem;
-      margin-top: 0.5rem;
+      margin-top: 0;
       font-size: 0.98rem;
       font-weight: 600;
+      flex: 1;
+      min-width: 0;
     }
 
     .status.error { color: #b91c1c; }
@@ -464,11 +498,18 @@
               <input id="valueSlider" class="value-slider" type="range" aria-label="Input value slider" />
             </div>
             <input id="sliderMaxInput" type="number" step="0.01" aria-label="Slider maximum" aria-describedby="statusMsg" />
-            <button id="sliderSweepBtn" class="slider-autoplay-btn" type="button" aria-label="Autoplay slider sweep">▶</button>
+          </div>
+          <div class="sweep-status-row">
+            <div id="sweepControls" class="sweep-controls">
+              <button id="sliderSweepBtn" class="slider-autoplay-btn" type="button" aria-label="Autoplay slider sweep">▶</button>
+              <button id="sweepSpeedX2Btn" class="speed-btn" type="button" aria-label="Set sweep speed to 2x">x2</button>
+              <button id="sweepSpeedX5Btn" class="speed-btn" type="button" aria-label="Set sweep speed to 5x">x5</button>
+              <button id="sweepSpeedX10Btn" class="speed-btn" type="button" aria-label="Set sweep speed to 10x">x10</button>
+            </div>
+            <div id="statusMsg" class="status info" role="status" aria-live="polite">Enter an input number and a polynomial transformation rule, then press Play.</div>
           </div>
         </div>
       </div>
-      <div id="statusMsg" class="status info" role="status" aria-live="polite">Enter an input number and a polynomial transformation rule, then press Play.</div>
     </section>
 
     <section class="card machine-stage" aria-label="Function machine animation area">
@@ -514,7 +555,11 @@
     const sliderMaxInput = document.getElementById('sliderMaxInput');
     const sliderVisibilityToggle = document.getElementById('sliderVisibilityToggle');
     const sliderControlsRow = document.getElementById('sliderControlsRow');
+    const sweepControls = document.getElementById('sweepControls');
     const sliderSweepBtn = document.getElementById('sliderSweepBtn');
+    const sweepSpeedX2Btn = document.getElementById('sweepSpeedX2Btn');
+    const sweepSpeedX5Btn = document.getElementById('sweepSpeedX5Btn');
+    const sweepSpeedX10Btn = document.getElementById('sweepSpeedX10Btn');
     const automaticToggle = document.getElementById('automaticToggle');
     const machineBox = document.getElementById('machineBox');
 
@@ -534,7 +579,13 @@
     let transformationNameValue = DEFAULT_TRANSFORMATION_NAME;
     let isShowingTransformationName = machineDisplayToggle.checked;
     const FALLBACK_BOUNDS = { min: 0, max: 10 };
-    const AUTO_SWEEP_INTERVAL_MS = 400;
+    const AUTO_SWEEP_BASE_INTERVAL_MS = 400;
+    let sweepSpeedMultiplier = 1;
+    const sweepSpeedButtons = [
+      { multiplier: 2, button: sweepSpeedX2Btn },
+      { multiplier: 5, button: sweepSpeedX5Btn },
+      { multiplier: 10, button: sweepSpeedX10Btn }
+    ];
 
 
     function sanitizeTransformationName(value) {
@@ -719,8 +770,8 @@
 
     function syncAutomaticUiState() {
       const isAutomatic = isAutomaticMode();
-      sliderSweepBtn.hidden = !isAutomatic;
-      sliderSweepBtn.setAttribute('aria-hidden', String(!isAutomatic));
+      sweepControls.hidden = !isAutomatic;
+      sweepControls.setAttribute('aria-hidden', String(!isAutomatic));
     }
 
     function setSliderVisibility(isVisible) {
@@ -786,6 +837,28 @@
     function syncAutoSweepButtonState() {
       sliderSweepBtn.textContent = autoSweepIntervalId === null ? '▶' : '⏸';
       sliderSweepBtn.title = autoSweepIntervalId === null ? 'Start automatic sweep' : 'Stop automatic sweep';
+    }
+
+    function syncSweepSpeedButtonState() {
+      sweepSpeedButtons.forEach(({ multiplier, button }) => {
+        const isActive = sweepSpeedMultiplier === multiplier;
+        button.classList.toggle('is-active', isActive);
+        button.setAttribute('aria-pressed', String(isActive));
+      });
+    }
+
+    function getAutoSweepIntervalMs() {
+      return AUTO_SWEEP_BASE_INTERVAL_MS / sweepSpeedMultiplier;
+    }
+
+    function setSweepSpeedMultiplier(multiplier) {
+      if (!Number.isFinite(multiplier) || multiplier <= 0) return;
+      sweepSpeedMultiplier = multiplier;
+      syncSweepSpeedButtonState();
+
+      if (autoSweepIntervalId !== null) {
+        startAutoSweep(true);
+      }
     }
 
     function resetAnimation() {
@@ -1085,7 +1158,7 @@
       }
     }
 
-    function startAutoSweep() {
+    function startAutoSweep(silent = false) {
       stopAutoSweep();
 
       if (!isAutomaticMode()) {
@@ -1108,10 +1181,12 @@
         setNumberInputValue(clampedNext);
         valueSlider.value = formatToTwoDecimals(clampedNext);
         applyImmediateTransformation();
-      }, AUTO_SWEEP_INTERVAL_MS);
+      }, getAutoSweepIntervalMs());
 
       syncAutoSweepButtonState();
-      setStatus('Automatic slider sweep started.', 'info');
+      if (!silent) {
+        setStatus('Automatic slider sweep started.', 'info');
+      }
     }
 
     function toggleAutoSweep() {
@@ -1163,6 +1238,9 @@
     playBtn.addEventListener('click', handlePlay);
     resetBtn.addEventListener('click', resetAnimation);
     sliderSweepBtn.addEventListener('click', toggleAutoSweep);
+    sweepSpeedX2Btn.addEventListener('click', () => setSweepSpeedMultiplier(2));
+    sweepSpeedX5Btn.addEventListener('click', () => setSweepSpeedMultiplier(5));
+    sweepSpeedX10Btn.addEventListener('click', () => setSweepSpeedMultiplier(10));
     transformationNameInput.addEventListener('input', () => {
       const start = transformationNameInput.selectionStart;
       const before = transformationNameInput.value;
@@ -1201,6 +1279,7 @@
 
     transformationNameInput.value = sanitizeTransformationName(transformationNameInput.value);
     transformationNameValue = normalizeTransformationName(transformationNameInput.value);
+    syncSweepSpeedButtonState();
 
     initValueControls();
     resetAnimation();
