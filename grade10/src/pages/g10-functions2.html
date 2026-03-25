@@ -96,6 +96,38 @@
       box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16);
     }
 
+    .piecewise-editor {
+      margin-top: 0.45rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .piece-block {
+      border: 1px solid #dbe3ff;
+      border-radius: 10px;
+      padding: 0.65rem;
+      background: #f8faff;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.7rem;
+    }
+
+    .piece-add {
+      align-self: flex-start;
+      min-width: 44px;
+      width: 44px;
+      height: 36px;
+      padding: 0;
+      border-radius: 9px;
+      background: #ede9fe;
+      color: #4c1d95;
+      border: 1px solid #c4b5fd;
+      font-size: 1.3rem;
+      line-height: 1;
+      font-weight: 800;
+    }
+
     .button-row {
       display: flex;
       gap: 0.65rem;
@@ -167,12 +199,6 @@
       font-weight: 700;
     }
 
-    .tips {
-      margin: 0 0 0.75rem;
-      font-size: 0.98rem;
-      color: #4338ca;
-    }
-
     .graph-wrap {
       position: relative;
       border-radius: 10px;
@@ -197,9 +223,10 @@
       line-height: 1.25;
       text-align: center;
       box-shadow: 0 6px 16px rgba(75, 45, 166, 0.25);
-      max-width: 44%;
+      max-width: 54%;
       word-break: break-word;
       pointer-events: none;
+      white-space: pre-line;
     }
 
     .graph-wrap[hidden] {
@@ -254,7 +281,6 @@
 
     @media (max-width: 720px) {
       .graph-stage { padding: 0.8rem; }
-      .tips { font-size: 0.92rem; }
       button { min-width: 100px; }
     }
   </style>
@@ -270,10 +296,6 @@
             <label for="transformationNameInput">Transformation name</label>
             <input id="transformationNameInput" type="text" value="name_transformation" />
           </div>
-          <div class="field">
-            <label for="ruleInput">Transformation rule</label>
-            <input id="ruleInput" type="text" value="x^2" aria-describedby="statusMsg" />
-          </div>
         </div>
 
         <div class="button-row">
@@ -281,7 +303,14 @@
           <button id="resetBtn" type="button">Reset</button>
         </div>
       </div>
-      <div id="statusMsg" class="status info" role="status" aria-live="polite">Set a rule, drag the stack horizontally, and click the purple chevron to add stem markers.</div>
+
+      <div class="field piecewise-editor" id="piecewiseEditor" aria-describedby="statusMsg">
+        <label>Transformation rule (piecewise)</label>
+        <div id="pieceBlocks"></div>
+        <button id="addPieceBtn" class="piece-add" type="button" aria-label="Add rule piece">+</button>
+      </div>
+
+      <div id="statusMsg" class="status info" role="status" aria-live="polite">Set piecewise rules, drag the stack horizontally, and click the purple chevron to add stem markers.</div>
     </section>
 
     <section class="card graph-stage" aria-label="Function graph with draggable vertical machine">
@@ -306,11 +335,16 @@
   </main>
 
   <script>
+    // Interval convention for domain tuples (a,b): [a, b), left-inclusive and right-exclusive.
+    // This keeps overlap resolution deterministic, including boundary-touching intervals.
+    const EPS = 1e-10;
+
     const transformationNameInput = document.getElementById('transformationNameInput');
-    const ruleInput = document.getElementById('ruleInput');
     const applyBtn = document.getElementById('applyBtn');
     const resetBtn = document.getElementById('resetBtn');
     const statusMsg = document.getElementById('statusMsg');
+    const pieceBlocks = document.getElementById('pieceBlocks');
+    const addPieceBtn = document.getElementById('addPieceBtn');
     const graphWrap = document.getElementById('graphWrap');
     const graphRuleBox = document.getElementById('graphRuleBox');
     const graphVisibilityToggle = document.getElementById('graphVisibilityToggle');
@@ -335,12 +369,18 @@
       yInput: 0,
       variable: 'x',
       transformationName: 'name_transformation',
-      ruleText: 'x^2',
-      rpn: null
+      piecewiseRules: []
     };
+
     const appliedDisplayState = {
       transformationName: 'name_transformation',
-      ruleText: 'x^2'
+      summary: 'name_transformation(x) = x^2 for (0,inf)'
+    };
+
+    const editorState = {
+      pieces: [
+        { ruleText: 'x^2', domainText: '(0,inf)', domainError: null }
+      ]
     };
 
     let stems = [];
@@ -363,7 +403,7 @@
         if (/\s/.test(ch)) { i += 1; continue; }
 
         if (/[0-9.]/.test(ch)) {
-          let start = i;
+          const start = i;
           let dotCount = 0;
           while (i < expr.length && /[0-9.]/.test(expr[i])) {
             if (expr[i] === '.') dotCount += 1;
@@ -376,7 +416,7 @@
         }
 
         if (/[A-Za-z_]/.test(ch)) {
-          let start = i;
+          const start = i;
           i += 1;
           while (i < expr.length && /[A-Za-z0-9_]/.test(expr[i])) i += 1;
           tokens.push({ type: 'identifier', value: expr.slice(start, i) });
@@ -526,10 +566,10 @@
     function extractSingleVariable(tokens) {
       const vars = [...new Set(tokens.filter(t => t.type === 'identifier').map(t => t.value))];
       if (vars.length === 0) {
-        throw new Error('Use one variable in the rule, such as x, Number, or value.');
+        throw new Error('Use one variable in each rule, such as x, Number, or value.');
       }
       if (vars.length > 1) {
-        throw new Error(`Only one variable is allowed. Found: ${vars.join(', ')}`);
+        throw new Error(`Only one variable is allowed per rule. Found: ${vars.join(', ')}`);
       }
       return vars[0];
     }
@@ -573,7 +613,269 @@
         return;
       }
 
-      graphRuleBox.textContent = `${appliedDisplayState.transformationName}(x) = ${appliedDisplayState.ruleText}`;
+      graphRuleBox.textContent = appliedDisplayState.summary;
+    }
+
+    function parseBound(raw) {
+      const s = raw.trim().toLowerCase();
+      if (s === 'inf' || s === '+inf' || s === 'infinity' || s === '+infinity') return Infinity;
+      if (s === '-inf' || s === '-infinity') return -Infinity;
+      if (!/^[-+]?\d+(\.\d+)?$/.test(s)) {
+        throw new Error(`Invalid domain bound: ${raw}`);
+      }
+      const n = Number(s);
+      if (!Number.isFinite(n)) throw new Error(`Invalid domain bound: ${raw}`);
+      return n;
+    }
+
+    function normalizeIntervals(intervals) {
+      if (!Array.isArray(intervals) || intervals.length === 0) return [];
+      const cleaned = intervals
+        .map(({ start, end }) => ({ start, end }))
+        .filter(({ start, end }) => Number.isFinite(start) || !Number.isNaN(start))
+        .filter(({ start, end }) => Number.isFinite(end) || !Number.isNaN(end))
+        .filter(({ start, end }) => start + EPS < end)
+        .sort((a, b) => a.start - b.start || a.end - b.end);
+
+      if (cleaned.length === 0) return [];
+
+      const merged = [cleaned[0]];
+      for (let i = 1; i < cleaned.length; i += 1) {
+        const cur = cleaned[i];
+        const prev = merged[merged.length - 1];
+        if (cur.start <= prev.end + EPS) {
+          prev.end = Math.max(prev.end, cur.end);
+        } else {
+          merged.push({ ...cur });
+        }
+      }
+
+      return merged;
+    }
+
+    function parseDomainText(text) {
+      const src = text.trim();
+      if (src === '') return [];
+
+      const regex = /\(\s*([^,()]+?)\s*,\s*([^,()]+?)\s*\)/g;
+      const intervals = [];
+      let match;
+      let consumed = '';
+      while ((match = regex.exec(src)) !== null) {
+        consumed += match[0];
+        const start = parseBound(match[1]);
+        const end = parseBound(match[2]);
+        if (!(start + EPS < end)) {
+          throw new Error(`Domain interval must satisfy a < b: (${match[1]},${match[2]})`);
+        }
+        intervals.push({ start, end });
+      }
+
+      const remainder = src.replace(regex, '').replace(/[\s,]/g, '');
+      if (remainder !== '') {
+        throw new Error('Domain must be tuples like (a,b),(c,d).');
+      }
+
+      return normalizeIntervals(intervals);
+    }
+
+    function formatBound(value) {
+      if (value === Infinity) return 'inf';
+      if (value === -Infinity) return '-inf';
+      const rounded = Math.abs(value) < EPS ? 0 : value;
+      const asInt = Number.isInteger(rounded);
+      return asInt ? String(rounded) : String(Number(rounded.toFixed(6))).replace(/\.0+$/, '');
+    }
+
+    function formatIntervals(intervals) {
+      if (!intervals || intervals.length === 0) return '';
+      return intervals.map(it => `(${formatBound(it.start)},${formatBound(it.end)})`).join(', ');
+    }
+
+    function unionIntervals(a, b) {
+      return normalizeIntervals([...(a || []), ...(b || [])]);
+    }
+
+    function subtractIntervals(base, subtractor) {
+      let result = normalizeIntervals(base || []);
+      const sub = normalizeIntervals(subtractor || []);
+      if (result.length === 0 || sub.length === 0) return result;
+
+      for (const s of sub) {
+        const next = [];
+        for (const b of result) {
+          const overlapStart = Math.max(b.start, s.start);
+          const overlapEnd = Math.min(b.end, s.end);
+          if (!(overlapStart + EPS < overlapEnd)) {
+            next.push({ ...b });
+            continue;
+          }
+
+          if (b.start + EPS < overlapStart) {
+            next.push({ start: b.start, end: overlapStart });
+          }
+          if (overlapEnd + EPS < b.end) {
+            next.push({ start: overlapEnd, end: b.end });
+          }
+        }
+        result = normalizeIntervals(next);
+        if (result.length === 0) break;
+      }
+
+      return result;
+    }
+
+    function pointInIntervals(x, intervals) {
+      for (const { start, end } of intervals) {
+        if (x >= start && x < end) return true;
+      }
+      return false;
+    }
+
+    function buildRulePieceElement(piece, index) {
+      const block = document.createElement('div');
+      block.className = 'piece-block';
+
+      const ruleField = document.createElement('div');
+      ruleField.className = 'field';
+
+      const ruleLabel = document.createElement('label');
+      ruleLabel.textContent = 'Rule';
+      ruleLabel.setAttribute('for', `ruleInput-${index}`);
+
+      const ruleInput = document.createElement('input');
+      ruleInput.id = `ruleInput-${index}`;
+      ruleInput.type = 'text';
+      ruleInput.value = piece.ruleText;
+
+      ruleInput.addEventListener('input', (event) => {
+        editorState.pieces[index].ruleText = event.target.value;
+      });
+
+      const domainField = document.createElement('div');
+      domainField.className = 'field';
+
+      const domainLabel = document.createElement('label');
+      domainLabel.textContent = 'Domain';
+      domainLabel.setAttribute('for', `domainInput-${index}`);
+
+      const domainInput = document.createElement('input');
+      domainInput.id = `domainInput-${index}`;
+      domainInput.type = 'text';
+      domainInput.placeholder = '(a,b),(c,d)';
+      domainInput.value = piece.domainText;
+
+      domainInput.addEventListener('input', (event) => {
+        editorState.pieces[index].domainText = event.target.value;
+        reconcilePieceDomains(index);
+      });
+
+      ruleField.append(ruleLabel, ruleInput);
+      domainField.append(domainLabel, domainInput);
+      block.append(ruleField, domainField);
+
+      return block;
+    }
+
+    function renderPiecewiseEditor() {
+      pieceBlocks.innerHTML = '';
+      editorState.pieces.forEach((piece, index) => {
+        pieceBlocks.appendChild(buildRulePieceElement(piece, index));
+      });
+    }
+
+    function reconcilePieceDomains(changedIndex) {
+      const parsed = [];
+      for (let i = 0; i < editorState.pieces.length; i += 1) {
+        const piece = editorState.pieces[i];
+        try {
+          parsed[i] = parseDomainText(piece.domainText);
+          piece.domainError = null;
+        } catch (error) {
+          piece.domainError = error.message || 'Invalid domain';
+          if (i === changedIndex) {
+            setStatus(`Rule ${i + 1} domain error: ${piece.domainError}`, 'error');
+          }
+          return false;
+        }
+      }
+
+      let coveredByLater = [];
+      const effective = new Array(parsed.length).fill(null);
+      for (let i = parsed.length - 1; i >= 0; i -= 1) {
+        const rawIntervals = parsed[i];
+        const effectiveIntervals = subtractIntervals(rawIntervals, coveredByLater);
+        effective[i] = effectiveIntervals;
+        coveredByLater = unionIntervals(coveredByLater, rawIntervals);
+      }
+
+      for (let i = 0; i < editorState.pieces.length; i += 1) {
+        const effectiveText = formatIntervals(effective[i]);
+        if (effectiveText !== editorState.pieces[i].domainText) {
+          editorState.pieces[i].domainText = effectiveText;
+        }
+      }
+
+      renderPiecewiseEditor();
+      setStatus('Domains updated with last-rule priority.', 'info');
+      return true;
+    }
+
+    function buildCompiledPiecewiseRules() {
+      const compiled = [];
+      for (let i = 0; i < editorState.pieces.length; i += 1) {
+        const piece = editorState.pieces[i];
+        const ruleText = piece.ruleText.trim();
+        if (!ruleText) {
+          throw new Error(`Rule ${i + 1} cannot be empty.`);
+        }
+
+        const intervals = parseDomainText(piece.domainText);
+        if (intervals.length === 0) {
+          continue;
+        }
+
+        const tokens = tokenize(ruleText);
+        const variableName = extractSingleVariable(tokens);
+        const rpn = toRpn(tokens);
+
+        compiled.push({
+          ruleText,
+          variableName,
+          rpn,
+          domainText: piece.domainText,
+          intervals
+        });
+      }
+
+      if (compiled.length === 0) {
+        throw new Error('At least one rule with a non-empty domain is required.');
+      }
+
+      const vars = [...new Set(compiled.map(c => c.variableName))];
+      if (vars.length > 1) {
+        throw new Error(`All rules must use the same variable. Found: ${vars.join(', ')}`);
+      }
+
+      return compiled;
+    }
+
+    function evaluateAtX(x) {
+      if (!machine.piecewiseRules || machine.piecewiseRules.length === 0) return NaN;
+
+      for (let i = machine.piecewiseRules.length - 1; i >= 0; i -= 1) {
+        const piece = machine.piecewiseRules[i];
+        if (pointInIntervals(x, piece.intervals)) {
+          return evaluateRpn(piece.rpn, { [piece.variableName]: x });
+        }
+      }
+      return NaN;
+    }
+
+    function compactPieceSummary(name, pieces) {
+      const rows = pieces.map(piece => `${piece.ruleText}, x∈${piece.domainText || '∅'}`);
+      const joined = rows.join('\n');
+      return `${name}(x)\n${joined}`;
     }
 
     function hexToRgba(hex, alpha) {
@@ -611,11 +913,6 @@
     function pxToX(px) {
       const t = (px - dims.padLeft) / plotWidth();
       return domain.xMin + t * (domain.xMax - domain.xMin);
-    }
-
-    function evaluateAtX(x) {
-      if (!machine.rpn) return NaN;
-      return evaluateRpn(machine.rpn, { [machine.variable]: x });
     }
 
     function drawGrid() {
@@ -1043,8 +1340,18 @@
       }
       drawStemMarkers();
       drawPreviewStem();
-      const boxes = drawMachine();
-      return boxes;
+      drawMachine();
+    }
+
+    function describeMatchForReadout(xVal) {
+      if (!machine.piecewiseRules || machine.piecewiseRules.length === 0) return null;
+      for (let i = machine.piecewiseRules.length - 1; i >= 0; i -= 1) {
+        const piece = machine.piecewiseRules[i];
+        if (pointInIntervals(xVal, piece.intervals)) {
+          return piece;
+        }
+      }
+      return null;
     }
 
     function updateReadout() {
@@ -1056,9 +1363,17 @@
         yVal = NaN;
       }
 
-      const substitution = substituteExpression(machine.ruleText, machine.variable, xVal);
-      stepVar.innerHTML = `Variable: <span class="mono">${machine.variable} = ${format2(xVal)}</span>`;
-      stepSub.innerHTML = `Substitution: <span class="mono">${machine.ruleText} &rarr; ${substitution}</span>`;
+      const match = describeMatchForReadout(xVal);
+      const variable = match ? match.variableName : (machine.variable || 'x');
+      stepVar.innerHTML = `Variable: <span class="mono">${variable} = ${format2(xVal)}</span>`;
+
+      if (match) {
+        const substitution = substituteExpression(match.ruleText, match.variableName, xVal);
+        stepSub.innerHTML = `Substitution: <span class="mono">${match.ruleText} &rarr; ${substitution}</span>`;
+      } else {
+        stepSub.innerHTML = `Substitution: <span class="mono">No rule for x = ${format2(xVal)}</span>`;
+      }
+
       const outText = Number.isFinite(yVal) ? format2(yVal) : 'undefined';
       stepOut.innerHTML = `Output: <span class="mono">f(${format2(xVal)}) = ${outText}</span>`;
     }
@@ -1113,7 +1428,24 @@
 
     function handlePointerDown(event) {
       const p = clientToCanvas(event.clientX, event.clientY);
-      const boxes = draw();
+      draw();
+      const xPx = xToPx(machine.x);
+      const yVal = evaluateAtX(machine.x);
+      const yDisplay = Number.isFinite(yVal) ? format2(yVal) : 'undefined';
+      ctx.font = '900 11px Segoe UI, sans-serif';
+      const inputW = Math.max(boxSize.minValueW, Math.ceil(ctx.measureText(format2(machine.x)).width + boxSize.valuePadX * 2));
+      const outputW = Math.max(boxSize.minValueW, Math.ceil(ctx.measureText(yDisplay).width + boxSize.valuePadX * 2));
+      const chevronW = Math.max(boxSize.chevronW, Math.max(inputW, outputW));
+      const yInput = yToPx(0) - boxSize.h / 2;
+      const isNegative = isNegativeOutput(yVal);
+      const direction = isNegative ? 1 : -1;
+      const yFunction = yInput + direction * (boxSize.h + boxSize.gap);
+      const yOutput = yFunction + direction * (boxSize.h + boxSize.gap);
+      const boxes = {
+        input: { x: xPx - inputW / 2, y: yInput, w: inputW, h: boxSize.h },
+        function: { x: xPx - chevronW / 2, y: yFunction, w: chevronW, h: boxSize.h },
+        output: { x: xPx - outputW / 2, y: yOutput, w: outputW, h: boxSize.h }
+      };
 
       if (inRect(p, boxes.function)) {
         addStemAtCurrentX();
@@ -1162,30 +1494,23 @@
     }
 
     function applyRule() {
-      const ruleText = ruleInput.value.trim();
-      if (ruleText === '') {
-        setStatus('Please enter a transformation rule.', 'error');
-        return;
-      }
+      if (!reconcilePieceDomains(-1)) return;
 
       try {
-        const tokens = tokenize(ruleText);
-        const variableName = extractSingleVariable(tokens);
-        const rpn = toRpn(tokens);
-
-        machine.ruleText = ruleText;
-        machine.variable = variableName;
-        machine.rpn = rpn;
+        const compiledPieces = buildCompiledPiecewiseRules();
+        machine.piecewiseRules = compiledPieces;
+        machine.variable = compiledPieces[0].variableName;
         machine.transformationName = getTransformationName();
+
         appliedDisplayState.transformationName = machine.transformationName;
-        appliedDisplayState.ruleText = machine.ruleText;
+        appliedDisplayState.summary = compactPieceSummary(machine.transformationName, compiledPieces);
 
         updateGraphRuleBox();
         updateReadout();
         draw();
-        setStatus(`Variable: ${variableName}`, 'success');
+        setStatus(`Applied ${compiledPieces.length} rule piece(s) with variable ${machine.variable}.`, 'success');
       } catch (error) {
-        setStatus(error.message || 'Could not parse transformation rule.', 'error');
+        setStatus(error.message || 'Could not parse piecewise transformation rule.', 'error');
       }
     }
 
@@ -1194,11 +1519,20 @@
       hoverStemIndex = -1;
       machine.x = 0;
       dragState = null;
+      editorState.pieces = [{ ruleText: 'x^2', domainText: '(0,inf)', domainError: null }];
+      renderPiecewiseEditor();
       applyRule();
       setStatus('Reset complete. Stems cleared and stack returned to x = 0.', 'info');
     }
 
     function initialize() {
+      renderPiecewiseEditor();
+
+      addPieceBtn.addEventListener('click', () => {
+        editorState.pieces.push({ ruleText: '', domainText: '', domainError: null });
+        renderPiecewiseEditor();
+      });
+
       updateGraphRuleBox();
       applyRule();
       draw();
