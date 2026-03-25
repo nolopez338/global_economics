@@ -58,9 +58,17 @@
 
     .controls {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: minmax(240px, 320px) minmax(0, 1fr);
       gap: 0.85rem;
-      align-items: end;
+      align-items: start;
+    }
+
+    .control-name-column {
+      min-width: 0;
+    }
+
+    .control-rule-column {
+      min-width: 0;
     }
 
     .control-fields {
@@ -71,8 +79,8 @@
     }
 
     .control-fields .field {
-      flex: 1 1 220px;
-      min-width: 220px;
+      flex: 1 1 auto;
+      min-width: 0;
     }
 
     .field label {
@@ -97,7 +105,7 @@
     }
 
     .piecewise-editor {
-      margin-top: 0.45rem;
+      margin-top: 0;
       display: flex;
       flex-direction: column;
       gap: 0.65rem;
@@ -131,7 +139,8 @@
     .button-row {
       display: flex;
       gap: 0.65rem;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      align-items: center;
     }
 
     button {
@@ -191,12 +200,22 @@
       accent-color: #4f46e5;
     }
 
-    .flow-label {
-      text-align: center;
-      font-size: 1.05rem;
+    .flow-action-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
       margin-bottom: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .flow-label {
+      text-align: left;
+      font-size: 1.05rem;
+      margin-bottom: 0;
       color: #312e81;
       font-weight: 700;
+      flex: 1 1 320px;
+      min-width: 260px;
     }
 
     .graph-wrap {
@@ -282,6 +301,8 @@
     @media (max-width: 720px) {
       .graph-stage { padding: 0.8rem; }
       button { min-width: 100px; }
+      .controls { grid-template-columns: 1fr; }
+      .button-row { flex-wrap: wrap; }
     }
   </style>
 </head>
@@ -291,30 +312,35 @@
 
     <section class="card">
       <div class="controls">
-        <div class="control-fields">
-          <div class="field">
-            <label for="transformationNameInput">Transformation name</label>
-            <input id="transformationNameInput" type="text" value="name_transformation" />
+        <div class="control-name-column">
+          <div class="control-fields">
+            <div class="field">
+              <label for="transformationNameInput">Transformation name</label>
+              <input id="transformationNameInput" type="text" value="name_transformation" />
+            </div>
           </div>
         </div>
 
-        <div class="button-row">
-          <button id="applyBtn" type="button">Apply Rule</button>
-          <button id="resetBtn" type="button">Reset</button>
+        <div class="control-rule-column">
+          <div class="field piecewise-editor" id="piecewiseEditor" aria-describedby="statusMsg">
+            <label>Transformation rule (piecewise)</label>
+            <div id="pieceBlocks"></div>
+            <button id="addPieceBtn" class="piece-add" type="button" aria-label="Add rule piece">+</button>
+          </div>
         </div>
-      </div>
-
-      <div class="field piecewise-editor" id="piecewiseEditor" aria-describedby="statusMsg">
-        <label>Transformation rule (piecewise)</label>
-        <div id="pieceBlocks"></div>
-        <button id="addPieceBtn" class="piece-add" type="button" aria-label="Add rule piece">+</button>
       </div>
 
       <div id="statusMsg" class="status info" role="status" aria-live="polite">Set piecewise rules, drag the stack horizontally, and click the purple chevron to add stem markers.</div>
     </section>
 
     <section class="card graph-stage" aria-label="Function graph with draggable vertical machine">
-      <div class="flow-label">input &rarr; function / transformation &rarr; output</div>
+      <div class="flow-action-row">
+        <div class="button-row">
+          <button id="applyBtn" type="button">Apply Rule</button>
+          <button id="resetBtn" type="button">Reset</button>
+        </div>
+        <div class="flow-label">input &rarr; function / transformation &rarr; output</div>
+      </div>
       <div class="graph-toggle">
         <label for="graphVisibilityToggle">Show graph</label>
         <input id="graphVisibilityToggle" type="checkbox" aria-controls="graphWrap" />
