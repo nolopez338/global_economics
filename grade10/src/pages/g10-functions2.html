@@ -244,7 +244,7 @@
           <button id="resetBtn" type="button">Reset</button>
         </div>
       </div>
-      <div id="statusMsg" class="status info" role="status" aria-live="polite">Set a rule, drag the stack horizontally, and click the purple box to add stem markers.</div>
+      <div id="statusMsg" class="status info" role="status" aria-live="polite">Set a rule, drag the stack horizontally, and click the purple chevron to add stem markers.</div>
     </section>
 
     <section class="card graph-stage" aria-label="Function graph with draggable vertical machine">
@@ -253,7 +253,7 @@
         <label for="graphVisibilityToggle">Show graph</label>
         <input id="graphVisibilityToggle" type="checkbox" aria-controls="graphWrap" />
       </div>
-      <p class="tips">Tip: drag the stack left/right on the graph. Click the purple box to place a stem at the current x-value.</p>
+      <p class="tips">Tip: drag the stack left/right on the graph. Click the purple chevron to place a stem at the current x-value.</p>
       <div class="graph-wrap" id="graphWrap" hidden>
         <canvas id="graphCanvas" width="960" height="540" aria-label="Coordinate graph"></canvas>
       </div>
@@ -689,6 +689,88 @@
       }
     }
 
+    function drawUpChevron(x, y, w, h, colorA, colorB) {
+      const peakHeight = Math.min(18, h * 0.4);
+      const shoulderInset = Math.max(16, w * 0.2);
+      const grad = ctx.createLinearGradient(x, y, x + w, y + h);
+      grad.addColorStop(0, colorA);
+      grad.addColorStop(1, colorB);
+
+      ctx.beginPath();
+      ctx.moveTo(x + shoulderInset, y + peakHeight);
+      ctx.lineTo(x + w / 2, y);
+      ctx.lineTo(x + w - shoulderInset, y + peakHeight);
+      ctx.lineTo(x + w, y + h);
+      ctx.lineTo(x, y + h);
+      ctx.closePath();
+
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+      ctx.lineWidth = 1.25;
+      ctx.stroke();
+    }
+
+    function drawCenteredTextFit(text, centerX, centerY, maxWidth, maxLines = 2) {
+      const minFont = 10;
+      const maxFont = 14;
+      let fontSize = maxFont;
+      let lines = [text];
+
+      function splitIntoLines(fontPx) {
+        ctx.font = `800 ${fontPx}px Segoe UI, sans-serif`;
+        const words = text.split(/\s+/).filter(Boolean);
+        if (words.length < 2) return [text];
+
+        const rows = [];
+        let current = words[0];
+        for (let i = 1; i < words.length; i += 1) {
+          const candidate = `${current} ${words[i]}`;
+          if (ctx.measureText(candidate).width <= maxWidth) {
+            current = candidate;
+          } else {
+            rows.push(current);
+            current = words[i];
+          }
+        }
+        rows.push(current);
+        return rows;
+      }
+
+      while (fontSize >= minFont) {
+        lines = splitIntoLines(fontSize);
+        ctx.font = `800 ${fontSize}px Segoe UI, sans-serif`;
+        const widest = Math.max(...lines.map(line => ctx.measureText(line).width));
+        if (widest <= maxWidth && lines.length <= maxLines) break;
+        fontSize -= 1;
+      }
+
+      if (lines.length > maxLines) {
+        lines = lines.slice(0, maxLines);
+        const last = lines[maxLines - 1];
+        let clipped = last;
+        ctx.font = `800 ${fontSize}px Segoe UI, sans-serif`;
+        while (clipped.length > 0 && ctx.measureText(`${clipped}…`).width > maxWidth) {
+          clipped = clipped.slice(0, -1);
+        }
+        lines[maxLines - 1] = `${clipped}…`;
+      }
+
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = `800 ${fontSize}px Segoe UI, sans-serif`;
+
+      const lineHeight = fontSize * 1.15;
+      const blockHeight = lineHeight * lines.length;
+      let y = centerY - blockHeight / 2 + lineHeight / 2;
+      for (const line of lines) {
+        ctx.fillText(line, centerX, y);
+        y += lineHeight;
+      }
+    }
+
     function drawMachine() {
       const xPx = xToPx(machine.x);
       const yInput = yToPx(0) - boxSize.h / 2;
@@ -710,15 +792,21 @@
         yDisplay
       );
 
-      drawBox(
-        xPx - boxSize.w / 2,
+      const functionBoxX = xPx - boxSize.w / 2;
+      drawUpChevron(
+        functionBoxX,
         yFunction,
         boxSize.w,
         boxSize.h,
         '#845ef7',
-        '#4b2da6',
-        '>_>',
-        { rotateRadians: -Math.PI / 2 }
+        '#4b2da6'
+      );
+      drawCenteredTextFit(
+        machine.ruleText,
+        xPx,
+        yFunction + boxSize.h * 0.62,
+        boxSize.w - 16,
+        2
       );
 
       drawBox(
