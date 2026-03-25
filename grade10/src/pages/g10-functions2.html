@@ -263,16 +263,55 @@
       color: #ffffff;
       border: 1px solid rgba(255, 255, 255, 0.4);
       border-radius: 10px;
-      padding: 0.45rem 0.65rem;
-      font-size: 0.95rem;
-      font-weight: 700;
+      padding: 0.5rem 0.65rem;
+      font-size: 0.9rem;
       line-height: 1.25;
-      text-align: center;
       box-shadow: 0 6px 16px rgba(75, 45, 166, 0.25);
-      max-width: 54%;
+      width: min(54%, 420px);
+      max-height: min(58%, 320px);
+      overflow: auto;
       word-break: break-word;
-      pointer-events: none;
-      white-space: pre-line;
+      pointer-events: auto;
+    }
+
+    .graph-rule-title {
+      margin: 0 0 0.35rem;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.97);
+    }
+
+    .graph-rule-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.34);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .graph-rule-table th,
+    .graph-rule-table td {
+      padding: 0.3rem 0.4rem;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.82rem;
+      color: #ffffff;
+      overflow-wrap: anywhere;
+      white-space: normal;
+    }
+
+    .graph-rule-table th {
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .graph-rule-empty {
+      margin: 0;
+      font-size: 0.82rem;
+      color: rgba(255, 255, 255, 0.95);
     }
 
     .graph-wrap[hidden] {
@@ -426,7 +465,8 @@
 
     const appliedDisplayState = {
       transformationName: 'name_transformation',
-      summary: 'name_transformation(x) = x^2 for (0,inf)'
+      summary: 'name_transformation(x) = x^2 for (0,inf)',
+      appliedPieces: [{ expression: 'x^2', domainText: '(0,inf)' }]
     };
 
     const editorState = {
@@ -665,7 +705,47 @@
         return;
       }
 
-      graphRuleBox.textContent = appliedDisplayState.summary;
+      const title = document.createElement('p');
+      title.className = 'graph-rule-title';
+      title.textContent = `${appliedDisplayState.transformationName}(x)`;
+
+      const pieces = Array.isArray(appliedDisplayState.appliedPieces)
+        ? appliedDisplayState.appliedPieces
+        : [];
+
+      if (pieces.length === 0) {
+        const empty = document.createElement('p');
+        empty.className = 'graph-rule-empty';
+        empty.textContent = 'No applied piecewise rules.';
+        graphRuleBox.replaceChildren(title, empty);
+        return;
+      }
+
+      const table = document.createElement('table');
+      table.className = 'graph-rule-table';
+
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+      const expressionHeader = document.createElement('th');
+      expressionHeader.textContent = 'Expression';
+      const domainHeader = document.createElement('th');
+      domainHeader.textContent = 'Domain';
+      headerRow.append(expressionHeader, domainHeader);
+      thead.appendChild(headerRow);
+
+      const tbody = document.createElement('tbody');
+      for (const piece of pieces) {
+        const row = document.createElement('tr');
+        const expressionCell = document.createElement('td');
+        expressionCell.textContent = piece.expression || '';
+        const domainCell = document.createElement('td');
+        domainCell.textContent = piece.domainText || '∅';
+        row.append(expressionCell, domainCell);
+        tbody.appendChild(row);
+      }
+
+      table.append(thead, tbody);
+      graphRuleBox.replaceChildren(title, table);
     }
 
     function parseBound(raw) {
@@ -1582,6 +1662,10 @@
 
         appliedDisplayState.transformationName = machine.transformationName;
         appliedDisplayState.summary = compactPieceSummary(machine.transformationName, compiledPieces);
+        appliedDisplayState.appliedPieces = compiledPieces.map(piece => ({
+          expression: piece.ruleText,
+          domainText: piece.domainText
+        }));
 
         updateGraphRuleBox();
         updateReadout();
