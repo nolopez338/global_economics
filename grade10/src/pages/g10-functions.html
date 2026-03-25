@@ -553,8 +553,38 @@
       return getExpressionDisplayText(ruleText);
     }
 
+    function setMachineRuleDisplayText(text) {
+      machineRule.textContent = text;
+    }
+
     function refreshMachineRuleDisplay(ruleText) {
-      machineRule.textContent = getMachineRuleDisplayText(ruleText);
+      setMachineRuleDisplayText(getMachineRuleDisplayText(ruleText));
+    }
+
+    function getCurrentInputDisplayValue(fallbackValue = null) {
+      const currentValue = numberInput.value.trim();
+      if (currentValue !== '' && parseNumberOrNull(currentValue) !== null) {
+        return currentValue;
+      }
+      if (fallbackValue !== null && Number.isFinite(Number(fallbackValue))) {
+        return formatToTwoDecimals(Number(fallbackValue));
+      }
+      return '';
+    }
+
+    function getMachineRuleOverlapDisplayText(ruleText, variableName, inputDisplayValue) {
+      const valueText = String(inputDisplayValue ?? '').trim();
+      if (valueText === '') {
+        return getMachineRuleDisplayText(ruleText);
+      }
+
+      if (isShowingTransformationName) {
+        return `${transformationNameValue}(${valueText})`;
+      }
+
+      const expressionText = getExpressionDisplayText(ruleText);
+      const variableForSubstitution = String(variableName ?? '').trim() || getCurrentVariableName();
+      return substituteExpression(expressionText, variableForSubstitution, valueText);
     }
 
     function setStatus(message, type = 'info') {
@@ -960,9 +990,11 @@
 
       setStatus('Inside the machine: applying the rule to the input.', 'info');
       stepSub.innerHTML = `Substitution: <span class="mono">${ruleText} &rarr; ${substituted}</span>`;
-      refreshMachineRuleDisplay(ruleText);
+      const overlapInputDisplayValue = getCurrentInputDisplayValue(inputValue);
+      setMachineRuleDisplayText(getMachineRuleOverlapDisplayText(ruleText, variableName, overlapInputDisplayValue));
       await sleep(1500);
 
+      refreshMachineRuleDisplay(ruleText);
       movingInput.classList.remove('show');
       movingOutput.textContent = String(outputValue);
       movingOutput.classList.add('show');
