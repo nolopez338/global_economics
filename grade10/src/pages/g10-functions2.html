@@ -704,27 +704,65 @@
         const px = xToPx(stem.x);
         const py = yToPx(stem.y);
         const isHovered = i === hoverStemIndex;
-
-        ctx.strokeStyle = '#9333ea';
-        ctx.lineWidth = isHovered ? 2.4 : 2;
-        ctx.beginPath();
-        ctx.moveTo(px, xAxisY);
-        ctx.lineTo(px, py);
-        ctx.stroke();
-
-        ctx.fillStyle = '#e03131';
-        ctx.beginPath();
-        ctx.arc(px, py, 5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
+        drawStemAtCoordinates(px, py, xAxisY, {
+          strokeStyle: '#9333ea',
+          lineWidth: isHovered ? 2.4 : 2,
+          pointFill: '#e03131',
+          pointRadius: 5,
+          pointBorder: '#ffffff',
+          pointBorderWidth: 1.5
+        });
 
         if (isHovered) {
           drawHoverLabel(px, py - 22, ['f(x) =', format2(stem.y)], 'top');
           drawHoverLabel(px, xAxisY + 22, ['x =', format2(stem.x)], 'bottom');
         }
       }
+      ctx.restore();
+    }
+
+    function drawStemAtCoordinates(px, py, xAxisY, style) {
+      ctx.strokeStyle = style.strokeStyle;
+      ctx.lineWidth = style.lineWidth;
+      ctx.setLineDash(style.dashPattern || []);
+      ctx.beginPath();
+      ctx.moveTo(px, xAxisY);
+      ctx.lineTo(px, py);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = style.pointFill;
+      ctx.beginPath();
+      ctx.arc(px, py, style.pointRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = style.pointBorder;
+      ctx.lineWidth = style.pointBorderWidth;
+      ctx.stroke();
+    }
+
+    function drawPreviewStem() {
+      let y;
+      try {
+        y = evaluateAtX(machine.x);
+      } catch (_) {
+        y = NaN;
+      }
+      if (!Number.isFinite(y)) return;
+
+      const xAxisY = yToPx(0);
+      const px = xToPx(machine.x);
+      const py = yToPx(y);
+
+      ctx.save();
+      drawStemAtCoordinates(px, py, xAxisY, {
+        strokeStyle: 'rgba(147, 51, 234, 0.72)',
+        lineWidth: 2,
+        dashPattern: [6, 5],
+        pointFill: 'rgba(224, 49, 49, 0.62)',
+        pointRadius: 4.5,
+        pointBorder: 'rgba(255, 255, 255, 0.9)',
+        pointBorderWidth: 1.25
+      });
       ctx.restore();
     }
 
@@ -990,6 +1028,7 @@
         drawFunctionCurve();
       }
       drawStemMarkers();
+      drawPreviewStem();
       const boxes = drawMachine();
       return boxes;
     }
