@@ -84,6 +84,36 @@
       box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16);
     }
 
+    .field input[type="checkbox"] {
+      width: auto;
+      transform: scale(1.1);
+      accent-color: #4f46e5;
+    }
+
+    .slider-shell {
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+    }
+
+    .slider-shell input[type="range"] {
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .slider-shell.is-hidden .value-slider {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      min-height: 46px;
+    }
+
     .button-row {
       display: flex;
       gap: 0.65rem;
@@ -281,6 +311,30 @@
         </div>
 
         <div class="field">
+          <label for="valueSlider">Input value slider</label>
+          <div id="sliderShell" class="slider-shell">
+            <input id="valueSlider" class="value-slider" type="range" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="sliderMinInput">Slider minimum</label>
+          <input id="sliderMinInput" type="number" step="any" aria-describedby="statusMsg" />
+        </div>
+
+        <div class="field">
+          <label for="sliderMaxInput">Slider maximum</label>
+          <input id="sliderMaxInput" type="number" step="any" aria-describedby="statusMsg" />
+        </div>
+
+        <div class="field">
+          <label for="sliderVisibilityToggle">Show input slider</label>
+          <div class="checkbox-row">
+            <input id="sliderVisibilityToggle" type="checkbox" checked />
+          </div>
+        </div>
+
+        <div class="field">
           <label for="ruleInput">Transformation rule</label>
           <input id="ruleInput" type="text" placeholder="e.g., Number^2 + 3*Number - 1" aria-describedby="statusMsg" />
         </div>
@@ -323,6 +377,11 @@
     const playBtn = document.getElementById('playBtn');
     const resetBtn = document.getElementById('resetBtn');
     const statusMsg = document.getElementById('statusMsg');
+    const valueSlider = document.getElementById('valueSlider');
+    const sliderMinInput = document.getElementById('sliderMinInput');
+    const sliderMaxInput = document.getElementById('sliderMaxInput');
+    const sliderVisibilityToggle = document.getElementById('sliderVisibilityToggle');
+    const sliderShell = document.getElementById('sliderShell');
 
     const movingInput = document.getElementById('movingInput');
     const movingOutput = document.getElementById('movingOutput');
@@ -334,6 +393,7 @@
     const stepOut = document.getElementById('stepOut');
 
     let isAnimating = false;
+    const FALLBACK_BOUNDS = { min: 0, max: 10 };
 
     function setStatus(message, type = 'info') {
       statusMsg.className = `status ${type}`;
@@ -342,6 +402,111 @@
 
     function sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
+    }
+
+    function parseNumberOrNull(value) {
+      if (value === null || value === undefined) return null;
+      const trimmed = String(value).trim();
+      if (trimmed === '') return null;
+      const parsed = Number(trimmed);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    function determineStepValue() {
+      return numberInput.step && numberInput.step !== 'any' ? numberInput.step : 'any';
+    }
+
+    function getCurrentBounds() {
+      const min = parseNumberOrNull(valueSlider.min) ?? FALLBACK_BOUNDS.min;
+      const max = parseNumberOrNull(valueSlider.max) ?? FALLBACK_BOUNDS.max;
+      return { min, max };
+    }
+
+    function syncSliderToInputValue() {
+      const numericValue = parseNumberOrNull(numberInput.value);
+      if (numericValue === null) return;
+      const { min, max } = getCurrentBounds();
+      const clamped = clamp(numericValue, min, max);
+      if (clamped !== numericValue) {
+        numberInput.value = String(clamped);
+      }
+      valueSlider.value = String(clamped);
+    }
+
+    function syncInputToSliderValue() {
+      numberInput.value = valueSlider.value;
+    }
+
+    function applySliderBounds(nextMin, nextMax) {
+      let min = Number.isFinite(nextMin) ? nextMin : FALLBACK_BOUNDS.min;
+      let max = Number.isFinite(nextMax) ? nextMax : FALLBACK_BOUNDS.max;
+
+      if (min > max) {
+        max = min;
+      }
+
+      valueSlider.min = String(min);
+      valueSlider.max = String(max);
+      sliderMinInput.value = String(min);
+      sliderMaxInput.value = String(max);
+      syncSliderToInputValue();
+    }
+
+    function applyBoundsFromControlInput(changedControl) {
+      const current = getCurrentBounds();
+      let nextMin = parseNumberOrNull(sliderMinInput.value);
+      let nextMax = parseNumberOrNull(sliderMaxInput.value);
+
+      if (nextMin === null) nextMin = current.min;
+      if (nextMax === null) nextMax = current.max;
+
+      if (nextMin > nextMax) {
+        if (changedControl === 'min') {
+          nextMax = nextMin;
+          sliderMaxInput.value = String(nextMax);
+        } else {
+          nextMin = nextMax;
+          sliderMinInput.value = String(nextMin);
+        }
+      }
+
+      applySliderBounds(nextMin, nextMax);
+    }
+
+    function setSliderVisibility(isVisible) {
+      sliderShell.classList.toggle('is-hidden', !isVisible);
+      valueSlider.setAttribute('aria-hidden', String(!isVisible));
+    }
+
+    function initValueControls() {
+      const stepValue = determineStepValue();
+      valueSlider.step = stepValue;
+      sliderMinInput.step = stepValue;
+      sliderMaxInput.step = stepValue;
+
+      const initialValue = parseNumberOrNull(numberInput.value) ?? FALLBACK_BOUNDS.min;
+      const attrMin = parseNumberOrNull(valueSlider.getAttribute('min'));
+      const attrMax = parseNumberOrNull(valueSlider.getAttribute('max'));
+      const inferredPadding = Math.max(1, Math.abs(initialValue) || 1);
+
+      const initialMin = attrMin ?? (initialValue - inferredPadding);
+      const initialMax = attrMax ?? (initialValue + inferredPadding);
+      applySliderBounds(initialMin, initialMax);
+
+      numberInput.addEventListener('input', syncSliderToInputValue);
+      valueSlider.addEventListener('input', syncInputToSliderValue);
+      sliderMinInput.addEventListener('input', () => applyBoundsFromControlInput('min'));
+      sliderMaxInput.addEventListener('input', () => applyBoundsFromControlInput('max'));
+      sliderVisibilityToggle.addEventListener('change', () => {
+        setSliderVisibility(sliderVisibilityToggle.checked);
+      });
+
+      setSliderVisibility(sliderVisibilityToggle.checked);
+      syncSliderToInputValue();
     }
 
     function resetAnimation() {
@@ -628,6 +793,7 @@
     playBtn.addEventListener('click', handlePlay);
     resetBtn.addEventListener('click', resetAnimation);
 
+    initValueControls();
     resetAnimation();
   </script>
 </body>
