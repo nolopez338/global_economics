@@ -290,7 +290,7 @@
       padBottom: 48
     };
 
-    const boxSize = { w: 58, h: 26, gap: 8 };
+    const boxSize = { h: 26, gap: 8, minValueW: 44, valuePadX: 10, chevronW: 66 };
     const machine = {
       x: 0,
       yInput: 0,
@@ -496,8 +496,19 @@
       return expression.replace(pattern, `(${format2(value)})`);
     }
 
+    function normalizeDisplayValue(value) {
+      if (!Number.isFinite(value)) return value;
+      return Math.abs(value) < 0.0005 ? 0 : value;
+    }
+
+    function isNegativeOutput(value) {
+      if (!Number.isFinite(value)) return false;
+      return normalizeDisplayValue(value) < 0;
+    }
+
     function format2(value) {
-      return Number.isFinite(value) ? value.toFixed(2) : 'undefined';
+      if (!Number.isFinite(value)) return 'undefined';
+      return normalizeDisplayValue(value).toFixed(2);
     }
 
     function hexToRgba(hex, alpha) {
@@ -659,18 +670,45 @@
         ctx.stroke();
 
         if (isHovered) {
-          const xLabelY = Math.min(canvas.height - dims.padBottom + 18, xAxisY + 18);
-          const fxLabelY = py - 14;
-          ctx.fillStyle = '#312e81';
-          ctx.font = '700 11px Segoe UI, sans-serif';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-
-          ctx.fillText(`x: ${format2(stem.x)}`, px, xLabelY);
-          ctx.fillText(`f(x): ${format2(stem.y)}`, px, fxLabelY);
+          drawHoverLabel(px, py - 22, ['f(x) =', format2(stem.y)], 'top');
+          drawHoverLabel(px, xAxisY + 22, ['x =', format2(stem.x)], 'bottom');
         }
       }
       ctx.restore();
+    }
+
+    function drawHoverLabel(anchorX, anchorY, lines, anchor) {
+      const padX = 8;
+      const padY = 6;
+      const lineHeight = 12;
+      const radius = 8;
+      const safe = 6;
+
+      ctx.font = '700 11px Segoe UI, sans-serif';
+      const textW = Math.max(...lines.map(line => ctx.measureText(line).width));
+      const w = Math.max(44, textW + padX * 2);
+      const h = lineHeight * lines.length + padY * 2;
+
+      let x = anchorX - w / 2;
+      x = clamp(x, safe, canvas.width - w - safe);
+
+      let y = anchor === 'top' ? anchorY - h : anchorY;
+      y = clamp(y, safe, canvas.height - h - safe);
+
+      roundedRectPath(x, y, w, h, radius);
+      ctx.fillStyle = 'rgba(255,255,255,0.97)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(15,23,42,0.2)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.fillStyle = '#1f2937';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      lines.forEach((line, idx) => {
+        const lineY = y + padY + lineHeight * (idx + 0.5);
+        ctx.fillText(line, x + w / 2, lineY);
+      });
     }
 
     function roundedRectPath(x, y, w, h, r = 10) {
@@ -731,7 +769,7 @@
       }
     }
 
-    function drawUpChevron(x, y, w, h, colorA, colorB) {
+    function drawChevron(x, y, w, h, colorA, colorB, direction = 'up') {
       const peakHeight = Math.min(10, h * 0.38);
       const shoulderInset = Math.max(8, w * 0.2);
       const grad = ctx.createLinearGradient(x, y, x + w, y + h);
@@ -739,11 +777,19 @@
       grad.addColorStop(1, colorB);
 
       ctx.beginPath();
-      ctx.moveTo(x + shoulderInset, y + peakHeight);
-      ctx.lineTo(x + w / 2, y);
-      ctx.lineTo(x + w - shoulderInset, y + peakHeight);
-      ctx.lineTo(x + w, y + h);
-      ctx.lineTo(x, y + h);
+      if (direction === 'down') {
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + w, y);
+        ctx.lineTo(x + w - shoulderInset, y + h - peakHeight);
+        ctx.lineTo(x + w / 2, y + h);
+        ctx.lineTo(x + shoulderInset, y + h - peakHeight);
+      } else {
+        ctx.moveTo(x + shoulderInset, y + peakHeight);
+        ctx.lineTo(x + w / 2, y);
+        ctx.lineTo(x + w - shoulderInset, y + peakHeight);
+        ctx.lineTo(x + w, y + h);
+        ctx.lineTo(x, y + h);
+      }
       ctx.closePath();
 
       ctx.fillStyle = grad;
@@ -815,19 +861,26 @@
 
     function drawMachine() {
       const xPx = xToPx(machine.x);
-      const yInput = yToPx(0) - boxSize.h / 2;
-      const yFunction = yInput - boxSize.h - boxSize.gap;
-      const yOutput = yFunction - boxSize.h - boxSize.gap;
-
-      machine.yInput = yInput;
-
       const yVal = evaluateAtX(machine.x);
       const yDisplay = Number.isFinite(yVal) ? format2(yVal) : 'undefined';
+      const xDisplay = format2(machine.x);
+      const isNegative = isNegativeOutput(yVal);
+      const direction = isNegative ? 1 : -1;
+
+      const yInput = yToPx(0) - boxSize.h / 2;
+      const yFunction = yInput + direction * (boxSize.h + boxSize.gap);
+      const yOutput = yFunction + direction * (boxSize.h + boxSize.gap);
+      machine.yInput = yInput;
+
+      ctx.font = '900 11px Segoe UI, sans-serif';
+      const inputW = Math.max(boxSize.minValueW, Math.ceil(ctx.measureText(xDisplay).width + boxSize.valuePadX * 2));
+      const outputW = Math.max(boxSize.minValueW, Math.ceil(ctx.measureText(yDisplay).width + boxSize.valuePadX * 2));
+      const chevronW = Math.max(boxSize.chevronW, Math.max(inputW, outputW));
 
       drawBox(
-        xPx - boxSize.w / 2,
+        xPx - outputW / 2,
         yOutput,
-        boxSize.w,
+        outputW,
         boxSize.h,
         '#fa5252',
         '#a61e1e',
@@ -835,31 +888,32 @@
         { centerAlpha: 0.58 }
       );
 
-      const functionBoxX = xPx - boxSize.w / 2;
-      drawUpChevron(
+      const functionBoxX = xPx - chevronW / 2;
+      drawChevron(
         functionBoxX,
         yFunction,
-        boxSize.w,
+        chevronW,
         boxSize.h,
         '#845ef7',
-        '#4b2da6'
+        '#4b2da6',
+        isNegative ? 'down' : 'up'
       );
       drawCenteredTextFit(
         machine.ruleText,
         xPx,
-        yFunction + boxSize.h * 0.62,
-        boxSize.w - 12,
+        yFunction + boxSize.h / 2,
+        chevronW - 12,
         2
       );
 
       drawBox(
-        xPx - boxSize.w / 2,
+        xPx - inputW / 2,
         yInput,
-        boxSize.w,
+        inputW,
         boxSize.h,
         '#40c057',
         '#1f6f30',
-        format2(machine.x),
+        xDisplay,
         { centerAlpha: 0.58 }
       );
 
@@ -873,9 +927,9 @@
       ctx.restore();
 
       return {
-        input: { x: xPx - boxSize.w / 2, y: yInput, w: boxSize.w, h: boxSize.h },
-        function: { x: xPx - boxSize.w / 2, y: yFunction, w: boxSize.w, h: boxSize.h },
-        output: { x: xPx - boxSize.w / 2, y: yOutput, w: boxSize.w, h: boxSize.h }
+        input: { x: xPx - inputW / 2, y: yInput, w: inputW, h: boxSize.h },
+        function: { x: xPx - chevronW / 2, y: yFunction, w: chevronW, h: boxSize.h },
+        output: { x: xPx - outputW / 2, y: yOutput, w: outputW, h: boxSize.h }
       };
     }
 
