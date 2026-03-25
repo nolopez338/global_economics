@@ -111,6 +111,13 @@
       gap: 0.65rem;
     }
 
+    .piece-row {
+      display: grid;
+      grid-template-columns: 34px minmax(0, 1fr);
+      align-items: start;
+      gap: 0.5rem;
+    }
+
     .piece-block {
       border: 1px solid #dbe3ff;
       border-radius: 10px;
@@ -119,6 +126,26 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 0.7rem;
+    }
+
+    .piece-delete {
+      width: 34px;
+      min-width: 34px;
+      height: 34px;
+      padding: 0;
+      border-radius: 9px;
+      border: 1px solid #fecaca;
+      background: #fee2e2;
+      color: #b91c1c;
+      font-size: 1rem;
+      font-weight: 800;
+      line-height: 1;
+      align-self: center;
+    }
+
+    .piece-delete:hover {
+      background: #fecaca;
+      border-color: #fca5a5;
     }
 
     .piece-add {
@@ -758,6 +785,18 @@
     }
 
     function buildRulePieceElement(piece, index) {
+      const row = document.createElement('div');
+      row.className = 'piece-row';
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.className = 'piece-delete';
+      deleteBtn.textContent = 'x';
+      deleteBtn.setAttribute('aria-label', `Delete rule ${index + 1}`);
+      deleteBtn.addEventListener('click', () => {
+        deletePieceAt(index);
+      });
+
       const block = document.createElement('div');
       block.className = 'piece-block';
 
@@ -799,7 +838,8 @@
       domainField.append(domainLabel, domainInput);
       block.append(ruleField, domainField);
 
-      return block;
+      row.append(deleteBtn, block);
+      return row;
     }
 
     function renderPiecewiseEditor() {
@@ -807,6 +847,19 @@
       editorState.pieces.forEach((piece, index) => {
         pieceBlocks.appendChild(buildRulePieceElement(piece, index));
       });
+    }
+
+    function deletePieceAt(index) {
+      if (index < 0 || index >= editorState.pieces.length) return;
+      editorState.pieces.splice(index, 1);
+      renderPiecewiseEditor();
+
+      if (editorState.pieces.length === 0) {
+        setStatus('All rule rows removed. Add a new row with + and apply when ready.', 'info');
+        return;
+      }
+
+      reconcilePieceDomains(-1);
     }
 
     function reconcilePieceDomains(changedIndex) {
