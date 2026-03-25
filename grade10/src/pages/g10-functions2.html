@@ -1328,25 +1328,25 @@
     }
 
     function drawChevron(x, y, w, h, colorA, colorB, direction = 'up') {
-      const peakHeight = Math.min(10, h * 0.38);
-      const shoulderInset = Math.max(8, w * 0.2);
       const grad = ctx.createLinearGradient(x, y, x + w, y + h);
       grad.addColorStop(0, colorA);
       grad.addColorStop(1, colorB);
 
+      const upShape = [
+        [0.5, 0],
+        [1, 0.5],
+        [1, 1],
+        [0.5, 0.48],
+        [0, 1],
+        [0, 0.5]
+      ];
+      const downShape = upShape.map(([px, py]) => [px, 1 - py]);
+      const points = direction === 'down' ? downShape : upShape;
+
       ctx.beginPath();
-      if (direction === 'down') {
-        ctx.moveTo(x, y);
-        ctx.lineTo(x + w, y);
-        ctx.lineTo(x + w - shoulderInset, y + h - peakHeight);
-        ctx.lineTo(x + w / 2, y + h);
-        ctx.lineTo(x + shoulderInset, y + h - peakHeight);
-      } else {
-        ctx.moveTo(x + shoulderInset, y + peakHeight);
-        ctx.lineTo(x + w / 2, y);
-        ctx.lineTo(x + w - shoulderInset, y + peakHeight);
-        ctx.lineTo(x + w, y + h);
-        ctx.lineTo(x, y + h);
+      ctx.moveTo(x + points[0][0] * w, y + points[0][1] * h);
+      for (let i = 1; i < points.length; i += 1) {
+        ctx.lineTo(x + points[i][0] * w, y + points[i][1] * h);
       }
       ctx.closePath();
 
@@ -1355,6 +1355,7 @@
 
       ctx.strokeStyle = 'rgba(255,255,255,0.6)';
       ctx.lineWidth = 1.25;
+      ctx.lineJoin = 'round';
       ctx.stroke();
     }
 
