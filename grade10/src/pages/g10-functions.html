@@ -641,7 +641,7 @@
         return currentValue;
       }
       if (fallbackValue !== null && Number.isFinite(Number(fallbackValue))) {
-        return formatToTwoDecimals(Number(fallbackValue));
+        return formatInputNumber(Number(fallbackValue));
       }
       return '';
     }
@@ -696,8 +696,22 @@
       return Number(value).toFixed(2);
     }
 
+    function isMathematicallyInteger(value) {
+      if (!Number.isFinite(value)) return false;
+      return Math.abs(value - Math.round(value)) < 1e-10;
+    }
+
+    function formatInputNumber(value) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric)) return '';
+      if (isMathematicallyInteger(numeric)) {
+        return String(Math.round(numeric));
+      }
+      return formatToTwoDecimals(numeric);
+    }
+
     function setNumberInputValue(value) {
-      numberInput.value = formatToTwoDecimals(value);
+      numberInput.value = formatInputNumber(value);
     }
 
     function syncSliderToInputValue() {
@@ -908,7 +922,7 @@
           continue;
         }
 
-        if ('+-*^()'.includes(ch)) {
+        if ('+-*/^()'.includes(ch)) {
           tokens.push({ type: 'operator', value: ch });
           i += 1;
           continue;
@@ -924,7 +938,7 @@
     function toRpn(tokens) {
       const output = [];
       const stack = [];
-      const precedence = { '+': 1, '-': 1, '*': 2, '^': 3, 'u-': 4 };
+      const precedence = { '+': 1, '-': 1, '*': 2, '/': 2, '^': 3, 'u-': 4 };
       const rightAssoc = { '^': true, 'u-': true };
 
       let prevType = 'start';
@@ -1027,6 +1041,12 @@
             case '+': stack.push(a + b); break;
             case '-': stack.push(a - b); break;
             case '*': stack.push(a * b); break;
+            case '/':
+              if (Math.abs(b) < Number.EPSILON) {
+                throw new Error('Division by zero is not allowed.');
+              }
+              stack.push(a / b);
+              break;
             case '^':
               if (!Number.isInteger(b)) {
                 throw new Error('Polynomial exponents must be integers.');
@@ -1063,6 +1083,10 @@
       const escaped = variableName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const pattern = new RegExp(`\\b${escaped}\\b`, 'g');
       return expression.replace(pattern, `(${value})`);
+    }
+
+    function expressionHasDivision(tokens) {
+      return tokens.some(token => token.type === 'operator' && token.value === '/');
     }
 
     async function runAnimation(inputValue, ruleText, variableName, outputValue, substituted) {
@@ -1110,13 +1134,21 @@
       return Number.isInteger(rounded) ? String(rounded) : String(rounded);
     }
 
+    function formatOutputValue(value) {
+      if (isMathematicallyInteger(value)) {
+        return String(Math.round(value));
+      }
+      return roundForDisplay(value);
+    }
+
     function computeTransformation(ruleText, inputValue) {
       const tokens = tokenize(ruleText);
       const variableName = extractSingleVariable(tokens);
+      const hasDivision = expressionHasDivision(tokens);
       const rpn = toRpn(tokens);
       const output = evaluateRpn(rpn, { [variableName]: inputValue });
-      const displayOutput = roundForDisplay(output);
-      const substituted = substituteExpression(ruleText, variableName, inputValue);
+      const displayOutput = formatOutputValue(output, hasDivision);
+      const substituted = substituteExpression(ruleText, variableName, formatInputNumber(inputValue));
       return { variableName, displayOutput, substituted };
     }
 
@@ -1146,12 +1178,12 @@
         movingInput.textContent = '';
         movingOutput.textContent = '';
 
-        inputAnchor.textContent = formatToTwoDecimals(clampedInput);
+        inputAnchor.textContent = formatInputNumber(clampedInput);
         outputAnchor.textContent = result.displayOutput;
         refreshMachineRuleDisplay(ruleText);
-        stepVar.innerHTML = `Variable: <span class="mono">${result.variableName} = ${formatToTwoDecimals(clampedInput)}</span>`;
+        stepVar.innerHTML = `Variable: <span class="mono">${result.variableName} = ${formatInputNumber(clampedInput)}</span>`;
         stepSub.innerHTML = `Substitution: <span class="mono">${ruleText} &rarr; ${result.substituted}</span>`;
-        stepOut.innerHTML = `Output: <span class="mono">f(${formatToTwoDecimals(clampedInput)}) = ${result.displayOutput}</span>`;
+        stepOut.innerHTML = `Output: <span class="mono">f(${formatInputNumber(clampedInput)}) = ${result.displayOutput}</span>`;
         setStatus('Automatic mode: transformation applied instantly.', 'success');
       } catch (error) {
         setStatus(error.message || 'Could not parse the transformation rule.', 'error');
