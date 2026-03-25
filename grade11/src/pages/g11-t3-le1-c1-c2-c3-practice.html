@@ -1135,5 +1135,118 @@
 
   </main>
   <script src="../../../assets/js/collapsible.js"></script>
+  <script>
+    (function () {
+      const BASELINE_Y = 100;
+      const X_MIN = 10;
+      const X_MAX = 230;
+      const CENTER = 120;
+      const SIGMA = 38;
+      const PEAK_HEIGHT = 90;
+
+      function clamp(value, min, max) {
+        return Math.min(max, Math.max(min, value));
+      }
+
+      function normalY(x) {
+        const z = (x - CENTER) / SIGMA;
+        return BASELINE_Y - PEAK_HEIGHT * Math.exp(-0.5 * z * z);
+      }
+
+      function buildCurvePath(step = 2) {
+        const points = [];
+        for (let x = X_MIN; x <= X_MAX; x += step) {
+          points.push(`${x.toFixed(1)},${normalY(x).toFixed(2)}`);
+        }
+        points[0] = `${X_MIN},${BASELINE_Y}`;
+        points.push(`${X_MAX},${BASELINE_Y}`);
+        return `M${points.join(' L')}`;
+      }
+
+      function buildAreaPath(startX, endX, step = 2) {
+        const from = clamp(startX, X_MIN, X_MAX);
+        const to = clamp(endX, X_MIN, X_MAX);
+        if (to <= from) {
+          return '';
+        }
+        const points = [`${from.toFixed(1)},${BASELINE_Y}`];
+        for (let x = from; x <= to; x += step) {
+          points.push(`${x.toFixed(1)},${normalY(x).toFixed(2)}`);
+        }
+        if ((to - from) % step !== 0) {
+          points.push(`${to.toFixed(1)},${normalY(to).toFixed(2)}`);
+        }
+        points.push(`${to.toFixed(1)},${BASELINE_Y}`);
+        return `M${points.join(' L')} Z`;
+      }
+
+      function parseNumbers(pathData) {
+        return (pathData.match(/-?\d*\.?\d+/g) || []).map(Number);
+      }
+
+      function inferBounds(svg, fillPaths) {
+        if (fillPaths.length === 0) {
+          return [];
+        }
+
+        const bounds = fillPaths.map((path) => {
+          const nums = parseNumbers(path.getAttribute('d') || '');
+          const xValues = [];
+          for (let i = 0; i < nums.length; i += 2) {
+            xValues.push(nums[i]);
+          }
+          const minX = Math.min(...xValues);
+          const maxX = Math.max(...xValues);
+          return { minX, maxX };
+        });
+
+        if (bounds.length === 1) {
+          const b = bounds[0];
+          const meanX = (b.minX + b.maxX) / 2;
+          if (meanX <= CENTER) {
+            return [{ from: X_MIN, to: b.maxX }];
+          }
+          return [{ from: b.minX, to: X_MAX }];
+        }
+
+        const sorted = bounds.sort((a, b) => a.minX - b.minX);
+        return [
+          { from: X_MIN, to: sorted[0].maxX },
+          { from: sorted[sorted.length - 1].minX, to: X_MAX }
+        ];
+      }
+
+      function redrawGraph(svg) {
+        const paths = Array.from(svg.querySelectorAll('path'));
+        if (paths.length === 0) return;
+
+        const curvePath = paths.find((path) => (path.getAttribute('fill') || '').toLowerCase() === 'none') || paths[0];
+        const fillPaths = paths.filter((path) => {
+          const fill = (path.getAttribute('fill') || '').toLowerCase();
+          return fill && fill !== 'none';
+        });
+
+        const bounds = inferBounds(svg, fillPaths);
+        curvePath.setAttribute('d', buildCurvePath());
+        curvePath.setAttribute('fill', 'none');
+        curvePath.setAttribute('stroke', '#000');
+        curvePath.setAttribute('stroke-width', '2');
+
+        fillPaths.forEach((path, index) => {
+          const bound = bounds[index];
+          if (!bound) {
+            path.remove();
+            return;
+          }
+          const d = buildAreaPath(bound.from, bound.to);
+          path.setAttribute('d', d);
+          path.setAttribute('fill', '#c9c9c9');
+          path.setAttribute('stroke', 'none');
+        });
+      }
+
+      document.querySelectorAll('.tail-graph svg').forEach(redrawGraph);
+    })();
+  </script>
 </body>
 </html>
