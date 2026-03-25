@@ -290,7 +290,7 @@
       padBottom: 48
     };
 
-    const boxSize = { w: 104, h: 44, gap: 12 };
+    const boxSize = { w: 58, h: 26, gap: 8 };
     const machine = {
       x: 0,
       yInput: 0,
@@ -302,6 +302,7 @@
     let stems = [];
     let dragState = null;
     let showFunctionLine = false;
+    let hoverStemIndex = -1;
 
     function setStatus(message, type = 'info') {
       statusMsg.className = `status ${type}`;
@@ -499,6 +500,18 @@
       return Number.isFinite(value) ? value.toFixed(2) : 'undefined';
     }
 
+    function hexToRgba(hex, alpha) {
+      const clean = hex.replace('#', '');
+      const full = clean.length === 3
+        ? clean.split('').map(ch => ch + ch).join('')
+        : clean;
+      const int = Number.parseInt(full, 16);
+      const r = (int >> 16) & 255;
+      const g = (int >> 8) & 255;
+      const b = int & 255;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
     function clamp(num, min, max) {
       return Math.min(max, Math.max(min, num));
     }
@@ -624,12 +637,14 @@
     function drawStemMarkers() {
       const xAxisY = yToPx(0);
       ctx.save();
-      for (const stem of stems) {
+      for (let i = 0; i < stems.length; i += 1) {
+        const stem = stems[i];
         const px = xToPx(stem.x);
         const py = yToPx(stem.y);
+        const isHovered = i === hoverStemIndex;
 
         ctx.strokeStyle = '#9333ea';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = isHovered ? 2.4 : 2;
         ctx.beginPath();
         ctx.moveTo(px, xAxisY);
         ctx.lineTo(px, py);
@@ -642,6 +657,18 @@
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 1.5;
         ctx.stroke();
+
+        if (isHovered) {
+          const xLabelY = Math.min(canvas.height - dims.padBottom + 18, xAxisY + 18);
+          const fxLabelY = py - 14;
+          ctx.fillStyle = '#312e81';
+          ctx.font = '700 11px Segoe UI, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+
+          ctx.fillText(`x: ${format2(stem.x)}`, px, xLabelY);
+          ctx.fillText(`f(x): ${format2(stem.y)}`, px, fxLabelY);
+        }
       }
       ctx.restore();
     }
@@ -673,6 +700,20 @@
       ctx.lineWidth = 1.25;
       ctx.stroke();
 
+      if (options.centerAlpha !== undefined) {
+        const inset = 4;
+        const innerW = w - inset * 2;
+        const innerH = h - inset * 2;
+        if (innerW > 0 && innerH > 0) {
+          const innerGrad = ctx.createLinearGradient(x + inset, y + inset, x + w - inset, y + h - inset);
+          innerGrad.addColorStop(0, hexToRgba(colorA, options.centerAlpha));
+          innerGrad.addColorStop(1, hexToRgba(colorB, options.centerAlpha));
+          roundedRectPath(x + inset, y + inset, innerW, innerH, 6);
+          ctx.fillStyle = innerGrad;
+          ctx.fill();
+        }
+      }
+
       ctx.fillStyle = '#ffffff';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -681,18 +722,18 @@
         ctx.save();
         ctx.translate(x + w / 2, y + h / 2);
         ctx.rotate(options.rotateRadians);
-        ctx.font = '900 17px Segoe UI, sans-serif';
+        ctx.font = '900 10px Segoe UI, sans-serif';
         ctx.fillText(valueText, 0, 0);
         ctx.restore();
       } else {
-        ctx.font = '900 15px Segoe UI, sans-serif';
+        ctx.font = '900 11px Segoe UI, sans-serif';
         ctx.fillText(valueText, x + w / 2, y + h / 2);
       }
     }
 
     function drawUpChevron(x, y, w, h, colorA, colorB) {
-      const peakHeight = Math.min(18, h * 0.4);
-      const shoulderInset = Math.max(16, w * 0.2);
+      const peakHeight = Math.min(10, h * 0.38);
+      const shoulderInset = Math.max(8, w * 0.2);
       const grad = ctx.createLinearGradient(x, y, x + w, y + h);
       grad.addColorStop(0, colorA);
       grad.addColorStop(1, colorB);
@@ -714,8 +755,8 @@
     }
 
     function drawCenteredTextFit(text, centerX, centerY, maxWidth, maxLines = 2) {
-      const minFont = 10;
-      const maxFont = 14;
+      const minFont = 7;
+      const maxFont = 10;
       let fontSize = maxFont;
       let lines = [text];
 
@@ -790,7 +831,8 @@
         boxSize.h,
         '#fa5252',
         '#a61e1e',
-        yDisplay
+        yDisplay,
+        { centerAlpha: 0.58 }
       );
 
       const functionBoxX = xPx - boxSize.w / 2;
@@ -806,7 +848,7 @@
         machine.ruleText,
         xPx,
         yFunction + boxSize.h * 0.62,
-        boxSize.w - 16,
+        boxSize.w - 12,
         2
       );
 
@@ -817,7 +859,8 @@
         boxSize.h,
         '#40c057',
         '#1f6f30',
-        format2(machine.x)
+        format2(machine.x),
+        { centerAlpha: 0.58 }
       );
 
       ctx.save();
@@ -876,6 +919,21 @@
       return point.x >= rect.x && point.x <= rect.x + rect.w && point.y >= rect.y && point.y <= rect.y + rect.h;
     }
 
+    function getStemIndexAtPoint(point) {
+      const xAxisY = yToPx(0);
+      for (let i = stems.length - 1; i >= 0; i -= 1) {
+        const stem = stems[i];
+        const px = xToPx(stem.x);
+        const py = yToPx(stem.y);
+        const nearLine = Math.abs(point.x - px) <= 7
+          && point.y >= Math.min(py, xAxisY) - 6
+          && point.y <= Math.max(py, xAxisY) + 6;
+        const nearPoint = Math.hypot(point.x - px, point.y - py) <= 9;
+        if (nearLine || nearPoint) return i;
+      }
+      return -1;
+    }
+
     function addStemAtCurrentX() {
       const x = machine.x;
       let y;
@@ -914,20 +972,35 @@
     }
 
     function handlePointerMove(event) {
-      if (!dragState || dragState.pointerId !== event.pointerId) return;
-
       const p = clientToCanvas(event.clientX, event.clientY);
-      const xPx = p.x - dragState.offset;
-      const boundedPx = clamp(xPx, xToPx(domain.xMin), xToPx(domain.xMax));
-      machine.x = clamp(pxToX(boundedPx), domain.xMin, domain.xMax);
-      updateReadout();
-      draw();
+
+      if (dragState && dragState.pointerId === event.pointerId) {
+        const xPx = p.x - dragState.offset;
+        const boundedPx = clamp(xPx, xToPx(domain.xMin), xToPx(domain.xMax));
+        machine.x = clamp(pxToX(boundedPx), domain.xMin, domain.xMax);
+        updateReadout();
+        draw();
+        return;
+      }
+
+      const newHoverStemIndex = getStemIndexAtPoint(p);
+      if (newHoverStemIndex !== hoverStemIndex) {
+        hoverStemIndex = newHoverStemIndex;
+        draw();
+      }
     }
 
     function handlePointerUp(event) {
       if (!dragState || dragState.pointerId !== event.pointerId) return;
       dragState = null;
       canvas.releasePointerCapture(event.pointerId);
+    }
+
+    function handlePointerLeave() {
+      if (hoverStemIndex !== -1) {
+        hoverStemIndex = -1;
+        draw();
+      }
     }
 
     function applyRule() {
@@ -956,6 +1029,7 @@
 
     function resetAll() {
       stems = [];
+      hoverStemIndex = -1;
       machine.x = 0;
       dragState = null;
       applyRule();
@@ -978,6 +1052,7 @@
       canvas.addEventListener('pointermove', handlePointerMove);
       canvas.addEventListener('pointerup', handlePointerUp);
       canvas.addEventListener('pointercancel', handlePointerUp);
+      canvas.addEventListener('pointerleave', handlePointerLeave);
     }
 
     applyBtn.addEventListener('click', applyRule);
