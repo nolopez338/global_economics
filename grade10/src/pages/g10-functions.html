@@ -280,6 +280,7 @@
       gap: 0.3rem;
       padding: 0.65rem;
       z-index: 10;
+      cursor: pointer;
     }
 
     .anchor.middle .machine-rule {
@@ -380,7 +381,7 @@
             </label>
           </div>
           <input id="numberInput" type="number" step="0.01" placeholder="e.g., 4.00" aria-describedby="statusMsg" />
-          <div class="slider-row">
+          <div id="sliderControlsRow" class="slider-row">
             <input id="sliderMinInput" type="number" step="0.01" aria-label="Slider minimum" aria-describedby="statusMsg" />
             <div id="sliderShell" class="slider-shell">
               <input id="valueSlider" class="value-slider" type="range" aria-label="Input value slider" />
@@ -413,7 +414,7 @@
       <div class="lane" id="lane">
         <div id="inputAnchor" class="anchor left">Input</div>
 
-        <div class="anchor middle">
+        <div id="machineBox" class="anchor middle">
           <div class="machine-rule" id="machineRule">f(x)</div>
         </div>
 
@@ -442,9 +443,11 @@
     const sliderMinInput = document.getElementById('sliderMinInput');
     const sliderMaxInput = document.getElementById('sliderMaxInput');
     const sliderVisibilityToggle = document.getElementById('sliderVisibilityToggle');
+    const sliderControlsRow = document.getElementById('sliderControlsRow');
     const sliderShell = document.getElementById('sliderShell');
     const sliderSweepBtn = document.getElementById('sliderSweepBtn');
     const automaticToggle = document.getElementById('automaticToggle');
+    const machineBox = document.getElementById('machineBox');
 
     const movingInput = document.getElementById('movingInput');
     const movingOutput = document.getElementById('movingOutput');
@@ -552,9 +555,35 @@
       applySliderBounds(nextMin, nextMax);
     }
 
+    function deriveBoundsFromInputValue(value) {
+      const safeValue = Number.isFinite(value) ? value : 0;
+      const padding = Math.max(1, Math.abs(safeValue));
+      return {
+        min: safeValue - padding,
+        max: safeValue + padding
+      };
+    }
+
+    function updateBoundsFromNumberInput() {
+      const numericValue = parseNumberOrNull(numberInput.value);
+      if (numericValue === null) return;
+      const { min, max } = deriveBoundsFromInputValue(numericValue);
+      applySliderBounds(min, max);
+    }
+
+    function syncAutomaticUiState() {
+      const isAutomatic = isAutomaticMode();
+      sliderSweepBtn.hidden = !isAutomatic;
+      sliderSweepBtn.setAttribute('aria-hidden', String(!isAutomatic));
+    }
+
     function setSliderVisibility(isVisible) {
+      sliderControlsRow.hidden = !isVisible;
       sliderShell.classList.toggle('is-hidden', !isVisible);
       valueSlider.setAttribute('aria-hidden', String(!isVisible));
+      if (!isVisible) {
+        stopAutoSweep();
+      }
     }
 
     function initValueControls() {
@@ -573,6 +602,7 @@
       applySliderBounds(initialMin, initialMax);
 
       numberInput.addEventListener('input', () => {
+        updateBoundsFromNumberInput();
         syncSliderToInputValue();
         if (isAutomaticMode()) {
           applyImmediateTransformation();
@@ -591,6 +621,7 @@
       });
 
       setSliderVisibility(sliderVisibilityToggle.checked);
+      syncAutomaticUiState();
       syncSliderToInputValue();
     }
 
@@ -992,11 +1023,14 @@
     automaticToggle.addEventListener('change', () => {
       if (!isAutomaticMode()) {
         stopAutoSweep();
+        syncAutomaticUiState();
         setStatus('Automatic mode off. Use Play to run animation.', 'info');
         return;
       }
+      syncAutomaticUiState();
       applyImmediateTransformation();
     });
+    machineBox.addEventListener('click', handlePlay);
 
     initValueControls();
     resetAnimation();
