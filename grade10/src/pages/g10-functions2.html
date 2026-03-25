@@ -254,7 +254,7 @@
         <input id="graphVisibilityToggle" type="checkbox" aria-controls="graphWrap" />
       </div>
       <p class="tips">Tip: drag the stack left/right on the graph. Click the purple chevron to place a stem at the current x-value.</p>
-      <div class="graph-wrap" id="graphWrap" hidden>
+      <div class="graph-wrap" id="graphWrap">
         <canvas id="graphCanvas" width="960" height="540" aria-label="Coordinate graph"></canvas>
       </div>
       <p class="graph-hidden-note" aria-live="polite">Graph is hidden. Turn on “Show graph” to display it.</p>
@@ -301,6 +301,7 @@
 
     let stems = [];
     let dragState = null;
+    let showFunctionLine = false;
 
     function setStatus(message, type = 'info') {
       statusMsg.className = `status ${type}`;
@@ -837,7 +838,9 @@
 
     function draw() {
       drawGrid();
-      drawFunctionCurve();
+      if (showFunctionLine) {
+        drawFunctionCurve();
+      }
       drawStemMarkers();
       const boxes = drawMachine();
       return boxes;
@@ -964,10 +967,11 @@
       draw();
       updateReadout();
 
-      graphWrap.hidden = true;
+      showFunctionLine = false;
       graphVisibilityToggle.checked = false;
       graphVisibilityToggle.addEventListener('change', () => {
-        graphWrap.hidden = !graphVisibilityToggle.checked;
+        showFunctionLine = graphVisibilityToggle.checked;
+        draw();
       });
 
       canvas.addEventListener('pointerdown', handlePointerDown);
