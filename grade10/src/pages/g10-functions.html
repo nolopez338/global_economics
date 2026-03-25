@@ -581,6 +581,7 @@
     const FALLBACK_BOUNDS = { min: 0, max: 10 };
     const AUTO_SWEEP_BASE_INTERVAL_MS = 400;
     let sweepSpeedMultiplier = 1;
+    let committedPurpleDisplay = null;
     const sweepSpeedButtons = [
       { multiplier: 2, button: sweepSpeedX2Btn },
       { multiplier: 5, button: sweepSpeedX5Btn },
@@ -631,7 +632,26 @@
       machineRule.textContent = text;
     }
 
-    function refreshMachineRuleDisplay(ruleText) {
+    function getCommittedPurpleDisplay() {
+      const text = String(committedPurpleDisplay ?? '').trim();
+      return text === '' ? null : text;
+    }
+
+    function setCommittedPurpleDisplay(value) {
+      const text = String(value ?? '').trim();
+      committedPurpleDisplay = text === '' ? null : text;
+    }
+
+    function clearCommittedPurpleDisplay() {
+      committedPurpleDisplay = null;
+    }
+
+    function refreshMachineRuleDisplay(ruleText, options = {}) {
+      const committedDisplay = getCommittedPurpleDisplay();
+      if (!options.ignoreCommitted && committedDisplay !== null) {
+        setMachineRuleDisplayText(committedDisplay);
+        return;
+      }
       setMachineRuleDisplayText(getMachineRuleDisplayText(ruleText));
     }
 
@@ -881,6 +901,7 @@
 
     function resetAnimation() {
       isAnimating = false;
+      clearCommittedPurpleDisplay();
       playBtn.disabled = false;
       movingInput.className = 'moving-box input-token';
       movingOutput.className = 'moving-box output-token';
@@ -1115,7 +1136,9 @@
       setStatus('Inside the machine: applying the rule to the input.', 'info');
       stepSub.innerHTML = `Substitution: <span class="mono">${ruleText} &rarr; ${substituted}</span>`;
       const overlapInputDisplayValue = getCurrentInputDisplayValue(inputValue);
-      setMachineRuleDisplayText(getMachineRuleOverlapDisplayText(ruleText, variableName, overlapInputDisplayValue));
+      const substitutedMachineDisplay = getMachineRuleOverlapDisplayText(ruleText, variableName, overlapInputDisplayValue);
+      setMachineRuleDisplayText(substitutedMachineDisplay);
+      setCommittedPurpleDisplay(substitutedMachineDisplay);
       await sleep(1500);
 
       refreshMachineRuleDisplay(ruleText);
@@ -1184,6 +1207,8 @@
 
         inputAnchor.textContent = formatInputNumber(clampedInput);
         outputAnchor.textContent = result.displayOutput;
+        const committedDisplay = getMachineRuleOverlapDisplayText(ruleText, result.variableName, formatInputNumber(clampedInput));
+        setCommittedPurpleDisplay(committedDisplay);
         refreshMachineRuleDisplay(ruleText);
         stepVar.innerHTML = `Variable: <span class="mono">${result.variableName} = ${formatInputNumber(clampedInput)}</span>`;
         stepSub.innerHTML = `Substitution: <span class="mono">${ruleText} &rarr; ${result.substituted}</span>`;
