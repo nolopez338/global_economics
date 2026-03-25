@@ -338,6 +338,10 @@
       ruleText: 'x^2',
       rpn: null
     };
+    const appliedDisplayState = {
+      transformationName: 'name_transformation',
+      ruleText: 'x^2'
+    };
 
     let stems = [];
     let dragState = null;
@@ -556,10 +560,20 @@
       return candidate || 'name_transformation';
     }
 
-    function updateTransformationLabels() {
-      machine.transformationName = getTransformationName();
-      const ruleText = ruleInput.value.trim() || machine.ruleText;
-      graphRuleBox.textContent = `${machine.transformationName}(x) = ${ruleText}`;
+    function getRuleBoxDisplayMode() {
+      const mode = (graphRuleBox.dataset.displayMode || 'expression').toLowerCase();
+      if (mode === 'name' || mode === 'expression') return mode;
+      return 'expression';
+    }
+
+    function updateGraphRuleBox() {
+      const mode = getRuleBoxDisplayMode();
+      if (mode === 'name') {
+        graphRuleBox.textContent = appliedDisplayState.transformationName;
+        return;
+      }
+
+      graphRuleBox.textContent = `${appliedDisplayState.transformationName}(x) = ${appliedDisplayState.ruleText}`;
     }
 
     function hexToRgba(hex, alpha) {
@@ -1163,8 +1177,10 @@
         machine.variable = variableName;
         machine.rpn = rpn;
         machine.transformationName = getTransformationName();
+        appliedDisplayState.transformationName = machine.transformationName;
+        appliedDisplayState.ruleText = machine.ruleText;
 
-        updateTransformationLabels();
+        updateGraphRuleBox();
         updateReadout();
         draw();
         setStatus(`Variable: ${variableName}`, 'success');
@@ -1183,7 +1199,7 @@
     }
 
     function initialize() {
-      updateTransformationLabels();
+      updateGraphRuleBox();
       applyRule();
       draw();
       updateReadout();
@@ -1202,10 +1218,9 @@
       canvas.addEventListener('pointerleave', handlePointerLeave);
 
       transformationNameInput.addEventListener('input', () => {
-        updateTransformationLabels();
+        machine.transformationName = getTransformationName();
         draw();
       });
-      ruleInput.addEventListener('input', updateTransformationLabels);
     }
 
     applyBtn.addEventListener('click', applyRule);
