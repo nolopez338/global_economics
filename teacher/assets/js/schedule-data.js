@@ -257,7 +257,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Problems for Discrete Probabilities",
+    "Description": "No class: Solidarity banquet",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C2"
@@ -268,9 +268,9 @@ window.SCHEDULE_DATA = [
     "Class #": "3-1",
     "Date": "2026-04-07",
     "Term": 3,
-    "Weekday": "Problems for Continuous Probabilities",
+    "Weekday": "Tuesday",
     "Day": "Day 1",
-    "Description": "-",
+    "Description": "Problems for Continuous Probabilities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3"
@@ -1648,7 +1648,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "Problems for Continuous probabilities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C2"
@@ -2337,7 +2337,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "Problems for Continuous probabilities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C2"
@@ -2831,7 +2831,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "C1 C2 C3 Practice activity",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C2"
@@ -3312,7 +3312,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "No Class: Term report review",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C2"
@@ -4768,7 +4768,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "No Class: Solidarity banquet",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C2"
