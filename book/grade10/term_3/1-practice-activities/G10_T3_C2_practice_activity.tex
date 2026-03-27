@@ -7,33 +7,33 @@
 \section*{Contents}
 \tableofcontents
 
-
 \newcommand{\CtwoProbGraph}[7]{
-\begin{center}
-\begin{tikzpicture}
-\pgfmathsetmacro{\supportA}{#1}
-\pgfmathsetmacro{\supportB}{#2}
-\pgfmathsetmacro{\pad}{0.12*(\supportB-\supportA)}
-\begin{axis}[
-  width=9cm,
-  height=5cm,
-  axis lines=left,
-  xlabel={$x$},
-  ylabel={$f(x)$},
-  xmin={\supportA-\pad},
-  xmax={\supportB+\pad},
-  ymin=0,
-  ymax=#7,
-  grid=both,
-  xtick={#6}
-]
-\addplot[domain=#1:#2, samples=400, const plot, draw=none, fill=blue!20, fill opacity=0.35] {#3} \closedcycle;
-\addplot[domain=#4:#5, samples=400, const plot, draw=none, fill=blue!60, fill opacity=0.55] {#3} \closedcycle;
-\addplot[domain=#1:#2, samples=400, const plot, very thick] {#3};
-\end{axis}
-\end{tikzpicture}
-\end{center}
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\supportA}{#1}
+			\pgfmathsetmacro{\supportB}{#2}
+			\pgfmathsetmacro{\pad}{0.12*(\supportB-\supportA)}
+			\begin{axis}[
+			  width=9cm,
+			  height=5cm,
+			  axis lines=left,
+			  xlabel={$x$},
+			  ylabel={$f(x)$},
+			  xmin={\supportA-\pad},
+			  xmax={\supportB+\pad},
+			  ymin=0,
+			  ymax=#7,
+			  grid=both,
+			  xtick={#6}
+				]
+				\addplot[domain=#1:#2, samples=400, const plot, draw=none, fill=blue!20, fill opacity=0.35] {#3} \closedcycle;
+				\addplot[domain=#4:#5, samples=400, const plot, draw=none, fill=blue!60, fill opacity=0.55] {#3} \closedcycle;
+				\addplot[domain=#1:#2, samples=400, const plot, very thick] {#3};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
 }
+
 \newcommand{\UniformEndpointGraph}[9]{%
 	\begin{center}
 		\begin{tikzpicture}[x=#1cm,y=8cm]
@@ -56,10 +56,85 @@
 	\end{center}
 }
 
+\newcommand{\UniformStartpointGraph}[9]{%
+	\begin{center}
+		\begin{tikzpicture}[x=#1cm,y=8cm]
+			% automatic y-axis height
+			\pgfmathsetmacro{\UniformYTop}{max(0.18,1.8*#6)}
+			
+			% axes
+			\draw[->] (#2,0) -- (#3,0) node[right] {$x$};
+			\draw[->] (0,-0.01) -- (0,\UniformYTop);
+			
+			% support shading
+			\fill[blue!20, fill opacity=0.35] (#4,0) rectangle (#5,#6);
+			
+			% highlighted region
+			\fill[blue!60, fill opacity=0.55] (#7,0) rectangle (#8,#6);
+			
+			% top density segment
+			\draw[thick] (#4,#6) -- (#5,#6);
+			
+			% custom guides and labels
+			#9
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\UniformVariableEndpointsGraph}[9]{%
+	% Main graph macro for Uniform(a,b)
+	% Arguments:
+	% 1 = x-scale
+	% 2 = x-axis minimum
+	% 3 = x-axis maximum
+	% 4 = support start
+	% 5 = support end
+	% 6 = density height
+	% 7 = highlighted region start
+	% 8 = highlighted region end
+	% 9 = extra TikZ code (guides, labels, etc.)
+	\begin{center}
+		\begin{tikzpicture}[x=#1cm,y=8cm]
+			% automatic y-axis height
+			\pgfmathsetmacro{\UniformYTop}{max(0.18,1.8*#6)}
+			
+			% axes
+			\draw[->] (#2,0) -- (#3,0) node[right] {$x$};
+			\draw[->] (0,-0.01) -- (0,\UniformYTop);
+			
+			% support shading
+			\fill[blue!20, fill opacity=0.35] (#4,0) rectangle (#5,#6);
+			
+			% highlighted region
+			\fill[blue!60, fill opacity=0.55] (#7,0) rectangle (#8,#6);
+			
+			% top density segment
+			\draw[thick] (#4,#6) -- (#5,#6);
+			
+			% custom guides and labels
+			#9
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\UniformGuideSet}[6]{%
+	% Helper macro for the five repeated dashed guides and x-axis labels
+	% Arguments:
+	% 1 = coord/label pair for first mark  (example: 0.8/a)
+	% 2 = coord/label pair for second mark (example: 2.8/2)
+	% 3 = coord/label pair for third mark  (example: 7.2/7)
+	% 4 = coord/label pair for fourth mark (example: 8.4/8)
+	% 5 = coord/label pair for fifth mark  (example: 10.2/b)
+	% 6 = guide height
+	\foreach \x/\lab in {#1,#2,#3,#4,#5}{%
+		\draw[dashed] (\x,0) -- (\x,#6);
+		\node[below] at (\x,0) {$\lab$};
+	}%
+}
 
 % --------------------------------------------------
 \section{Introductory Uniform Distribution}
-
+	
 \textbf{Problem.}
 Let $X\sim \text{Uniform}(0,10)$.
 
@@ -490,39 +565,23 @@ Find:
 	
 	\item[(b)] The support is $[a,10]$.
 	
-	\begin{center}
-		\begin{tikzpicture}[x=0.9cm,y=8cm]
-			% axes
-			\draw[->] (-0.4,0) -- (11.0,0) node[right] {$x$};
-			\draw[->] (0,-0.01) -- (0,0.18);
-			
-			% support shading
-			\fill[blue!20, fill opacity=0.35] (0.8,0) rectangle (10.2,0.1);
-			
-			% full PDF shading
-			\fill[blue!60, fill opacity=0.55] (0.8,0) rectangle (10.2,0.1);
-			
-			% top density segment
-			\draw[thick] (0.8,0.1) -- (10.2,0.1);
-			
-			% dashed guide lines
-			\draw[dashed] (0.8,0) -- (0.8,0.1);
-			\draw[dashed] (2.8,0) -- (2.8,0.1);
-			\draw[dashed] (7.2,0) -- (7.2,0.1);
-			\draw[dashed] (8.4,0) -- (8.4,0.1);
-			\draw[dashed] (10.2,0) -- (10.2,0.1);
-			
-			% x-axis labels
-			\node[below] at (0.8,0) {$a$};
-			\node[below] at (2.8,0) {$2$};
-			\node[below] at (7.2,0) {$7$};
-			\node[below] at (8.4,0) {$8$};
-			\node[below] at (10.2,0) {$10$};
-			
-			% density label
-			\node[left] at (0.8,0.1) {$\frac{1}{10-a}$};
-		\end{tikzpicture}
-	\end{center}
+	\UniformStartpointGraph
+	{0.9}{-0.4}{11.0}{0.8}{10.2}{0.1}{0.8}{10.2}
+	{
+		\draw[dashed] (0.8,0) -- (0.8,0.1);
+		\draw[dashed] (2.8,0) -- (2.8,0.1);
+		\draw[dashed] (7.2,0) -- (7.2,0.1);
+		\draw[dashed] (8.4,0) -- (8.4,0.1);
+		\draw[dashed] (10.2,0) -- (10.2,0.1);
+		
+		\node[below] at (0.8,0) {$a$};
+		\node[below] at (2.8,0) {$2$};
+		\node[below] at (7.2,0) {$7$};
+		\node[below] at (8.4,0) {$8$};
+		\node[below] at (10.2,0) {$10$};
+		
+		\node[left] at (0.8,0.1) {$\frac{1}{10-a}$};
+	}
 	
 	\noindent Consider the following cases obtained by assigning specific values to $a$.
 	
@@ -531,74 +590,46 @@ Find:
 			\centering
 			\textit{Example with $a=1$}
 			
-			\begin{tikzpicture}[x=0.42cm,y=8cm]
-				% axes
-				\draw[->] (-6.8,0) -- (10.8,0) node[right] {$x$};
-				\draw[->] (0,-0.01) -- (0,0.18);
-				
-				% support shading
-				\fill[blue!20, fill opacity=0.35] (1,0) rectangle (10,0.1111);
-				
-				% full PDF shading
-				\fill[blue!60, fill opacity=0.55] (1,0) rectangle (10,0.1111);
-				
-				% top density segment
-				\draw[thick] (1,0.1111) -- (10,0.1111);
-				
-				% dashed guide lines
+			\UniformStartpointGraph
+			{0.42}{-6.8}{10.8}{1}{10}{0.1111}{1}{10}
+			{
 				\draw[dashed] (1,0) -- (1,0.1111);
 				\draw[dashed] (2,0) -- (2,0.1111);
 				\draw[dashed] (7,0) -- (7,0.1111);
 				\draw[dashed] (8,0) -- (8,0.1111);
 				\draw[dashed] (10,0) -- (10,0.1111);
 				
-				% x-axis labels
 				\node[below] at (1,0) {$1$};
 				\node[below] at (2,0) {$2$};
 				\node[below] at (7,0) {$7$};
 				\node[below] at (8,0) {$8$};
 				\node[below] at (10,0) {$10$};
 				
-				% density label
 				\node[left] at (1,0.1111) {$\frac{1}{9}$};
-			\end{tikzpicture}
+			}
 		\end{minipage}
 		\hfill
 		\begin{minipage}{0.48\textwidth}
 			\centering
 			\textit{Example with $a=-6$}
 			
-			\begin{tikzpicture}[x=0.42cm,y=8cm]
-				% axes
-				\draw[->] (-6.8,0) -- (10.8,0) node[right] {$x$};
-				\draw[->] (0,-0.01) -- (0,0.18);
-				
-				% support shading
-				\fill[blue!20, fill opacity=0.35] (-6,0) rectangle (10,0.0625);
-				
-				% full PDF shading
-				\fill[blue!60, fill opacity=0.55] (-6,0) rectangle (10,0.0625);
-				
-				% top density segment
-				\draw[thick] (-6,0.0625) -- (10,0.0625);
-				
-				% dashed guide lines
+			\UniformStartpointGraph
+			{0.42}{-6.8}{10.8}{-6}{10}{0.0625}{-6}{10}
+			{
 				\draw[dashed] (-6,0) -- (-6,0.0625);
 				\draw[dashed] (2,0) -- (2,0.0625);
 				\draw[dashed] (7,0) -- (7,0.0625);
 				\draw[dashed] (8,0) -- (8,0.0625);
 				\draw[dashed] (10,0) -- (10,0.0625);
 				
-				% x-axis labels
 				\node[below] at (-6,0) {$-6$};
 				\node[below] at (2,0) {$2$};
 				\node[below] at (7,0) {$7$};
 				\node[below] at (8,0) {$8$};
 				\node[below] at (10,0) {$10$};
 				
-				% density label
 				\node[left] at (-6,0.0625) {$\frac{1}{16}$};
-			\end{tikzpicture}
+			}
 		\end{minipage}
 	\end{center}
 	
@@ -607,39 +638,23 @@ Find:
 	P(2\le X\le 7)=\frac{7-2}{10-a}=\frac{5}{10-a}.
 	\]
 	
-	\begin{center}
-		\begin{tikzpicture}[x=0.9cm,y=8cm]
-			% axes
-			\draw[->] (-0.4,0) -- (11.0,0) node[right] {$x$};
-			\draw[->] (0,-0.01) -- (0,0.18);
-			
-			% support shading
-			\fill[blue!20, fill opacity=0.35] (0.8,0) rectangle (10.2,0.1);
-			
-			% highlighted interval for P(2 \le X \le 7)
-			\fill[blue!60, fill opacity=0.55] (2.8,0) rectangle (7.2,0.1);
-			
-			% top density segment
-			\draw[thick] (0.8,0.1) -- (10.2,0.1);
-			
-			% dashed guide lines
-			\draw[dashed] (0.8,0) -- (0.8,0.1);
-			\draw[dashed] (2.8,0) -- (2.8,0.1);
-			\draw[dashed] (7.2,0) -- (7.2,0.1);
-			\draw[dashed] (8.4,0) -- (8.4,0.1);
-			\draw[dashed] (10.2,0) -- (10.2,0.1);
-			
-			% x-axis labels
-			\node[below] at (0.8,0) {$a$};
-			\node[below] at (2.8,0) {$2$};
-			\node[below] at (7.2,0) {$7$};
-			\node[below] at (8.4,0) {$8$};
-			\node[below] at (10.2,0) {$10$};
-			
-			% density label
-			\node[left] at (0.8,0.1) {$\frac{1}{10-a}$};
-		\end{tikzpicture}
-	\end{center}
+	\UniformStartpointGraph
+	{0.9}{-0.4}{11.0}{0.8}{10.2}{0.1}{2.8}{7.2}
+	{
+		\draw[dashed] (0.8,0) -- (0.8,0.1);
+		\draw[dashed] (2.8,0) -- (2.8,0.1);
+		\draw[dashed] (7.2,0) -- (7.2,0.1);
+		\draw[dashed] (8.4,0) -- (8.4,0.1);
+		\draw[dashed] (10.2,0) -- (10.2,0.1);
+		
+		\node[below] at (0.8,0) {$a$};
+		\node[below] at (2.8,0) {$2$};
+		\node[below] at (7.2,0) {$7$};
+		\node[below] at (8.4,0) {$8$};
+		\node[below] at (10.2,0) {$10$};
+		
+		\node[left] at (0.8,0.1) {$\frac{1}{10-a}$};
+	}
 	
 	\noindent Consider the following cases obtained by assigning specific values to $a$.
 	
@@ -652,37 +667,23 @@ Find:
 			P(2\le X\le 7)=\frac{5}{9}
 			\]
 			
-			\begin{tikzpicture}[x=0.42cm,y=8cm]
-				% axes
-				\draw[->] (-6.8,0) -- (10.8,0) node[right] {$x$};
-				\draw[->] (0,-0.01) -- (0,0.18);
-				
-				% support shading
-				\fill[blue!20, fill opacity=0.35] (1,0) rectangle (10,0.1111);
-				
-				% highlighted interval
-				\fill[blue!60, fill opacity=0.55] (2,0) rectangle (7,0.1111);
-				
-				% top density segment
-				\draw[thick] (1,0.1111) -- (10,0.1111);
-				
-				% dashed guide lines
+			\UniformStartpointGraph
+			{0.42}{-6.8}{10.8}{1}{10}{0.1111}{2}{7}
+			{
 				\draw[dashed] (1,0) -- (1,0.1111);
 				\draw[dashed] (2,0) -- (2,0.1111);
 				\draw[dashed] (7,0) -- (7,0.1111);
 				\draw[dashed] (8,0) -- (8,0.1111);
 				\draw[dashed] (10,0) -- (10,0.1111);
 				
-				% x-axis labels
 				\node[below] at (1,0) {$1$};
 				\node[below] at (2,0) {$2$};
 				\node[below] at (7,0) {$7$};
 				\node[below] at (8,0) {$8$};
 				\node[below] at (10,0) {$10$};
 				
-				% density label
 				\node[left] at (1,0.1111) {$\frac{1}{9}$};
-			\end{tikzpicture}
+			}
 		\end{minipage}
 		\hfill
 		\begin{minipage}{0.48\textwidth}
@@ -693,37 +694,23 @@ Find:
 			P(2\le X\le 7)=\frac{5}{16}
 			\]
 			
-			\begin{tikzpicture}[x=0.42cm,y=8cm]
-				% axes
-				\draw[->] (-6.8,0) -- (10.8,0) node[right] {$x$};
-				\draw[->] (0,-0.01) -- (0,0.18);
-				
-				% support shading
-				\fill[blue!20, fill opacity=0.35] (-6,0) rectangle (10,0.0625);
-				
-				% highlighted interval
-				\fill[blue!60, fill opacity=0.55] (2,0) rectangle (7,0.0625);
-				
-				% top density segment
-				\draw[thick] (-6,0.0625) -- (10,0.0625);
-				
-				% dashed guide lines
+			\UniformStartpointGraph
+			{0.42}{-6.8}{10.8}{-6}{10}{0.0625}{2}{7}
+			{
 				\draw[dashed] (-6,0) -- (-6,0.0625);
 				\draw[dashed] (2,0) -- (2,0.0625);
 				\draw[dashed] (7,0) -- (7,0.0625);
 				\draw[dashed] (8,0) -- (8,0.0625);
 				\draw[dashed] (10,0) -- (10,0.0625);
 				
-				% x-axis labels
 				\node[below] at (-6,0) {$-6$};
 				\node[below] at (2,0) {$2$};
 				\node[below] at (7,0) {$7$};
 				\node[below] at (8,0) {$8$};
 				\node[below] at (10,0) {$10$};
 				
-				% density label
 				\node[left] at (-6,0.0625) {$\frac{1}{16}$};
-			\end{tikzpicture}
+			}
 		\end{minipage}
 	\end{center}
 	
@@ -732,39 +719,23 @@ Find:
 	P(X>8)=\frac{10-8}{10-a}=\frac{2}{10-a}.
 	\]
 	
-	\begin{center}
-		\begin{tikzpicture}[x=0.9cm,y=8cm]
-			% axes
-			\draw[->] (-0.4,0) -- (11.0,0) node[right] {$x$};
-			\draw[->] (0,-0.01) -- (0,0.18);
-			
-			% support shading
-			\fill[blue!20, fill opacity=0.35] (0.8,0) rectangle (10.2,0.1);
-			
-			% highlighted interval for P(X > 8)
-			\fill[blue!60, fill opacity=0.55] (8.4,0) rectangle (10.2,0.1);
-			
-			% top density segment
-			\draw[thick] (0.8,0.1) -- (10.2,0.1);
-			
-			% dashed guide lines
-			\draw[dashed] (0.8,0) -- (0.8,0.1);
-			\draw[dashed] (2.8,0) -- (2.8,0.1);
-			\draw[dashed] (7.2,0) -- (7.2,0.1);
-			\draw[dashed] (8.4,0) -- (8.4,0.1);
-			\draw[dashed] (10.2,0) -- (10.2,0.1);
-			
-			% x-axis labels
-			\node[below] at (0.8,0) {$a$};
-			\node[below] at (2.8,0) {$2$};
-			\node[below] at (7.2,0) {$7$};
-			\node[below] at (8.4,0) {$8$};
-			\node[below] at (10.2,0) {$10$};
-			
-			% density label
-			\node[left] at (0.8,0.1) {$\frac{1}{10-a}$};
-		\end{tikzpicture}
-	\end{center}
+	\UniformStartpointGraph
+	{0.9}{-0.4}{11.0}{0.8}{10.2}{0.1}{8.4}{10.2}
+	{
+		\draw[dashed] (0.8,0) -- (0.8,0.1);
+		\draw[dashed] (2.8,0) -- (2.8,0.1);
+		\draw[dashed] (7.2,0) -- (7.2,0.1);
+		\draw[dashed] (8.4,0) -- (8.4,0.1);
+		\draw[dashed] (10.2,0) -- (10.2,0.1);
+		
+		\node[below] at (0.8,0) {$a$};
+		\node[below] at (2.8,0) {$2$};
+		\node[below] at (7.2,0) {$7$};
+		\node[below] at (8.4,0) {$8$};
+		\node[below] at (10.2,0) {$10$};
+		
+		\node[left] at (0.8,0.1) {$\frac{1}{10-a}$};
+	}
 	
 	\noindent Consider the following cases obtained by assigning specific values to $a$.
 	
@@ -777,37 +748,23 @@ Find:
 			P(X>8)=\frac{2}{9}
 			\]
 			
-			\begin{tikzpicture}[x=0.42cm,y=8cm]
-				% axes
-				\draw[->] (-6.8,0) -- (10.8,0) node[right] {$x$};
-				\draw[->] (0,-0.01) -- (0,0.18);
-				
-				% support shading
-				\fill[blue!20, fill opacity=0.35] (1,0) rectangle (10,0.1111);
-				
-				% highlighted interval
-				\fill[blue!60, fill opacity=0.55] (8,0) rectangle (10,0.1111);
-				
-				% top density segment
-				\draw[thick] (1,0.1111) -- (10,0.1111);
-				
-				% dashed guide lines
+			\UniformStartpointGraph
+			{0.42}{-6.8}{10.8}{1}{10}{0.1111}{8}{10}
+			{
 				\draw[dashed] (1,0) -- (1,0.1111);
 				\draw[dashed] (2,0) -- (2,0.1111);
 				\draw[dashed] (7,0) -- (7,0.1111);
 				\draw[dashed] (8,0) -- (8,0.1111);
 				\draw[dashed] (10,0) -- (10,0.1111);
 				
-				% x-axis labels
 				\node[below] at (1,0) {$1$};
 				\node[below] at (2,0) {$2$};
 				\node[below] at (7,0) {$7$};
 				\node[below] at (8,0) {$8$};
 				\node[below] at (10,0) {$10$};
 				
-				% density label
 				\node[left] at (1,0.1111) {$\frac{1}{9}$};
-			\end{tikzpicture}
+			}
 		\end{minipage}
 		\hfill
 		\begin{minipage}{0.48\textwidth}
@@ -818,37 +775,23 @@ Find:
 			P(X>8)=\frac{2}{16}=\frac{1}{8}
 			\]
 			
-			\begin{tikzpicture}[x=0.42cm,y=8cm]
-				% axes
-				\draw[->] (-6.8,0) -- (10.8,0) node[right] {$x$};
-				\draw[->] (0,-0.01) -- (0,0.18);
-				
-				% support shading
-				\fill[blue!20, fill opacity=0.35] (-6,0) rectangle (10,0.0625);
-				
-				% highlighted interval
-				\fill[blue!60, fill opacity=0.55] (8,0) rectangle (10,0.0625);
-				
-				% top density segment
-				\draw[thick] (-6,0.0625) -- (10,0.0625);
-				
-				% dashed guide lines
+			\UniformStartpointGraph
+			{0.42}{-6.8}{10.8}{-6}{10}{0.0625}{8}{10}
+			{
 				\draw[dashed] (-6,0) -- (-6,0.0625);
 				\draw[dashed] (2,0) -- (2,0.0625);
 				\draw[dashed] (7,0) -- (7,0.0625);
 				\draw[dashed] (8,0) -- (8,0.0625);
 				\draw[dashed] (10,0) -- (10,0.0625);
 				
-				% x-axis labels
 				\node[below] at (-6,0) {$-6$};
 				\node[below] at (2,0) {$2$};
 				\node[below] at (7,0) {$7$};
 				\node[below] at (8,0) {$8$};
 				\node[below] at (10,0) {$10$};
 				
-				% density label
 				\node[left] at (-6,0.0625) {$\frac{1}{16}$};
-			\end{tikzpicture}
+			}
 		\end{minipage}
 	\end{center}
 	
@@ -863,39 +806,23 @@ Find:
 	\]
 	So both approaches give the same value.
 	
-	\begin{center}
-		\begin{tikzpicture}[x=0.9cm,y=8cm]
-			% axes
-			\draw[->] (-0.4,0) -- (11.0,0) node[right] {$x$};
-			\draw[->] (0,-0.01) -- (0,0.18);
-			
-			% support shading
-			\fill[blue!20, fill opacity=0.35] (0.8,0) rectangle (10.2,0.1);
-			
-			% highlighted interval for P(X \le 8)
-			\fill[blue!60, fill opacity=0.55] (0.8,0) rectangle (8.4,0.1);
-			
-			% top density segment
-			\draw[thick] (0.8,0.1) -- (10.2,0.1);
-			
-			% dashed guide lines
-			\draw[dashed] (0.8,0) -- (0.8,0.1);
-			\draw[dashed] (2.8,0) -- (2.8,0.1);
-			\draw[dashed] (7.2,0) -- (7.2,0.1);
-			\draw[dashed] (8.4,0) -- (8.4,0.1);
-			\draw[dashed] (10.2,0) -- (10.2,0.1);
-			
-			% x-axis labels
-			\node[below] at (0.8,0) {$a$};
-			\node[below] at (2.8,0) {$2$};
-			\node[below] at (7.2,0) {$7$};
-			\node[below] at (8.4,0) {$8$};
-			\node[below] at (10.2,0) {$10$};
-			
-			% density label
-			\node[left] at (0.8,0.1) {$\frac{1}{10-a}$};
-		\end{tikzpicture}
-	\end{center}
+	\UniformStartpointGraph
+	{0.9}{-0.4}{11.0}{0.8}{10.2}{0.1}{0.8}{8.4}
+	{
+		\draw[dashed] (0.8,0) -- (0.8,0.1);
+		\draw[dashed] (2.8,0) -- (2.8,0.1);
+		\draw[dashed] (7.2,0) -- (7.2,0.1);
+		\draw[dashed] (8.4,0) -- (8.4,0.1);
+		\draw[dashed] (10.2,0) -- (10.2,0.1);
+		
+		\node[below] at (0.8,0) {$a$};
+		\node[below] at (2.8,0) {$2$};
+		\node[below] at (7.2,0) {$7$};
+		\node[below] at (8.4,0) {$8$};
+		\node[below] at (10.2,0) {$10$};
+		
+		\node[left] at (0.8,0.1) {$\frac{1}{10-a}$};
+	}
 	
 	\noindent Consider the following cases obtained by assigning specific values to $a$.
 	
@@ -908,37 +835,23 @@ Find:
 			P(X\le 8)=\frac{7}{9}
 			\]
 			
-			\begin{tikzpicture}[x=0.42cm,y=8cm]
-				% axes
-				\draw[->] (-6.8,0) -- (10.8,0) node[right] {$x$};
-				\draw[->] (0,-0.01) -- (0,0.18);
-				
-				% support shading
-				\fill[blue!20, fill opacity=0.35] (1,0) rectangle (10,0.1111);
-				
-				% highlighted interval
-				\fill[blue!60, fill opacity=0.55] (1,0) rectangle (8,0.1111);
-				
-				% top density segment
-				\draw[thick] (1,0.1111) -- (10,0.1111);
-				
-				% dashed guide lines
+			\UniformStartpointGraph
+			{0.42}{-6.8}{10.8}{1}{10}{0.1111}{1}{8}
+			{
 				\draw[dashed] (1,0) -- (1,0.1111);
 				\draw[dashed] (2,0) -- (2,0.1111);
 				\draw[dashed] (7,0) -- (7,0.1111);
 				\draw[dashed] (8,0) -- (8,0.1111);
 				\draw[dashed] (10,0) -- (10,0.1111);
 				
-				% x-axis labels
 				\node[below] at (1,0) {$1$};
 				\node[below] at (2,0) {$2$};
 				\node[below] at (7,0) {$7$};
 				\node[below] at (8,0) {$8$};
 				\node[below] at (10,0) {$10$};
 				
-				% density label
 				\node[left] at (1,0.1111) {$\frac{1}{9}$};
-			\end{tikzpicture}
+			}
 		\end{minipage}
 		\hfill
 		\begin{minipage}{0.48\textwidth}
@@ -949,37 +862,23 @@ Find:
 			P(X\le 8)=\frac{14}{16}=\frac{7}{8}
 			\]
 			
-			\begin{tikzpicture}[x=0.42cm,y=8cm]
-				% axes
-				\draw[->] (-6.8,0) -- (10.8,0) node[right] {$x$};
-				\draw[->] (0,-0.01) -- (0,0.18);
-				
-				% support shading
-				\fill[blue!20, fill opacity=0.35] (-6,0) rectangle (10,0.0625);
-				
-				% highlighted interval
-				\fill[blue!60, fill opacity=0.55] (-6,0) rectangle (8,0.0625);
-				
-				% top density segment
-				\draw[thick] (-6,0.0625) -- (10,0.0625);
-				
-				% dashed guide lines
+			\UniformStartpointGraph
+			{0.42}{-6.8}{10.8}{-6}{10}{0.0625}{-6}{8}
+			{
 				\draw[dashed] (-6,0) -- (-6,0.0625);
 				\draw[dashed] (2,0) -- (2,0.0625);
 				\draw[dashed] (7,0) -- (7,0.0625);
 				\draw[dashed] (8,0) -- (8,0.0625);
 				\draw[dashed] (10,0) -- (10,0.0625);
 				
-				% x-axis labels
 				\node[below] at (-6,0) {$-6$};
 				\node[below] at (2,0) {$2$};
 				\node[below] at (7,0) {$7$};
 				\node[below] at (8,0) {$8$};
 				\node[below] at (10,0) {$10$};
 				
-				% density label
 				\node[left] at (-6,0.0625) {$\frac{1}{16}$};
-			\end{tikzpicture}
+			}
 		\end{minipage}
 	\end{center}
 	
@@ -989,6 +888,7 @@ Find:
 For a simple uniform model with variable startpoint, probability is interval length divided by total length. Complements give the same result because the region $X\le 8$ and the region $X>8$ together make the whole support.
 
 % --------------------------------------------------
+
 \section{Introductory Uniform Distribution with Variable Endpoints}
 
 \textbf{Problem.}
@@ -1001,61 +901,335 @@ Find:
 	\item[(b)] the support interval of $X$,
 	\item[(c)] $P(2\le X\le 7)$,
 	\item[(d)] $P(X>8)$,
-	\item[(e)] $P(X\le 5)$.
+	\item[(e)] $P(X\le 8)$.
 \end{itemize}
 
 \textbf{Solution.}
-For $X\sim \text{Uniform}(a,b)$,
-\[
-f(x)=\frac{1}{b-a},\qquad a\le x\le b.
-\]
-So the support is $[a,b]$.
-\[
-P(2\le X\le 7)=\frac{7-2}{b-a}=\frac{5}{b-a}.
-\]
-\[
-P(X>8)=\frac{b-8}{b-a}.
-\]
-\[
-P(X\le 5)=\frac{5-a}{b-a}.
-\]
-
-\begin{center}
-	\begin{tikzpicture}[x=0.9cm,y=8cm]
-		% axes
-		\draw[->] (-0.4,0) -- (11.0,0) node[right] {$x$};
-		\draw[->] (0,-0.01) -- (0,0.18);
-		
-		% support shading
-		\fill[blue!20, fill opacity=0.35] (0.8,0) rectangle (10.2,0.1);
-		
-		% highlighted interval for P(2 \le X \le 7)
-		\fill[blue!60, fill opacity=0.55] (2.8,0) rectangle (7.2,0.1);
-		
-		% top density segment
-		\draw[thick] (0.8,0.1) -- (10.2,0.1);
-		
-		% dashed guide lines
-		\draw[dashed] (0.8,0) -- (0.8,0.1);
-		\draw[dashed] (2.8,0) -- (2.8,0.1);
-		\draw[dashed] (7.2,0) -- (7.2,0.1);
-		\draw[dashed] (8.4,0) -- (8.4,0.1);
-		\draw[dashed] (10.2,0) -- (10.2,0.1);
-		
-		% x-axis labels
-		\node[below] at (0.8,0) {$a$};
-		\node[below] at (2.8,0) {$2$};
-		\node[below] at (7.2,0) {$7$};
-		\node[below] at (8.4,0) {$8$};
-		\node[below] at (10.2,0) {$b$};
-		
-		% density label
+\begin{itemize}
+	\item[(a)] For $X\sim \text{Uniform}(a,b)$,
+	\[
+	f(x)=\frac{1}{b-a},\qquad a\le x\le b.
+	\]
+	
+	\item[(b)] The support is $[a,b]$.
+	
+	\UniformVariableEndpointsGraph
+	{0.9}{-0.4}{11.0}{0.8}{10.2}{0.1}{0.8}{10.2}
+	{
+		\UniformGuideSet{0.8/a}{2.8/2}{7.2/7}{8.4/8}{10.2/b}{0.1}
 		\node[left] at (0.8,0.1) {$\frac{1}{b-a}$};
-	\end{tikzpicture}
-\end{center}
+	}
+	
+	\noindent Consider the following cases obtained by assigning specific values to the endpoints.
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Startpoint $a=1$, endpoint $b=9$}
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{9}{0.125}{1}{9}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{9/9}{0.125}
+				\node[left] at (1,0.125) {$\frac{1}{8}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Startpoint $a=1$, endpoint $b=16$}
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{16}{0.0667}{1}{16}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{16/16}{0.0667}
+				\node[left] at (1,0.0667) {$\frac{1}{15}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Endpoint $b=10$, startpoint $a=1$}
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{10}{0.1111}{1}{10}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{10/10}{0.1111}
+				\node[left] at (1,0.1111) {$\frac{1}{9}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Endpoint $b=10$, startpoint $a=-6$}
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{-6}{10}{0.0625}{-6}{10}
+			{
+				\UniformGuideSet{-6/-6}{2/2}{7/7}{8/8}{10/10}{0.0625}
+				\node[left] at (-6,0.0625) {$\frac{1}{16}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+	\item[(c)]
+	\[
+	P(2\le X\le 7)=\frac{7-2}{b-a}=\frac{5}{b-a}.
+	\]
+	
+	\UniformVariableEndpointsGraph
+	{0.9}{-0.4}{11.0}{0.8}{10.2}{0.1}{2.8}{7.2}
+	{
+		\UniformGuideSet{0.8/a}{2.8/2}{7.2/7}{8.4/8}{10.2/b}{0.1}
+		\node[left] at (0.8,0.1) {$\frac{1}{b-a}$};
+	}
+	
+	\noindent Consider the following cases for part (c).
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Startpoint $a=1$, endpoint $b=9$}
+			
+			\[
+			P(2\le X\le 7)=\frac{5}{8}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{9}{0.125}{2}{7}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{9/9}{0.125}
+				\node[left] at (1,0.125) {$\frac{1}{8}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Startpoint $a=1$, endpoint $b=16$}
+			
+			\[
+			P(2\le X\le 7)=\frac{5}{15}=\frac{1}{3}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{16}{0.0667}{2}{7}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{16/16}{0.0667}
+				\node[left] at (1,0.0667) {$\frac{1}{15}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Endpoint $b=10$, startpoint $a=1$}
+			
+			\[
+			P(2\le X\le 7)=\frac{5}{9}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{10}{0.1111}{2}{7}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{10/10}{0.1111}
+				\node[left] at (1,0.1111) {$\frac{1}{9}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Endpoint $b=10$, startpoint $a=-6$}
+			
+			\[
+			P(2\le X\le 7)=\frac{5}{16}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{-6}{10}{0.0625}{2}{7}
+			{
+				\UniformGuideSet{-6/-6}{2/2}{7/7}{8/8}{10/10}{0.0625}
+				\node[left] at (-6,0.0625) {$\frac{1}{16}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+	\item[(d)]
+	\[
+	P(X>8)=\frac{b-8}{b-a}.
+	\]
+	
+	\UniformVariableEndpointsGraph
+	{0.9}{-0.4}{11.0}{0.8}{10.2}{0.1}{8.4}{10.2}
+	{
+		\UniformGuideSet{0.8/a}{2.8/2}{7.2/7}{8.4/8}{10.2/b}{0.1}
+		\node[left] at (0.8,0.1) {$\frac{1}{b-a}$};
+	}
+	
+	\noindent Consider the following cases for part (d).
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Startpoint $a=1$, endpoint $b=9$}
+			
+			\[
+			P(X>8)=\frac{1}{8}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{9}{0.125}{8}{9}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{9/9}{0.125}
+				\node[left] at (1,0.125) {$\frac{1}{8}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Startpoint $a=1$, endpoint $b=16$}
+			
+			\[
+			P(X>8)=\frac{8}{15}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{16}{0.0667}{8}{16}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{16/16}{0.0667}
+				\node[left] at (1,0.0667) {$\frac{1}{15}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Endpoint $b=10$, startpoint $a=1$}
+			
+			\[
+			P(X>8)=\frac{2}{9}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{10}{0.1111}{8}{10}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{10/10}{0.1111}
+				\node[left] at (1,0.1111) {$\frac{1}{9}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Endpoint $b=10$, startpoint $a=-6$}
+			
+			\[
+			P(X>8)=\frac{2}{16}=\frac{1}{8}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{-6}{10}{0.0625}{8}{10}
+			{
+				\UniformGuideSet{-6/-6}{2/2}{7/7}{8/8}{10/10}{0.0625}
+				\node[left] at (-6,0.0625) {$\frac{1}{16}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+	\item[(e)] The standard approach gives
+	\[
+	P(X\le 8)=\frac{8-a}{b-a}.
+	\]
+	Using the complement approach,
+	\[
+	P(X\le 8)=1-P(X>8)=1-\frac{b-8}{b-a}
+	=\frac{b-a-(b-8)}{b-a}=\frac{8-a}{b-a}.
+	\]
+	So both approaches give the same value.
+	
+	\UniformVariableEndpointsGraph
+	{0.9}{-0.4}{11.0}{0.8}{10.2}{0.1}{0.8}{8.4}
+	{
+		\UniformGuideSet{0.8/a}{2.8/2}{7.2/7}{8.4/8}{10.2/b}{0.1}
+		\node[left] at (0.8,0.1) {$\frac{1}{b-a}$};
+	}
+	
+	\noindent Consider the following cases for part (e).
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Startpoint $a=1$, endpoint $b=9$}
+			
+			\[
+			P(X\le 8)=\frac{7}{8}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{9}{0.125}{1}{8}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{9/9}{0.125}
+				\node[left] at (1,0.125) {$\frac{1}{8}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Startpoint $a=1$, endpoint $b=16$}
+			
+			\[
+			P(X\le 8)=\frac{7}{15}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{16}{0.0667}{1}{8}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{16/16}{0.0667}
+				\node[left] at (1,0.0667) {$\frac{1}{15}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Endpoint $b=10$, startpoint $a=1$}
+			
+			\[
+			P(X\le 8)=\frac{7}{9}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{10}{0.1111}{1}{8}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{10/10}{0.1111}
+				\node[left] at (1,0.1111) {$\frac{1}{9}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Endpoint $b=10$, startpoint $a=-6$}
+			
+			\[
+			P(X\le 8)=\frac{14}{16}=\frac{7}{8}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{-6}{10}{0.0625}{-6}{8}
+			{
+				\UniformGuideSet{-6/-6}{2/2}{7/7}{8/8}{10/10}{0.0625}
+				\node[left] at (-6,0.0625) {$\frac{1}{16}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+\end{itemize}
 
 \textbf{Interpretation.}
-For a simple uniform model with variable endpoints, probability is interval length divided by total length.
+For a simple uniform model with variable endpoints, probability is interval length divided by total length. Complements give the same result because the region $X\le 8$ and the region $X>8$ together make the whole support.
 
 % --------------------------------------------------
 \section{Two-Interval Piecewise Uniform (Basic)}
@@ -1065,34 +1239,54 @@ Let $X$ have density
 \[
 f(x)=
 \begin{cases}
-\dfrac{1}{5}, & 0\le x<4,\\
-\dfrac{1}{30}, & 4\le x\le 10,\\
-0, & \text{otherwise.}
+	\dfrac{1}{5}, & 0\le x<4,\\
+	\dfrac{1}{30}, & 4\le x\le 10,\\
+	0, & \text{otherwise.}
 \end{cases}
 \]
 
 \textbf{Question.}
 Find:
 \begin{itemize}
-    \item[(a)] $P(X<3)$,
-    \item[(b)] $P(2\le X\le 8)$,
-    \item[(c)] $P(X\ge 4)$.
+	\item[(a)] $P(X<3)$,
+	\item[(b)] $P(X\ge 3)$,
+	\item[(c)] $P(2\le X\le 8)$.
 \end{itemize}
 
 \textbf{Solution.}
+
+\textbf{Function definition.}
 Check total area:
 \[
 4\left(\frac{1}{5}\right)+6\left(\frac{1}{30}\right)=\frac{4}{5}+\frac{1}{5}=1.
 \]
+
+\CtwoProbGraph{0}{10}{x < 4 ? 1/5 : 1/30}{0}{10}{0,2,3,4,8,10}{0.26}
+
+\textbf{(a)}
 \[
 P(X<3)=3\left(\frac{1}{5}\right)=\frac{3}{5}.
 \]
+
+\CtwoProbGraph{0}{10}{x < 4 ? 1/5 : 1/30}{0}{3}{0,2,3,4,8,10}{0.26}
+
+\textbf{(b)} Using the standard approach,
+\[
+P(X\ge 3)=1\left(\frac{1}{5}\right)+6\left(\frac{1}{30}\right)=\frac{1}{5}+\frac{1}{5}=\frac{2}{5}.
+\]
+Using the complement approach,
+\[
+P(X\ge 3)=1-P(X<3)=1-\frac{3}{5}=\frac{2}{5}.
+\]
+So both approaches give the same value.
+
+\CtwoProbGraph{0}{10}{x < 4 ? 1/5 : 1/30}{3}{10}{0,2,3,4,8,10}{0.26}
+
+\textbf{(c)}
 \[
 P(2\le X\le 8)=2\left(\frac{1}{5}\right)+4\left(\frac{1}{30}\right)=\frac{2}{5}+\frac{2}{15}=\frac{8}{15}.
 \]
-\[
-P(X\ge 4)=6\left(\frac{1}{30}\right)=\frac{1}{5}.
-\]
+
 \CtwoProbGraph{0}{10}{x < 4 ? 1/5 : 1/30}{2}{8}{0,2,3,4,8,10}{0.26}
 
 \textbf{Interpretation.}
@@ -1106,18 +1300,18 @@ Let $X$ have density
 \[
 f(x)=
 \begin{cases}
-\dfrac{1}{6}, & -2\le x<1,\\
-\dfrac{1}{10}, & 1\le x\le 6,\\
-0, & \text{otherwise.}
+	\dfrac{1}{6}, & -2\le x<1,\\
+	\dfrac{1}{10}, & 1\le x\le 6,\\
+	0, & \text{otherwise.}
 \end{cases}
 \]
 
 \textbf{Question.}
 Find:
 \begin{itemize}
-    \item[(a)] $P(-1\le X\le 4)$,
-    \item[(b)] $P(X>3)$,
-    \item[(c)] $P(X<1)$.
+	\item[(a)] $P(-1\le X\le 4)$,
+	\item[(b)] $P(X>3)$,
+	\item[(c)] $P(X\le 3)$.
 \end{itemize}
 
 \textbf{Solution.}
@@ -1125,19 +1319,37 @@ Check total area:
 \[
 3\left(\frac{1}{6}\right)+5\left(\frac{1}{10}\right)=\frac{1}{2}+\frac{1}{2}=1.
 \]
+
+\CtwoProbGraph{-2}{6}{x < 1 ? 1/6 : 1/10}{-2}{6}{-2,-1,1,3,4,6}{0.24}
+
+\textbf{(a)}
 \[
 P(-1\le X\le 4)=2\left(\frac{1}{6}\right)+3\left(\frac{1}{10}\right)=\frac{1}{3}+\frac{3}{10}=\frac{19}{30}.
 \]
+
+\CtwoProbGraph{-2}{6}{x < 1 ? 1/6 : 1/10}{-1}{4}{-2,-1,1,3,4,6}{0.24}
+
+\textbf{(b)}
 \[
 P(X>3)=3\left(\frac{1}{10}\right)=\frac{3}{10}.
 \]
+
+\CtwoProbGraph{-2}{6}{x < 1 ? 1/6 : 1/10}{3}{6}{-2,-1,1,3,4,6}{0.24}
+
+\textbf{(c)} Using the standard approach,
 \[
-P(X<1)=3\left(\frac{1}{6}\right)=\frac{1}{2}.
+P(X\le 3)=3\left(\frac{1}{6}\right)+2\left(\frac{1}{10}\right)=\frac{1}{2}+\frac{1}{5}=\frac{7}{10}.
 \]
-\CtwoProbGraph{-2}{6}{x < 1 ? 1/6 : 1/10}{-1}{4}{-2,-1,1,3,4,6}{0.24}
+Using the complement approach,
+\[
+P(X\le 3)=1-P(X>3)=1-\frac{3}{10}=\frac{7}{10}.
+\]
+So both approaches give the same value.
+
+\CtwoProbGraph{-2}{6}{x < 1 ? 1/6 : 1/10}{-2}{3}{-2,-1,1,3,4,6}{0.24}
 
 \textbf{Interpretation.}
-To find each probability, add the rectangular areas over the relevant subintervals.
+To find each probability, add the rectangular areas over the relevant subintervals. In part (c), the complement method works because the regions $X\le 3$ and $X>3$ together make the whole support.
 
 % --------------------------------------------------
 \section{Two-Interval Piecewise Uniform with Unique Variable Endpoint}
