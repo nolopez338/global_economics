@@ -7,6 +7,85 @@
 \section*{Contents}
 \tableofcontents
 
+\newcommand{\UniformDistGraph}[5]{
+\begin{center}
+\begin{tikzpicture}
+\pgfmathsetmacro{\ua}{#1}
+\pgfmathsetmacro{\ub}{#2}
+\pgfmathsetmacro{\uh}{1/(\ub-\ua)}
+\begin{axis}[
+  width=9cm,
+  height=5cm,
+  axis lines=left,
+  xlabel={$x$},
+  ylabel={$f(x)$},
+  xmin=#3,
+  xmax=#4,
+  ymin=0,
+  ymax={1.6*\uh},
+  grid=both,
+  xtick={#5},
+  ytick=\empty
+]
+\addplot[very thick, blue, domain=\ua:\ub] {\uh};
+\addplot[very thick, blue] coordinates {(\ua,0) (\ua,\uh)};
+\addplot[very thick, blue] coordinates {(\ub,\uh) (\ub,0)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+}
+
+\newcommand{\TriangularDistGraph}[6]{
+\begin{center}
+\begin{tikzpicture}
+\pgfmathsetmacro{\ta}{#1}
+\pgfmathsetmacro{\tc}{#2}
+\pgfmathsetmacro{\tb}{#3}
+\pgfmathsetmacro{\th}{2/(\tb-\ta)}
+\begin{axis}[
+  width=9cm,
+  height=5cm,
+  axis lines=left,
+  xlabel={$x$},
+  ylabel={$f(x)$},
+  xmin=#4,
+  xmax=#5,
+  ymin=0,
+  ymax={1.6*\th},
+  grid=both,
+  xtick={#6},
+  ytick=\empty
+]
+\addplot[very thick, blue] coordinates {(\ta,0) (\tc,\th) (\tb,0)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+}
+
+\newcommand{\NormalDistGraph}[5]{
+\begin{center}
+\begin{tikzpicture}
+\pgfmathsetmacro{\mu}{#1}
+\pgfmathsetmacro{\sig}{#2}
+\begin{axis}[
+  width=9cm,
+  height=5cm,
+  axis lines=left,
+  xlabel={$x$},
+  ylabel={$f(x)$},
+  xmin=#3,
+  xmax=#4,
+  ymin=0,
+  grid=both,
+  xtick={#5},
+  ytick=\empty
+]
+\addplot[very thick, blue, domain=#3:#4, samples=220] {1/(\sig*sqrt(2*pi))*exp(-((x-\mu)^2)/(2*\sig^2))};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+}
+
 \section{Problem 1: Streaming Time (Uniform)}
 
 \textbf{Problem.}
@@ -38,6 +117,7 @@ E[X]=\frac{12+24}{2}=18,
 \[
 \sigma=\sqrt{12}=2\sqrt{3}\approx 3.46.
 \]
+\UniformDistGraph{12}{24}{10}{26}{12,18,24}
 Support is \([12,24]\), and all values in this interval have the same density, so 22 and 14 are equally likely on equal-length subintervals.
 
 % --------------------------------------------------
@@ -74,6 +154,7 @@ E[W]=\frac{2+14+6}{3}=\frac{22}{3}\approx 7.33,
 \[
 \sigma=\sqrt{\frac{56}{9}}=\frac{\sqrt{56}}{3}\approx 2.49.
 \]
+\TriangularDistGraph{2}{6}{14}{0}{16}{2,6,10,14}
 Since mode 6 is closer to 2 than to 14, the distribution is right-skewed (longer right side).
 
 % --------------------------------------------------
@@ -102,6 +183,30 @@ Intervals:
 \[
 [\mu-\sigma,\mu+\sigma]=[62,78],\qquad [\mu-2\sigma,\mu+2\sigma]=[54,86].
 \]
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  width=9cm,
+  height=5cm,
+  axis lines=left,
+  xlabel={$s$},
+  ylabel={$f(s)$},
+  xmin=48,
+  xmax=92,
+  ymin=0,
+  grid=both,
+  xtick={54,62,70,78,86},
+  ytick=\empty
+]
+\addplot[very thick, blue, domain=48:92, samples=240] {1/(8*sqrt(2*pi))*exp(-((x-70)^2)/(2*8^2))};
+\addplot[dashed] coordinates {(70,0) (70,0.055)};
+\addplot[densely dotted] coordinates {(62,0) (62,0.03)};
+\addplot[densely dotted] coordinates {(78,0) (78,0.03)};
+\addplot[densely dotted] coordinates {(54,0) (54,0.015)};
+\addplot[densely dotted] coordinates {(86,0) (86,0.015)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
 The normal curve is symmetric about 70, so values equally distant from 70 have equal density; values near 70 are most likely.
 
 % --------------------------------------------------
@@ -132,6 +237,32 @@ E[X_2]=9,\quad \mathrm{Var}(X_2)=\frac{6^2}{12}=3;
 \[
 E[X_3]=9,\quad \mathrm{Var}(X_3)=\frac{10^2}{12}=\frac{25}{3}.
 \]
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  width=10cm,
+  height=5.6cm,
+  axis lines=left,
+  xlabel={$x$},
+  ylabel={$f(x)$},
+  xmin=3,
+  xmax=15,
+  ymin=0,
+  ymax=0.21,
+  grid=both,
+  xtick={4,6,10,12,14},
+  ytick=\empty,
+  legend style={at={(0.98,0.98)},anchor=north east,draw=none,fill=none}
+]
+\addplot[very thick, blue] coordinates {(4,0) (4,1/6) (10,1/6) (10,0)};
+\addlegendentry{$X_1\sim U(4,10)$}
+\addplot[very thick, red] coordinates {(6,0) (6,1/6) (12,1/6) (12,0)};
+\addlegendentry{$X_2\sim U(6,12)$}
+\addplot[very thick, teal!70!black] coordinates {(4,0) (4,1/10) (14,1/10) (14,0)};
+\addlegendentry{$X_3\sim U(4,14)$}
+\end{axis}
+\end{tikzpicture}
+\end{center}
 Shifting both endpoints by the same amount changes the mean but not spread. Increasing interval width increases variance.
 
 % --------------------------------------------------
@@ -167,6 +298,32 @@ E[T_2]=\frac{2+7+10}{3}=\frac{19}{3},\quad
 E[T_3]=\frac{4+7+12}{3}=\frac{23}{3},\quad
 \mathrm{Var}(T_3)=\frac{4^2+7^2+12^2-4\cdot7-4\cdot12-7\cdot12}{18}=\frac{49}{18}.
 \]
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  width=10cm,
+  height=5.6cm,
+  axis lines=left,
+  xlabel={$t$},
+  ylabel={$f(t)$},
+  xmin=1,
+  xmax=13,
+  ymin=0,
+  ymax=0.28,
+  grid=both,
+  xtick={2,4,5,7,10,12},
+  ytick=\empty,
+  legend style={at={(0.98,0.98)},anchor=north east,draw=none,fill=none}
+]
+\addplot[very thick, blue] coordinates {(2,0) (5,0.25) (10,0)};
+\addlegendentry{$T_1:(2,5,10)$}
+\addplot[very thick, red] coordinates {(2,0) (7,0.25) (10,0)};
+\addlegendentry{$T_2:(2,7,10)$}
+\addplot[very thick, teal!70!black] coordinates {(4,0) (7,0.25) (12,0)};
+\addlegendentry{$T_3:(4,7,12)$}
+\end{axis}
+\end{tikzpicture}
+\end{center}
 Changing only the mode shifts peak and mean but here keeps variance unchanged; shifting all parameters by +2 shifts location but not spread.
 
 % --------------------------------------------------
@@ -194,6 +351,31 @@ E[N_2]=11,\ \mathrm{Var}(N_2)=2.25;
 \qquad
 E[N_3]=9,\ \mathrm{Var}(N_3)=6.25.
 \]
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  width=10cm,
+  height=5.6cm,
+  axis lines=left,
+  xlabel={$x$ (thousands)},
+  ylabel={$f(x)$},
+  xmin=1,
+  xmax=19,
+  ymin=0,
+  grid=both,
+  xtick={6,9,11,12,14},
+  ytick=\empty,
+  legend style={at={(0.98,0.98)},anchor=north east,draw=none,fill=none}
+]
+\addplot[very thick, blue, domain=1:19, samples=220] {1/(1.5*sqrt(2*pi))*exp(-((x-9)^2)/(2*1.5^2))};
+\addlegendentry{$N_1:N(9,1.5^2)$}
+\addplot[very thick, red, domain=1:19, samples=220] {1/(1.5*sqrt(2*pi))*exp(-((x-11)^2)/(2*1.5^2))};
+\addlegendentry{$N_2:N(11,1.5^2)$}
+\addplot[very thick, teal!70!black, domain=1:19, samples=220] {1/(2.5*sqrt(2*pi))*exp(-((x-9)^2)/(2*2.5^2))};
+\addlegendentry{$N_3:N(9,2.5^2)$}
+\end{axis}
+\end{tikzpicture}
+\end{center}
 Changing \(\mu\) moves the center left or right without changing shape width. Increasing \(\sigma\) makes the curve wider and less peaked, so far-from-mean values become more likely.
 
 % --------------------------------------------------
@@ -219,6 +401,18 @@ E[X]=\frac{p+(p+12)}{2}=p+6,
 \qquad
 \mathrm{Var}(X)=\frac{((p+12)-p)^2}{12}=\frac{12^2}{12}=12.
 \]
+\begin{center}
+\begin{tikzpicture}
+\draw[->] (0,0) -- (8,0) node[right] {$x$};
+\draw[->] (0,0) -- (0,3.4) node[above] {$f(x)$};
+\draw[very thick, blue] (1.4,0) -- (1.4,2.1) -- (6.6,2.1) -- (6.6,0);
+\node[below] at (1.4,0) {$p$};
+\node[below] at (6.6,0) {$p+12$};
+\node[below] at (4.0,0) {$p+6$};
+\draw[dashed] (4.0,0) -- (4.0,2.1);
+\node[left] at (0,2.1) {$\frac{1}{12}$};
+\end{tikzpicture}
+\end{center}
 So \(p\) controls location; spread is fixed by width 12 and does not depend on \(p\).
 
 % --------------------------------------------------
@@ -248,6 +442,16 @@ E[Y]=\frac{a+b+c}{3}=\frac{4+14+(4+m)}{3}=\frac{22+m}{3}.
 =\frac{16+196+(4+m)^2-56-4(4+m)-14(4+m)}{18}
 =\frac{m^2-10m+100}{18}.
 \]
+\begin{center}
+\begin{tikzpicture}
+\draw[->] (0,0) -- (9,0) node[right] {$y$};
+\draw[->] (0,0) -- (0,3.5) node[above] {$f(y)$};
+\draw[very thick, blue] (1.2,0) -- (3.8,2.4) -- (7.8,0);
+\node[below] at (1.2,0) {$4$};
+\node[below] at (3.8,0) {$4+m$};
+\node[below] at (7.8,0) {$14$};
+\end{tikzpicture}
+\end{center}
 Validity needs \(a\le c\le b\Rightarrow 4\le 4+m\le 14\Rightarrow 0\le m\le 10\).
 Mean increases linearly with \(m\). As mode moves right, the distribution becomes less right-skewed and can become left-skewed when the mode passes midpoint 9.
 
@@ -276,6 +480,17 @@ E[Z]=60+k,
 \qquad
 \sigma=2k.
 \]
+\begin{center}
+\begin{tikzpicture}
+\draw[->] (0,0) -- (10,0) node[right] {$z$};
+\draw[->] (0,0) -- (0,3.4) node[above] {$f(z)$};
+\draw[very thick, blue] plot[smooth] coordinates {(1.0,0.15) (2.4,0.8) (3.7,1.9) (5.0,2.7) (6.3,1.9) (7.6,0.8) (9.0,0.15)};
+\draw[dashed] (5.0,0) -- (5.0,2.7);
+\node[below] at (5.0,0) {$60+k$};
+\node[below] at (3.2,0) {$60-k$};
+\node[below] at (6.8,0) {$60+3k$};
+\end{tikzpicture}
+\end{center}
 For a valid non-degenerate normal spread, \(k>0\). Increasing \(k\) shifts mean right and also increases spread quadratically through variance.
 
 % --------------------------------------------------
@@ -302,6 +517,17 @@ E[C]=\frac{(10-r)+(10+r)}{2}=10,
 \[
 \mathrm{Var}(C)=\frac{((10+r)-(10-r))^2}{12}=\frac{(2r)^2}{12}=\frac{r^2}{3}.
 \]
+\begin{center}
+\begin{tikzpicture}
+\draw[->] (0,0) -- (9,0) node[right] {$c$};
+\draw[->] (0,0) -- (0,3.4) node[above] {$f(c)$};
+\draw[very thick, blue] (1.5,0) -- (1.5,2.0) -- (7.0,2.0) -- (7.0,0);
+\draw[dashed] (4.25,0) -- (4.25,2.0);
+\node[below] at (1.5,0) {$10-r$};
+\node[below] at (4.25,0) {$10$};
+\node[below] at (7.0,0) {$10+r$};
+\end{tikzpicture}
+\end{center}
 Need \(r>0\). Width is \(2r\), so larger \(r\) means wider interval and larger variance; smaller positive \(r\) means narrower distribution.
 
 % --------------------------------------------------
@@ -328,6 +554,16 @@ E[Q]=\frac{a+(a+3)+(a+9)}{3}=a+4.
 \[
 \mathrm{Var}(Q)=\frac{a^2+(a+3)^2+(a+9)^2-a(a+3)-a(a+9)-(a+3)(a+9)}{18}=\frac{7}{2}.
 \]
+\begin{center}
+\begin{tikzpicture}
+\draw[->] (0,0) -- (9,0) node[right] {$q$};
+\draw[->] (0,0) -- (0,3.4) node[above] {$f(q)$};
+\draw[very thick, blue] (1.2,0) -- (3.4,2.2) -- (7.8,0);
+\node[below] at (1.2,0) {$a$};
+\node[below] at (3.4,0) {$a+3$};
+\node[below] at (7.8,0) {$a+9$};
+\end{tikzpicture}
+\end{center}
 Since \(a\le a+3\le a+9\) always holds, the distribution is valid for all real \(a\). Parameter \(a\) shifts location; spread and shape remain unchanged.
 
 % --------------------------------------------------
@@ -355,6 +591,17 @@ E[R]=m,
 \qquad
 \sigma=1+s.
 \]
+\begin{center}
+\begin{tikzpicture}
+\draw[->] (0,0) -- (10,0) node[right] {$r$};
+\draw[->] (0,0) -- (0,3.4) node[above] {$f(r)$};
+\draw[very thick, blue] plot[smooth] coordinates {(1.1,0.2) (2.5,0.9) (3.8,2.0) (5.0,2.6) (6.2,2.0) (7.5,0.9) (8.9,0.2)};
+\draw[dashed] (5.0,0) -- (5.0,2.6);
+\node[below] at (5.0,0) {$m$};
+\node[below] at (3.4,0) {$m-(1+s)$};
+\node[below] at (6.6,0) {$m+(1+s)$};
+\end{tikzpicture}
+\end{center}
 A valid standard deviation needs \(\sigma>0\Rightarrow 1+s>0\Rightarrow s>-1\).
 Increasing \(m\) shifts the center only. Increasing \(s\) increases spread, making the bell wider and less concentrated around the mean.
 
@@ -396,6 +643,17 @@ If \(h\) and \(w\) both increase by 2, then width increases by \(3(2)=6\) (widen
 E[U]'-(E[U])=\left(h+2-\frac{w+2}{2}\right)-\left(h-\frac{w}{2}\right)=1,
 \]
 so it also shifts right by 1.
+\begin{center}
+\begin{tikzpicture}
+\draw[->] (0,0) -- (10,0) node[right] {$u$};
+\draw[->] (0,0) -- (0,3.4) node[above] {$f(u)$};
+\draw[very thick, blue] (1.2,0) -- (1.2,2.0) -- (8.0,2.0) -- (8.0,0);
+\draw[dashed] (4.6,0) -- (4.6,2.0);
+\node[below] at (1.2,0) {$h-2w$};
+\node[below] at (8.0,0) {$h+w$};
+\node[below] at (4.6,0) {$h-\frac{w}{2}$};
+\end{tikzpicture}
+\end{center}
 
 % --------------------------------------------------
 \section{Problem 14: Triangular with Parameters}
@@ -442,6 +700,16 @@ which holds whenever \(r\ge 0\); with \(r>0\), spread is nonzero, so the model i
 Parameter \(k\) shifts location only. Parameter \(r\) increases both mean offset (\(\frac{4r}{3}\)) and spread (\(\propto r^2\)).
 For endpoints \(k\) and \(k+3r\), symmetry would need mode at midpoint \(k+\frac{3r}{2}\), but here mode is \(k+r\), left of midpoint; therefore the model is right-skewed.
 Comparing \(r=2\) and \(r=5\) (fixed \(k\)): mean increases by \(\frac{4}{3}(5-2)=4\), variance scales from \(\frac{28}{18}\) to \(\frac{175}{18}\), and skewness direction stays right-skewed.
+\begin{center}
+\begin{tikzpicture}
+\draw[->] (0,0) -- (10,0) node[right] {$t$};
+\draw[->] (0,0) -- (0,3.5) node[above] {$f(t)$};
+\draw[very thick, blue] (1.2,0) -- (3.5,2.4) -- (8.4,0);
+\node[below] at (1.2,0) {$k$};
+\node[below] at (3.5,0) {$k+r$};
+\node[below] at (8.4,0) {$k+3r$};
+\end{tikzpicture}
+\end{center}
 
 % --------------------------------------------------
 \section{Problem 15: Normal with Parameters}
@@ -473,5 +741,17 @@ Parameter \(p\) changes only location (horizontal shift). Parameter \(q\) change
 Case A \(\to\) B keeps \(q=1\), so \(\sigma=3\) is unchanged: concentration and tail behavior relative to each mean stay the same, but mean shifts from \(50\) to \(44\) (left by 6).
 Case C \(\to\) D keeps \(p=0\), so mean stays 50, but \(\sigma\) increases from \(3\) to \(6\): values are less concentrated near 50 and far-from-mean values become more likely.
 For \(M_1\), \(\sigma=2\); for \(M_2\), \(\sigma=5\). A value 15 GB above its own mean is \(15/\sigma\) standard deviations above mean: \(7.5\sigma\) for \(M_1\) versus \(3\sigma\) for \(M_2\). The \(3\sigma\) event is much less extreme, so \(M_2\) is more likely.
+\begin{center}
+\begin{tikzpicture}
+\draw[->] (0,0) -- (10,0) node[right] {$n$};
+\draw[->] (0,0) -- (0,3.4) node[above] {$f(n)$};
+\draw[very thick, blue] plot[smooth] coordinates {(1.0,0.15) (2.4,0.8) (3.8,1.9) (5.0,2.6) (6.2,1.9) (7.6,0.8) (9.0,0.15)};
+\draw[dashed] (5.0,0) -- (5.0,2.6);
+\node[below] at (5.0,0) {$50+3p$};
+\node[below] at (3.4,0) {$\mu-\sigma$};
+\node[below] at (6.6,0) {$\mu+\sigma$};
+\node[right] at (8.9,1.8) {$\sigma=2+q$};
+\end{tikzpicture}
+\end{center}
 
 \end{document}
