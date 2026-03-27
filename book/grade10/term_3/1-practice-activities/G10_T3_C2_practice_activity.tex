@@ -1,433 +1,525 @@
 \input{../../../preamble/preamble_exams.tex}
 
 \begin{document}
-\ExamTitleBlock{10th grade}{Term 3 Practice Activity: C2 Uniform Random Variables}{}
-\ExamSection{C2 Explains how a uniform random variable works.}
+\ExamTitleBlock{10th grade}{Term 3 Practice Activity: C2 Uniform and Piecewise Uniform Random Variables}{}
+\ExamSection{C2 Explains how area under a density function represents probability.}
 
 \section*{Contents}
 \tableofcontents
 
-\newcommand{\UniformProbGraph}[5]{
-\begin{center}
-\begin{tikzpicture}
-\pgfmathsetmacro{\supportA}{#1}
-\pgfmathsetmacro{\supportB}{#2}
-\pgfmathsetmacro{\heightVal}{1/(\supportB-\supportA)}
-\pgfmathsetmacro{\pad}{0.12*(\supportB-\supportA)}
-\begin{axis}[
-  width=9cm,
-  height=5cm,
-  axis lines=left,
-  xlabel={$x$},
-  ylabel={$f(x)$},
-  xmin={\supportA-\pad},
-  xmax={\supportB+\pad},
-  ymin=0,
-  ymax={1.7*\heightVal},
-  grid=both,
-  xtick={#1,#4,#5,#2}
-]
-\addplot[domain=#1:#2, samples=2, draw=none, fill=blue!20, fill opacity=0.35] {\heightVal} \closedcycle;
-\addplot[domain=#4:#5, samples=2, draw=none, fill=blue!60, fill opacity=0.55] {\heightVal} \closedcycle;
-\addplot[smooth, domain=#1:#2, samples=2] {\heightVal};
-\end{axis}
-\end{tikzpicture}
-\end{center}
-}
-
-\newcommand{\UniformProbGraphTwoIntervals}[6]{
-\begin{center}
-\begin{tikzpicture}
-\pgfmathsetmacro{\supportA}{#1}
-\pgfmathsetmacro{\supportB}{#2}
-\pgfmathsetmacro{\heightVal}{1/(\supportB-\supportA)}
-\pgfmathsetmacro{\pad}{0.12*(\supportB-\supportA)}
-\begin{axis}[
-  width=9cm,
-  height=5cm,
-  axis lines=left,
-  xlabel={$x$},
-  ylabel={$f(x)$},
-  xmin={\supportA-\pad},
-  xmax={\supportB+\pad},
-  ymin=0,
-  ymax={1.7*\heightVal},
-  grid=both,
-  xtick={#1,#3,#4,#5,#6,#2}
-]
-\addplot[domain=#1:#2, samples=2, draw=none, fill=blue!20, fill opacity=0.35] {\heightVal} \closedcycle;
-\addplot[domain=#3:#4, samples=2, draw=none, fill=blue!60, fill opacity=0.55] {\heightVal} \closedcycle;
-\addplot[domain=#5:#6, samples=2, draw=none, fill=blue!60, fill opacity=0.55] {\heightVal} \closedcycle;
-\addplot[smooth, domain=#1:#2, samples=2] {\heightVal};
-\end{axis}
-\end{tikzpicture}
-\end{center}
-}
-\section*{General Problem}
+% --------------------------------------------------
+\section{Problem 1: Introductory Uniform Distribution}
 
 \textbf{Problem.}
-Let $X\sim \text{Uniform}(a,b)$ with $a<b$.
-This means all values in $[a,b]$ are equally likely.
-Take numbers $c,d$ such that $a\le c\le d\le b$, and numbers $e,f$ such that $a\le e<f\le b$.
+Let $X\sim \text{Uniform}(0,10)$.
 
 \textbf{Question.}
 Find:
 \begin{itemize}
-    \item[(a)] $P(c\le X\le d)$,
-    \item[(b)] $P(X<e\ \text{or}\ X>f)$.
-Explain the general method you used.
+    \item[(a)] the density value $f(x)$ on the support,
+    \item[(b)] the support interval of $X$,
+    \item[(c)] $P(2\le X\le 7)$,
+    \item[(d)] $P(X>8)$.
 \end{itemize}
 
 \textbf{Solution.}
-For a uniform random variable on $[a,b]$, the total interval length is
+For $X\sim \text{Uniform}(0,10)$,
 \[
-b-a.
+f(x)=\frac{1}{10-0}=\frac{1}{10},\qquad 0\le x\le 10.
 \]
-So each probability is found by
+So the support is $[0,10]$.
 \[
-P(\text{event})=\frac{\text{length of event interval(s)}}{b-a}.
+P(2\le X\le 7)=\frac{7-2}{10}=\frac{1}{2}.
 \]
-Therefore,
 \[
-P(c\le X\le d)=\frac{d-c}{b-a}.
+P(X>8)=\frac{10-8}{10}=\frac{1}{5}.
 \]
-\UniformProbGraph{0}{1}{0}{0.25}{0.7}
-For two outside pieces,
-\[
-P(X<e\ \text{or}\ X>f)=\frac{e-a}{b-a}+\frac{b-f}{b-a}=1-\frac{f-e}{b-a}.
-\]
-\UniformProbGraphTwoIntervals{0}{1}{0}{0.2}{0.8}{1}
 
 \textbf{Interpretation.}
-In a uniform model, probability is proportional to interval length.
-So we compare the length of the requested region(s) to the full support length.
+For a simple uniform model, probability is interval length divided by total length.
 
 % --------------------------------------------------
-\section{Bus Stop Waiting Time}
+\section{Problem 2: Two-Interval Piecewise Uniform (Basic)}
 
 \textbf{Problem.}
-A learner waits for a bus that can arrive at any time between 0 and 12 minutes after reaching the stop.
-Let $X\sim \text{Uniform}(0,12)$.
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+\dfrac{1}{5}, & 0\le x<4,\\
+\dfrac{1}{30}, & 4\le x\le 10,\\
+0, & \text{otherwise.}
+\end{cases}
+\]
 
 \textbf{Question.}
 Find:
 \begin{itemize}
-    \item[(a)] $P(X<5)$,
-    \item[(b)] $P(3\le X\le 9)$.
-Interpret each result in context.
+    \item[(a)] $P(X<3)$,
+    \item[(b)] $P(2\le X\le 8)$,
+    \item[(c)] $P(X\ge 4)$.
 \end{itemize}
 
 \textbf{Solution.}
-The total interval length is
+Check total area:
 \[
-b-a=12-0=12.
-\]
-For a uniform variable,
-\[
-P(\text{event})=\frac{\text{event interval length}}{\text{total length}}.
+4\left(\frac{1}{5}\right)+6\left(\frac{1}{30}\right)=\frac{4}{5}+\frac{1}{5}=1.
 \]
 \[
-P(X<5)=\frac{5-0}{12}=\frac{5}{12}\approx 0.417.
+P(X<3)=3\left(\frac{1}{5}\right)=\frac{3}{5}.
 \]
-\UniformProbGraph{0}{12}{0}{0}{5}
 \[
-P(3\le X\le 9)=\frac{9-3}{12}=\frac{6}{12}=\frac{1}{2}=0.5.
+P(2\le X\le 8)=2\left(\frac{1}{5}\right)+4\left(\frac{1}{30}\right)=\frac{2}{5}+\frac{2}{15}=\frac{8}{15}.
 \]
-\UniformProbGraph{0}{12}{0}{3}{9}
+\[
+P(X\ge 4)=6\left(\frac{1}{30}\right)=\frac{1}{5}.
+\]
 
 \textbf{Interpretation.}
-There is a $\frac{5}{12}$ chance the wait is under 5 minutes, and a $\frac{1}{2}$ chance the wait is between 3 and 9 minutes.
+Most probability mass is on $[0,4)$ because its density height is much larger.
 
 % --------------------------------------------------
-\section{App Download Duration}
+\section{Problem 3: Two-Interval Piecewise Uniform (Basic)}
 
 \textbf{Problem.}
-A file download takes a random time between 2 and 10 minutes.
-Let $X\sim \text{Uniform}(2,10)$.
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+\dfrac{1}{6}, & -2\le x<1,\\
+\dfrac{1}{10}, & 1\le x\le 6,\\
+0, & \text{otherwise.}
+\end{cases}
+\]
 
 \textbf{Question.}
 Find:
 \begin{itemize}
-    \item[(a)] $P(4\le X\le 7)$,
-    \item[(b)] $P(X>8)$.
-Interpret each result.
+    \item[(a)] $P(-1\le X\le 4)$,
+    \item[(b)] $P(X>3)$,
+    \item[(c)] $P(X<1)$.
 \end{itemize}
 
 \textbf{Solution.}
-The total interval length is
+Check total area:
 \[
-b-a=10-2=8.
+3\left(\frac{1}{6}\right)+5\left(\frac{1}{10}\right)=\frac{1}{2}+\frac{1}{2}=1.
 \]
 \[
-P(4\le X\le 7)=\frac{7-4}{8}=\frac{3}{8}=0.375.
+P(-1\le X\le 4)=2\left(\frac{1}{6}\right)+3\left(\frac{1}{10}\right)=\frac{1}{3}+\frac{3}{10}=\frac{19}{30}.
 \]
-\UniformProbGraph{2}{10}{0}{4}{7}
 \[
-P(X>8)=\frac{10-8}{8}=\frac{2}{8}=\frac{1}{4}=0.25.
+P(X>3)=3\left(\frac{1}{10}\right)=\frac{3}{10}.
 \]
-\UniformProbGraph{2}{10}{0}{8}{10}
+\[
+P(X<1)=3\left(\frac{1}{6}\right)=\frac{1}{2}.
+\]
 
 \textbf{Interpretation.}
-The download is between 4 and 7 minutes with probability $\frac{3}{8}$, and longer than 8 minutes with probability $\frac{1}{4}$.
+To find each probability, add the rectangular areas over the relevant subintervals.
 
 % --------------------------------------------------
-\section{Morning Temperature Range}
+\section{Problem 4: Three-Interval Piecewise Uniform (Combining Regions)}
 
 \textbf{Problem.}
-In a city, early-morning temperature (in $^\circ$C) is modeled as uniform from $-3$ to $5$.
-Let $X\sim \text{Uniform}(-3,5)$.
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+\dfrac{1}{10}, & 0\le x<2,\\
+\dfrac{1}{5}, & 2\le x<5,\\
+\dfrac{1}{10}, & 5\le x\le 7,\\
+0, & \text{otherwise.}
+\end{cases}
+\]
 
 \textbf{Question.}
 Find:
 \begin{itemize}
-    \item[(a)] $P(-1\le X\le 2)$,
-    \item[(b)] $P(X<0\ \text{or}\ X>4)$.
-Interpret each probability.
+    \item[(a)] $P(X<2\ \text{or}\ X>5)$,
+    \item[(b)] $P(2\le X\le 4)$,
+    \item[(c)] Which is more likely: $X\in[0,2)$ or $X\in[2,5)$? Explain.
 \end{itemize}
 
 \textbf{Solution.}
-The total interval length is
+Check total area:
 \[
-b-a=5-(-3)=8.
+2\left(\frac{1}{10}\right)+3\left(\frac{1}{5}\right)+2\left(\frac{1}{10}\right)=\frac{1}{5}+\frac{3}{5}+\frac{1}{5}=1.
 \]
 \[
-P(-1\le X\le 2)=\frac{2-(-1)}{8}=\frac{3}{8}=0.375.
+P(X<2\ \text{or}\ X>5)=2\left(\frac{1}{10}\right)+2\left(\frac{1}{10}\right)=\frac{2}{5}.
 \]
-\UniformProbGraph{-3}{5}{0}{-1}{2}
-For the union of disjoint intervals:
 \[
-P(X<0\ \text{or}\ X>4)=\frac{0-(-3)}{8}+\frac{5-4}{8}=\frac{3}{8}+\frac{1}{8}=\frac{1}{2}=0.5.
+P(2\le X\le 4)=2\left(\frac{1}{5}\right)=\frac{2}{5}.
 \]
-\UniformProbGraphTwoIntervals{-3}{5}{-3}{0}{4}{5}
+Also,
+\[
+P(0\le X<2)=\frac{1}{5},\qquad P(2\le X<5)=\frac{3}{5}.
+\]
+So $[2,5)$ is more likely.
 
 \textbf{Interpretation.}
-There is a $\frac{3}{8}$ chance the temperature is between $-1^\circ$C and $2^\circ$C, and a $\frac{1}{2}$ chance it is below $0^\circ$C or above $4^\circ$C.
+Even with equal widths, a taller density rectangle gives larger probability.
 
 % --------------------------------------------------
-\section{Delivery Arrival Minute}
+\section{Problem 5: Piecewise Uniform with Complement Reasoning}
 
 \textbf{Problem.}
-A delivery may arrive any time between minute 100 and minute 160 of a tracking window.
-Let $X\sim \text{Uniform}(100,160)$.
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+\dfrac{3}{20}, & 10\le x<14,\\
+\dfrac{1}{10}, & 14\le x<18,\\
+0, & \text{otherwise.}
+\end{cases}
+\]
 
 \textbf{Question.}
 Find:
 \begin{itemize}
-    \item[(a)] $P(115\le X\le 145)$,
-    \item[(b)] $P(X<110\ \text{or}\ X>150)$.
-Interpret both answers.
+    \item[(a)] $P(11\le X\le 13\ \text{or}\ 16\le X\le 18)$,
+    \item[(b)] $P(X<12\ \text{or}\ X>17)$,
+    \item[(c)] $P(12\le X\le 17)$ using a complement.
 \end{itemize}
 
 \textbf{Solution.}
-The total interval length is
+Check total area:
 \[
-b-a=160-100=60.
+4\left(\frac{3}{20}\right)+4\left(\frac{1}{10}\right)=\frac{3}{5}+\frac{2}{5}=1.
 \]
 \[
-P(115\le X\le 145)=\frac{145-115}{60}=\frac{30}{60}=\frac{1}{2}=0.5.
+P(11\le X\le 13\ \text{or}\ 16\le X\le 18)=2\left(\frac{3}{20}\right)+2\left(\frac{1}{10}\right)=\frac{3}{10}+\frac{1}{5}=\frac{1}{2}.
 \]
-\UniformProbGraph{100}{160}{0}{115}{145}
 \[
-P(X<110\ \text{or}\ X>150)=\frac{110-100}{60}+\frac{160-150}{60}=\frac{10}{60}+\frac{10}{60}=\frac{20}{60}=\frac{1}{3}.
+P(X<12\ \text{or}\ X>17)=2\left(\frac{3}{20}\right)+1\left(\frac{1}{10}\right)=\frac{3}{10}+\frac{1}{10}=\frac{2}{5}.
 \]
-\UniformProbGraphTwoIntervals{100}{160}{100}{110}{150}{160}
+\[
+P(12\le X\le 17)=1-P(X<12\ \text{or}\ X>17)=1-\frac{2}{5}=\frac{3}{5}.
+\]
 
 \textbf{Interpretation.}
-The package has probability $\frac{1}{2}$ of arriving between minutes 115 and 145, and probability $\frac{1}{3}$ of arriving very early or very late in the window.
+Complement reasoning avoids repeating long area sums.
 
 % --------------------------------------------------
-\section{Practice Session Length}
+\section{Problem 6: Piecewise Uniform with Unknown $k$}
 
 \textbf{Problem.}
-A student's after-school practice session can last between 30 and 90 minutes, uniformly.
-Let $X\sim \text{Uniform}(30,90)$.
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+2k, & 0\le x<3,\\
+k, & 3\le x\le 8,\\
+0, & \text{otherwise,}
+\end{cases}
+\]
+where $k>0$.
 
 \textbf{Question.}
 Find:
 \begin{itemize}
-    \item[(a)] $P(X\le 50)$,
-    \item[(b)] $P(45\le X\le 75)$.
-Interpret each result.
+    \item[(a)] the value of $k$ so that $f$ is a valid PDF,
+    \item[(b)] $P(X<5)$,
+    \item[(c)] $P(6\le X\le 8)$.
 \end{itemize}
 
 \textbf{Solution.}
-The total interval length is
+For validity, total area must be 1:
 \[
-b-a=90-30=60.
+3(2k)+5(k)=1\ \Rightarrow\ 11k=1\ \Rightarrow\ k=\frac{1}{11}.
+\]
+So densities are $\frac{2}{11}$ and $\frac{1}{11}$, both nonnegative.
+\[
+P(X<5)=3\left(\frac{2}{11}\right)+2\left(\frac{1}{11}\right)=\frac{8}{11}.
 \]
 \[
-P(X\le 50)=\frac{50-30}{60}=\frac{20}{60}=\frac{1}{3}.
+P(6\le X\le 8)=2\left(\frac{1}{11}\right)=\frac{2}{11}.
 \]
-\UniformProbGraph{30}{90}{0}{30}{50}
-\[
-P(45\le X\le 75)=\frac{75-45}{60}=\frac{30}{60}=\frac{1}{2}=0.5.
-\]
-\UniformProbGraph{30}{90}{0}{45}{75}
 
 \textbf{Interpretation.}
-There is a $\frac{1}{3}$ chance practice ends by 50 minutes, and a $\frac{1}{2}$ chance it lasts from 45 to 75 minutes.
+First solve for $k$ using total area, then compute probabilities by area of rectangles.
 
 % --------------------------------------------------
-\section{Commute Time with Complement}
+\section{Problem 7: Piecewise Uniform with Unknown $k$ and Validity Check}
 
 \textbf{Problem.}
-A student's commute time (minutes) is uniformly distributed from 5 to 25.
-Let $X\sim \text{Uniform}(5,25)$.
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+k, & 0\le x<2,\\
+2k, & 2\le x<5,\\
+\dfrac{k}{2}, & 5\le x\le 9,\\
+0, & \text{otherwise,}
+\end{cases}
+\]
+where $k$ is a constant.
 
 \textbf{Question.}
 Find:
 \begin{itemize}
-    \item[(a)] $P(10\le X\le 20)$,
-    \item[(b)] $P(X<10\ \text{or}\ X>20)$ using complement reasoning.
-Interpret each probability.
+    \item[(a)] $k$,
+    \item[(b)] verify that all density values are valid for a PDF,
+    \item[(c)] $P(1\le X\le 6)$.
 \end{itemize}
 
 \textbf{Solution.}
-The total interval length is
+Total area condition:
 \[
-b-a=25-5=20.
+2(k)+3(2k)+4\left(\frac{k}{2}\right)=1
+\Rightarrow 2k+6k+2k=1
+\Rightarrow 10k=1
+\Rightarrow k=\frac{1}{10}.
 \]
+Then heights are
 \[
-P(10\le X\le 20)=\frac{20-10}{20}=\frac{10}{20}=\frac{1}{2}.
+\frac{1}{10},\quad \frac{1}{5},\quad \frac{1}{20},
 \]
-\UniformProbGraph{5}{25}{0}{10}{20}
-Using complement:
+all nonnegative, so valid.
 \[
-P(X<10\ \text{or}\ X>20)=1-P(10\le X\le 20)=1-\frac{1}{2}=\frac{1}{2}.
+P(1\le X\le 6)=1\left(\frac{1}{10}\right)+3\left(\frac{1}{5}\right)+1\left(\frac{1}{20}\right)
+=\frac{2}{20}+\frac{12}{20}+\frac{1}{20}=\frac{3}{4}.
 \]
-\UniformProbGraphTwoIntervals{5}{25}{5}{10}{20}{25}
 
 \textbf{Interpretation.}
-The commute is between 10 and 20 minutes half the time, and outside that range the other half.
+A valid PDF needs both nonnegative heights and total area exactly 1.
 
 % --------------------------------------------------
-\section{Online Game Match Duration}
+\section{Problem 8: Four-Interval Piecewise Uniform (Organizing Across Many Intervals)}
 
 \textbf{Problem.}
-An online game match lasts between 40 and 70 minutes, uniformly.
-Let $X\sim \text{Uniform}(40,70)$.
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+\dfrac{3}{10}, & 0\le x<1,\\
+\dfrac{1}{5}, & 1\le x<3,\\
+\dfrac{1}{10}, & 3\le x<5,\\
+\dfrac{1}{10}, & 5\le x\le 6,\\
+0, & \text{otherwise.}
+\end{cases}
+\]
 
 \textbf{Question.}
 Find:
 \begin{itemize}
-    \item[(a)] $P(X>55)$,
-    \item[(b)] $P(45\le X\le 60)$.
-Interpret both answers.
+    \item[(a)] $P(0.5\le X\le 5.5)$,
+    \item[(b)] compare $P(X<3)$ and $P(X\ge 3)$,
+    \item[(c)] identify where most of the probability mass is concentrated.
 \end{itemize}
 
 \textbf{Solution.}
-The total interval length is
+Check total area:
 \[
-b-a=70-40=30.
+1\left(\frac{3}{10}\right)+2\left(\frac{1}{5}\right)+2\left(\frac{1}{10}\right)+1\left(\frac{1}{10}\right)
+=\frac{3}{10}+\frac{4}{10}+\frac{2}{10}+\frac{1}{10}=1.
 \]
 \[
-P(X>55)=\frac{70-55}{30}=\frac{15}{30}=\frac{1}{2}=0.5.
+P(0.5\le X\le 5.5)=0.5\left(\frac{3}{10}\right)+2\left(\frac{1}{5}\right)+2\left(\frac{1}{10}\right)+0.5\left(\frac{1}{10}\right)
+=\frac{3}{20}+\frac{8}{20}+\frac{4}{20}+\frac{1}{20}=\frac{4}{5}.
 \]
-\UniformProbGraph{40}{70}{0}{55}{70}
 \[
-P(45\le X\le 60)=\frac{60-45}{30}=\frac{15}{30}=\frac{1}{2}=0.5.
+P(X<3)=\frac{3}{10}+\frac{4}{10}=\frac{7}{10},
+\qquad
+P(X\ge 3)=\frac{3}{10}.
 \]
-\UniformProbGraph{40}{70}{0}{45}{60}
+Most mass is below 3.
 
 \textbf{Interpretation.}
-A match has a $\frac{1}{2}$ chance to last more than 55 minutes, and also a $\frac{1}{2}$ chance to last from 45 to 60 minutes.
+Careful partitioning of a long interval keeps multi-step area sums accurate.
 
 % --------------------------------------------------
-\section{Daily Minimum Temperature}
+\section{Problem 9: Structured Piecewise Uniform with Parameter $k$}
 
 \textbf{Problem.}
-The minimum temperature (in $^\circ$C) is modeled as uniform from $-8$ to $4$.
-Let $X\sim \text{Uniform}(-8,4)$.
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+k, & -3\le x<0,\\
+2k, & 0\le x<2,\\
+\dfrac{1}{12}, & 2\le x\le 6,\\
+0, & \text{otherwise.}
+\end{cases}
+\]
 
 \textbf{Question.}
 Find:
 \begin{itemize}
-    \item[(a)] $P(-5\le X\le 1)$,
-    \item[(b)] $P(X>-2)$ using complement reasoning.
-Interpret each result.
+    \item[(a)] $k$,
+    \item[(b)] $P(-1\le X\le 4)$,
+    \item[(c)] which is larger: $P(X<0)$ or $P(X\ge 2)$?
 \end{itemize}
 
 \textbf{Solution.}
-The total interval length is
+Use total area:
 \[
-b-a=4-(-8)=12.
+3k+2(2k)+4\left(\frac{1}{12}\right)=1
+\Rightarrow 7k+\frac{1}{3}=1
+\Rightarrow 7k=\frac{2}{3}
+\Rightarrow k=\frac{2}{21}.
 \]
 \[
-P(-5\le X\le 1)=\frac{1-(-5)}{12}=\frac{6}{12}=\frac{1}{2}=0.5.
+P(-1\le X\le 4)=1\left(\frac{2}{21}\right)+2\left(\frac{4}{21}\right)+2\left(\frac{1}{12}\right)
+=\frac{2}{21}+\frac{8}{21}+\frac{1}{6}
+=\frac{13}{21}+\frac{1}{6}
+=\frac{11}{14}.
 \]
-\UniformProbGraph{-8}{4}{0}{-5}{1}
-Use the complement of $X\le -2$:
 \[
-P(X>-2)=1-P(X\le -2)=1-\frac{-2-(-8)}{12}=1-\frac{6}{12}=\frac{1}{2}.
+P(X<0)=3\left(\frac{2}{21}\right)=\frac{2}{7},
+\qquad
+P(X\ge 2)=4\left(\frac{1}{12}\right)=\frac{1}{3}.
 \]
-\UniformProbGraph{-8}{4}{0}{-2}{4}
+So $P(X\ge 2)$ is larger.
 
 \textbf{Interpretation.}
-There is a $\frac{1}{2}$ chance the minimum temperature is from $-5^\circ$C to $1^\circ$C, and a $\frac{1}{2}$ chance it is above $-2^\circ$C.
+A wider interval with a moderate height can beat a narrower interval with a higher height.
 
 % --------------------------------------------------
-\section{Video Call Start Minute}
+\section{Problem 10: Symbolic Endpoint (Conceptual Effect of Width)}
 
 \textbf{Problem.}
-A video call starts at a random minute between 50 and 110 minutes after 3:00 p.m.
-Let $X\sim \text{Uniform}(50,110)$.
+Let $m>0$ and define
+\[
+f(x)=
+\begin{cases}
+\dfrac{1}{3m}, & 0\le x<m,\\
+\dfrac{2}{3m}, & m\le x\le 2m,\\
+0, & \text{otherwise.}
+\end{cases}
+\]
 
 \textbf{Question.}
 Find:
 \begin{itemize}
-    \item[(a)] $P(70\le X\le 95)$,
-    \item[(b)] $P(X<65\ \text{or}\ X>100)$.
-Interpret both probabilities.
+    \item[(a)] verify that $f$ is a valid PDF,
+    \item[(b)] $P\left(X<\dfrac{3m}{2}\right)$,
+    \item[(c)] explain what happens to this probability if $m$ is doubled.
 \end{itemize}
 
 \textbf{Solution.}
-The total interval length is
 \[
-b-a=110-50=60.
+m\left(\frac{1}{3m}\right)+m\left(\frac{2}{3m}\right)=\frac{1}{3}+\frac{2}{3}=1,
 \]
+so $f$ is valid and nonnegative.
 \[
-P(70\le X\le 95)=\frac{95-70}{60}=\frac{25}{60}=\frac{5}{12}.
+P\left(X<\frac{3m}{2}\right)=m\left(\frac{1}{3m}\right)+\frac{m}{2}\left(\frac{2}{3m}\right)=\frac{1}{3}+\frac{1}{3}=\frac{2}{3}.
 \]
-\UniformProbGraph{50}{110}{0}{70}{95}
-For the disjoint union:
-\[
-P(X<65\ \text{or}\ X>100)=\frac{65-50}{60}+\frac{110-100}{60}=\frac{15}{60}+\frac{10}{60}=\frac{25}{60}=\frac{5}{12}.
-\]
-\UniformProbGraphTwoIntervals{50}{110}{50}{65}{100}{110}
+If $m$ is doubled, both widths scale by the same factor and densities scale down accordingly, so this probability stays $\frac{2}{3}$.
 
 \textbf{Interpretation.}
-The call starts between minutes 70 and 95 with probability $\frac{5}{12}$, and has the same probability of starting very early or very late.
+Rescaling the horizontal axis can leave certain relative probabilities unchanged.
 
 % --------------------------------------------------
-\section{Streaming Buffer Time}
+\section{Problem 11: Infer Missing Endpoint from a Probability Condition}
 
 \textbf{Problem.}
-A streaming app buffer time is uniformly distributed between 0 and 15 seconds.
-Let $X\sim \text{Uniform}(0,15)$.
+Let $b>2$ and let
+\[
+f(x)=
+\begin{cases}
+c, & 0\le x<2,\\
+\dfrac{c}{2}, & 2\le x\le b,\\
+0, & \text{otherwise.}
+\end{cases}
+\]
+Suppose $P(X>2)=\dfrac{1}{3}$.
 
 \textbf{Question.}
 Find:
 \begin{itemize}
-    \item[(a)] $P(X\ge 12)$,
-    \item[(b)] $P(4\le X\le 10)$.
-Interpret each answer in context.
+    \item[(a)] $c$,
+    \item[(b)] $b$,
+    \item[(c)] $P(1\le X\le 3)$.
 \end{itemize}
 
 \textbf{Solution.}
-The total interval length is
+Given
 \[
-b-a=15-0=15.
+P(X>2)=(b-2)\left(\frac{c}{2}\right)=\frac{1}{3}. \tag{1}
 \]
+Total area is 1:
 \[
-P(X\ge 12)=\frac{15-12}{15}=\frac{3}{15}=\frac{1}{5}=0.2.
+2c+(b-2)\left(\frac{c}{2}\right)=1.
 \]
-\UniformProbGraph{0}{15}{0}{12}{15}
+Using (1):
 \[
-P(4\le X\le 10)=\frac{10-4}{15}=\frac{6}{15}=\frac{2}{5}=0.4.
+2c+\frac{1}{3}=1 \Rightarrow 2c=\frac{2}{3} \Rightarrow c=\frac{1}{3}.
 \]
-\UniformProbGraph{0}{15}{0}{4}{10}
+Now substitute into (1):
+\[
+(b-2)\left(\frac{1}{6}\right)=\frac{1}{3}
+\Rightarrow b-2=2
+\Rightarrow b=4.
+\]
+Finally,
+\[
+P(1\le X\le 3)=1\left(\frac{1}{3}\right)+1\left(\frac{1}{6}\right)=\frac{1}{2}.
+\]
 
 \textbf{Interpretation.}
-There is a $\frac{1}{5}$ chance buffering lasts at least 12 seconds, and a $\frac{2}{5}$ chance it lasts between 4 and 10 seconds.
+A probability condition plus total-area condition can determine unknown parameters.
+
+% --------------------------------------------------
+\section{Problem 12: Rich Piecewise Uniform Design Problem}
+
+\textbf{Problem.}
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+k, & 0\le x<1,\\
+2k, & 1\le x<4,\\
+m, & 4\le x<7,\\
+k, & 7\le x\le 10,\\
+0, & \text{otherwise,}
+\end{cases}
+\]
+where $k,m>0$. Assume
+\[
+P(4\le X<7)=P(0\le X<1)+P(7\le X\le 10).
+\]
+
+\textbf{Question.}
+Find:
+\begin{itemize}
+    \item[(a)] $k$ and $m$,
+    \item[(b)] $P(2\le X\le 8)$,
+    \item[(c)] compare $P(1\le X<4)$ and $P(4\le X\le 10)$,
+    \item[(d)] explain where the distribution places most of its mass and why.
+\end{itemize}
+
+\textbf{Solution.}
+From the condition:
+\[
+3m=1\cdot k+3\cdot k=4k
+\Rightarrow m=\frac{4k}{3}. \tag{1}
+\]
+Total area:
+\[
+1(k)+3(2k)+3(m)+3(k)=1
+\Rightarrow 10k+3m=1.
+\]
+Using (1):
+\[
+10k+4k=1 \Rightarrow 14k=1 \Rightarrow k=\frac{1}{14},
+\qquad
+m=\frac{4}{3}\cdot\frac{1}{14}=\frac{2}{21}.
+\]
+Now
+\[
+P(2\le X\le 8)=2\left(\frac{1}{7}\right)+3\left(\frac{2}{21}\right)+1\left(\frac{1}{14}\right)
+=\frac{2}{7}+\frac{2}{7}+\frac{1}{14}=\frac{9}{14}.
+\]
+\[
+P(1\le X<4)=3\left(\frac{1}{7}\right)=\frac{3}{7},
+\qquad
+P(4\le X\le 10)=3\left(\frac{2}{21}\right)+3\left(\frac{1}{14}\right)=\frac{4}{7}.
+\]
+So $P(4\le X\le 10)$ is larger.
+
+\textbf{Interpretation.}
+The right side $[4,10]$ gets more mass because it combines substantial width with moderate heights across two intervals.
 
 \end{document}
