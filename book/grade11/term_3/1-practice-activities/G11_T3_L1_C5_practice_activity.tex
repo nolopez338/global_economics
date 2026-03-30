@@ -1,5 +1,50 @@
 \input{../../../preamble/preamble_exams.tex}
 
+\usepackage{tikz}
+
+\newcommand{\NormalBase}{%
+\draw[->] (-3.4,0) -- (3.4,0);
+\draw[thick,samples=120,smooth,domain=-3.2:3.2] plot (\x,{0.4*exp(-\x*\x/2)});
+\node[below] at (0,0) {0};
+}
+
+\newcommand{\OneTailGraph}[4]{%
+% #1: 0=left, 1=right; #2: z_obs; #3: optional z_crit; #4: label
+\begin{tikzpicture}[x=0.9cm,y=3.0cm]
+    \NormalBase
+    \ifnum#1=0
+        \fill[blue!20,domain=-3.2:#2] (-3.2,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (#2,0) -- cycle;
+    \else
+        \fill[blue!20,domain=#2:3.2] (#2,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (3.2,0) -- cycle;
+    \fi
+    \draw[dashed] (#2,0) -- (#2,{0.4*exp(-#2*#2/2)});
+    \node[above] at (#2,{0.4*exp(-#2*#2/2)}) {\scriptsize $z_{obs}=#2$};
+    \if\relax\detokenize{#3}\relax\else
+        \draw[red,dashed] (#3,0) -- (#3,{0.4*exp(-#3*#3/2)});
+        \node[above,red] at (#3,{0.4*exp(-#3*#3/2)}) {\scriptsize $z_{\alpha}=#3$};
+    \fi
+    \node at (0,0.46) {\scriptsize #4};
+\end{tikzpicture}%
+}
+
+\newcommand{\TwoTailGraph}[3]{%
+% #1: |z_obs|; #2: optional z_crit>0; #3: label
+\begin{tikzpicture}[x=0.9cm,y=3.0cm]
+    \NormalBase
+    \fill[blue!20,domain=-3.2:-#1] (-3.2,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (-#1,0) -- cycle;
+    \fill[blue!20,domain=#1:3.2] (#1,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (3.2,0) -- cycle;
+    \draw[dashed] (-#1,0) -- (-#1,{0.4*exp(-#1*#1/2)});
+    \draw[dashed] (#1,0) -- (#1,{0.4*exp(-#1*#1/2)});
+    \node[above] at (#1,{0.4*exp(-#1*#1/2)}) {\scriptsize $|z_{obs}|=#1$};
+    \if\relax\detokenize{#2}\relax\else
+        \draw[red,dashed] (#2,0) -- (#2,{0.4*exp(-#2*#2/2)});
+        \draw[red,dashed] (-#2,0) -- (-#2,{0.4*exp(-#2*#2/2)});
+        \node[above,red] at (#2,{0.4*exp(-#2*#2/2)}) {\scriptsize $z_{\alpha/2}=#2$};
+    \fi
+    \node at (0,0.46) {\scriptsize #3};
+\end{tikzpicture}%
+}
+
 \begin{document}
 \ExamTitleBlock{11th grade}{Term 3 --- Lesson 1 Practice Activity (C5) with Solutions}{}
 
@@ -48,6 +93,14 @@ A benchmark claim concerns a population mean \(\mu\). A random sample of size \(
     \item \textbf{Conclusion template:} ``There is sufficient evidence'' (reject \(H_0\)) or ``There is not enough evidence'' (fail to reject \(H_0\)) for the contextual claim in \(H_a\).
 \end{itemize}
 
+\begin{center}
+\OneTailGraph{0}{-1.20}{}{Lower-tail template}
+\hspace{0.8cm}
+\OneTailGraph{1}{1.20}{}{Higher-tail template}
+\hspace{0.8cm}
+\TwoTailGraph{1.20}{}{Two-tailed template}
+\end{center}
+
 \section{Average commute time after schedule redesign (introductory lower-tail)}
 A company benchmark for average commute time is 42 minutes. After a schedule redesign, a random sample of 100 employees has mean commute time 41.0 minutes. The population standard deviation is known to be 5 minutes. At \(\alpha=5\%\), test whether the true mean commute time is lower than 42 minutes.
 
@@ -62,6 +115,11 @@ A company benchmark for average commute time is 42 minutes. After a schedule red
     \item \textbf{Decision:} Reject \(H_0\) since \(0.0228<0.05\).
     \item \textbf{Conclusion:} There is sufficient evidence that the true mean commute time is below 42 minutes.
 \end{itemize}
+
+\begin{center}
+\OneTailGraph{0}{-2.00}{-1.645}{Lower-tail mean test}
+\end{center}
+
 
 \section{Average monthly spending on phone plans (introductory higher-tail)}
 A provider benchmark is 45 dollars per month for average phone-plan spending. A random sample of 64 customers has mean spending 46.2 dollars. The known population standard deviation is 8 dollars. At \(\alpha=5\%\), test whether the true mean spending is higher than 45 dollars.
@@ -78,6 +136,11 @@ A provider benchmark is 45 dollars per month for average phone-plan spending. A 
     \item \textbf{Conclusion:} There is not enough evidence that the true mean spending exceeds 45 dollars.
 \end{itemize}
 
+\begin{center}
+\OneTailGraph{1}{1.20}{1.645}{Higher-tail mean test}
+\end{center}
+
+
 \section{Average monthly commuting cost (introductory two-tailed)}
 A benchmark for average monthly commuting cost is 220 dollars. A random sample of 64 workers has mean cost 224 dollars. The known population standard deviation is 15 dollars. At \(\alpha=5\%\), test whether the true mean is different from 220 dollars.
 
@@ -92,6 +155,11 @@ A benchmark for average monthly commuting cost is 220 dollars. A random sample o
     \item \textbf{Decision:} Reject \(H_0\) since \(0.0332<0.05\).
     \item \textbf{Conclusion:} There is sufficient evidence that the true mean commuting cost differs from 220 dollars.
 \end{itemize}
+
+\begin{center}
+\TwoTailGraph{2.13}{1.96}{Two-tailed mean test}
+\end{center}
+
 
 \section{Average processing time sensitivity (lower-tail)}
 A service desk benchmark is 18.0 minutes for average request processing time. A random sample of 144 requests has mean 17.65 minutes. The known population standard deviation is 2.1 minutes. Test whether the true mean is lower than 18.0 minutes at \(\alpha=5\%\) and \(\alpha=1\%\).
@@ -109,6 +177,13 @@ A service desk benchmark is 18.0 minutes for average request processing time. A 
     \item \textbf{Sensitivity note:} Data and statistic stay fixed; only \(\alpha\) changes the decision.
 \end{itemize}
 
+\begin{center}
+\OneTailGraph{0}{-2.00}{-1.645}{\(\alpha=5\%\)}
+\hspace{0.8cm}
+\OneTailGraph{0}{-2.00}{-2.326}{\(\alpha=1\%\)}
+\end{center}
+
+
 \section{Average monthly savings sensitivity (higher-tail)}
 A financial planner benchmark is 240 dollars for average monthly emergency savings. A random sample of 64 workers has mean savings 243.3 dollars. The known population standard deviation is 12 dollars. Test whether the true mean is higher than 240 dollars at \(\alpha=5\%\) and \(\alpha=1\%\).
 
@@ -125,6 +200,13 @@ A financial planner benchmark is 240 dollars for average monthly emergency savin
     \item \textbf{Sensitivity note:} One sample supports different decisions under different significance thresholds.
 \end{itemize}
 
+\begin{center}
+\OneTailGraph{1}{2.20}{1.645}{\(\alpha=5\%\)}
+\hspace{0.8cm}
+\OneTailGraph{1}{2.20}{2.326}{\(\alpha=1\%\)}
+\end{center}
+
+
 \section{Average mathematics score sensitivity (two-tailed)}
 A district benchmark for average mathematics score is 70 points. A random sample of 196 students has mean score 71.4 points. The known population standard deviation is 9.8 points. Test whether the true mean differs from 70 at \(\alpha=5\%\) and \(\alpha=1\%\).
 
@@ -140,6 +222,13 @@ A district benchmark for average mathematics score is 70 points. A random sample
     \item \textbf{Decision at 1\%:} Fail to reject \(H_0\).
     \item \textbf{Sensitivity note:} The evidence is threshold-sensitive for the two-tailed formulation.
 \end{itemize}
+
+\begin{center}
+\TwoTailGraph{2.00}{1.96}{\(\alpha=5\%\)}
+\hspace{0.8cm}
+\TwoTailGraph{2.00}{2.576}{\(\alpha=1\%\)}
+\end{center}
+
 
 \section{Average monthly gym visits: lower vs higher (same evidence)}
 A health benchmark is 10 gym visits per month. A random sample of 81 members has mean 9.2 visits. The known population standard deviation is 2.4 visits. Use \(\alpha=5\%\).
@@ -168,6 +257,13 @@ A health benchmark is 10 gym visits per month. A random sample of 81 members has
 
 \textbf{Comparison note:} Direction alone changes tail area and decision.
 
+\begin{center}
+\textbf{(a)}\;\OneTailGraph{0}{-3.00}{-1.645}{Lower-tail}
+\hspace{0.8cm}
+\textbf{(b)}\;\OneTailGraph{1}{-3.00}{1.645}{Higher-tail}
+\end{center}
+
+
 \section{Average sleep hours: lower vs different (same evidence)}
 A wellness benchmark is 7.0 hours of sleep per night. A random sample of 100 students has mean sleep 6.8 hours. The known population standard deviation is 1.0 hour. Use \(\alpha=5\%\).
 
@@ -194,6 +290,13 @@ A wellness benchmark is 7.0 hours of sleep per night. A random sample of 100 stu
 \end{itemize}
 
 \textbf{Comparison note:} The two-tailed p-value is larger, but both tests reject at 5\%.
+
+\begin{center}
+\textbf{(a)}\;\OneTailGraph{0}{-2.00}{-1.645}{Lower-tail}
+\hspace{0.8cm}
+\textbf{(b)}\;\TwoTailGraph{2.00}{1.96}{Two-tailed}
+\end{center}
+
 
 \section{Average call duration: higher vs different (same evidence)}
 A call-center benchmark for average call duration is 6.0 minutes. A random sample of 100 calls has mean duration 6.50 minutes. The known population standard deviation is 1.5 minutes. Use \(\alpha=5\%\).
@@ -222,6 +325,13 @@ A call-center benchmark for average call duration is 6.0 minutes. A random sampl
 
 \textbf{Comparison note:} Both formulations reject; the two-tailed p-value is larger but still very small.
 
+\begin{center}
+\textbf{(a)}\;\OneTailGraph{1}{3.33}{1.645}{Higher-tail}
+\hspace{0.8cm}
+\textbf{(b)}\;\TwoTailGraph{3.33}{1.96}{Two-tailed}
+\end{center}
+
+
 \section{Average monthly subscriptions cost: lower vs higher vs different (same evidence)}
 A finance benchmark for average subscriptions cost is 32 dollars per month. A random sample of 49 workers has mean cost 32.7 dollars. The known population standard deviation is 7 dollars. Use \(\alpha=5\%\).
 
@@ -240,6 +350,15 @@ A finance benchmark for average subscriptions cost is 32 dollars per month. A ra
     \item Two-tailed p-value \(\approx0.4840\), fail to reject \(H_0\).
     \item \textbf{Conclusion:} All three formulations fail to reject, giving a stable non-signal case.
 \end{itemize}
+
+\begin{center}
+\textbf{(a)}\;\OneTailGraph{0}{0.70}{-1.645}{Lower-tail}
+\hspace{0.5cm}
+\textbf{(b)}\;\OneTailGraph{1}{0.70}{1.645}{Higher-tail}
+\hspace{0.5cm}
+\textbf{(c)}\;\TwoTailGraph{0.70}{1.96}{Two-tailed}
+\end{center}
+
 
 \section{Synthesis case A: strict-threshold non-rejection pattern}
 A benchmark for average support response time is 12.0 minutes. A random sample of 196 calls has mean 11.3 minutes. The known population standard deviation is 4.9 minutes. Use \(\alpha=1\%\).
@@ -260,6 +379,15 @@ A benchmark for average support response time is 12.0 minutes. A random sample o
     \item \textbf{Conclusion:} All tests fail to reject under a strict threshold.
 \end{itemize}
 
+\begin{center}
+\textbf{(a)}\;\OneTailGraph{0}{-2.00}{-2.326}{Lower-tail (1\%)}
+\hspace{0.5cm}
+\textbf{(b)}\;\OneTailGraph{1}{-2.00}{2.326}{Higher-tail (1\%)}
+\hspace{0.5cm}
+\textbf{(c)}\;\TwoTailGraph{2.00}{2.576}{Two-tailed (1\%)}
+\end{center}
+
+
 \section{Synthesis case B: one-direction-only rejection}
 A benchmark for average waiting time is 18.0 minutes. A random sample of 81 customers has mean waiting time 17.29 minutes. The known population standard deviation is 3.3 minutes. Use \(\alpha=5\%\).
 
@@ -279,6 +407,15 @@ A benchmark for average waiting time is 18.0 minutes. A random sample of 81 cust
     \item \textbf{Conclusion:} Only the lower-direction test rejects; the opposite direction and two-tailed test fail to reject.
 \end{itemize}
 
+\begin{center}
+\textbf{(a)}\;\OneTailGraph{0}{-1.94}{-1.645}{Lower-tail}
+\hspace{0.5cm}
+\textbf{(b)}\;\OneTailGraph{1}{-1.94}{1.645}{Higher-tail}
+\hspace{0.5cm}
+\textbf{(c)}\;\TwoTailGraph{1.94}{1.96}{Two-tailed}
+\end{center}
+
+
 \section{Synthesis case C: directional and two-tailed rejection with opposite-direction non-rejection}
 An employer benchmark is 8 sick days used per year on average. A random sample of 144 employees has mean sick days 7.4. The known population standard deviation is 2.4 days. Use \(\alpha=5\%\).
 
@@ -297,5 +434,13 @@ An employer benchmark is 8 sick days used per year on average. A random sample o
     \item Two-tailed p-value \(\approx0.0026\), reject \(H_0\).
     \item \textbf{Conclusion:} One directional test and the two-tailed test reject, while the opposite direction does not.
 \end{itemize}
+
+\begin{center}
+\textbf{(a)}\;\OneTailGraph{1}{-3.00}{1.645}{Higher-tail}
+\hspace{0.5cm}
+\textbf{(b)}\;\OneTailGraph{0}{-3.00}{-1.645}{Lower-tail}
+\hspace{0.5cm}
+\textbf{(c)}\;\TwoTailGraph{3.00}{1.96}{Two-tailed}
+\end{center}
 
 \end{document}
