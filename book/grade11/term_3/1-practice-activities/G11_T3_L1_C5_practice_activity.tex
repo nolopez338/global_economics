@@ -20,12 +20,19 @@
     \draw[dashed] (#2,0) -- (#2,{0.4*exp(-#2*#2/2)});
     \node[above] at (#2,{0.4*exp(-#2*#2/2)}) {\scriptsize $z_{obs}=#2$};
     \if\relax\detokenize{#3}\relax\else
-        \draw[red,dashed] (#3,0) -- (#3,{0.4*exp(-#3*#3/2)});
-        \node[above,red] at (#3,{0.4*exp(-#3*#3/2)}) {\scriptsize $z_{\alpha}=#3$};
+        \pgfmathparse{(#1==0 && #2<=#3) || (#1==1 && #2>=#3) ? 1 : 0}
+        \ifnum\pgfmathresult=1
+            \def\CritColor{green!60!black}
+        \else
+            \def\CritColor{red}
+        \fi
+        \draw[\CritColor,dashed] (#3,0) -- (#3,{0.4*exp(-#3*#3/2)});
+        \node[below,\CritColor] at (#3,-0.045) {\scriptsize $z_{\alpha}=#3$};
     \fi
     \node at (0,0.46) {\scriptsize #4};
 \end{tikzpicture}%
 }
+
 
 \newcommand{\TwoTailGraph}[3]{%
 % #1: |z_obs|; #2: optional z_crit>0; #3: label
@@ -37,13 +44,20 @@
     \draw[dashed] (#1,0) -- (#1,{0.4*exp(-#1*#1/2)});
     \node[above] at (#1,{0.4*exp(-#1*#1/2)}) {\scriptsize $|z_{obs}|=#1$};
     \if\relax\detokenize{#2}\relax\else
-        \draw[red,dashed] (#2,0) -- (#2,{0.4*exp(-#2*#2/2)});
-        \draw[red,dashed] (-#2,0) -- (-#2,{0.4*exp(-#2*#2/2)});
-        \node[above,red] at (#2,{0.4*exp(-#2*#2/2)}) {\scriptsize $z_{\alpha/2}=#2$};
+        \pgfmathparse{#1>=#2 ? 1 : 0}
+        \ifnum\pgfmathresult=1
+            \def\CritColor{green!60!black}
+        \else
+            \def\CritColor{red}
+        \fi
+        \draw[\CritColor,dashed] (#2,0) -- (#2,{0.4*exp(-#2*#2/2)});
+        \draw[\CritColor,dashed] (-#2,0) -- (-#2,{0.4*exp(-#2*#2/2)});
+        \node[below,\CritColor] at (#2,-0.045) {\scriptsize $z_{\alpha/2}=#2$};
     \fi
     \node at (0,0.46) {\scriptsize #3};
 \end{tikzpicture}%
 }
+
 
 \begin{document}
 \ExamTitleBlock{11th grade}{Term 3 --- Lesson 1 Practice Activity (C5) with Solutions}{}
