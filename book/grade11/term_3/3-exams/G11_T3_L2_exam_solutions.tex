@@ -1,0 +1,221 @@
+\input{../../../preamble/preamble_exams.tex}
+
+\usepackage{tikz}
+
+\newcommand{\NormalBase}{%
+\draw[->] (-3.4,0) -- (3.4,0);
+\draw[thick,samples=120,smooth,domain=-3.2:3.2] plot (\x,{0.4*exp(-\x*\x/2)});
+\node[below] at (0,0) {0};
+}
+
+\newcommand{\OneTailGraph}[4]{%
+\begin{tikzpicture}[x=0.9cm,y=3.0cm]
+    \NormalBase
+    \ifnum#1=0
+        \fill[blue!20,domain=-3.2:#2] (-3.2,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (#2,0) -- cycle;
+    \else
+        \fill[blue!20,domain=#2:3.2] (#2,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (3.2,0) -- cycle;
+    \fi
+    \def\ObsColor{black}
+    \if\relax\detokenize{#3}\relax\else
+        \pgfmathtruncatemacro{\RejectFlag}{(#1==0 && #2<=#3) || (#1==1 && #2>=#3)}
+        \ifnum\RejectFlag=1
+            \def\ObsColor{green!60!black}
+        \else
+            \def\ObsColor{red}
+        \fi
+        \draw[dashed] (#3,0) -- (#3,{0.4*exp(-#3*#3/2)});
+    \fi
+    \draw[\ObsColor,dashed] (#2,0) -- (#2,{0.4*exp(-#2*#2/2)});
+    \node at (0,0.46) {\scriptsize #4};
+\end{tikzpicture}%
+}
+
+\newcommand{\TwoTailGraph}[3]{%
+\begin{tikzpicture}[x=0.9cm,y=3.0cm]
+    \NormalBase
+    \fill[blue!20,domain=-3.2:-#1] (-3.2,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (-#1,0) -- cycle;
+    \fill[blue!20,domain=#1:3.2] (#1,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (3.2,0) -- cycle;
+    \def\ObsColor{black}
+    \if\relax\detokenize{#2}\relax\else
+        \pgfmathtruncatemacro{\RejectFlag}{#1>=#2}
+        \ifnum\RejectFlag=1
+            \def\ObsColor{green!60!black}
+        \else
+            \def\ObsColor{red}
+        \fi
+        \draw[dashed] (#2,0) -- (#2,{0.4*exp(-#2*#2/2)});
+        \draw[dashed] (-#2,0) -- (-#2,{0.4*exp(-#2*#2/2)});
+    \fi
+    \draw[\ObsColor,dashed] (-#1,0) -- (-#1,{0.4*exp(-#1*#1/2)});
+    \draw[\ObsColor,dashed] (#1,0) -- (#1,{0.4*exp(-#1*#1/2)});
+    \node at (0,0.46) {\scriptsize #3};
+\end{tikzpicture}%
+}
+
+\begin{document}
+\ExamTitleBlock{11th grade}{Term 3 --- Lesson 2 Exam Solutions}{One-sample proportion and mean tests}
+
+\section*{Contents}
+\addcontentsline{toc}{section}{Contents}
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{1}
+\tableofcontents
+
+\ExamSection{Evaluated criteria}
+\begin{ExamCriteria}
+    \item C4: Applies one-sample hypothesis testing for population proportions in context.
+    \item C5: Calculates and interprets one-sample mean \(z\)-tests with known population standard deviation.
+\end{ExamCriteria}
+
+\section{Problem 1: Foundational one-sample proportion test}
+A district states that \(64\%\) of students submit digital homework before the deadline. In a random sample of \(n=300\) students, \(174\) submitted before the deadline. At \(\alpha=5\%\), test whether the true proportion is lower than \(0.64\).
+
+\subsection*{C4}
+\begin{itemize}
+    \item \textbf{Parameter:} \(p\) = true proportion of students who submit before the deadline.
+    \item \textbf{Hypotheses:} \(H_0:p=0.64\), \(H_a:p<0.64\).
+    \item \textbf{Conditions:} \(np_0=300(0.64)=192\ge10\), \(n(1-p_0)=108\ge10\).
+    \item \textbf{Sample proportion:} \(\hat p=174/300=0.58\).
+    \item \textbf{Test statistic:}
+    \[
+    z=\frac{0.58-0.64}{\sqrt{\frac{0.64(0.36)}{300}}}\approx -2.16.
+    \]
+    \item \textbf{p-value:} \(P(Z\le -2.16)\approx 0.0154\).
+    \item \textbf{Decision:} Reject \(H_0\) since \(0.0154<0.05\).
+    \item \textbf{Conclusion:} There is sufficient evidence that the true on-time digital homework proportion is below \(64\%\).
+\end{itemize}
+
+\begin{center}
+\OneTailGraph{0}{-2.16}{-1.645}{Lower-tail proportion test}
+\end{center}
+
+\section{Problem 2: Foundational one-sample mean \texorpdfstring{\(z\)}{z}-test}
+A transit authority benchmark states that the mean waiting time is \(15.0\) minutes. A random sample of \(n=100\) riders has mean waiting time \(\bar x=15.9\) minutes. Assume known population standard deviation \(\sigma=4.5\) minutes. At \(\alpha=5\%\), test whether the true mean waiting time is higher than \(15.0\) minutes.
+
+\subsection*{C5}
+\begin{itemize}
+    \item \textbf{Parameter:} \(\mu\) = true mean waiting time.
+    \item \textbf{Hypotheses:} \(H_0:\mu=15.0\), \(H_a:\mu>15.0\).
+    \item \textbf{Test statistic:}
+    \[
+    z=\frac{15.9-15.0}{4.5/\sqrt{100}}=2.00.
+    \]
+    \item \textbf{p-value:} \(P(Z\ge2.00)\approx0.0228\).
+    \item \textbf{Decision:} Reject \(H_0\) since \(0.0228<0.05\).
+    \item \textbf{Conclusion:} There is sufficient evidence that the true mean waiting time exceeds \(15.0\) minutes.
+\end{itemize}
+
+\begin{center}
+\OneTailGraph{1}{2.00}{1.645}{Higher-tail mean test}
+\end{center}
+
+\section{Problem 3: Significance-level sensitivity for a proportion test}
+A health office claims that \(30\%\) of adults meet a weekly activity target. In a random sample of \(n=250\), \(66\) meet the target. Test \(H_a:p<0.30\) at both \(\alpha=5\%\) and \(\alpha=1\%\).
+
+\subsection*{C4}
+\begin{itemize}
+    \item \textbf{Parameter:} \(p\) = true activity-target proportion.
+    \item \textbf{Hypotheses:} \(H_0:p=0.30\), \(H_a:p<0.30\).
+    \item \textbf{Conditions:} \(np_0=75\ge10\), \(n(1-p_0)=175\ge10\).
+    \item \(\hat p=66/250=0.264\).
+    \item \[z=\frac{0.264-0.30}{\sqrt{\frac{0.30(0.70)}{250}}}\approx -1.24.\]
+    \item \textbf{p-value:} \(P(Z\le-1.24)\approx0.1075\).
+    \item \textbf{At \(\alpha=5\%\):} Fail to reject \(H_0\), since \(0.1075>0.05\).
+    \item \textbf{At \(\alpha=1\%\):} Fail to reject \(H_0\), since \(0.1075>0.01\).
+    \item \textbf{Conclusion:} The same sample gives insufficient evidence of a decrease at both significance levels.
+\end{itemize}
+
+\section{Problem 4: Directional comparison with fixed evidence (mean test)}
+A learning platform benchmark is \(\mu_0=70\) minutes average weekly study time. A sample of \(n=64\) students has \(\bar x=68.0\) minutes, with known \(\sigma=8\) minutes. Use \(\alpha=5\%\).
+
+\textbf{Tasks}
+\begin{enumerate}
+    \item[(a)] Test \(H_a:\mu<70\).
+    \item[(b)] Test \(H_a:\mu>70\).
+    \item[(c)] Compare the contextual conclusions.
+\end{enumerate}
+
+\subsection*{C5}
+\begin{itemize}
+    \item \textbf{Common statistic:}
+    \[
+    z=\frac{68.0-70}{8/\sqrt{64}}=\frac{-2.0}{1.0}=-2.00.
+    \]
+\end{itemize}
+
+\textbf{(a) Lower-tail test}
+\begin{itemize}
+    \item p-value \(=P(Z\le-2.00)\approx0.0228\).
+    \item Reject \(H_0\) since \(0.0228<0.05\).
+    \item There is sufficient evidence that the true mean study time is below 70 minutes.
+\end{itemize}
+
+\textbf{(b) Higher-tail test}
+\begin{itemize}
+    \item p-value \(=P(Z\ge-2.00)\approx0.9772\).
+    \item Fail to reject \(H_0\) since \(0.9772>0.05\).
+    \item There is not enough evidence that the true mean study time exceeds 70 minutes.
+\end{itemize}
+
+\textbf{(c) Comparison}
+\begin{itemize}
+    \item The data are below the benchmark, so evidence supports the lower-direction claim but not the higher-direction claim.
+\end{itemize}
+
+\begin{center}
+\textbf{(a)}\;\OneTailGraph{0}{-2.00}{-1.645}{Lower-tail}
+\hspace{0.8cm}
+\textbf{(b)}\;\OneTailGraph{1}{-2.00}{1.645}{Higher-tail}
+\end{center}
+
+\section{Problem 5: Synthesis across test framing and thresholds}
+A customer-service center reports that \(70\%\) of calls are resolved on first contact. A random sample of \(n=400\) calls shows \(292\) resolved on first contact.
+
+\textbf{Tasks}
+\begin{enumerate}
+    \item[(a)] Test \(H_a:p>0.70\) at \(\alpha=5\%\).
+    \item[(b)] Test \(H_a:p<0.70\) at \(\alpha=5\%\).
+    \item[(c)] Test \(H_a:p\ne0.70\) at \(\alpha=5\%\) and \(\alpha=1\%\).
+\end{enumerate}
+
+\subsection*{C4}
+\begin{itemize}
+    \item \textbf{Parameter:} \(p\) = true first-contact resolution proportion.
+    \item \textbf{Common setup:} \(\hat p=292/400=0.73\), \(p_0=0.70\).
+    \item \textbf{Conditions:} \(np_0=280\ge10\), \(n(1-p_0)=120\ge10\).
+    \item \textbf{Test statistic:}
+    \[
+    z=\frac{0.73-0.70}{\sqrt{\frac{0.70(0.30)}{400}}}\approx1.31.
+    \]
+\end{itemize}
+
+\textbf{(a) Higher-tail at 5\%}
+\begin{itemize}
+    \item p-value \(=P(Z\ge1.31)\approx0.0951\).
+    \item Fail to reject \(H_0\) since \(0.0951>0.05\).
+\end{itemize}
+
+\textbf{(b) Lower-tail at 5\%}
+\begin{itemize}
+    \item p-value \(=P(Z\le1.31)\approx0.9049\).
+    \item Fail to reject \(H_0\) since \(0.9049>0.05\).
+\end{itemize}
+
+\textbf{(c) Two-tailed}
+\begin{itemize}
+    \item p-value \(=2P(Z\ge1.31)\approx0.1902\).
+    \item At \(\alpha=5\%\): fail to reject \(H_0\).
+    \item At \(\alpha=1\%\): fail to reject \(H_0\).
+    \item \textbf{Contextual synthesis:} Across all framings and both thresholds, evidence is insufficient to claim a real change from the 70\% benchmark.
+\end{itemize}
+
+\begin{center}
+\textbf{(a)}\;\OneTailGraph{1}{1.31}{1.645}{Higher-tail}
+\hspace{0.5cm}
+\textbf{(b)}\;\OneTailGraph{0}{1.31}{-1.645}{Lower-tail}
+\hspace{0.5cm}
+\textbf{(c)}\;\TwoTailGraph{1.31}{1.96}{Two-tailed}
+\end{center}
+
+\end{document}
