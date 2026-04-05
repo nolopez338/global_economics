@@ -1193,9 +1193,9 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 5",
-    "Description": "-",
+    "Description": "Problems for Uniform probabilities",
     "Material": "-",
-    "Material teacher": "Problems for Uniform probabilities",
+    "Material teacher": "-",
     "Summary": "C2"
   },
   {
