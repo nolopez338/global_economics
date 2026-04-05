@@ -1638,7 +1638,7 @@ window.SCHEDULE_DATA = [
     "Description": "Problems for Discrete probabilities",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1"
+    "Summary": "C0"
   },
   {
     "Grade": 10,
@@ -1651,7 +1651,7 @@ window.SCHEDULE_DATA = [
     "Description": "Problems for Continuous probabilities",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "C1"
   },
   {
     "Grade": 10,
@@ -1661,7 +1661,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "-",
+    "Description": "Problems for Uniform probabilities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C2"
@@ -2327,7 +2327,7 @@ window.SCHEDULE_DATA = [
     "Description": "Problems for Discrete probabilities",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1"
+    "Summary": "C0"
   },
   {
     "Grade": 10,
@@ -2340,7 +2340,7 @@ window.SCHEDULE_DATA = [
     "Description": "Problems for Continuous probabilities",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "C1"
   },
   {
     "Grade": 10,
@@ -2350,7 +2350,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "-",
+    "Description": "Problems for Uniform probabilities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C2"
@@ -3806,10 +3806,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "-",
+    "Description": "C1 C2 C3 practice activity",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "C1 C2 C3"
   },
   {
     "Grade": 11,
@@ -4287,10 +4287,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "-",
+    "Description": "C1 C2 C3 Practice activity",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "C1 C2 C3"
   },
   {
     "Grade": 11,
