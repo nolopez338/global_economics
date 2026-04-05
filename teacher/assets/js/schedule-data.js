@@ -702,7 +702,7 @@ window.SCHEDULE_DATA = [
     "Description": "Problems for Discrete probabilities",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1"
+    "Summary": "C0"
   },
   {
     "Grade": 10,
@@ -715,7 +715,7 @@ window.SCHEDULE_DATA = [
     "Description": "Problems for Continuous probabilities",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "C1"
   },
   {
     "Grade": 10,
@@ -725,7 +725,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 5",
-    "Description": "-",
+    "Description": "Problems for Uniform probabilities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C2"
@@ -1170,7 +1170,7 @@ window.SCHEDULE_DATA = [
     "Description": "Problems for Discrete probabilities",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1"
+    "Summary": "C0"
   },
   {
     "Grade": 10,
@@ -1183,7 +1183,7 @@ window.SCHEDULE_DATA = [
     "Description": "Problems for Continuous probabilities",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "C1"
   },
   {
     "Grade": 10,
@@ -1195,7 +1195,7 @@ window.SCHEDULE_DATA = [
     "Day": "Day 5",
     "Description": "-",
     "Material": "-",
-    "Material teacher": "-",
+    "Material teacher": "Problems for Uniform probabilities",
     "Summary": "C2"
   },
   {
@@ -3325,10 +3325,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 5",
-    "Description": "-",
+    "Description": "C1 C2 C3 Practice activity",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "C1 C2 C3"
   },
   {
     "Grade": 11,
