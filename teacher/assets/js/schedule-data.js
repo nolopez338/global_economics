@@ -940,6 +940,32 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 10,
+    "Section": "B",
+    "Class #": "11-1",
+    "Date": "2026-06-03",
+    "Term": 3,
+    "Weekday": "Wednesday",
+    "Day": "Day 1",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C11"
+  },
+  {
+    "Grade": 10,
+    "Section": "B",
+    "Class #": "11-2",
+    "Date": "2026-06-09",
+    "Term": 3,
+    "Weekday": "Tuesday",
+    "Day": "Day 5",
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C11"
+  },
+  {
+    "Grade": 10,
     "Section": "C",
     "Class #": "3-2",
     "Date": "2026/01/15",
