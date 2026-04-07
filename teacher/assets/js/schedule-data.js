@@ -218,7 +218,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Resting from ICFES",
+    "Description": "No Class: Resting from ICFES",
     "Material": "C1",
     "Material teacher": "C1",
     "Summary": "C1"
@@ -273,7 +273,7 @@ window.SCHEDULE_DATA = [
     "Description": "Problems for Continuous Probabilities",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3"
+    "Summary": "C1"
   },
   {
     "Grade": 10,
@@ -283,10 +283,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "Problems for Uniform Probabilities",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3"
+    "Summary": "C2"
   },
   {
     "Grade": 10,
@@ -296,10 +296,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "-",
+    "Description": "Problems for Linear Probabilities",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "C3"
   },
   {
     "Grade": 10,
@@ -309,10 +309,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "C1 C2 C3 Exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "Exam"
   },
   {
     "Grade": 10,
@@ -686,7 +686,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Resting from ICFES",
+    "Description": "No Class: Resting from ICFES",
     "Material": "C1",
     "Material teacher": "C1",
     "Summary": "C1"
@@ -738,7 +738,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "-",
+    "Description": "Problems for Linear probabilities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3"
@@ -751,10 +751,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 5",
-    "Description": "-",
+    "Description": "Exam C1 C2 C3",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3"
+    "Summary": "Exam"
   },
   {
     "Grade": 10,
@@ -1154,7 +1154,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "Resting from ICFES",
+    "Description": "No Class: Resting from ICFES",
     "Material": "C1",
     "Material teacher": "C1",
     "Summary": "C1"
@@ -1206,7 +1206,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "-",
+    "Description": "Problems for Linear probabilities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3"
@@ -1219,10 +1219,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 5",
-    "Description": "-",
+    "Description": "C1 C2 C3 Exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3"
+    "Summary": "Exam"
   },
   {
     "Grade": 10,
@@ -2792,7 +2792,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Resting from ICFES",
+    "Description": "No Class: Resting from ICFES",
     "Material": "C1",
     "Material teacher": "C1",
     "Summary": "C1"
@@ -4248,7 +4248,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "Resting from ICFES",
+    "Description": "No Class: Resting from ICFES",
     "Material": "",
     "Material teacher": "",
     "Summary": "Rest ICFES"
