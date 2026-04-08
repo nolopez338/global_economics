@@ -1,3 +1,143 @@
+const calendar2026days = {
+  year: 2026,
+  weekdays: ["su", "mo", "tu", "we", "th", "fr", "sa"],
+  months: [
+    {
+      month: 1,
+      name: "January",
+      weeks: [
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, 3,    4,    5,    1,    null],
+        [null, 2,    3,    4,    5,    1,    null],
+        [null, 2,    3,    4,    5,    1,    null]
+      ]
+    },
+    {
+      month: 2,
+      name: "February",
+      weeks: [
+        [null, 2, 3, 4, 5, 1, null],
+        [null, 2, 3, 4, 5, 1, null],
+        [null, 2, 3, 4, 5, 1, null],
+        [null, 2, 3, 4, 5, 1, null]
+      ]
+    },
+    {
+      month: 3,
+      name: "March",
+      weeks: [
+        [null, 2,    3,    4,    5,    1,    null],
+        [null, 2,    3,    4,    5,    null, null],
+        [null, 1,    2,    3,    4,    5,    null],
+        [null, null, 1,    2,    3,    null, null],
+        [null, null, null, null, null, null, null]
+      ]
+    },
+    {
+      month: 4,
+      name: "April",
+      weeks: [
+        [null, null, null, null, null, null, null],
+        [null, 4,    5,    1,    2,    3,    null],
+        [null, 4,    5,    1,    2,    3,    null],
+        [null, 4,    5,    1,    2,    3,    null],
+        [null, 4,    5,    1,    2,    null, null]
+      ]
+    },
+    {
+      month: 5,
+      name: "May",
+      weeks: [
+        [null, null, null, null, null, null, null],
+        [null, 3,    4,    5,    1,    2,    null],
+        [null, 3,    4,    5,    1,    null, null],
+        [null, null, 2,    3,    4,    5,    null],
+        [null, 1,    2,    3,    4,    5,    null],
+        [null, null, null, null, null, null, null]
+      ]
+    },
+    {
+      month: 6,
+      name: "June",
+      weeks: [
+        [null, 1,    2,    3,    4,    5,    null],
+        [null, null, 1,    2,    3,    4,    null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null]
+      ]
+    },
+    {
+      month: 7,
+      name: "July",
+      weeks: [
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null]
+      ]
+    },
+    {
+      month: 8,
+      name: "August",
+      weeks: [
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null]
+      ]
+    },
+    {
+      month: 9,
+      name: "September",
+      weeks: [
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null]
+      ]
+    },
+    {
+      month: 10,
+      name: "October",
+      weeks: [
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null]
+      ]
+    },
+    {
+      month: 11,
+      name: "November",
+      weeks: [
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null]
+      ]
+    },
+    {
+      month: 12,
+      name: "December",
+      weeks: [
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null],
+        [null, null, null, null, null, null, null]
+      ]
+    }
+  ]
+};
+
 const calendar2026 = {
   year: 2026,
   weekdays: ["su", "mo", "tu", "we", "th", "fr", "sa"],
