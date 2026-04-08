@@ -1,0 +1,2322 @@
+\makeatletter
+\def\input@path{{./}{../}{../../}{../../../}{../../../../}{preamble/}{../preamble/}{../../preamble/}{../../../preamble/}}
+\makeatother	
+
+\input{preamble_exams.tex}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\title{Term 3 Practice Activity: C2 Uniform Random Variables}
+\author{}
+\date{}
+
+\begin{document}
+	\maketitle
+
+	\setcounter{tocdepth}{1}
+	\setcounter{secnumdepth}{2}
+	\tableofcontents
+
+	\section*{Evaluated criteria}
+	\begin{itemize}
+		\item C2.
+	\end{itemize}
+
+
+\newcommand{\CtwoProbGraph}[7]{
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\supportA}{#1}
+			\pgfmathsetmacro{\supportB}{#2}
+			\pgfmathsetmacro{\pad}{0.12*(\supportB-\supportA)}
+			\begin{axis}[
+			  width=9cm,
+			  height=5cm,
+			  axis lines=left,
+			  xlabel={$x$},
+			  ylabel={$f(x)$},
+			  xmin={\supportA-\pad},
+			  xmax={\supportB+\pad},
+			  ymin=0,
+			  ymax=#7,
+			  grid=both,
+			  xtick={#6}
+				]
+				\addplot[domain=#1:#2, samples=400, const plot, draw=none, fill=blue!20, fill opacity=0.35] {#3} \closedcycle;
+				\addplot[domain=#4:#5, samples=400, const plot, draw=none, fill=blue!60, fill opacity=0.55] {#3} \closedcycle;
+				\addplot[domain=#1:#2, samples=400, const plot, very thick] {#3};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\UniformEndpointGraph}[9]{%
+	\begin{center}
+		\begin{tikzpicture}[x=#1cm,y=8cm]
+			% axes
+			\draw[->] (#2,0) -- (#3,0) node[right] {$x$};
+			\draw[->] (0,-0.01) -- (0,#4);
+			
+			% support shading
+			\fill[blue!20, fill opacity=0.35] (0,0) rectangle (#5,#6);
+			
+			% highlighted region
+			\fill[blue!60, fill opacity=0.55] (#7,0) rectangle (#8,#6);
+			
+			% top density segment
+			\draw[thick] (0,#6) -- (#5,#6);
+			
+			% custom guides and labels
+			#9
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\UniformStartpointGraph}[9]{%
+	\begin{center}
+		\begin{tikzpicture}[x=#1cm,y=8cm]
+			% automatic y-axis height
+			\pgfmathsetmacro{\UniformYTop}{max(0.18,1.8*#6)}
+			
+			% axes
+			\draw[->] (#2,0) -- (#3,0) node[right] {$x$};
+			\draw[->] (0,-0.01) -- (0,\UniformYTop);
+			
+			% support shading
+			\fill[blue!20, fill opacity=0.35] (#4,0) rectangle (#5,#6);
+			
+			% highlighted region
+			\fill[blue!60, fill opacity=0.55] (#7,0) rectangle (#8,#6);
+			
+			% top density segment
+			\draw[thick] (#4,#6) -- (#5,#6);
+			
+			% custom guides and labels
+			#9
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\UniformVariableEndpointsGraph}[9]{%
+	% Main graph macro for Uniform(a,b)
+	% Arguments:
+	% 1 = x-scale
+	% 2 = x-axis minimum
+	% 3 = x-axis maximum
+	% 4 = support start
+	% 5 = support end
+	% 6 = density height
+	% 7 = highlighted region start
+	% 8 = highlighted region end
+	% 9 = extra TikZ code (guides, labels, etc.)
+	\begin{center}
+		\begin{tikzpicture}[x=#1cm,y=8cm]
+			% automatic y-axis height
+			\pgfmathsetmacro{\UniformYTop}{max(0.18,1.8*#6)}
+			
+			% axes
+			\draw[->] (#2,0) -- (#3,0) node[right] {$x$};
+			\draw[->] (0,-0.01) -- (0,\UniformYTop);
+			
+			% support shading
+			\fill[blue!20, fill opacity=0.35] (#4,0) rectangle (#5,#6);
+			
+			% highlighted region
+			\fill[blue!60, fill opacity=0.55] (#7,0) rectangle (#8,#6);
+			
+			% top density segment
+			\draw[thick] (#4,#6) -- (#5,#6);
+			
+			% custom guides and labels
+			#9
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\UniformGuideSet}[6]{%
+	% Helper macro for the five repeated dashed guides and x-axis labels
+	% Arguments:
+	% 1 = coord/label pair for first mark  (example: 0.8/a)
+	% 2 = coord/label pair for second mark (example: 2.8/2)
+	% 3 = coord/label pair for third mark  (example: 7.2/7)
+	% 4 = coord/label pair for fourth mark (example: 8.4/8)
+	% 5 = coord/label pair for fifth mark  (example: 10.2/b)
+	% 6 = guide height
+	\foreach \x/\lab in {#1,#2,#3,#4,#5}{%
+		\draw[dashed] (\x,0) -- (\x,#6);
+		\node[below] at (\x,0) {$\lab$};
+	}%
+}
+
+% --------------------------------------------------
+\section{Introductory Uniform Distribution}
+	
+\textbf{Problem.}
+Let $X\sim \text{Uniform}(0,10)$.
+
+\textbf{Questions/Tasks.}
+Find:
+\begin{itemize}
+	\item[(a)] the density value $f(x)$ on the support,
+	\item[(b)] the support interval of $X$,
+	\item[(c)] $P(2\le X\le 7)$,
+	\item[(d)] $P(X>8)$,
+	\item[(e)] $P(X\le 8)$.
+\end{itemize}
+
+\subsection*{C2}
+\begin{itemize}
+	\item[(a)] For $X\sim \text{Uniform}(0,10)$,
+	\[
+	f(x)=\frac{1}{10-0}=\frac{1}{10},\qquad 0\le x\le 10.
+	\]
+	
+	\item[(b)] The support is $[0,10]$.
+	
+	\[
+	P(0\le X\le 10)=1.
+	\]
+	
+	\CtwoProbGraph{0}{10}{1/10}{0}{10}{0,2,7,8,10}{0.18}
+	
+	\item[(c)]
+	\[
+	P(2\le X\le 7)=\frac{7-2}{10}=\frac{1}{2}.
+	\]
+	
+	\CtwoProbGraph{0}{10}{1/10}{2}{7}{0,2,7,8,10}{0.18}
+	
+	\item[(d)]
+	\[
+	P(X>8)=\frac{10-8}{10}=\frac{1}{5}.
+	\]
+	
+	\CtwoProbGraph{0}{10}{1/10}{8}{10}{0,2,7,8,10}{0.18}
+	
+	\item[(e)] For $P(X\le 8)$, the standard approach gives
+	\[
+	P(X\le 8)=\frac{8-0}{10}=\frac{4}{5}.
+	\]
+	Using the complement approach,
+	\[
+	P(X\le 8)=1-P(X>8)=1-\frac{1}{5}=\frac{4}{5}.
+	\]
+	So both approaches give the same value.
+	
+	\CtwoProbGraph{0}{10}{1/10}{0}{8}{0,2,7,8,10}{0.18}
+\end{itemize}
+
+\textbf{Interpretation.}
+For a simple uniform model, probability is interval length divided by total length. Complements give the same result because the region $X\le 8$ and the region $X>8$ together make the whole support.
+
+% --------------------------------------------------
+\section{Introductory Uniform Distribution with Variable Endpoint}
+
+\textbf{Problem.}
+Let $X\sim \text{Uniform}(0,b)$, where $b>8$.
+
+\textbf{Questions/Tasks.}
+Find:
+\begin{itemize}
+	\item[(a)] the density value $f(x)$ on the support,
+	\item[(b)] the support interval of $X$,
+	\item[(c)] $P(2\le X\le 7)$,
+	\item[(d)] $P(X>8)$,
+	\item[(e)] $P(X\le 8)$.
+\end{itemize}
+
+\subsection*{C2}
+\begin{itemize}
+	\item[(a)] For $X\sim \text{Uniform}(0,b)$,
+	\[
+	f(x)=\frac{1}{b-0}=\frac{1}{b},\qquad 0\le x\le b.
+	\]
+	
+	\item[(b)] The support is $[0,b]$.
+	
+	\UniformEndpointGraph
+	{0.9}{-0.4}{10.8}{0.18}{10}{0.1}{0}{10}
+	{
+		\draw[dashed] (0,0) -- (0,0.1);
+		\draw[dashed] (2.35,0) -- (2.35,0.1);
+		\draw[dashed] (8.24,0) -- (8.24,0.1);
+		\draw[dashed] (9.41,0) -- (9.41,0.1);
+		\draw[dashed] (10,0) -- (10,0.1);
+		
+		\node[below] at (0,0) {$0$};
+		\node[below] at (2.35,0) {$2$};
+		\node[below] at (8.24,0) {$7$};
+		\node[below] at (9.41,0) {$8$};
+		\node[below] at (10,0) {$b$};
+		
+		\node[left] at (0,0.1) {$\frac{1}{b}$};
+	}
+	
+	\noindent Consider the following cases obtained by assigning specific values to $b$.
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Example with $b=9$}
+			
+			\UniformEndpointGraph
+			{0.42}{-0.4}{16.8}{0.18}{9}{0.1111}{0}{9}
+			{
+				\draw[dashed] (0,0) -- (0,0.1111);
+				\draw[dashed] (2,0) -- (2,0.1111);
+				\draw[dashed] (7,0) -- (7,0.1111);
+				\draw[dashed] (8,0) -- (8,0.1111);
+				\draw[dashed] (9,0) -- (9,0.1111);
+				
+				\node[below] at (0,0) {$0$};
+				\node[below] at (2,0) {$2$};
+				\node[below] at (7,0) {$7$};
+				\node[below] at (8,0) {$8$};
+				\node[below] at (9,0) {$9$};
+				
+				\node[left] at (0,0.1111) {$\frac{1}{9}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Example with $b=16$}
+			
+			\UniformEndpointGraph
+			{0.42}{-0.4}{16.8}{0.18}{16}{0.0625}{0}{16}
+			{
+				\draw[dashed] (0,0) -- (0,0.0625);
+				\draw[dashed] (2,0) -- (2,0.0625);
+				\draw[dashed] (7,0) -- (7,0.0625);
+				\draw[dashed] (8,0) -- (8,0.0625);
+				\draw[dashed] (16,0) -- (16,0.0625);
+				
+				\node[below] at (0,0) {$0$};
+				\node[below] at (2,0) {$2$};
+				\node[below] at (7,0) {$7$};
+				\node[below] at (8,0) {$8$};
+				\node[below] at (16,0) {$16$};
+				
+				\node[left] at (0,0.0625) {$\frac{1}{16}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+	\item[(c)]
+	\[
+	P(2\le X\le 7)=\frac{7-2}{b}=\frac{5}{b}.
+	\]
+	
+	\UniformEndpointGraph
+	{0.9}{-0.4}{10.8}{0.18}{10}{0.1}{2.35}{8.24}
+	{
+		\draw[dashed] (0,0) -- (0,0.1);
+		\draw[dashed] (2.35,0) -- (2.35,0.1);
+		\draw[dashed] (8.24,0) -- (8.24,0.1);
+		\draw[dashed] (9.41,0) -- (9.41,0.1);
+		\draw[dashed] (10,0) -- (10,0.1);
+		
+		\node[below] at (0,0) {$0$};
+		\node[below] at (2.35,0) {$2$};
+		\node[below] at (8.24,0) {$7$};
+		\node[below] at (9.41,0) {$8$};
+		\node[below] at (10,0) {$b$};
+		
+		\node[left] at (0,0.1) {$\frac{1}{b}$};
+	}
+	
+	\noindent Consider the following cases obtained by assigning specific values to $b$.
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Example with $b=9$}
+			
+			\[
+			P(2\le X\le 7)=\frac{5}{9}
+			\]
+			
+			\UniformEndpointGraph
+			{0.42}{-0.4}{16.8}{0.18}{9}{0.1111}{2}{7}
+			{
+				\draw[dashed] (0,0) -- (0,0.1111);
+				\draw[dashed] (2,0) -- (2,0.1111);
+				\draw[dashed] (7,0) -- (7,0.1111);
+				\draw[dashed] (8,0) -- (8,0.1111);
+				\draw[dashed] (9,0) -- (9,0.1111);
+				
+				\node[below] at (0,0) {$0$};
+				\node[below] at (2,0) {$2$};
+				\node[below] at (7,0) {$7$};
+				\node[below] at (8,0) {$8$};
+				\node[below] at (9,0) {$9$};
+				
+				\node[left] at (0,0.1111) {$\frac{1}{9}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Example with $b=16$}
+			
+			\[
+			P(2\le X\le 7)=\frac{5}{16}
+			\]
+			
+			\UniformEndpointGraph
+			{0.42}{-0.4}{16.8}{0.18}{16}{0.0625}{2}{7}
+			{
+				\draw[dashed] (0,0) -- (0,0.0625);
+				\draw[dashed] (2,0) -- (2,0.0625);
+				\draw[dashed] (7,0) -- (7,0.0625);
+				\draw[dashed] (8,0) -- (8,0.0625);
+				\draw[dashed] (16,0) -- (16,0.0625);
+				
+				\node[below] at (0,0) {$0$};
+				\node[below] at (2,0) {$2$};
+				\node[below] at (7,0) {$7$};
+				\node[below] at (8,0) {$8$};
+				\node[below] at (16,0) {$16$};
+				
+				\node[left] at (0,0.0625) {$\frac{1}{16}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+	\item[(d)]
+	\[
+	P(X>8)=\frac{b-8}{b}.
+	\]
+	
+	\UniformEndpointGraph
+	{0.9}{-0.4}{10.8}{0.18}{10}{0.1}{9.41}{10}
+	{
+		\draw[dashed] (0,0) -- (0,0.1);
+		\draw[dashed] (2.35,0) -- (2.35,0.1);
+		\draw[dashed] (8.24,0) -- (8.24,0.1);
+		\draw[dashed] (9.41,0) -- (9.41,0.1);
+		\draw[dashed] (10,0) -- (10,0.1);
+		
+		\node[below] at (0,0) {$0$};
+		\node[below] at (2.35,0) {$2$};
+		\node[below] at (8.24,0) {$7$};
+		\node[below] at (9.41,0) {$8$};
+		\node[below] at (10,0) {$b$};
+		
+		\node[left] at (0,0.1) {$\frac{1}{b}$};
+	}
+	
+	\noindent Consider the following cases obtained by assigning specific values to $b$.
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Example with $b=9$}
+			
+			\[
+			P(X>8)=\frac{1}{9}
+			\]
+			
+			\UniformEndpointGraph
+			{0.42}{-0.4}{16.8}{0.18}{9}{0.1111}{8}{9}
+			{
+				\draw[dashed] (0,0) -- (0,0.1111);
+				\draw[dashed] (2,0) -- (2,0.1111);
+				\draw[dashed] (7,0) -- (7,0.1111);
+				\draw[dashed] (8,0) -- (8,0.1111);
+				\draw[dashed] (9,0) -- (9,0.1111);
+				
+				\node[below] at (0,0) {$0$};
+				\node[below] at (2,0) {$2$};
+				\node[below] at (7,0) {$7$};
+				\node[below] at (8,0) {$8$};
+				\node[below] at (9,0) {$9$};
+				
+				\node[left] at (0,0.1111) {$\frac{1}{9}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Example with $b=16$}
+			
+			\[
+			P(X>8)=\frac{8}{16}=\frac{1}{2}
+			\]
+			
+			\UniformEndpointGraph
+			{0.42}{-0.4}{16.8}{0.18}{16}{0.0625}{8}{16}
+			{
+				\draw[dashed] (0,0) -- (0,0.0625);
+				\draw[dashed] (2,0) -- (2,0.0625);
+				\draw[dashed] (7,0) -- (7,0.0625);
+				\draw[dashed] (8,0) -- (8,0.0625);
+				\draw[dashed] (16,0) -- (16,0.0625);
+				
+				\node[below] at (0,0) {$0$};
+				\node[below] at (2,0) {$2$};
+				\node[below] at (7,0) {$7$};
+				\node[below] at (8,0) {$8$};
+				\node[below] at (16,0) {$16$};
+				
+				\node[left] at (0,0.0625) {$\frac{1}{16}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+	\item[(e)] The standard approach gives
+	\[
+	P(X\le 8)=\frac{8-0}{b}=\frac{8}{b}.
+	\]
+	Using the complement approach,
+	\[
+	P(X\le 8)=1-P(X>8)=1-\frac{b-8}{b}
+	=\frac{b-(b-8)}{b}=\frac{8}{b}.
+	\]
+	So both approaches give the same value.
+	
+	\UniformEndpointGraph
+	{0.9}{-0.4}{10.8}{0.18}{10}{0.1}{0}{9.41}
+	{
+		\draw[dashed] (0,0) -- (0,0.1);
+		\draw[dashed] (2.35,0) -- (2.35,0.1);
+		\draw[dashed] (8.24,0) -- (8.24,0.1);
+		\draw[dashed] (9.41,0) -- (9.41,0.1);
+		\draw[dashed] (10,0) -- (10,0.1);
+		
+		\node[below] at (0,0) {$0$};
+		\node[below] at (2.35,0) {$2$};
+		\node[below] at (8.24,0) {$7$};
+		\node[below] at (9.41,0) {$8$};
+		\node[below] at (10,0) {$b$};
+		
+		\node[left] at (0,0.1) {$\frac{1}{b}$};
+	}
+	
+	\noindent Consider the following cases obtained by assigning specific values to $b$.
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Example with $b=9$}
+			
+			\[
+			P(X\le 8)=\frac{8}{9}
+			\]
+			
+			\UniformEndpointGraph
+			{0.42}{-0.4}{16.8}{0.18}{9}{0.1111}{0}{8}
+			{
+				\draw[dashed] (0,0) -- (0,0.1111);
+				\draw[dashed] (2,0) -- (2,0.1111);
+				\draw[dashed] (7,0) -- (7,0.1111);
+				\draw[dashed] (8,0) -- (8,0.1111);
+				\draw[dashed] (9,0) -- (9,0.1111);
+				
+				\node[below] at (0,0) {$0$};
+				\node[below] at (2,0) {$2$};
+				\node[below] at (7,0) {$7$};
+				\node[below] at (8,0) {$8$};
+				\node[below] at (9,0) {$9$};
+				
+				\node[left] at (0,0.1111) {$\frac{1}{9}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Example with $b=16$}
+			
+			\[
+			P(X\le 8)=\frac{8}{16}=\frac{1}{2}
+			\]
+			
+			\UniformEndpointGraph
+			{0.42}{-0.4}{16.8}{0.18}{16}{0.0625}{0}{8}
+			{
+				\draw[dashed] (0,0) -- (0,0.0625);
+				\draw[dashed] (2,0) -- (2,0.0625);
+				\draw[dashed] (7,0) -- (7,0.0625);
+				\draw[dashed] (8,0) -- (8,0.0625);
+				\draw[dashed] (16,0) -- (16,0.0625);
+				
+				\node[below] at (0,0) {$0$};
+				\node[below] at (2,0) {$2$};
+				\node[below] at (7,0) {$7$};
+				\node[below] at (8,0) {$8$};
+				\node[below] at (16,0) {$16$};
+				
+				\node[left] at (0,0.0625) {$\frac{1}{16}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+\end{itemize}
+
+\textbf{Interpretation.}
+For a simple uniform model with variable endpoint, probability is interval length divided by total length. Complements give the same result because the region $X\le 8$ and the region $X>8$ together make the whole support.
+
+% --------------------------------------------------
+\section{Introductory Uniform Distribution with Variable Startpoint}
+
+\textbf{Problem.}
+Let $X\sim \text{Uniform}(a,10)$, where $a<2$.
+
+\textbf{Questions/Tasks.}
+Find:
+\begin{itemize}
+	\item[(a)] the density value $f(x)$ on the support,
+	\item[(b)] the support interval of $X$,
+	\item[(c)] $P(2\le X\le 7)$,
+	\item[(d)] $P(X>8)$,
+	\item[(e)] $P(X\le 8)$.
+\end{itemize}
+
+\subsection*{C2}
+\begin{itemize}
+	\item[(a)] For $X\sim \text{Uniform}(a,10)$,
+	\[
+	f(x)=\frac{1}{10-a},\qquad a\le x\le 10.
+	\]
+	
+	\item[(b)] The support is $[a,10]$.
+	
+	\UniformStartpointGraph
+	{0.9}{-0.4}{11.0}{0.8}{10.2}{0.1}{0.8}{10.2}
+	{
+		\draw[dashed] (0.8,0) -- (0.8,0.1);
+		\draw[dashed] (2.8,0) -- (2.8,0.1);
+		\draw[dashed] (7.2,0) -- (7.2,0.1);
+		\draw[dashed] (8.4,0) -- (8.4,0.1);
+		\draw[dashed] (10.2,0) -- (10.2,0.1);
+		
+		\node[below] at (0.8,0) {$a$};
+		\node[below] at (2.8,0) {$2$};
+		\node[below] at (7.2,0) {$7$};
+		\node[below] at (8.4,0) {$8$};
+		\node[below] at (10.2,0) {$10$};
+		
+		\node[left] at (0.8,0.1) {$\frac{1}{10-a}$};
+	}
+	
+	\noindent Consider the following cases obtained by assigning specific values to $a$.
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Example with $a=1$}
+			
+			\UniformStartpointGraph
+			{0.42}{-6.8}{10.8}{1}{10}{0.1111}{1}{10}
+			{
+				\draw[dashed] (1,0) -- (1,0.1111);
+				\draw[dashed] (2,0) -- (2,0.1111);
+				\draw[dashed] (7,0) -- (7,0.1111);
+				\draw[dashed] (8,0) -- (8,0.1111);
+				\draw[dashed] (10,0) -- (10,0.1111);
+				
+				\node[below] at (1,0) {$1$};
+				\node[below] at (2,0) {$2$};
+				\node[below] at (7,0) {$7$};
+				\node[below] at (8,0) {$8$};
+				\node[below] at (10,0) {$10$};
+				
+				\node[left] at (1,0.1111) {$\frac{1}{9}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Example with $a=-6$}
+			
+			\UniformStartpointGraph
+			{0.42}{-6.8}{10.8}{-6}{10}{0.0625}{-6}{10}
+			{
+				\draw[dashed] (-6,0) -- (-6,0.0625);
+				\draw[dashed] (2,0) -- (2,0.0625);
+				\draw[dashed] (7,0) -- (7,0.0625);
+				\draw[dashed] (8,0) -- (8,0.0625);
+				\draw[dashed] (10,0) -- (10,0.0625);
+				
+				\node[below] at (-6,0) {$-6$};
+				\node[below] at (2,0) {$2$};
+				\node[below] at (7,0) {$7$};
+				\node[below] at (8,0) {$8$};
+				\node[below] at (10,0) {$10$};
+				
+				\node[left] at (-6,0.0625) {$\frac{1}{16}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+	\item[(c)]
+	\[
+	P(2\le X\le 7)=\frac{7-2}{10-a}=\frac{5}{10-a}.
+	\]
+	
+	\UniformStartpointGraph
+	{0.9}{-0.4}{11.0}{0.8}{10.2}{0.1}{2.8}{7.2}
+	{
+		\draw[dashed] (0.8,0) -- (0.8,0.1);
+		\draw[dashed] (2.8,0) -- (2.8,0.1);
+		\draw[dashed] (7.2,0) -- (7.2,0.1);
+		\draw[dashed] (8.4,0) -- (8.4,0.1);
+		\draw[dashed] (10.2,0) -- (10.2,0.1);
+		
+		\node[below] at (0.8,0) {$a$};
+		\node[below] at (2.8,0) {$2$};
+		\node[below] at (7.2,0) {$7$};
+		\node[below] at (8.4,0) {$8$};
+		\node[below] at (10.2,0) {$10$};
+		
+		\node[left] at (0.8,0.1) {$\frac{1}{10-a}$};
+	}
+	
+	\noindent Consider the following cases obtained by assigning specific values to $a$.
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Example with $a=1$}
+			
+			\[
+			P(2\le X\le 7)=\frac{5}{9}
+			\]
+			
+			\UniformStartpointGraph
+			{0.42}{-6.8}{10.8}{1}{10}{0.1111}{2}{7}
+			{
+				\draw[dashed] (1,0) -- (1,0.1111);
+				\draw[dashed] (2,0) -- (2,0.1111);
+				\draw[dashed] (7,0) -- (7,0.1111);
+				\draw[dashed] (8,0) -- (8,0.1111);
+				\draw[dashed] (10,0) -- (10,0.1111);
+				
+				\node[below] at (1,0) {$1$};
+				\node[below] at (2,0) {$2$};
+				\node[below] at (7,0) {$7$};
+				\node[below] at (8,0) {$8$};
+				\node[below] at (10,0) {$10$};
+				
+				\node[left] at (1,0.1111) {$\frac{1}{9}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Example with $a=-6$}
+			
+			\[
+			P(2\le X\le 7)=\frac{5}{16}
+			\]
+			
+			\UniformStartpointGraph
+			{0.42}{-6.8}{10.8}{-6}{10}{0.0625}{2}{7}
+			{
+				\draw[dashed] (-6,0) -- (-6,0.0625);
+				\draw[dashed] (2,0) -- (2,0.0625);
+				\draw[dashed] (7,0) -- (7,0.0625);
+				\draw[dashed] (8,0) -- (8,0.0625);
+				\draw[dashed] (10,0) -- (10,0.0625);
+				
+				\node[below] at (-6,0) {$-6$};
+				\node[below] at (2,0) {$2$};
+				\node[below] at (7,0) {$7$};
+				\node[below] at (8,0) {$8$};
+				\node[below] at (10,0) {$10$};
+				
+				\node[left] at (-6,0.0625) {$\frac{1}{16}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+	\item[(d)]
+	\[
+	P(X>8)=\frac{10-8}{10-a}=\frac{2}{10-a}.
+	\]
+	
+	\UniformStartpointGraph
+	{0.9}{-0.4}{11.0}{0.8}{10.2}{0.1}{8.4}{10.2}
+	{
+		\draw[dashed] (0.8,0) -- (0.8,0.1);
+		\draw[dashed] (2.8,0) -- (2.8,0.1);
+		\draw[dashed] (7.2,0) -- (7.2,0.1);
+		\draw[dashed] (8.4,0) -- (8.4,0.1);
+		\draw[dashed] (10.2,0) -- (10.2,0.1);
+		
+		\node[below] at (0.8,0) {$a$};
+		\node[below] at (2.8,0) {$2$};
+		\node[below] at (7.2,0) {$7$};
+		\node[below] at (8.4,0) {$8$};
+		\node[below] at (10.2,0) {$10$};
+		
+		\node[left] at (0.8,0.1) {$\frac{1}{10-a}$};
+	}
+	
+	\noindent Consider the following cases obtained by assigning specific values to $a$.
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Example with $a=1$}
+			
+			\[
+			P(X>8)=\frac{2}{9}
+			\]
+			
+			\UniformStartpointGraph
+			{0.42}{-6.8}{10.8}{1}{10}{0.1111}{8}{10}
+			{
+				\draw[dashed] (1,0) -- (1,0.1111);
+				\draw[dashed] (2,0) -- (2,0.1111);
+				\draw[dashed] (7,0) -- (7,0.1111);
+				\draw[dashed] (8,0) -- (8,0.1111);
+				\draw[dashed] (10,0) -- (10,0.1111);
+				
+				\node[below] at (1,0) {$1$};
+				\node[below] at (2,0) {$2$};
+				\node[below] at (7,0) {$7$};
+				\node[below] at (8,0) {$8$};
+				\node[below] at (10,0) {$10$};
+				
+				\node[left] at (1,0.1111) {$\frac{1}{9}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Example with $a=-6$}
+			
+			\[
+			P(X>8)=\frac{2}{16}=\frac{1}{8}
+			\]
+			
+			\UniformStartpointGraph
+			{0.42}{-6.8}{10.8}{-6}{10}{0.0625}{8}{10}
+			{
+				\draw[dashed] (-6,0) -- (-6,0.0625);
+				\draw[dashed] (2,0) -- (2,0.0625);
+				\draw[dashed] (7,0) -- (7,0.0625);
+				\draw[dashed] (8,0) -- (8,0.0625);
+				\draw[dashed] (10,0) -- (10,0.0625);
+				
+				\node[below] at (-6,0) {$-6$};
+				\node[below] at (2,0) {$2$};
+				\node[below] at (7,0) {$7$};
+				\node[below] at (8,0) {$8$};
+				\node[below] at (10,0) {$10$};
+				
+				\node[left] at (-6,0.0625) {$\frac{1}{16}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+	\item[(e)] The standard approach gives
+	\[
+	P(X\le 8)=\frac{8-a}{10-a}.
+	\]
+	Using the complement approach,
+	\[
+	P(X\le 8)=1-P(X>8)=1-\frac{2}{10-a}
+	=\frac{10-a-2}{10-a}=\frac{8-a}{10-a}.
+	\]
+	So both approaches give the same value.
+	
+	\UniformStartpointGraph
+	{0.9}{-0.4}{11.0}{0.8}{10.2}{0.1}{0.8}{8.4}
+	{
+		\draw[dashed] (0.8,0) -- (0.8,0.1);
+		\draw[dashed] (2.8,0) -- (2.8,0.1);
+		\draw[dashed] (7.2,0) -- (7.2,0.1);
+		\draw[dashed] (8.4,0) -- (8.4,0.1);
+		\draw[dashed] (10.2,0) -- (10.2,0.1);
+		
+		\node[below] at (0.8,0) {$a$};
+		\node[below] at (2.8,0) {$2$};
+		\node[below] at (7.2,0) {$7$};
+		\node[below] at (8.4,0) {$8$};
+		\node[below] at (10.2,0) {$10$};
+		
+		\node[left] at (0.8,0.1) {$\frac{1}{10-a}$};
+	}
+	
+	\noindent Consider the following cases obtained by assigning specific values to $a$.
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Example with $a=1$}
+			
+			\[
+			P(X\le 8)=\frac{7}{9}
+			\]
+			
+			\UniformStartpointGraph
+			{0.42}{-6.8}{10.8}{1}{10}{0.1111}{1}{8}
+			{
+				\draw[dashed] (1,0) -- (1,0.1111);
+				\draw[dashed] (2,0) -- (2,0.1111);
+				\draw[dashed] (7,0) -- (7,0.1111);
+				\draw[dashed] (8,0) -- (8,0.1111);
+				\draw[dashed] (10,0) -- (10,0.1111);
+				
+				\node[below] at (1,0) {$1$};
+				\node[below] at (2,0) {$2$};
+				\node[below] at (7,0) {$7$};
+				\node[below] at (8,0) {$8$};
+				\node[below] at (10,0) {$10$};
+				
+				\node[left] at (1,0.1111) {$\frac{1}{9}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Example with $a=-6$}
+			
+			\[
+			P(X\le 8)=\frac{14}{16}=\frac{7}{8}
+			\]
+			
+			\UniformStartpointGraph
+			{0.42}{-6.8}{10.8}{-6}{10}{0.0625}{-6}{8}
+			{
+				\draw[dashed] (-6,0) -- (-6,0.0625);
+				\draw[dashed] (2,0) -- (2,0.0625);
+				\draw[dashed] (7,0) -- (7,0.0625);
+				\draw[dashed] (8,0) -- (8,0.0625);
+				\draw[dashed] (10,0) -- (10,0.0625);
+				
+				\node[below] at (-6,0) {$-6$};
+				\node[below] at (2,0) {$2$};
+				\node[below] at (7,0) {$7$};
+				\node[below] at (8,0) {$8$};
+				\node[below] at (10,0) {$10$};
+				
+				\node[left] at (-6,0.0625) {$\frac{1}{16}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+\end{itemize}
+
+\textbf{Interpretation.}
+For a simple uniform model with variable startpoint, probability is interval length divided by total length. Complements give the same result because the region $X\le 8$ and the region $X>8$ together make the whole support.
+
+% --------------------------------------------------
+
+\section{Introductory Uniform Distribution with Variable Endpoints}
+
+\textbf{Problem.}
+Let $X\sim \text{Uniform}(a,b)$, where $a<2<7<8<b$.
+
+\textbf{Questions/Tasks.}
+Find:
+\begin{itemize}
+	\item[(a)] the density value $f(x)$ on the support,
+	\item[(b)] the support interval of $X$,
+	\item[(c)] $P(2\le X\le 7)$,
+	\item[(d)] $P(X>8)$,
+	\item[(e)] $P(X\le 8)$.
+\end{itemize}
+
+\subsection*{C2}
+\begin{itemize}
+	\item[(a)] For $X\sim \text{Uniform}(a,b)$,
+	\[
+	f(x)=\frac{1}{b-a},\qquad a\le x\le b.
+	\]
+	
+	\item[(b)] The support is $[a,b]$.
+	
+	\UniformVariableEndpointsGraph
+	{0.9}{-0.4}{11.0}{0.8}{10.2}{0.1}{0.8}{10.2}
+	{
+		\UniformGuideSet{0.8/a}{2.8/2}{7.2/7}{8.4/8}{10.2/b}{0.1}
+		\node[left] at (0.8,0.1) {$\frac{1}{b-a}$};
+	}
+	
+	\noindent Consider the following cases obtained by assigning specific values to the endpoints.
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Startpoint $a=1$, endpoint $b=9$}
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{9}{0.125}{1}{9}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{9/9}{0.125}
+				\node[left] at (1,0.125) {$\frac{1}{8}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Startpoint $a=1$, endpoint $b=16$}
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{16}{0.0667}{1}{16}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{16/16}{0.0667}
+				\node[left] at (1,0.0667) {$\frac{1}{15}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Endpoint $b=10$, startpoint $a=1$}
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{10}{0.1111}{1}{10}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{10/10}{0.1111}
+				\node[left] at (1,0.1111) {$\frac{1}{9}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Endpoint $b=10$, startpoint $a=-6$}
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{-6}{10}{0.0625}{-6}{10}
+			{
+				\UniformGuideSet{-6/-6}{2/2}{7/7}{8/8}{10/10}{0.0625}
+				\node[left] at (-6,0.0625) {$\frac{1}{16}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+	\item[(c)]
+	\[
+	P(2\le X\le 7)=\frac{7-2}{b-a}=\frac{5}{b-a}.
+	\]
+	
+	\UniformVariableEndpointsGraph
+	{0.9}{-0.4}{11.0}{0.8}{10.2}{0.1}{2.8}{7.2}
+	{
+		\UniformGuideSet{0.8/a}{2.8/2}{7.2/7}{8.4/8}{10.2/b}{0.1}
+		\node[left] at (0.8,0.1) {$\frac{1}{b-a}$};
+	}
+	
+	\noindent Consider the following cases for part (c).
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Startpoint $a=1$, endpoint $b=9$}
+			
+			\[
+			P(2\le X\le 7)=\frac{5}{8}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{9}{0.125}{2}{7}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{9/9}{0.125}
+				\node[left] at (1,0.125) {$\frac{1}{8}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Startpoint $a=1$, endpoint $b=16$}
+			
+			\[
+			P(2\le X\le 7)=\frac{5}{15}=\frac{1}{3}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{16}{0.0667}{2}{7}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{16/16}{0.0667}
+				\node[left] at (1,0.0667) {$\frac{1}{15}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Endpoint $b=10$, startpoint $a=1$}
+			
+			\[
+			P(2\le X\le 7)=\frac{5}{9}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{10}{0.1111}{2}{7}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{10/10}{0.1111}
+				\node[left] at (1,0.1111) {$\frac{1}{9}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Endpoint $b=10$, startpoint $a=-6$}
+			
+			\[
+			P(2\le X\le 7)=\frac{5}{16}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{-6}{10}{0.0625}{2}{7}
+			{
+				\UniformGuideSet{-6/-6}{2/2}{7/7}{8/8}{10/10}{0.0625}
+				\node[left] at (-6,0.0625) {$\frac{1}{16}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+	\item[(d)]
+	\[
+	P(X>8)=\frac{b-8}{b-a}.
+	\]
+	
+	\UniformVariableEndpointsGraph
+	{0.9}{-0.4}{11.0}{0.8}{10.2}{0.1}{8.4}{10.2}
+	{
+		\UniformGuideSet{0.8/a}{2.8/2}{7.2/7}{8.4/8}{10.2/b}{0.1}
+		\node[left] at (0.8,0.1) {$\frac{1}{b-a}$};
+	}
+	
+	\noindent Consider the following cases for part (d).
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Startpoint $a=1$, endpoint $b=9$}
+			
+			\[
+			P(X>8)=\frac{1}{8}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{9}{0.125}{8}{9}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{9/9}{0.125}
+				\node[left] at (1,0.125) {$\frac{1}{8}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Startpoint $a=1$, endpoint $b=16$}
+			
+			\[
+			P(X>8)=\frac{8}{15}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{16}{0.0667}{8}{16}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{16/16}{0.0667}
+				\node[left] at (1,0.0667) {$\frac{1}{15}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Endpoint $b=10$, startpoint $a=1$}
+			
+			\[
+			P(X>8)=\frac{2}{9}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{10}{0.1111}{8}{10}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{10/10}{0.1111}
+				\node[left] at (1,0.1111) {$\frac{1}{9}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Endpoint $b=10$, startpoint $a=-6$}
+			
+			\[
+			P(X>8)=\frac{2}{16}=\frac{1}{8}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{-6}{10}{0.0625}{8}{10}
+			{
+				\UniformGuideSet{-6/-6}{2/2}{7/7}{8/8}{10/10}{0.0625}
+				\node[left] at (-6,0.0625) {$\frac{1}{16}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+	\item[(e)] The standard approach gives
+	\[
+	P(X\le 8)=\frac{8-a}{b-a}.
+	\]
+	Using the complement approach,
+	\[
+	P(X\le 8)=1-P(X>8)=1-\frac{b-8}{b-a}
+	=\frac{b-a-(b-8)}{b-a}=\frac{8-a}{b-a}.
+	\]
+	So both approaches give the same value.
+	
+	\UniformVariableEndpointsGraph
+	{0.9}{-0.4}{11.0}{0.8}{10.2}{0.1}{0.8}{8.4}
+	{
+		\UniformGuideSet{0.8/a}{2.8/2}{7.2/7}{8.4/8}{10.2/b}{0.1}
+		\node[left] at (0.8,0.1) {$\frac{1}{b-a}$};
+	}
+	
+	\noindent Consider the following cases for part (e).
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Startpoint $a=1$, endpoint $b=9$}
+			
+			\[
+			P(X\le 8)=\frac{7}{8}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{9}{0.125}{1}{8}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{9/9}{0.125}
+				\node[left] at (1,0.125) {$\frac{1}{8}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Startpoint $a=1$, endpoint $b=16$}
+			
+			\[
+			P(X\le 8)=\frac{7}{15}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{16}{0.0667}{1}{8}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{16/16}{0.0667}
+				\node[left] at (1,0.0667) {$\frac{1}{15}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Endpoint $b=10$, startpoint $a=1$}
+			
+			\[
+			P(X\le 8)=\frac{7}{9}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{1}{10}{0.1111}{1}{8}
+			{
+				\UniformGuideSet{1/1}{2/2}{7/7}{8/8}{10/10}{0.1111}
+				\node[left] at (1,0.1111) {$\frac{1}{9}$};
+			}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\textit{Endpoint $b=10$, startpoint $a=-6$}
+			
+			\[
+			P(X\le 8)=\frac{14}{16}=\frac{7}{8}
+			\]
+			
+			\UniformVariableEndpointsGraph
+			{0.32}{-6.8}{16.8}{-6}{10}{0.0625}{-6}{8}
+			{
+				\UniformGuideSet{-6/-6}{2/2}{7/7}{8/8}{10/10}{0.0625}
+				\node[left] at (-6,0.0625) {$\frac{1}{16}$};
+			}
+		\end{minipage}
+	\end{center}
+	
+\end{itemize}
+
+\textbf{Interpretation.}
+For a simple uniform model with variable endpoints, probability is interval length divided by total length. Complements give the same result because the region $X\le 8$ and the region $X>8$ together make the whole support.
+
+% --------------------------------------------------
+\section{Two-Interval Piecewise Uniform (Basic)}
+
+\textbf{Problem.}
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+	\dfrac{1}{5}, & 0\le x<4,\\
+	\dfrac{1}{30}, & 4\le x\le 10,\\
+	0, & \text{otherwise.}
+\end{cases}
+\]
+
+\textbf{Questions/Tasks.}
+Find:
+\begin{itemize}
+	\item[(a)] $P(X<3)$,
+	\item[(b)] $P(X\ge 3)$,
+	\item[(c)] $P(2\le X\le 8)$.
+\end{itemize}
+
+\subsection*{C2}
+
+\textbf{Function definition.}
+Check total area:
+\[
+4\left(\frac{1}{5}\right)+6\left(\frac{1}{30}\right)=\frac{4}{5}+\frac{1}{5}=1.
+\]
+
+\CtwoProbGraph{0}{10}{x < 4 ? 1/5 : 1/30}{0}{10}{0,2,3,4,8,10}{0.26}
+
+\textbf{(a)}
+\[
+P(X<3)=3\left(\frac{1}{5}\right)=\frac{3}{5}.
+\]
+
+\CtwoProbGraph{0}{10}{x < 4 ? 1/5 : 1/30}{0}{3}{0,2,3,4,8,10}{0.26}
+
+\textbf{(b)} Using the standard approach,
+\[
+P(X\ge 3)=1\left(\frac{1}{5}\right)+6\left(\frac{1}{30}\right)=\frac{1}{5}+\frac{1}{5}=\frac{2}{5}.
+\]
+Using the complement approach,
+\[
+P(X\ge 3)=1-P(X<3)=1-\frac{3}{5}=\frac{2}{5}.
+\]
+So both approaches give the same value.
+
+\CtwoProbGraph{0}{10}{x < 4 ? 1/5 : 1/30}{3}{10}{0,2,3,4,8,10}{0.26}
+
+\textbf{(c)}
+\[
+P(2\le X\le 8)=2\left(\frac{1}{5}\right)+4\left(\frac{1}{30}\right)=\frac{2}{5}+\frac{2}{15}=\frac{8}{15}.
+\]
+
+\CtwoProbGraph{0}{10}{x < 4 ? 1/5 : 1/30}{2}{8}{0,2,3,4,8,10}{0.26}
+
+\textbf{Interpretation.}
+Most probability mass is on $[0,4)$ because its density height is much larger.
+
+% --------------------------------------------------
+\section{Two-Interval Piecewise Uniform (Basic)}
+
+\textbf{Problem.}
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+	\dfrac{1}{6}, & -2\le x<1,\\
+	\dfrac{1}{10}, & 1\le x\le 6,\\
+	0, & \text{otherwise.}
+\end{cases}
+\]
+
+\textbf{Questions/Tasks.}
+Find:
+\begin{itemize}
+	\item[(a)] $P(-1\le X\le 4)$,
+	\item[(b)] $P(X>3)$,
+	\item[(c)] $P(X\le 3)$.
+\end{itemize}
+
+\subsection*{C2}
+Check total area:
+\[
+3\left(\frac{1}{6}\right)+5\left(\frac{1}{10}\right)=\frac{1}{2}+\frac{1}{2}=1.
+\]
+
+\CtwoProbGraph{-2}{6}{x < 1 ? 1/6 : 1/10}{-2}{6}{-2,-1,1,3,4,6}{0.24}
+
+\textbf{(a)}
+\[
+P(-1\le X\le 4)=2\left(\frac{1}{6}\right)+3\left(\frac{1}{10}\right)=\frac{1}{3}+\frac{3}{10}=\frac{19}{30}.
+\]
+
+\CtwoProbGraph{-2}{6}{x < 1 ? 1/6 : 1/10}{-1}{4}{-2,-1,1,3,4,6}{0.24}
+
+\textbf{(b)}
+\[
+P(X>3)=3\left(\frac{1}{10}\right)=\frac{3}{10}.
+\]
+
+\CtwoProbGraph{-2}{6}{x < 1 ? 1/6 : 1/10}{3}{6}{-2,-1,1,3,4,6}{0.24}
+
+\textbf{(c)} Using the standard approach,
+\[
+P(X\le 3)=3\left(\frac{1}{6}\right)+2\left(\frac{1}{10}\right)=\frac{1}{2}+\frac{1}{5}=\frac{7}{10}.
+\]
+Using the complement approach,
+\[
+P(X\le 3)=1-P(X>3)=1-\frac{3}{10}=\frac{7}{10}.
+\]
+So both approaches give the same value.
+
+\CtwoProbGraph{-2}{6}{x < 1 ? 1/6 : 1/10}{-2}{3}{-2,-1,1,3,4,6}{0.24}
+
+\textbf{Interpretation.}
+To find each probability, add the rectangular areas over the relevant subintervals. In part (c), the complement method works because the regions $X\le 3$ and $X>3$ together make the whole support.
+
+% --------------------------------------------------
+\section{Two-Interval Piecewise Uniform with Unique Variable Endpoint}
+
+\textbf{Problem.}
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+	\dfrac{1}{12}, & -2\le x<1,\\[4pt]
+	\dfrac{1}{8}, & 1\le x\le b,\\[4pt]
+	0, & \text{otherwise,}
+\end{cases}
+\]
+where $b>1$.
+
+\textbf{Questions/Tasks.}
+Find:
+\begin{itemize}
+	\item[(a)] the value of $b$ that makes this a valid density,
+	\item[(b)] $P(-1\le X\le 4)$,
+	\item[(c)] $P(X>3)$,
+	\item[(d)] $P(X<1)$.
+\end{itemize}
+
+\subsection*{C2}
+For a valid density, the total area must be $1$:
+\[
+3\left(\frac{1}{12}\right)+(b-1)\left(\frac{1}{8}\right)=1.
+\]
+So
+\[
+\frac{1}{4}+\frac{b-1}{8}=1.
+\]
+Thus
+\[
+\frac{b-1}{8}=\frac{3}{4},
+\]
+and therefore
+\[
+b-1=6,
+\qquad
+b=7.
+\]
+
+Now use $b=7$.
+
+\[
+P(-1\le X\le 4)=2\left(\frac{1}{12}\right)+3\left(\frac{1}{8}\right)
+=\frac{1}{6}+\frac{3}{8}
+=\frac{13}{24}.
+\]
+
+\[
+P(X>3)=4\left(\frac{1}{8}\right)=\frac{1}{2}.
+\]
+
+\[
+P(X<1)=3\left(\frac{1}{12}\right)=\frac{1}{4}.
+\]
+
+\CtwoProbGraph{-2}{7}{x < 1 ? 1/12 : 1/8}{-1}{4}{-2,-1,1,3,4,7}{0.18}
+
+\textbf{Interpretation.}
+Because the heights are fixed, there is only one endpoint that makes the total area equal to $1$. After finding that endpoint, probabilities are found by adding the relevant rectangular areas.
+
+% --------------------------------------------------
+\section{Two-Interval Piecewise Uniform with Unique Variable Startpoint}
+
+\textbf{Problem.}
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+	\dfrac{1}{6}, & a\le x<1,\\[4pt]
+	\dfrac{1}{10}, & 1\le x\le 6,\\[4pt]
+	0, & \text{otherwise,}
+\end{cases}
+\]
+where $a<1$.
+
+\textbf{Questions/Tasks.}
+Find:
+\begin{itemize}
+	\item[(a)] the value of $a$ that makes this a valid density,
+	\item[(b)] $P(-1\le X\le 4)$,
+	\item[(c)] $P(X>3)$,
+	\item[(d)] $P(X<1)$.
+\end{itemize}
+
+\subsection*{C2}
+For a valid density, the total area must be $1$:
+\[
+(1-a)\left(\frac{1}{6}\right)+5\left(\frac{1}{10}\right)=1.
+\]
+So
+\[
+\frac{1-a}{6}+\frac{1}{2}=1.
+\]
+Thus
+\[
+\frac{1-a}{6}=\frac{1}{2},
+\]
+and therefore
+\[
+1-a=3,
+\qquad
+a=-2.
+\]
+
+Now use $a=-2$.
+
+\[
+P(-1\le X\le 4)=2\left(\frac{1}{6}\right)+3\left(\frac{1}{10}\right)
+=\frac{1}{3}+\frac{3}{10}
+=\frac{19}{30}.
+\]
+
+\[
+P(X>3)=3\left(\frac{1}{10}\right)=\frac{3}{10}.
+\]
+
+\[
+P(X<1)=3\left(\frac{1}{6}\right)=\frac{1}{2}.
+\]
+
+\CtwoProbGraph{-2}{6}{x < 1 ? 1/6 : 1/10}{-1}{4}{-2,-1,1,3,4,6}{0.24}
+
+\textbf{Interpretation.}
+Because the heights are fixed, there is only one startpoint that makes the total area equal to $1$. After finding that startpoint, probabilities are found by adding the relevant rectangular areas.
+
+% --------------------------------------------------
+\section{Two-Interval Piecewise Uniform with Variable Endpoint}
+
+\textbf{Problem.}
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+	\dfrac{1}{6}, & -2\le x<1,\\[4pt]
+	\dfrac{1}{2(b-1)}, & 1\le x\le b,\\[4pt]
+	0, & \text{otherwise,}
+\end{cases}
+\qquad \text{where } b>4.
+\]
+
+\textbf{Questions/Tasks.}
+Find:
+\begin{itemize}
+	\item[(a)] $P(-1\le X\le 4)$,
+	\item[(b)] $P(X>3)$,
+	\item[(c)] $P(X<1)$.
+\end{itemize}
+
+\subsection*{C2}
+Check total area:
+\[
+3\left(\frac{1}{6}\right)+(b-1)\left(\frac{1}{2(b-1)}\right)
+=\frac{1}{2}+\frac{1}{2}=1.
+\]
+So this is a valid density.
+
+For part (a), split the interval at $x=1$:
+\[
+P(-1\le X\le 4)
+=2\left(\frac{1}{6}\right)+3\left(\frac{1}{2(b-1)}\right)
+=\frac{1}{3}+\frac{3}{2(b-1)}.
+\]
+
+For part (b),
+\[
+P(X>3)
+=(b-3)\left(\frac{1}{2(b-1)}\right)
+=\frac{b-3}{2(b-1)}.
+\]
+
+For part (c),
+\[
+P(X<1)=3\left(\frac{1}{6}\right)=\frac{1}{2}.
+\]
+
+\begin{center}
+	\begin{tikzpicture}[x=1cm,y=8cm]
+		% axes
+		\draw[->] (-0.8,0) -- (8.6,0) node[right] {$x$};
+		\draw[->] (0,-0.01) -- (0,0.22);
+		
+		% support shading
+		\fill[blue!20, fill opacity=0.35] (1.0,0) rectangle (4.0,0.1667);
+		\fill[blue!20, fill opacity=0.35] (4.0,0) rectangle (8.0,0.0833);
+		
+		% highlighted interval for P(-1 \le X \le 4)
+		\fill[blue!60, fill opacity=0.55] (2.0,0) rectangle (4.0,0.1667);
+		\fill[blue!60, fill opacity=0.55] (4.0,0) rectangle (7.0,0.0833);
+		
+		% density graph
+		\draw[thick] (1.0,0.1667) -- (4.0,0.1667);
+		\draw[thick] (4.0,0.0833) -- (8.0,0.0833);
+		
+		% dashed guide lines
+		\draw[dashed] (1.0,0) -- (1.0,0.1667);
+		\draw[dashed] (2.0,0) -- (2.0,0.1667);
+		\draw[dashed] (4.0,0) -- (4.0,0.1667);
+		\draw[dashed] (7.0,0) -- (7.0,0.0833);
+		\draw[dashed] (8.0,0) -- (8.0,0.0833);
+		
+		% labels
+		\node[below] at (1.0,0) {$-2$};
+		\node[below] at (2.0,0) {$-1$};
+		\node[below] at (4.0,0) {$1$};
+		\node[below] at (6.0,0) {$3$};
+		\node[below] at (7.0,0) {$4$};
+		\node[below] at (8.0,0) {$b$};
+		
+		\node[left] at (1.0,0.1667) {$\frac{1}{6}$};
+		\node[right] at (8.0,0.0833) {$\frac{1}{2(b-1)}$};
+	\end{tikzpicture}
+\end{center}
+
+\noindent Consider the following cases obtained by assigning specific values to $b$.
+
+\begin{center}
+	\begin{minipage}{0.48\textwidth}
+		\centering
+		\textit{Example with $b=5$}
+		
+		\[
+		\frac{1}{2(b-1)}=\frac{1}{2(5-1)}=\frac{1}{8}
+		\]
+		\[
+		\text{(a)}\;P(-1\le X\le 4)=\frac{1}{3}+\frac{3}{2(5-1)}=\frac{1}{3}+\frac{3}{8}=\frac{17}{24}
+		\]
+		\[
+		\text{(b)}\;P(X>3)=\frac{5-3}{2(5-1)}=\frac{1}{4}
+		\]
+		\[
+		\text{(c)}\;P(X<1)=\frac{1}{2}
+		\]
+		
+		\begin{tikzpicture}[x=0.75cm,y=8cm]
+			\draw[->] (-2.8,0) -- (5.8,0) node[right] {$x$};
+			\draw[->] (0,-0.01) -- (0,0.22);
+			
+			\fill[blue!20, fill opacity=0.35] (-2,0) rectangle (1,0.1667);
+			\fill[blue!20, fill opacity=0.35] (1,0) rectangle (5,0.125);
+			
+			\fill[blue!60, fill opacity=0.55] (-1,0) rectangle (1,0.1667);
+			\fill[blue!60, fill opacity=0.55] (1,0) rectangle (4,0.125);
+			
+			\draw[thick] (-2,0.1667) -- (1,0.1667);
+			\draw[thick] (1,0.125) -- (5,0.125);
+			
+			\draw[dashed] (-2,0) -- (-2,0.1667);
+			\draw[dashed] (-1,0) -- (-1,0.1667);
+			\draw[dashed] (1,0) -- (1,0.1667);
+			\draw[dashed] (3,0) -- (3,0.125);
+			\draw[dashed] (4,0) -- (4,0.125);
+			\draw[dashed] (5,0) -- (5,0.125);
+			
+			\node[below] at (-2,0) {$-2$};
+			\node[below] at (-1,0) {$-1$};
+			\node[below] at (1,0) {$1$};
+			\node[below] at (3,0) {$3$};
+			\node[below] at (4,0) {$4$};
+			\node[below] at (5,0) {$5$};
+			
+			\node[left] at (-2,0.1667) {$\frac{1}{6}$};
+			\node[right] at (5,0.125) {$\frac{1}{8}$};
+		\end{tikzpicture}
+	\end{minipage}
+	\hfill
+	\begin{minipage}{0.48\textwidth}
+		\centering
+		\textit{Example with $b=11$}
+		
+		\[
+		\frac{1}{2(b-1)}=\frac{1}{2(11-1)}=\frac{1}{20}
+		\]
+		\[
+		\text{(a)}\;P(-1\le X\le 4)=\frac{1}{3}+\frac{3}{2(11-1)}=\frac{1}{3}+\frac{3}{20}=\frac{29}{60}
+		\]
+		\[
+		\text{(b)}\;P(X>3)=\frac{11-3}{2(11-1)}=\frac{8}{20}=\frac{2}{5}
+		\]
+		\[
+		\text{(c)}\;P(X<1)=\frac{1}{2}
+		\]
+		
+		\begin{tikzpicture}[x=0.42cm,y=8cm]
+			\draw[->] (-2.8,0) -- (11.8,0) node[right] {$x$};
+			\draw[->] (0,-0.01) -- (0,0.22);
+			
+			\fill[blue!20, fill opacity=0.35] (-2,0) rectangle (1,0.1667);
+			\fill[blue!20, fill opacity=0.35] (1,0) rectangle (11,0.05);
+			
+			\fill[blue!60, fill opacity=0.55] (-1,0) rectangle (1,0.1667);
+			\fill[blue!60, fill opacity=0.55] (1,0) rectangle (4,0.05);
+			
+			\draw[thick] (-2,0.1667) -- (1,0.1667);
+			\draw[thick] (1,0.05) -- (11,0.05);
+			
+			\draw[dashed] (-2,0) -- (-2,0.1667);
+			\draw[dashed] (-1,0) -- (-1,0.1667);
+			\draw[dashed] (1,0) -- (1,0.1667);
+			\draw[dashed] (3,0) -- (3,0.05);
+			\draw[dashed] (4,0) -- (4,0.05);
+			\draw[dashed] (11,0) -- (11,0.05);
+			
+			\node[below] at (-2,0) {$-2$};
+			\node[below] at (-1,0) {$-1$};
+			\node[below] at (1,0) {$1$};
+			\node[below] at (3,0) {$3$};
+			\node[below] at (4,0) {$4$};
+			\node[below] at (11,0) {$11$};
+			
+			\node[left] at (-2,0.1667) {$\frac{1}{6}$};
+			\node[right] at (11,0.05) {$\frac{1}{20}$};
+		\end{tikzpicture}
+	\end{minipage}
+\end{center}
+
+\textbf{Interpretation.}
+To find each probability, add the rectangular areas over the relevant subintervals.
+
+% --------------------------------------------------
+\section{Two-Interval Piecewise Uniform with Variable Start}
+
+\textbf{Problem.}
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+	\dfrac{1}{2(1-a)}, & a\le x<1,\\[4pt]
+	\dfrac{1}{10}, & 1\le x\le 6,\\[4pt]
+	0, & \text{otherwise,}
+\end{cases}
+\qquad \text{where } a<-1.
+\]
+
+\textbf{Questions/Tasks.}
+Find:
+\begin{itemize}
+	\item[(a)] $P(-1\le X\le 4)$,
+	\item[(b)] $P(X>3)$,
+	\item[(c)] $P(X<1)$.
+\end{itemize}
+
+\subsection*{C2}
+Check total area:
+\[
+(1-a)\left(\frac{1}{2(1-a)}\right)+5\left(\frac{1}{10}\right)
+=\frac{1}{2}+\frac{1}{2}=1.
+\]
+So this is a valid density.
+
+For part (a), split the interval at $x=1$:
+\[
+P(-1\le X\le 4)
+=2\left(\frac{1}{2(1-a)}\right)+3\left(\frac{1}{10}\right)
+=\frac{1}{1-a}+\frac{3}{10}.
+\]
+
+For part (b),
+\[
+P(X>3)=3\left(\frac{1}{10}\right)=\frac{3}{10}.
+\]
+
+For part (c),
+\[
+P(X<1)=(1-a)\left(\frac{1}{2(1-a)}\right)=\frac{1}{2}.
+\]
+
+\begin{center}
+	\begin{tikzpicture}[x=1cm,y=8cm]
+		% axes
+		\draw[->] (-0.8,0) -- (8.6,0) node[right] {$x$};
+		\draw[->] (0,-0.01) -- (0,0.22);
+		
+		% support shading
+		\fill[blue!20, fill opacity=0.35] (1.0,0) rectangle (4.0,0.0833);
+		\fill[blue!20, fill opacity=0.35] (4.0,0) rectangle (8.0,0.1);
+		
+		% highlighted interval for P(-1 \le X \le 4)
+		\fill[blue!60, fill opacity=0.55] (2.0,0) rectangle (4.0,0.0833);
+		\fill[blue!60, fill opacity=0.55] (4.0,0) rectangle (7.0,0.1);
+		
+		% density graph
+		\draw[thick] (1.0,0.0833) -- (4.0,0.0833);
+		\draw[thick] (4.0,0.1) -- (8.0,0.1);
+		
+		% dashed guide lines
+		\draw[dashed] (1.0,0) -- (1.0,0.0833);
+		\draw[dashed] (2.0,0) -- (2.0,0.0833);
+		\draw[dashed] (4.0,0) -- (4.0,0.1);
+		\draw[dashed] (6.0,0) -- (6.0,0.1);
+		\draw[dashed] (7.0,0) -- (7.0,0.1);
+		\draw[dashed] (8.0,0) -- (8.0,0.1);
+		
+		% labels
+		\node[below] at (1.0,0) {$a$};
+		\node[below] at (2.0,0) {$-1$};
+		\node[below] at (4.0,0) {$1$};
+		\node[below] at (6.0,0) {$3$};
+		\node[below] at (7.0,0) {$4$};
+		\node[below] at (8.0,0) {$6$};
+		
+		\node[left] at (1.0,0.0833) {$\frac{1}{2(1-a)}$};
+		\node[right] at (8.0,0.1) {$\frac{1}{10}$};
+	\end{tikzpicture}
+\end{center}
+
+\noindent Consider the following cases obtained by assigning specific values to $a$.
+
+\begin{center}
+	\begin{minipage}{0.48\textwidth}
+		\centering
+		\textit{Example with $a=-2$}
+		
+		\[
+		\frac{1}{2(1-a)}=\frac{1}{2(1-(-2))}=\frac{1}{6}
+		\]
+		\[
+		\text{(a)}\;P(-1\le X\le 4)=\frac{1}{1-(-2)}+\frac{3}{10}=\frac{1}{3}+\frac{3}{10}=\frac{19}{30}
+		\]
+		\[
+		\text{(b)}\;P(X>3)=\frac{3}{10}
+		\]
+		\[
+		\text{(c)}\;P(X<1)=\frac{1}{2}
+		\]
+		
+		\begin{tikzpicture}[x=0.75cm,y=8cm]
+			\draw[->] (-2.8,0) -- (6.8,0) node[right] {$x$};
+			\draw[->] (0,-0.01) -- (0,0.22);
+			
+			\fill[blue!20, fill opacity=0.35] (-2,0) rectangle (1,0.1667);
+			\fill[blue!20, fill opacity=0.35] (1,0) rectangle (6,0.1);
+			
+			\fill[blue!60, fill opacity=0.55] (-1,0) rectangle (1,0.1667);
+			\fill[blue!60, fill opacity=0.55] (1,0) rectangle (4,0.1);
+			
+			\draw[thick] (-2,0.1667) -- (1,0.1667);
+			\draw[thick] (1,0.1) -- (6,0.1);
+			
+			\draw[dashed] (-2,0) -- (-2,0.1667);
+			\draw[dashed] (-1,0) -- (-1,0.1667);
+			\draw[dashed] (1,0) -- (1,0.1667);
+			\draw[dashed] (3,0) -- (3,0.1);
+			\draw[dashed] (4,0) -- (4,0.1);
+			\draw[dashed] (6,0) -- (6,0.1);
+			
+			\node[below] at (-2,0) {$-2$};
+			\node[below] at (-1,0) {$-1$};
+			\node[below] at (1,0) {$1$};
+			\node[below] at (3,0) {$3$};
+			\node[below] at (4,0) {$4$};
+			\node[below] at (6,0) {$6$};
+			
+			\node[left] at (-2,0.1667) {$\frac{1}{6}$};
+			\node[right] at (6,0.1) {$\frac{1}{10}$};
+		\end{tikzpicture}
+	\end{minipage}
+	\hfill
+	\begin{minipage}{0.48\textwidth}
+		\centering
+		\textit{Example with $a=-8$}
+		
+		\[
+		\frac{1}{2(1-a)}=\frac{1}{2(1-(-8))}=\frac{1}{18}
+		\]
+		\[
+		\text{(a)}\;P(-1\le X\le 4)=\frac{1}{1-(-8)}+\frac{3}{10}=\frac{1}{9}+\frac{3}{10}=\frac{37}{90}
+		\]
+		\[
+		\text{(b)}\;P(X>3)=\frac{3}{10}
+		\]
+		\[
+		\text{(c)}\;P(X<1)=\frac{1}{2}
+		\]
+		
+		\begin{tikzpicture}[x=0.38cm,y=8cm]
+			\draw[->] (-8.8,0) -- (6.8,0) node[right] {$x$};
+			\draw[->] (0,-0.01) -- (0,0.22);
+			
+			\fill[blue!20, fill opacity=0.35] (-8,0) rectangle (1,0.0556);
+			\fill[blue!20, fill opacity=0.35] (1,0) rectangle (6,0.1);
+			
+			\fill[blue!60, fill opacity=0.55] (-1,0) rectangle (1,0.0556);
+			\fill[blue!60, fill opacity=0.55] (1,0) rectangle (4,0.1);
+			
+			\draw[thick] (-8,0.0556) -- (1,0.0556);
+			\draw[thick] (1,0.1) -- (6,0.1);
+			
+			\draw[dashed] (-8,0) -- (-8,0.0556);
+			\draw[dashed] (-1,0) -- (-1,0.0556);
+			\draw[dashed] (1,0) -- (1,0.1);
+			\draw[dashed] (3,0) -- (3,0.1);
+			\draw[dashed] (4,0) -- (4,0.1);
+			\draw[dashed] (6,0) -- (6,0.1);
+			
+			\node[below] at (-8,0) {$-8$};
+			\node[below] at (-1,0) {$-1$};
+			\node[below] at (1,0) {$1$};
+			\node[below] at (3,0) {$3$};
+			\node[below] at (4,0) {$4$};
+			\node[below] at (6,0) {$6$};
+			
+			\node[left] at (-8,0.0556) {$\frac{1}{18}$};
+			\node[right] at (6,0.1) {$\frac{1}{10}$};
+		\end{tikzpicture}
+	\end{minipage}
+\end{center}
+
+\textbf{Interpretation.}
+To find each probability, add the rectangular areas over the relevant subintervals.
+
+% --------------------------------------------------
+\section{Three-Interval Piecewise Uniform (Combining Regions)}
+
+\textbf{Problem.}
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+\dfrac{1}{10}, & 0\le x<2,\\
+\dfrac{1}{5}, & 2\le x<5,\\
+\dfrac{1}{10}, & 5\le x\le 7,\\
+0, & \text{otherwise.}
+\end{cases}
+\]
+
+\textbf{Questions/Tasks.}
+Find:
+\begin{itemize}
+    \item[(a)] $P(X<2\ \text{or}\ X>5)$,
+    \item[(b)] $P(2\le X\le 4)$,
+    \item[(c)] Which is more likely: $X\in[0,2)$ or $X\in[2,5)$? Explain.
+\end{itemize}
+
+\subsection*{C2}
+Check total area:
+\[
+2\left(\frac{1}{10}\right)+3\left(\frac{1}{5}\right)+2\left(\frac{1}{10}\right)=\frac{1}{5}+\frac{3}{5}+\frac{1}{5}=1.
+\]
+\[
+P(X<2\ \text{or}\ X>5)=2\left(\frac{1}{10}\right)+2\left(\frac{1}{10}\right)=\frac{2}{5}.
+\]
+\[
+P(2\le X\le 4)=2\left(\frac{1}{5}\right)=\frac{2}{5}.
+\]
+Also,
+\[
+P(0\le X<2)=\frac{1}{5},\qquad P(2\le X<5)=\frac{3}{5}.
+\]
+So $[2,5)$ is more likely.
+\CtwoProbGraph{0}{7}{x < 2 ? 1/10 : (x < 5 ? 1/5 : 1/10)}{2}{4}{0,2,4,5,7}{0.26}
+
+\textbf{Interpretation.}
+Even with equal widths, a taller density rectangle gives larger probability.
+
+% --------------------------------------------------
+\section{Piecewise Uniform with Complement Reasoning}
+
+\textbf{Problem.}
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+\dfrac{3}{20}, & 10\le x<14,\\
+\dfrac{1}{10}, & 14\le x<18,\\
+0, & \text{otherwise.}
+\end{cases}
+\]
+
+\textbf{Questions/Tasks.}
+Find:
+\begin{itemize}
+    \item[(a)] $P(11\le X\le 13\ \text{or}\ 16\le X\le 18)$,
+    \item[(b)] $P(X<12\ \text{or}\ X>17)$,
+    \item[(c)] $P(12\le X\le 17)$ using a complement.
+\end{itemize}
+
+\subsection*{C2}
+Check total area:
+\[
+4\left(\frac{3}{20}\right)+4\left(\frac{1}{10}\right)=\frac{3}{5}+\frac{2}{5}=1.
+\]
+So densities are $\frac{2}{11}$ and $\frac{1}{11}$, both nonnegative.
+\[
+P(11\le X\le 13\ \text{or}\ 16\le X\le 18)=2\left(\frac{3}{20}\right)+2\left(\frac{1}{10}\right)=\frac{3}{10}+\frac{1}{5}=\frac{1}{2}.
+\]
+\[
+P(X<12\ \text{or}\ X>17)=2\left(\frac{3}{20}\right)+1\left(\frac{1}{10}\right)=\frac{3}{10}+\frac{1}{10}=\frac{2}{5}.
+\]
+\[
+P(12\le X\le 17)=1-P(X<12\ \text{or}\ X>17)=1-\frac{2}{5}=\frac{3}{5}.
+\]
+\CtwoProbGraph{10}{18}{x < 14 ? 3/20 : 1/10}{12}{17}{10,11,12,13,14,16,17,18}{0.22}
+
+\textbf{Interpretation.}
+Complement reasoning avoids repeating long area sums.
+
+% --------------------------------------------------
+\section{Piecewise Uniform with Unknown $k$}
+
+\textbf{Problem.}
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+2k, & 0\le x<3,\\
+k, & 3\le x\le 8,\\
+0, & \text{otherwise,}
+\end{cases}
+\]
+where $k>0$.
+
+\textbf{Questions/Tasks.}
+Find:
+\begin{itemize}
+    \item[(a)] the value of $k$ so that $f$ is a valid PDF,
+    \item[(b)] $P(X<5)$,
+    \item[(c)] $P(6\le X\le 8)$.
+\end{itemize}
+
+\subsection*{C2}
+For validity, total area must be 1:
+\[
+3(2k)+5(k)=1\ \Rightarrow\ 11k=1\ \Rightarrow\ k=\frac{1}{11}.
+\]
+So densities are $\frac{2}{11}$ and $\frac{1}{11}$, both nonnegative.
+\[
+P(X<5)=3\left(\frac{2}{11}\right)+2\left(\frac{1}{11}\right)=\frac{8}{11}.
+\]
+\[
+P(6\le X\le 8)=2\left(\frac{1}{11}\right)=\frac{2}{11}.
+\]
+\CtwoProbGraph{0}{8}{x < 3 ? 2/11 : 1/11}{0}{5}{0,3,5,6,8}{0.26}
+
+\textbf{Interpretation.}
+First solve for $k$ using total area, then compute probabilities by area of rectangles.
+
+% --------------------------------------------------
+\section{Piecewise Uniform with Unknown $k$ and Validity Check}
+
+\textbf{Problem.}
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+k, & 0\le x<2,\\
+2k, & 2\le x<5,\\
+\dfrac{k}{2}, & 5\le x\le 9,\\
+0, & \text{otherwise,}
+\end{cases}
+\]
+where $k$ is a constant.
+
+\textbf{Questions/Tasks.}
+Find:
+\begin{itemize}
+    \item[(a)] $k$,
+    \item[(b)] verify that all density values are valid for a PDF,
+    \item[(c)] $P(1\le X\le 6)$.
+\end{itemize}
+
+\subsection*{C2}
+Total area condition:
+\[
+2(k)+3(2k)+4\left(\frac{k}{2}\right)=1
+\Rightarrow 2k+6k+2k=1
+\Rightarrow 10k=1
+\Rightarrow k=\frac{1}{10}.
+\]
+Then heights are
+\[
+\frac{1}{10},\quad \frac{1}{5},\quad \frac{1}{20},
+\]
+all nonnegative, so valid.
+\[
+P(1\le X\le 6)=1\left(\frac{1}{10}\right)+3\left(\frac{1}{5}\right)+1\left(\frac{1}{20}\right)
+=\frac{2}{20}+\frac{12}{20}+\frac{1}{20}=\frac{3}{4}.
+\]
+\CtwoProbGraph{0}{9}{x < 2 ? 1/10 : (x < 5 ? 1/5 : 1/20)}{1}{6}{0,1,2,5,6,9}{0.26}
+
+\textbf{Interpretation.}
+A valid PDF needs both nonnegative heights and total area exactly 1.
+
+% --------------------------------------------------
+\section{Four-Interval Piecewise Uniform (Organizing Across Many Intervals)}
+
+\textbf{Problem.}
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+\dfrac{3}{10}, & 0\le x<1,\\
+\dfrac{1}{5}, & 1\le x<3,\\
+\dfrac{1}{10}, & 3\le x<5,\\
+\dfrac{1}{10}, & 5\le x\le 6,\\
+0, & \text{otherwise.}
+\end{cases}
+\]
+
+\textbf{Questions/Tasks.}
+Find:
+\begin{itemize}
+    \item[(a)] $P(0.5\le X\le 5.5)$,
+    \item[(b)] compare $P(X<3)$ and $P(X\ge 3)$,
+    \item[(c)] identify where most of the probability mass is concentrated.
+\end{itemize}
+
+\subsection*{C2}
+Check total area:
+\[
+1\left(\frac{3}{10}\right)+2\left(\frac{1}{5}\right)+2\left(\frac{1}{10}\right)+1\left(\frac{1}{10}\right)
+=\frac{3}{10}+\frac{4}{10}+\frac{2}{10}+\frac{1}{10}=1.
+\]
+\[
+P(0.5\le X\le 5.5)=0.5\left(\frac{3}{10}\right)+2\left(\frac{1}{5}\right)+2\left(\frac{1}{10}\right)+0.5\left(\frac{1}{10}\right)
+=\frac{3}{20}+\frac{8}{20}+\frac{4}{20}+\frac{1}{20}=\frac{4}{5}.
+\]
+\[
+P(X<3)=\frac{3}{10}+\frac{4}{10}=\frac{7}{10},
+\qquad
+P(X\ge 3)=\frac{3}{10}.
+\]
+Most mass is below 3.
+\CtwoProbGraph{0}{6}{x < 1 ? 3/10 : (x < 3 ? 1/5 : (x < 5 ? 1/10 : 1/10))}{0.5}{5.5}{0,0.5,1,3,5,5.5,6}{0.38}
+
+\textbf{Interpretation.}
+Careful partitioning of a long interval keeps multi-step area sums accurate.
+
+% --------------------------------------------------
+\section{Structured Piecewise Uniform with Parameter $k$}
+
+\textbf{Problem.}
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+k, & -3\le x<0,\\
+2k, & 0\le x<2,\\
+\dfrac{1}{12}, & 2\le x\le 6,\\
+0, & \text{otherwise.}
+\end{cases}
+\]
+
+\textbf{Questions/Tasks.}
+Find:
+\begin{itemize}
+    \item[(a)] $k$,
+    \item[(b)] $P(-1\le X\le 4)$,
+    \item[(c)] which is larger: $P(X<0)$ or $P(X\ge 2)$?
+\end{itemize}
+
+\subsection*{C2}
+Use total area:
+\[
+3k+2(2k)+4\left(\frac{1}{12}\right)=1
+\Rightarrow 7k+\frac{1}{3}=1
+\Rightarrow 7k=\frac{2}{3}
+\Rightarrow k=\frac{2}{21}.
+\]
+\[
+P(-1\le X\le 4)=1\left(\frac{2}{21}\right)+2\left(\frac{4}{21}\right)+2\left(\frac{1}{12}\right)
+=\frac{2}{21}+\frac{8}{21}+\frac{1}{6}
+=\frac{13}{21}+\frac{1}{6}
+=\frac{11}{14}.
+\]
+\[
+P(X<0)=3\left(\frac{2}{21}\right)=\frac{2}{7},
+\qquad
+P(X\ge 2)=4\left(\frac{1}{12}\right)=\frac{1}{3}.
+\]
+So $P(X\ge 2)$ is larger.
+\CtwoProbGraph{-3}{6}{x < 0 ? 2/21 : (x < 2 ? 4/21 : 1/12)}{-1}{4}{-3,-1,0,2,4,6}{0.26}
+
+\textbf{Interpretation.}
+A wider interval with a moderate height can beat a narrower interval with a higher height.
+
+% --------------------------------------------------
+\section{Symbolic Endpoint (Conceptual Effect of Width)}
+
+\textbf{Problem.}
+Let $m>0$ and define
+\[
+f(x)=
+\begin{cases}
+\dfrac{1}{3m}, & 0\le x<m,\\
+\dfrac{2}{3m}, & m\le x\le 2m,\\
+0, & \text{otherwise.}
+\end{cases}
+\]
+
+\textbf{Questions/Tasks.}
+Find:
+\begin{itemize}
+    \item[(a)] verify that $f$ is a valid PDF,
+    \item[(b)] $P\left(X<\dfrac{3m}{2}\right)$,
+    \item[(c)] explain what happens to this probability if $m$ is doubled.
+\end{itemize}
+
+\subsection*{C2}
+\[
+m\left(\frac{1}{3m}\right)+m\left(\frac{2}{3m}\right)=\frac{1}{3}+\frac{2}{3}=1,
+\]
+so $f$ is valid and nonnegative.
+\[
+P\left(X<\frac{3m}{2}\right)=m\left(\frac{1}{3m}\right)+\frac{m}{2}\left(\frac{2}{3m}\right)=\frac{1}{3}+\frac{1}{3}=\frac{2}{3}.
+\]
+If $m$ is doubled, both widths scale by the same factor and densities scale down accordingly, so this probability stays $\frac{2}{3}$.
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  width=9cm,
+  height=5cm,
+  axis lines=left,
+  xlabel={$x$},
+  ylabel={$f(x)$},
+  xmin=-0.2,
+  xmax=2.2,
+  ymin=0,
+  ymax=0.9,
+  grid=both,
+  xtick={0,1,1.5,2},
+  xticklabels={$0$,$m$,${3m}/{2}$,$2m$},
+  ytick={0,0.333333,0.666667},
+  yticklabels={$0$,${1}/{3m}$,${2}/{3m}$}
+]
+\addplot[domain=0:2, samples=300, const plot, draw=none, fill=blue!20, fill opacity=0.35] {x < 1 ? 1/3 : 2/3} \closedcycle;
+\addplot[domain=0:1.5, samples=300, const plot, draw=none, fill=blue!60, fill opacity=0.55] {x < 1 ? 1/3 : 2/3} \closedcycle;
+\addplot[domain=0:2, samples=300, const plot, very thick] {x < 1 ? 1/3 : 2/3};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+
+\textbf{Interpretation.}
+Rescaling the horizontal axis can leave certain relative probabilities unchanged.
+
+% --------------------------------------------------
+\section{Infer Missing Endpoint from a Probability Condition}
+
+\textbf{Problem.}
+Let $b>2$ and let
+\[
+f(x)=
+\begin{cases}
+c, & 0\le x<2,\\
+\dfrac{c}{2}, & 2\le x\le b,\\
+0, & \text{otherwise.}
+\end{cases}
+\]
+Suppose $P(X>2)=\dfrac{1}{3}$.
+
+\textbf{Questions/Tasks.}
+Find:
+\begin{itemize}
+    \item[(a)] $c$,
+    \item[(b)] $b$,
+    \item[(c)] $P(1\le X\le 3)$.
+\end{itemize}
+
+\subsection*{C2}
+Given
+\[
+P(X>2)=(b-2)\left(\frac{c}{2}\right)=\frac{1}{3}. \tag{1}
+\]
+Total area is 1:
+\[
+2c+(b-2)\left(\frac{c}{2}\right)=1.
+\]
+Using (1):
+\[
+2c+\frac{1}{3}=1 \Rightarrow 2c=\frac{2}{3} \Rightarrow c=\frac{1}{3}.
+\]
+Now substitute into (1):
+\[
+(b-2)\left(\frac{1}{6}\right)=\frac{1}{3}
+\Rightarrow b-2=2
+\Rightarrow b=4.
+\]
+Finally,
+\[
+P(1\le X\le 3)=1\left(\frac{1}{3}\right)+1\left(\frac{1}{6}\right)=\frac{1}{2}.
+\]
+\CtwoProbGraph{0}{4}{x < 2 ? 1/3 : 1/6}{1}{3}{0,1,2,3,4}{0.42}
+
+\textbf{Interpretation.}
+A probability condition plus total-area condition can determine unknown parameters.
+
+% --------------------------------------------------
+\section{Rich Piecewise Uniform Design Problem}
+
+\textbf{Problem.}
+Let $X$ have density
+\[
+f(x)=
+\begin{cases}
+k, & 0\le x<1,\\
+2k, & 1\le x<4,\\
+m, & 4\le x<7,\\
+k, & 7\le x\le 10,\\
+0, & \text{otherwise,}
+\end{cases}
+\]
+where $k,m>0$. Assume
+\[
+P(4\le X<7)=P(0\le X<1)+P(7\le X\le 10).
+\]
+
+\textbf{Questions/Tasks.}
+Find:
+\begin{itemize}
+    \item[(a)] $k$ and $m$,
+    \item[(b)] $P(2\le X\le 8)$,
+    \item[(c)] compare $P(1\le X<4)$ and $P(4\le X\le 10)$,
+    \item[(d)] explain where the distribution places most of its mass and why.
+\end{itemize}
+
+\subsection*{C2}
+From the condition:
+\[
+3m=1\cdot k+3\cdot k=4k
+\Rightarrow m=\frac{4k}{3}. \tag{1}
+\]
+Total area:
+\[
+1(k)+3(2k)+3(m)+3(k)=1
+\Rightarrow 10k+3m=1.
+\]
+Using (1):
+\[
+10k+4k=1 \Rightarrow 14k=1 \Rightarrow k=\frac{1}{14},
+\qquad
+m=\frac{4}{3}\cdot\frac{1}{14}=\frac{2}{21}.
+\]
+Now
+\[
+P(2\le X\le 8)=2\left(\frac{1}{7}\right)+3\left(\frac{2}{21}\right)+1\left(\frac{1}{14}\right)
+=\frac{2}{7}+\frac{2}{7}+\frac{1}{14}=\frac{9}{14}.
+\]
+\[
+P(1\le X<4)=3\left(\frac{1}{7}\right)=\frac{3}{7},
+\qquad
+P(4\le X\le 10)=3\left(\frac{2}{21}\right)+3\left(\frac{1}{14}\right)=\frac{4}{7}.
+\]
+So $P(4\le X\le 10)$ is larger.
+\CtwoProbGraph{0}{10}{x < 1 ? 1/14 : (x < 4 ? 1/7 : (x < 7 ? 2/21 : 1/14))}{2}{8}{0,1,2,4,7,8,10}{0.22}
+
+\textbf{Interpretation.}
+The right side $[4,10]$ gets more mass because it combines substantial width with moderate heights across two intervals.
+
+\end{document}
