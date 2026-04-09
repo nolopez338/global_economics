@@ -4,6 +4,240 @@
 window.SCHEDULE_DATA = [
   {
     "Grade": 10,
+    "Class #": "1-1",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "1-2",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "2-1",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "2-2",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "3-1",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "3-2",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "4-1",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "4-2",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "5-1",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "5-2",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "6-1",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "6-2",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "7-1",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "7-2",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "8-1",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "8-2",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "9-1",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "9-2",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "10-1",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "10-2",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "11-1",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "11-2",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "1-1",
+    "Term": 2,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "1-2",
+    "Term": 2,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "2-1",
+    "Term": 2,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
+    "Class #": "2-2",
+    "Term": 2,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 10,
     "Class #": "3-1",
     "Term": 2,
     "Description": "Introductory class - Presentation of Calendar - Example 1 as example, Example 2 as exercise.",
@@ -87,10 +321,10 @@ window.SCHEDULE_DATA = [
     "Grade": 10,
     "Class #": "7-2",
     "Term": 2,
-    "Description": "Workshop on C7",
-    "Material": "Midterm Mock",
-    "Material teacher": "Midterm Mock",
-    "Summary": "Midterm Mock"
+    "Description": "Homework support for C7",
+    "Material": "Homework support",
+    "Material teacher": "Homework support",
+    "Summary": "Homework support"
   },
   {
     "Grade": 10,
@@ -114,19 +348,37 @@ window.SCHEDULE_DATA = [
     "Grade": 10,
     "Class #": "9-1",
     "Term": 2,
-    "Description": "FAS",
-    "Material": "Midterm mock",
-    "Material teacher": "Midterm mock",
-    "Summary": "Midterm mock"
+    "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
+    "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
   },
   {
     "Grade": 10,
     "Class #": "9-2",
     "Term": 2,
+    "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
+    "Material": "Project (C8–C10)",
+    "Material teacher": "Project (C8–C10)",
+    "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
+    "Class #": "10-1",
+    "Term": 2,
     "Description": "FAS",
     "Material": "Project (C8–C10)",
     "Material teacher": "Project (C8–C10)",
-    "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
+    "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
+  },
+  {
+    "Grade": 10,
+    "Class #": "10-2",
+    "Term": 2,
+    "Description": "FAS",
+    "Material": "Project submission + project problems",
+    "Material teacher": "Project submission + project problems",
+    "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
   },
   {
     "Grade": 10,
@@ -139,12 +391,12 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 10,
-    "Class #": "12-1",
+    "Class #": "11-2",
     "Term": 2,
     "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
-    "Material": "Project submission + project problems",
-    "Material teacher": "Project submission + project problems",
-    "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
+    "Material": "",
+    "Material teacher": "",
+    "Summary": ""
   },
   {
     "Grade": 10,
@@ -345,346 +597,247 @@ window.SCHEDULE_DATA = [
     "Summary": "Farewell"
   },
   {
-    "Grade": 10,
-    "Class #": "3-1",
-    "Term": 2,
-    "Description": "Introductory class - Presentation of Calendar - Example 1 as example, Example 2 as exercise.",
-    "Material": "Practice Activity 1",
-    "Material teacher": "Practice Activity 1",
-    "Summary": "Practice Activity 1"
-  },
-  {
-    "Grade": 10,
-    "Class #": "3-2",
-    "Term": 2,
-    "Description": "Second class - Example 1 as example, Example 2 as task.",
-    "Material": "Practice Activity 2",
-    "Material teacher": "Practice Activity 2",
-    "Summary": "Practice Activity 2"
-  },
-  {
-    "Grade": 10,
-    "Class #": "4-1",
-    "Term": 2,
-    "Description": "Last class before mock exam: One complete exercise from Practice Activity 2, plus basic information for the mock exam and the real exam as learning evidence.",
-    "Material": "Practice Activity 2",
-    "Material teacher": "Practice Activity 2",
-    "Summary": "Practice Activity 2"
-  },
-  {
-    "Grade": 10,
-    "Class #": "4-2",
-    "Term": 2,
-    "Description": "Mock exam: One question followed by sufficient time to review and revise the mock exam.",
-    "Material": "Mock exam",
-    "Material teacher": "Mock exam",
-    "Summary": "Mock exam"
-  },
-  {
-    "Grade": 10,
-    "Class #": "5-1",
-    "Term": 2,
-    "Description": "Mock exam reviewed.",
-    "Material": "Last session before the exam",
-    "Material teacher": "Last session before the exam",
-    "Summary": "Last session before the exam"
-  },
-  {
-    "Grade": 10,
-    "Class #": "5-2",
-    "Term": 2,
-    "Description": "Exam in pairs. Students select 2 out of 3 questions.",
-    "Material": "Exam",
-    "Material teacher": "Exam",
-    "Summary": "Exam"
-  },
-  {
-    "Grade": 10,
-    "Class #": "6-1",
-    "Term": 2,
-    "Description": "Exam session",
-    "Material": "Exam session",
-    "Material teacher": "Exam session",
-    "Summary": "Exam session"
-  },
-  {
-    "Grade": 10,
-    "Class #": "6-2",
-    "Term": 2,
-    "Description": "Review of C6 examples, Exam revisions.",
-    "Material": "C6",
-    "Material teacher": "C6",
-    "Summary": "C6"
-  },
-  {
-    "Grade": 10,
-    "Class #": "7-1",
-    "Term": 2,
-    "Description": "Exam on C6 and Review of C7",
-    "Material": "Workshop",
-    "Material teacher": "Workshop",
-    "Summary": "Workshop"
-  },
-  {
-    "Grade": 10,
-    "Class #": "7-2",
-    "Term": 2,
-    "Description": "Homework support for C7",
-    "Material": "Homework support",
-    "Material teacher": "Homework support",
-    "Summary": "Homework support"
-  },
-  {
-    "Grade": 10,
-    "Class #": "8-1",
-    "Term": 2,
-    "Description": "Midterm Mock",
-    "Material": "Midterm Mock",
-    "Material teacher": "Midterm Mock",
-    "Summary": "Midterm Mock"
-  },
-  {
-    "Grade": 10,
-    "Class #": "8-2",
-    "Term": 2,
-    "Description": "Midterm Exam",
-    "Material": "Midterm Exam",
-    "Material teacher": "Midterm Exam",
-    "Summary": "Midterm Exam"
-  },
-  {
-    "Grade": 10,
-    "Class #": "9-1",
-    "Term": 2,
-    "Description": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria.",
-    "Material": "Project (C8–C10)",
-    "Material teacher": "Project (C8–C10)",
-    "Summary": "Project introduction (C8–C10). Project work begins. Non-project students complete catch-up activities for missing criteria."
-  },
-  {
-    "Grade": 10,
-    "Class #": "9-2",
-    "Term": 2,
-    "Description": "Project work session 1. Non-project students complete catch-up activities for missing criteria.",
-    "Material": "Project (C8–C10)",
-    "Material teacher": "Project (C8–C10)",
-    "Summary": "Project work session 1. Non-project students complete catch-up activities for missing criteria."
-  },
-  {
-    "Grade": 10,
-    "Class #": "10-1",
-    "Term": 2,
-    "Description": "FAS",
-    "Material": "Project (C8–C10)",
-    "Material teacher": "Project (C8–C10)",
-    "Summary": "Project work session 2. Non-project students complete catch-up activities for missing criteria."
-  },
-  {
-    "Grade": 10,
-    "Class #": "10-2",
-    "Term": 2,
-    "Description": "FAS",
-    "Material": "Project submission + project problems",
-    "Material teacher": "Project submission + project problems",
-    "Summary": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria."
-  },
-  {
-    "Grade": 10,
-    "Class #": "11-1",
-    "Term": 2,
-    "Description": "Project work session 2. Non-project students complete catch-up activities for missing criteria.",
-    "Material": "Wrap-up",
-    "Material teacher": "Wrap-up",
-    "Summary": "Wrap-up session. Review and complete any leftover work (project or catch-up) and confirm pending criteria."
-  },
-  {
-    "Grade": 10,
-    "Class #": "11-2",
-    "Term": 2,
-    "Description": "Project submission. Students complete the project problems (C8–C10). Non-project students complete catch-up activities for missing criteria.",
-    "Material": "",
-    "Material teacher": "",
-    "Summary": ""
-  },
-  {
-    "Grade": 10,
+    "Grade": 11,
     "Class #": "1-1",
-    "Term": 3,
-    "Description": "From discrete probabilities to continuous probabilities",
+    "Term": 1,
+    "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1"
+    "Summary": "-"
   },
   {
-    "Grade": 10,
+    "Grade": 11,
     "Class #": "1-2",
-    "Term": 3,
-    "Description": "Problems for Discrete probabilities",
+    "Term": 1,
+    "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C0"
+    "Summary": "-"
   },
   {
-    "Grade": 10,
+    "Grade": 11,
     "Class #": "2-1",
-    "Term": 3,
-    "Description": "Problems for Continuous probabilities",
+    "Term": 1,
+    "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1"
+    "Summary": "-"
   },
   {
-    "Grade": 10,
+    "Grade": 11,
     "Class #": "2-2",
-    "Term": 3,
-    "Description": "Problems for Uniform probabilities",
+    "Term": 1,
+    "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "-"
   },
   {
-    "Grade": 10,
+    "Grade": 11,
     "Class #": "3-1",
-    "Term": 3,
+    "Term": 1,
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3"
+    "Summary": "-"
   },
   {
-    "Grade": 10,
+    "Grade": 11,
     "Class #": "3-2",
-    "Term": 3,
+    "Term": 1,
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3"
+    "Summary": "-"
   },
   {
-    "Grade": 10,
+    "Grade": 11,
     "Class #": "4-1",
-    "Term": 3,
+    "Term": 1,
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "-"
   },
   {
-    "Grade": 10,
+    "Grade": 11,
     "Class #": "4-2",
-    "Term": 3,
+    "Term": 1,
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "-"
   },
   {
-    "Grade": 10,
+    "Grade": 11,
     "Class #": "5-1",
-    "Term": 3,
+    "Term": 1,
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C5"
+    "Summary": "-"
   },
   {
-    "Grade": 10,
+    "Grade": 11,
     "Class #": "5-2",
-    "Term": 3,
+    "Term": 1,
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C5"
+    "Summary": "-"
   },
   {
-    "Grade": 10,
+    "Grade": 11,
     "Class #": "6-1",
-    "Term": 3,
+    "Term": 1,
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C6"
+    "Summary": "-"
   },
   {
-    "Grade": 10,
+    "Grade": 11,
     "Class #": "6-2",
-    "Term": 3,
+    "Term": 1,
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C6"
+    "Summary": "-"
   },
   {
-    "Grade": 10,
+    "Grade": 11,
     "Class #": "7-1",
-    "Term": 3,
+    "Term": 1,
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C7"
+    "Summary": "-"
   },
   {
-    "Grade": 10,
+    "Grade": 11,
     "Class #": "7-2",
-    "Term": 3,
+    "Term": 1,
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C7"
+    "Summary": "-"
   },
   {
-    "Grade": 10,
+    "Grade": 11,
     "Class #": "8-1",
-    "Term": 3,
+    "Term": 1,
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C8"
+    "Summary": "-"
   },
   {
-    "Grade": 10,
+    "Grade": 11,
     "Class #": "8-2",
-    "Term": 3,
+    "Term": 1,
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C8"
+    "Summary": "-"
   },
   {
-    "Grade": 10,
+    "Grade": 11,
     "Class #": "9-1",
-    "Term": 3,
+    "Term": 1,
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C9"
+    "Summary": "-"
   },
   {
-    "Grade": 10,
+    "Grade": 11,
     "Class #": "9-2",
-    "Term": 3,
+    "Term": 1,
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C9"
+    "Summary": "-"
   },
   {
-    "Grade": 10,
+    "Grade": 11,
     "Class #": "10-1",
-    "Term": 3,
+    "Term": 1,
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C10"
+    "Summary": "-"
   },
   {
-    "Grade": 10,
+    "Grade": 11,
     "Class #": "10-2",
-    "Term": 3,
+    "Term": 1,
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C10"
+    "Summary": "-"
+  },
+  {
+    "Grade": 11,
+    "Class #": "11-1",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 11,
+    "Class #": "11-2",
+    "Term": 1,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 11,
+    "Class #": "1-1",
+    "Term": 2,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 11,
+    "Class #": "1-2",
+    "Term": 2,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 11,
+    "Class #": "2-1",
+    "Term": 2,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 11,
+    "Class #": "2-2",
+    "Term": 2,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 11,
+    "Class #": "3-1",
+    "Term": 2,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
   },
   {
     "Grade": 11,
@@ -1021,20 +1174,20 @@ window.SCHEDULE_DATA = [
   },
   {
     "Grade": 11,
-    "Class #": "10-2",
+    "Class #": "11-1",
     "Term": 3,
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C10"
+    "Summary": "-"
   },
   {
     "Grade": 11,
-    "Class #": "10-2",
+    "Class #": "11-2",
     "Term": 3,
     "Description": "-",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C10"
-  },
+    "Summary": "-"
+  }
 ];
