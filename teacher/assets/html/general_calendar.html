@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2026 General Calendar</title>
+  <style>
+    :root {
+      --bg: #f7f8fb;
+      --card: #ffffff;
+      --border: #d9deea;
+      --text: #1d2636;
+      --muted: #8a94a8;
+      --accent: #3e5ca8;
+      --empty: #eef1f7;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 1rem;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 1rem;
+      font-size: clamp(1.4rem, 2.6vw, 2rem);
+      text-align: center;
+    }
+
+    .calendar-year {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      align-items: start;
+    }
+
+    .month-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    .month-name {
+      margin: 0 0 0.6rem;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    .weekday-row,
+    .week-row {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.3rem;
+    }
+
+    .weekday-row {
+      margin-bottom: 0.35rem;
+    }
+
+    .weekday {
+      text-transform: lowercase;
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-align: center;
+      font-weight: 600;
+      padding: 0.2rem 0;
+    }
+
+    .month-grid {
+      display: grid;
+      gap: 0.3rem;
+    }
+
+    .day-cell {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      min-height: 2.6rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: #fff;
+      padding: 0.2rem;
+      overflow: hidden;
+    }
+
+    .day-cell.empty {
+      background: var(--empty);
+      border-style: dashed;
+      opacity: 0.8;
+    }
+
+    .day-number {
+      position: absolute;
+      top: 0.22rem;
+      left: 0.3rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .cycle-day {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 0.92rem;
+      color: var(--accent);
+      font-weight: 700;
+      padding-top: 0.45rem;
+    }
+
+    .cycle-day.missing {
+      font-weight: 500;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .notice {
+      margin: 0.5rem 0 1rem;
+      color: #b23a3a;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>2026 General Calendar</h1>
+    <p id="notice" class="notice" hidden></p>
+    <section id="calendar-year" class="calendar-year" aria-label="Full year calendar"></section>
+  </main>
+
+  <script src="../js/year-calendar-data.js"></script>
+  <script>
+    (function renderYearCalendar() {
+      const container = document.getElementById("calendar-year");
+      const notice = document.getElementById("notice");
+
+      if (!container) return;
+
+      if (
+        typeof calendar2026 === "undefined" ||
+        !calendar2026 ||
+        !Array.isArray(calendar2026.months)
+      ) {
+        notice.hidden = false;
+        notice.textContent = "Unable to load calendar2026 data.";
+        return;
+      }
+
+      const weekdays = Array.isArray(calendar2026.weekdays)
+        ? calendar2026.weekdays
+        : ["su", "mo", "tu", "we", "th", "fr", "sa"];
+
+      calendar2026.months.forEach((month, monthIndex) => {
+        const alignedMonth =
+          typeof calendar2026days !== "undefined" &&
+          calendar2026days &&
+          Array.isArray(calendar2026days.months)
+            ? calendar2026days.months[monthIndex]
+            : null;
+
+        const monthCard = document.createElement("article");
+        monthCard.className = "month-card";
+
+        const monthName = document.createElement("h2");
+        monthName.className = "month-name";
+        monthName.textContent = month?.name || `Month ${monthIndex + 1}`;
+        monthCard.appendChild(monthName);
+
+        const weekdayRow = document.createElement("div");
+        weekdayRow.className = "weekday-row";
+        weekdays.forEach((label) => {
+          const weekday = document.createElement("div");
+          weekday.className = "weekday";
+          weekday.textContent = label;
+          weekdayRow.appendChild(weekday);
+        });
+        monthCard.appendChild(weekdayRow);
+
+        const monthGrid = document.createElement("div");
+        monthGrid.className = "month-grid";
+
+        const monthWeeks = Array.isArray(month?.weeks) ? month.weeks : [];
+
+        monthWeeks.forEach((week, weekIndex) => {
+          const weekRow = document.createElement("div");
+          weekRow.className = "week-row";
+
+          for (let dayIndex = 0; dayIndex < 7; dayIndex += 1) {
+            const realDate = Array.isArray(week) ? week[dayIndex] : null;
+            const cycleDayRaw =
+              alignedMonth && Array.isArray(alignedMonth.weeks)
+                ? alignedMonth.weeks?.[weekIndex]?.[dayIndex]
+                : null;
+            const cycleDay =
+              cycleDayRaw === undefined || cycleDayRaw === null
+                ? null
+                : cycleDayRaw;
+
+            const dayCell = document.createElement("div");
+            dayCell.className = "day-cell";
+
+            if (realDate === null || realDate === undefined) {
+              dayCell.classList.add("empty");
+              dayCell.setAttribute("aria-hidden", "true");
+            } else {
+              const dayNumber = document.createElement("div");
+              dayNumber.className = "day-number";
+              dayNumber.textContent = String(realDate);
+
+              const cycleValue = document.createElement("div");
+              cycleValue.className = "cycle-day";
+
+              if (cycleDay === null) {
+                cycleValue.classList.add("missing");
+                cycleValue.textContent = "–";
+              } else {
+                cycleValue.textContent = String(cycleDay);
+              }
+
+              dayCell.appendChild(dayNumber);
+              dayCell.appendChild(cycleValue);
+            }
+
+            weekRow.appendChild(dayCell);
+          }
+
+          monthGrid.appendChild(weekRow);
+        });
+
+        monthCard.appendChild(monthGrid);
+        container.appendChild(monthCard);
+      });
+    })();
+  </script>
+</body>
+</html>
