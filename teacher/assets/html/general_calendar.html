@@ -113,6 +113,20 @@
       align-items: center;
       gap: 0.45rem;
       font-size: 0.9rem;
+      padding: 0.2rem 0.35rem;
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .legend-item:hover {
+      background: #f3f6fd;
+    }
+
+    .legend-item:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(47, 111, 214, 0.4);
     }
 
     .legend-swatch {
@@ -297,6 +311,7 @@
       const DEFAULT_TO_DATE = "2026-12-31";
       const FROM_STORAGE_KEY = "generalCalendar.fromDate";
       const TO_STORAGE_KEY = "generalCalendar.toDate";
+      const HIGHLIGHT_COLORS_STORAGE_KEY = "generalCalendar.highlightColors";
       const CALENDAR_YEAR = "2026";
 
       if (!container || !notice || !fromDateInput || !toDateInput || !legendContainer) return;
@@ -313,9 +328,12 @@
 
       const highlightGroups = [
         {
+          id: "academic-tests",
           label: "Pruebas Academicas",
           cellClass: "highlight-academic-tests",
           legendSwatchClass: "legend-swatch-academic-tests",
+          colorVar: "--highlight-academic-tests",
+          defaultColor: "#dff5df",
           entries: [
             { date: "2026-05-07" },
             { date: "2026-05-08" },
@@ -330,9 +348,12 @@
           ],
         },
         {
+          id: "holy-week",
           label: "Holy Week",
           cellClass: "highlight-holy-week",
           legendSwatchClass: "legend-swatch-holy-week",
+          colorVar: "--highlight-holy-week",
+          defaultColor: "#fff7bf",
           entries: [
             { date: "2026-03-30" },
             { date: "2026-03-31" },
@@ -344,15 +365,21 @@
           ],
         },
         {
+          id: "holidays",
           label: "Holidays",
           cellClass: "highlight-holidays",
           legendSwatchClass: "legend-swatch-holidays",
+          colorVar: "--highlight-holidays",
+          defaultColor: "#e0b52e",
           entries: Array.isArray(holidays2026) ? holidays2026 : [],
         },
         {
+          id: "individual-development",
           label: "Individual development",
           cellClass: "highlight-individual-development",
           legendSwatchClass: "legend-swatch-individual-development",
+          colorVar: "--highlight-individual-development",
+          defaultColor: "#bfe6bf",
           entries: [
             { date: "2026-06-16" },
             { date: "2026-06-17" },
@@ -366,12 +393,104 @@
           ],
         },
         {
+          id: "today",
           label: "Today",
           cellClass: "highlight-today",
           legendSwatchClass: "legend-swatch-today",
+          colorVar: "--highlight-today",
+          defaultColor: "#dbe9ff",
           entries: todayInCalendarYear ? [{ date: todayIsoDate }] : [],
         },
       ];
+
+      function normalizeHexColor(value, fallback) {
+        if (typeof value !== "string") return fallback;
+        const trimmed = value.trim();
+        const shortHex = /^#([a-fA-F0-9]{3})$/;
+        const longHex = /^#([a-fA-F0-9]{6})$/;
+
+        if (longHex.test(trimmed)) return trimmed.toLowerCase();
+        if (shortHex.test(trimmed)) {
+          const rgb = trimmed.slice(1).split("").map((char) => `${char}${char}`).join("");
+          return `#${rgb}`.toLowerCase();
+        }
+        return fallback;
+      }
+
+      function clampRgb(value) {
+        return Math.max(0, Math.min(255, Math.round(value)));
+      }
+
+      function darkenHexColor(colorHex, ratio) {
+        const normalized = normalizeHexColor(colorHex, "#2f6fd6");
+        const red = parseInt(normalized.slice(1, 3), 16);
+        const green = parseInt(normalized.slice(3, 5), 16);
+        const blue = parseInt(normalized.slice(5, 7), 16);
+
+        const darkenedRed = clampRgb(red * (1 - ratio));
+        const darkenedGreen = clampRgb(green * (1 - ratio));
+        const darkenedBlue = clampRgb(blue * (1 - ratio));
+
+        const toHex = (channel) => channel.toString(16).padStart(2, "0");
+        return `#${toHex(darkenedRed)}${toHex(darkenedGreen)}${toHex(darkenedBlue)}`;
+      }
+
+      function applyHighlightColorsToCss() {
+        highlightGroups.forEach((group) => {
+          document.documentElement.style.setProperty(group.colorVar, group.currentColor);
+        });
+
+        const todayGroup = highlightGroups.find((group) => group.id === "today");
+        if (todayGroup) {
+          const todayStrongColor = darkenHexColor(todayGroup.currentColor, 0.28);
+          document.documentElement.style.setProperty("--highlight-today-strong", todayStrongColor);
+        }
+      }
+
+      function saveHighlightColors() {
+        const serializableColors = {};
+        highlightGroups.forEach((group) => {
+          serializableColors[group.id] = group.currentColor;
+        });
+
+        try {
+          localStorage.setItem(HIGHLIGHT_COLORS_STORAGE_KEY, JSON.stringify(serializableColors));
+        } catch (error) {
+          // Ignore storage failures and continue rendering.
+        }
+      }
+
+      function restoreHighlightColors() {
+        let parsedData = null;
+
+        highlightGroups.forEach((group) => {
+          group.currentColor = normalizeHexColor(group.defaultColor, group.defaultColor);
+        });
+
+        try {
+          const rawData = localStorage.getItem(HIGHLIGHT_COLORS_STORAGE_KEY);
+          if (!rawData) {
+            applyHighlightColorsToCss();
+            return;
+          }
+
+          const parsed = JSON.parse(rawData);
+          if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+            parsedData = parsed;
+          }
+        } catch (error) {
+          parsedData = null;
+        }
+
+        if (parsedData) {
+          highlightGroups.forEach((group) => {
+            const candidateColor = parsedData[group.id];
+            group.currentColor = normalizeHexColor(candidateColor, group.defaultColor);
+          });
+        }
+
+        applyHighlightColorsToCss();
+      }
 
       const highlightByDate = new Map();
       highlightGroups.forEach((group) => {
@@ -401,6 +520,9 @@
         highlightGroups.forEach((group) => {
           const item = document.createElement("li");
           item.className = "legend-item";
+          item.setAttribute("role", "button");
+          item.setAttribute("tabindex", "0");
+          item.setAttribute("title", `Change color for ${group.label}`);
 
           const swatch = document.createElement("span");
           swatch.className = `legend-swatch ${group.legendSwatchClass}`;
@@ -411,6 +533,38 @@
 
           item.appendChild(swatch);
           item.appendChild(label);
+
+          const colorInput = document.createElement("input");
+          colorInput.type = "color";
+          colorInput.value = group.currentColor;
+          colorInput.setAttribute("aria-label", `Pick color for ${group.label}`);
+          colorInput.style.position = "absolute";
+          colorInput.style.opacity = "0";
+          colorInput.style.pointerEvents = "none";
+          colorInput.style.width = "1px";
+          colorInput.style.height = "1px";
+
+          const openColorPicker = () => {
+            colorInput.value = group.currentColor;
+            colorInput.click();
+          };
+
+          item.addEventListener("click", openColorPicker);
+          item.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              openColorPicker();
+            }
+          });
+
+          colorInput.addEventListener("input", (event) => {
+            const nextColor = normalizeHexColor(event.target.value, group.currentColor);
+            group.currentColor = nextColor;
+            applyHighlightColorsToCss();
+            saveHighlightColors();
+          });
+
+          item.appendChild(colorInput);
           legendList.appendChild(item);
         });
 
@@ -642,6 +796,7 @@
       fromDateInput.addEventListener("change", handleFilterInput);
       toDateInput.addEventListener("change", handleFilterInput);
 
+      restoreHighlightColors();
       renderLegend();
       restoreFilterState();
       renderCalendar();
