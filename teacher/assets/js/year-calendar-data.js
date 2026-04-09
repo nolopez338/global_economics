@@ -316,6 +316,27 @@ const calendar2026 = {
   ]
 };
 
+const holidays2026 = [
+  { date: "2026-01-01", name: "Año Nuevo" },
+  { date: "2026-01-06", name: "Reyes Magos" },
+  { date: "2026-03-23", name: "San José" },
+  { date: "2026-04-02", name: "Jueves Santo" },
+  { date: "2026-04-03", name: "Viernes Santo" },
+  { date: "2026-04-05", name: "Domingo de Resurrección" },
+  { date: "2026-05-01", name: "Día del Trabajo" },
+  { date: "2026-05-18", name: "Ascensión" },
+  { date: "2026-06-08", name: "Corpus Christi" },
+  { date: "2026-07-06", name: "San Pedro y San Pablo" },
+  { date: "2026-07-20", name: "Independencia de Colombia" },
+  { date: "2026-08-07", name: "Batalla de Boyacá" },
+  { date: "2026-08-15", name: "Asunción de la Virgen" },
+  { date: "2026-10-19", name: "Día de la Raza" },
+  { date: "2026-11-01", name: "Todos los Santos" },
+  { date: "2026-11-16", name: "Independencia de Cartagena" },
+  { date: "2026-12-08", name: "Inmaculada Concepción" },
+  { date: "2026-12-25", name: "Navidad" }
+];
+
 function getWeekday2026(month, day) {
   let monthData;
 
@@ -412,6 +433,7 @@ if (typeof module !== "undefined" && module.exports) {
     calendar2026days,
     calendar2026cycle,
     calendar2026,
+    holidays2026,
     getWeekday2026,
     getCycleDay2026,
     getCycleNumber2026
