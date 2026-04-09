@@ -42,6 +42,31 @@
     .class-schedule-table tbody td:nth-child(7) {
       width: 380px;
     }
+
+    .past-dates-toggle-main {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .past-dates-count-input {
+      width: 52px;
+      height: 26px;
+      padding: 2px 6px;
+      border: 1px solid var(--grid);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .past-dates-count-input:focus-visible {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 1px;
+    }
   </style>
 </head>
 
@@ -54,5 +79,151 @@
   <script src="../assets/js/schedule-today.js" defer></script>
   <script src="../assets/js/full-schedule-page.js" defer></script>
   <script src="../assets/js/full-schedule-today.js" defer></script>
+  <script>
+    (function () {
+      var DEFAULT_PAST_DATES = 2;
+
+      function normalizeDate(raw) {
+        if (!raw) {
+          return null;
+        }
+
+        var match = String(raw).trim().match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
+        if (!match) {
+          return null;
+        }
+
+        var year = match[1];
+        var month = match[2].padStart(2, '0');
+        var day = match[3].padStart(2, '0');
+        return year + '-' + month + '-' + day;
+      }
+
+      function getTodayISODate() {
+        var today = new Date();
+        var yyyy = today.getFullYear();
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var dd = String(today.getDate()).padStart(2, '0');
+        return yyyy + '-' + mm + '-' + dd;
+      }
+
+      function parseCount(input) {
+        if (!input) {
+          return DEFAULT_PAST_DATES;
+        }
+
+        var parsed = Number.parseInt(input.value, 10);
+        if (!Number.isFinite(parsed)) {
+          parsed = DEFAULT_PAST_DATES;
+        }
+
+        if (parsed < 0) {
+          parsed = 0;
+        }
+
+        input.value = String(parsed);
+        return parsed;
+      }
+
+      function buildPastDateRows(table) {
+        var todayISO = getTodayISODate();
+        return Array.from(table.tBodies[0]?.rows || []).filter(function (row) {
+          if (!row || row.classList.contains('past-dates-toggle-row')) {
+            return false;
+          }
+
+          var normalized = normalizeDate(row.dataset.date);
+          return Boolean(normalized && normalized < todayISO);
+        });
+      }
+
+      function updatePastRows(table, toggleButton, countInput) {
+        var rows = buildPastDateRows(table);
+        if (rows.length === 0) {
+          return;
+        }
+
+        var dates = Array.from(new Set(rows.map(function (row) {
+          return normalizeDate(row.dataset.date);
+        }).filter(Boolean))).sort();
+
+        var visibleCount = parseCount(countInput);
+        var visibleDateSet = new Set(dates.slice(Math.max(0, dates.length - visibleCount)));
+
+        var expanded = toggleButton.getAttribute('aria-expanded') === 'true';
+
+        rows.forEach(function (row) {
+          var date = normalizeDate(row.dataset.date);
+          var shouldAlwaysShow = visibleDateSet.has(date);
+          row.hidden = !(shouldAlwaysShow || expanded);
+        });
+      }
+
+      function wirePastDatesControl(table) {
+        var toggleButton = table.querySelector('.past-dates-toggle');
+        var toggleLabel = toggleButton?.querySelector('.toggle-label');
+
+        if (!toggleButton || !toggleLabel || toggleButton.dataset.countInputAttached === 'true') {
+          return;
+        }
+
+        var mainGroup = document.createElement('span');
+        mainGroup.className = 'past-dates-toggle-main';
+
+        toggleLabel.before(mainGroup);
+        mainGroup.append(toggleLabel);
+
+        var countInput = document.createElement('input');
+        countInput.type = 'number';
+        countInput.className = 'past-dates-count-input';
+        countInput.min = '0';
+        countInput.step = '1';
+        countInput.inputMode = 'numeric';
+        countInput.setAttribute('aria-label', 'Number of past dates to show');
+        countInput.value = String(DEFAULT_PAST_DATES);
+
+        mainGroup.append(countInput);
+
+        countInput.addEventListener('click', function (event) {
+          event.stopPropagation();
+        });
+
+        countInput.addEventListener('keydown', function (event) {
+          event.stopPropagation();
+        });
+
+        var onChange = function () {
+          updatePastRows(table, toggleButton, countInput);
+        };
+
+        countInput.addEventListener('input', onChange);
+        countInput.addEventListener('change', onChange);
+        countInput.addEventListener('blur', onChange);
+
+        toggleButton.addEventListener('click', function () {
+          updatePastRows(table, toggleButton, countInput);
+        });
+
+        toggleButton.dataset.countInputAttached = 'true';
+        updatePastRows(table, toggleButton, countInput);
+      }
+
+      function attachControls() {
+        document.querySelectorAll('.class-schedule-table').forEach(function (table) {
+          wirePastDatesControl(table);
+        });
+      }
+
+      document.addEventListener('class-schedule-rendered', function (event) {
+        wirePastDatesControl(event.detail?.table || null);
+      });
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attachControls);
+      } else {
+        attachControls();
+      }
+    })();
+  </script>
 </body>
 </html>
