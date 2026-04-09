@@ -1674,10 +1674,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "From discrete probabilities to continuous probabilities",
+    "Description": "Introduction: From discrete probabilities to continuous probabilities",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1"
+    "Summary": "Intro"
   },
   {
     "Grade": 10,
@@ -1687,10 +1687,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 4",
-    "Description": "Problems for Discrete probabilities",
+    "Description": "C0: Problems for Discrete probabilities",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C0"
+    "Summary": "C0 Practice"
   },
   {
     "Grade": 10,
@@ -1700,10 +1700,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 3",
-    "Description": "Problems for Continuous probabilities",
+    "Description": "C1: Problems for Continuous probabilities",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1"
+    "Summary": "C1 Practice"
   },
   {
     "Grade": 10,
@@ -1713,10 +1713,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "Problems for Uniform probabilities",
+    "Description": "C2: Problems for Uniform probabilities",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "C2 Practice"
   },
   {
     "Grade": 10,
@@ -1726,10 +1726,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "C3: Problems for Linear probabilities",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3"
+    "Summary": "C3 Practice"
   },
   {
     "Grade": 10,
@@ -1739,10 +1739,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "-",
+    "Description": "C1 C2 C3: Exam practice",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3"
+    "Summary": "C1 C2 C3 Practice"
   },
   {
     "Grade": 10,
@@ -1752,10 +1752,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "Exam: C1 C2 C3",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "C1 C2 C3 Exam"
   },
   {
     "Grade": 10,
@@ -1765,10 +1765,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "-",
+    "Description": "C4: Problems on Variance and SD",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "C4 Practice"
   },
   {
     "Grade": 10,
@@ -1778,10 +1778,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "C5: Problems on Normal Distribution",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C5"
+    "Summary": "C5 Practice"
   },
   {
     "Grade": 10,
@@ -1791,7 +1791,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "-",
+    "Description": "C4 C5: Exam practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
@@ -1804,7 +1804,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "C4 C5: Exam",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -1817,10 +1817,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 4",
-    "Description": "-",
+    "Description": "C6: Problems on Normal Distribution Normalization",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C6"
+    "Summary": "C6 Practice"
   },
   {
     "Grade": 10,
@@ -1830,10 +1830,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "C7: Problems on Normal Distribution Inverse",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C7"
+    "Summary": "C7 Practice"
   },
   {
     "Grade": 10,
@@ -1843,10 +1843,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 4",
-    "Description": "-",
+    "Description": "C1-C7: Midterm Exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C7"
+    "Summary": "C1-C7 Midterm"
   },
   {
     "Grade": 10,
@@ -1856,10 +1856,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "C8 C9 C10: Characterization of in investment portfolio",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C8"
+    "Summary": "C8 C9 C10 practice"
   },
   {
     "Grade": 10,
@@ -1869,10 +1869,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 4",
-    "Description": "-",
+    "Description": "C8 C9 C10: Probability distribution modeling of investment portfolio",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C8"
+    "Summary": "C8 C9 C10 Practice"
   },
   {
     "Grade": 10,
@@ -1882,10 +1882,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "C8 C9 C10: Proyect Development",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C9"
+    "Summary": "Final proyect"
   },
   {
     "Grade": 10,
@@ -1895,10 +1895,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 4",
-    "Description": "-",
+    "Description": "C8 C9 C10: Proyect Development",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C9"
+    "Summary": "Final proyect"
   },
   {
     "Grade": 10,
@@ -1908,10 +1908,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "C8 C9 C10: Proyect Development",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C10"
+    "Summary": "Final proyect"
   },
   {
     "Grade": 10,
@@ -1921,205 +1921,36 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 4",
-    "Description": "-",
+    "Description": "C8 C9 C10: Proyect Development Final session",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C10"
+    "Summary": "Proyect submission"
   },
   {
     "Grade": 10,
     "Section": "D",
-    "Class #": "13-1",
+    "Class #": "11-1",
     "Date": "2026/06/11",
-    "Term": null,
+    "Term": 3,
     "Weekday": "Thursday",
-    "Day": " ",
-    "Description": "-",
+    "Day": "Day 3",
+    "Description": "Epilogue: Advanced statistics",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3"
+    "Summary": "Epilogue"
   },
   {
     "Grade": 10,
     "Section": "D",
-    "Class #": "14-1",
-    "Date": " ",
-    "Term": null,
-    "Weekday": " ",
-    "Day": " ",
-    "Description": "-",
+    "Class #": "11-2",
+    "Date": "2026/06/11",
+    "Term": 3,
+    "Weekday": "Thursday",
+    "Day": "Day 4",
+    "Description": "Semester Farewell",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
-  },
-  {
-    "Grade": 10,
-    "Section": "D",
-    "Class #": "12-2",
-    "Date": "2026/06/12",
-    "Term": null,
-    "Weekday": "Friday",
-    "Day": " ",
-    "Description": "-",
-    "Material": "-",
-    "Material teacher": "-",
-    "Summary": "C4"
-  },
-  {
-    "Grade": 10,
-    "Section": "D",
-    "Class #": "15-1",
-    "Date": " ",
-    "Term": null,
-    "Weekday": " ",
-    "Day": " ",
-    "Description": "-",
-    "Material": "-",
-    "Material teacher": "-",
-    "Summary": "C5"
-  },
-  {
-    "Grade": 10,
-    "Section": "D",
-    "Class #": "13-2",
-    "Date": " ",
-    "Term": null,
-    "Weekday": " ",
-    "Day": " ",
-    "Description": "-",
-    "Material": "-",
-    "Material teacher": "-",
-    "Summary": "C5"
-  },
-  {
-    "Grade": 10,
-    "Section": "D",
-    "Class #": "16-1",
-    "Date": " ",
-    "Term": null,
-    "Weekday": " ",
-    "Day": " ",
-    "Description": "-",
-    "Material": "-",
-    "Material teacher": "-",
-    "Summary": "C6"
-  },
-  {
-    "Grade": 10,
-    "Section": "D",
-    "Class #": "14-2",
-    "Date": " ",
-    "Term": null,
-    "Weekday": " ",
-    "Day": " ",
-    "Description": "-",
-    "Material": "-",
-    "Material teacher": "-",
-    "Summary": "C6"
-  },
-  {
-    "Grade": 10,
-    "Section": "D",
-    "Class #": "17-1",
-    "Date": " ",
-    "Term": null,
-    "Weekday": " ",
-    "Day": " ",
-    "Description": "-",
-    "Material": "-",
-    "Material teacher": "-",
-    "Summary": "C7"
-  },
-  {
-    "Grade": 10,
-    "Section": "D",
-    "Class #": "15-2",
-    "Date": " ",
-    "Term": null,
-    "Weekday": " ",
-    "Day": " ",
-    "Description": "-",
-    "Material": "-",
-    "Material teacher": "-",
-    "Summary": "C7"
-  },
-  {
-    "Grade": 10,
-    "Section": "D",
-    "Class #": "18-1",
-    "Date": " ",
-    "Term": null,
-    "Weekday": " ",
-    "Day": " ",
-    "Description": "-",
-    "Material": "-",
-    "Material teacher": "-",
-    "Summary": "C8"
-  },
-  {
-    "Grade": 10,
-    "Section": "D",
-    "Class #": "16-2",
-    "Date": " ",
-    "Term": null,
-    "Weekday": " ",
-    "Day": " ",
-    "Description": "-",
-    "Material": "-",
-    "Material teacher": "-",
-    "Summary": "C8"
-  },
-  {
-    "Grade": 10,
-    "Section": "D",
-    "Class #": "19-1",
-    "Date": " ",
-    "Term": null,
-    "Weekday": " ",
-    "Day": " ",
-    "Description": "-",
-    "Material": "-",
-    "Material teacher": "-",
-    "Summary": "C9"
-  },
-  {
-    "Grade": 10,
-    "Section": "D",
-    "Class #": "17-2",
-    "Date": " ",
-    "Term": null,
-    "Weekday": " ",
-    "Day": " ",
-    "Description": "-",
-    "Material": "-",
-    "Material teacher": "-",
-    "Summary": "C9"
-  },
-  {
-    "Grade": 10,
-    "Section": "D",
-    "Class #": "20-1",
-    "Date": " ",
-    "Term": null,
-    "Weekday": " ",
-    "Day": " ",
-    "Description": "-",
-    "Material": "-",
-    "Material teacher": "-",
-    "Summary": "C10"
-  },
-  {
-    "Grade": 10,
-    "Section": "D",
-    "Class #": "18-2",
-    "Date": " ",
-    "Term": null,
-    "Weekday": " ",
-    "Day": " ",
-    "Description": "-",
-    "Material": "-",
-    "Material teacher": "-",
-    "Summary": "C10"
+    "Summary": "Farewell"
   },
   {
     "Grade": 10,
