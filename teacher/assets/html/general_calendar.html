@@ -13,6 +13,7 @@
       --muted: #8a94a8;
       --accent: #3e5ca8;
       --empty: #eef1f7;
+      --highlight-academic-tests: #dff5df;
     }
 
     * {
@@ -73,6 +74,53 @@
       font-size: 0.95rem;
       color: var(--text);
       background: #fff;
+    }
+
+
+
+    .legend-block {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .legend-title {
+      margin: 0 0 0.45rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .legend-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.9rem;
+    }
+
+    .legend-swatch {
+      width: 0.95rem;
+      height: 0.95rem;
+      border-radius: 3px;
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .legend-swatch-academic-tests,
+    .day-cell.highlight-academic-tests {
+      background: var(--highlight-academic-tests);
     }
 
     .calendar-year {
@@ -199,6 +247,7 @@
         <input id="to-date" class="filter-input" type="date" value="2026-12-31" min="2026-01-01" max="2026-12-31" />
       </div>
     </section>
+    <section id="highlights-legend" class="legend-block" aria-label="Calendar highlights"></section>
     <p id="notice" class="notice" hidden></p>
     <section id="calendar-year" class="calendar-year" aria-label="Full year calendar"></section>
   </main>
@@ -210,8 +259,68 @@
       const notice = document.getElementById("notice");
       const fromDateInput = document.getElementById("from-date");
       const toDateInput = document.getElementById("to-date");
+      const legendContainer = document.getElementById("highlights-legend");
 
-      if (!container || !notice || !fromDateInput || !toDateInput) return;
+      if (!container || !notice || !fromDateInput || !toDateInput || !legendContainer) return;
+
+      const highlightGroups = [
+        {
+          label: "Pruebas Academicas",
+          cellClass: "highlight-academic-tests",
+          legendSwatchClass: "legend-swatch-academic-tests",
+          dates: [
+            "2026-05-07",
+            "2026-05-08",
+            "2026-05-11",
+            "2026-05-12",
+            "2026-05-13",
+            "2026-05-14",
+            "2026-05-19",
+            "2026-05-20",
+            "2026-05-21",
+            "2026-05-22",
+          ],
+        },
+      ];
+
+      const highlightByDate = new Map();
+      highlightGroups.forEach((group) => {
+        group.dates.forEach((date) => {
+          const list = highlightByDate.get(date) || [];
+          list.push(group);
+          highlightByDate.set(date, list);
+        });
+      });
+
+      function renderLegend() {
+        legendContainer.innerHTML = "";
+
+        const title = document.createElement("h2");
+        title.className = "legend-title";
+        title.textContent = "Highlights";
+        legendContainer.appendChild(title);
+
+        const legendList = document.createElement("ul");
+        legendList.className = "legend-list";
+
+        highlightGroups.forEach((group) => {
+          const item = document.createElement("li");
+          item.className = "legend-item";
+
+          const swatch = document.createElement("span");
+          swatch.className = `legend-swatch ${group.legendSwatchClass}`;
+          swatch.setAttribute("aria-hidden", "true");
+
+          const label = document.createElement("span");
+          label.textContent = group.label;
+
+          item.appendChild(swatch);
+          item.appendChild(label);
+          legendList.appendChild(item);
+        });
+
+        legendContainer.appendChild(legendList);
+      }
 
       if (
         typeof calendar2026 === "undefined" ||
@@ -307,6 +416,11 @@
                   dayCell.classList.add("filtered");
                   dayCell.setAttribute("aria-hidden", "true");
                 } else {
+                  const matchingHighlights = highlightByDate.get(isoDate) || [];
+                  matchingHighlights.forEach((group) => {
+                    dayCell.classList.add(group.cellClass);
+                  });
+
                   const dayNumber = document.createElement("div");
                   dayNumber.className = "day-number";
                   dayNumber.textContent = String(realDate);
@@ -342,6 +456,7 @@
       fromDateInput.addEventListener("change", renderCalendar);
       toDateInput.addEventListener("change", renderCalendar);
 
+      renderLegend();
       renderCalendar();
     })();
   </script>
