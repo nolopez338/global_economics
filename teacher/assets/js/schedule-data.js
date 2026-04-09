@@ -2246,7 +2246,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "Problems for Linear probabilities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3"
@@ -2259,10 +2259,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "-",
+    "Description": "C1 C2 C3: Exam practice",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3"
+    "Summary": "C1 C2 C3"
   },
   {
     "Grade": 10,
@@ -3234,7 +3234,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 5",
-    "Description": "C1 C2 C3 Practice activity",
+    "Description": "C1 C2 C3: Practice activity",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1 C2 C3"
@@ -3247,10 +3247,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "C1 C2 C3: Exam problems practice",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3"
+    "Summary": "C1 C2 C3"
   },
   {
     "Grade": 11,
@@ -3260,10 +3260,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 5",
-    "Description": "-",
+    "Description": "Exam: First Learning Evidence - C1 C2 C3",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3"
+    "Summary": "Exam"
   },
   {
     "Grade": 11,
