@@ -43,6 +43,10 @@
       width: 380px;
     }
 
+    .class-schedule-table tbody tr.date-change-divider td,
+    .class-schedule-table tbody tr.date-change-divider th {
+      border-top: 6px solid #000000;
+    }
 
     .today-indicator-row td {
       border-top: 2px solid #cbd5e1;
@@ -167,6 +171,35 @@
         });
       }
 
+
+      function markDateChangeDividers(table) {
+        if (!table || !table.tBodies || !table.tBodies[0]) {
+          return;
+        }
+
+        var rows = Array.from(table.tBodies[0].rows || []);
+        var previousDate = null;
+
+        rows.forEach(function (row) {
+          row.classList.remove('date-change-divider');
+
+          if (!row || row.hidden || row.classList.contains('past-dates-toggle-row') || row.classList.contains('today-indicator-row')) {
+            return;
+          }
+
+          var currentDate = normalizeDate(row.dataset.date);
+          if (!currentDate) {
+            return;
+          }
+
+          if (previousDate && currentDate !== previousDate) {
+            row.classList.add('date-change-divider');
+          }
+
+          previousDate = currentDate;
+        });
+      }
+
       function updatePastRows(table, toggleButton, countInput) {
         var rows = buildPastDateRows(table);
         if (rows.length === 0) {
@@ -187,6 +220,8 @@
           var shouldAlwaysShow = visibleDateSet.has(date);
           row.hidden = !(shouldAlwaysShow || expanded);
         });
+
+        markDateChangeDividers(table);
       }
 
       function wirePastDatesControl(table) {
@@ -243,12 +278,15 @@
 
         document.querySelectorAll('.class-schedule-table').forEach(function (table) {
           wirePastDatesControl(table);
+          markDateChangeDividers(table);
         });
       }
 
       document.addEventListener('class-schedule-rendered', function (event) {
         updateBackToScheduleLink();
-        wirePastDatesControl(event.detail?.table || null);
+        var table = event.detail?.table || null;
+        wirePastDatesControl(table);
+        markDateChangeDividers(table);
       });
 
       if (document.readyState === 'loading') {
