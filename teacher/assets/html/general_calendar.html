@@ -208,10 +208,12 @@
       inset: 0;
       display: grid;
       place-items: center;
-      font-size: 0.92rem;
+      font-size: 0.88rem;
       color: var(--accent);
       font-weight: 700;
       padding-top: 0.45rem;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
     }
 
     .cycle-day.missing {
@@ -429,13 +431,6 @@
         }
 
         calendar2026.months.forEach((month, monthIndex) => {
-          const alignedMonth =
-            typeof calendar2026days !== "undefined" &&
-            calendar2026days &&
-            Array.isArray(calendar2026days.months)
-              ? calendar2026days.months[monthIndex]
-              : null;
-
           const monthCard = document.createElement("article");
           monthCard.className = "month-card";
 
@@ -471,14 +466,6 @@
 
             for (let dayIndex = 0; dayIndex < 7; dayIndex += 1) {
               const realDate = Array.isArray(week) ? week[dayIndex] : null;
-              const cycleDayRaw =
-                alignedMonth && Array.isArray(alignedMonth.weeks)
-                  ? alignedMonth.weeks?.[weekIndex]?.[dayIndex]
-                  : null;
-              const cycleDay =
-                cycleDayRaw === undefined || cycleDayRaw === null
-                  ? null
-                  : cycleDayRaw;
 
               const dayCell = document.createElement("div");
               dayCell.className = "day-cell";
@@ -506,12 +493,31 @@
 
                   const cycleValue = document.createElement("div");
                   cycleValue.className = "cycle-day";
+                  let cycleNumber = null;
+                  let cycleDay = null;
 
-                  if (cycleDay === null) {
+                  try {
+                    cycleNumber = getCycleNumber2026(monthIndex + 1, realDate);
+                  } catch (error) {
+                    cycleNumber = null;
+                  }
+
+                  try {
+                    cycleDay = getCycleDay2026(monthIndex + 1, realDate);
+                  } catch (error) {
+                    cycleDay = null;
+                  }
+
+                  if (
+                    cycleNumber === null ||
+                    cycleNumber === undefined ||
+                    cycleDay === null ||
+                    cycleDay === undefined
+                  ) {
                     cycleValue.classList.add("missing");
                     cycleValue.textContent = "–";
                   } else {
-                    cycleValue.textContent = String(cycleDay);
+                    cycleValue.textContent = `${cycleNumber}-${cycleDay}`;
                   }
 
                   dayCell.appendChild(dayNumber);
