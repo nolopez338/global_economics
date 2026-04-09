@@ -38,6 +38,43 @@
       text-align: center;
     }
 
+    .filter-block {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1rem;
+      align-items: flex-end;
+      justify-content: center;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .filter-field {
+      display: grid;
+      gap: 0.35rem;
+      min-width: 180px;
+    }
+
+    .filter-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .filter-input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.45rem 0.55rem;
+      font-size: 0.95rem;
+      color: var(--text);
+      background: #fff;
+    }
+
     .calendar-year {
       display: grid;
       gap: 1rem;
@@ -102,6 +139,12 @@
       opacity: 0.8;
     }
 
+    .day-cell.filtered {
+      background: var(--empty);
+      border-style: dashed;
+      opacity: 0.5;
+    }
+
     .day-number {
       position: absolute;
       top: 0.22rem;
@@ -135,22 +178,40 @@
       text-align: center;
       font-size: 0.95rem;
     }
+
+    @media (max-width: 560px) {
+      .filter-field {
+        min-width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
   <main>
     <h1>2026 General Calendar</h1>
+    <section class="filter-block" aria-label="Date range filter">
+      <div class="filter-field">
+        <label for="from-date" class="filter-label">From</label>
+        <input id="from-date" class="filter-input" type="date" value="2026-01-01" min="2026-01-01" max="2026-12-31" />
+      </div>
+      <div class="filter-field">
+        <label for="to-date" class="filter-label">To</label>
+        <input id="to-date" class="filter-input" type="date" value="2026-12-31" min="2026-01-01" max="2026-12-31" />
+      </div>
+    </section>
     <p id="notice" class="notice" hidden></p>
     <section id="calendar-year" class="calendar-year" aria-label="Full year calendar"></section>
   </main>
 
   <script src="../js/year-calendar-data.js"></script>
   <script>
-    (function renderYearCalendar() {
+    (function initializeYearCalendar() {
       const container = document.getElementById("calendar-year");
       const notice = document.getElementById("notice");
+      const fromDateInput = document.getElementById("from-date");
+      const toDateInput = document.getElementById("to-date");
 
-      if (!container) return;
+      if (!container || !notice || !fromDateInput || !toDateInput) return;
 
       if (
         typeof calendar2026 === "undefined" ||
@@ -166,86 +227,122 @@
         ? calendar2026.weekdays
         : ["su", "mo", "tu", "we", "th", "fr", "sa"];
 
-      calendar2026.months.forEach((month, monthIndex) => {
-        const alignedMonth =
-          typeof calendar2026days !== "undefined" &&
-          calendar2026days &&
-          Array.isArray(calendar2026days.months)
-            ? calendar2026days.months[monthIndex]
-            : null;
+      function getCurrentRange() {
+        const from = fromDateInput.value || "2026-01-01";
+        const to = toDateInput.value || "2026-12-31";
+        return { from, to, isValid: from <= to };
+      }
 
-        const monthCard = document.createElement("article");
-        monthCard.className = "month-card";
+      function renderCalendar() {
+        const { from, to, isValid } = getCurrentRange();
+        container.innerHTML = "";
 
-        const monthName = document.createElement("h2");
-        monthName.className = "month-name";
-        monthName.textContent = month?.name || `Month ${monthIndex + 1}`;
-        monthCard.appendChild(monthName);
+        if (!isValid) {
+          notice.hidden = false;
+          notice.textContent = "Invalid range: From date must be on or before To date.";
+        } else {
+          notice.hidden = true;
+          notice.textContent = "";
+        }
 
-        const weekdayRow = document.createElement("div");
-        weekdayRow.className = "weekday-row";
-        weekdays.forEach((label) => {
-          const weekday = document.createElement("div");
-          weekday.className = "weekday";
-          weekday.textContent = label;
-          weekdayRow.appendChild(weekday);
-        });
-        monthCard.appendChild(weekdayRow);
+        calendar2026.months.forEach((month, monthIndex) => {
+          const alignedMonth =
+            typeof calendar2026days !== "undefined" &&
+            calendar2026days &&
+            Array.isArray(calendar2026days.months)
+              ? calendar2026days.months[monthIndex]
+              : null;
 
-        const monthGrid = document.createElement("div");
-        monthGrid.className = "month-grid";
+          const monthCard = document.createElement("article");
+          monthCard.className = "month-card";
 
-        const monthWeeks = Array.isArray(month?.weeks) ? month.weeks : [];
+          const monthName = document.createElement("h2");
+          monthName.className = "month-name";
+          monthName.textContent = month?.name || `Month ${monthIndex + 1}`;
+          monthCard.appendChild(monthName);
 
-        monthWeeks.forEach((week, weekIndex) => {
-          const weekRow = document.createElement("div");
-          weekRow.className = "week-row";
+          const weekdayRow = document.createElement("div");
+          weekdayRow.className = "weekday-row";
+          weekdays.forEach((label) => {
+            const weekday = document.createElement("div");
+            weekday.className = "weekday";
+            weekday.textContent = label;
+            weekdayRow.appendChild(weekday);
+          });
+          monthCard.appendChild(weekdayRow);
 
-          for (let dayIndex = 0; dayIndex < 7; dayIndex += 1) {
-            const realDate = Array.isArray(week) ? week[dayIndex] : null;
-            const cycleDayRaw =
-              alignedMonth && Array.isArray(alignedMonth.weeks)
-                ? alignedMonth.weeks?.[weekIndex]?.[dayIndex]
-                : null;
-            const cycleDay =
-              cycleDayRaw === undefined || cycleDayRaw === null
-                ? null
-                : cycleDayRaw;
+          const monthGrid = document.createElement("div");
+          monthGrid.className = "month-grid";
 
-            const dayCell = document.createElement("div");
-            dayCell.className = "day-cell";
+          const monthWeeks = Array.isArray(month?.weeks) ? month.weeks : [];
+          const numericMonth = String(month?.month ?? monthIndex + 1).padStart(2, "0");
 
-            if (realDate === null || realDate === undefined) {
-              dayCell.classList.add("empty");
-              dayCell.setAttribute("aria-hidden", "true");
-            } else {
-              const dayNumber = document.createElement("div");
-              dayNumber.className = "day-number";
-              dayNumber.textContent = String(realDate);
+          monthWeeks.forEach((week, weekIndex) => {
+            const weekRow = document.createElement("div");
+            weekRow.className = "week-row";
 
-              const cycleValue = document.createElement("div");
-              cycleValue.className = "cycle-day";
+            for (let dayIndex = 0; dayIndex < 7; dayIndex += 1) {
+              const realDate = Array.isArray(week) ? week[dayIndex] : null;
+              const cycleDayRaw =
+                alignedMonth && Array.isArray(alignedMonth.weeks)
+                  ? alignedMonth.weeks?.[weekIndex]?.[dayIndex]
+                  : null;
+              const cycleDay =
+                cycleDayRaw === undefined || cycleDayRaw === null
+                  ? null
+                  : cycleDayRaw;
 
-              if (cycleDay === null) {
-                cycleValue.classList.add("missing");
-                cycleValue.textContent = "–";
+              const dayCell = document.createElement("div");
+              dayCell.className = "day-cell";
+
+              if (realDate === null || realDate === undefined) {
+                dayCell.classList.add("empty");
+                dayCell.setAttribute("aria-hidden", "true");
               } else {
-                cycleValue.textContent = String(cycleDay);
+                const numericDay = String(realDate).padStart(2, "0");
+                const isoDate = `2026-${numericMonth}-${numericDay}`;
+                const inRange = isValid && isoDate >= from && isoDate <= to;
+
+                if (!inRange) {
+                  dayCell.classList.add("filtered");
+                  dayCell.setAttribute("aria-hidden", "true");
+                } else {
+                  const dayNumber = document.createElement("div");
+                  dayNumber.className = "day-number";
+                  dayNumber.textContent = String(realDate);
+
+                  const cycleValue = document.createElement("div");
+                  cycleValue.className = "cycle-day";
+
+                  if (cycleDay === null) {
+                    cycleValue.classList.add("missing");
+                    cycleValue.textContent = "–";
+                  } else {
+                    cycleValue.textContent = String(cycleDay);
+                  }
+
+                  dayCell.appendChild(dayNumber);
+                  dayCell.appendChild(cycleValue);
+                }
               }
 
-              dayCell.appendChild(dayNumber);
-              dayCell.appendChild(cycleValue);
+              weekRow.appendChild(dayCell);
             }
 
-            weekRow.appendChild(dayCell);
-          }
+            monthGrid.appendChild(weekRow);
+          });
 
-          monthGrid.appendChild(weekRow);
+          monthCard.appendChild(monthGrid);
+          container.appendChild(monthCard);
         });
+      }
 
-        monthCard.appendChild(monthGrid);
-        container.appendChild(monthCard);
-      });
+      fromDateInput.addEventListener("input", renderCalendar);
+      toDateInput.addEventListener("input", renderCalendar);
+      fromDateInput.addEventListener("change", renderCalendar);
+      toDateInput.addEventListener("change", renderCalendar);
+
+      renderCalendar();
     })();
   </script>
 </body>
