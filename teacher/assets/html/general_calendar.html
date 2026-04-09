@@ -260,6 +260,10 @@
       const fromDateInput = document.getElementById("from-date");
       const toDateInput = document.getElementById("to-date");
       const legendContainer = document.getElementById("highlights-legend");
+      const DEFAULT_FROM_DATE = "2026-01-01";
+      const DEFAULT_TO_DATE = "2026-12-31";
+      const FROM_STORAGE_KEY = "generalCalendar.fromDate";
+      const TO_STORAGE_KEY = "generalCalendar.toDate";
 
       if (!container || !notice || !fromDateInput || !toDateInput || !legendContainer) return;
 
@@ -336,19 +340,85 @@
         ? calendar2026.weekdays
         : ["su", "mo", "tu", "we", "th", "fr", "sa"];
 
+      function isValidDateString(value) {
+        if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+        const parsed = new Date(`${value}T00:00:00Z`);
+        return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+      }
+
+      function normalizeStoredDate(value, fallback) {
+        if (!isValidDateString(value)) return fallback;
+        if (value < DEFAULT_FROM_DATE || value > DEFAULT_TO_DATE) return fallback;
+        return value;
+      }
+
+      function restoreFilterState() {
+        let storedFrom = null;
+        let storedTo = null;
+
+        try {
+          storedFrom = localStorage.getItem(FROM_STORAGE_KEY);
+          storedTo = localStorage.getItem(TO_STORAGE_KEY);
+        } catch (error) {
+          storedFrom = null;
+          storedTo = null;
+        }
+
+        fromDateInput.value = normalizeStoredDate(storedFrom, DEFAULT_FROM_DATE);
+        toDateInput.value = normalizeStoredDate(storedTo, DEFAULT_TO_DATE);
+      }
+
+      function saveFilterState() {
+        const from = normalizeStoredDate(fromDateInput.value, DEFAULT_FROM_DATE);
+        const to = normalizeStoredDate(toDateInput.value, DEFAULT_TO_DATE);
+
+        try {
+          localStorage.setItem(FROM_STORAGE_KEY, from);
+          localStorage.setItem(TO_STORAGE_KEY, to);
+        } catch (error) {
+          // Ignore storage failures and continue rendering.
+        }
+      }
+
       function getCurrentRange() {
-        const from = fromDateInput.value || "2026-01-01";
-        const to = toDateInput.value || "2026-12-31";
+        const from = normalizeStoredDate(fromDateInput.value, DEFAULT_FROM_DATE);
+        const to = normalizeStoredDate(toDateInput.value, DEFAULT_TO_DATE);
         return { from, to, isValid: from <= to };
       }
 
+      function isDateInRange(isoDate, range) {
+        return range.isValid && isoDate >= range.from && isoDate <= range.to;
+      }
+
+      function weekHasVisibleDate(week, numericMonth, range) {
+        if (!Array.isArray(week)) return false;
+
+        return week.some((realDate) => {
+          if (realDate === null || realDate === undefined) return false;
+          const numericDay = String(realDate).padStart(2, "0");
+          const isoDate = `2026-${numericMonth}-${numericDay}`;
+          return isDateInRange(isoDate, range);
+        });
+      }
+
+      function getVisibleWeeks(monthWeeks, numericMonth, range) {
+        return monthWeeks
+          .map((week, weekIndex) => ({ week, weekIndex }))
+          .filter(({ week }) => weekHasVisibleDate(week, numericMonth, range));
+      }
+
+      function monthHasVisibleWeek(visibleWeeks) {
+        return Array.isArray(visibleWeeks) && visibleWeeks.length > 0;
+      }
+
       function renderCalendar() {
-        const { from, to, isValid } = getCurrentRange();
+        const range = getCurrentRange();
         container.innerHTML = "";
 
-        if (!isValid) {
+        if (!range.isValid) {
           notice.hidden = false;
           notice.textContent = "Invalid range: From date must be on or before To date.";
+          return;
         } else {
           notice.hidden = true;
           notice.textContent = "";
@@ -385,8 +455,13 @@
 
           const monthWeeks = Array.isArray(month?.weeks) ? month.weeks : [];
           const numericMonth = String(month?.month ?? monthIndex + 1).padStart(2, "0");
+          const visibleWeeks = getVisibleWeeks(monthWeeks, numericMonth, range);
 
-          monthWeeks.forEach((week, weekIndex) => {
+          if (!monthHasVisibleWeek(visibleWeeks)) {
+            return;
+          }
+
+          visibleWeeks.forEach(({ week, weekIndex }) => {
             const weekRow = document.createElement("div");
             weekRow.className = "week-row";
 
@@ -410,7 +485,7 @@
               } else {
                 const numericDay = String(realDate).padStart(2, "0");
                 const isoDate = `2026-${numericMonth}-${numericDay}`;
-                const inRange = isValid && isoDate >= from && isoDate <= to;
+                const inRange = isDateInRange(isoDate, range);
 
                 if (!inRange) {
                   dayCell.classList.add("filtered");
@@ -451,12 +526,18 @@
         });
       }
 
-      fromDateInput.addEventListener("input", renderCalendar);
-      toDateInput.addEventListener("input", renderCalendar);
-      fromDateInput.addEventListener("change", renderCalendar);
-      toDateInput.addEventListener("change", renderCalendar);
+      function handleFilterInput() {
+        saveFilterState();
+        renderCalendar();
+      }
+
+      fromDateInput.addEventListener("input", handleFilterInput);
+      toDateInput.addEventListener("input", handleFilterInput);
+      fromDateInput.addEventListener("change", handleFilterInput);
+      toDateInput.addEventListener("change", handleFilterInput);
 
       renderLegend();
+      restoreFilterState();
       renderCalendar();
     })();
   </script>
