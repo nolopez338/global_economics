@@ -364,13 +364,17 @@
           storedTo = null;
         }
 
-        fromDateInput.value = normalizeStoredDate(storedFrom, DEFAULT_FROM_DATE);
-        toDateInput.value = normalizeStoredDate(storedTo, DEFAULT_TO_DATE);
+        const normalizedFrom = normalizeStoredDate(storedFrom, DEFAULT_FROM_DATE);
+        const normalizedTo = normalizeStoredDate(storedTo, DEFAULT_TO_DATE);
+        const restoredRangeIsValid = normalizedFrom <= normalizedTo;
+
+        fromDateInput.value = restoredRangeIsValid ? normalizedFrom : DEFAULT_FROM_DATE;
+        toDateInput.value = restoredRangeIsValid ? normalizedTo : DEFAULT_TO_DATE;
       }
 
       function saveFilterState() {
-        const from = normalizeStoredDate(fromDateInput.value, DEFAULT_FROM_DATE);
-        const to = normalizeStoredDate(toDateInput.value, DEFAULT_TO_DATE);
+        const { from, to, isValid } = getCurrentRange();
+        if (!isValid) return;
 
         try {
           localStorage.setItem(FROM_STORAGE_KEY, from);
