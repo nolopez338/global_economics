@@ -138,6 +138,44 @@ const calendar2026days = {
   ]
 };
 
+const calendar2026cycle = (() => {
+  const cycleMonths = calendar2026days.months.map(month => ({
+    month: month.month,
+    name: month.name,
+    weeks: month.weeks.map(week => week.map(day => (day === null ? null : 0)))
+  }));
+
+  let currentCycle = 3;
+  let previousCycleDay = null;
+
+  for (let monthIndex = 0; monthIndex < calendar2026days.months.length; monthIndex++) {
+    const month = calendar2026days.months[monthIndex];
+    for (let weekIndex = 0; weekIndex < month.weeks.length; weekIndex++) {
+      const week = month.weeks[weekIndex];
+      for (let weekdayIndex = 0; weekdayIndex < week.length; weekdayIndex++) {
+        const cycleDay = week[weekdayIndex];
+
+        if (cycleDay === null) {
+          continue;
+        }
+
+        if (previousCycleDay === 5 && cycleDay === 1) {
+          currentCycle = (currentCycle % 11) + 1;
+        }
+
+        cycleMonths[monthIndex].weeks[weekIndex][weekdayIndex] = currentCycle;
+        previousCycleDay = cycleDay;
+      }
+    }
+  }
+
+  return {
+    year: 2026,
+    weekdays: ["su", "mo", "tu", "we", "th", "fr", "sa"],
+    months: cycleMonths
+  };
+})();
+
 const calendar2026 = {
   year: 2026,
   weekdays: ["su", "mo", "tu", "we", "th", "fr", "sa"],
@@ -337,11 +375,45 @@ function getCycleDay2026(month, day) {
   throw new Error("Invalid day for the given month");
 }
 
+function getCycleNumber2026(month, day) {
+  let monthData;
+  let monthIndex;
+
+  if (typeof month === "number") {
+    monthIndex = calendar2026.months.findIndex(m => m.month === month);
+    monthData = calendar2026.months[monthIndex];
+  } else if (typeof month === "string") {
+    const normalizedMonth = month.trim().toLowerCase();
+    monthIndex = calendar2026.months.findIndex(
+      m => m.name.toLowerCase() === normalizedMonth
+    );
+    monthData = calendar2026.months[monthIndex];
+  } else {
+    throw new Error("Month must be a number or a string");
+  }
+
+  if (!monthData) {
+    throw new Error("Invalid month");
+  }
+
+  for (let weekIndex = 0; weekIndex < monthData.weeks.length; weekIndex++) {
+    const weekdayIndex = monthData.weeks[weekIndex].indexOf(day);
+    if (weekdayIndex !== -1) {
+      return calendar2026cycle.months[monthIndex].weeks[weekIndex][weekdayIndex];
+    }
+  }
+
+  throw new Error("Invalid day for the given month");
+}
+
+
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     calendar2026days,
+    calendar2026cycle,
     calendar2026,
     getWeekday2026,
-    getCycleDay2026
+    getCycleDay2026,
+    getCycleNumber2026
   };
 }
