@@ -82,6 +82,25 @@
   <script>
     (function () {
       var DEFAULT_PAST_DATES = 2;
+      var ORIGIN_TO_BACK_LINK = {
+        schedule: '../schedule.html',
+        'schedule-teacher': '../schedule-teacher.html'
+      };
+
+      function getBackLinkFromOrigin() {
+        var params = new URLSearchParams(window.location.search || '');
+        var origin = params.get('origin');
+        return ORIGIN_TO_BACK_LINK[origin] || '../schedule.html';
+      }
+
+      function updateBackToScheduleLink() {
+        var link = document.querySelector('.breadcrumbs .back-link');
+        if (!link) {
+          return;
+        }
+
+        link.setAttribute('href', getBackLinkFromOrigin());
+      }
 
       function normalizeDate(raw) {
         if (!raw) {
@@ -209,12 +228,15 @@
       }
 
       function attachControls() {
+        updateBackToScheduleLink();
+
         document.querySelectorAll('.class-schedule-table').forEach(function (table) {
           wirePastDatesControl(table);
         });
       }
 
       document.addEventListener('class-schedule-rendered', function (event) {
+        updateBackToScheduleLink();
         wirePastDatesControl(event.detail?.table || null);
       });
 
