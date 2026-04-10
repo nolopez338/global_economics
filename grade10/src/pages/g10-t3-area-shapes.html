@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Area Models: Rectangle, Triangle, Trapezoid</title>
+  <style>
+    :root {
+      --bg: #f6f8fc;
+      --card: #ffffff;
+      --ink: #1f2937;
+      --muted: #6b7280;
+      --line: #d1d5db;
+      --primary: #2563eb;
+      --primary-soft: #dbeafe;
+      --accent: #0f766e;
+      --canvas-bg: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(160deg, #f8fafc 0%, #eef2ff 100%);
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+
+    .header {
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 1.7rem;
+      letter-spacing: 0.2px;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(520px, 1fr) 360px;
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+    }
+
+    .canvas-wrap {
+      padding: 14px;
+      display: flex;
+      min-height: 620px;
+    }
+
+    #shapeCanvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      background: var(--canvas-bg);
+      display: block;
+    }
+
+    .panel {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+      color: #334155;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .shape-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .shape-btn {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: #1f2937;
+      border-radius: 10px;
+      padding: 9px 8px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 140ms ease;
+    }
+
+    .shape-btn:hover {
+      border-color: #93c5fd;
+      transform: translateY(-1px);
+    }
+
+    .shape-btn.active {
+      background: var(--primary-soft);
+      border-color: var(--primary);
+      color: #1e3a8a;
+      box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.18);
+    }
+
+    .formula-box,
+    .area-box {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: #f9fafb;
+    }
+
+    .formula {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #0f172a;
+      margin: 2px 0 0;
+    }
+
+    .area-value {
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 4px;
+    }
+
+    .controls {
+      display: grid;
+      gap: 10px;
+    }
+
+    .control-row {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 10px;
+      background: #fff;
+    }
+
+    .control-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+
+    .var-label {
+      font-weight: 700;
+      font-size: 1rem;
+      color: #0f172a;
+    }
+
+    .num-input {
+      width: 88px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 0.95rem;
+      text-align: right;
+    }
+
+    .slider {
+      width: 100%;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .reset-btn {
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      background: #fff;
+      font-weight: 600;
+      padding: 9px 10px;
+      cursor: pointer;
+      transition: all 140ms ease;
+    }
+
+    .reset-btn:hover {
+      border-color: #93c5fd;
+      background: #eff6ff;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+      .canvas-wrap {
+        min-height: 440px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="header">
+      <h1>Interactive Area Models</h1>
+      <p class="subtitle">Adjust variables to explore how area changes for rectangles, triangles, and trapezoids.</p>
+    </header>
+
+    <section class="layout">
+      <div class="card canvas-wrap">
+        <canvas id="shapeCanvas" aria-label="Geometry drawing canvas"></canvas>
+      </div>
+
+      <aside class="card panel">
+        <section>
+          <h2 class="section-title">Choose Shape</h2>
+          <div class="shape-buttons" id="shapeButtons"></div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Area Formula</h2>
+          <div class="formula-box">
+            <div id="formulaText" class="formula"></div>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-title">Variables</h2>
+          <div id="controls" class="controls"></div>
+        </section>
+
+        <button id="resetBtn" class="reset-btn" type="button">Reset Current Shape</button>
+
+        <section>
+          <h2 class="section-title">Area</h2>
+          <div class="area-box">
+            <div id="areaText" class="area-value"></div>
+          </div>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    // ---------- State ----------
+    const SHAPES = {
+      rectangle: {
+        label: "Rectangle",
+        formula: "A = b\u00d7h",
+        vars: {
+          b: { label: "b", min: 2, max: 30, step: 1, default: 12 },
+          h: { label: "h", min: 2, max: 24, step: 1, default: 8 }
+        }
+      },
+      triangle: {
+        label: "Triangle",
+        formula: "A = (b\u00d7h)/2",
+        vars: {
+          b: { label: "b", min: 2, max: 30, step: 1, default: 14 },
+          h: { label: "h", min: 2, max: 24, step: 1, default: 9 }
+        }
+      },
+      trapezoid: {
+        label: "Trapezoid",
+        formula: "A = ((a+b)\u00d7h)/2",
+        vars: {
+          a: { label: "a", min: 2, max: 26, step: 1, default: 10 },
+          b: { label: "b", min: 4, max: 32, step: 1, default: 18 },
+          h: { label: "h", min: 2, max: 22, step: 1, default: 8 }
+        }
+      }
+    };
+
+    const appState = {
+      currentShape: "rectangle",
+      values: Object.fromEntries(
+        Object.entries(SHAPES).map(([shapeKey, shapeCfg]) => {
+          const defaults = Object.fromEntries(
+            Object.entries(shapeCfg.vars).map(([key, cfg]) => [key, cfg.default])
+          );
+          return [shapeKey, defaults];
+        })
+      )
+    };
+
+    // ---------- DOM ----------
+    const canvas = document.getElementById("shapeCanvas");
+    const ctx = canvas.getContext("2d");
+    const shapeButtonsEl = document.getElementById("shapeButtons");
+    const controlsEl = document.getElementById("controls");
+    const formulaTextEl = document.getElementById("formulaText");
+    const areaTextEl = document.getElementById("areaText");
+    const resetBtn = document.getElementById("resetBtn");
+
+    // ---------- Utility ----------
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
+    }
+
+    function resizeCanvasToDisplaySize() {
+      const ratio = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      const width = Math.max(320, Math.floor(rect.width));
+      const height = Math.max(320, Math.floor(rect.height));
+      if (canvas.width !== Math.floor(width * ratio) || canvas.height !== Math.floor(height * ratio)) {
+        canvas.width = Math.floor(width * ratio);
+        canvas.height = Math.floor(height * ratio);
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      }
+      return { width, height };
+    }
+
+    function formatArea(value) {
+      return Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.00$/, "");
+    }
+
+    // ---------- Area Calculation ----------
+    function calcArea(shape, v) {
+      if (shape === "rectangle") return v.b * v.h;
+      if (shape === "triangle") return (v.b * v.h) / 2;
+      if (shape === "trapezoid") return ((v.a + v.b) * v.h) / 2;
+      return 0;
+    }
+
+    // ---------- Drawing Helpers ----------
+    function drawDimLine(x1, y1, x2, y2, label, offset = 16) {
+      ctx.save();
+      ctx.strokeStyle = "#334155";
+      ctx.fillStyle = "#0f172a";
+      ctx.lineWidth = 1.4;
+      ctx.font = "600 16px Inter, sans-serif";
+
+      const vx = x2 - x1;
+      const vy = y2 - y1;
+      const len = Math.hypot(vx, vy) || 1;
+      const nx = -vy / len;
+      const ny = vx / len;
+
+      const sx1 = x1 + nx * offset;
+      const sy1 = y1 + ny * offset;
+      const sx2 = x2 + nx * offset;
+      const sy2 = y2 + ny * offset;
+
+      ctx.beginPath();
+      ctx.moveTo(sx1, sy1);
+      ctx.lineTo(sx2, sy2);
+      ctx.stroke();
+
+      const cap = 5;
+      const ang = Math.atan2(sy2 - sy1, sx2 - sx1);
+      [
+        [sx1, sy1, ang + Math.PI],
+        [sx2, sy2, ang]
+      ].forEach(([x, y, dir]) => {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + Math.cos(dir + 0.45) * cap, y + Math.sin(dir + 0.45) * cap);
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + Math.cos(dir - 0.45) * cap, y + Math.sin(dir - 0.45) * cap);
+        ctx.stroke();
+      });
+
+      const mx = (sx1 + sx2) / 2;
+      const my = (sy1 + sy2) / 2;
+      ctx.fillText(label, mx - 5, my - 6);
+      ctx.restore();
+    }
+
+    function drawHeightMarker(xBase, yTop, yBottom, label = "h") {
+      ctx.save();
+      ctx.strokeStyle = "#9333ea";
+      ctx.fillStyle = "#6b21a8";
+      ctx.lineWidth = 1.6;
+      ctx.setLineDash([6, 5]);
+      ctx.beginPath();
+      ctx.moveTo(xBase, yTop);
+      ctx.lineTo(xBase, yBottom);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Right-angle marker near base
+      const s = 10;
+      ctx.beginPath();
+      ctx.moveTo(xBase, yBottom);
+      ctx.lineTo(xBase + s, yBottom);
+      ctx.lineTo(xBase + s, yBottom - s);
+      ctx.stroke();
+
+      ctx.font = "600 16px Inter, sans-serif";
+      ctx.fillText(label, xBase + 10, (yTop + yBottom) / 2 - 4);
+      ctx.restore();
+    }
+
+    function drawRectangle(v, W, H) {
+      const margin = 80;
+      const usableW = W - margin * 2;
+      const usableH = H - margin * 2;
+      const scale = Math.min(usableW / v.b, usableH / v.h);
+      const w = v.b * scale;
+      const h = v.h * scale;
+
+      const x = (W - w) / 2;
+      const y = (H - h) / 2;
+
+      ctx.fillStyle = "rgba(37,99,235,0.16)";
+      ctx.strokeStyle = "#1d4ed8";
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.rect(x, y, w, h);
+      ctx.fill();
+      ctx.stroke();
+
+      drawDimLine(x, y + h, x + w, y + h, "b", 22);
+      drawDimLine(x, y + h, x, y, "h", -22);
+    }
+
+    function drawTriangle(v, W, H) {
+      const margin = 80;
+      const usableW = W - margin * 2;
+      const usableH = H - margin * 2;
+      const scale = Math.min(usableW / v.b, usableH / v.h);
+      const bpx = v.b * scale;
+      const hpx = v.h * scale;
+
+      const xLeft = (W - bpx) / 2;
+      const yBase = (H + hpx) / 2;
+      const xRight = xLeft + bpx;
+      const xApex = xLeft + bpx * 0.68;
+      const yApex = yBase - hpx;
+
+      ctx.fillStyle = "rgba(14,116,144,0.18)";
+      ctx.strokeStyle = "#0f766e";
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(xLeft, yBase);
+      ctx.lineTo(xRight, yBase);
+      ctx.lineTo(xApex, yApex);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      drawDimLine(xLeft, yBase, xRight, yBase, "b", 22);
+
+      // Perpendicular height from apex to base line
+      const xFoot = xApex;
+      drawHeightMarker(xFoot, yApex, yBase, "h");
+    }
+
+    function drawTrapezoid(v, W, H) {
+      const margin = 80;
+      const widthUnits = Math.max(v.a, v.b) + Math.abs(v.b - v.a) * 0.35;
+      const usableW = W - margin * 2;
+      const usableH = H - margin * 2;
+      const scale = Math.min(usableW / widthUnits, usableH / v.h);
+
+      const topW = v.a * scale;
+      const botW = v.b * scale;
+      const hpx = v.h * scale;
+
+      const cx = W / 2;
+      const yTop = (H - hpx) / 2;
+      const yBot = yTop + hpx;
+
+      const xTopLeft = cx - topW / 2;
+      const xTopRight = cx + topW / 2;
+      const xBotLeft = cx - botW / 2;
+      const xBotRight = cx + botW / 2;
+
+      ctx.fillStyle = "rgba(234,88,12,0.17)";
+      ctx.strokeStyle = "#c2410c";
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      ctx.moveTo(xTopLeft, yTop);
+      ctx.lineTo(xTopRight, yTop);
+      ctx.lineTo(xBotRight, yBot);
+      ctx.lineTo(xBotLeft, yBot);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      drawDimLine(xTopLeft, yTop, xTopRight, yTop, "a", -20);
+      drawDimLine(xBotLeft, yBot, xBotRight, yBot, "b", 22);
+
+      const xH = xTopLeft - 24;
+      drawHeightMarker(xH, yTop, yBot, "h");
+
+      // Extend helper lines to show perpendicular height relation
+      ctx.save();
+      ctx.strokeStyle = "#a78bfa";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 5]);
+      ctx.beginPath();
+      ctx.moveTo(xH, yTop);
+      ctx.lineTo(xTopLeft, yTop);
+      ctx.moveTo(xH, yBot);
+      ctx.lineTo(xBotLeft, yBot);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // ---------- Rendering ----------
+    function renderShapeButtons() {
+      shapeButtonsEl.innerHTML = "";
+      Object.entries(SHAPES).forEach(([shapeKey, cfg]) => {
+        const btn = document.createElement("button");
+        btn.className = `shape-btn ${appState.currentShape === shapeKey ? "active" : ""}`;
+        btn.type = "button";
+        btn.textContent = cfg.label;
+        btn.addEventListener("click", () => {
+          appState.currentShape = shapeKey;
+          renderAll();
+        });
+        shapeButtonsEl.appendChild(btn);
+      });
+    }
+
+    function createControlRow(varKey, cfg, value) {
+      const row = document.createElement("div");
+      row.className = "control-row";
+
+      const top = document.createElement("div");
+      top.className = "control-top";
+
+      const label = document.createElement("span");
+      label.className = "var-label";
+      label.textContent = cfg.label;
+
+      const num = document.createElement("input");
+      num.className = "num-input";
+      num.type = "number";
+      num.min = cfg.min;
+      num.max = cfg.max;
+      num.step = cfg.step;
+      num.value = value;
+
+      top.appendChild(label);
+      top.appendChild(num);
+
+      const slider = document.createElement("input");
+      slider.className = "slider";
+      slider.type = "range";
+      slider.min = cfg.min;
+      slider.max = cfg.max;
+      slider.step = cfg.step;
+      slider.value = value;
+
+      function updateFrom(nextVal) {
+        const bounded = clamp(Number(nextVal) || cfg.min, cfg.min, cfg.max);
+        appState.values[appState.currentShape][varKey] = bounded;
+        num.value = bounded;
+        slider.value = bounded;
+        renderCanvasAndArea();
+      }
+
+      num.addEventListener("input", () => updateFrom(num.value));
+      slider.addEventListener("input", () => updateFrom(slider.value));
+
+      row.appendChild(top);
+      row.appendChild(slider);
+      return row;
+    }
+
+    function renderControls() {
+      controlsEl.innerHTML = "";
+      const shapeCfg = SHAPES[appState.currentShape];
+      const vals = appState.values[appState.currentShape];
+
+      Object.entries(shapeCfg.vars).forEach(([varKey, cfg]) => {
+        controlsEl.appendChild(createControlRow(varKey, cfg, vals[varKey]));
+      });
+    }
+
+    function renderFormula() {
+      formulaTextEl.textContent = SHAPES[appState.currentShape].formula;
+    }
+
+    function renderCanvasAndArea() {
+      const { width: W, height: H } = resizeCanvasToDisplaySize();
+      const shape = appState.currentShape;
+      const vals = appState.values[shape];
+
+      ctx.clearRect(0, 0, W, H);
+
+      // subtle grid for educational feel
+      ctx.save();
+      ctx.strokeStyle = "#f1f5f9";
+      ctx.lineWidth = 1;
+      for (let x = 0; x <= W; x += 36) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, H);
+        ctx.stroke();
+      }
+      for (let y = 0; y <= H; y += 36) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(W, y);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      if (shape === "rectangle") drawRectangle(vals, W, H);
+      if (shape === "triangle") drawTriangle(vals, W, H);
+      if (shape === "trapezoid") drawTrapezoid(vals, W, H);
+
+      const area = calcArea(shape, vals);
+      areaTextEl.textContent = `A = ${formatArea(area)} units\u00b2`;
+    }
+
+    function resetCurrentShape() {
+      const shape = appState.currentShape;
+      Object.entries(SHAPES[shape].vars).forEach(([k, cfg]) => {
+        appState.values[shape][k] = cfg.default;
+      });
+      renderAll();
+    }
+
+    function renderAll() {
+      renderShapeButtons();
+      renderControls();
+      renderFormula();
+      renderCanvasAndArea();
+    }
+
+    // ---------- Events ----------
+    resetBtn.addEventListener("click", resetCurrentShape);
+    window.addEventListener("resize", renderCanvasAndArea);
+
+    // ---------- Init ----------
+    renderAll();
+  </script>
+</body>
+</html>
