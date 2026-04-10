@@ -3247,7 +3247,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "C1 C2 C3: Exam problems practice",
+    "Description": "No Class: Yearbook Picture",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1 C2 C3"
@@ -3260,7 +3260,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 5",
-    "Description": "Exam: First Learning Evidence - C1 C2 C3",
+    "Description": "C1 C2 C3: Exam problems practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "Exam"
@@ -3273,7 +3273,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "Exam: First Learning Evidence - C1 C2 C3",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C4"
