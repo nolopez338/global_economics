@@ -76,6 +76,8 @@
       border: 1px solid #e5e7eb;
       background: var(--canvas-bg);
       display: block;
+      touch-action: none;
+      cursor: crosshair;
     }
 
     .panel {
@@ -122,6 +124,30 @@
       border-color: var(--primary);
       color: #1e3a8a;
       box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.18);
+    }
+
+    .toggle-row {
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toggle-row label {
+      font-size: 0.93rem;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .toggle-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+      cursor: pointer;
     }
 
     .formula-box,
@@ -230,6 +256,11 @@
           <div class="shape-buttons" id="shapeButtons"></div>
         </section>
 
+        <section class="toggle-row">
+          <label for="fixedBackgroundToggle">Fixed background size</label>
+          <input id="fixedBackgroundToggle" type="checkbox" checked />
+        </section>
+
         <section>
           <h2 class="section-title">Area Formula</h2>
           <div class="formula-box">
@@ -259,7 +290,7 @@
     const SHAPES = {
       rectangle: {
         label: "Rectangle",
-        formula: "A = b\u00d7h",
+        formula: "A = b×h",
         vars: {
           b: { label: "b", min: 2, max: 30, step: 1, default: 12 },
           h: { label: "h", min: 2, max: 24, step: 1, default: 8 }
@@ -267,7 +298,7 @@
       },
       triangle: {
         label: "Triangle",
-        formula: "A = (b\u00d7h)/2",
+        formula: "A = (b×h)/2",
         vars: {
           b: { label: "b", min: 2, max: 30, step: 1, default: 14 },
           h: { label: "h", min: 2, max: 24, step: 1, default: 9 }
@@ -275,7 +306,7 @@
       },
       trapezoid: {
         label: "Trapezoid",
-        formula: "A = ((a+b)\u00d7h)/2",
+        formula: "A = ((a+b)×h)/2",
         vars: {
           a: { label: "a", min: 2, max: 26, step: 1, default: 10 },
           b: { label: "b", min: 4, max: 32, step: 1, default: 18 },
@@ -286,6 +317,7 @@
 
     const appState = {
       currentShape: "rectangle",
+      fixedBackground: true,
       values: Object.fromEntries(
         Object.entries(SHAPES).map(([shapeKey, shapeCfg]) => {
           const defaults = Object.fromEntries(
@@ -296,6 +328,17 @@
       )
     };
 
+    const interactionState = {
+      activeHandleId: null,
+      hoverHandleId: null,
+      pointerId: null,
+      dragState: null
+    };
+
+    const viewState = {
+      lastGeometry: null
+    };
+
     // ---------- DOM ----------
     const canvas = document.getElementById("shapeCanvas");
     const ctx = canvas.getContext("2d");
@@ -304,6 +347,7 @@
     const formulaTextEl = document.getElementById("formulaText");
     const areaTextEl = document.getElementById("areaText");
     const resetBtn = document.getElementById("resetBtn");
+    const fixedBackgroundToggle = document.getElementById("fixedBackgroundToggle");
 
     // ---------- Utility ----------
     function clamp(value, min, max) {
@@ -325,6 +369,48 @@
 
     function formatArea(value) {
       return Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.00$/, "");
+    }
+
+    function getMaxFixedScale(shape, W, H) {
+      const margin = 80;
+      const usableW = W - margin * 2;
+      const usableH = H - margin * 2;
+      const vars = SHAPES[shape].vars;
+
+      if (shape === "rectangle") {
+        return Math.min(usableW / vars.b.max, usableH / vars.h.max);
+      }
+      if (shape === "triangle") {
+        return Math.min(usableW / vars.b.max, usableH / vars.h.max);
+      }
+      const widthUnits = Math.max(vars.a.max, vars.b.max) + Math.abs(vars.b.max - vars.a.max) * 0.35;
+      return Math.min(usableW / widthUnits, usableH / vars.h.max);
+    }
+
+    function getShapeLayout(shape, v, W, H) {
+      const margin = 80;
+      const usableW = W - margin * 2;
+      const usableH = H - margin * 2;
+      let scale;
+
+      if (appState.fixedBackground) {
+        scale = getMaxFixedScale(shape, W, H);
+      } else if (shape === "trapezoid") {
+        const widthUnits = Math.max(v.a, v.b) + Math.abs(v.b - v.a) * 0.35;
+        scale = Math.min(usableW / widthUnits, usableH / v.h);
+      } else {
+        scale = Math.min(usableW / v.b, usableH / v.h);
+      }
+
+      return { margin, scale, usableW, usableH, W, H };
+    }
+
+    function toCanvasPoint(event) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
+      };
     }
 
     // ---------- Area Calculation ----------
@@ -391,7 +477,6 @@
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Right-angle marker near base
       const s = 10;
       ctx.beginPath();
       ctx.moveTo(xBase, yBottom);
@@ -404,16 +489,30 @@
       ctx.restore();
     }
 
-    function drawRectangle(v, W, H) {
-      const margin = 80;
-      const usableW = W - margin * 2;
-      const usableH = H - margin * 2;
-      const scale = Math.min(usableW / v.b, usableH / v.h);
-      const w = v.b * scale;
-      const h = v.h * scale;
+    function drawHandles(handles) {
+      handles.forEach((handle) => {
+        const isActive = interactionState.activeHandleId === handle.id;
+        const isHover = interactionState.hoverHandleId === handle.id;
+        const radius = isActive ? 8 : 7;
 
-      const x = (W - w) / 2;
-      const y = (H - h) / 2;
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(handle.x, handle.y, radius, 0, Math.PI * 2);
+        ctx.fillStyle = isActive ? "#1d4ed8" : isHover ? "#60a5fa" : "#ffffff";
+        ctx.fill();
+        ctx.lineWidth = 2.4;
+        ctx.strokeStyle = isActive ? "#0f172a" : "#2563eb";
+        ctx.stroke();
+        ctx.restore();
+      });
+    }
+
+    // ---------- Shape Drawing + Geometry ----------
+    function drawRectangle(v, layout) {
+      const w = v.b * layout.scale;
+      const h = v.h * layout.scale;
+      const x = (layout.W - w) / 2;
+      const y = (layout.H - h) / 2;
 
       ctx.fillStyle = "rgba(37,99,235,0.16)";
       ctx.strokeStyle = "#1d4ed8";
@@ -425,18 +524,31 @@
 
       drawDimLine(x, y + h, x + w, y + h, "b", 22);
       drawDimLine(x, y + h, x, y, "h", -22);
+
+      return {
+        shape: "rectangle",
+        scale: layout.scale,
+        points: {
+          tl: { x, y },
+          tr: { x: x + w, y },
+          br: { x: x + w, y: y + h },
+          bl: { x, y: y + h }
+        },
+        handles: [
+          { id: "tl", x, y },
+          { id: "tr", x: x + w, y },
+          { id: "br", x: x + w, y: y + h },
+          { id: "bl", x, y: y + h }
+        ]
+      };
     }
 
-    function drawTriangle(v, W, H) {
-      const margin = 80;
-      const usableW = W - margin * 2;
-      const usableH = H - margin * 2;
-      const scale = Math.min(usableW / v.b, usableH / v.h);
-      const bpx = v.b * scale;
-      const hpx = v.h * scale;
+    function drawTriangle(v, layout) {
+      const bpx = v.b * layout.scale;
+      const hpx = v.h * layout.scale;
 
-      const xLeft = (W - bpx) / 2;
-      const yBase = (H + hpx) / 2;
+      const xLeft = (layout.W - bpx) / 2;
+      const yBase = (layout.H + hpx) / 2;
       const xRight = xLeft + bpx;
       const xApex = xLeft + bpx * 0.68;
       const yApex = yBase - hpx;
@@ -453,25 +565,32 @@
       ctx.stroke();
 
       drawDimLine(xLeft, yBase, xRight, yBase, "b", 22);
+      drawHeightMarker(xApex, yApex, yBase, "h");
 
-      // Perpendicular height from apex to base line
-      const xFoot = xApex;
-      drawHeightMarker(xFoot, yApex, yBase, "h");
+      return {
+        shape: "triangle",
+        scale: layout.scale,
+        points: {
+          left: { x: xLeft, y: yBase },
+          right: { x: xRight, y: yBase },
+          apex: { x: xApex, y: yApex },
+          yBase
+        },
+        handles: [
+          { id: "left", x: xLeft, y: yBase },
+          { id: "right", x: xRight, y: yBase },
+          { id: "apex", x: xApex, y: yApex }
+        ]
+      };
     }
 
-    function drawTrapezoid(v, W, H) {
-      const margin = 80;
-      const widthUnits = Math.max(v.a, v.b) + Math.abs(v.b - v.a) * 0.35;
-      const usableW = W - margin * 2;
-      const usableH = H - margin * 2;
-      const scale = Math.min(usableW / widthUnits, usableH / v.h);
+    function drawTrapezoid(v, layout) {
+      const topW = v.a * layout.scale;
+      const botW = v.b * layout.scale;
+      const hpx = v.h * layout.scale;
 
-      const topW = v.a * scale;
-      const botW = v.b * scale;
-      const hpx = v.h * scale;
-
-      const cx = W / 2;
-      const yTop = (H - hpx) / 2;
+      const cx = layout.W / 2;
+      const yTop = (layout.H - hpx) / 2;
       const yBot = yTop + hpx;
 
       const xTopLeft = cx - topW / 2;
@@ -497,7 +616,6 @@
       const xH = xTopLeft - 24;
       drawHeightMarker(xH, yTop, yBot, "h");
 
-      // Extend helper lines to show perpendicular height relation
       ctx.save();
       ctx.strokeStyle = "#a78bfa";
       ctx.lineWidth = 1;
@@ -509,6 +627,23 @@
       ctx.lineTo(xBotLeft, yBot);
       ctx.stroke();
       ctx.restore();
+
+      return {
+        shape: "trapezoid",
+        scale: layout.scale,
+        points: {
+          tl: { x: xTopLeft, y: yTop },
+          tr: { x: xTopRight, y: yTop },
+          br: { x: xBotRight, y: yBot },
+          bl: { x: xBotLeft, y: yBot }
+        },
+        handles: [
+          { id: "tl", x: xTopLeft, y: yTop },
+          { id: "tr", x: xTopRight, y: yTop },
+          { id: "br", x: xBotRight, y: yBot },
+          { id: "bl", x: xBotLeft, y: yBot }
+        ]
+      };
     }
 
     // ---------- Rendering ----------
@@ -521,6 +656,8 @@
         btn.textContent = cfg.label;
         btn.addEventListener("click", () => {
           appState.currentShape = shapeKey;
+          interactionState.activeHandleId = null;
+          interactionState.hoverHandleId = null;
           renderAll();
         });
         shapeButtonsEl.appendChild(btn);
@@ -530,6 +667,7 @@
     function createControlRow(varKey, cfg, value) {
       const row = document.createElement("div");
       row.className = "control-row";
+      row.dataset.varKey = varKey;
 
       const top = document.createElement("div");
       top.className = "control-top";
@@ -583,6 +721,19 @@
       });
     }
 
+    function syncControlValues() {
+      const vals = appState.values[appState.currentShape];
+      controlsEl.querySelectorAll(".control-row").forEach((row) => {
+        const varKey = row.dataset.varKey;
+        if (!varKey || !(varKey in vals)) return;
+        const val = vals[varKey];
+        const num = row.querySelector(".num-input");
+        const slider = row.querySelector(".slider");
+        if (num) num.value = val;
+        if (slider) slider.value = val;
+      });
+    }
+
     function renderFormula() {
       formulaTextEl.textContent = SHAPES[appState.currentShape].formula;
     }
@@ -591,10 +742,10 @@
       const { width: W, height: H } = resizeCanvasToDisplaySize();
       const shape = appState.currentShape;
       const vals = appState.values[shape];
+      const layout = getShapeLayout(shape, vals, W, H);
 
       ctx.clearRect(0, 0, W, H);
 
-      // subtle grid for educational feel
       ctx.save();
       ctx.strokeStyle = "#f1f5f9";
       ctx.lineWidth = 1;
@@ -612,12 +763,18 @@
       }
       ctx.restore();
 
-      if (shape === "rectangle") drawRectangle(vals, W, H);
-      if (shape === "triangle") drawTriangle(vals, W, H);
-      if (shape === "trapezoid") drawTrapezoid(vals, W, H);
+      let geometry;
+      if (shape === "rectangle") geometry = drawRectangle(vals, layout);
+      if (shape === "triangle") geometry = drawTriangle(vals, layout);
+      if (shape === "trapezoid") geometry = drawTrapezoid(vals, layout);
+
+      if (geometry) {
+        viewState.lastGeometry = geometry;
+        drawHandles(geometry.handles);
+      }
 
       const area = calcArea(shape, vals);
-      areaTextEl.textContent = `A = ${formatArea(area)} units\u00b2`;
+      areaTextEl.textContent = `A = ${formatArea(area)} units²`;
     }
 
     function resetCurrentShape() {
@@ -629,14 +786,161 @@
     }
 
     function renderAll() {
+      fixedBackgroundToggle.checked = appState.fixedBackground;
       renderShapeButtons();
       renderControls();
       renderFormula();
       renderCanvasAndArea();
     }
 
+    // ---------- Drag Interaction ----------
+    function getHandleAtPoint(point) {
+      const geometry = viewState.lastGeometry;
+      if (!geometry) return null;
+      let match = null;
+      let nearest = Infinity;
+      geometry.handles.forEach((h) => {
+        const d = Math.hypot(point.x - h.x, point.y - h.y);
+        if (d <= 12 && d < nearest) {
+          nearest = d;
+          match = h;
+        }
+      });
+      return match;
+    }
+
+    function updateRectangleByHandle(handleId, point, geometry) {
+      const vals = appState.values.rectangle;
+      const cfg = SHAPES.rectangle.vars;
+      const p = geometry.points;
+      const boundsPad = 24;
+
+      const clampedX = clamp(point.x, boundsPad, geometry.scale * cfg.b.max + geometry.points.tl.x + 2000);
+      const clampedY = clamp(point.y, boundsPad, canvas.height + 2000);
+      const map = {
+        tl: p.br,
+        tr: p.bl,
+        br: p.tl,
+        bl: p.tr
+      };
+      const anchor = map[handleId];
+      const nextB = clamp(Math.abs(clampedX - anchor.x) / geometry.scale, cfg.b.min, cfg.b.max);
+      const nextH = clamp(Math.abs(clampedY - anchor.y) / geometry.scale, cfg.h.min, cfg.h.max);
+      vals.b = nextB;
+      vals.h = nextH;
+    }
+
+    function updateTriangleByHandle(handleId, point, geometry) {
+      const vals = appState.values.triangle;
+      const cfg = SHAPES.triangle.vars;
+      const p = geometry.points;
+
+      if (handleId === "left") {
+        vals.b = clamp(Math.abs(p.right.x - point.x) / geometry.scale, cfg.b.min, cfg.b.max);
+      } else if (handleId === "right") {
+        vals.b = clamp(Math.abs(point.x - p.left.x) / geometry.scale, cfg.b.min, cfg.b.max);
+      } else if (handleId === "apex") {
+        vals.h = clamp((p.yBase - point.y) / geometry.scale, cfg.h.min, cfg.h.max);
+      }
+    }
+
+    function updateTrapezoidByHandle(handleId, point, geometry) {
+      const vals = appState.values.trapezoid;
+      const cfg = SHAPES.trapezoid.vars;
+      const p = geometry.points;
+
+      if (handleId === "tl") {
+        vals.a = clamp(Math.abs(p.tr.x - point.x) / geometry.scale, cfg.a.min, cfg.a.max);
+        vals.h = clamp((p.bl.y - point.y) / geometry.scale, cfg.h.min, cfg.h.max);
+      } else if (handleId === "tr") {
+        vals.a = clamp(Math.abs(point.x - p.tl.x) / geometry.scale, cfg.a.min, cfg.a.max);
+        vals.h = clamp((p.br.y - point.y) / geometry.scale, cfg.h.min, cfg.h.max);
+      } else if (handleId === "bl") {
+        vals.b = clamp(Math.abs(p.br.x - point.x) / geometry.scale, cfg.b.min, cfg.b.max);
+        vals.h = clamp((point.y - p.tl.y) / geometry.scale, cfg.h.min, cfg.h.max);
+      } else if (handleId === "br") {
+        vals.b = clamp(Math.abs(point.x - p.bl.x) / geometry.scale, cfg.b.min, cfg.b.max);
+        vals.h = clamp((point.y - p.tr.y) / geometry.scale, cfg.h.min, cfg.h.max);
+      }
+    }
+
+    function updateShapeFromDrag(point) {
+      const geometry = viewState.lastGeometry;
+      if (!geometry || !interactionState.activeHandleId) return;
+
+      const clampedPoint = {
+        x: clamp(point.x, 24, canvas.clientWidth - 24),
+        y: clamp(point.y, 24, canvas.clientHeight - 24)
+      };
+
+      if (geometry.shape === "rectangle") {
+        updateRectangleByHandle(interactionState.activeHandleId, clampedPoint, geometry);
+      }
+      if (geometry.shape === "triangle") {
+        updateTriangleByHandle(interactionState.activeHandleId, clampedPoint, geometry);
+      }
+      if (geometry.shape === "trapezoid") {
+        updateTrapezoidByHandle(interactionState.activeHandleId, clampedPoint, geometry);
+      }
+
+      syncControlValues();
+      renderCanvasAndArea();
+    }
+
+    function onPointerDown(event) {
+      const point = toCanvasPoint(event);
+      const handle = getHandleAtPoint(point);
+      if (!handle) return;
+
+      interactionState.activeHandleId = handle.id;
+      interactionState.pointerId = event.pointerId;
+      canvas.setPointerCapture(event.pointerId);
+      updateShapeFromDrag(point);
+      renderCanvasAndArea();
+    }
+
+    function onPointerMove(event) {
+      const point = toCanvasPoint(event);
+      if (interactionState.activeHandleId && event.pointerId === interactionState.pointerId) {
+        updateShapeFromDrag(point);
+        return;
+      }
+
+      const handle = getHandleAtPoint(point);
+      interactionState.hoverHandleId = handle ? handle.id : null;
+      canvas.style.cursor = handle ? "grab" : "crosshair";
+      renderCanvasAndArea();
+    }
+
+    function onPointerUp(event) {
+      if (interactionState.pointerId !== null && event.pointerId === interactionState.pointerId) {
+        canvas.releasePointerCapture(event.pointerId);
+      }
+      interactionState.activeHandleId = null;
+      interactionState.pointerId = null;
+      canvas.style.cursor = interactionState.hoverHandleId ? "grab" : "crosshair";
+      renderCanvasAndArea();
+    }
+
+    function onPointerLeave() {
+      if (!interactionState.activeHandleId) {
+        interactionState.hoverHandleId = null;
+        canvas.style.cursor = "crosshair";
+        renderCanvasAndArea();
+      }
+    }
+
     // ---------- Events ----------
     resetBtn.addEventListener("click", resetCurrentShape);
+    fixedBackgroundToggle.addEventListener("change", () => {
+      appState.fixedBackground = fixedBackgroundToggle.checked;
+      renderCanvasAndArea();
+    });
+    canvas.addEventListener("pointerdown", onPointerDown);
+    canvas.addEventListener("pointermove", onPointerMove);
+    canvas.addEventListener("pointerup", onPointerUp);
+    canvas.addEventListener("pointercancel", onPointerUp);
+    canvas.addEventListener("pointerleave", onPointerLeave);
     window.addEventListener("resize", renderCanvasAndArea);
 
     // ---------- Init ----------
