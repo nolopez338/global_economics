@@ -1,0 +1,325 @@
+\makeatletter
+\def\input@path{{./}{../}{../../}{../../../}{../../../../}{preamble/}{../preamble/}{../../preamble/}{../../../preamble/}}
+\makeatother
+
+\input{preamble_exams.tex}
+
+\usepackage{tikz}
+
+\newcommand{\NormalBase}{%
+	\draw[->] (-3.4,0) -- (3.4,0);
+	\draw[thick,samples=120,smooth,domain=-3.2:3.2] plot (\x,{0.4*exp(-\x*\x/2)});
+	\node[below] at (0,0) {0};
+}
+
+\newcommand{\OneTailGraph}[4]{%
+	\begin{tikzpicture}[x=0.9cm,y=3.0cm]
+		\NormalBase
+		\ifnum#1=0
+		\fill[blue!20,domain=-3.2:#2] (-3.2,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (#2,0) -- cycle;
+		\else
+		\fill[blue!20,domain=#2:3.2] (#2,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (3.2,0) -- cycle;
+		\fi
+		\def\ObsColor{black}
+		\if\relax\detokenize{#3}\relax\else
+		\pgfmathtruncatemacro{\RejectFlag}{(#1==0 && #2<=#3) || (#1==1 && #2>=#3)}
+		\ifnum\RejectFlag=1
+		\def\ObsColor{green!60!black}
+		\else
+		\def\ObsColor{red}
+		\fi
+		\draw[dashed] (#3,0) -- (#3,{0.4*exp(-#3*#3/2)});
+		\fi
+		\draw[\ObsColor,dashed] (#2,0) -- (#2,{0.4*exp(-#2*#2/2)});
+		\node at (0,0.46) {\scriptsize #4};
+	\end{tikzpicture}%
+}
+
+\newcommand{\TwoTailGraph}[3]{%
+	\begin{tikzpicture}[x=0.9cm,y=3.0cm]
+		\NormalBase
+		\fill[blue!20,domain=-3.2:-#1] (-3.2,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (-#1,0) -- cycle;
+		\fill[blue!20,domain=#1:3.2] (#1,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (3.2,0) -- cycle;
+		\def\ObsColor{black}
+		\if\relax\detokenize{#2}\relax\else
+		\pgfmathtruncatemacro{\RejectFlag}{#1>=#2}
+		\ifnum\RejectFlag=1
+		\def\ObsColor{green!60!black}
+		\else
+		\def\ObsColor{red}
+		\fi
+		\draw[dashed] (#2,0) -- (#2,{0.4*exp(-#2*#2/2)});
+		\draw[dashed] (-#2,0) -- (-#2,{0.4*exp(-#2*#2/2)});
+		\fi
+		\draw[\ObsColor,dashed] (-#1,0) -- (-#1,{0.4*exp(-#1*#1/2)});
+		\draw[\ObsColor,dashed] (#1,0) -- (#1,{0.4*exp(-#1*#1/2)});
+		\node at (0,0.46) {\scriptsize #3};
+	\end{tikzpicture}%
+}
+
+\title{11th Grade --- Term 3 Lesson 2 Exam Solutions}
+\author{}
+\date{}
+
+\begin{document}
+	
+	\maketitle
+	
+	\setcounter{tocdepth}{1}
+	\setcounter{secnumdepth}{2}
+	\tableofcontents
+	
+	\section*{Evaluated criteria}
+	\begin{itemize}
+		\item C4: Applies one-sample hypothesis testing for population proportions in context.
+		\item C5: Calculates and interprets one-sample mean \(z\)-tests with known population standard deviation.
+	\end{itemize}
+	
+	\section{Problem 1: Foundational one-sample proportion test}
+	A district states that \(64\%\) of students submit digital homework before the deadline. In a random sample of \(n=300\) students, \(174\) submitted before the deadline. At \(\alpha=5\%\), test whether the true proportion is lower than \(0.64\). The district is considering whether it should review its reminder system before the next reporting period.
+	
+	\textbf{Questions/Tasks.}
+	\begin{enumerate}
+		\item[(a)] Carry out the one-sample proportion test.
+		\item[(b)] Interpret what the result means in context and explain whether the evidence is strong enough to justify reviewing the reminder system.
+	\end{enumerate}
+	
+	\subsection*{C4}
+	\begin{itemize}
+		\item \textbf{Parameter:} \(p\) = true proportion of students who submit digital homework before the deadline.
+		\item \textbf{Hypotheses:} \(H_0:p=0.64\), \(H_a:p<0.64\).
+		\item \textbf{Conditions:} \(np_0=300(0.64)=192\ge10\), \(n(1-p_0)=108\ge10\).
+		\item \textbf{Sample proportion:} \(\hat p=174/300=0.58\).
+		\item \textbf{Test statistic:}
+		\[
+		z=\frac{0.58-0.64}{\sqrt{\frac{0.64(0.36)}{300}}}\approx -2.16.
+		\]
+		\item \textbf{p-value:} \(P(Z\le -2.16)\approx 0.0154\).
+		\item \textbf{Decision:} Reject \(H_0\) since \(0.0154<0.05\).
+		\item \textbf{Contextual interpretation:} There is sufficient evidence that the true on-time digital homework proportion is below \(64\%\). In context, the sample does not just show a small fluctuation below the benchmark; it gives reasonably strong evidence that the district benchmark is too optimistic.
+		\item \textbf{Practical evaluation:} Based on this result, reviewing the reminder system is justified. A remaining limitation is that this test does not explain \emph{why} students are submitting late.
+	\end{itemize}
+	
+	\begin{center}
+		\OneTailGraph{0}{-2.16}{-1.645}{Lower-tail proportion test}
+	\end{center}
+	
+	\section{Problem 2: Significance-level sensitivity for a proportion test}
+	A health office claims that \(30\%\) of adults meet a weekly activity target. In a random sample of \(n=250\), \(66\) meet the target. The office is deciding whether to describe the result as evidence of a decline. Test \(H_a:p<0.30\) at both \(\alpha=5\%\) and \(\alpha=1\%\).
+	
+	\textbf{Questions/Tasks.}
+	\begin{enumerate}
+		\item[(a)] Carry out the one-sample proportion test at both significance levels.
+		\item[(b)] Explain whether the evidence is strong or weak in context and describe one limitation that remains even after the calculation.
+	\end{enumerate}
+	
+	\subsection*{C4}
+	\begin{itemize}
+		\item \textbf{Parameter:} \(p\) = true proportion of adults who meet the weekly activity target.
+		\item \textbf{Hypotheses:} \(H_0:p=0.30\), \(H_a:p<0.30\).
+		\item \textbf{Conditions:} \(np_0=75\ge10\), \(n(1-p_0)=175\ge10\).
+		\item \textbf{Sample proportion:} \(\hat p=66/250=0.264\).
+		\item \textbf{Test statistic:}
+		\[
+		z=\frac{0.264-0.30}{\sqrt{\frac{0.30(0.70)}{250}}}\approx -1.24.
+		\]
+		\item \textbf{p-value:} \(P(Z\le-1.24)\approx0.1075\).
+		\item \textbf{At \(\alpha=5\%\):} Fail to reject \(H_0\), since \(0.1075>0.05\).
+		\item \textbf{At \(\alpha=1\%\):} Fail to reject \(H_0\), since \(0.1075>0.01\).
+		\item \textbf{Contextual interpretation:} The sample proportion is below \(30\%\), but the evidence is not strong enough to conclude that the true proportion has decreased. The result is weak because it does not remain unusual enough under the benchmark.
+		\item \textbf{Remaining limitation:} Failing to reject \(H_0\) does not prove that the true proportion is exactly \(30\%\). It only means the sample does not provide enough evidence of a decrease.
+	\end{itemize}
+	
+	\begin{center}
+		\textbf{At \(5\%\)}\;\OneTailGraph{0}{-1.24}{-1.645}{Lower-tail}
+		\hspace{0.8cm}
+		\textbf{At \(1\%\)}\;\OneTailGraph{0}{-1.24}{-2.326}{Lower-tail}
+	\end{center}
+	
+	\section{Problem 3: One-sided proportion test with practical interpretation}
+	A customer-service center reports that \(70\%\) of calls are resolved on first contact. A random sample of \(n=400\) calls shows that \(292\) were resolved on first contact. Management wants to know whether it is appropriate to publicly describe this as an improvement over the benchmark.
+	
+	\textbf{Questions/Tasks.}
+	\begin{enumerate}
+		\item[(a)] At \(\alpha=5\%\), test whether the true proportion is higher than \(0.70\).
+		\item[(b)] Interpret what the result suggests about the benchmark and justify whether management should claim a real improvement.
+	\end{enumerate}
+	
+	\subsection*{C4}
+	\begin{itemize}
+		\item \textbf{Parameter:} \(p\) = true first-contact resolution proportion.
+		\item \textbf{Hypotheses:} \(H_0:p=0.70\), \(H_a:p>0.70\).
+		\item \textbf{Conditions:} \(np_0=280\ge10\), \(n(1-p_0)=120\ge10\).
+		\item \textbf{Sample proportion:} \(\hat p=292/400=0.73\).
+		\item \textbf{Test statistic:}
+		\[
+		z=\frac{0.73-0.70}{\sqrt{\frac{0.70(0.30)}{400}}}\approx1.31.
+		\]
+		\item \textbf{p-value:} \(P(Z\ge1.31)\approx0.0951\).
+		\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.0951>0.05\).
+		\item \textbf{Contextual interpretation:} The sample proportion is above the benchmark, but the evidence is not strong enough to conclude that the true resolution rate is higher than \(70\%\).
+		\item \textbf{Practical evaluation:} Management should not claim a confirmed improvement from this sample alone. The result suggests a possible increase, but not one that is statistically convincing at the \(5\%\) level.
+	\end{itemize}
+	
+	\begin{center}
+		\OneTailGraph{1}{1.31}{1.645}{Higher-tail proportion test}
+	\end{center}
+	
+	\section{Problem 4: Two-sided proportion test with benchmark evaluation}
+	A school nutrition program states that \(45\%\) of students choose the healthy lunch option on a typical day. In a random sample of \(n=500\) students, \(258\) choose the healthy option. The school wants to know whether the benchmark still describes current behavior.
+	
+	\textbf{Questions/Tasks.}
+	\begin{enumerate}
+		\item[(a)] At \(\alpha=5\%\), test whether the true proportion is different from \(0.45\).
+		\item[(b)] Interpret what the result means in context and explain what it suggests about the current benchmark.
+	\end{enumerate}
+	
+	\subsection*{C4}
+	\begin{itemize}
+		\item \textbf{Parameter:} \(p\) = true proportion of students who choose the healthy lunch option.
+		\item \textbf{Hypotheses:} \(H_0:p=0.45\), \(H_a:p\ne0.45\).
+		\item \textbf{Conditions:} \(np_0=225\ge10\), \(n(1-p_0)=275\ge10\).
+		\item \textbf{Sample proportion:} \(\hat p=258/500=0.516\).
+		\item \textbf{Test statistic:}
+		\[
+		z=\frac{0.516-0.45}{\sqrt{\frac{0.45(0.55)}{500}}}\approx2.97.
+		\]
+		\item \textbf{p-value:} \(2P(Z\ge2.97)\approx0.0030\).
+		\item \textbf{Decision:} Reject \(H_0\) since \(0.0030<0.05\).
+		\item \textbf{Contextual interpretation:} There is sufficient evidence that the true proportion is different from \(45\%\). Since the sample proportion is above the benchmark, the result suggests that the healthy option is being chosen more often than the benchmark states.
+		\item \textbf{Benchmark evaluation:} The current benchmark no longer appears to describe the population well. However, the test by itself does not identify the causes of the change.
+	\end{itemize}
+	
+	\begin{center}
+		\TwoTailGraph{2.97}{1.96}{Two-tailed proportion test}
+	\end{center}
+	
+	\section{Problem 5: Foundational one-sample mean \texorpdfstring{\(z\)}{z}-test}
+	A transit authority benchmark states that the mean waiting time is \(15.0\) minutes. A random sample of \(n=100\) riders has mean waiting time \(\bar x=15.9\) minutes. Assume known population standard deviation \(\sigma=4.5\) minutes. At \(\alpha=5\%\), test whether the true mean waiting time is higher than \(15.0\) minutes. The authority is deciding whether to review its current scheduling targets.
+	
+	\textbf{Questions/Tasks.}
+	\begin{enumerate}
+		\item[(a)] Carry out the one-sample mean \(z\)-test.
+		\item[(b)] Interpret the result in context and explain whether it supports reviewing the current scheduling targets.
+	\end{enumerate}
+	
+	\subsection*{C5}
+	\begin{itemize}
+		\item \textbf{Parameter:} \(\mu\) = true mean waiting time.
+		\item \textbf{Hypotheses:} \(H_0:\mu=15.0\), \(H_a:\mu>15.0\).
+		\item \textbf{Test statistic:}
+		\[
+		z=\frac{15.9-15.0}{4.5/\sqrt{100}}=2.00.
+		\]
+		\item \textbf{p-value:} \(P(Z\ge2.00)\approx0.0228\).
+		\item \textbf{Decision:} Reject \(H_0\) since \(0.0228<0.05\).
+		\item \textbf{Contextual interpretation:} There is sufficient evidence that the true mean waiting time exceeds \(15.0\) minutes. In context, the benchmark appears to underestimate current waiting times.
+		\item \textbf{Practical evaluation:} Reviewing the scheduling targets is justified because the result supports the idea that riders are waiting longer than intended. A limitation is that the test does not explain what operational factors are creating the longer waits.
+	\end{itemize}
+	
+	\begin{center}
+		\OneTailGraph{1}{2.00}{1.645}{Higher-tail mean test}
+	\end{center}
+	
+	\section{Problem 6: Directional comparison with fixed evidence for a mean test}
+	A learning platform benchmark is \(\mu_0=70\) minutes average weekly study time. A sample of \(n=64\) students has \(\bar x=68.0\) minutes, with known \(\sigma=8\) minutes. Use \(\alpha=5\%\). The platform team wants to decide whether the data support concern about underuse or instead support a claim that students are spending more time than expected.
+	
+	\textbf{Questions/Tasks.}
+	\begin{enumerate}
+		\item[(a)] Test \(H_a:\mu<70\).
+		\item[(b)] Test \(H_a:\mu>70\).
+		\item[(c)] Compare the two conclusions and explain which interpretation is more appropriate in context.
+	\end{enumerate}
+	
+	\subsection*{C5}
+	\begin{itemize}
+		\item \textbf{Common statistic:}
+		\[
+		z=\frac{68.0-70}{8/\sqrt{64}}=\frac{-2.0}{1.0}=-2.00.
+		\]
+	\end{itemize}
+	
+	\textbf{(a) Lower-tail test}
+	\begin{itemize}
+		\item p-value \(=P(Z\le-2.00)\approx0.0228\).
+		\item Reject \(H_0\) since \(0.0228<0.05\).
+		\item There is sufficient evidence that the true mean study time is below \(70\) minutes.
+	\end{itemize}
+	
+	\textbf{(b) Higher-tail test}
+	\begin{itemize}
+		\item p-value \(=P(Z\ge-2.00)\approx0.9772\).
+		\item Fail to reject \(H_0\) since \(0.9772>0.05\).
+		\item There is not enough evidence that the true mean study time exceeds \(70\) minutes.
+	\end{itemize}
+	
+	\textbf{(c) Comparison}
+	\begin{itemize}
+		\item The more appropriate interpretation is the lower-direction one, because the sample mean is below the benchmark and the corresponding p-value is small enough to support a decrease.
+		\item In context, the data support concern about underuse rather than a claim of unusually high study time.
+	\end{itemize}
+	
+	\begin{center}
+		\textbf{(a)}\;\OneTailGraph{0}{-2.00}{-1.645}{Lower-tail}
+		\hspace{0.8cm}
+		\textbf{(b)}\;\OneTailGraph{1}{-2.00}{1.645}{Higher-tail}
+	\end{center}
+	
+	\section{Problem 7: Significance-level sensitivity for a mean test}
+	A support center uses \(12.0\) minutes as its benchmark mean response time. A random sample of \(n=81\) requests has mean response time \(\bar x=12.6\) minutes. Assume known population standard deviation \(\sigma=2.7\) minutes. Management wants to know whether the evidence of slower response is convincing under both a standard and a stricter significance threshold.
+	
+	\textbf{Questions/Tasks.}
+	\begin{enumerate}
+		\item[(a)] Test \(H_a:\mu>12.0\) at both \(\alpha=5\%\) and \(\alpha=1\%\).
+		\item[(b)] Explain what the difference between the two conclusions suggests about the strength of the evidence in context.
+	\end{enumerate}
+	
+	\subsection*{C5}
+	\begin{itemize}
+		\item \textbf{Parameter:} \(\mu\) = true mean response time.
+		\item \textbf{Hypotheses:} \(H_0:\mu=12.0\), \(H_a:\mu>12.0\).
+		\item \textbf{Test statistic:}
+		\[
+		z=\frac{12.6-12.0}{2.7/\sqrt{81}}=\frac{0.6}{0.3}=2.00.
+		\]
+		\item \textbf{p-value:} \(P(Z\ge2.00)\approx0.0228\).
+		\item \textbf{At \(\alpha=5\%\):} Reject \(H_0\), since \(0.0228<0.05\).
+		\item \textbf{At \(\alpha=1\%\):} Fail to reject \(H_0\), since \(0.0228>0.01\).
+		\item \textbf{Contextual interpretation:} The evidence is strong enough to support slower response times at the \(5\%\) level, but not strong enough under the stricter \(1\%\) standard.
+		\item \textbf{Strength-of-evidence evaluation:} This suggests that the evidence is moderate rather than overwhelming. The sample points toward slower performance, but a more demanding threshold would require stronger evidence before reaching that conclusion.
+	\end{itemize}
+	
+	\begin{center}
+		\textbf{At \(5\%\)}\;\OneTailGraph{1}{2.00}{1.645}{Higher-tail}
+		\hspace{0.8cm}
+		\textbf{At \(1\%\)}\;\OneTailGraph{1}{2.00}{2.326}{Higher-tail}
+	\end{center}
+	
+	\section{Problem 8: Two-sided mean test with contextual interpretation}
+	A tutoring program states that the mean session length is \(40.0\) minutes. A random sample of \(n=64\) sessions has mean length \(\bar x=38.8\) minutes. Assume known population standard deviation \(\sigma=4.0\) minutes. The program wants to know whether its benchmark still represents current practice.
+	
+	\textbf{Questions/Tasks.}
+	\begin{enumerate}
+		\item[(a)] At \(\alpha=5\%\), test whether the true mean session length is different from \(40.0\) minutes.
+		\item[(b)] Interpret what the result suggests about the benchmark and explain which of the following interpretations is more appropriate: ``the benchmark no longer fits the data'' or ``every tutoring session is shorter than \(40\) minutes''.
+	\end{enumerate}
+	
+	\subsection*{C5}
+	\begin{itemize}
+		\item \textbf{Parameter:} \(\mu\) = true mean tutoring-session length.
+		\item \textbf{Hypotheses:} \(H_0:\mu=40.0\), \(H_a:\mu\ne40.0\).
+		\item \textbf{Test statistic:}
+		\[
+		z=\frac{38.8-40.0}{4.0/\sqrt{64}}=\frac{-1.2}{0.5}=-2.40.
+		\]
+		\item \textbf{p-value:} \(2P(Z\le-2.40)\approx0.0164\).
+		\item \textbf{Decision:} Reject \(H_0\) since \(0.0164<0.05\).
+		\item \textbf{Contextual interpretation:} There is sufficient evidence that the true mean session length is different from \(40.0\) minutes. Since the sample mean is lower, the result suggests that the average session length is currently below the benchmark.
+		\item \textbf{Evaluation of interpretations:} The more appropriate interpretation is ``the benchmark no longer fits the data.'' The statement ``every tutoring session is shorter than \(40\) minutes'' is too strong because hypothesis testing about a mean does not describe every individual session.
+	\end{itemize}
+	
+	\begin{center}
+		\TwoTailGraph{2.40}{1.96}{Two-tailed mean test}
+	\end{center}
+	
+\end{document}
