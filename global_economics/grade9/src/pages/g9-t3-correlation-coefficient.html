@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scatter Plot and Linear Correlation Explorer</title>
+  <style>
+    :root {
+      --bg: #f6f8fc;
+      --panel: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --grid: #e5e7eb;
+      --axis: #334155;
+      --point: #0f766e;
+      --border: #d1d5db;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--text);
+      background: linear-gradient(160deg, #f8fafc, var(--bg));
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.25rem, 2vw, 1.75rem);
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(380px, 1.25fr) minmax(280px, 0.9fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .plot-panel,
+    .control-panel {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      padding: 14px;
+    }
+
+    canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      cursor: default;
+    }
+
+    .section-title {
+      margin: 0 0 12px;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .control-group {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+      color: #374151;
+      font-weight: 600;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+
+    .readout {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px 10px;
+      margin: 10px 0 14px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #f9fafb;
+      font-size: 0.95rem;
+    }
+
+    .readout .key {
+      color: #374151;
+      font-weight: 600;
+    }
+
+    .readout .value {
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #1e3a8a;
+      font-weight: 700;
+      font-size: 0.82rem;
+      margin-top: 6px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 9px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.93rem;
+      font-weight: 700;
+      padding: 10px 12px;
+      cursor: pointer;
+    }
+
+    button:hover { filter: brightness(1.03); }
+
+    .button-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .ghost {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .notes {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      color: #374151;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .notes p {
+      margin: 0 0 8px;
+    }
+
+    .tip {
+      color: var(--muted);
+      font-size: 0.84rem;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1>Scatter Plot and Linear Correlation Explorer</h1>
+    <p class="subtitle">Adjust a target Pearson correlation coefficient and observe how the point cloud changes.</p>
+
+    <section class="layout">
+      <div class="plot-panel">
+        <h2 class="section-title">Scatter Plot</h2>
+        <canvas id="plot" width="700" height="520" aria-label="Scatter plot with x and y axes"></canvas>
+        <p class="tip">Tip: Drag points directly on the graph to explore how moving points changes correlation.</p>
+      </div>
+
+      <aside class="control-panel">
+        <h2 class="section-title">Controls & Outputs</h2>
+
+        <div class="control-group">
+          <label for="targetSlider">Target correlation (r): <span id="targetValue">0.00</span></label>
+          <input id="targetSlider" type="range" min="-1" max="1" step="0.01" value="0" />
+        </div>
+
+        <div class="control-group">
+          <label for="pointCount">Number of points</label>
+          <input id="pointCount" type="number" min="5" max="120" step="1" value="28" />
+        </div>
+
+        <div class="readout">
+          <div class="key">Target r</div><div id="targetReadout" class="value">0.000</div>
+          <div class="key">Actual r (Pearson)</div><div id="actualReadout" class="value">0.000</div>
+        </div>
+
+        <div>
+          <div class="key" style="font-size: 0.9rem; font-weight: 600; color:#374151;">Association strength</div>
+          <div id="qualitative" class="badge">Near zero</div>
+        </div>
+
+        <div class="button-row" style="margin-top:14px;">
+          <button id="regenBtn" type="button">Generate New Dataset</button>
+          <button id="resetBtn" class="ghost" type="button">Reset</button>
+        </div>
+
+        <div class="notes">
+          <p><strong>What is correlation?</strong> The Pearson correlation coefficient <em>r</em> measures the strength and direction of a linear relationship between two variables.</p>
+          <p><strong>Range:</strong> from -1 (perfect negative line) to +1 (perfect positive line). Values near 0 indicate little linear association.</p>
+          <p><strong>Important:</strong> Correlation describes association, not causation.</p>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+
+      // ---------- DOM REFERENCES ----------
+      const canvas = document.getElementById('plot');
+      const ctx = canvas.getContext('2d');
+
+      const targetSlider = document.getElementById('targetSlider');
+      const targetValue = document.getElementById('targetValue');
+      const pointCountInput = document.getElementById('pointCount');
+      const targetReadout = document.getElementById('targetReadout');
+      const actualReadout = document.getElementById('actualReadout');
+      const qualitative = document.getElementById('qualitative');
+      const regenBtn = document.getElementById('regenBtn');
+      const resetBtn = document.getElementById('resetBtn');
+
+      // ---------- PLOT CONFIG ----------
+      const margin = { top: 20, right: 20, bottom: 46, left: 56 };
+      const xMin = -3;
+      const xMax = 3;
+      const yMin = -3;
+      const yMax = 3;
+      const pointRadius = 5;
+
+      let points = [];
+      let dragIndex = -1;
+
+      // ---------- UTILITY: RANDOM NORMAL ----------
+      // Box-Muller transform for standard normal N(0,1).
+      function randn() {
+        let u = 0;
+        let v = 0;
+        while (u === 0) u = Math.random();
+        while (v === 0) v = Math.random();
+        return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+      }
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      // ---------- STATISTICS ----------
+      function mean(arr) {
+        return arr.reduce((sum, x) => sum + x, 0) / arr.length;
+      }
+
+      function std(arr, m) {
+        const variance = arr.reduce((acc, x) => acc + (x - m) ** 2, 0) / arr.length;
+        return Math.sqrt(variance);
+      }
+
+      // Compute Pearson correlation from CURRENT displayed point coordinates.
+      function pearsonCorrelation(data) {
+        const n = data.length;
+        if (n < 2) return 0;
+
+        const xs = data.map((p) => p.x);
+        const ys = data.map((p) => p.y);
+
+        const mx = mean(xs);
+        const my = mean(ys);
+        const sx = std(xs, mx);
+        const sy = std(ys, my);
+
+        if (sx === 0 || sy === 0) return 0;
+
+        let cov = 0;
+        for (let i = 0; i < n; i++) {
+          cov += (xs[i] - mx) * (ys[i] - my);
+        }
+        cov /= n;
+
+        return clamp(cov / (sx * sy), -1, 1);
+      }
+
+      // ---------- DATA GENERATION ----------
+      // Generate points with approximate target correlation:
+      // x = Z1, y = r*Z1 + sqrt(1-r^2)*Z2
+      function generateCorrelatedPoints(count, targetR) {
+        const arr = [];
+        const safeR = clamp(targetR, -0.9999, 0.9999);
+        const noiseScale = Math.sqrt(1 - safeR * safeR);
+
+        for (let i = 0; i < count; i++) {
+          const z1 = randn();
+          const z2 = randn();
+
+          const x = z1;
+          const y = safeR * z1 + noiseScale * z2;
+
+          arr.push({
+            x: clamp(x, xMin, xMax),
+            y: clamp(y, yMin, yMax)
+          });
+        }
+
+        // Small iterative refinement to push closer to exact target while keeping randomness.
+        for (let k = 0; k < 10; k++) {
+          const current = pearsonCorrelation(arr);
+          const error = targetR - current;
+          if (Math.abs(error) < 0.005) break;
+
+          for (let i = 0; i < arr.length; i++) {
+            const jitter = randn() * 0.03;
+            arr[i].y = clamp(arr[i].y + error * arr[i].x * 0.15 + jitter, yMin, yMax);
+          }
+        }
+
+        return arr;
+      }
+
+      // ---------- COORDINATE TRANSFORMS ----------
+      function xToPx(x) {
+        const plotW = canvas.width - margin.left - margin.right;
+        return margin.left + ((x - xMin) / (xMax - xMin)) * plotW;
+      }
+
+      function yToPx(y) {
+        const plotH = canvas.height - margin.top - margin.bottom;
+        return margin.top + ((yMax - y) / (yMax - yMin)) * plotH;
+      }
+
+      function pxToX(px) {
+        const plotW = canvas.width - margin.left - margin.right;
+        return xMin + ((px - margin.left) / plotW) * (xMax - xMin);
+      }
+
+      function pxToY(py) {
+        const plotH = canvas.height - margin.top - margin.bottom;
+        return yMax - ((py - margin.top) / plotH) * (yMax - yMin);
+      }
+
+      // ---------- DRAWING ----------
+      function drawAxes() {
+        const plotLeft = margin.left;
+        const plotRight = canvas.width - margin.right;
+        const plotTop = margin.top;
+        const plotBottom = canvas.height - margin.bottom;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Grid + ticks
+        ctx.strokeStyle = '#e5e7eb';
+        ctx.lineWidth = 1;
+        ctx.fillStyle = '#6b7280';
+        ctx.font = '12px Inter, Segoe UI, sans-serif';
+
+        for (let t = -3; t <= 3; t++) {
+          const px = xToPx(t);
+          const py = yToPx(t);
+
+          // Vertical grid lines
+          ctx.beginPath();
+          ctx.moveTo(px, plotTop);
+          ctx.lineTo(px, plotBottom);
+          ctx.stroke();
+
+          // Horizontal grid lines
+          ctx.beginPath();
+          ctx.moveTo(plotLeft, py);
+          ctx.lineTo(plotRight, py);
+          ctx.stroke();
+
+          // x tick labels
+          ctx.fillText(String(t), px - 4, plotBottom + 18);
+
+          // y tick labels
+          if (t !== 0) {
+            ctx.fillText(String(t), plotLeft - 22, py + 4);
+          }
+        }
+
+        // Axes lines at x=0 and y=0
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 2;
+
+        const zeroX = xToPx(0);
+        const zeroY = yToPx(0);
+
+        ctx.beginPath();
+        ctx.moveTo(plotLeft, zeroY);
+        ctx.lineTo(plotRight, zeroY);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(zeroX, plotTop);
+        ctx.lineTo(zeroX, plotBottom);
+        ctx.stroke();
+
+        // Axis labels
+        ctx.fillStyle = '#0f172a';
+        ctx.font = '700 14px Inter, Segoe UI, sans-serif';
+        ctx.fillText('x', plotRight - 12, zeroY - 8);
+        ctx.fillText('y', zeroX + 8, plotTop + 16);
+      }
+
+      function drawPoints() {
+        ctx.fillStyle = 'rgba(15, 118, 110, 0.9)';
+        ctx.strokeStyle = '#0f766e';
+        ctx.lineWidth = 1;
+
+        points.forEach((p) => {
+          const px = xToPx(p.x);
+          const py = yToPx(p.y);
+          ctx.beginPath();
+          ctx.arc(px, py, pointRadius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        });
+      }
+
+      function drawPlot() {
+        drawAxes();
+        drawPoints();
+      }
+
+      // ---------- UI LABELS ----------
+      function getQualitativeLabel(r) {
+        if (r >= 0.7) return 'Strong positive';
+        if (r >= 0.3) return 'Weak positive';
+        if (r > -0.3) return 'Near zero';
+        if (r > -0.7) return 'Weak negative';
+        return 'Strong negative';
+      }
+
+      function refreshReadouts() {
+        const targetR = Number(targetSlider.value);
+        const actualR = pearsonCorrelation(points);
+
+        targetValue.textContent = targetR.toFixed(2);
+        targetReadout.textContent = targetR.toFixed(3);
+        actualReadout.textContent = actualR.toFixed(3);
+        qualitative.textContent = getQualitativeLabel(actualR);
+      }
+
+      // ---------- EVENT HANDLERS ----------
+      function regenerateWithCurrentTarget() {
+        const count = clamp(parseInt(pointCountInput.value, 10) || 28, 5, 120);
+        pointCountInput.value = count;
+        points = generateCorrelatedPoints(count, Number(targetSlider.value));
+        drawPlot();
+        refreshReadouts();
+      }
+
+      targetSlider.addEventListener('input', regenerateWithCurrentTarget);
+
+      pointCountInput.addEventListener('change', regenerateWithCurrentTarget);
+
+      regenBtn.addEventListener('click', regenerateWithCurrentTarget);
+
+      resetBtn.addEventListener('click', () => {
+        targetSlider.value = '0';
+        pointCountInput.value = '28';
+        regenerateWithCurrentTarget();
+      });
+
+      // Optional direct interaction: drag points.
+      canvas.addEventListener('mousedown', (event) => {
+        const rect = canvas.getBoundingClientRect();
+        const mx = event.clientX - rect.left;
+        const my = event.clientY - rect.top;
+
+        dragIndex = -1;
+        let closestDist = Infinity;
+
+        points.forEach((p, i) => {
+          const dx = xToPx(p.x) - mx;
+          const dy = yToPx(p.y) - my;
+          const d = Math.hypot(dx, dy);
+          if (d < pointRadius + 4 && d < closestDist) {
+            closestDist = d;
+            dragIndex = i;
+          }
+        });
+
+        if (dragIndex !== -1) {
+          canvas.style.cursor = 'grabbing';
+        }
+      });
+
+      canvas.addEventListener('mousemove', (event) => {
+        if (dragIndex === -1) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const mx = event.clientX - rect.left;
+        const my = event.clientY - rect.top;
+
+        const newX = clamp(pxToX(mx), xMin, xMax);
+        const newY = clamp(pxToY(my), yMin, yMax);
+
+        points[dragIndex].x = newX;
+        points[dragIndex].y = newY;
+
+        drawPlot();
+        refreshReadouts();
+      });
+
+      function endDrag() {
+        if (dragIndex !== -1) {
+          dragIndex = -1;
+          canvas.style.cursor = 'default';
+        }
+      }
+
+      canvas.addEventListener('mouseup', endDrag);
+      canvas.addEventListener('mouseleave', endDrag);
+
+      // ---------- INITIALIZE ----------
+      regenerateWithCurrentTarget();
+    })();
+  </script>
+</body>
+</html>
