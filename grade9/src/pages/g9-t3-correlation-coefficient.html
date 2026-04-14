@@ -343,7 +343,6 @@
     (() => {
       'use strict';
 
-      // ---------- DOM REFERENCES ----------
       const canvas = document.getElementById('plot');
       const ctx = canvas.getContext('2d');
 
@@ -363,7 +362,6 @@
       const regenBtn = document.getElementById('regenBtn');
       const resetBtn = document.getElementById('resetBtn');
 
-      // ---------- PLOT CONFIG ----------
       const margin = { top: 20, right: 20, bottom: 46, left: 56 };
       const xMin = -3;
       const xMax = 3;
@@ -374,22 +372,13 @@
 
       let points = [];
       let dragIndex = -1;
+      let latent = { xStd: [], zStd: [] };
+      let isProgrammaticControlSync = false;
 
-      // Latent representation for continuous updates without regenerating from scratch.
-      let latent = {
-        xStd: [],
-        zStd: []
-      };
-
-      function modelState() {
-        return {
-          targetR: Number(targetSlider.value),
-          slope: Number(slopeSlider.value),
-          intercept: Number(interceptSlider.value)
-        };
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
       }
 
-      // ---------- UTILITY: RANDOM NORMAL ----------
       function randn() {
         let u = 0;
         let v = 0;
@@ -398,11 +387,6 @@
         return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
       }
 
-      function clamp(value, min, max) {
-        return Math.max(min, Math.min(max, value));
-      }
-
-      // ---------- STATISTICS ----------
       function mean(arr) {
         return arr.reduce((sum, x) => sum + x, 0) / arr.length;
       }
@@ -414,88 +398,66 @@
 
       function dot(a, b) {
         let sum = 0;
-        for (let i = 0; i < a.length; i++) {
-          sum += a[i] * b[i];
-        }
+        for (let i = 0; i < a.length; i++) sum += a[i] * b[i];
         return sum;
       }
 
       function standardize(arr) {
         if (arr.length === 0) return [];
         const m = mean(arr);
-        let s = std(arr, m);
-
-        if (s < EPS) {
-          return arr.map((_, i) => (i % 2 === 0 ? -1 : 1));
-        }
-
+        const s = std(arr, m);
+        if (s < EPS) return arr.map((_, i) => (i % 2 === 0 ? -1 : 1));
         return arr.map((v) => (v - m) / s);
       }
 
       function orthogonalizedStandardNoise(raw, xStd) {
         let z = raw.slice();
         const xNormSq = dot(xStd, xStd);
-
         if (xNormSq > EPS) {
           const projScale = dot(z, xStd) / xNormSq;
           z = z.map((v, i) => v - projScale * xStd[i]);
         }
-
         z = standardize(z);
-
-        const zNormSq = dot(z, z);
-        if (xNormSq > EPS && zNormSq > EPS) {
+        if (xNormSq > EPS) {
           const correction = dot(z, xStd) / xNormSq;
           z = z.map((v, i) => v - correction * xStd[i]);
           z = standardize(z);
         }
-
         return z;
       }
 
-      function pearsonCorrelation(data) {
+      function computeStats(data) {
         const n = data.length;
-        if (n < 2) return 0;
-
+        if (n < 2) return { n, mx: 0, my: 0, sx: 0, sy: 0, cov: 0, r: 0, slope: 0, intercept: 0 };
         const xs = data.map((p) => p.x);
         const ys = data.map((p) => p.y);
-
         const mx = mean(xs);
         const my = mean(ys);
         const sx = std(xs, mx);
         const sy = std(ys, my);
-
-        if (sx === 0 || sy === 0) return 0;
-
-        let cov = 0;
-        for (let i = 0; i < n; i++) {
-          cov += (xs[i] - mx) * (ys[i] - my);
+        if (sx < EPS || sy < EPS) {
+          return { n, mx, my, sx, sy, cov: 0, r: 0, slope: 0, intercept: my };
         }
+        let cov = 0;
+        for (let i = 0; i < n; i++) cov += (xs[i] - mx) * (ys[i] - my);
         cov /= n;
-
-        return clamp(cov / (sx * sy), -1, 1);
+        const slope = cov / (sx * sx);
+        const intercept = my - slope * mx;
+        const r = clamp(cov / (sx * sy), -1, 1);
+        return { n, mx, my, sx, sy, cov, r, slope, intercept };
       }
 
-      // ---------- LATENT DATA MODEL ----------
       function createRandomLatentDataset(count) {
         const xRaw = Array.from({ length: count }, () => randn());
         const zRaw = Array.from({ length: count }, () => randn());
-
-        const xStd = standardize(xRaw);
-        const zStd = orthogonalizedStandardNoise(zRaw, xStd);
-
-        latent = { xStd, zStd };
-      }
-
-      function generateLatentPoint() {
-        return { x: randn(), z: randn() };
+        latent.xStd = standardize(xRaw);
+        latent.zStd = orthogonalizedStandardNoise(zRaw, latent.xStd);
       }
 
       function addLatentPoints(countToAdd) {
         for (let i = 0; i < countToAdd; i++) {
-          const latentPoint = generateLatentPoint();
-          latent.xStd.push(latentPoint.x);
-          latent.zStd.push(latentPoint.z);
+          latent.xStd.push(randn());
+          latent.zStd.push(randn());
         }
         latent.xStd = standardize(latent.xStd);
         latent.zStd = orthogonalizedStandardNoise(latent.zStd, latent.xStd);
@@ -509,65 +471,62 @@
         latent.zStd = orthogonalizedStandardNoise(latent.zStd, latent.xStd);
       }
 
-      function setSampleSizeIncremental(nextCount) {
-        const currentCount = latent.xStd.length;
-        const difference = nextCount - currentCount;
-
-        if (difference > 0) {
-          addLatentPoints(difference);
-        } else if (difference < 0) {
-          removeLatentPoints(Math.abs(difference));
-        }
-      }
-
-      // Keep slider motion continuous after dragging points.
-      function syncLatentFromDisplayedPoints() {
+      function syncLatentFromPoints() {
         if (points.length < 2) return;
-
-        const { intercept, slope, targetR } = modelState();
+        const stats = computeStats(points);
         const xs = points.map((p) => p.x);
-        const residual = points.map((p) => p.y - intercept - slope * p.x);
-
+        const residuals = points.map((p) => p.y - stats.intercept - stats.slope * p.x);
         const xStd = standardize(xs);
-        const residualStd = standardize(residual);
-
-        const absR = Math.abs(targetR);
-        const safeAbsR = Math.max(absR, 0.01);
-        const approxNoiseScale = Math.max(Math.abs(slope), 0.05) * Math.sqrt(Math.max(0, (1 / (safeAbsR * safeAbsR)) - 1));
-        const rawZ = residualStd.map((rVal) => rVal / Math.max(approxNoiseScale, 0.2));
-
-        const zStd = orthogonalizedStandardNoise(rawZ, xStd);
+        const zStd = orthogonalizedStandardNoise(residuals, xStd);
         latent = { xStd, zStd };
       }
 
-      function composePointsFromLatent() {
-        const { targetR, slope, intercept } = modelState();
-        const absR = Math.abs(targetR);
-        let noiseScale;
+      function composeFromLatent(controlR, controlSlope, controlIntercept) {
+        const absR = Math.abs(controlR);
+        const noiseScale = absR < 0.01
+          ? Math.max(Math.abs(controlSlope), 0.1) * 3
+          : Math.max(Math.abs(controlSlope), 0.05) * Math.sqrt(Math.max(0, (1 / (absR * absR)) - 1));
 
-        if (absR < 0.01) {
-          noiseScale = 6;
-        } else {
-          const effectiveSlope = Math.max(Math.abs(slope), 0.05);
-          noiseScale = effectiveSlope * Math.sqrt(Math.max(0, (1 / (absR * absR)) - 1));
-        }
-
-        points = latent.xStd.map((x, i) => {
-          const yModel = intercept + slope * x + noiseScale * latent.zStd[i];
-          return {
-            x: clamp(x, xMin, xMax),
-            y: clamp(yModel, yMin, yMax)
-          };
-        });
+        points = latent.xStd.map((x, i) => ({
+          x: clamp(x, xMin, xMax),
+          y: clamp(controlIntercept + controlSlope * x + noiseScale * latent.zStd[i], yMin, yMax)
+        }));
       }
 
-      function updateDisplayedPointsFromControls() {
-        composePointsFromLatent();
-        drawPlot();
-        refreshReadouts();
+      function setControls({ targetR, slope, intercept }) {
+        isProgrammaticControlSync = true;
+        if (typeof targetR === 'number') targetSlider.value = clamp(targetR, -1, 1).toFixed(2);
+        if (typeof slope === 'number') slopeSlider.value = clamp(slope, -3, 3).toFixed(2);
+        if (typeof intercept === 'number') interceptSlider.value = clamp(intercept, -2.5, 2.5).toFixed(2);
+        isProgrammaticControlSync = false;
       }
 
-      // ---------- COORDINATE TRANSFORMS ----------
+      function getQualitativeLabel(r) {
+        if (r >= 0.7) return 'Strong positive';
+        if (r >= 0.3) return 'Weak positive';
+        if (r > -0.3) return 'Near zero';
+        if (r > -0.7) return 'Weak negative';
+        return 'Strong negative';
+      }
+
+      function refreshReadouts() {
+        const targetR = Number(targetSlider.value);
+        const stats = computeStats(points);
+
+        targetValue.textContent = targetR.toFixed(2);
+        slopeValue.textContent = Number(slopeSlider.value).toFixed(2);
+        interceptValue.textContent = Number(interceptSlider.value).toFixed(2);
+
+        targetReadout.textContent = targetR.toFixed(3);
+        actualReadout.textContent = stats.r.toFixed(3);
+        slopeReadout.textContent = stats.slope.toFixed(3);
+        interceptReadout.textContent = stats.intercept.toFixed(3);
+
+        const sign = stats.slope >= 0 ? '+' : '-';
+        equationReadout.textContent = `ŷ = ${stats.intercept.toFixed(3)} ${sign} ${Math.abs(stats.slope).toFixed(3)}x`;
+        qualitative.textContent = getQualitativeLabel(stats.r);
+      }
+
       function xToPx(x) {
         const plotW = canvas.width - margin.left - margin.right;
         return margin.left + ((x - xMin) / (xMax - xMin)) * plotW;
@@ -588,7 +547,6 @@
         return yMax - ((py - margin.top) / plotH) * (yMax - yMin);
       }
 
-      // ---------- DRAWING ----------
       function drawAxes() {
         const plotLeft = margin.left;
         const plotRight = canvas.width - margin.right;
@@ -596,7 +554,6 @@
         const plotBottom = canvas.height - margin.bottom;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
         ctx.strokeStyle = '#e5e7eb';
         ctx.lineWidth = 1;
         ctx.fillStyle = '#6b7280';
@@ -617,15 +574,11 @@
           ctx.stroke();
 
           ctx.fillText(String(t), px - 4, plotBottom + 18);
-
-          if (t !== 0) {
-            ctx.fillText(String(t), plotLeft - 22, py + 4);
-          }
+          if (t !== 0) ctx.fillText(String(t), plotLeft - 22, py + 4);
         }
 
         ctx.strokeStyle = '#334155';
         ctx.lineWidth = 2;
-
         const zeroX = xToPx(0);
         const zeroY = yToPx(0);
 
@@ -646,9 +599,9 @@
       }
 
       function drawRegressionLine() {
-        const { intercept, slope } = modelState();
-        const yAtMin = intercept + slope * xMin;
-        const yAtMax = intercept + slope * xMax;
+        const stats = computeStats(points);
+        const yAtMin = stats.intercept + stats.slope * xMin;
+        const yAtMax = stats.intercept + stats.slope * xMax;
 
         ctx.save();
         ctx.strokeStyle = 'rgba(220, 38, 38, 0.95)';
@@ -675,65 +628,115 @@
         });
       }
 
-      function drawPlot() {
+      function renderAll() {
         drawAxes();
         drawRegressionLine();
         drawPoints();
+        refreshReadouts();
       }
 
-      // ---------- UI LABELS ----------
-      function getQualitativeLabel(r) {
-        if (r >= 0.7) return 'Strong positive';
-        if (r >= 0.3) return 'Weak positive';
-        if (r > -0.3) return 'Near zero';
-        if (r > -0.7) return 'Weak negative';
-        return 'Strong negative';
+      function recomputeAndSyncFromDataset({ updateTarget = true, updateSlope = true, updateIntercept = true } = {}) {
+        const stats = computeStats(points);
+        setControls({
+          targetR: updateTarget ? stats.r : undefined,
+          slope: updateSlope ? stats.slope : undefined,
+          intercept: updateIntercept ? stats.intercept : undefined
+        });
+        syncLatentFromPoints();
+        renderAll();
       }
 
-      function refreshReadouts() {
-        const { targetR, slope, intercept } = modelState();
-        const actualR = pearsonCorrelation(points);
+      function handleRChange() {
+        if (isProgrammaticControlSync || points.length < 2) return;
 
-        targetValue.textContent = targetR.toFixed(2);
-        slopeValue.textContent = slope.toFixed(2);
-        interceptValue.textContent = intercept.toFixed(2);
+        const targetR = Number(targetSlider.value);
+        const stats = computeStats(points);
+        const xs = points.map((p) => p.x);
+        const xc = xs.map((x) => x - stats.mx);
+        const residual = points.map((p) => p.y - stats.intercept - stats.slope * p.x);
+        const residualOrth = orthogonalizedStandardNoise(residual, standardize(xs));
 
-        targetReadout.textContent = targetR.toFixed(3);
-        actualReadout.textContent = actualR.toFixed(3);
-        slopeReadout.textContent = slope.toFixed(3);
-        interceptReadout.textContent = intercept.toFixed(3);
+        const rawResidualScale = std(residual, mean(residual));
+        const absTarget = Math.min(0.999, Math.abs(targetR));
+        const slopeSign = targetR === 0 ? (Math.sign(stats.slope) || 1) : Math.sign(targetR);
+        const slopeMagnitude = Math.max(Math.abs(stats.slope), 0.05);
+        const newSlope = slopeMagnitude * slopeSign;
 
-        const slopeSign = slope >= 0 ? '+' : '-';
-        equationReadout.textContent = `ŷ = ${intercept.toFixed(3)} ${slopeSign} ${Math.abs(slope).toFixed(3)}x`;
-        qualitative.textContent = getQualitativeLabel(actualR);
+        let desiredResidualScale;
+        if (absTarget < 0.01) {
+          desiredResidualScale = Math.max(stats.sx, 1) * 2.8;
+        } else {
+          desiredResidualScale = Math.abs(newSlope) * Math.max(stats.sx, 0.2) * Math.sqrt((1 / (absTarget * absTarget)) - 1);
+        }
+
+        const k = rawResidualScale < EPS ? 0 : desiredResidualScale / rawResidualScale;
+        const newIntercept = stats.my - newSlope * stats.mx;
+
+        points = points.map((p, i) => ({
+          x: p.x,
+          y: clamp(newIntercept + newSlope * p.x + (k * rawResidualScale * residualOrth[i]), yMin, yMax)
+        }));
+
+        recomputeAndSyncFromDataset({ updateTarget: false, updateSlope: true, updateIntercept: true });
       }
 
-      // ---------- EVENT HANDLERS ----------
+      function handleAChange() {
+        if (isProgrammaticControlSync || points.length < 2) return;
+
+        const targetA = Number(interceptSlider.value);
+        const stats = computeStats(points);
+        const delta = targetA - stats.intercept;
+
+        points = points.map((p) => ({ x: p.x, y: clamp(p.y + delta, yMin, yMax) }));
+        recomputeAndSyncFromDataset({ updateTarget: true, updateSlope: true, updateIntercept: true });
+      }
+
+      function handleBChange() {
+        if (isProgrammaticControlSync || points.length < 2) return;
+
+        const targetB = Number(slopeSlider.value);
+        const stats = computeStats(points);
+        const residual = points.map((p) => p.y - stats.intercept - stats.slope * p.x);
+        const newIntercept = stats.my - targetB * stats.mx;
+
+        points = points.map((p, i) => ({
+          x: p.x,
+          y: clamp(newIntercept + targetB * p.x + residual[i], yMin, yMax)
+        }));
+
+        recomputeAndSyncFromDataset({ updateTarget: true, updateSlope: true, updateIntercept: true });
+      }
+
       function regenerateLatentDataset() {
         const count = clamp(parseInt(pointCountInput.value, 10) || 28, 5, 120);
         pointCountInput.value = count;
         createRandomLatentDataset(count);
-        updateDisplayedPointsFromControls();
+        composeFromLatent(Number(targetSlider.value), Number(slopeSlider.value), Number(interceptSlider.value));
+        recomputeAndSyncFromDataset({ updateTarget: true, updateSlope: true, updateIntercept: true });
       }
 
       function handlePointCountChange() {
-        const nextCount = clamp(parseInt(pointCountInput.value, 10) || latent.xStd.length || 28, 5, 120);
+        const nextCount = clamp(parseInt(pointCountInput.value, 10) || points.length || 28, 5, 120);
         pointCountInput.value = nextCount;
-        setSampleSizeIncremental(nextCount);
-        updateDisplayedPointsFromControls();
+
+        syncLatentFromPoints();
+        const currentCount = latent.xStd.length;
+        if (nextCount > currentCount) addLatentPoints(nextCount - currentCount);
+        if (nextCount < currentCount) removeLatentPoints(currentCount - nextCount);
+
+        composeFromLatent(Number(targetSlider.value), Number(slopeSlider.value), Number(interceptSlider.value));
+        recomputeAndSyncFromDataset({ updateTarget: true, updateSlope: true, updateIntercept: true });
       }
 
       function resetControlsAndDataset() {
-        targetSlider.value = '0';
-        slopeSlider.value = '1';
-        interceptSlider.value = '0';
+        setControls({ targetR: 0, slope: 1, intercept: 0 });
         pointCountInput.value = '28';
         regenerateLatentDataset();
       }
 
-      targetSlider.addEventListener('input', updateDisplayedPointsFromControls);
-      slopeSlider.addEventListener('input', updateDisplayedPointsFromControls);
-      interceptSlider.addEventListener('input', updateDisplayedPointsFromControls);
+      targetSlider.addEventListener('input', handleRChange);
+      slopeSlider.addEventListener('input', handleBChange);
+      interceptSlider.addEventListener('input', handleAChange);
       pointCountInput.addEventListener('change', handlePointCountChange);
       regenBtn.addEventListener('click', regenerateLatentDataset);
       resetBtn.addEventListener('click', resetControlsAndDataset);
@@ -756,9 +759,7 @@
           }
         });
 
-        if (dragIndex !== -1) {
-          canvas.style.cursor = 'grabbing';
-        }
+        if (dragIndex !== -1) canvas.style.cursor = 'grabbing';
       });
 
       canvas.addEventListener('mousemove', (event) => {
@@ -768,28 +769,22 @@
         const mx = event.clientX - rect.left;
         const my = event.clientY - rect.top;
 
-        const newX = clamp(pxToX(mx), xMin, xMax);
-        const newY = clamp(pxToY(my), yMin, yMax);
+        points[dragIndex].x = clamp(pxToX(mx), xMin, xMax);
+        points[dragIndex].y = clamp(pxToY(my), yMin, yMax);
 
-        points[dragIndex].x = newX;
-        points[dragIndex].y = newY;
-
-        drawPlot();
-        refreshReadouts();
+        recomputeAndSyncFromDataset({ updateTarget: true, updateSlope: true, updateIntercept: true });
       });
 
       function endDrag() {
-        if (dragIndex !== -1) {
-          dragIndex = -1;
-          canvas.style.cursor = 'default';
-          syncLatentFromDisplayedPoints();
-        }
+        if (dragIndex === -1) return;
+        dragIndex = -1;
+        canvas.style.cursor = 'default';
+        syncLatentFromPoints();
       }
 
       canvas.addEventListener('mouseup', endDrag);
       canvas.addEventListener('mouseleave', endDrag);
 
-      // ---------- INITIALIZE ----------
       resetControlsAndDataset();
     })();
   </script>
