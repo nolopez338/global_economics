@@ -290,6 +290,21 @@
           <input id="pointCount" type="number" min="5" max="120" step="1" value="28" />
         </div>
 
+        <div class="control-group">
+          <label for="xZoomSlider">X-axis zoom: <span id="xZoomValue">1.00×</span></label>
+          <input id="xZoomSlider" type="range" min="0.5" max="4" step="0.05" value="1" />
+        </div>
+
+        <div class="control-group">
+          <label for="yZoomSlider">Y-axis zoom: <span id="yZoomValue">1.00×</span></label>
+          <input id="yZoomSlider" type="range" min="0.5" max="4" step="0.05" value="1" />
+        </div>
+
+        <div class="readout" style="margin-top: 4px; margin-bottom: 14px;">
+          <div class="key">Visible x-range</div><div id="xRangeReadout" class="value">[-3.00, 3.00]</div>
+          <div class="key">Visible y-range</div><div id="yRangeReadout" class="value">[-3.00, 3.00]</div>
+        </div>
+
         <div class="equation-box" id="equationReadout">ŷ = 0.000 + 1.000x</div>
 
         <div class="readout">
@@ -307,12 +322,14 @@
         <div class="button-row" style="margin-top:14px;">
           <button id="regenBtn" type="button">Generate New Dataset</button>
           <button id="resetBtn" class="ghost" type="button">Reset</button>
+          <button id="resetViewBtn" class="ghost" type="button">Reset View</button>
         </div>
 
         <div class="notes">
           <p><strong>What is correlation?</strong> The Pearson linear correlation coefficient <em>r</em> measures the strength and direction of a linear relationship between two variables.</p>
           <p><strong>Range of r:</strong> from -1 (perfect negative line) to +1 (perfect positive line). Values near 0 indicate weak linear association.</p>
           <p><strong>Important:</strong> Correlation describes association, not causation.</p>
+          <p><strong>Zoom controls:</strong> These change only the visible graph window. Data values are not changed by zooming.</p>
         </div>
       </aside>
     </section>
@@ -361,14 +378,34 @@
       const qualitative = document.getElementById('qualitative');
       const regenBtn = document.getElementById('regenBtn');
       const resetBtn = document.getElementById('resetBtn');
+      const xZoomSlider = document.getElementById('xZoomSlider');
+      const yZoomSlider = document.getElementById('yZoomSlider');
+      const xZoomValue = document.getElementById('xZoomValue');
+      const yZoomValue = document.getElementById('yZoomValue');
+      const xRangeReadout = document.getElementById('xRangeReadout');
+      const yRangeReadout = document.getElementById('yRangeReadout');
+      const resetViewBtn = document.getElementById('resetViewBtn');
 
       const margin = { top: 20, right: 20, bottom: 46, left: 56 };
-      const xMin = -3;
-      const xMax = 3;
-      const yMin = -3;
-      const yMax = 3;
+      const dataXMin = -3;
+      const dataXMax = 3;
+      const dataYMin = -3;
+      const dataYMax = 3;
+      const defaultVisibleXMin = -3;
+      const defaultVisibleXMax = 3;
+      const defaultVisibleYMin = -3;
+      const defaultVisibleYMax = 3;
+      const defaultVisibleXCenter = (defaultVisibleXMin + defaultVisibleXMax) / 2;
+      const defaultVisibleYCenter = (defaultVisibleYMin + defaultVisibleYMax) / 2;
+      const defaultVisibleXWidth = defaultVisibleXMax - defaultVisibleXMin;
+      const defaultVisibleYHeight = defaultVisibleYMax - defaultVisibleYMin;
       const pointRadius = 5;
       const EPS = 1e-9;
+
+      let visibleXMin = defaultVisibleXMin;
+      let visibleXMax = defaultVisibleXMax;
+      let visibleYMin = defaultVisibleYMin;
+      let visibleYMax = defaultVisibleYMax;
 
       let points = [];
       let dragIndex = -1;
@@ -488,8 +525,8 @@
           : Math.max(Math.abs(controlSlope), 0.05) * Math.sqrt(Math.max(0, (1 / (absR * absR)) - 1));
 
         points = latent.xStd.map((x, i) => ({
-          x: clamp(x, xMin, xMax),
-          y: clamp(controlIntercept + controlSlope * x + noiseScale * latent.zStd[i], yMin, yMax)
+          x: clamp(x, dataXMin, dataXMax),
+          y: clamp(controlIntercept + controlSlope * x + noiseScale * latent.zStd[i], dataYMin, dataYMax)
         }));
       }
 
@@ -507,6 +544,24 @@
         if (r > -0.3) return 'Near zero';
         if (r > -0.7) return 'Weak negative';
         return 'Strong negative';
+      }
+
+      function updateViewportFromZoom() {
+        const xZoom = Number(xZoomSlider.value);
+        const yZoom = Number(yZoomSlider.value);
+
+        const halfX = (defaultVisibleXWidth / xZoom) / 2;
+        const halfY = (defaultVisibleYHeight / yZoom) / 2;
+
+        visibleXMin = defaultVisibleXCenter - halfX;
+        visibleXMax = defaultVisibleXCenter + halfX;
+        visibleYMin = defaultVisibleYCenter - halfY;
+        visibleYMax = defaultVisibleYCenter + halfY;
+
+        xZoomValue.textContent = `${xZoom.toFixed(2)}×`;
+        yZoomValue.textContent = `${yZoom.toFixed(2)}×`;
+        xRangeReadout.textContent = `[${visibleXMin.toFixed(2)}, ${visibleXMax.toFixed(2)}]`;
+        yRangeReadout.textContent = `[${visibleYMin.toFixed(2)}, ${visibleYMax.toFixed(2)}]`;
       }
 
       function refreshReadouts() {
@@ -529,22 +584,44 @@
 
       function xToPx(x) {
         const plotW = canvas.width - margin.left - margin.right;
-        return margin.left + ((x - xMin) / (xMax - xMin)) * plotW;
+        return margin.left + ((x - visibleXMin) / (visibleXMax - visibleXMin)) * plotW;
       }
 
       function yToPx(y) {
         const plotH = canvas.height - margin.top - margin.bottom;
-        return margin.top + ((yMax - y) / (yMax - yMin)) * plotH;
+        return margin.top + ((visibleYMax - y) / (visibleYMax - visibleYMin)) * plotH;
       }
 
       function pxToX(px) {
         const plotW = canvas.width - margin.left - margin.right;
-        return xMin + ((px - margin.left) / plotW) * (xMax - xMin);
+        return visibleXMin + ((px - margin.left) / plotW) * (visibleXMax - visibleXMin);
       }
 
       function pxToY(py) {
         const plotH = canvas.height - margin.top - margin.bottom;
-        return yMax - ((py - margin.top) / plotH) * (yMax - yMin);
+        return visibleYMax - ((py - margin.top) / plotH) * (visibleYMax - visibleYMin);
+      }
+
+      function calculateTicks(min, max) {
+        const span = max - min;
+        if (span <= 0) return [min];
+        const roughStep = span / 6;
+        const power = Math.pow(10, Math.floor(Math.log10(roughStep)));
+        const multipliers = [1, 2, 5, 10];
+        let step = power;
+        for (const m of multipliers) {
+          if (m * power >= roughStep) {
+            step = m * power;
+            break;
+          }
+        }
+
+        const ticks = [];
+        const start = Math.ceil(min / step) * step;
+        for (let t = start; t <= max + EPS; t += step) {
+          ticks.push(Number(t.toFixed(10)));
+        }
+        return ticks;
       }
 
       function drawAxes() {
@@ -559,56 +636,74 @@
         ctx.fillStyle = '#6b7280';
         ctx.font = '12px Inter, Segoe UI, sans-serif';
 
-        for (let t = -3; t <= 3; t++) {
-          const px = xToPx(t);
-          const py = yToPx(t);
+        const xTicks = calculateTicks(visibleXMin, visibleXMax);
+        const yTicks = calculateTicks(visibleYMin, visibleYMax);
 
+        xTicks.forEach((t) => {
+          const px = xToPx(t);
           ctx.beginPath();
           ctx.moveTo(px, plotTop);
           ctx.lineTo(px, plotBottom);
           ctx.stroke();
+          ctx.fillText(t.toFixed(2).replace(/\.00$/, ''), px - 10, plotBottom + 18);
+        });
 
+        yTicks.forEach((t) => {
+          const py = yToPx(t);
           ctx.beginPath();
           ctx.moveTo(plotLeft, py);
           ctx.lineTo(plotRight, py);
           ctx.stroke();
-
-          ctx.fillText(String(t), px - 4, plotBottom + 18);
-          if (t !== 0) ctx.fillText(String(t), plotLeft - 22, py + 4);
-        }
+          if (Math.abs(t) > EPS) ctx.fillText(t.toFixed(2).replace(/\.00$/, ''), plotLeft - 34, py + 4);
+        });
 
         ctx.strokeStyle = '#334155';
         ctx.lineWidth = 2;
-        const zeroX = xToPx(0);
-        const zeroY = yToPx(0);
 
+        if (visibleYMin <= 0 && visibleYMax >= 0) {
+          const zeroY = yToPx(0);
+          ctx.beginPath();
+          ctx.moveTo(plotLeft, zeroY);
+          ctx.lineTo(plotRight, zeroY);
+          ctx.stroke();
+          ctx.fillStyle = '#0f172a';
+          ctx.font = '700 14px Inter, Segoe UI, sans-serif';
+          ctx.fillText('x', plotRight - 12, zeroY - 8);
+        }
+
+        if (visibleXMin <= 0 && visibleXMax >= 0) {
+          const zeroX = xToPx(0);
+          ctx.beginPath();
+          ctx.moveTo(zeroX, plotTop);
+          ctx.lineTo(zeroX, plotBottom);
+          ctx.stroke();
+          ctx.fillStyle = '#0f172a';
+          ctx.font = '700 14px Inter, Segoe UI, sans-serif';
+          ctx.fillText('y', zeroX + 8, plotTop + 16);
+        }
+
+        ctx.save();
         ctx.beginPath();
-        ctx.moveTo(plotLeft, zeroY);
-        ctx.lineTo(plotRight, zeroY);
-        ctx.stroke();
+        ctx.rect(plotLeft, plotTop, plotRight - plotLeft, plotBottom - plotTop);
+        ctx.clip();
 
-        ctx.beginPath();
-        ctx.moveTo(zeroX, plotTop);
-        ctx.lineTo(zeroX, plotBottom);
-        ctx.stroke();
+        drawRegressionLine();
+        drawPoints();
 
-        ctx.fillStyle = '#0f172a';
-        ctx.font = '700 14px Inter, Segoe UI, sans-serif';
-        ctx.fillText('x', plotRight - 12, zeroY - 8);
-        ctx.fillText('y', zeroX + 8, plotTop + 16);
+        ctx.restore();
       }
 
       function drawRegressionLine() {
         const stats = computeStats(points);
-        const yAtMin = stats.intercept + stats.slope * xMin;
-        const yAtMax = stats.intercept + stats.slope * xMax;
+        const yAtMinX = stats.intercept + stats.slope * visibleXMin;
+        const yAtMaxX = stats.intercept + stats.slope * visibleXMax;
 
         ctx.save();
         ctx.strokeStyle = 'rgba(220, 38, 38, 0.95)';
         ctx.lineWidth = 2.5;
         ctx.beginPath();
-        ctx.moveTo(xToPx(xMin), yToPx(clamp(yAtMin, yMin, yMax)));
-        ctx.lineTo(xToPx(xMax), yToPx(clamp(yAtMax, yMin, yMax)));
+        ctx.moveTo(xToPx(visibleXMin), yToPx(yAtMinX));
+        ctx.lineTo(xToPx(visibleXMax), yToPx(yAtMaxX));
         ctx.stroke();
         ctx.restore();
       }
@@ -619,6 +714,9 @@
         ctx.lineWidth = 1;
 
         points.forEach((p) => {
+          if (p.x < visibleXMin || p.x > visibleXMax || p.y < visibleYMin || p.y > visibleYMax) {
+            return;
+          }
           const px = xToPx(p.x);
           const py = yToPx(p.y);
           ctx.beginPath();
@@ -629,9 +727,8 @@
       }
 
       function renderAll() {
+        updateViewportFromZoom();
         drawAxes();
-        drawRegressionLine();
-        drawPoints();
         refreshReadouts();
       }
 
@@ -652,7 +749,6 @@
         const targetR = Number(targetSlider.value);
         const stats = computeStats(points);
         const xs = points.map((p) => p.x);
-        const xc = xs.map((x) => x - stats.mx);
         const residual = points.map((p) => p.y - stats.intercept - stats.slope * p.x);
         const residualOrth = orthogonalizedStandardNoise(residual, standardize(xs));
 
@@ -674,7 +770,7 @@
 
         points = points.map((p, i) => ({
           x: p.x,
-          y: clamp(newIntercept + newSlope * p.x + (k * rawResidualScale * residualOrth[i]), yMin, yMax)
+          y: clamp(newIntercept + newSlope * p.x + (k * rawResidualScale * residualOrth[i]), dataYMin, dataYMax)
         }));
 
         recomputeAndSyncFromDataset({ updateTarget: false, updateSlope: true, updateIntercept: true });
@@ -687,7 +783,7 @@
         const stats = computeStats(points);
         const delta = targetA - stats.intercept;
 
-        points = points.map((p) => ({ x: p.x, y: clamp(p.y + delta, yMin, yMax) }));
+        points = points.map((p) => ({ x: p.x, y: clamp(p.y + delta, dataYMin, dataYMax) }));
         recomputeAndSyncFromDataset({ updateTarget: true, updateSlope: true, updateIntercept: true });
       }
 
@@ -701,7 +797,7 @@
 
         points = points.map((p, i) => ({
           x: p.x,
-          y: clamp(newIntercept + targetB * p.x + residual[i], yMin, yMax)
+          y: clamp(newIntercept + targetB * p.x + residual[i], dataYMin, dataYMax)
         }));
 
         recomputeAndSyncFromDataset({ updateTarget: true, updateSlope: true, updateIntercept: true });
@@ -728,9 +824,16 @@
         recomputeAndSyncFromDataset({ updateTarget: true, updateSlope: true, updateIntercept: true });
       }
 
+      function resetViewport() {
+        xZoomSlider.value = '1';
+        yZoomSlider.value = '1';
+        renderAll();
+      }
+
       function resetControlsAndDataset() {
         setControls({ targetR: 0, slope: 1, intercept: 0 });
         pointCountInput.value = '28';
+        resetViewport();
         regenerateLatentDataset();
       }
 
@@ -740,6 +843,9 @@
       pointCountInput.addEventListener('change', handlePointCountChange);
       regenBtn.addEventListener('click', regenerateLatentDataset);
       resetBtn.addEventListener('click', resetControlsAndDataset);
+      xZoomSlider.addEventListener('input', renderAll);
+      yZoomSlider.addEventListener('input', renderAll);
+      resetViewBtn.addEventListener('click', resetViewport);
 
       canvas.addEventListener('mousedown', (event) => {
         const rect = canvas.getBoundingClientRect();
@@ -769,8 +875,8 @@
         const mx = event.clientX - rect.left;
         const my = event.clientY - rect.top;
 
-        points[dragIndex].x = clamp(pxToX(mx), xMin, xMax);
-        points[dragIndex].y = clamp(pxToY(my), yMin, yMax);
+        points[dragIndex].x = clamp(pxToX(mx), dataXMin, dataXMax);
+        points[dragIndex].y = clamp(pxToY(my), dataYMin, dataYMax);
 
         recomputeAndSyncFromDataset({ updateTarget: true, updateSlope: true, updateIntercept: true });
       });
