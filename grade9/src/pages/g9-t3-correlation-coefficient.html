@@ -401,6 +401,35 @@
         latent = { xStd, zStd };
       }
 
+      function generateLatentPoint() {
+        return { x: randn(), z: randn() };
+      }
+
+      function addLatentPoints(countToAdd) {
+        for (let i = 0; i < countToAdd; i++) {
+          const latentPoint = generateLatentPoint();
+          latent.xStd.push(latentPoint.x);
+          latent.zStd.push(latentPoint.z);
+        }
+      }
+
+      function removeLatentPoints(countToRemove) {
+        if (countToRemove <= 0) return;
+        latent.xStd.splice(-countToRemove, countToRemove);
+        latent.zStd.splice(-countToRemove, countToRemove);
+      }
+
+      function setSampleSizeIncremental(nextCount) {
+        const currentCount = latent.xStd.length;
+        const difference = nextCount - currentCount;
+
+        if (difference > 0) {
+          addLatentPoints(difference);
+        } else if (difference < 0) {
+          removeLatentPoints(Math.abs(difference));
+        }
+      }
+
       // Rebuild latent representation from currently visible points (used after dragging).
       // This keeps future slider motion continuous from the current cloud shape.
       function syncLatentFromDisplayedPoints() {
@@ -575,6 +604,13 @@
         updateDisplayedPointsFromTarget();
       }
 
+      function handlePointCountChange() {
+        const nextCount = clamp(parseInt(pointCountInput.value, 10) || latent.xStd.length || 28, 5, 120);
+        pointCountInput.value = nextCount;
+        setSampleSizeIncremental(nextCount);
+        updateDisplayedPointsFromTarget();
+      }
+
       function resetControlsAndDataset() {
         targetSlider.value = '0';
         pointCountInput.value = '28';
@@ -584,7 +620,7 @@
       // Slider now only recomposes current dataset from stable latent vectors.
       targetSlider.addEventListener('input', updateDisplayedPointsFromTarget);
 
-      pointCountInput.addEventListener('change', regenerateLatentDataset);
+      pointCountInput.addEventListener('change', handlePointCountChange);
 
       regenBtn.addEventListener('click', regenerateLatentDataset);
 
