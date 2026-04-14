@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Scatter Plot and Linear Correlation Explorer</title>
+  <title>Scatter Plot, Correlation, and Regression Explorer</title>
   <style>
     :root {
       --bg: #f6f8fc;
@@ -15,6 +15,7 @@
       --grid: #e5e7eb;
       --axis: #334155;
       --point: #0f766e;
+      --line: #dc2626;
       --border: #d1d5db;
       --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
     }
@@ -78,11 +79,17 @@
     }
 
     .plot-panel,
-    .control-panel {
+    .control-panel,
+    .concept-panel {
       border: 1px solid var(--border);
       border-radius: 12px;
       background: #fff;
       padding: 14px;
+    }
+
+    .concept-panel {
+      margin-top: 18px;
+      background: #fcfdff;
     }
 
     canvas {
@@ -149,6 +156,19 @@
       color: #111827;
     }
 
+    .equation-box {
+      margin: 12px 0;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #bfdbfe;
+      background: #eff6ff;
+      color: #1e3a8a;
+      font-weight: 700;
+      font-size: 1rem;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
     .badge {
       display: inline-block;
       padding: 6px 10px;
@@ -193,8 +213,30 @@
       line-height: 1.45;
     }
 
-    .notes p {
+    .notes p,
+    .concept-panel p {
       margin: 0 0 8px;
+    }
+
+    .formula {
+      padding: 8px 10px;
+      border-left: 3px solid #93c5fd;
+      background: #f8fbff;
+      border-radius: 8px;
+      margin: 10px 0;
+      font-family: "Cambria Math", "Times New Roman", serif;
+      font-size: 0.96rem;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .memory-aid {
+      margin-top: 8px;
+      padding: 10px;
+      border: 1px dashed #93c5fd;
+      border-radius: 10px;
+      background: #f8fbff;
+      font-size: 0.92rem;
     }
 
     .tip {
@@ -215,22 +257,32 @@
       <a href="https://correosanbartoloedu-my.sharepoint.com/:b:/g/personal/nicolas_lopez_sanbartolo_edu_co/IQBDJpJUEleIR5r20sKK9QDAAdReL-JAMIrT5aDQMzfs54Y?e=qzDFu2" target="_blank" rel="noopener noreferrer">Coefficient Correlation Activity</a>
     </section>
 
-    <h1>Scatter Plot and Linear Correlation Explorer</h1>
-    <p class="subtitle">Adjust a target Pearson correlation coefficient and observe how the point cloud changes.</p>
+    <h1>Scatter Plot, Linear Correlation, and Regression Explorer</h1>
+    <p class="subtitle">Adjust the target linear correlation coefficient and regression parameters to see a live model of \(y=a+bx+\varepsilon\).</p>
 
     <section class="layout">
       <div class="plot-panel">
-        <h2 class="section-title">Scatter Plot</h2>
-        <canvas id="plot" width="700" height="520" aria-label="Scatter plot with x and y axes"></canvas>
-        <p class="tip">Tip: Drag points directly on the graph to explore how moving points changes correlation.</p>
+        <h2 class="section-title">Scatter Plot and Regression Line</h2>
+        <canvas id="plot" width="700" height="520" aria-label="Scatter plot with x and y axes and regression line"></canvas>
+        <p class="tip">Tip: Drag points directly on the graph. Then move sliders to continue from that current cloud without rebuilding everything.</p>
       </div>
 
       <aside class="control-panel">
         <h2 class="section-title">Controls & Outputs</h2>
 
         <div class="control-group">
-          <label for="targetSlider">Target correlation (r): <span id="targetValue">0.00</span></label>
+          <label for="targetSlider">Target linear correlation coefficient (r): <span id="targetValue">0.00</span></label>
           <input id="targetSlider" type="range" min="-1" max="1" step="0.01" value="0" />
+        </div>
+
+        <div class="control-group">
+          <label for="slopeSlider">Regression slope coefficient (b): <span id="slopeValue">1.00</span></label>
+          <input id="slopeSlider" type="range" min="-3" max="3" step="0.01" value="1" />
+        </div>
+
+        <div class="control-group">
+          <label for="interceptSlider">Regression intercept (a): <span id="interceptValue">0.00</span></label>
+          <input id="interceptSlider" type="range" min="-2.5" max="2.5" step="0.01" value="0" />
         </div>
 
         <div class="control-group">
@@ -238,9 +290,13 @@
           <input id="pointCount" type="number" min="5" max="120" step="1" value="28" />
         </div>
 
+        <div class="equation-box" id="equationReadout">ŷ = 0.000 + 1.000x</div>
+
         <div class="readout">
           <div class="key">Target r</div><div id="targetReadout" class="value">0.000</div>
           <div class="key">Actual r (Pearson)</div><div id="actualReadout" class="value">0.000</div>
+          <div class="key">Regression slope b</div><div id="slopeReadout" class="value">1.000</div>
+          <div class="key">Regression intercept a</div><div id="interceptReadout" class="value">0.000</div>
         </div>
 
         <div>
@@ -254,11 +310,32 @@
         </div>
 
         <div class="notes">
-          <p><strong>What is correlation?</strong> The Pearson correlation coefficient <em>r</em> measures the strength and direction of a linear relationship between two variables.</p>
-          <p><strong>Range:</strong> from -1 (perfect negative line) to +1 (perfect positive line). Values near 0 indicate little linear association.</p>
+          <p><strong>What is correlation?</strong> The Pearson linear correlation coefficient <em>r</em> measures the strength and direction of a linear relationship between two variables.</p>
+          <p><strong>Range of r:</strong> from -1 (perfect negative line) to +1 (perfect positive line). Values near 0 indicate weak linear association.</p>
           <p><strong>Important:</strong> Correlation describes association, not causation.</p>
         </div>
       </aside>
+    </section>
+
+    <section class="concept-panel" aria-label="Conceptual distinction between correlation and slope">
+      <h2 class="section-title">How are <em>r</em> and <em>b</em> related, and why are they different?</h2>
+      <p>The linear correlation coefficient <em>r</em> answers: <strong>How strong and in what direction is the linear association?</strong> The regression slope coefficient <em>b</em> answers: <strong>How much does predicted \(y\) change when \(x\) increases by 1 unit?</strong></p>
+      <p>So, <em>r</em> is a <strong>measure of association</strong>, while <em>b</em> is a <strong>measure of change</strong>.</p>
+
+      <div class="formula">r = [nΣxy - (Σx)(Σy)] / √([nΣx² - (Σx)²][nΣy² - (Σy)²])</div>
+      <div class="formula">b = [nΣxy - (Σx)(Σy)] / [nΣx² - (Σx)²]</div>
+
+      <p>Both formulas have the same numerator, but the denominators are different. Therefore, <em>r</em> and <em>b</em> are generally not equal.</p>
+      <div class="formula">b = r(s<sub>y</sub> / s<sub>x</sub>)</div>
+      <p>Here, \(s_y\) is the standard deviation of \(y\), and \(s_x\) is the standard deviation of \(x\). This relationship explains why <em>r</em> and <em>b</em> may sometimes look similar but are usually different.</p>
+      <p><strong>Interpretation:</strong> <em>r</em> is always between -1 and 1 and has no units. The slope coefficient <em>b</em> is not restricted to [-1, 1] and has units of <em>y</em> per unit of <em>x</em>.</p>
+      <p>If <em>r = b</em> in one example, that is a special case where \(s_y / s_x = 1\), meaning the spread of \(x\) and \(y\) is the same. This is not a general rule.</p>
+
+      <div class="memory-aid">
+        <strong>Memory aid:</strong><br />
+        • <em>r</em>: “How strong is the linear relationship?”<br />
+        • <em>b</em>: “How much does predicted <em>y</em> change when <em>x</em> increases by 1?”
+      </div>
     </section>
   </main>
 
@@ -271,10 +348,17 @@
       const ctx = canvas.getContext('2d');
 
       const targetSlider = document.getElementById('targetSlider');
+      const slopeSlider = document.getElementById('slopeSlider');
+      const interceptSlider = document.getElementById('interceptSlider');
       const targetValue = document.getElementById('targetValue');
+      const slopeValue = document.getElementById('slopeValue');
+      const interceptValue = document.getElementById('interceptValue');
       const pointCountInput = document.getElementById('pointCount');
       const targetReadout = document.getElementById('targetReadout');
       const actualReadout = document.getElementById('actualReadout');
+      const slopeReadout = document.getElementById('slopeReadout');
+      const interceptReadout = document.getElementById('interceptReadout');
+      const equationReadout = document.getElementById('equationReadout');
       const qualitative = document.getElementById('qualitative');
       const regenBtn = document.getElementById('regenBtn');
       const resetBtn = document.getElementById('resetBtn');
@@ -291,15 +375,21 @@
       let points = [];
       let dragIndex = -1;
 
-      // Latent representation used for continuous slider deformation.
-      // points[i] is drawn from xStd[i] and zStd[i] for any target r.
+      // Latent representation for continuous updates without regenerating from scratch.
       let latent = {
         xStd: [],
         zStd: []
       };
 
+      function modelState() {
+        return {
+          targetR: Number(targetSlider.value),
+          slope: Number(slopeSlider.value),
+          intercept: Number(interceptSlider.value)
+        };
+      }
+
       // ---------- UTILITY: RANDOM NORMAL ----------
-      // Box-Muller transform for standard normal N(0,1).
       function randn() {
         let u = 0;
         let v = 0;
@@ -335,7 +425,6 @@
         const m = mean(arr);
         let s = std(arr, m);
 
-        // Guard against degenerate vectors.
         if (s < EPS) {
           return arr.map((_, i) => (i % 2 === 0 ? -1 : 1));
         }
@@ -343,7 +432,6 @@
         return arr.map((v) => (v - m) / s);
       }
 
-      // Returns vector with component along x removed, then standardized.
       function orthogonalizedStandardNoise(raw, xStd) {
         let z = raw.slice();
         const xNormSq = dot(xStd, xStd);
@@ -355,7 +443,6 @@
 
         z = standardize(z);
 
-        // Re-orthogonalize after standardization to reduce numerical drift.
         const zNormSq = dot(z, z);
         if (xNormSq > EPS && zNormSq > EPS) {
           const correction = dot(z, xStd) / xNormSq;
@@ -366,7 +453,6 @@
         return z;
       }
 
-      // Compute Pearson correlation from CURRENT displayed point coordinates.
       function pearsonCorrelation(data) {
         const n = data.length;
         if (n < 2) return 0;
@@ -411,12 +497,16 @@
           latent.xStd.push(latentPoint.x);
           latent.zStd.push(latentPoint.z);
         }
+        latent.xStd = standardize(latent.xStd);
+        latent.zStd = orthogonalizedStandardNoise(latent.zStd, latent.xStd);
       }
 
       function removeLatentPoints(countToRemove) {
         if (countToRemove <= 0) return;
         latent.xStd.splice(-countToRemove, countToRemove);
         latent.zStd.splice(-countToRemove, countToRemove);
+        latent.xStd = standardize(latent.xStd);
+        latent.zStd = orthogonalizedStandardNoise(latent.zStd, latent.xStd);
       }
 
       function setSampleSizeIncremental(nextCount) {
@@ -430,44 +520,49 @@
         }
       }
 
-      // Rebuild latent representation from currently visible points (used after dragging).
-      // This keeps future slider motion continuous from the current cloud shape.
+      // Keep slider motion continuous after dragging points.
       function syncLatentFromDisplayedPoints() {
         if (points.length < 2) return;
 
+        const { intercept, slope, targetR } = modelState();
         const xs = points.map((p) => p.x);
-        const ys = points.map((p) => p.y);
+        const residual = points.map((p) => p.y - intercept - slope * p.x);
 
         const xStd = standardize(xs);
-        const yStd = standardize(ys);
+        const residualStd = standardize(residual);
 
-        const xNormSq = dot(xStd, xStd);
-        let alignedCoeff = 0;
-        if (xNormSq > EPS) {
-          alignedCoeff = dot(yStd, xStd) / xNormSq;
-        }
+        const absR = Math.abs(targetR);
+        const safeAbsR = Math.max(absR, 0.01);
+        const approxNoiseScale = Math.max(Math.abs(slope), 0.05) * Math.sqrt(Math.max(0, (1 / (safeAbsR * safeAbsR)) - 1));
+        const rawZ = residualStd.map((rVal) => rVal / Math.max(approxNoiseScale, 0.2));
 
-        const residual = yStd.map((v, i) => v - alignedCoeff * xStd[i]);
-        const zStd = orthogonalizedStandardNoise(residual, xStd);
-
+        const zStd = orthogonalizedStandardNoise(rawZ, xStd);
         latent = { xStd, zStd };
       }
 
-      function composePointsFromLatent(targetR) {
-        const safeR = clamp(targetR, -0.9999, 0.9999);
-        const noiseScale = Math.sqrt(Math.max(0, 1 - safeR * safeR));
+      function composePointsFromLatent() {
+        const { targetR, slope, intercept } = modelState();
+        const absR = Math.abs(targetR);
+        let noiseScale;
+
+        if (absR < 0.01) {
+          noiseScale = 6;
+        } else {
+          const effectiveSlope = Math.max(Math.abs(slope), 0.05);
+          noiseScale = effectiveSlope * Math.sqrt(Math.max(0, (1 / (absR * absR)) - 1));
+        }
 
         points = latent.xStd.map((x, i) => {
-          const y = safeR * x + noiseScale * latent.zStd[i];
+          const yModel = intercept + slope * x + noiseScale * latent.zStd[i];
           return {
             x: clamp(x, xMin, xMax),
-            y: clamp(y, yMin, yMax)
+            y: clamp(yModel, yMin, yMax)
           };
         });
       }
 
-      function updateDisplayedPointsFromTarget() {
-        composePointsFromLatent(Number(targetSlider.value));
+      function updateDisplayedPointsFromControls() {
+        composePointsFromLatent();
         drawPlot();
         refreshReadouts();
       }
@@ -502,7 +597,6 @@
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Grid + ticks
         ctx.strokeStyle = '#e5e7eb';
         ctx.lineWidth = 1;
         ctx.fillStyle = '#6b7280';
@@ -512,28 +606,23 @@
           const px = xToPx(t);
           const py = yToPx(t);
 
-          // Vertical grid lines
           ctx.beginPath();
           ctx.moveTo(px, plotTop);
           ctx.lineTo(px, plotBottom);
           ctx.stroke();
 
-          // Horizontal grid lines
           ctx.beginPath();
           ctx.moveTo(plotLeft, py);
           ctx.lineTo(plotRight, py);
           ctx.stroke();
 
-          // x tick labels
           ctx.fillText(String(t), px - 4, plotBottom + 18);
 
-          // y tick labels
           if (t !== 0) {
             ctx.fillText(String(t), plotLeft - 22, py + 4);
           }
         }
 
-        // Axes lines at x=0 and y=0
         ctx.strokeStyle = '#334155';
         ctx.lineWidth = 2;
 
@@ -550,11 +639,25 @@
         ctx.lineTo(zeroX, plotBottom);
         ctx.stroke();
 
-        // Axis labels
         ctx.fillStyle = '#0f172a';
         ctx.font = '700 14px Inter, Segoe UI, sans-serif';
         ctx.fillText('x', plotRight - 12, zeroY - 8);
         ctx.fillText('y', zeroX + 8, plotTop + 16);
+      }
+
+      function drawRegressionLine() {
+        const { intercept, slope } = modelState();
+        const yAtMin = intercept + slope * xMin;
+        const yAtMax = intercept + slope * xMax;
+
+        ctx.save();
+        ctx.strokeStyle = 'rgba(220, 38, 38, 0.95)';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(xToPx(xMin), yToPx(clamp(yAtMin, yMin, yMax)));
+        ctx.lineTo(xToPx(xMax), yToPx(clamp(yAtMax, yMin, yMax)));
+        ctx.stroke();
+        ctx.restore();
       }
 
       function drawPoints() {
@@ -574,6 +677,7 @@
 
       function drawPlot() {
         drawAxes();
+        drawRegressionLine();
         drawPoints();
       }
 
@@ -587,12 +691,20 @@
       }
 
       function refreshReadouts() {
-        const targetR = Number(targetSlider.value);
+        const { targetR, slope, intercept } = modelState();
         const actualR = pearsonCorrelation(points);
 
         targetValue.textContent = targetR.toFixed(2);
+        slopeValue.textContent = slope.toFixed(2);
+        interceptValue.textContent = intercept.toFixed(2);
+
         targetReadout.textContent = targetR.toFixed(3);
         actualReadout.textContent = actualR.toFixed(3);
+        slopeReadout.textContent = slope.toFixed(3);
+        interceptReadout.textContent = intercept.toFixed(3);
+
+        const slopeSign = slope >= 0 ? '+' : '-';
+        equationReadout.textContent = `ŷ = ${intercept.toFixed(3)} ${slopeSign} ${Math.abs(slope).toFixed(3)}x`;
         qualitative.textContent = getQualitativeLabel(actualR);
       }
 
@@ -601,32 +713,31 @@
         const count = clamp(parseInt(pointCountInput.value, 10) || 28, 5, 120);
         pointCountInput.value = count;
         createRandomLatentDataset(count);
-        updateDisplayedPointsFromTarget();
+        updateDisplayedPointsFromControls();
       }
 
       function handlePointCountChange() {
         const nextCount = clamp(parseInt(pointCountInput.value, 10) || latent.xStd.length || 28, 5, 120);
         pointCountInput.value = nextCount;
         setSampleSizeIncremental(nextCount);
-        updateDisplayedPointsFromTarget();
+        updateDisplayedPointsFromControls();
       }
 
       function resetControlsAndDataset() {
         targetSlider.value = '0';
+        slopeSlider.value = '1';
+        interceptSlider.value = '0';
         pointCountInput.value = '28';
         regenerateLatentDataset();
       }
 
-      // Slider now only recomposes current dataset from stable latent vectors.
-      targetSlider.addEventListener('input', updateDisplayedPointsFromTarget);
-
+      targetSlider.addEventListener('input', updateDisplayedPointsFromControls);
+      slopeSlider.addEventListener('input', updateDisplayedPointsFromControls);
+      interceptSlider.addEventListener('input', updateDisplayedPointsFromControls);
       pointCountInput.addEventListener('change', handlePointCountChange);
-
       regenBtn.addEventListener('click', regenerateLatentDataset);
-
       resetBtn.addEventListener('click', resetControlsAndDataset);
 
-      // Optional direct interaction: drag points.
       canvas.addEventListener('mousedown', (event) => {
         const rect = canvas.getBoundingClientRect();
         const mx = event.clientX - rect.left;
