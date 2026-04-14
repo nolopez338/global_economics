@@ -263,9 +263,17 @@
       const yMin = -3;
       const yMax = 3;
       const pointRadius = 5;
+      const EPS = 1e-9;
 
       let points = [];
       let dragIndex = -1;
+
+      // Latent representation used for continuous slider deformation.
+      // points[i] is drawn from xStd[i] and zStd[i] for any target r.
+      let latent = {
+        xStd: [],
+        zStd: []
+      };
 
       // ---------- UTILITY: RANDOM NORMAL ----------
       // Box-Muller transform for standard normal N(0,1).
@@ -289,6 +297,50 @@
       function std(arr, m) {
         const variance = arr.reduce((acc, x) => acc + (x - m) ** 2, 0) / arr.length;
         return Math.sqrt(variance);
+      }
+
+      function dot(a, b) {
+        let sum = 0;
+        for (let i = 0; i < a.length; i++) {
+          sum += a[i] * b[i];
+        }
+        return sum;
+      }
+
+      function standardize(arr) {
+        if (arr.length === 0) return [];
+        const m = mean(arr);
+        let s = std(arr, m);
+
+        // Guard against degenerate vectors.
+        if (s < EPS) {
+          return arr.map((_, i) => (i % 2 === 0 ? -1 : 1));
+        }
+
+        return arr.map((v) => (v - m) / s);
+      }
+
+      // Returns vector with component along x removed, then standardized.
+      function orthogonalizedStandardNoise(raw, xStd) {
+        let z = raw.slice();
+        const xNormSq = dot(xStd, xStd);
+
+        if (xNormSq > EPS) {
+          const projScale = dot(z, xStd) / xNormSq;
+          z = z.map((v, i) => v - projScale * xStd[i]);
+        }
+
+        z = standardize(z);
+
+        // Re-orthogonalize after standardization to reduce numerical drift.
+        const zNormSq = dot(z, z);
+        if (xNormSq > EPS && zNormSq > EPS) {
+          const correction = dot(z, xStd) / xNormSq;
+          z = z.map((v, i) => v - correction * xStd[i]);
+          z = standardize(z);
+        }
+
+        return z;
       }
 
       // Compute Pearson correlation from CURRENT displayed point coordinates.
@@ -315,40 +367,57 @@
         return clamp(cov / (sx * sy), -1, 1);
       }
 
-      // ---------- DATA GENERATION ----------
-      // Generate points with approximate target correlation:
-      // x = Z1, y = r*Z1 + sqrt(1-r^2)*Z2
-      function generateCorrelatedPoints(count, targetR) {
-        const arr = [];
+      // ---------- LATENT DATA MODEL ----------
+      function createRandomLatentDataset(count) {
+        const xRaw = Array.from({ length: count }, () => randn());
+        const zRaw = Array.from({ length: count }, () => randn());
+
+        const xStd = standardize(xRaw);
+        const zStd = orthogonalizedStandardNoise(zRaw, xStd);
+
+        latent = { xStd, zStd };
+      }
+
+      // Rebuild latent representation from currently visible points (used after dragging).
+      // This keeps future slider motion continuous from the current cloud shape.
+      function syncLatentFromDisplayedPoints() {
+        if (points.length < 2) return;
+
+        const xs = points.map((p) => p.x);
+        const ys = points.map((p) => p.y);
+
+        const xStd = standardize(xs);
+        const yStd = standardize(ys);
+
+        const xNormSq = dot(xStd, xStd);
+        let alignedCoeff = 0;
+        if (xNormSq > EPS) {
+          alignedCoeff = dot(yStd, xStd) / xNormSq;
+        }
+
+        const residual = yStd.map((v, i) => v - alignedCoeff * xStd[i]);
+        const zStd = orthogonalizedStandardNoise(residual, xStd);
+
+        latent = { xStd, zStd };
+      }
+
+      function composePointsFromLatent(targetR) {
         const safeR = clamp(targetR, -0.9999, 0.9999);
-        const noiseScale = Math.sqrt(1 - safeR * safeR);
+        const noiseScale = Math.sqrt(Math.max(0, 1 - safeR * safeR));
 
-        for (let i = 0; i < count; i++) {
-          const z1 = randn();
-          const z2 = randn();
-
-          const x = z1;
-          const y = safeR * z1 + noiseScale * z2;
-
-          arr.push({
+        points = latent.xStd.map((x, i) => {
+          const y = safeR * x + noiseScale * latent.zStd[i];
+          return {
             x: clamp(x, xMin, xMax),
             y: clamp(y, yMin, yMax)
-          });
-        }
+          };
+        });
+      }
 
-        // Small iterative refinement to push closer to exact target while keeping randomness.
-        for (let k = 0; k < 10; k++) {
-          const current = pearsonCorrelation(arr);
-          const error = targetR - current;
-          if (Math.abs(error) < 0.005) break;
-
-          for (let i = 0; i < arr.length; i++) {
-            const jitter = randn() * 0.03;
-            arr[i].y = clamp(arr[i].y + error * arr[i].x * 0.15 + jitter, yMin, yMax);
-          }
-        }
-
-        return arr;
+      function updateDisplayedPointsFromTarget() {
+        composePointsFromLatent(Number(targetSlider.value));
+        drawPlot();
+        refreshReadouts();
       }
 
       // ---------- COORDINATE TRANSFORMS ----------
@@ -476,25 +545,27 @@
       }
 
       // ---------- EVENT HANDLERS ----------
-      function regenerateWithCurrentTarget() {
+      function regenerateLatentDataset() {
         const count = clamp(parseInt(pointCountInput.value, 10) || 28, 5, 120);
         pointCountInput.value = count;
-        points = generateCorrelatedPoints(count, Number(targetSlider.value));
-        drawPlot();
-        refreshReadouts();
+        createRandomLatentDataset(count);
+        updateDisplayedPointsFromTarget();
       }
 
-      targetSlider.addEventListener('input', regenerateWithCurrentTarget);
-
-      pointCountInput.addEventListener('change', regenerateWithCurrentTarget);
-
-      regenBtn.addEventListener('click', regenerateWithCurrentTarget);
-
-      resetBtn.addEventListener('click', () => {
+      function resetControlsAndDataset() {
         targetSlider.value = '0';
         pointCountInput.value = '28';
-        regenerateWithCurrentTarget();
-      });
+        regenerateLatentDataset();
+      }
+
+      // Slider now only recomposes current dataset from stable latent vectors.
+      targetSlider.addEventListener('input', updateDisplayedPointsFromTarget);
+
+      pointCountInput.addEventListener('change', regenerateLatentDataset);
+
+      regenBtn.addEventListener('click', regenerateLatentDataset);
+
+      resetBtn.addEventListener('click', resetControlsAndDataset);
 
       // Optional direct interaction: drag points.
       canvas.addEventListener('mousedown', (event) => {
@@ -541,6 +612,7 @@
         if (dragIndex !== -1) {
           dragIndex = -1;
           canvas.style.cursor = 'default';
+          syncLatentFromDisplayedPoints();
         }
       }
 
@@ -548,7 +620,7 @@
       canvas.addEventListener('mouseleave', endDrag);
 
       // ---------- INITIALIZE ----------
-      regenerateWithCurrentTarget();
+      resetControlsAndDataset();
     })();
   </script>
 </body>
