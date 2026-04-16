@@ -8,21 +8,28 @@
 \author{}
 \date{}
 
-\providecommand{\PropDecisionLine}[6]{%
+\providecommand{\PropDecisionLine}[7]{%
 	\begin{center}
 		\begin{tikzpicture}[x=48cm,y=1cm,>=stealth]
 			\pgfmathsetmacro{\ArrowEnd}{#1 + (#3)*(0.025)*abs(#6)}
-			\draw[thick] (0.60,0) -- (0.80,0);
-			\foreach \x/\lab in {0.64/0.64,0.68/0.68,0.72/0.72,0.76/0.76,0.80/0.80}{
+			\pgfmathsetmacro{\LineLeft}{#7 - 0.10}
+			\pgfmathsetmacro{\LineRight}{#7 + 0.10}
+			\pgfmathsetmacro{\TickA}{#7 - 0.08}
+			\pgfmathsetmacro{\TickB}{#7 - 0.04}
+			\pgfmathsetmacro{\TickC}{#7}
+			\pgfmathsetmacro{\TickD}{#7 + 0.04}
+			\pgfmathsetmacro{\TickE}{#7 + 0.08}
+			\draw[thick] (\LineLeft,0) -- (\LineRight,0);
+			\foreach \x in {\TickA,\TickB,\TickC,\TickD,\TickE}{
 				\draw (\x,0.025) -- (\x,-0.025);
-				\node[below,font=\scriptsize] at (\x,-0.025) {\(\lab\)};
+				\node[below,font=\scriptsize] at (\x,-0.025) {\(\pgfmathprintnumber[fixed,precision=2]{\x}\)};
 			}
 			\filldraw[black] (#1,0) circle (1.8pt);
 			\node[above,font=\scriptsize] at (#1,0.11) {\(p_0=#1\)};
 			\filldraw[#4] (#2,0) circle (1.8pt);
 			\node[above,font=\scriptsize,#4] at (#2,0.11) {\(\hat p=#2\)};
 			\draw[->,very thick,#4] (#1,0.16) -- (\ArrowEnd,0.16);
-			\node[#4,font=\scriptsize] at (0.70,-0.59) {#5};
+			\node[#4,font=\scriptsize] at (#7,-0.59) {#5};
 		\end{tikzpicture}
 	\end{center}
 }
@@ -193,7 +200,7 @@ A benchmark claim concerns a population proportion. A random sample of size \(n\
 	\OneTailGraph{1}{1.41}{1.645}{Sample A higher-tail test: \(H_a:p>0.72\)}
 	\end{center}
 		
-	\PropDecisionLine{0.72}{0.76}{1}{red}{fail to reject \(H_0\)}{1.41}
+	\PropDecisionLine{0.72}{0.76}{1}{red}{fail to reject \(H_0\)}{1.41}{0.72}
 	
 	\textbf{Sample B}
 	
@@ -213,7 +220,7 @@ A benchmark claim concerns a population proportion. A random sample of size \(n\
 	\OneTailGraph{1}{1.99}{1.645}{Sample B higher-tail test: \(H_a:p>0.72\)}
 	\end{center}
 	
-	\PropDecisionLine{0.72}{0.76}{1}{green!60!black}{reject \(H_0\)}{1.99}
+	\PropDecisionLine{0.72}{0.76}{1}{green!60!black}{reject \(H_0\)}{1.99}{0.72}
 		
 	Although both samples have the same sample proportion \(\hat p=0.76\), the larger sample gives a more positive test statistic and a smaller p-value because the standard error is smaller.
 		
@@ -249,7 +256,7 @@ Notice that both samples have the same sample proportion. At \(\alpha=5\%\), tes
 	\OneTailGraph{0}{-1.41}{-1.645}{Sample A lower-tail test: \(H_a:p<0.72\)}
 \end{center}
 
-\PropDecisionLine{0.72}{0.68}{-1}{red}{fail to reject \(H_0\)}{1.41}
+\PropDecisionLine{0.72}{0.68}{-1}{red}{fail to reject \(H_0\)}{1.41}{0.72}
 
 \textbf{Sample B}
 
@@ -269,7 +276,7 @@ Notice that both samples have the same sample proportion. At \(\alpha=5\%\), tes
 	\OneTailGraph{0}{-1.99}{-1.645}{Sample B lower-tail test: \(H_a:p<0.72\)}
 \end{center}
 
-\PropDecisionLine{0.72}{0.68}{-1}{green!60!black}{reject \(H_0\)}{1.99}
+\PropDecisionLine{0.72}{0.68}{-1}{green!60!black}{reject \(H_0\)}{1.99}{0.72}
 
 Although both samples have the same sample proportion \(\hat p=0.68\), the larger sample gives a more negative test statistic and a smaller p-value because the standard error is smaller.
 \section{On-time assignment completion rate (introductory two-tailed)}
@@ -304,7 +311,7 @@ Notice that both samples have the same sample proportion. At \(\alpha=5\%\), tes
 	\TwoTailGraph{1.41}{1.96}{Sample A two-tailed test: \(H_a:p\ne0.72\)}
 \end{center}
 
-\PropDecisionLine{0.72}{0.76}{0.795}{red}{fail to reject \(H_0\)}{1.41}
+\PropDecisionLine{0.72}{0.76}{0.795}{red}{fail to reject \(H_0\)}{1.41}{0.72}
 
 \textbf{Sample B}
 
@@ -324,7 +331,7 @@ Notice that both samples have the same sample proportion. At \(\alpha=5\%\), tes
 	\TwoTailGraph{1.99}{1.96}{Sample B two-tailed test: \(H_a:p\ne0.72\)}
 \end{center}
 
-\PropDecisionLine{0.72}{0.76}{0.795}{green!60!black}{reject \(H_0\)}{1.99}
+\PropDecisionLine{0.72}{0.76}{0.795}{green!60!black}{reject \(H_0\)}{1.99}{0.72}
 
 Although both samples have the same sample proportion \(\hat p=0.76\), the larger sample gives a larger absolute test statistic and a smaller p-value because the standard error is smaller.
 
@@ -352,19 +359,19 @@ A district dashboard states that 40\% of teachers regularly use a new digital pl
 	\OneTailGraph{1}{2.12}{1.645}{Higher-tail test at \(\alpha=5\%\): \(H_a:p>0.40\)}
 \end{center}
 
-\PropDecisionLine{0.40}{0.46}{1}{green!60!black}{reject \(H_0\)}{2.12}
+\PropDecisionLine{0.40}{0.46}{1}{green!60!black}{reject \(H_0\)}{2.12}{0.40}
 
 \begin{center}
 	\OneTailGraph{1}{2.12}{2.054}{Higher-tail test at \(\alpha=2\%\): \(H_a:p>0.40\)}
 \end{center}
 
-\PropDecisionLine{0.40}{0.46}{1}{green!60!black}{reject \(H_0\)}{2.12}
+\PropDecisionLine{0.40}{0.46}{1}{green!60!black}{reject \(H_0\)}{2.12}{0.40}
 
 \begin{center}
 	\OneTailGraph{1}{2.12}{2.326}{Higher-tail test at \(\alpha=1\%\): \(H_a:p>0.40\)}
 \end{center}
 
-\PropDecisionLine{0.40}{0.46}{1}{red}{fail to reject \(H_0\)}{2.12}
+\PropDecisionLine{0.40}{0.46}{1}{red}{fail to reject \(H_0\)}{2.12}{0.40}
 
 \section{Platform adoption rate after training (lower-tail test compared across three significance levels)}
 A district dashboard states that 40\% of teachers regularly use a new digital platform. After training, a random sample of 300 teachers shows 102 regular users. At significance levels \(\alpha=1\%\), \(\alpha=2\%\), and \(\alpha=5\%\), test whether the true adoption proportion is lower than 40\%.
@@ -390,19 +397,19 @@ A district dashboard states that 40\% of teachers regularly use a new digital pl
 	\OneTailGraph{0}{-2.12}{-1.645}{Lower-tail test at \(\alpha=5\%\): \(H_a:p<0.40\)}
 \end{center}
 
-\PropDecisionLine{0.40}{0.34}{-1}{green!60!black}{reject \(H_0\)}{2.12}
+\PropDecisionLine{0.40}{0.34}{-1}{green!60!black}{reject \(H_0\)}{2.12}{0.40}
 
 \begin{center}
 	\OneTailGraph{0}{-2.12}{-2.054}{Lower-tail test at \(\alpha=2\%\): \(H_a:p<0.40\)}
 \end{center}
 
-\PropDecisionLine{0.40}{0.34}{-1}{green!60!black}{reject \(H_0\)}{2.12}
+\PropDecisionLine{0.40}{0.34}{-1}{green!60!black}{reject \(H_0\)}{2.12}{0.40}
 
 \begin{center}
 	\OneTailGraph{0}{-2.12}{-2.326}{Lower-tail test at \(\alpha=1\%\): \(H_a:p<0.40\)}
 \end{center}
 
-\PropDecisionLine{0.40}{0.34}{-1}{red}{fail to reject \(H_0\)}{2.12}
+\PropDecisionLine{0.40}{0.34}{-1}{red}{fail to reject \(H_0\)}{2.12}{0.40}
 
 \section{Platform adoption rate after training (two-tailed test compared across three significance levels)}
 A district dashboard states that 40\% of teachers regularly use a new digital platform. After training, a random sample of 300 teachers shows 138 regular users. At significance levels \(\alpha=1\%\), \(\alpha=2\%\), and \(\alpha=5\%\), test whether the true adoption proportion is different from 40\%.
@@ -473,7 +480,7 @@ For learning purposes, apply both one-sided tests to each sample, even though in
 	\OneTailGraph{0}{-1.69}{-1.645}{Sample A lower-tail test: \(H_a:p<0.72\)}
 \end{center}
 
-\PropDecisionLine{0.72}{0.672}{0.605}{green!60!black}{reject \(H_0\)}{-1.69}
+\PropDecisionLine{0.72}{0.672}{0.605}{green!60!black}{reject \(H_0\)}{-1.69}{0.72}
 
 \textbf{Test 2: Higher-tail test for Sample A}
 
@@ -488,7 +495,7 @@ For learning purposes, apply both one-sided tests to each sample, even though in
 	\OneTailGraph{1}{-1.69}{1.645}{Sample A higher-tail test: \(H_a:p>0.72\)}
 \end{center}
 
-\PropDecisionLine{0.72}{0.672}{0.795}{red}{fail to reject \(H_0\)}{-1.69}
+\PropDecisionLine{0.72}{0.672}{0.795}{red}{fail to reject \(H_0\)}{-1.69}{0.72}
 
 \textbf{Sample B}
 
@@ -514,7 +521,7 @@ For learning purposes, apply both one-sided tests to each sample, even though in
 	\OneTailGraph{0}{1.69}{-1.645}{Sample B lower-tail test: \(H_a:p<0.72\)}
 \end{center}
 
-\PropDecisionLine{0.72}{0.754}{0.605}{red}{fail to reject \(H_0\)}{1.69}
+\PropDecisionLine{0.72}{0.754}{0.605}{red}{fail to reject \(H_0\)}{1.69}{0.72}
 
 \textbf{Test 2: Higher-tail test for Sample B}
 
@@ -529,7 +536,7 @@ For learning purposes, apply both one-sided tests to each sample, even though in
 	\OneTailGraph{1}{1.69}{1.645}{Sample B higher-tail test: \(H_a:p>0.72\)}
 \end{center}
 
-\PropDecisionLine{0.72}{0.754}{0.795}{green!60!black}{reject \(H_0\)}{1.69}
+\PropDecisionLine{0.72}{0.754}{0.795}{green!60!black}{reject \(H_0\)}{1.69}{0.72}
 
 In Sample A, the observed proportion is below the benchmark, so the lower-tail alternative is the direction supported by the data. In Sample B, the observed proportion is above the benchmark, so the higher-tail alternative is the direction supported by the data.
 
@@ -570,7 +577,7 @@ For learning purposes, apply both one-sided tests to each sample, even though in
 	\OneTailGraph{0}{-1.55}{-1.645}{Sample A lower-tail test: \(H_a:p<0.72\)}
 \end{center}
 
-\PropDecisionLine{0.72}{0.676}{0.605}{red}{fail to reject \(H_0\)}{-1.55}
+\PropDecisionLine{0.72}{0.676}{0.605}{red}{fail to reject \(H_0\)}{-1.55}{0.72}
 
 \textbf{Test 2: Higher-tail test for Sample A}
 
@@ -585,7 +592,7 @@ For learning purposes, apply both one-sided tests to each sample, even though in
 	\OneTailGraph{1}{-1.55}{1.645}{Sample A higher-tail test: \(H_a:p>0.72\)}
 \end{center}
 
-\PropDecisionLine{0.72}{0.676}{0.795}{red}{fail to reject \(H_0\)}{-1.55}
+\PropDecisionLine{0.72}{0.676}{0.795}{red}{fail to reject \(H_0\)}{-1.55}{0.72}
 
 \textbf{Sample B}
 
@@ -611,7 +618,7 @@ For learning purposes, apply both one-sided tests to each sample, even though in
 	\OneTailGraph{0}{1.59}{-1.645}{Sample B lower-tail test: \(H_a:p<0.72\)}
 \end{center}
 
-\PropDecisionLine{0.72}{0.752}{0.605}{red}{fail to reject \(H_0\)}{1.59}
+\PropDecisionLine{0.72}{0.752}{0.605}{red}{fail to reject \(H_0\)}{1.59}{0.72}
 
 \textbf{Test 2: Higher-tail test for Sample B}
 
@@ -626,7 +633,7 @@ For learning purposes, apply both one-sided tests to each sample, even though in
 	\OneTailGraph{1}{1.59}{1.645}{Sample B higher-tail test: \(H_a:p>0.72\)}
 \end{center}
 
-\PropDecisionLine{0.72}{0.752}{0.795}{red}{fail to reject \(H_0\)}{1.59}
+\PropDecisionLine{0.72}{0.752}{0.795}{red}{fail to reject \(H_0\)}{1.59}{0.72}
 
 In Sample A, the observed proportion is below the benchmark, so the lower-tail alternative is the direction supported by the data. In Sample B, the observed proportion is above the benchmark, so the higher-tail alternative is the direction supported by the data. However, in both samples the evidence is not strong enough at the \(5\%\) significance level, so all tests fail to reject \(H_0\).
 
