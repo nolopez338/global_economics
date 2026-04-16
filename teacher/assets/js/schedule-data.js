@@ -2756,7 +2756,7 @@ window.SCHEDULE_DATA = [
     "Description": "Exam - C1 C2 C3",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "Exam"
   },
   {
     "Grade": 11,
@@ -2766,10 +2766,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "C4: t-test with proportions",
+    "Description": "Explanation videos : p-value",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "Videos"
   },
   {
     "Grade": 11,
@@ -2779,10 +2779,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "C5: t-test with mean",
+    "Description": "C4 C5: t-test with proportion and mean",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C5"
+    "Summary": "C4 C5"
   },
   {
     "Grade": 11,
@@ -3273,7 +3273,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "Exam: First Learning Evidence - C1 C2 C3",
+    "Description": "Exam - C1 C2 C3",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C4"
@@ -3286,7 +3286,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 5",
-    "Description": "-",
+    "Description": "Explanation videos : p-value",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C4"
@@ -3299,7 +3299,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "-",
+    "Description": "C4 C5: t-test with proportion and mean",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
@@ -3744,7 +3744,7 @@ window.SCHEDULE_DATA = [
     "Description": "Exam - C1 C2 C3",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3"
+    "Summary": "Exam"
   },
   {
     "Grade": 11,
@@ -3754,10 +3754,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 2",
-    "Description": "C4: t-test with proportions",
+    "Description": "Explanation videos : p-value",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "Videos"
   },
   {
     "Grade": 11,
@@ -3767,10 +3767,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "C5: t-test with mean",
+    "Description": "C4 C5: t-test with proportion and mean",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "C4 C5"
   },
   {
     "Grade": 11,
@@ -4235,10 +4235,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "C4: t-test with proportions",
+    "Description": "Explanation videos : p-value",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "Videos"
   },
   {
     "Grade": 11,
@@ -4248,10 +4248,10 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "C5: t-test with mean",
+    "Description": "C4 C5: t-test with proportion and mean",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C5"
+    "Summary": "C4 C5"
   },
   {
     "Grade": 11,
@@ -4729,7 +4729,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "C4: t-test with proportions",
+    "Description": "Explanation videos : p-value",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C4"
@@ -4742,7 +4742,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 2",
-    "Description": "C5: t-test with mean",
+    "Description": "C4 C5: t-test with proportion and mean",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"

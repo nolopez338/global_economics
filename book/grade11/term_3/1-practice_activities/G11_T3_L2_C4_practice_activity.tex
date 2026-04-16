@@ -10,6 +10,25 @@
 
 \usepackage{tikz}
 
+\providecommand{\PropDecisionLine}[6]{%
+	\begin{center}
+		\begin{tikzpicture}[x=48cm,y=1cm,>=stealth]
+			\pgfmathsetmacro{\ArrowEnd}{#1 + (#3)*(0.03)*abs(#6)}
+			\draw[thick] (0.60,0) -- (0.80,0);
+			\foreach \x/\lab in {0.64/0.64,0.68/0.68,0.72/0.72,0.76/0.76,0.80/0.80}{
+				\draw (\x,0.025) -- (\x,-0.025);
+				\node[below,font=\scriptsize] at (\x,-0.025) {\(\lab\)};
+			}
+			\filldraw[black] (#1,0) circle (1.8pt);
+			\node[above,font=\scriptsize] at (#1,0.11) {\(p_0=#1\)};
+			\filldraw[#4] (#2,0) circle (1.8pt);
+			\node[above,font=\scriptsize,#4] at (#2,0.11) {\(\hat p=#2\)};
+			\draw[->,very thick,#4] (#1,0.16) -- (\ArrowEnd,0.16);
+			\node[#4,font=\scriptsize] at (0.70,-0.59) {#5};
+		\end{tikzpicture}
+	\end{center}
+}
+
 \newcommand{\NormalBase}{%
 \draw[->] (-3.4,0) -- (3.4,0);
 \draw[thick,samples=120,smooth,domain=-3.2:3.2] plot (\x,{0.4*exp(-\x*\x/2)});
@@ -141,59 +160,64 @@ A benchmark claim concerns a population proportion. A random sample of size \(n\
 	\hspace{0.8cm}
 	\TwoTailGraph{1.20}{}{Two-tailed template}
 \end{center}
-
+		
+		
 \section{On-time assignment completion rate (introductory higher-tail)}
-A school reports that 72\% of assignments are submitted on time. Consider two random samples:
-\begin{itemize}
-	\item Sample A has 250 assignments, of which 190 are submitted on time.
-	\item Sample B has 500 assignments, of which 380 are submitted on time.
-\end{itemize}
-Notice that both samples have the same sample proportion. At \(\alpha=5\%\), test whether the true on-time proportion is higher than 72\% for each sample.
-
-\subsection*{C4}
-\begin{itemize}
+		A school reports that 72\% of assignments are submitted on time. Consider two random samples:
+		\begin{itemize}
+		\item Sample A has 250 assignments, of which 190 are submitted on time.
+		\item Sample B has 500 assignments, of which 380 are submitted on time.
+		\end{itemize}
+		Notice that both samples have the same sample proportion. At \(\alpha=5\%\), test whether the true on-time proportion is higher than 72\% for each sample.
+		
+	\subsection*{C4}
+	\begin{itemize}
 	\item \textbf{Parameter:} \(p\) = true on-time submission proportion.
-	\item \textbf{Hypotheses:} \(H_0\colon p=0.72\), \(H_a\colon p>0.72\).
-\end{itemize}
-
-\textbf{Sample A}
-
-\begin{itemize}
+		\item \textbf{Hypotheses:} \(H_0\colon p=0.72\), \(H_a\colon p>0.72\).
+	\end{itemize}
+	
+	\textbf{Sample A}
+	
+	\begin{itemize}
 	\item \textbf{Conditions:} \(np_0=250(0.72)=180\ge10\), \(n(1-p_0)=250(0.28)=70\ge10\).
 	\item \textbf{Sample proportion:} \(\hat p=190/250=0.76\).
-	\item \textbf{Test statistic:}
-	\[
-	z=\frac{0.76-0.72}{\sqrt{\frac{0.72(0.28)}{250}}}\approx 1.41.
-	\]
-	\item \textbf{p-value:} \(P(Z\ge 1.41)\approx 0.0795\).
-	\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.0795>0.05\).
-	\item \textbf{Conclusion:} There is not enough evidence that the true on-time submission rate is above 72\%.
-\end{itemize}
-
-\begin{center}
+		\item \textbf{Test statistic:}
+		\[
+		z=\frac{0.76-0.72}{\sqrt{\frac{0.72(0.28)}{250}}}\approx 1.41.
+		\]
+		\item \textbf{p-value:} \(P(Z\ge 1.41)\approx 0.0795\).
+		\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.0795>0.05\).
+		\item \textbf{Conclusion:} There is not enough evidence that the true on-time submission rate is above 72\%.
+		\end{itemize}
+		
+	\begin{center}
 	\OneTailGraph{1}{1.41}{1.645}{Sample A higher-tail test: \(H_a:p>0.72\)}
-\end{center}
-
-\textbf{Sample B}
-
-\begin{itemize}
+	\end{center}
+		
+	\PropDecisionLine{0.72}{0.76}{1}{red}{fail to reject \(H_0\)}{1.41}
+	
+	\textbf{Sample B}
+	
+	\begin{itemize}
 	\item \textbf{Conditions:} \(np_0=500(0.72)=360\ge10\), \(n(1-p_0)=500(0.28)=140\ge10\).
 	\item \textbf{Sample proportion:} \(\hat p=380/500=0.76\).
-	\item \textbf{Test statistic:}
-	\[
+		\item \textbf{Test statistic:}
+		\[
 	z=\frac{0.76-0.72}{\sqrt{\frac{0.72(0.28)}{500}}}\approx 1.99.
 	\]
 	\item \textbf{p-value:} \(P(Z\ge 1.99)\approx 0.0232\).
 	\item \textbf{Decision:} Reject \(H_0\) since \(0.0232<0.05\).
 	\item \textbf{Conclusion:} There is enough evidence that the true on-time submission rate is above 72\%.
-\end{itemize}
-
-\begin{center}
+		\end{itemize}
+		
+	\begin{center}
 	\OneTailGraph{1}{1.99}{1.645}{Sample B higher-tail test: \(H_a:p>0.72\)}
-\end{center}
-
-Although both samples have the same sample proportion \(\hat p=0.76\), the larger sample gives a more positive test statistic and a smaller p-value because the standard error is smaller.
-
+	\end{center}
+	
+	\PropDecisionLine{0.72}{0.76}{1}{green!60!black}{reject \(H_0\)}{1.99}
+		
+	Although both samples have the same sample proportion \(\hat p=0.76\), the larger sample gives a more positive test statistic and a smaller p-value because the standard error is smaller.
+		
 \section{On-time assignment completion rate (introductory lower-tail)}
 A school reports that 72\% of assignments are submitted on time. Consider two random samples:
 \begin{itemize}
@@ -226,6 +250,8 @@ Notice that both samples have the same sample proportion. At \(\alpha=5\%\), tes
 	\OneTailGraph{0}{-1.41}{-1.645}{Sample A lower-tail test: \(H_a:p<0.72\)}
 \end{center}
 
+\PropDecisionLine{0.72}{0.68}{-1}{red}{fail to reject \(H_0\)}{1.41}
+
 \textbf{Sample B}
 
 \begin{itemize}
@@ -244,8 +270,9 @@ Notice that both samples have the same sample proportion. At \(\alpha=5\%\), tes
 	\OneTailGraph{0}{-1.99}{-1.645}{Sample B lower-tail test: \(H_a:p<0.72\)}
 \end{center}
 
-Although both samples have the same sample proportion \(\hat p=0.68\), the larger sample gives a more negative test statistic and a smaller p-value because the standard error is smaller.
+\PropDecisionLine{0.72}{0.68}{-1}{green!60!black}{reject \(H_0\)}{1.99}
 
+Although both samples have the same sample proportion \(\hat p=0.68\), the larger sample gives a more negative test statistic and a smaller p-value because the standard error is smaller.
 \section{On-time assignment completion rate (introductory two-tailed)}
 A school reports that 72\% of assignments are submitted on time. Consider two random samples:
 \begin{itemize}
@@ -278,6 +305,8 @@ Notice that both samples have the same sample proportion. At \(\alpha=5\%\), tes
 	\TwoTailGraph{1.41}{1.96}{Sample A two-tailed test: \(H_a:p\ne0.72\)}
 \end{center}
 
+\PropDecisionLine{0.72}{0.76}{0.795}{red}{fail to reject \(H_0\)}
+
 \textbf{Sample B}
 
 \begin{itemize}
@@ -295,6 +324,8 @@ Notice that both samples have the same sample proportion. At \(\alpha=5\%\), tes
 \begin{center}
 	\TwoTailGraph{1.99}{1.96}{Sample B two-tailed test: \(H_a:p\ne0.72\)}
 \end{center}
+
+\PropDecisionLine{0.72}{0.76}{0.795}{green!60!black}{reject \(H_0\)}
 
 Although both samples have the same sample proportion \(\hat p=0.76\), the larger sample gives a larger absolute test statistic and a smaller p-value because the standard error is smaller.
 
@@ -393,6 +424,200 @@ A district dashboard states that 40\% of teachers regularly use a new digital pl
 	
 	\TwoTailGraph{2.12}{2.576}{Two-tailed test at \(\alpha=1\%\): \(H_a:p\ne0.40\)}
 \end{center}
+
+\section{On-time assignment completion rate (comparison of lower-tail and higher-tail tests in two samples)}
+A school reports that 72\% of assignments are submitted on time. Consider two random samples:
+\begin{itemize}
+	\item Sample A has 250 assignments, of which 168 are submitted on time.
+	\item Sample B has 500 assignments, of which 377 are submitted on time.
+\end{itemize}
+For learning purposes, apply both one-sided tests to each sample, even though in Sample A the observed proportion is below 72\% and in Sample B the observed proportion is above 72\%. At \(\alpha=5\%\), test whether the true on-time proportion is lower than 72\% and whether it is higher than 72\% for each sample.
+
+\subsection*{C4}
+\begin{itemize}
+	\item \textbf{Parameter:} \(p\) = true on-time submission proportion.
+\end{itemize}
+
+\textbf{Sample A}
+
+\begin{itemize}
+	\item \textbf{Conditions:} \(np_0=250(0.72)=180\ge10\), \(n(1-p_0)=250(0.28)=70\ge10\).
+	\item \textbf{Sample proportion:} \(\hat p=168/250=0.672\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.672-0.72}{\sqrt{\frac{0.72(0.28)}{250}}}\approx -1.69.
+	\]
+\end{itemize}
+
+\textbf{Test 1: Lower-tail test for Sample A}
+
+\begin{itemize}
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon p=0.72\), \(H_a\colon p<0.72\).
+	\item \textbf{p-value:} \(P(Z\le -1.69)\approx 0.0455\).
+	\item \textbf{Decision:} Reject \(H_0\) since \(0.0455<0.05\).
+	\item \textbf{Conclusion:} There is sufficient evidence that the true on-time submission rate is below 72\%.
+\end{itemize}
+
+\begin{center}
+	\OneTailGraph{0}{-1.69}{-1.645}{Sample A lower-tail test: \(H_a:p<0.72\)}
+\end{center}
+
+\PropDecisionLine{0.72}{0.672}{0.605}{green!60!black}{reject \(H_0\)}
+
+\textbf{Test 2: Higher-tail test for Sample A}
+
+\begin{itemize}
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon p=0.72\), \(H_a\colon p>0.72\).
+	\item \textbf{p-value:} \(P(Z\ge -1.69)\approx 0.9545\).
+	\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.9545>0.05\).
+	\item \textbf{Conclusion:} There is not enough evidence that the true on-time submission rate is above 72\%.
+\end{itemize}
+
+\begin{center}
+	\OneTailGraph{1}{-1.69}{1.645}{Sample A higher-tail test: \(H_a:p>0.72\)}
+\end{center}
+
+\PropDecisionLine{0.72}{0.672}{0.795}{red}{fail to reject \(H_0\)}
+
+\textbf{Sample B}
+
+\begin{itemize}
+	\item \textbf{Conditions:} \(np_0=500(0.72)=360\ge10\), \(n(1-p_0)=500(0.28)=140\ge10\).
+	\item \textbf{Sample proportion:} \(\hat p=377/500=0.754\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.754-0.72}{\sqrt{\frac{0.72(0.28)}{500}}}\approx 1.69.
+	\]
+\end{itemize}
+
+\textbf{Test 1: Lower-tail test for Sample B}
+
+\begin{itemize}
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon p=0.72\), \(H_a\colon p<0.72\).
+	\item \textbf{p-value:} \(P(Z\le 1.69)\approx 0.9545\).
+	\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.9545>0.05\).
+	\item \textbf{Conclusion:} There is not enough evidence that the true on-time submission rate is below 72\%.
+\end{itemize}
+
+\begin{center}
+	\OneTailGraph{0}{1.69}{-1.645}{Sample B lower-tail test: \(H_a:p<0.72\)}
+\end{center}
+
+\PropDecisionLine{0.72}{0.754}{0.605}{red}{fail to reject \(H_0\)}
+
+\textbf{Test 2: Higher-tail test for Sample B}
+
+\begin{itemize}
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon p=0.72\), \(H_a\colon p>0.72\).
+	\item \textbf{p-value:} \(P(Z\ge 1.69)\approx 0.0455\).
+	\item \textbf{Decision:} Reject \(H_0\) since \(0.0455<0.05\).
+	\item \textbf{Conclusion:} There is sufficient evidence that the true on-time submission rate is above 72\%.
+\end{itemize}
+
+\begin{center}
+	\OneTailGraph{1}{1.69}{1.645}{Sample B higher-tail test: \(H_a:p>0.72\)}
+\end{center}
+
+\PropDecisionLine{0.72}{0.754}{0.795}{green!60!black}{reject \(H_0\)}
+
+In Sample A, the observed proportion is below the benchmark, so the lower-tail alternative is the direction supported by the data. In Sample B, the observed proportion is above the benchmark, so the higher-tail alternative is the direction supported by the data.
+
+\section{On-time assignment completion rate (comparison of lower-tail and higher-tail tests in two samples, all fail to reject)}
+A school reports that 72\% of assignments are submitted on time. Consider two random samples:
+\begin{itemize}
+	\item Sample A has 250 assignments, of which 169 are submitted on time.
+	\item Sample B has 500 assignments, of which 376 are submitted on time.
+\end{itemize}
+For learning purposes, apply both one-sided tests to each sample, even though in Sample A the observed proportion is below 72\% and in Sample B the observed proportion is above 72\%. At \(\alpha=5\%\), test whether the true on-time proportion is lower than 72\% and whether it is higher than 72\% for each sample.
+
+\subsection*{C4}
+\begin{itemize}
+	\item \textbf{Parameter:} \(p\) = true on-time submission proportion.
+\end{itemize}
+
+\textbf{Sample A}
+
+\begin{itemize}
+	\item \textbf{Conditions:} \(np_0=250(0.72)=180\ge10\), \(n(1-p_0)=250(0.28)=70\ge10\).
+	\item \textbf{Sample proportion:} \(\hat p=169/250=0.676\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.676-0.72}{\sqrt{\frac{0.72(0.28)}{250}}}\approx -1.55.
+	\]
+\end{itemize}
+
+\textbf{Test 1: Lower-tail test for Sample A}
+
+\begin{itemize}
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon p=0.72\), \(H_a\colon p<0.72\).
+	\item \textbf{p-value:} \(P(Z\le -1.55)\approx 0.0606\).
+	\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.0606>0.05\).
+	\item \textbf{Conclusion:} There is not enough evidence that the true on-time submission rate is below 72\%.
+\end{itemize}
+
+\begin{center}
+	\OneTailGraph{0}{-1.55}{-1.645}{Sample A lower-tail test: \(H_a:p<0.72\)}
+\end{center}
+
+\PropDecisionLine{0.72}{0.676}{0.605}{red}{fail to reject \(H_0\)}
+
+\textbf{Test 2: Higher-tail test for Sample A}
+
+\begin{itemize}
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon p=0.72\), \(H_a\colon p>0.72\).
+	\item \textbf{p-value:} \(P(Z\ge -1.55)\approx 0.9394\).
+	\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.9394>0.05\).
+	\item \textbf{Conclusion:} There is not enough evidence that the true on-time submission rate is above 72\%.
+\end{itemize}
+
+\begin{center}
+	\OneTailGraph{1}{-1.55}{1.645}{Sample A higher-tail test: \(H_a:p>0.72\)}
+\end{center}
+
+\PropDecisionLine{0.72}{0.676}{0.795}{red}{fail to reject \(H_0\)}
+
+\textbf{Sample B}
+
+\begin{itemize}
+	\item \textbf{Conditions:} \(np_0=500(0.72)=360\ge10\), \(n(1-p_0)=500(0.28)=140\ge10\).
+	\item \textbf{Sample proportion:} \(\hat p=376/500=0.752\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.752-0.72}{\sqrt{\frac{0.72(0.28)}{500}}}\approx 1.59.
+	\]
+\end{itemize}
+
+\textbf{Test 1: Lower-tail test for Sample B}
+
+\begin{itemize}
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon p=0.72\), \(H_a\colon p<0.72\).
+	\item \textbf{p-value:} \(P(Z\le 1.59)\approx 0.9445\).
+	\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.9445>0.05\).
+	\item \textbf{Conclusion:} There is not enough evidence that the true on-time submission rate is below 72\%.
+\end{itemize}
+
+\begin{center}
+	\OneTailGraph{0}{1.59}{-1.645}{Sample B lower-tail test: \(H_a:p<0.72\)}
+\end{center}
+
+\PropDecisionLine{0.72}{0.752}{0.605}{red}{fail to reject \(H_0\)}
+
+\textbf{Test 2: Higher-tail test for Sample B}
+
+\begin{itemize}
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon p=0.72\), \(H_a\colon p>0.72\).
+	\item \textbf{p-value:} \(P(Z\ge 1.59)\approx 0.0555\).
+	\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.0555>0.05\).
+	\item \textbf{Conclusion:} There is not enough evidence that the true on-time submission rate is above 72\%.
+\end{itemize}
+
+\begin{center}
+	\OneTailGraph{1}{1.59}{1.645}{Sample B higher-tail test: \(H_a:p>0.72\)}
+\end{center}
+
+\PropDecisionLine{0.72}{0.752}{0.795}{red}{fail to reject \(H_0\)}
+
+In Sample A, the observed proportion is below the benchmark, so the lower-tail alternative is the direction supported by the data. In Sample B, the observed proportion is above the benchmark, so the higher-tail alternative is the direction supported by the data. However, in both samples the evidence is not strong enough at the \(5\%\) significance level, so all tests fail to reject \(H_0\).
 
 \section{Compliance with safety checklist (Comparison of higher-tail and two-tailed I)}
 A quality team states that 85\% of shifts complete a safety checklist. In a random sample of 320 shifts, 288 completed the checklist. At \(\alpha=5\%\), test both whether the true completion proportion is higher than 85\% and whether the true completion proportion is different from 85\%.
