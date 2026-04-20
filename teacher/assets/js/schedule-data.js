@@ -1271,7 +1271,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 5",
-    "Description": "Exam: C1 C2 C3",
+    "Description": "Exam: C1 C2 C3 Session 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C4"
@@ -1284,7 +1284,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "-",
+    "Description": "Exam: C1 C2 C3 Session 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
@@ -1297,7 +1297,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 5",
-    "Description": "-",
+    "Description": "C4: Problems on Variance and SD",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
@@ -1310,7 +1310,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "-",
+    "Description": "C5: Problems on Normal Distribution",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -1323,7 +1323,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 5",
-    "Description": "-",
+    "Description": "C4 C5: Exam",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
