@@ -1765,7 +1765,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "Exam: C1 C2 C3",
+    "Description": "Exam: C1 C2 C3 Sesion 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C4 Practice"
@@ -3754,7 +3754,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 2",
-    "Description": "Explanation videos : p-value",
+    "Description": "Exam extra class",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "Videos"
@@ -3767,7 +3767,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "C4 C5: t-test with proportion and mean",
+    "Description": "Explanation videos : p-value",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C4 C5"
@@ -3780,7 +3780,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 2",
-    "Description": "-",
+    "Description": "C4 C5: t-test with proportion and mean",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
