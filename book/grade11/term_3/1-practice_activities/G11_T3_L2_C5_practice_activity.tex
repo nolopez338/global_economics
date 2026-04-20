@@ -8,7 +8,112 @@
 \author{}
 \date{}
 
-\usepackage{tikz}
+\providecommand{\PropDecisionLine}[8]{%
+	\begin{center}
+		\begin{tikzpicture}[x=48cm,y=1cm,>=stealth]
+			\def\Zcrit{1.645}%
+			\ifnum#8=10 \def\Zcrit{1.282}\fi
+			\ifnum#8=5 \def\Zcrit{1.645}\fi
+			\ifnum#8=2 \def\Zcrit{2.054}\fi
+			\ifnum#8=1 \def\Zcrit{2.326}\fi
+			\pgfmathsetmacro{\ArrowEnd}{#1 + (#3)*(0.025)*abs(#6)}
+			\pgfmathsetmacro{\CritPos}{#1 + (#3)*(0.025)*\Zcrit}
+			\pgfmathsetmacro{\LineLeft}{#7 - 0.10}
+			\pgfmathsetmacro{\LineRight}{#7 + 0.10}
+			\pgfmathsetmacro{\TickA}{#7 - 0.08}
+			\pgfmathsetmacro{\TickB}{#7 - 0.04}
+			\pgfmathsetmacro{\TickC}{#7}
+			\pgfmathsetmacro{\TickD}{#7 + 0.04}
+			\pgfmathsetmacro{\TickE}{#7 + 0.08}
+			\draw[thick] (\LineLeft,0) -- (\LineRight,0);
+			\foreach \x in {\TickA,\TickB,\TickC,\TickD,\TickE}{
+				\draw (\x,0.025) -- (\x,-0.025);
+				\node[below,font=\scriptsize] at (\x,-0.025) {\(\pgfmathprintnumber[fixed,precision=2]{\x}\)};
+			}
+			\filldraw[black] (#1,0) circle (1.8pt);
+			\node[above,font=\scriptsize] at (#1,0.11) {\(\mu_0=#1\)};
+			\filldraw[#4] (#2,0) circle (1.8pt);
+			\node[above,font=\scriptsize,#4] at (#2,0.11) {\(\bar x=#2\)};
+			\draw[thick] (\CritPos,0.05) -- (\CritPos,0.27);
+			\node[below,font=\scriptsize] at (\CritPos,-0.24) {\(\alpha=#8\%\)};
+			\draw[->,very thick,#4] (#1,0.16) -- (\ArrowEnd,0.16);
+			\node[#4,font=\scriptsize] at (#7,-0.59) {#5};
+		\end{tikzpicture}
+	\end{center}
+}
+
+\providecommand{\PropDecisionLineTwoTail}[7]{%
+	\begin{center}
+		\begin{tikzpicture}[x=48cm,y=1cm,>=stealth]
+			\def\Zcrit{1.960}%
+			\ifnum#7=10 \def\Zcrit{1.645}\fi
+			\ifnum#7=5 \def\Zcrit{1.960}\fi
+			\ifnum#7=2 \def\Zcrit{2.326}\fi
+			\ifnum#7=1 \def\Zcrit{2.576}\fi
+			\pgfmathsetmacro{\ArrowOffset}{(0.025)*abs(#5)}
+			\pgfmathsetmacro{\LeftArrowEnd}{#1 - \ArrowOffset}
+			\pgfmathsetmacro{\RightArrowEnd}{#1 + \ArrowOffset}
+			\pgfmathsetmacro{\LeftCrit}{#1 - (0.025)*\Zcrit}
+			\pgfmathsetmacro{\RightCrit}{#1 + (0.025)*\Zcrit}
+			\pgfmathsetmacro{\LineLeft}{#6 - 0.10}
+			\pgfmathsetmacro{\LineRight}{#6 + 0.10}
+			\pgfmathsetmacro{\TickA}{#6 - 0.08}
+			\pgfmathsetmacro{\TickB}{#6 - 0.04}
+			\pgfmathsetmacro{\TickC}{#6}
+			\pgfmathsetmacro{\TickD}{#6 + 0.04}
+			\pgfmathsetmacro{\TickE}{#6 + 0.08}
+			\draw[thick] (\LineLeft,0) -- (\LineRight,0);
+			\foreach \x in {\TickA,\TickB,\TickC,\TickD,\TickE}{
+				\draw (\x,0.025) -- (\x,-0.025);
+				\node[below,font=\scriptsize] at (\x,-0.025) {\(\pgfmathprintnumber[fixed,precision=2]{\x}\)};
+			}
+			\filldraw[black] (#1,0) circle (1.8pt);
+			\node[above,font=\scriptsize] at (#1,0.11) {\(\mu_0=#1\)};
+			\filldraw[#3] (#2,0) circle (1.8pt);
+			\node[above,font=\scriptsize,#3] at (#2,0.11) {\(\bar x=#2\)};
+			\draw[thick] (\LeftCrit,0.05) -- (\LeftCrit,0.27);
+			\draw[thick] (\RightCrit,0.05) -- (\RightCrit,0.27);
+			\node[below,font=\scriptsize] at (#6,0.94) {\(\alpha=#7\%\)};
+			\draw[->,very thick,#3] (#1,0.16) -- (\LeftArrowEnd,0.16);
+			\draw[->,very thick,#3] (#1,0.16) -- (\RightArrowEnd,0.16);
+			\node[#3,font=\scriptsize] at (#6,-0.59) {#4};
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\PropDecisionLineFixed}[8]{%
+	\begin{center}
+		\begin{tikzpicture}[x=48cm,y=1cm,>=stealth]
+			\def\Zcrit{1.645}%
+			\ifnum#8=10 \def\Zcrit{1.282}\fi
+			\ifnum#8=5 \def\Zcrit{1.645}\fi
+			\ifnum#8=2 \def\Zcrit{2.054}\fi
+			\ifnum#8=1 \def\Zcrit{2.326}\fi
+			\pgfmathsetmacro{\ArrowEnd}{#1 + (#3)*(0.025)*abs(#6)}
+			\pgfmathsetmacro{\CritPos}{#1 + (#3)*(0.025)*\Zcrit}
+			\pgfmathsetmacro{\LineLeft}{#7 - 0.10}
+			\pgfmathsetmacro{\LineRight}{#7 + 0.10}
+			\pgfmathsetmacro{\TickA}{#7 - 0.08}
+			\pgfmathsetmacro{\TickB}{#7 - 0.04}
+			\pgfmathsetmacro{\TickC}{#7}
+			\pgfmathsetmacro{\TickD}{#7 + 0.04}
+			\pgfmathsetmacro{\TickE}{#7 + 0.08}
+			\draw[thick] (\LineLeft,0) -- (\LineRight,0);
+			\foreach \x in {\TickA,\TickB,\TickC,\TickD,\TickE}{
+				\draw (\x,0.025) -- (\x,-0.025);
+				\node[below,font=\scriptsize] at (\x,-0.025) {\(\pgfmathprintnumber[fixed,precision=2]{\x}\)};
+			}
+			\filldraw[black] (#1,0) circle (1.8pt);
+			\node[above,font=\scriptsize] at (#1,0.11) {\(\mu_0=#1\)};
+			\filldraw[#4] (#2,0) circle (1.8pt);
+			\node[above,font=\scriptsize,#4] at (#2,0.11) {\(\bar x=#2\)};
+			\draw[thick] (\CritPos,0.05) -- (\CritPos,0.27);
+			\node[below,font=\scriptsize] at (\CritPos,-0.24) {\(\alpha=#8\%\)};
+			\draw[->,very thick,#4] (#1,0.16) -- (\ArrowEnd,0.16);
+			\node[#4,font=\scriptsize] at (#7,-0.59) {#5};
+		\end{tikzpicture}
+	\end{center}
+}
 
 \newcommand{\NormalBase}{%
 \draw[->] (-3.4,0) -- (3.4,0);
@@ -17,54 +122,54 @@
 }
 
 \newcommand{\OneTailGraph}[4]{%
-	% #1: 0=left, 1=right; #2: z_obs; #3: optional z_crit; #4: label
-	\begin{tikzpicture}[x=0.9cm,y=3.0cm]
-		\NormalBase
-		\ifnum#1=0
-		\fill[blue!20,domain=-3.2:#2] (-3.2,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (#2,0) -- cycle;
-		\else
-		\fill[blue!20,domain=#2:3.2] (#2,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (3.2,0) -- cycle;
-		\fi
-		\def\ObsColor{black}
-		\if\relax\detokenize{#3}\relax\else
-		\pgfmathtruncatemacro{\RejectFlag}{(#1==0 && #2<=#3) || (#1==1 && #2>=#3)}
-		\ifnum\RejectFlag=1
-		\def\ObsColor{green!60!black}
-		\else
-		\def\ObsColor{red}
-		\fi
-		\draw[dashed] (#3,0) -- (#3,{0.4*exp(-#3*#3/2)});
-		\node[below] at (#3,-0.05) {\scriptsize $z_{\alpha}=#3$};
-		\fi
-		\draw[\ObsColor,dashed] (#2,0) -- (#2,{0.4*exp(-#2*#2/2)});
-		\node[above,text=\ObsColor] at (#2,{0.4*exp(-#2*#2/2)}) {\scriptsize $z_{obs}=#2$};
-		\node at (0,0.46) {\scriptsize #4};
-	\end{tikzpicture}%
+% #1: 0=left, 1=right; #2: z_obs; #3: optional z_crit; #4: label
+\begin{tikzpicture}[x=0.9cm,y=3.0cm]
+    \NormalBase
+    \ifnum#1=0
+        \fill[blue!20,domain=-3.2:#2] (-3.2,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (#2,0) -- cycle;
+    \else
+        \fill[blue!20,domain=#2:3.2] (#2,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (3.2,0) -- cycle;
+    \fi
+    \def\ObsColor{black}
+    \if\relax\detokenize{#3}\relax\else
+        \pgfmathtruncatemacro{\RejectFlag}{(#1==0 && #2<=#3) || (#1==1 && #2>=#3)}
+        \ifnum\RejectFlag=1
+            \def\ObsColor{green!60!black}
+        \else
+            \def\ObsColor{red}
+        \fi
+        \draw[dashed] (#3,0) -- (#3,{0.4*exp(-#3*#3/2)});
+        \node[below] at (#3,-0.05) {\scriptsize $z_{\alpha}=#3$};
+    \fi
+    \draw[\ObsColor,dashed] (#2,0) -- (#2,{0.4*exp(-#2*#2/2)});
+    \node[above,text=\ObsColor] at (#2,{0.4*exp(-#2*#2/2)}) {\scriptsize $z_{obs}=#2$};
+    \node at (0,0.46) {\scriptsize #4};
+\end{tikzpicture}%
 }
 
 \newcommand{\TwoTailGraph}[3]{%
-	% #1: |z_obs|; #2: optional z_crit>0; #3: label
-	\begin{tikzpicture}[x=0.9cm,y=3.0cm]
-		\NormalBase
-		\fill[blue!20,domain=-3.2:-#1] (-3.2,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (-#1,0) -- cycle;
-		\fill[blue!20,domain=#1:3.2] (#1,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (3.2,0) -- cycle;
-		\def\ObsColor{black}
-		\if\relax\detokenize{#2}\relax\else
-		\pgfmathtruncatemacro{\RejectFlag}{#1>=#2}
-		\ifnum\RejectFlag=1
-		\def\ObsColor{green!60!black}
-		\else
-		\def\ObsColor{red}
-		\fi
-		\draw[dashed] (#2,0) -- (#2,{0.4*exp(-#2*#2/2)});
-		\draw[dashed] (-#2,0) -- (-#2,{0.4*exp(-#2*#2/2)});
-		\node[below] at (#2,-0.05) {\scriptsize $z_{\alpha/2}=#2$};
-		\fi
-		\draw[\ObsColor,dashed] (-#1,0) -- (-#1,{0.4*exp(-#1*#1/2)});
-		\draw[\ObsColor,dashed] (#1,0) -- (#1,{0.4*exp(-#1*#1/2)});
-		\node[above,text=\ObsColor] at (#1,{0.4*exp(-#1*#1/2)}) {\scriptsize $|z_{obs}|=#1$};
-		\node at (0,0.46) {\scriptsize #3};
-	\end{tikzpicture}%
+% #1: |z_obs|; #2: optional z_crit>0; #3: label
+\begin{tikzpicture}[x=0.9cm,y=3.0cm]
+    \NormalBase
+    \fill[blue!20,domain=-3.2:-#1] (-3.2,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (-#1,0) -- cycle;
+    \fill[blue!20,domain=#1:3.2] (#1,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (3.2,0) -- cycle;
+    \def\ObsColor{black}
+    \if\relax\detokenize{#2}\relax\else
+        \pgfmathtruncatemacro{\RejectFlag}{#1>=#2}
+        \ifnum\RejectFlag=1
+            \def\ObsColor{green!60!black}
+        \else
+            \def\ObsColor{red}
+        \fi
+        \draw[dashed] (#2,0) -- (#2,{0.4*exp(-#2*#2/2)});
+        \draw[dashed] (-#2,0) -- (-#2,{0.4*exp(-#2*#2/2)});
+        \node[below] at (#2,-0.05) {\scriptsize $z_{\alpha/2}=#2$};
+    \fi
+    \draw[\ObsColor,dashed] (-#1,0) -- (-#1,{0.4*exp(-#1*#1/2)});
+    \draw[\ObsColor,dashed] (#1,0) -- (#1,{0.4*exp(-#1*#1/2)});
+    \node[above,text=\ObsColor] at (#1,{0.4*exp(-#1*#1/2)}) {\scriptsize $|z_{obs}|=#1$};
+    \node at (0,0.46) {\scriptsize #3};
+\end{tikzpicture}%
 }
 
 \begin{document}
@@ -77,379 +182,1303 @@
 
 \section*{Evaluated criteria}
 \begin{itemize}
-    \item C5: Calculates hypothesis tests on the mean of a population.
+    \item C5: Calculates hypothesis tests on the mean of a population in counting contexts.
 \end{itemize}
 
-\section{General Problem (One-Sample Mean \texorpdfstring{\(z\)}{z}-Test Template)}
-A benchmark claim concerns a population mean \(\mu\). A random sample of size \(n\) has sample mean \(\bar x\), and the population standard deviation \(\sigma\) is known. At significance level \(\alpha\), test whether the true mean is lower than, higher than, or different from the benchmark \(\mu_0\).
+
+\section{General Problem (One-Sample Mean Test Template in Counting Contexts)}
+A benchmark claim concerns a population mean count. A random sample of size \(n\) has \(x\) successes, so \(\bar x=x/n\). At significance level \(\alpha\), test whether the true mean count is lower than, higher than, or different from the benchmark \(\mu_0\).
+
+\textbf{Reference table for common significance levels}
+
+\begin{center}
+	\renewcommand{\arraystretch}{1.3}
+	\begin{tabular}{|c|c|c|}
+		\hline
+		\textbf{Significance level} & \textbf{Upper-tail p-value} & \textbf{\(z_\alpha\) such that \(P(Z>z_\alpha)=\alpha\)} \\
+		\hline
+		\(10\%\) & \(0.10\) & \(1.282\) \\
+		\hline
+		\(5\%\) & \(0.05\) & \(1.645\) \\
+		\hline
+		\(2\%\) & \(0.02\) & \(2.054\) \\
+		\hline
+		\(1\%\) & \(0.01\) & \(2.326\) \\
+		\hline
+	\end{tabular}
+\end{center}
 
 \textbf{Questions/Tasks.}
 \begin{enumerate}
-    \item[(a)] Identify the population parameter and write hypotheses for lower-tail, higher-tail, and two-tailed alternatives.
-    \item[(b)] Write the one-sample mean \(z\)-test statistic.
-    \item[(c)] State how p-values are computed for each tail type.
-    \item[(d)] State the decision rule using p-value and \(\alpha\).
-    \item[(e)] Write a contextual conclusion template for reject/fail-to-reject outcomes.
+	\item[(a)] Identify the population parameter and write hypotheses for lower-tail, higher-tail, and two-tailed alternatives.
+	\item[(b)] State the condition checks for a one-sample mean count \(z\)-test.
+	\item[(c)] Write the one-sample mean count test statistic.
+	\item[(d)] State how the p-value is computed for lower-tail, higher-tail, and two-tailed tests.
+	\item[(e)] State the decision rule and write a contextual conclusion template.
 \end{enumerate}
 
 \subsection*{C5}
 \begin{itemize}
-    \item \textbf{Parameter:} \(\mu\) = true population mean in context.
-    \item \textbf{Hypotheses:}
-    \[
-    H_0\colon \mu=\mu_0,\qquad
-    H_a\colon \mu<\mu_0\ \text{or}\ \mu>\mu_0\ \text{or}\ \mu\ne\mu_0.
-    \]
-    \item \textbf{Test statistic (known \(\sigma\)):}
-    \[
-    z=\frac{\bar x-\mu_0}{\sigma/\sqrt{n}}.
-    \]
-    \item \textbf{p-value by tail type:}
-    \begin{itemize}
-        \item Lower-tail: \(P(Z\le z_{obs})\)
-        \item Higher-tail: \(P(Z\ge z_{obs})\)
-        \item Two-tailed: \(2P(Z\ge |z_{obs}|)\)
-    \end{itemize}
-    \item \textbf{Decision rule:} Reject \(H_0\) if p-value \(\le\alpha\); otherwise fail to reject \(H_0\).
-    \item \textbf{Conclusion template:} ``There is sufficient evidence'' (reject \(H_0\)) or ``There is not enough evidence'' (fail to reject \(H_0\)) for the contextual claim in \(H_a\).
+	\item \textbf{Parameter:} \(\mu\) = true population mean count for the context.
+	\item \textbf{Hypotheses:}
+	\[
+	H_0\colon \mu=\mu_0,\qquad
+	H_a\colon \mu<\mu_0\ \text{or}\ \mu>\mu_0\ \text{or}\ \mu\ne \mu_0.
+	\]
+	\item \textbf{Conditions:} Check \(n\mu_0\ge 10\) and \(n(1-\mu_0)\ge 10\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{\bar x-\mu_0}{\sqrt{\frac{\mu_0(1-\mu_0)}{n}}}.
+	\]
+	\item \textbf{p-value by tail type:}
+	\begin{itemize}
+		\item Lower-tail: \(P(Z\le z_{obs})\)
+		\item Higher-tail: \(P(Z\ge z_{obs})\)
+		\item Two-tailed: \(2P(Z\ge |z_{obs}|)\)
+	\end{itemize}
+	\item \textbf{Decision rule:} Reject \(H_0\) if p-value \(\le \alpha\); otherwise fail to reject \(H_0\).
+	\item \textbf{Conclusion template:} ``There is sufficient evidence'' (reject \(H_0\)) or ``There is not enough evidence'' (fail to reject \(H_0\)) for the contextual claim in \(H_a\).
 \end{itemize}
 
 \begin{center}
-\OneTailGraph{0}{-1.20}{}{Lower-tail template}
-\hspace{0.8cm}
-\OneTailGraph{1}{1.20}{}{Higher-tail template}
-\hspace{0.8cm}
-\TwoTailGraph{1.20}{}{Two-tailed template}
+	\OneTailGraph{0}{-1.20}{}{Lower-tail template}
+	\hspace{0.8cm}
+	\OneTailGraph{1}{1.20}{}{Higher-tail template}
+	\hspace{0.8cm}
+	\TwoTailGraph{1.20}{}{Two-tailed template}
 \end{center}
+		
+		
+\section{On-time assignment completion mean count (introductory higher-tail)}
+		A school reports that students submit an average of 0.72 on-time assignments per assignment opportunity (counting variable: 1 for on time, 0 for not on time). Consider two random samples:
+		\begin{itemize}
+		\item Sample A has 250 assignments, of which 190 are submitted on time.
+		\item Sample B has 500 assignments, of which 380 are submitted on time.
+		\end{itemize}
+		Notice that both samples have the same sample mean count. At \(\alpha=5\%\), test whether the true on-time mean count is higher than 0.72 for each sample.
+		
+	\subsection*{C5}
+	\begin{itemize}
+	\item \textbf{Parameter:} \(\mu\) = true mean number of on-time submissions per assignment opportunity (0 or 1).
+		\item \textbf{Hypotheses:} \(H_0\colon \mu=0.72\), \(H_a\colon \mu>0.72\).
+	\end{itemize}
+	
+	\textbf{Sample A}
+	
+	\begin{itemize}
+	\item \textbf{Conditions:} \(n\mu_0=250(0.72)=180\ge10\), \(n(1-\mu_0)=250(0.28)=70\ge10\).
+	\item \textbf{Sample mean count:} \(\bar x=190/250=0.76\).
+		\item \textbf{Test statistic:}
+		\[
+		z=\frac{0.76-0.72}{\sigma/\sqrt{250}}\approx 1.41,\quad \sigma=\sqrt{0.72(0.28)}\approx0.4489.
+		\]
+		\item \textbf{p-value:} \(P(Z\ge 1.41)\approx 0.0795\).
+		\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.0795>0.05\).
+		\item \textbf{Conclusion:} There is not enough evidence that the true on-time submission mean count is above 0.72.
+		\end{itemize}
+		
+	\begin{center}
+	\OneTailGraph{1}{1.41}{1.645}{Sample A higher-tail test: \(H_a:\mu>0.72\)}
+	\end{center}
+		
+	\PropDecisionLine{0.72}{0.76}{1}{red}{fail to reject \(H_0\)}{1.41}{0.72}{5}
 
-\section{Average commute time after schedule redesign (introductory lower-tail)}
-A company benchmark for average commute time is 42 minutes. After a schedule redesign, a random sample of 100 employees has mean commute time 41.0 minutes. The population standard deviation is known to be 5 minutes. At \(\alpha=5\%\), test whether the true mean commute time is lower than 42 minutes.
+	
+	\textbf{Sample B}
+	
+	\begin{itemize}
+	\item \textbf{Conditions:} \(n\mu_0=500(0.72)=360\ge10\), \(n(1-\mu_0)=500(0.28)=140\ge10\).
+	\item \textbf{Sample mean count:} \(\bar x=380/500=0.76\).
+		\item \textbf{Test statistic:}
+		\[
+	z=\frac{0.76-0.72}{\sigma/\sqrt{500}}\approx 1.99,\quad \sigma=\sqrt{0.72(0.28)}\approx0.4489.
+	\]
+	\item \textbf{p-value:} \(P(Z\ge 1.99)\approx 0.0232\).
+	\item \textbf{Decision:} Reject \(H_0\) since \(0.0232<0.05\).
+	\item \textbf{Conclusion:} There is enough evidence that the true on-time submission mean count is above 0.72.
+		\end{itemize}
+		
+	\begin{center}
+	\OneTailGraph{1}{1.99}{1.645}{Sample B higher-tail test: \(H_a:\mu>0.72\)}
+	\end{center}
+	
+	\PropDecisionLine{0.72}{0.76}{1}{green!60!black}{reject \(H_0\)}{1.99}{0.72}{5}
+
+		
+	Although both samples have the same sample mean count \(\bar x=0.76\), the larger sample gives a more positive test statistic and a smaller p-value because the standard error is smaller.
+		
+\section{On-time assignment completion mean count (introductory lower-tail)}
+A school reports that students submit an average of 0.72 on-time assignments per assignment opportunity (counting variable: 1 for on time, 0 for not on time). Consider two random samples:
+\begin{itemize}
+	\item Sample A has 250 assignments, of which 170 are submitted on time.
+	\item Sample B has 500 assignments, of which 340 are submitted on time.
+\end{itemize}
+Notice that both samples have the same sample mean count. At \(\alpha=5\%\), test whether the true on-time mean count is lower than 0.72 for each sample.
 
 \subsection*{C5}
 \begin{itemize}
-    \item \textbf{Hypotheses:} \(H_0\colon \mu=42\), \(H_a\colon \mu<42\).
-    \item \textbf{Test statistic:}
-    \[
-    z=\frac{41.0-42}{5/\sqrt{100}}=\frac{-1.0}{0.5}=-2.00.
-    \]
-    \item \textbf{p-value:} \(P(Z\le -2.00)\approx 0.0228\).
-    \item \textbf{Decision:} Reject \(H_0\) since \(0.0228<0.05\).
-    \item \textbf{Conclusion:} There is sufficient evidence that the true mean commute time is below 42 minutes.
+	\item \textbf{Parameter:} \(\mu\) = true mean number of on-time submissions per assignment opportunity (0 or 1).
+	\item \textbf{Hypotheses:} \(H_0\colon \mu=0.72\), \(H_a\colon \mu<0.72\).
+\end{itemize}
+
+\textbf{Sample A}
+
+\begin{itemize}
+	\item \textbf{Conditions:} \(n\mu_0=250(0.72)=180\ge10\), \(n(1-\mu_0)=250(0.28)=70\ge10\).
+	\item \textbf{Sample mean count:} \(\bar x=170/250=0.68\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.68-0.72}{\sqrt{\frac{\sigma^2}{250}}}\approx -1.41.
+	\]
+	\item \textbf{p-value:} \(P(Z\le -1.41)\approx 0.0795\).
+	\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.0795>0.05\).
+	\item \textbf{Conclusion:} There is not enough evidence that the true on-time submission mean count is below 0.72.
 \end{itemize}
 
 \begin{center}
-\OneTailGraph{0}{-2.00}{-1.645}{Lower-tail mean test}
+	\OneTailGraph{0}{-1.41}{-1.645}{Sample A lower-tail test: \(H_a:\mu<0.72\)}
 \end{center}
 
-\section{Average monthly spending on phone plans (introductory higher-tail)}
-A provider benchmark is 45 dollars per month for average phone-plan spending. A random sample of 64 customers has mean spending 46.2 dollars. The known population standard deviation is 8 dollars. At \(\alpha=5\%\), test whether the true mean spending is higher than 45 dollars.
+\PropDecisionLine{0.72}{0.68}{-1}{red}{fail to reject \(H_0\)}{1.41}{0.72}{5}
+
+\textbf{Sample B}
+
+\begin{itemize}
+	\item \textbf{Conditions:} \(n\mu_0=500(0.72)=360\ge10\), \(n(1-\mu_0)=500(0.28)=140\ge10\).
+	\item \textbf{Sample mean count:} \(\bar x=340/500=0.68\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.68-0.72}{\sqrt{\frac{\sigma^2}{500}}}\approx -1.99.
+	\]
+	\item \textbf{p-value:} \(P(Z\le -1.99)\approx 0.0232\).
+	\item \textbf{Decision:} Reject \(H_0\) since \(0.0232<0.05\).
+	\item \textbf{Conclusion:} There is enough evidence that the true on-time submission mean count is below 0.72.
+\end{itemize}
+
+\begin{center}
+	\OneTailGraph{0}{-1.99}{-1.645}{Sample B lower-tail test: \(H_a:\mu<0.72\)}
+\end{center}
+
+\PropDecisionLine{0.72}{0.68}{-1}{green!60!black}{reject \(H_0\)}{1.99}{0.72}{5}
+
+Although both samples have the same sample mean count \(\bar x=0.68\), the larger sample gives a more negative test statistic and a smaller p-value because the standard error is smaller.
+\section{On-time assignment completion mean count (introductory two-tailed)}
+A school reports that students submit an average of 0.72 on-time assignments per assignment opportunity (counting variable: 1 for on time, 0 for not on time). Consider two random samples:
+\begin{itemize}
+	\item Sample A has 250 assignments, of which 190 are submitted on time.
+	\item Sample B has 500 assignments, of which 380 are submitted on time.
+\end{itemize}
+Notice that both samples have the same sample mean count. At \(\alpha=5\%\), test whether the true on-time mean count is different from 0.72 for each sample.
 
 \subsection*{C5}
 \begin{itemize}
-    \item \textbf{Hypotheses:} \(H_0\colon \mu=45\), \(H_a\colon \mu>45\).
-    \item \textbf{Test statistic:}
-    \[
-    z=\frac{46.2-45}{8/\sqrt{64}}=1.20.
-    \]
-    \item \textbf{p-value:} \(P(Z\ge 1.20)\approx 0.1151\).
-    \item \textbf{Decision:} Fail to reject \(H_0\) since \(0.1151>0.05\).
-    \item \textbf{Conclusion:} There is not enough evidence that the true mean spending exceeds 45 dollars.
+	\item \textbf{Parameter:} \(\mu\) = true mean number of on-time submissions per assignment opportunity (0 or 1).
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon \mu=0.72\), \(H_a\colon \mu\ne0.72\).
+\end{itemize}
+
+\textbf{Sample A}
+
+\begin{itemize}
+	\item \textbf{Conditions:} \(n\mu_0=250(0.72)=180\ge10\), \(n(1-\mu_0)=250(0.28)=70\ge10\).
+	\item \textbf{Sample mean count:} \(\bar x=190/250=0.76\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.76-0.72}{\sigma/\sqrt{250}}\approx 1.41,\quad \sigma=\sqrt{0.72(0.28)}\approx0.4489.
+	\]
+	\item \textbf{p-value:} \(2P(Z\ge 1.41)\approx 0.1590\).
+	\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.1590>0.05\).
+	\item \textbf{Conclusion:} There is not enough evidence that the true on-time submission mean count is different from 0.72.
 \end{itemize}
 
 \begin{center}
-\OneTailGraph{1}{1.20}{1.645}{Higher-tail mean test}
+	\TwoTailGraph{1.41}{1.96}{Sample A two-tailed test: \(H_a:\mu\ne0.72\)}
 \end{center}
 
-\section{Average monthly commuting cost (introductory two-tailed)}
-A benchmark for average monthly commuting cost is 220 dollars. A random sample of 64 workers has mean cost 224 dollars. The known population standard deviation is 15 dollars. At \(\alpha=5\%\), test whether the true mean is different from 220 dollars.
+\PropDecisionLineTwoTail{0.72}{0.76}{red}{fail to reject \(H_0\)}{1.41}{0.72}{5}
+
+\textbf{Sample B}
+
+\begin{itemize}
+	\item \textbf{Conditions:} \(n\mu_0=500(0.72)=360\ge10\), \(n(1-\mu_0)=500(0.28)=140\ge10\).
+	\item \textbf{Sample mean count:} \(\bar x=380/500=0.76\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.76-0.72}{\sigma/\sqrt{500}}\approx 1.99,\quad \sigma=\sqrt{0.72(0.28)}\approx0.4489.
+	\]
+	\item \textbf{p-value:} \(2P(Z\ge 1.99)\approx 0.0464\).
+	\item \textbf{Decision:} Reject \(H_0\) since \(0.0464<0.05\).
+	\item \textbf{Conclusion:} There is enough evidence that the true on-time submission mean count is different from 0.72.
+\end{itemize}
+
+\begin{center}
+	\TwoTailGraph{1.99}{1.96}{Sample B two-tailed test: \(H_a:\mu\ne0.72\)}
+\end{center}
+
+\PropDecisionLineTwoTail{0.72}{0.76}{green!60!black}{reject \(H_0\)}{1.99}{0.72}{5}
+
+Although both samples have the same sample mean count \(\bar x=0.76\), the larger sample gives a larger absolute test statistic and a smaller p-value because the standard error is smaller.
+
+\section{Platform adoption rate after training (higher-tail test compared across three significance levels)}
+A district dashboard states that teachers average 0.40 regular uses of a new digital platform per observation period (counting variable: 1 if used regularly, 0 otherwise). After training, a random sample of 300 teachers shows 138 regular users. At significance levels \(\alpha=1\%\), \(\alpha=2\%\), and \(\alpha=5\%\), test whether the true adoption mean count is higher than 0.40.
 
 \subsection*{C5}
 \begin{itemize}
-    \item \textbf{Hypotheses:} \(H_0\colon \mu=220\), \(H_a\colon \mu\ne220\).
-    \item \textbf{Test statistic:}
-    \[
-    z=\frac{224-220}{15/\sqrt{64}}\approx 2.13.
-    \]
-    \item \textbf{p-value:} \(2P(Z\ge 2.13)\approx 0.0332\).
-    \item \textbf{Decision:} Reject \(H_0\) since \(0.0332<0.05\).
-    \item \textbf{Conclusion:} There is sufficient evidence that the true mean commuting cost differs from 220 dollars.
+	\item \textbf{Parameter:} \(\mu\) = true mean number of regular platform uses per observation period (0 or 1).
+	\item \textbf{Hypotheses at \(\alpha=1\%\), \(\alpha=2\%\), and \(\alpha=5\%\):} \(H_0\colon \mu=0.40\), \(H_a\colon \mu>0.40\).
+	\item \textbf{Conditions:} \(n\mu_0=120\ge10\), \(n(1-\mu_0)=180\ge10\).
+	\item \textbf{Sample mean count:} \(\bar x=138/300=0.46\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.46-0.40}{\sqrt{\frac{\sigma^2}{300}}}\approx 2.12.
+	\]
+	\item \textbf{p-value:} \(P(Z\ge 2.12)\approx 0.0170\).
+	\item \textbf{Decision at \(\alpha=5\%\):} Reject \(H_0\) since \(0.0170<0.05\).
+	\item \textbf{Decision at \(\alpha=2\%\):} Reject \(H_0\) since \(0.0170<0.02\).
+	\item \textbf{Decision at \(\alpha=1\%\):} Fail to reject \(H_0\) since \(0.0170>0.01\).
+	\item \textbf{Conclusion:} The null hypothesis is rejected at the 5\% and 2\% significance levels, but it is not rejected at the 1\% significance level. Therefore, only one of the three significance levels fails to reject \(H_0\).
 \end{itemize}
 
 \begin{center}
-\TwoTailGraph{2.13}{1.96}{Two-tailed mean test}
+	\OneTailGraph{1}{2.12}{1.645}{Higher-tail test at \(\alpha=5\%\): \(H_a:\mu>0.40\)}
 \end{center}
 
-\section{Average processing time sensitivity (lower-tail)}
-A service desk benchmark is 18.0 minutes for average request processing time. A random sample of 144 requests has mean 17.65 minutes. The known population standard deviation is 2.1 minutes. Test whether the true mean is lower than 18.0 minutes at \(\alpha=5\%\) and \(\alpha=1\%\).
+\PropDecisionLine{0.40}{0.46}{1}{green!60!black}{reject \(H_0\)}{2.12}{0.40}{5}
+
+\begin{center}
+	\OneTailGraph{1}{2.12}{2.054}{Higher-tail test at \(\alpha=2\%\): \(H_a:\mu>0.40\)}
+\end{center}
+
+\PropDecisionLine{0.40}{0.46}{1}{green!60!black}{reject \(H_0\)}{2.12}{0.40}{2}
+
+\begin{center}
+	\OneTailGraph{1}{2.12}{2.326}{Higher-tail test at \(\alpha=1\%\): \(H_a:\mu>0.40\)}
+\end{center}
+
+\PropDecisionLine{0.40}{0.46}{1}{red}{fail to reject \(H_0\)}{2.12}{0.40}{1}
+
+\section{Platform adoption rate after training (lower-tail test compared across three significance levels)}
+A district dashboard states that teachers average 0.40 regular uses of a new digital platform per observation period (counting variable: 1 if used regularly, 0 otherwise). After training, a random sample of 300 teachers shows 102 regular users. At significance levels \(\alpha=1\%\), \(\alpha=2\%\), and \(\alpha=5\%\), test whether the true adoption mean count is lower than 0.40.
 
 \subsection*{C5}
 \begin{itemize}
-    \item \textbf{Hypotheses:} \(H_0\colon \mu=18.0\), \(H_a\colon \mu<18.0\).
-    \item \textbf{Test statistic:}
-    \[
-    z=\frac{17.65-18.0}{2.1/\sqrt{144}}=\frac{-0.35}{0.175}=-2.00.
-    \]
-    \item \textbf{p-value:} \(P(Z\le -2.00)\approx 0.0228\).
-    \item \textbf{Decision at 5\%:} Reject \(H_0\).
-    \item \textbf{Decision at 1\%:} Fail to reject \(H_0\).
-    \item \textbf{Sensitivity note:} Data and statistic stay fixed; only \(\alpha\) changes the decision.
+	\item \textbf{Parameter:} \(\mu\) = true mean number of regular platform uses per observation period (0 or 1).
+	\item \textbf{Hypotheses at \(\alpha=1\%\), \(\alpha=2\%\), and \(\alpha=5\%\):} \(H_0\colon \mu=0.40\), \(H_a\colon \mu<0.40\).
+	\item \textbf{Conditions:} \(n\mu_0=120\ge10\), \(n(1-\mu_0)=180\ge10\).
+	\item \textbf{Sample mean count:} \(\bar x=102/300=0.34\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.34-0.40}{\sqrt{\frac{\sigma^2}{300}}}\approx -2.12.
+	\]
+	\item \textbf{p-value:} \(P(Z\le -2.12)\approx 0.0170\).
+	\item \textbf{Decision at \(\alpha=5\%\):} Reject \(H_0\) since \(0.0170<0.05\).
+	\item \textbf{Decision at \(\alpha=2\%\):} Reject \(H_0\) since \(0.0170<0.02\).
+	\item \textbf{Decision at \(\alpha=1\%\):} Fail to reject \(H_0\) since \(0.0170>0.01\).
+	\item \textbf{Conclusion:} The null hypothesis is rejected at the 5\% and 2\% significance levels, but it is not rejected at the 1\% significance level. Therefore, only one of the three significance levels fails to reject \(H_0\).
 \end{itemize}
 
 \begin{center}
-\OneTailGraph{0}{-2.00}{-1.645}{\(\alpha=5\%\)}
-\hspace{0.8cm}
-\OneTailGraph{0}{-2.00}{-2.326}{\(\alpha=1\%\)}
+	\OneTailGraph{0}{-2.12}{-1.645}{Lower-tail test at \(\alpha=5\%\): \(H_a:\mu<0.40\)}
 \end{center}
 
-\section{Average monthly savings sensitivity (higher-tail)}
-A financial planner benchmark is 240 dollars for average monthly emergency savings. A random sample of 64 workers has mean savings 243.3 dollars. The known population standard deviation is 12 dollars. Test whether the true mean is higher than 240 dollars at \(\alpha=5\%\) and \(\alpha=1\%\).
+\PropDecisionLine{0.40}{0.34}{-1}{green!60!black}{reject \(H_0\)}{2.12}{0.40}{5}
+
+\begin{center}
+	\OneTailGraph{0}{-2.12}{-2.054}{Lower-tail test at \(\alpha=2\%\): \(H_a:\mu<0.40\)}
+\end{center}
+
+\PropDecisionLine{0.40}{0.34}{-1}{green!60!black}{reject \(H_0\)}{2.12}{0.40}{2}
+
+\begin{center}
+	\OneTailGraph{0}{-2.12}{-2.326}{Lower-tail test at \(\alpha=1\%\): \(H_a:\mu<0.40\)}
+\end{center}
+
+\PropDecisionLine{0.40}{0.34}{-1}{red}{fail to reject \(H_0\)}{2.12}{0.40}{1}
+
+\section{Platform adoption rate after training (two-tailed test compared across three significance levels)}
+A district dashboard states that teachers average 0.40 regular uses of a new digital platform per observation period (counting variable: 1 if used regularly, 0 otherwise). After training, a random sample of 300 teachers shows 138 regular users. At significance levels \(\alpha=1\%\), \(\alpha=2\%\), and \(\alpha=5\%\), test whether the true adoption mean count is different from 0.40.
 
 \subsection*{C5}
 \begin{itemize}
-    \item \textbf{Hypotheses:} \(H_0\colon \mu=240\), \(H_a\colon \mu>240\).
-    \item \textbf{Test statistic:}
-    \[
-    z=\frac{243.3-240}{12/\sqrt{64}}=2.20.
-    \]
-    \item \textbf{p-value:} \(P(Z\ge 2.20)\approx 0.0139\).
-    \item \textbf{Decision at 5\%:} Reject \(H_0\).
-    \item \textbf{Decision at 1\%:} Fail to reject \(H_0\).
-    \item \textbf{Sensitivity note:} One sample supports different decisions under different significance thresholds.
+	\item \textbf{Parameter:} \(\mu\) = true mean number of regular platform uses per observation period (0 or 1).
+	\item \textbf{Hypotheses at \(\alpha=1\%\), \(\alpha=2\%\), and \(\alpha=5\%\):} \(H_0\colon \mu=0.40\), \(H_a\colon \mu\ne0.40\).
+	\item \textbf{Conditions:} \(n\mu_0=120\ge10\), \(n(1-\mu_0)=180\ge10\).
+	\item \textbf{Sample mean count:} \(\bar x=138/300=0.46\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.46-0.40}{\sqrt{\frac{\sigma^2}{300}}}\approx 2.12.
+	\]
+	\item \textbf{p-value:} \(2P(Z\ge 2.12)\approx 0.0340\).
+	\item \textbf{Decision at \(\alpha=5\%\):} Reject \(H_0\) since \(0.0340<0.05\).
+	\item \textbf{Decision at \(\alpha=2\%\):} Fail to reject \(H_0\) since \(0.0340>0.02\).
+	\item \textbf{Decision at \(\alpha=1\%\):} Fail to reject \(H_0\) since \(0.0340>0.01\).
+	\item \textbf{Conclusion:} The null hypothesis is rejected at the 5\% significance level, but it is not rejected at the 2\% and 1\% significance levels.
 \end{itemize}
 
 \begin{center}
-\OneTailGraph{1}{2.20}{1.645}{\(\alpha=5\%\)}
-\hspace{0.8cm}
-\OneTailGraph{1}{2.20}{2.326}{\(\alpha=1\%\)}
+\TwoTailGraph{2.12}{1.96}{Two-tailed test at \(\alpha=5\%\): \(H_a:\mu\ne0.40\)}
 \end{center}
 
-\section{Average mathematics score sensitivity (two-tailed)}
-A district benchmark for average mathematics score is 70 points. A random sample of 196 students has mean score 71.4 points. The known population standard deviation is 9.8 points. Test whether the true mean differs from 70 at \(\alpha=5\%\) and \(\alpha=1\%\).
+\PropDecisionLineTwoTail{0.40}{0.46}{green!60!black}{Reject \(H_0\)}{2.12}{0.42}{5}
+
+
+\begin{center}
+\TwoTailGraph{2.12}{2.326}{Two-tailed test at \(\alpha=2\%\): \(H_a:\mu\ne0.40\)}
+\end{center}
+
+\PropDecisionLineTwoTail{0.40}{0.46}{red}{Fail to reject \(H_0\)}{2.12}{0.42}{2}
+
+\begin{center}
+	\TwoTailGraph{2.12}{2.576}{Two-tailed test at \(\alpha=1\%\): \(H_a:\mu\ne0.40\)}
+\end{center}
+
+\PropDecisionLineTwoTail{0.40}{0.46}{red}{Fail to reject \(H_0\)}{2.12}{0.42}{1}
+
+\section{On-time assignment completion mean count (comparison of lower-tail and higher-tail tests in two samples)}
+A school reports that students submit an average of 0.72 on-time assignments per assignment opportunity (counting variable: 1 for on time, 0 for not on time). Consider two random samples:
+\begin{itemize}
+	\item Sample A has 250 assignments, of which 168 are submitted on time.
+	\item Sample B has 500 assignments, of which 377 are submitted on time.
+\end{itemize}
+For learning purposes, apply both one-sided tests to each sample, even though in Sample A the observed mean count is below 0.72 and in Sample B the observed mean count is above 0.72. At \(\alpha=5\%\), test whether the true on-time mean count is lower than 0.72 and whether it is higher than 0.72 for each sample.
 
 \subsection*{C5}
 \begin{itemize}
-    \item \textbf{Hypotheses:} \(H_0\colon \mu=70\), \(H_a\colon \mu\ne70\).
-    \item \textbf{Test statistic:}
-    \[
-    z=\frac{71.4-70}{9.8/\sqrt{196}}=2.00.
-    \]
-    \item \textbf{p-value:} \(2P(Z\ge2.00)\approx0.0456\).
-    \item \textbf{Decision at 5\%:} Reject \(H_0\).
-    \item \textbf{Decision at 1\%:} Fail to reject \(H_0\).
-    \item \textbf{Sensitivity note:} The evidence is threshold-sensitive for the two-tailed formulation.
+	\item \textbf{Parameter:} \(\mu\) = true mean number of on-time submissions per assignment opportunity (0 or 1).
+\end{itemize}
+
+\textbf{Sample A}
+
+\begin{itemize}
+	\item \textbf{Conditions:} \(n\mu_0=250(0.72)=180\ge10\), \(n(1-\mu_0)=250(0.28)=70\ge10\).
+	\item \textbf{Sample mean count:} \(\bar x=168/250=0.672\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.672-0.72}{\sqrt{\frac{\sigma^2}{250}}}\approx -1.69.
+	\]
+\end{itemize}
+
+\textbf{Test 1: Lower-tail test for Sample A}
+
+\begin{itemize}
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon \mu=0.72\), \(H_a\colon \mu<0.72\).
+	\item \textbf{p-value:} \(P(Z\le -1.69)\approx 0.0455\).
+	\item \textbf{Decision:} Reject \(H_0\) since \(0.0455<0.05\).
+	\item \textbf{Conclusion:} There is sufficient evidence that the true on-time submission mean count is below 0.72.
 \end{itemize}
 
 \begin{center}
-\TwoTailGraph{2.00}{1.96}{\(\alpha=5\%\)}
-\hspace{0.8cm}
-\TwoTailGraph{2.00}{2.576}{\(\alpha=1\%\)}
+	\OneTailGraph{0}{-1.69}{-1.645}{Sample A lower-tail test: \(H_a:\mu<0.72\)}
 \end{center}
 
-\section{Average monthly gym visits: lower vs higher (same evidence)}
-A health benchmark is 10 gym visits per month. A random sample of 81 members has mean 9.2 visits. The known population standard deviation is 2.4 visits. Use \(\alpha=5\%\).
+\PropDecisionLine{0.72}{0.672}{-1}{green!60!black}{reject \(H_0\)}{1.69}{0.72}{5}
 
-\textbf{Questions/Tasks.}
-\begin{enumerate}
-    \item[(a)] Test \(H_a\colon \mu<10\).
-    \item[(b)] Test \(H_a\colon \mu>10\).
-\end{enumerate}
+\textbf{Test 2: Higher-tail test for Sample A}
 
-\subsection*{C5}
-\textbf{Common setup}
 \begin{itemize}
-    \item \(z=\dfrac{9.2-10}{2.4/\sqrt{81}}\approx -3.00\).
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon \mu=0.72\), \(H_a\colon \mu>0.72\).
+	\item \textbf{p-value:} \(P(Z\ge -1.69)\approx 0.9545\).
+	\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.9545>0.05\).
+	\item \textbf{Conclusion:} There is not enough evidence that the true on-time submission mean count is above 0.72.
 \end{itemize}
-
-\textbf{Part (a): Lower-tail}
-\begin{itemize}
-    \item p-value \(\approx0.0013\), reject \(H_0\).
-\end{itemize}
-
-\textbf{Part (b): Higher-tail}
-\begin{itemize}
-    \item p-value \(\approx0.9987\), fail to reject \(H_0\).
-\end{itemize}
-
-\textbf{Comparison note:} Direction alone changes tail area and decision.
 
 \begin{center}
-\textbf{(a)}\;\OneTailGraph{0}{-3.00}{-1.645}{Lower-tail}
-\hspace{0.8cm}
-\textbf{(b)}\;\OneTailGraph{1}{-3.00}{1.645}{Higher-tail}
+	\OneTailGraph{1}{-1.69}{1.645}{Sample A higher-tail test: \(H_a:\mu>0.72\)}
 \end{center}
 
-\section{Average sleep hours: lower vs different (same evidence)}
-A wellness benchmark is 7.0 hours of sleep per night. A random sample of 100 students has mean sleep 6.8 hours. The known population standard deviation is 1.0 hour. Use \(\alpha=5\%\).
+\PropDecisionLine{0.72}{0.672}{1}{red}{fail to reject \(H_0\)}{1.69}{0.72}{5}
 
-\textbf{Questions/Tasks.}
-\begin{enumerate}
-    \item[(a)] Test \(H_a\colon \mu<7.0\).
-    \item[(b)] Test \(H_a\colon \mu\ne7.0\).
-\end{enumerate}
+\textbf{Sample B}
 
-\subsection*{C5}
-\textbf{Common setup}
 \begin{itemize}
-    \item \(z=\dfrac{6.8-7.0}{1.0/\sqrt{100}}=-2.00\).
+	\item \textbf{Conditions:} \(n\mu_0=500(0.72)=360\ge10\), \(n(1-\mu_0)=500(0.28)=140\ge10\).
+	\item \textbf{Sample mean count:} \(\bar x=377/500=0.754\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.754-0.72}{\sqrt{\frac{\sigma^2}{500}}}\approx 1.69.
+	\]
 \end{itemize}
 
-\textbf{Part (a): Lower-tail}
-\begin{itemize}
-    \item p-value \(\approx0.0228\), reject \(H_0\).
-\end{itemize}
+\textbf{Test 1: Lower-tail test for Sample B}
 
-\textbf{Part (b): Two-tailed}
 \begin{itemize}
-    \item p-value \(\approx0.0456\), reject \(H_0\).
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon \mu=0.72\), \(H_a\colon \mu<0.72\).
+	\item \textbf{p-value:} \(P(Z\le 1.69)\approx 0.9545\).
+	\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.9545>0.05\).
+	\item \textbf{Conclusion:} There is not enough evidence that the true on-time submission mean count is below 0.72.
 \end{itemize}
-
-\textbf{Comparison note:} The two-tailed p-value is larger, but both tests reject at 5\%.
 
 \begin{center}
-\textbf{(a)}\;\OneTailGraph{0}{-2.00}{-1.645}{Lower-tail}
-\hspace{0.8cm}
-\textbf{(b)}\;\TwoTailGraph{2.00}{1.96}{Two-tailed}
+	\OneTailGraph{0}{1.69}{-1.645}{Sample B lower-tail test: \(H_a:\mu<0.72\)}
 \end{center}
 
-\section{Average call duration: higher vs different (same evidence)}
-A call-center benchmark for average call duration is 6.0 minutes. A random sample of 100 calls has mean duration 6.50 minutes. The known population standard deviation is 1.5 minutes. Use \(\alpha=5\%\).
+\PropDecisionLine{0.72}{0.754}{-1}{red}{fail to reject \(H_0\)}{1.69}{0.72}{5}
 
-\textbf{Questions/Tasks.}
-\begin{enumerate}
-    \item[(a)] Test \(H_a\colon \mu>6.0\).
-    \item[(b)] Test \(H_a\colon \mu\ne6.0\).
-\end{enumerate}
+\textbf{Test 2: Higher-tail test for Sample B}
 
-\subsection*{C5}
-\textbf{Common setup}
 \begin{itemize}
-    \item \(z=\dfrac{6.50-6.0}{1.5/\sqrt{100}}=3.33\).
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon \mu=0.72\), \(H_a\colon \mu>0.72\).
+	\item \textbf{p-value:} \(P(Z\ge 1.69)\approx 0.0455\).
+	\item \textbf{Decision:} Reject \(H_0\) since \(0.0455<0.05\).
+	\item \textbf{Conclusion:} There is sufficient evidence that the true on-time submission mean count is above 0.72.
 \end{itemize}
-
-\textbf{Part (a): Higher-tail}
-\begin{itemize}
-    \item p-value \(\approx0.0004\), reject \(H_0\).
-\end{itemize}
-
-\textbf{Part (b): Two-tailed}
-\begin{itemize}
-    \item p-value \(\approx0.0008\), reject \(H_0\).
-\end{itemize}
-
-\textbf{Comparison note:} Both formulations reject; the two-tailed p-value is larger but still very small.
 
 \begin{center}
-\textbf{(a)}\;\OneTailGraph{1}{3.33}{1.645}{Higher-tail}
-\hspace{0.8cm}
-\textbf{(b)}\;\TwoTailGraph{3.33}{1.96}{Two-tailed}
+	\OneTailGraph{1}{1.69}{1.645}{Sample B higher-tail test: \(H_a:\mu>0.72\)}
 \end{center}
 
-\section{Average monthly subscriptions cost: lower vs higher vs different (same evidence)}
-A finance benchmark for average subscriptions cost is 32 dollars per month. A random sample of 49 workers has mean cost 32.7 dollars. The known population standard deviation is 7 dollars. Use \(\alpha=5\%\).
+\PropDecisionLine{0.72}{0.754}{1}{green!60!black}{reject \(H_0\)}{1.69}{0.72}{5}
 
-\textbf{Questions/Tasks.}
-\begin{enumerate}
-    \item[(a)] Test \(H_a\colon \mu<32\).
-    \item[(b)] Test \(H_a\colon \mu>32\).
-    \item[(c)] Test \(H_a\colon \mu\ne32\).
-\end{enumerate}
+In Sample A, the observed mean count is below the benchmark, so the lower-tail alternative is the direction supported by the data. In Sample B, the observed mean count is above the benchmark, so the higher-tail alternative is the direction supported by the data.
+
+\section{On-time assignment completion mean count (comparison of lower-tail and higher-tail tests in two samples, all fail to reject)}
+A school reports that students submit an average of 0.72 on-time assignments per assignment opportunity (counting variable: 1 for on time, 0 for not on time). Consider two random samples:
+\begin{itemize}
+	\item Sample A has 250 assignments, of which 173 are submitted on time.
+	\item Sample B has 500 assignments, of which 372 are submitted on time.
+\end{itemize}
+For learning purposes, apply both one-sided tests to each sample, even though in Sample A the observed mean count is below 0.72 and in Sample B the observed mean count is above 0.72. At \(\alpha=5\%\), test whether the true on-time mean count is lower than 0.72 and whether it is higher than 0.72 for each sample.
 
 \subsection*{C5}
 \begin{itemize}
-    \item \(z=\dfrac{32.7-32}{7/\sqrt{49}}=0.70\).
-    \item Lower-tail p-value \(\approx0.7580\), fail to reject \(H_0\).
-    \item Higher-tail p-value \(\approx0.2420\), fail to reject \(H_0\).
-    \item Two-tailed p-value \(\approx0.4840\), fail to reject \(H_0\).
-    \item \textbf{Conclusion:} All three formulations fail to reject, giving a stable non-signal case.
+	\item \textbf{Parameter:} \(\mu\) = true mean number of on-time submissions per assignment opportunity (0 or 1).
+\end{itemize}
+
+\textbf{Sample A}
+
+\begin{itemize}
+	\item \textbf{Conditions:} \(n\mu_0=250(0.72)=180\ge10\), \(n(1-\mu_0)=250(0.28)=70\ge10\).
+	\item \textbf{Sample mean count:} \(\bar x=173/250=0.692\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.692-0.72}{\sqrt{\frac{\sigma^2}{250}}}\approx -0.99.
+	\]
+\end{itemize}
+
+\textbf{Test 1: Lower-tail test for Sample A}
+
+\begin{itemize}
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon \mu=0.72\), \(H_a\colon \mu<0.72\).
+	\item \textbf{p-value:} \(P(Z\le -0.99)\approx 0.1611\).
+	\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.1611>0.05\).
+	\item \textbf{Conclusion:} There is not enough evidence that the true on-time submission mean count is below 0.72.
 \end{itemize}
 
 \begin{center}
-\textbf{(a)}\;\OneTailGraph{0}{0.70}{-1.645}{Lower-tail}
-\hspace{0.5cm}
-\textbf{(b)}\;\OneTailGraph{1}{0.70}{1.645}{Higher-tail}
-\hspace{0.5cm}
-\textbf{(c)}\;\TwoTailGraph{0.70}{1.96}{Two-tailed}
+	\OneTailGraph{0}{-0.99}{-1.645}{Sample A lower-tail test: \(H_a:\mu<0.72\)}
 \end{center}
 
-\section{Synthesis case A: strict-threshold non-rejection pattern}
-A benchmark for average support response time is 12.0 minutes. A random sample of 196 calls has mean 11.3 minutes. The known population standard deviation is 4.9 minutes. Use \(\alpha=1\%\).
+\PropDecisionLine{0.72}{0.692}{-1}{red}{fail to reject \(H_0\)}{0.99}{0.72}{5}
 
-\textbf{Questions/Tasks.}
-\begin{enumerate}
-    \item[(a)] Test \(H_a\colon \mu<12.0\).
-    \item[(b)] Test \(H_a\colon \mu>12.0\).
-    \item[(c)] Test \(H_a\colon \mu\ne12.0\).
-\end{enumerate}
+\textbf{Test 2: Higher-tail test for Sample A}
+
+\begin{itemize}
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon \mu=0.72\), \(H_a\colon \mu>0.72\).
+	\item \textbf{p-value:} \(P(Z\ge -0.99)\approx 0.8389\).
+	\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.8389>0.05\).
+	\item \textbf{Conclusion:} There is not enough evidence that the true on-time submission mean count is above 0.72.
+\end{itemize}
+
+\begin{center}
+	\OneTailGraph{1}{-0.99}{1.645}{Sample A higher-tail test: \(H_a:\mu>0.72\)}
+\end{center}
+
+\PropDecisionLine{0.72}{0.692}{1}{red}{fail to reject \(H_0\)}{0.99}{0.72}{5}
+
+\textbf{Sample B}
+
+\begin{itemize}
+	\item \textbf{Conditions:} \(n\mu_0=500(0.72)=360\ge10\), \(n(1-\mu_0)=500(0.28)=140\ge10\).
+	\item \textbf{Sample mean count:} \(\bar x=372/500=0.744\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.744-0.72}{\sqrt{\frac{\sigma^2}{500}}}\approx 1.20.
+	\]
+\end{itemize}
+
+\textbf{Test 1: Lower-tail test for Sample B}
+
+\begin{itemize}
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon \mu=0.72\), \(H_a\colon \mu<0.72\).
+	\item \textbf{p-value:} \(P(Z\le 1.20)\approx 0.8849\).
+	\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.8849>0.05\).
+	\item \textbf{Conclusion:} There is not enough evidence that the true on-time submission mean count is below 0.72.
+\end{itemize}
+
+\begin{center}
+	\OneTailGraph{0}{1.20}{-1.645}{Sample B lower-tail test: \(H_a:\mu<0.72\)}
+\end{center}
+
+\PropDecisionLine{0.72}{0.744}{-1}{red}{fail to reject \(H_0\)}{1.20}{0.72}{5}
+
+\textbf{Test 2: Higher-tail test for Sample B}
+
+\begin{itemize}
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon \mu=0.72\), \(H_a\colon \mu>0.72\).
+	\item \textbf{p-value:} \(P(Z\ge 1.20)\approx 0.1151\).
+	\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.1151>0.05\).
+	\item \textbf{Conclusion:} There is not enough evidence that the true on-time submission mean count is above 0.72.
+\end{itemize}
+
+\begin{center}
+	\OneTailGraph{1}{1.20}{1.645}{Sample B higher-tail test: \(H_a:\mu>0.72\)}
+\end{center}
+
+\PropDecisionLine{0.72}{0.744}{1}{red}{fail to reject \(H_0\)}{1.20}{0.72}{5}
+
+In Sample A, the observed mean count is below the benchmark, so the lower-tail alternative is the direction supported by the data. In Sample B, the observed mean count is above the benchmark, so the higher-tail alternative is the direction supported by the data. However, in both samples the evidence is not strong enough at the \(5\%\) significance level, so all tests fail to reject \(H_0\).
+
+\section{Compliance with safety checklist (Comparison of higher-tail and two-tailed I)}
+A quality team states that 0.85 of shifts complete a safety checklist. In a random sample of 320 shifts, 288 completed the checklist. At \(\alpha=5\%\), test both whether the true completion mean count is higher than 0.85 and whether the true completion mean count is different from 0.85.
 
 \subsection*{C5}
 \begin{itemize}
-    \item \(z=\dfrac{11.3-12.0}{4.9/\sqrt{196}}=-2.00\).
-    \item Lower-tail p-value \(\approx0.0228\), fail to reject \(H_0\) at 1\%.
-    \item Higher-tail p-value \(\approx0.9772\), fail to reject \(H_0\).
-    \item Two-tailed p-value \(\approx0.0456\), fail to reject \(H_0\) at 1\%.
-    \item \textbf{Conclusion:} All tests fail to reject under a strict threshold.
+	\item \textbf{Parameter:} \(\mu\) = true mean number of completed safety checklists per request (0 or 1).
+	\item \textbf{Conditions:} \(n\mu_0=272\ge10\), \(n(1-\mu_0)=48\ge10\).
+	\item \textbf{Sample mean count:} \(\bar x=288/320=0.90\).
+\end{itemize}
+
+\textbf{Test 1: Higher-tail test}
+
+\begin{itemize}
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon \mu=0.85\), \(H_a\colon \mu>0.85\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.90-0.85}{\sqrt{\frac{\sigma^2}{320}}}\approx 2.50.
+	\]
+	\item \textbf{p-value:} \(P(Z\ge 2.50)\approx 0.0062\).
+	\item \textbf{Decision:} Reject \(H_0\) since \(0.0062<0.05\).
+	\item \textbf{Conclusion:} There is sufficient evidence that the true checklist-completion mean count is higher than 0.85.
 \end{itemize}
 
 \begin{center}
-\textbf{(a)}\;\OneTailGraph{0}{-2.00}{-2.326}{Lower-tail (1\%)}
-\hspace{0.5cm}
-\textbf{(b)}\;\OneTailGraph{1}{-2.00}{2.326}{Higher-tail (1\%)}
-\hspace{0.5cm}
-\textbf{(c)}\;\TwoTailGraph{2.00}{2.576}{Two-tailed (1\%)}
+	\OneTailGraph{1}{2.50}{1.645}{Higher-tail test: \(H_a:\mu>0.85\)}
 \end{center}
 
-\section{Synthesis case B: one-direction-only rejection}
-A benchmark for average waiting time is 18.0 minutes. A random sample of 81 customers has mean waiting time 17.29 minutes. The known population standard deviation is 3.3 minutes. Use \(\alpha=5\%\).
+\PropDecisionLine{0.85}{0.90}{1}{green!60!black}{reject \(H_0\)}{2.50}{0.85}{5}
 
-\textbf{Questions/Tasks.}
-\begin{enumerate}
-    \item[(a)] Test \(H_a\colon \mu<18.0\).
-    \item[(b)] Test \(H_a\colon \mu>18.0\).
-    \item[(c)] Test \(H_a\colon \mu\ne18.0\).
-\end{enumerate}
+\textbf{Test 2: Two-tailed test}
+
+\begin{itemize}
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon \mu=0.85\), \(H_a\colon \mu\ne0.85\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.90-0.85}{\sqrt{\frac{\sigma^2}{320}}}\approx 2.50.
+	\]
+	\item \textbf{p-value:} \(2P(Z\ge 2.50)\approx 0.0124\).
+	\item \textbf{Decision:} Reject \(H_0\) since \(0.0124<0.05\).
+	\item \textbf{Conclusion:} There is sufficient evidence that the true checklist-completion mean count is different from 0.85.
+\end{itemize}
+
+\begin{center}
+	\TwoTailGraph{2.50}{1.96}{Two-tailed test: \(H_a:\mu\ne0.85\)}
+\end{center}
+
+\PropDecisionLineTwoTail{0.85}{0.90}{green!60!black}{reject \(H_0\)}{2.50}{0.85}{5}
+
+\section{Compliance with safety checklist (Comparison of higher-tail and two-tailed II)}
+A quality team states that 0.85 of shifts complete a safety checklist. In a random sample of 320 shifts, 282 completed the checklist. At \(\alpha=5\%\), test both whether the true completion mean count is higher than 0.85 and whether the true completion mean count is different from 0.85.
 
 \subsection*{C5}
 \begin{itemize}
-    \item \(z=\dfrac{17.29-18.0}{3.3/\sqrt{81}}=\dfrac{-0.71}{0.3667}\approx-1.94\).
-    \item Lower-tail p-value \(\approx0.0262\), reject \(H_0\).
-    \item Higher-tail p-value \(\approx0.9332\), fail to reject \(H_0\).
-    \item Two-tailed p-value \(\approx0.0524\), fail to reject \(H_0\).
-    \item \textbf{Conclusion:} Only the lower-direction test rejects; the opposite direction and two-tailed test fail to reject.
+	\item \textbf{Parameter:} \(\mu\) = true mean number of completed safety checklists per request (0 or 1).
+	\item \textbf{Conditions:} \(n\mu_0=272\ge10\), \(n(1-\mu_0)=48\ge10\).
+	\item \textbf{Sample mean count:} \(\bar x=282/320=0.88125\).
+\end{itemize}
+
+\textbf{Test 1: Higher-tail test}
+
+\begin{itemize}
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon \mu=0.85\), \(H_a\colon \mu>0.85\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.88125-0.85}{\sqrt{\frac{\sigma^2}{320}}}\approx 1.57.
+	\]
+	\item \textbf{p-value:} \(P(Z\ge 1.57)\approx 0.0582\).
+	\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.0582>0.05\).
+	\item \textbf{Conclusion:} There is not enough evidence that the true checklist-completion mean count is higher than 0.85.
 \end{itemize}
 
 \begin{center}
-\textbf{(a)}\;\OneTailGraph{0}{-1.94}{-1.645}{Lower-tail}
-\hspace{0.5cm}
-\textbf{(b)}\;\OneTailGraph{1}{-1.94}{1.645}{Higher-tail}
-\hspace{0.5cm}
-\textbf{(c)}\;\TwoTailGraph{1.94}{1.96}{Two-tailed}
+	\OneTailGraph{1}{1.57}{1.645}{Higher-tail test: \(H_a:\mu>0.85\)}
 \end{center}
 
-\section{Synthesis case C: directional and two-tailed rejection with opposite-direction non-rejection}
-An employer benchmark is 8 sick days used per year on average. A random sample of 144 employees has mean sick days 7.4. The known population standard deviation is 2.4 days. Use \(\alpha=5\%\).
+\PropDecisionLine{0.85}{0.88125}{1}{red}{fail to reject \(H_0\)}{1.57}{0.85}{5}
 
-\textbf{Questions/Tasks.}
-\begin{enumerate}
-    \item[(a)] Test \(H_a\colon \mu>8\).
-    \item[(b)] Test \(H_a\colon \mu<8\).
-    \item[(c)] Test \(H_a\colon \mu\ne8\).
-\end{enumerate}
+\textbf{Test 2: Two-tailed test}
+
+\begin{itemize}
+	\item \textbf{Hypotheses at \(\alpha=5\%\):} \(H_0\colon \mu=0.85\), \(H_a\colon \mu\ne0.85\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.88125-0.85}{\sqrt{\frac{\sigma^2}{320}}}\approx 1.57.
+	\]
+	\item \textbf{p-value:} \(2P(Z\ge 1.57)\approx 0.1164\).
+	\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.1164>0.05\).
+	\item \textbf{Conclusion:} There is not enough evidence that the true checklist-completion mean count is different from 0.85.
+\end{itemize}
+
+\begin{center}
+	\TwoTailGraph{1.57}{1.96}{Two-tailed test: \(H_a:\mu\ne0.85\)}
+\end{center}
+
+\PropDecisionLineTwoTail{0.85}{0.88125}{red}{fail to reject \(H_0\)}{1.57}{0.85}{5}
+
+\section{Compliance with safety checklist (Comparison of higher-tail and two-tailed III)}
+A quality team states that 0.85 of shifts complete a safety checklist. In a random sample of 320 shifts, 284 completed the checklist. At \(\alpha=5\%\), test both whether the true completion mean count is higher than 0.85 and whether the true completion mean count is different from 0.85.
 
 \subsection*{C5}
 \begin{itemize}
-    \item \(z=\dfrac{7.4-8}{2.4/\sqrt{144}}=-3.00\).
-    \item Higher-tail p-value \(\approx0.9987\), fail to reject \(H_0\).
-    \item Lower-tail p-value \(\approx0.0013\), reject \(H_0\).
-    \item Two-tailed p-value \(\approx0.0026\), reject \(H_0\).
-    \item \textbf{Conclusion:} One directional test and the two-tailed test reject, while the opposite direction does not.
+	\item \textbf{Parameter:} \(\mu\) = true mean number of completed safety checklists per request (0 or 1).
+	\item \textbf{Conditions:} \(n\mu_0=272\ge10\), \(n(1-\mu_0)=48\ge10\).
+	\item \textbf{Sample mean count:} \(\bar x=284/320=0.8875\).
+\end{itemize}
+
+\textbf{Test 1: Higher-tail test}
+
+\begin{itemize}
+	\item \textbf{Hypotheses:} \(H_0\colon \mu=0.85\), \(H_a\colon \mu>0.85\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.8875-0.85}{\sqrt{\frac{\sigma^2}{320}}}\approx 1.88.
+	\]
+	\item \textbf{p-value:} \(P(Z\ge 1.88)\approx 0.0301\).
+	\item \textbf{Decision:} Reject \(H_0\) since \(0.0301<0.05\).
+	\item \textbf{Conclusion:} There is sufficient evidence that the true checklist-completion mean count is higher than 0.85.
 \end{itemize}
 
 \begin{center}
-\textbf{(a)}\;\OneTailGraph{1}{-3.00}{1.645}{Higher-tail}
-\hspace{0.5cm}
-\textbf{(b)}\;\OneTailGraph{0}{-3.00}{-1.645}{Lower-tail}
-\hspace{0.5cm}
-\textbf{(c)}\;\TwoTailGraph{3.00}{1.96}{Two-tailed}
+	\OneTailGraph{1}{1.88}{1.645}{Higher-tail test: \(H_a:\mu>0.85\)}
+\end{center}
+
+\PropDecisionLine{0.85}{0.8875}{1}{green!60!black}{reject \(H_0\)}{1.88}{0.85}{5}
+
+\textbf{Test 2: Two-tailed test}
+
+\begin{itemize}
+	\item \textbf{Hypotheses:} \(H_0\colon \mu=0.85\), \(H_a\colon \mu\ne0.85\).
+	\item \textbf{Test statistic:}
+	\[
+	z=\frac{0.8875-0.85}{\sqrt{\frac{\sigma^2}{320}}}\approx 1.88.
+	\]
+	\item \textbf{p-value:} \(2P(Z\ge 1.88)\approx 0.0602\).
+	\item \textbf{Decision:} Fail to reject \(H_0\) since \(0.0602>0.05\).
+	\item \textbf{Conclusion:} There is not enough evidence that the true checklist-completion mean count is different from 0.85.
+\end{itemize}
+
+\begin{center}
+	\TwoTailGraph{1.88}{1.96}{Two-tailed test: \(H_a:\mu\ne0.85\)}
+\end{center}
+
+\PropDecisionLineTwoTail{0.85}{0.8875}{red}{fail to reject \(H_0\)}{1.88}{0.85}{5}
+
+\section{On-time assignment completion mean count (higher-tail test with fixed sample mean count and variable sample size)}
+A school reports that students submit an average of 0.72 on-time assignments per assignment opportunity (counting variable: 1 for on time, 0 for not on time). Suppose that for samples of different sizes, the observed sample mean count is always
+\[
+\bar x=0.76.
+\]
+At significance levels \(\alpha=10\%\), \(\alpha=5\%\), and \(\alpha=1\%\), test whether the true on-time mean count is higher than 0.72, and describe how the value of the test statistic changes as the sample size \(n\) increases.
+
+\subsection*{C5}
+\begin{itemize}
+	\item \textbf{Parameter:} \(\mu\) = true mean number of on-time submissions per assignment opportunity (0 or 1).
+	\item \textbf{Hypotheses at \(\alpha=10\%\), \(\alpha=5\%\), and \(\alpha=1\%\):} \(H_0\colon \mu=0.72\), \(H_a\colon \mu>0.72\).
+	\item \textbf{Condition:} For a one-sample mean count test, check
+	\[
+	n\mu_0=n(0.72)\ge10
+	\qquad\text{and}\qquad
+	n(1-\mu_0)=n(0.28)\ge10.
+	\]
+	Since
+	\[
+	n\ge \frac{10}{0.28}\approx 35.72,
+	\]
+	the conditions are satisfied for \(n\ge36\).
+	\item \textbf{Sample mean count:} \(\bar x=0.76\).
+	\item \textbf{Test statistic as a function of \(n\):}
+	\[
+	z(n)=\frac{0.76-0.72}{\sqrt{\frac{\sigma^2}{n}}}.
+	\]
+	Simplifying,
+	\[
+	z(n)=\frac{0.04}{\sqrt{\frac{0.2016}{n}}}
+	=\frac{0.04\sqrt{n}}{\sqrt{0.2016}}
+	\approx 0.0891\sqrt{n}.
+	\]
+	\item \textbf{p-value as a function of \(n\):}
+	\[
+	p\text{-value}(n)=P(Z\ge z(n)).
+	\]
+	Since this is a higher-tail test,
+	\[
+	p\text{-value}(n)=1-\Phi(z(n)),
+	\]
+	where \(\Phi\) is the standard normal cumulative distribution function.
+	\item \textbf{Interpretation of the formulas:} Since \(z(n)\approx 0.0891\sqrt{n}\), the test statistic increases as \(n\) increases when the sample mean count stays fixed at \(0.76\). Therefore, the p-value decreases as \(n\) increases.
+	\item \textbf{Critical values:} For a higher-tail test,
+	\[
+	z_{10\%}=1.282,\qquad z_{5\%}=1.645,\qquad z_{1\%}=2.326.
+	\]
+	\item \textbf{When does rejection begin?} Reject \(H_0\) when \(z(n)>z_\alpha\).
+	
+	At \(\alpha=10\%\),
+	\[
+	0.0891\sqrt{n}>1.282
+	\]
+	so
+	\[
+	\sqrt{n}>\frac{1.282}{0.0891}\approx 14.39,
+	\qquad
+	n>207.0.
+	\]
+	So rejection begins for
+	\[
+	n\ge208.
+	\]
+	
+	At \(\alpha=5\%\),
+	\[
+	0.0891\sqrt{n}>1.645
+	\]
+	so
+	\[
+	\sqrt{n}>\frac{1.645}{0.0891}\approx 18.46,
+	\qquad
+	n>340.9.
+	\]
+	So rejection begins for
+	\[
+	n\ge341.
+	\]
+	
+	At \(\alpha=1\%\),
+	\[
+	0.0891\sqrt{n}>2.326
+	\]
+	so
+	\[
+	\sqrt{n}>\frac{2.326}{0.0891}\approx 26.11,
+	\qquad
+	n>681.5.
+	\]
+	So rejection begins for
+	\[
+	n\ge682.
+	\]
+	
+	\item \textbf{Sample 1: \(n=250\).}
+	\[
+	z(250)\approx 0.0891\sqrt{250}\approx 1.41,
+	\qquad
+	p\text{-value}(250)\approx 0.0795.
+	\]
+	
+	At \(\alpha=10\%\), reject \(H_0\) since \(0.0795<0.10\).
+	
+	\begin{center}
+		\OneTailGraph{1}{1.41}{1.282}{Higher-tail test for \(n=250\) at \(\alpha=10\%\): \(H_a:\mu>0.72\)}
+	\end{center}
+	
+	\PropDecisionLine{0.72}{0.76}{1}{green!60!black}{reject \(H_0\)}{1.41}{0.72}{10}
+	
+	At \(\alpha=5\%\), fail to reject \(H_0\) since \(0.0795>0.05\).
+	
+	\begin{center}
+		\OneTailGraph{1}{1.41}{1.645}{Higher-tail test for \(n=250\) at \(\alpha=5\%\): \(H_a:\mu>0.72\)}
+	\end{center}
+	
+	\PropDecisionLine{0.72}{0.76}{1}{red}{fail to reject \(H_0\)}{1.41}{0.72}{5}
+	
+	At \(\alpha=1\%\), fail to reject \(H_0\) since \(0.0795>0.01\).
+	
+	\begin{center}
+		\OneTailGraph{1}{1.41}{2.326}{Higher-tail test for \(n=250\) at \(\alpha=1\%\): \(H_a:\mu>0.72\)}
+	\end{center}
+	
+	\PropDecisionLine{0.72}{0.76}{1}{red}{fail to reject \(H_0\)}{1.41}{0.72}{1}
+	
+	\item \textbf{Sample 2: \(n=500\).}
+	\[
+	z(500)\approx 0.0891\sqrt{500}\approx 1.99,
+	\qquad
+	p\text{-value}(500)\approx 0.0232.
+	\]
+	
+	At \(\alpha=10\%\), reject \(H_0\) since \(0.0232<0.10\).
+	
+	\begin{center}
+		\OneTailGraph{1}{1.99}{1.282}{Higher-tail test for \(n=500\) at \(\alpha=10\%\): \(H_a:\mu>0.72\)}
+	\end{center}
+	
+	\PropDecisionLine{0.72}{0.76}{1}{green!60!black}{reject \(H_0\)}{1.99}{0.72}{10}
+	
+	At \(\alpha=5\%\), reject \(H_0\) since \(0.0232<0.05\).
+	
+	\begin{center}
+		\OneTailGraph{1}{1.99}{1.645}{Higher-tail test for \(n=500\) at \(\alpha=5\%\): \(H_a:\mu>0.72\)}
+	\end{center}
+	
+	\PropDecisionLine{0.72}{0.76}{1}{green!60!black}{reject \(H_0\)}{1.99}{0.72}{5}
+	
+	At \(\alpha=1\%\), fail to reject \(H_0\) since \(0.0232>0.01\).
+	
+	\begin{center}
+		\OneTailGraph{1}{1.99}{2.326}{Higher-tail test for \(n=500\) at \(\alpha=1\%\): \(H_a:\mu>0.72\)}
+	\end{center}
+	
+	\PropDecisionLine{0.72}{0.76}{1}{red}{fail to reject \(H_0\)}{1.99}{0.72}{1}
+	
+	\item \textbf{Conclusion:} If the sample mean count remains fixed at \(0.76\), then increasing the sample size increases the test statistic and decreases the p-value. As a result, rejection of \(H_0\) first occurs at the \(10\%\) level, then at the \(5\%\) level, and finally at the \(1\%\) level as \(n\) becomes large enough.
+\end{itemize}
+
+\begin{center}
+	\begin{tikzpicture}[x=0.015cm,y=2.5cm]
+		\draw[->] (0,0) -- (730,0) node[right] {$n$};
+		\draw[->] (0,0) -- (0,2.9) node[above] {$z(n)$};
+		
+		\foreach \x in {100,200,300,400,500,600,700}{
+			\draw (\x,0.03) -- (\x,-0.03);
+			\node[below,font=\scriptsize] at (\x,0) {\x};
+		}
+		
+		\foreach \y/\label in {0.5/0.5,1.0/1.0,1.5/1.5,2.0/2.0,2.5/2.5}{
+			\draw (3,\y) -- (-3,\y);
+			\node[left,font=\scriptsize] at (0,\y) {\label};
+		}
+		
+		\draw[thick] plot[smooth] coordinates {
+			(36,0.5345)
+			(100,0.8909)
+			(200,1.2599)
+			(208,1.2824)
+			(250,1.4086)
+			(300,1.5430)
+			(341,1.6451)
+			(400,1.7817)
+			(500,1.9920)
+			(600,2.1822)
+			(682,2.3261)
+			(700,2.3570)
+		};
+		
+		\draw[dashed,green] (0,1.282) -- (730,1.282);
+		\draw[dashed,blue] (0,1.645) -- (730,1.645);
+		\draw[dashed,purple] (0,2.326) -- (730,2.326);
+		
+		\draw[dashed,green] (208,0) -- (208,2.9);
+		\draw[dashed,blue] (341,0) -- (341,2.9);
+		\draw[dashed,purple] (682,0) -- (682,2.9);
+		
+		\fill (250,1.4086) circle (2pt);
+		\draw (250,1.4086) -- (255,1.18);
+		\node[font=\scriptsize,right] at (255,1.18) {\( (250,1.41) \)};
+		
+		\fill (500,1.9920) circle (2pt);
+		\draw (500,1.9920) -- (525,1.95);
+		\node[font=\scriptsize,right] at (525,1.95) {\( (500,1.99) \)};
+		
+		\node[font=\small] at (350,2.72) {$n$ vs.\ test statistic};
+		
+		\filldraw[white,draw=black, rounded corners=3pt] (520,1.02) rectangle (930,1.78);
+		
+		\draw[green,thick] (530,1.62) -- (555,1.62);
+		\node[anchor=west,font=\scriptsize] at (560,1.62) {\(\alpha=10\%\), \(z_{10\%}=1.282\), cutoff \(n=208\)};
+		
+		\draw[blue,thick] (530,1.47) -- (555,1.47);
+		\node[anchor=west,font=\scriptsize] at (560,1.47) {\(\alpha=5\%\), \(z_{5\%}=1.645\), cutoff \(n=341\)};
+		
+		\draw[purple,thick] (530,1.32) -- (555,1.32);
+		\node[anchor=west,font=\scriptsize] at (560,1.32) {\(\alpha=1\%\), \(z_{1\%}=2.326\), cutoff \(n=682\)};
+		
+		\draw[black,thick] (530,1.17) -- (555,1.17);
+		\node[anchor=west,font=\scriptsize] at (560,1.17) {\(z(n)=0.0891\sqrt{n}\)};
+	\end{tikzpicture}
+\end{center}
+
+\begin{center}
+	\begin{tikzpicture}[x=0.015cm,y=14cm]
+		\draw[->] (0,0) -- (730,0) node[right] {$n$};
+		\draw[->] (0,0) -- (0,0.34) node[above] {p-value};
+		
+		\foreach \x in {100,200,300,400,500,600,700}{
+			\draw (\x,0.006) -- (\x,-0.006);
+			\node[below,font=\scriptsize] at (\x,0) {\x};
+		}
+		
+		\foreach \y/\label in {0.01/0.01,0.05/0.05,0.10/0.10,0.15/0.15,0.20/0.20,0.25/0.25,0.30/0.30}{
+			\draw (3,\y) -- (-3,\y);
+			\node[left,font=\scriptsize] at (0,\y) {\label};
+		}
+		
+		\draw[thick] plot[smooth] coordinates {
+			(36,0.2965)
+			(100,0.1865)
+			(200,0.1039)
+			(208,0.0995)
+			(250,0.0795)
+			(300,0.0614)
+			(341,0.0500)
+			(400,0.0374)
+			(500,0.0232)
+			(600,0.0145)
+			(682,0.0100)
+			(700,0.0092)
+		};
+		
+		\draw[dashed,green] (0,0.10) -- (730,0.10);
+		\draw[dashed,blue] (0,0.05) -- (730,0.05);
+		\draw[dashed,purple] (0,0.01) -- (730,0.01);
+		
+		\draw[dashed,green] (208,0) -- (208,0.34);
+		\draw[dashed,blue] (341,0) -- (341,0.34);
+		\draw[dashed,purple] (682,0) -- (682,0.34);
+		
+		\fill (250,0.0795) circle (2pt);
+		\draw (250,0.0795) -- (290,0.115);
+		\node[font=\scriptsize,right] at (290,0.115) {\( (250,0.0795) \)};
+		
+		\fill (500,0.0232) circle (2pt);
+		\draw (500,0.0232) -- (540,0.055);
+		\node[font=\scriptsize,right] at (540,0.055) {\( (500,0.0232) \)};
+		
+		\node[font=\small] at (350,0.325) {$n$ vs.\ p-value};
+		
+		\filldraw[white,draw=black, rounded corners=3pt] (420,0.225) rectangle (700,0.325);
+		
+		\draw[green,thick] (430,0.305) -- (455,0.305);
+		\node[anchor=west,font=\scriptsize] at (460,0.305) {\(\alpha=10\%\), cutoff \(n=208\)};
+		
+		\draw[blue,thick] (430,0.285) -- (455,0.285);
+		\node[anchor=west,font=\scriptsize] at (460,0.285) {\(\alpha=5\%\), cutoff \(n=341\)};
+		
+		\draw[purple,thick] (430,0.265) -- (455,0.265);
+		\node[anchor=west,font=\scriptsize] at (460,0.265) {\(\alpha=1\%\), cutoff \(n=682\)};
+		
+		\draw[black,thick] (430,0.245) -- (455,0.245);
+		\node[anchor=west,font=\scriptsize] at (460,0.245) {\(p\text{-value}(n)=1-\Phi(z(n))\)};
+	\end{tikzpicture}
+\end{center}
+
+\section{Workshop attendance rate (higher-tail test with fixed sample size and variable sample mean count)}
+A school reports that students attend an average of 0.72 workshops per weekly opportunity (counting variable: 1 if attended, 0 if not). Suppose that the sample size is fixed at
+\[
+n=400,
+\]
+and that the observed sample mean count \(\bar x\) varies from one sample to another. At significance levels \(\alpha=10\%\), \(\alpha=5\%\), and \(\alpha=1\%\), test whether the true attendance mean count is higher than 0.72, and describe how the value of the test statistic and the p-value change as the observed sample mean count changes.
+
+\subsection*{C5}
+\begin{itemize}
+	\item \textbf{Parameter:} \(\mu\) = true mean number of workshop attendances per weekly opportunity (0 or 1).
+	
+	\item \textbf{Hypotheses at \(\alpha=10\%\), \(\alpha=5\%\), and \(\alpha=1\%\):}
+	\[
+	H_0\colon \mu=0.72,
+	\qquad
+	H_a\colon \mu>0.72.
+	\]
+	
+	\item \textbf{Conditions:} For a one-sample mean count test, check
+	\[
+	n\mu_0=400(0.72)=288\ge10
+	\qquad\text{and}\qquad
+	n(1-\mu_0)=400(0.28)=112\ge10.
+	\]
+	So the normal conditions are satisfied.
+	
+	\item \textbf{Test statistic as a function of \(\bar x\):}
+	\[
+	z(\bar x)=\frac{\bar x-0.72}{\sqrt{\frac{\sigma^2}{400}}}.
+	\]
+	Since
+	\[
+	\sqrt{\frac{\sigma^2}{400}}=\sqrt{0.000504}\approx 0.02245,
+	\]
+	we obtain
+	\[
+	z(\bar x)\approx \frac{\bar x-0.72}{0.02245}
+	\approx 44.54(\bar x-0.72).
+	\]
+	
+	\item \textbf{p-value as a function of \(\bar x\):} Since this is a higher-tail test,
+	\[
+	p\text{-value}(\bar x)=P(Z\ge z(\bar x))=1-\Phi(z(\bar x)).
+	\]
+	
+	\item \textbf{Interpretation of the formulas:} As \(\bar x\) increases, the quantity \(\bar x-0.72\) increases, so the test statistic \(z(\bar x)\) increases. Since the p-value is
+	\[
+	1-\Phi(z(\bar x)),
+	\]
+	the p-value decreases as \(\bar x\) increases.
+	
+	\item \textbf{Critical values:}
+	\[
+	z_{10\%}=1.282,
+	\qquad
+	z_{5\%}=1.645,
+	\qquad
+	z_{1\%}=2.326.
+	\]
+	
+	\item \textbf{Rejection thresholds in terms of \(\bar x\):} Reject \(H_0\) when
+	\[
+	z(\bar x)>z_\alpha.
+	\]
+	
+	At \(\alpha=10\%\),
+	\[
+	44.54(\bar x-0.72)>1.282,
+	\]
+	so
+	\[
+	\bar x-0.72>\frac{1.282}{44.54}\approx 0.0288,
+	\]
+	and therefore
+	\[
+	\bar x>0.7488.
+	\]
+	
+	At \(\alpha=5\%\),
+	\[
+	44.54(\bar x-0.72)>1.645,
+	\]
+	so
+	\[
+	\bar x-0.72>\frac{1.645}{44.54}\approx 0.0369,
+	\]
+	and therefore
+	\[
+	\bar x>0.7569.
+	\]
+	
+	At \(\alpha=1\%\),
+	\[
+	44.54(\bar x-0.72)>2.326,
+	\]
+	so
+	\[
+	\bar x-0.72>\frac{2.326}{44.54}\approx 0.0522,
+	\]
+	and therefore
+	\[
+	\bar x>0.7722.
+	\]
+	
+	\item \textbf{Example 1:} Suppose the sample gives
+	\[
+	\bar x=0.7525.
+	\]
+	Then
+	\[
+	z(0.7525)=\frac{0.7525-0.72}{\sqrt{\frac{\sigma^2}{400}}}
+	\approx 1.45.
+	\]
+	The corresponding p-value is
+	\[
+	p\text{-value}(0.7525)=P(Z\ge1.45)\approx 0.0739.
+	\]
+	
+	At \(\alpha=10\%\), reject \(H_0\) since \(0.0739<0.10\).
+	
+	\begin{center}
+		\OneTailGraph{1}{1.45}{1.282}{Higher-tail test for \(\bar x=0.7525\) at \(\alpha=10\%\): \(H_a:\mu>0.72\)}
+	\end{center}
+	
+	\PropDecisionLineFixed{0.72}{0.7525}{1}{green!60!black}{reject \(H_0\)}{1.45}{0.72}{10}
+	
+	At \(\alpha=5\%\), fail to reject \(H_0\) since \(0.0739>0.05\).
+	
+	\begin{center}
+		\OneTailGraph{1}{1.45}{1.645}{Higher-tail test for \(\bar x=0.7525\) at \(\alpha=5\%\): \(H_a:\mu>0.72\)}
+	\end{center}
+	
+	\PropDecisionLineFixed{0.72}{0.7525}{1}{red}{fail to reject \(H_0\)}{1.45}{0.72}{5}
+	
+	At \(\alpha=1\%\), fail to reject \(H_0\) since \(0.0739>0.01\).
+	
+	\begin{center}
+		\OneTailGraph{1}{1.45}{2.326}{Higher-tail test for \(\bar x=0.7525\) at \(\alpha=1\%\): \(H_a:\mu>0.72\)}
+	\end{center}
+	
+	\PropDecisionLineFixed{0.72}{0.7525}{1}{red}{fail to reject \(H_0\)}{1.45}{0.72}{1}
+	
+	\item \textbf{Example 2:} Suppose the sample gives
+	\[
+	\bar x=0.7650.
+	\]
+	Then
+	\[
+	z(0.7650)=\frac{0.7650-0.72}{\sqrt{\frac{\sigma^2}{400}}}
+	\approx 2.00.
+	\]
+	The corresponding p-value is
+	\[
+	p\text{-value}(0.7650)=P(Z\ge2.00)\approx 0.0225.
+	\]
+	
+	At \(\alpha=10\%\), reject \(H_0\) since \(0.0225<0.10\).
+	
+	\begin{center}
+		\OneTailGraph{1}{2.00}{1.282}{Higher-tail test for \(\bar x=0.7650\) at \(\alpha=10\%\): \(H_a:\mu>0.72\)}
+	\end{center}
+	
+	\PropDecisionLineFixed{0.72}{0.7650}{1}{green!60!black}{reject \(H_0\)}{2.00}{0.72}{10}
+	
+	At \(\alpha=5\%\), reject \(H_0\) since \(0.0225<0.05\).
+	
+	\begin{center}
+		\OneTailGraph{1}{2.00}{1.645}{Higher-tail test for \(\bar x=0.7650\) at \(\alpha=5\%\): \(H_a:\mu>0.72\)}
+	\end{center}
+	
+	\PropDecisionLineFixed{0.72}{0.7650}{1}{green!60!black}{reject \(H_0\)}{2.00}{0.72}{5}
+	
+	At \(\alpha=1\%\), fail to reject \(H_0\) since \(0.0225>0.01\).
+	
+	\begin{center}
+		\OneTailGraph{1}{2.00}{2.326}{Higher-tail test for \(\bar x=0.7650\) at \(\alpha=1\%\): \(H_a:\mu>0.72\)}
+	\end{center}
+	
+	\PropDecisionLineFixed{0.72}{0.7650}{1}{red}{fail to reject \(H_0\)}{2.00}{0.72}{1}
+	
+	\item \textbf{Conclusion:} With the sample size fixed at \(n=400\), increasing the observed sample mean count \(\bar x\) increases the test statistic and decreases the p-value. Therefore, rejection begins once \(\bar x\) becomes large enough. It starts at the \(10\%\) level, then at the \(5\%\) level, and finally at the \(1\%\) level as \(\bar x\) increases.
+\end{itemize}
+
+\begin{center}
+	\begin{tikzpicture}[x=120cm,y=3cm]
+		% Axis lines
+		\draw[->] (0.698,0) -- (0.792,0) node[right] {\(\bar x\)};
+		\draw[->] (0.70,-1.1) -- (0.70,3.3) node[above] {\(z(\bar x)\)};
+		
+		% X-axis ticks and labels
+		\foreach \x/\label in {0.70/0.70,0.72/0.72,0.74/0.74,0.76/0.76,0.78/0.78}{
+			\draw (\x,0.06) -- (\x,-0.06);
+			\node[below,font=\small] at (\x,0) {\label};
+		}
+		
+		% Y-axis ticks and labels
+		\foreach \y/\label in {-1.0/-1.0,0.0/0.0,1.0/1.0,1.282/1.282,1.645/1.645,2.0/2.0,2.326/2.326}{
+			\draw (0.7003,\y) -- (0.6997,\y);
+			\node[left,font=\small] at (0.70,\y) {\label};
+		}
+		
+		% The Plot
+		\draw[thick] plot[smooth] coordinates {
+			(0.700,-0.8909)
+			(0.710,-0.4454)
+			(0.720,0.0000)
+			(0.730,0.4454)
+			(0.740,0.8909)
+			(0.7488,1.2820)
+			(0.7525,1.4477)
+			(0.7569,1.6450)
+			(0.7650,2.0045)
+			(0.7722,2.3260)
+			(0.7800,2.6726)
+			(0.790,3.1180)
+		};
+		
+		% Horizontal dashed lines to Y-axis
+		\draw[dashed,green] (0.698,1.282) -- (0.7488,1.282);
+		\draw[dashed,blue] (0.698,1.645) -- (0.7569,1.645);
+		\draw[dashed,purple] (0.698,2.326) -- (0.7722,2.326);
+		
+		% Vertical dashed lines to X-axis
+		\draw[dashed,green] (0.7488,0) -- (0.7488,1.282);
+		\draw[dashed,blue] (0.7569,0) -- (0.7569,1.645);
+		\draw[dashed,purple] (0.7722,0) -- (0.7722,2.326);
+		
+		% X-axis cutoff labels
+		\node[font=\small,below,green] at (0.7488,-0.05) {\(0.7488\)};
+		\node[font=\small,below,blue] at (0.7569,-0.2) {\(0.7569\)};
+		\node[font=\small,below,purple] at (0.7722,-0.35) {\(0.7722\)};
+		
+		% Data Point Annotations
+		\fill (0.7525,1.4477) circle (2pt);
+		\draw (0.7525,1.4477) -- (0.754,1.28);
+		\node[font=\small,right] at (0.754,1.28) {\( (0.7525,1.45) \)};
+		
+		\fill (0.7650,2.0045) circle (2pt);
+		\draw (0.7650,2.0045) -- (0.767,2);
+		\node[font=\small,right] at (0.767,2) {\( (0.7650,2.00) \)};
+		
+		% Legend Box (Moved to prevent covering the line in wide view and widened)
+		% Original box: (0.71,2.6) to (0.735,3.3) [width 0.025]
+		% New box: (0.71,2.6) to (0.760,3.3) [width 0.050]
+		\filldraw[white,draw=black, rounded corners=3pt] (0.71,2.6) rectangle (0.7570,3.3);
+		
+		\draw[green,thick] (0.712,3.2) -- (0.714,3.2);
+		\node[anchor=west,font=\footnotesize] at (0.715,3.2) {\(\alpha=10\%\), \(z=1.282\), \(\bar x=0.7488\)};
+		
+		\draw[blue,thick] (0.712,3.05) -- (0.714,3.05);
+		\node[anchor=west,font=\footnotesize] at (0.715,3.05) {\(\alpha=5\%\), \(z=1.645\), \(\bar x=0.7569\)};
+		
+		\draw[purple,thick] (0.712,2.9) -- (0.714,2.9);
+		\node[anchor=west,font=\footnotesize] at (0.715,2.9) {\(\alpha=1\%\), \(z=2.326\), \(\bar x=0.7722\)};
+		
+		\draw[black,thick] (0.712,2.7) -- (0.714,2.7);
+		\node[anchor=west,font=\small, font=\bfseries] at (0.715,2.7) {\(z(\bar x)\approx 44.54(\bar x-0.72)\)};
+	\end{tikzpicture}
+\end{center}
+
+\begin{center}
+	\begin{tikzpicture}[x=160cm,y=10cm]
+		\draw[->] (0.698,0) -- (0.782,0) node[right] {\(\bar x\)};
+		\draw[->] (0.70,0) -- (0.70,0.86) node[above] {p-value};
+		
+		\foreach \x/\label in {0.70/0.70,0.72/0.72,0.74/0.74,0.76/0.76,0.78/0.78}{
+			\draw (\x,0.012) -- (\x,-0.012);
+			\node[below,font=\scriptsize] at (\x,0) {\label};
+		}
+		
+		\foreach \y/\label in {0.01/0.01,0.05/0.05,0.10/0.10,0.20/0.20,0.30/0.30,0.50/0.50,0.80/0.80}{
+			\draw (0.70035,\y) -- (0.69965,\y);
+			\node[left,font=\scriptsize] at (0.70,\y) {\label};
+		}
+		
+		\draw[thick] plot[smooth] coordinates {
+			(0.700,0.8135)
+			(0.710,0.6720)
+			(0.720,0.5000)
+			(0.730,0.3280)
+			(0.740,0.1865)
+			(0.7488,0.1000)
+			(0.7525,0.0739)
+			(0.7569,0.0500)
+			(0.7650,0.0225)
+			(0.7722,0.0100)
+			(0.7800,0.0038)
+		};
+		
+		\draw[dashed,green] (0.698,0.10) -- (0.782,0.10);
+		\draw[dashed,blue] (0.698,0.05) -- (0.782,0.05);
+		\draw[dashed,purple] (0.698,0.01) -- (0.782,0.01);
+		
+		\draw[dashed,green] (0.7488,0) -- (0.7488,0.86);
+		\draw[dashed,blue] (0.7569,0) -- (0.7569,0.86);
+		\draw[dashed,purple] (0.7722,0) -- (0.7722,0.86);
+		
+		\fill (0.7525,0.0739) circle (2pt);
+		\draw (0.7525,0.0739) -- (0.756,0.14);
+		\node[font=\scriptsize,right] at (0.756,0.14) {\( (0.7525,0.0739) \)};
+		
+		\fill (0.7650,0.0225) circle (2pt);
+		\draw (0.7650,0.0225) -- (0.768,0.085);
+		\node[font=\scriptsize,right] at (0.768,0.085) {\( (0.7650,0.0225) \)};
+		
+		\node[font=\small] at (0.741,0.82) {sample mean count vs.\ p-value};
+		
+		\filldraw[white,draw=black, rounded corners=3pt] (0.7412,0.56) rectangle (0.772,0.762);
+		
+		\draw[green,thick] (0.742,0.74) -- (0.746,0.74);
+		\node[anchor=west,font=\scriptsize] at (0.7465,0.74) {\(\alpha=10\%\), cutoff \(\bar x=0.7488\)};
+		
+		\draw[blue,thick] (0.742,0.69) -- (0.746,0.69);
+		\node[anchor=west,font=\scriptsize] at (0.7465,0.69) {\(\alpha=5\%\), cutoff \(\bar x=0.7569\)};
+		
+		\draw[purple,thick] (0.742,0.64) -- (0.746,0.64);
+		\node[anchor=west,font=\scriptsize] at (0.7465,0.64) {\(\alpha=1\%\), cutoff \(\bar x=0.7722\)};
+		
+		\draw[black,thick] (0.742,0.59) -- (0.746,0.59);
+		\node[anchor=west,font=\scriptsize] at (0.7465,0.59) {\(p\text{-value}(\bar x)=1-\Phi(z(\bar x))\)};
+	\end{tikzpicture}
 \end{center}
 
 \end{document}
