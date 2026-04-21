@@ -3273,7 +3273,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "Exam - C1 C2 C3",
+    "Description": "No Class: Yearbook Picture",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C4"
@@ -3286,7 +3286,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 5",
-    "Description": "Explanation videos : p-value",
+    "Description": "Exam - C1 C2 C3",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C4"
@@ -3299,7 +3299,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "C4 C5: t-test with proportion and mean",
+    "Description": "Explanation videos : p-value",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
@@ -3312,7 +3312,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 5",
-    "Description": "-",
+    "Description": "C4 C5: t-test with proportion and mean",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
