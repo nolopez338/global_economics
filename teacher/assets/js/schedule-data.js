@@ -4261,7 +4261,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "-",
+    "Description": "Work on C4 C5 Proyect",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
@@ -4274,7 +4274,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "-",
+    "Description": "Work on C4 C5 Proyect",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
@@ -4287,7 +4287,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "-",
+    "Description": "C6: Minimum Number of samples",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -4300,7 +4300,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 4",
-    "Description": "-",
+    "Description": "C7: p-values vs Hypothesis, Error Types.",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -4313,7 +4313,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 1",
-    "Description": "-",
+    "Description": "C6 C7: Exam practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7"
@@ -4326,7 +4326,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 4",
-    "Description": "-",
+    "Description": "C1-C7: Midterm",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7"
@@ -4339,7 +4339,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 1",
-    "Description": "-",
+    "Description": "C8: p-values vs Confidence Intervals",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8"
@@ -4352,7 +4352,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 4",
-    "Description": "-",
+    "Description": "C9 C10: Modeling Research Question in Economic context",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8"
@@ -4365,7 +4365,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "-",
+    "Description": "C8 C9 C10 Proyect development",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C9"
@@ -4378,7 +4378,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 4",
-    "Description": "-",
+    "Description": "C8 C9 C10 Proyect development",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C9"
@@ -4391,7 +4391,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "-",
+    "Description": "C8 C9 C10 Proyect development",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C10"
@@ -4404,10 +4404,36 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 4",
-    "Description": "-",
+    "Description": "C8 C9 C10: Proyect development. Final session",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C10"
+  },
+  {
+    "Grade": 11,
+    "Section": "D",
+    "Class #": "11-1",
+    "Date": "2026/06/08",
+    "Term": 3,
+    "Weekday": "Monday",
+    "Day": "Day 1",
+    "Description": "Epilogue: Advanced statistics",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": 11,
+    "Section": "D",
+    "Class #": "11-2",
+    "Date": "2026/06/11",
+    "Term": 3,
+    "Weekday": "Thursday",
+    "Day": "Day 4",
+    "Description": "Semester Farewell",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
   },
   {
     "Grade": 11,

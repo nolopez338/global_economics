@@ -996,7 +996,7 @@ window.SCHEDULE_DATA = [
     "Grade": 11,
     "Class #": "1-1",
     "Term": 3,
-    "Description": "No Class: Resting from ICFES",
+    "Description": "Introduction: Hypotesis Testing",
     "Material": "C1",
     "Material teacher": "C1",
     "Summary": "C1"
@@ -1005,7 +1005,7 @@ window.SCHEDULE_DATA = [
     "Grade": 11,
     "Class #": "1-2",
     "Term": 3,
-    "Description": "Vectors and Degrees of Freedom videos",
+    "Description": "C1 C2 C3: Basic examples",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1"
@@ -1014,7 +1014,7 @@ window.SCHEDULE_DATA = [
     "Grade": 11,
     "Class #": "2-1",
     "Term": 3,
-    "Description": "Introduction and C1 C2 C3 Examples  ",
+    "Description": "C1 C2 C3: Practice activity",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C2"
@@ -1023,7 +1023,7 @@ window.SCHEDULE_DATA = [
     "Grade": 11,
     "Class #": "2-2",
     "Term": 3,
-    "Description": "C1 C2 C3 Practice activity",
+    "Description": "C1 C2 C3: Exam practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C2"
@@ -1032,7 +1032,7 @@ window.SCHEDULE_DATA = [
     "Grade": 11,
     "Class #": "3-1",
     "Term": 3,
-    "Description": "Exam problems practice",
+    "Description": "C1 C2 C3: Exam",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3"
@@ -1041,7 +1041,7 @@ window.SCHEDULE_DATA = [
     "Grade": 11,
     "Class #": "3-2",
     "Term": 3,
-    "Description": "No Class: Yearbook Picture",
+    "Description": "Explanation videos : p-value",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3"
@@ -1050,7 +1050,7 @@ window.SCHEDULE_DATA = [
     "Grade": 11,
     "Class #": "4-1",
     "Term": 3,
-    "Description": "C1 C2 C3 Exam",
+    "Description": "C4 C5: t-test with proportion and mean",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C4"
@@ -1059,7 +1059,7 @@ window.SCHEDULE_DATA = [
     "Grade": 11,
     "Class #": "4-2",
     "Term": 3,
-    "Description": "-",
+    "Description": "Work on C4 C5 Proyect",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C4"
@@ -1068,7 +1068,7 @@ window.SCHEDULE_DATA = [
     "Grade": 11,
     "Class #": "5-1",
     "Term": 3,
-    "Description": "-",
+    "Description": "Work on C4 C5 Proyect",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
@@ -1077,7 +1077,7 @@ window.SCHEDULE_DATA = [
     "Grade": 11,
     "Class #": "5-2",
     "Term": 3,
-    "Description": "-",
+    "Description": "C6: Minimum Number of samples",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
@@ -1086,7 +1086,7 @@ window.SCHEDULE_DATA = [
     "Grade": 11,
     "Class #": "6-1",
     "Term": 3,
-    "Description": "-",
+    "Description": "C7: p-values vs Hypothesis, Error Types.",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -1095,7 +1095,7 @@ window.SCHEDULE_DATA = [
     "Grade": 11,
     "Class #": "6-2",
     "Term": 3,
-    "Description": "-",
+    "Description": "C6 C7: Exam practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -1104,7 +1104,7 @@ window.SCHEDULE_DATA = [
     "Grade": 11,
     "Class #": "7-1",
     "Term": 3,
-    "Description": "-",
+    "Description": "C1-C7: Midterm",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7"
@@ -1113,7 +1113,7 @@ window.SCHEDULE_DATA = [
     "Grade": 11,
     "Class #": "7-2",
     "Term": 3,
-    "Description": "-",
+    "Description": "C8: p-values vs Confidence Intervals",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7"
@@ -1122,7 +1122,7 @@ window.SCHEDULE_DATA = [
     "Grade": 11,
     "Class #": "8-1",
     "Term": 3,
-    "Description": "-",
+    "Description": "C9 C10: Modeling Research Question in Economic context",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8"
@@ -1131,7 +1131,7 @@ window.SCHEDULE_DATA = [
     "Grade": 11,
     "Class #": "8-2",
     "Term": 3,
-    "Description": "-",
+    "Description": "C8 C9 C10 Proyect development",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8"
@@ -1140,7 +1140,7 @@ window.SCHEDULE_DATA = [
     "Grade": 11,
     "Class #": "9-1",
     "Term": 3,
-    "Description": "-",
+    "Description": "C8 C9 C10 Proyect development",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C9"
@@ -1149,7 +1149,7 @@ window.SCHEDULE_DATA = [
     "Grade": 11,
     "Class #": "9-2",
     "Term": 3,
-    "Description": "-",
+    "Description": "C8 C9 C10 Proyect development",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C9"
@@ -1158,7 +1158,7 @@ window.SCHEDULE_DATA = [
     "Grade": 11,
     "Class #": "10-1",
     "Term": 3,
-    "Description": "-",
+    "Description": "Epilogue: Advanced statistics",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C10"
@@ -1167,7 +1167,7 @@ window.SCHEDULE_DATA = [
     "Grade": 11,
     "Class #": "10-2",
     "Term": 3,
-    "Description": "-",
+    "Description": "Semester Farewell",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C10"
