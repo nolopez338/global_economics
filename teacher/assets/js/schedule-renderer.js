@@ -1,10 +1,11 @@
 const formatScheduleDate = (value) => {
-  const [year, month, day] = value.split("/").map((part) => part.trim());
-  if (!year || !month || !day) {
+  const normalizedDate = normalizeScheduleDate(value);
+  if (!normalizedDate) {
     return value;
   }
 
-  return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+  const [year, month, day] = normalizedDate.split("-");
+  return `${year} / ${month} / ${day}`;
 };
 
 const getScheduleData = () => {
@@ -39,7 +40,9 @@ const normalizeScheduleDate = (raw) => {
     return null;
   }
 
-  const match = String(raw).trim().match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
+  const match = String(raw)
+    .trim()
+    .match(/^(\d{4})\s*(?:[-\/]|\s\/\s)\s*(\d{1,2})\s*(?:[-\/]|\s\/\s)\s*(\d{1,2})$/);
   if (!match) {
     return null;
   }
