@@ -22,6 +22,120 @@
 		\item C4.
 	\end{itemize}
 
+% Corrected command: 9 parameters only
+% #1 = variable symbol
+% #2 = xmin
+% #3 = xmax
+% #4 = ymax
+% #5 = left endpoint
+% #6 = mean - sigma
+% #7 = mean
+% #8 = mean + sigma
+% #9 = right endpoint
+\newcommand{\UniformMeanSDGraph}[9]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\BlueHeight}{1/((#9)-(#5))}
+			\pgfmathsetmacro{\ShadeHeight}{0.5*\BlueHeight}
+			\pgfmathsetmacro{\GuideHeight}{0.8*(#4)}
+			\pgfmathsetmacro{\MeanLineHeight}{0.97*(#4)}
+			\begin{axis}[
+				width=10cm,
+				height=5.5cm,
+				axis lines=left,
+				xlabel={$#1$},
+				xlabel style={at={(axis description cs:1.02,-0.06)}, anchor=north west},
+				ylabel={$f(#1)$},
+				xmin=#2,
+				xmax=#3,
+				ymin=0,
+				ymax=#4,
+				grid=both,
+				xtick={#5,#6,#7,#8,#9},
+				xticklabels={$#5$,,{$E[#1]=#7$},,{$#9$}},
+				ytick=\empty
+				]
+				\addplot[ultra thick, blue]
+				coordinates {(#5,0) (#5,\BlueHeight) (#9,\BlueHeight) (#9,0)};
+				
+				\addplot[ultra thick, orange]
+				coordinates {(#7,0) (#7,\MeanLineHeight)};
+				
+				\addplot[red, densely dotted, thick]
+				coordinates {(#6,0) (#6,\GuideHeight)};
+				
+				\addplot[red, densely dotted, thick]
+				coordinates {(#8,0) (#8,\GuideHeight)};
+				
+				\addplot[draw=none, fill=red, fill opacity=0.5]
+				coordinates {(#6,0) (#6,\ShadeHeight) (#8,\ShadeHeight) (#8,0)}
+				\closedcycle;
+				
+				\node[font=\small, above] at (axis cs:#6,\GuideHeight) {$E[#1]-\sigma$};
+				\node[font=\small, above] at (axis cs:#8,\GuideHeight) {$E[#1]+\sigma$};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+% New command for triangular graphs with mean and one-standard-deviation interval
+% #1 = variable symbol
+% #2 = left endpoint a
+% #3 = mode c
+% #4 = right endpoint b
+% #5 = xmin
+% #6 = xmax
+% #7 = ymax
+\newcommand{\TriangularMeanSDGraph}[7]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\TriMean}{((#2)+(#3)+(#4))/3}
+			\pgfmathsetmacro{\TriVar}{((#2)^2+(#3)^2+(#4)^2-(#2)*(#3)-(#2)*(#4)-(#3)*(#4))/18}
+			\pgfmathsetmacro{\TriSigma}{sqrt(\TriVar)}
+			\pgfmathsetmacro{\LeftSD}{\TriMean-\TriSigma}
+			\pgfmathsetmacro{\RightSD}{\TriMean+\TriSigma}
+			\pgfmathsetmacro{\PeakHeight}{2/((#4)-(#2))}
+			\pgfmathsetmacro{\ShadeHeight}{0.5*\PeakHeight}
+			\pgfmathsetmacro{\GuideHeight}{0.82*(#7)}
+			\pgfmathsetmacro{\MeanLineHeight}{0.71*(#7)}
+			\begin{axis}[
+				width=10cm,
+				height=5.5cm,
+				axis lines=left,
+				xlabel={$#1$},
+				xlabel style={at={(axis description cs:1.02,-0.06)}, anchor=north west},
+				ylabel={$f(#1)$},
+				xmin=#5,
+				xmax=#6,
+				ymin=0,
+				ymax=#7,
+				grid=both,
+				xtick={#2,\LeftSD,\TriMean,\RightSD,#4},
+				xticklabels={$#2$,,$E[#1]=\pgfmathprintnumber[precision=2]{\TriMean}$,,$#4$},
+				ytick=\empty
+				]
+				\addplot[ultra thick, blue]
+				coordinates {(#2,0) (#3,\PeakHeight) (#4,0)};
+				
+				\addplot[ultra thick, orange]
+				coordinates {(\TriMean,0) (\TriMean,\MeanLineHeight)};
+				
+				\addplot[red, densely dotted, thick]
+				coordinates {(\LeftSD,0) (\LeftSD,\GuideHeight)};
+				
+				\addplot[red, densely dotted, thick]
+				coordinates {(\RightSD,0) (\RightSD,\GuideHeight)};
+				
+				\addplot[draw=none, fill=red, fill opacity=0.5]
+				coordinates {(\LeftSD,0) (\LeftSD,\ShadeHeight) (\RightSD,\ShadeHeight) (\RightSD,0)}
+				\closedcycle;
+				
+				\node[font=\small, above] at (axis cs:\LeftSD,\GuideHeight) {$E[#1]-\sigma$};
+				\node[font=\small, above] at (axis cs:\RightSD,\GuideHeight) {$E[#1]+\sigma$};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
 
 \newcommand{\UniformDistGraph}[5]{
 \begin{center}
@@ -151,31 +265,7 @@ E[X]=\frac{a+b}{2},\qquad \mathrm{Var}(X)=\frac{(b-a)^2}{12}.
 	\approx [9.69,\;14.31].
 	\]
 	
-	\begin{center}
-		\begin{tikzpicture}
-			\begin{axis}[
-				width=10cm,
-				height=5.5cm,
-				axis lines=left,
-				xlabel={$x$},
-				ylabel={$f(x)$},
-				xmin=6,
-				xmax=18,
-				ymin=0,
-				ymax=0.18,
-				grid=both,
-				xtick={8,9.69,12,14.31,16},
-				xticklabels={$8$,$12-\sigma$,$E[X]=12$,$12+\sigma$,$16$},
-				ytick=\empty
-				]
-				\addplot[very thick, blue] coordinates {(8,0) (8,0.125) (16,0.125) (16,0)};
-				\addplot[ultra thick, orange] coordinates {(12,0) (12,0.125)};
-				\addplot[densely dotted] coordinates {(9.69,0) (9.69,0.125)};
-				\addplot[densely dotted] coordinates {(14.31,0) (14.31,0.125)};
-				\addplot[thick, red] coordinates {(9.69,0.015) (14.31,0.015)};
-			\end{axis}
-		\end{tikzpicture}
-	\end{center}
+	\UniformMeanSDGraph{X}{6}{18}{0.18}{8}{9.69}{12}{14.31}{16}
 	
 	\item Since this is a continuous model, the probability of any exact single value is \(0\). So we compare small intervals of the same length around \(9\) and \(13\).
 	
@@ -239,7 +329,17 @@ E[W]=\frac{2+14+2}{3}=\frac{18}{3}=6,
 \[
 \sigma=\sqrt{8}=2\sqrt{2}\approx 2.83.
 \]
-\TriangularDistGraph{2}{2}{14}{0}{16}{2,6,10,14}
+
+One standard deviation around the mean is
+\[
+[E[W]-\sigma,\;E[W]+\sigma]
+=
+[6-2\sqrt{2},\;6+2\sqrt{2}]
+\approx [3.17,\;8.83].
+\]
+
+\TriangularMeanSDGraph{W}{2}{2}{14}{0}{16}{0.19}
+
 Since the mode is at the left endpoint \(2\), the density is greatest there and then decreases linearly toward \(14\). Therefore the distribution is right-skewed, with a long tail to the right.
 
 Values near \(2\) are more likely than values near \(14\) because the graph has its maximum height at \(2\) and slopes downward as \(W\) increases.
@@ -280,7 +380,8 @@ E[W]=\frac{2+14+6}{3}=\frac{22}{3}\approx 7.33,
 \[
 \sigma=\sqrt{\frac{56}{9}}=\frac{\sqrt{56}}{3}\approx 2.49.
 \]
-\TriangularDistGraph{2}{6}{14}{0}{16}{2,6,10,14}
+\TriangularMeanSDGraph{W}{2}{6}{14}{0}{16}{0.19}
+
 Since mode 6 is closer to 2 than to 14, the distribution is right-skewed (longer right side).
 
 % --------------------------------------------------
