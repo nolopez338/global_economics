@@ -37,7 +37,9 @@
       return null;
     }
 
-    const match = String(raw).trim().match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
+    const match = String(raw)
+      .trim()
+      .match(/^(\d{4})\s*(?:[-\/]|\s\/\s)\s*(\d{1,2})\s*(?:[-\/]|\s\/\s)\s*(\d{1,2})$/);
     if (!match) {
       return null;
     }

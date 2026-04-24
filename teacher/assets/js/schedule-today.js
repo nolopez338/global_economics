@@ -1,3 +1,6 @@
+const isFullSchedulePage = () =>
+  /\/full_schedule\.html$/i.test(window.location.pathname || "");
+
 const buildTodayIndicatorRow = (columnCount) => {
   const row = document.createElement("tr");
   row.className = "today-indicator-row";
@@ -23,16 +26,22 @@ const normalizeDateString = (raw) => {
     return null;
   }
 
-  const match = raw.trim().match(/^(\d{4})[-\/](\d{2})[-\/](\d{2})$/);
+  const match = String(raw)
+    .trim()
+    .match(/^(\d{4})\s*(?:[-\/]|\s\/\s)\s*(\d{1,2})\s*(?:[-\/]|\s\/\s)\s*(\d{1,2})$/);
   if (!match) {
     return null;
   }
 
   const [, year, month, day] = match;
-  return `${year}-${month}-${day}`;
+  return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
 };
 
 const applyTodayMarker = (table) => {
+  if (isFullSchedulePage()) {
+    return;
+  }
+
   const body = table.tBodies[0];
   if (!body) {
     return;
@@ -71,7 +80,9 @@ const applyTodayMarker = (table) => {
       continue;
     }
 
-    const rowDateNormalized = normalizeDateString(dateCell.textContent);
+    const rowDateNormalized = normalizeDateString(
+      row.dataset.date || dateCell.textContent
+    );
     if (!rowDateNormalized) {
       continue;
     }
@@ -102,12 +113,20 @@ const applyTodayMarker = (table) => {
 };
 
 const applyTodayMarkers = () => {
+  if (isFullSchedulePage()) {
+    return;
+  }
+
   document
     .querySelectorAll(".class-schedule-table")
     .forEach((table) => applyTodayMarker(table));
 };
 
 document.addEventListener("class-schedule-rendered", (event) => {
+  if (isFullSchedulePage()) {
+    return;
+  }
+
   const table = event.detail?.table;
   if (table) {
     applyTodayMarker(table);

@@ -83,7 +83,7 @@
           return null;
         }
 
-        var match = String(raw).trim().match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
+        var match = String(raw).trim().match(/^(\d{4})\s*(?:[-\/]|\s\/\s)\s*(\d{1,2})\s*(?:[-\/]|\s\/\s)\s*(\d{1,2})$/);
         if (!match) {
           return null;
         }
@@ -92,6 +92,16 @@
         var month = match[2].padStart(2, '0');
         var day = match[3].padStart(2, '0');
         return year + '-' + month + '-' + day;
+      }
+
+      function formatDisplayDate(raw) {
+        var normalized = normalizeDate(raw);
+        if (!normalized) {
+          return raw || '';
+        }
+
+        var parts = normalized.split('-');
+        return parts[0] + ' / ' + parts[1] + ' / ' + parts[2];
       }
 
       function getTodayISODate() {
@@ -203,14 +213,36 @@
         updatePastRows(table, toggleButton, countInput);
       }
 
+      function updateRenderedDateCells(table) {
+        if (!table) {
+          return;
+        }
+
+        Array.from(table.tBodies[0]?.rows || []).forEach(function (row) {
+          if (!row || row.classList.contains('past-dates-toggle-row')) {
+            return;
+          }
+
+          var dateCell = row.cells[1];
+          if (!dateCell) {
+            return;
+          }
+
+          dateCell.textContent = formatDisplayDate(row.dataset.date || dateCell.textContent);
+        });
+      }
+
       function attachControls() {
         document.querySelectorAll('.class-schedule-table').forEach(function (table) {
           wirePastDatesControl(table);
+          updateRenderedDateCells(table);
         });
       }
 
       document.addEventListener('class-schedule-rendered', function (event) {
-        wirePastDatesControl(event.detail?.table || null);
+        var table = event.detail?.table || null;
+        wirePastDatesControl(table);
+        updateRenderedDateCells(table);
       });
 
       if (document.readyState === 'loading') {
