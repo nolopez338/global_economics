@@ -83,7 +83,11 @@
 
           <tr>
             <th scope="row">07:55 - 08:45</th>
-            <td class="empty">—</td>
+            <td>
+              <a class="class-link" href="pages/magis.html" aria-label="Open schedule page for Teams">
+                <span class="block" style="background: #d3b3f3;">11-HS</span>
+              </a>
+            </td>
             <td class="empty">—</td>
             <td>
               <a class="class-link" href="pages/class_schedules/10A.html" aria-label="Open schedule page for class 10A">
@@ -136,11 +140,7 @@
                 <span class="block cool">11E-1</span>
               </a>
             </td>
-            <td>
-              <a class="class-link" href="pages/magis.html" aria-label="Open schedule page for Teams">
-                <span class="block" style="background: #d3b3f3;">Teams</span>
-              </a>
-            </td>
+            <td class="empty">—</td>
             <td class="empty">—</td>
             <td class="empty">—</td>
           </tr>

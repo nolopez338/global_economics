@@ -335,7 +335,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "Exam: C1 C2 C3 Session 2",
+    "Description": "No class: Lenguage Day",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
@@ -348,7 +348,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "C4: Problems on Variance and SD",
+    "Description": "Exam: C1 C2 C3 Session 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -361,7 +361,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "C5: Problems on Normal Distribution",
+    "Description": "C4: Problems on Variance and SD",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -374,7 +374,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 1",
-    "Description": "C4 C5: Exam",
+    "Description": "C5: Problems on Normal Distribution",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7"
@@ -387,7 +387,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "C6: Problems on Normal Distribution Normalization",
+    "Description": "C4 C5: Exam",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7"
@@ -400,7 +400,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 1",
-    "Description": "C7: Problems on Normal Distribution Inverse",
+    "Description": "C6 - C7: Problems on Normal Distribution Normalization and Normal Distribution Inverse",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8"
@@ -1778,7 +1778,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "Exam: C1 C2 C3 Session 2",
+    "Description": "No class: Lenguage day",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5 Practice"
@@ -1791,7 +1791,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "C4: Problems on Variance and SD",
+    "Description": "Exam: C1 C2 C3 Session 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
@@ -1804,7 +1804,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "C5: Problems on Normal Distribution",
+    "Description": "C4: Problems on Variance and SD",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -1817,7 +1817,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 4",
-    "Description": "C4 C5: Exam",
+    "Description": "C5: Problems on Normal Distribution",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6 Practice"
@@ -1830,7 +1830,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "C6: Problems on Normal Distribution Normalization",
+    "Description": "C4 C5: Exam",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7 Practice"
@@ -1843,7 +1843,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 4",
-    "Description": "C7: Problems on Normal Distribution Inverse",
+    "Description": "C6: Problems on Normal Distribution Normalization",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1-C7 Midterm"
@@ -1856,7 +1856,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "C1-C7: Midterm Exam",
+    "Description": "C7: Problems on Normal Distribution Inverse",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8 C9 C10 practice"
@@ -1869,7 +1869,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 4",
-    "Description": "C8 C9 C10: Characterization of in investment portfolio",
+    "Description": "C1-C7: Midterm Exam",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8 C9 C10 Practice"
@@ -1882,7 +1882,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "C8 C9 C10: Probability distribution modeling of investment portfolio",
+    "Description": "C8 C9 C10: Characterization of in investment portfolio",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "Final proyect"
@@ -1895,7 +1895,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 4",
-    "Description": "C8 C9 C10: Proyect Development",
+    "Description": "C8 C9 C10: Probability distribution modeling of investment portfolio",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "Final proyect"
@@ -2298,7 +2298,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "Exam: C1 C2 C3 Session 2",
+    "Description": "No class: Lenguage Day",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
@@ -2311,7 +2311,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "C4: Problems on Variance and SD",
+    "Description": "Exam: C1 C2 C3 Session 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
@@ -2324,7 +2324,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "C5: Problems on Normal Distribution",
+    "Description": "C4: Problems on Variance and SD",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -2337,7 +2337,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 4",
-    "Description": "C4 C5: Exam",
+    "Description": "C5: Problems on Normal Distribution",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -2350,7 +2350,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "C6: Problems on Normal Distribution Normalization",
+    "Description": "C4 C5: Exam",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7"
@@ -2363,7 +2363,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 4",
-    "Description": "C7: Problems on Normal Distribution Inverse",
+    "Description": "C6: Problems on Normal Distribution Normalization",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7"
@@ -2376,7 +2376,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "C1-C7: Midterm Exam",
+    "Description": "C7: Problems on Normal Distribution Inverse",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8"
@@ -2389,7 +2389,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 4",
-    "Description": "C8 C9 C10: Characterization of in investment portfolio",
+    "Description": "C1-C7: Midterm Exam",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8"
@@ -2402,7 +2402,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "C8 C9 C10: Probability distribution modeling of investment portfolio",
+    "Description": "C8 C9 C10: Characterization of in investment portfolio",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C9"
@@ -2415,7 +2415,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 4",
-    "Description": "C8 C9 C10: Proyect Development",
+    "Description": "C8 C9 C10: Probability distribution modeling of investment portfolio",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C9"
@@ -2792,7 +2792,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "Work on C4 C5 Proyect",
+    "Description": "No class: Lenguage Day",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
@@ -2805,7 +2805,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "Work on C4 C5 Proyect",
+    "Description": "Work on C4 C5 Proyect - Session 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -2818,7 +2818,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "C6: Minimum Number of samples",
+    "Description": "Work on C4 C5 Proyect - Session 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -2831,7 +2831,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 1",
-    "Description": "C7: p-values vs Hypothesis, Error Types.",
+    "Description": "C6: Minimum Number of samples",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7"
@@ -2844,7 +2844,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "C6 C7: Exam practice",
+    "Description": "C7: p-values vs Hypothesis, Error Types.",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7"
@@ -2857,7 +2857,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 1",
-    "Description": "C1-C7: Midterm",
+    "Description": "C6 C7: Exam practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8"
@@ -2870,7 +2870,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "C8: p-values vs Confidence Intervals",
+    "Description": "C1-C7: Midterm",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8"
@@ -2883,7 +2883,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "C9 C10: Modeling Research Question in Economic context",
+    "Description": "C8: p-values vs Confidence Intervals",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C9"
@@ -2896,7 +2896,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "C8 C9 C10 Proyect development",
+    "Description": "C9 C10: Modeling Research Question in Economic context",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C9"
@@ -2909,7 +2909,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "-",
+    "Description": "C8 C9 C10 Proyect development",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C10"
@@ -3299,7 +3299,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "Explanation videos : p-value",
+    "Description": "No class: Lenguage Day",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
@@ -3325,7 +3325,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "Work on C4 C5 Proyect",
+    "Description": "Work on C4 C5 Proyect - Session 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -3338,7 +3338,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 5",
-    "Description": "Work on C4 C5 Proyect",
+    "Description": "Work on C4 C5 Proyect - Session 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -4820,7 +4820,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 3",
-    "Description": "Work on C4 C5 Proyect",
+    "Description": "No class: Lenguage Day",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
@@ -4833,7 +4833,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 2",
-    "Description": "Work on C4 C5 Proyect",
+    "Description": "Work on C4 C5 Proyect - Session 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -4846,7 +4846,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "C6: Minimum Number of samples",
+    "Description": "Work on C4 C5 Proyect - Session 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -4859,7 +4859,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 2",
-    "Description": "C7: p-values vs Hypothesis, Error Types.",
+    "Description": "C6: Minimum Number of samples",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7"
@@ -4872,7 +4872,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "C6 C7: Exam practice",
+    "Description": "C7: p-values vs Hypothesis, Error Types.",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7"
@@ -4885,7 +4885,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 2",
-    "Description": "C1-C7: Midterm",
+    "Description": "C6 C7: Exam practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8"
@@ -4898,7 +4898,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "C8: p-values vs Confidence Intervals",
+    "Description": "C1-C7: Midterm",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8"
@@ -4911,7 +4911,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 2",
-    "Description": "C9 C10: Modeling Research Question in Economic context",
+    "Description": "C8: p-values vs Confidence Intervals",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C9"
@@ -4924,7 +4924,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 3",
-    "Description": "C8 C9 C10 Proyect development",
+    "Description": "C9 C10: Modeling Research Question in Economic context",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C9"
@@ -4937,7 +4937,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 2",
-    "Description": "-",
+    "Description": "C8 C9 C10 Proyect development",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C10"
