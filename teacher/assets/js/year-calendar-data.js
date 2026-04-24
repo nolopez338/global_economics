@@ -1,3 +1,12 @@
+/*
+  Purpose:
+  Defines the academic calendar structure used by the yearly calendar views.
+
+  Responsibilities:
+  - Provides month-by-month week matrices and weekday mapping for 2026
+  - Supplies calendar metadata consumed by calendar rendering components
+  - Acts as a static data source rather than executing page interaction logic
+*/
 const calendar2026days = {
   year: 2026,
   weekdays: ["su", "mo", "tu", "we", "th", "fr", "sa"],

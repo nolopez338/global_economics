@@ -1,3 +1,12 @@
+/*
+  Purpose:
+  Controls interactive behavior for the principal/teacher weekly schedule page.
+
+  Responsibilities:
+  - Updates schedule links and navigation targets based on page mode and access context
+  - Manages weekday controls, table display toggles, and shared schedule UI state
+  - Emits render lifecycle events and applies dynamic table interactions after markup loads
+*/
     const scheduleRenderedEventName = "class-schedule-rendered";
 
     const triggerScheduleRendered = () => {

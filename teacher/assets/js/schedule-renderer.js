@@ -1,3 +1,12 @@
+/*
+  Purpose:
+  Renders schedule table rows from global schedule data into class and schedule pages.
+
+  Responsibilities:
+  - Normalizes schedule fields (dates, origin mode, material values) for display
+  - Builds table body content including empty-state handling and per-entry row output
+  - Integrates with page datasets and table markup to populate schedule views consistently
+*/
 const formatScheduleDate = (value) => {
   const normalizedDate = normalizeScheduleDate(value);
   if (!normalizedDate) {

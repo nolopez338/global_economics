@@ -1,3 +1,12 @@
+/*
+  Purpose:
+  Provides class-level reference data used by class schedule pages.
+
+  Responsibilities:
+  - Exposes student list document links per class via window.CLASS_STUDENT_LISTS
+  - Exposes per-class notes collections via window.CLASS_NOTES
+  - Serves as global input data for class-page rendering and related UI sections
+*/
 window.CLASS_STUDENT_LISTS = {
   "10A": {
     pdfUrl:

@@ -1,3 +1,12 @@
+/*
+  Purpose:
+  Applies “Today” highlighting behavior specifically to full-schedule tables.
+
+  Responsibilities:
+  - Detects full_schedule pages and targets class-schedule-table instances
+  - Parses date columns and inserts/removes today indicator rows as schedule changes
+  - Keeps full-schedule today markers separate from the standard schedule-today logic
+*/
 (() => {
   const isFullSchedulePage = () =>
     /\/full_schedule\.html$/i.test(window.location.pathname || "");
