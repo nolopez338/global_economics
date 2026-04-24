@@ -19,10 +19,11 @@
 
 	\section*{Evaluated criteria}
 	\begin{itemize}
-		\item C4.
+		\item [C4] Interprets the concept of variance and standard deviation of a probability function.
 	\end{itemize}
-
-% Corrected command: 9 parameters only
+	
+	
+% \UniformMeanSDGraph: 9 parameters
 % #1 = variable symbol
 % #2 = xmin
 % #3 = xmax
@@ -36,7 +37,7 @@
 	\begin{center}
 		\begin{tikzpicture}
 			\pgfmathsetmacro{\BlueHeight}{1/((#9)-(#5))}
-			\pgfmathsetmacro{\ShadeHeight}{0.5*\BlueHeight}
+			\pgfmathsetmacro{\ShadeHeight}{\BlueHeight}
 			\pgfmathsetmacro{\GuideHeight}{0.8*(#4)}
 			\pgfmathsetmacro{\MeanLineHeight}{0.97*(#4)}
 			\begin{axis}[
@@ -78,7 +79,8 @@
 	\end{center}
 }
 
-% New command for triangular graphs with mean and one-standard-deviation interval
+
+% \TriangularMeanSDGraph: 7 parameters
 % #1 = variable symbol
 % #2 = left endpoint a
 % #3 = mode c
@@ -95,9 +97,31 @@
 			\pgfmathsetmacro{\LeftSD}{\TriMean-\TriSigma}
 			\pgfmathsetmacro{\RightSD}{\TriMean+\TriSigma}
 			\pgfmathsetmacro{\PeakHeight}{2/((#4)-(#2))}
-			\pgfmathsetmacro{\ShadeHeight}{0.5*\PeakHeight}
 			\pgfmathsetmacro{\GuideHeight}{0.82*(#7)}
 			\pgfmathsetmacro{\MeanLineHeight}{0.71*(#7)}
+			
+			\ifdim#3pt=#2pt
+			\pgfmathsetmacro{\LeftHeight}{2*((#4)-(\LeftSD))/(((#4)-(#2))*((#4)-(#3)))}
+			\pgfmathsetmacro{\RightHeight}{2*((#4)-(\RightSD))/(((#4)-(#2))*((#4)-(#3)))}
+			\else
+			\ifdim#3pt=#4pt
+			\pgfmathsetmacro{\LeftHeight}{2*((\LeftSD)-(#2))/(((#4)-(#2))*((#3)-(#2)))}
+			\pgfmathsetmacro{\RightHeight}{2*((\RightSD)-(#2))/(((#4)-(#2))*((#3)-(#2)))}
+			\else
+			\ifdim\LeftSD pt<#3pt
+			\pgfmathsetmacro{\LeftHeight}{2*((\LeftSD)-(#2))/(((#4)-(#2))*((#3)-(#2)))}
+			\else
+			\pgfmathsetmacro{\LeftHeight}{2*((#4)-(\LeftSD))/(((#4)-(#2))*((#4)-(#3)))}
+			\fi
+			
+			\ifdim\RightSD pt<#3pt
+			\pgfmathsetmacro{\RightHeight}{2*((\RightSD)-(#2))/(((#4)-(#2))*((#3)-(#2)))}
+			\else
+			\pgfmathsetmacro{\RightHeight}{2*((#4)-(\RightSD))/(((#4)-(#2))*((#4)-(#3)))}
+			\fi
+			\fi
+			\fi
+			
 			\begin{axis}[
 				width=10cm,
 				height=5.5cm,
@@ -114,6 +138,35 @@
 				xticklabels={$#2$,,$E[#1]=\pgfmathprintnumber[precision=2]{\TriMean}$,,$#4$},
 				ytick=\empty
 				]
+				
+				\ifdim#3pt=#2pt
+				\addplot[draw=none, fill=red, fill opacity=0.5]
+				coordinates {(\LeftSD,0) (\LeftSD,\LeftHeight) (\RightSD,\RightHeight) (\RightSD,0)}
+				\closedcycle;
+				\else
+				\ifdim#3pt=#4pt
+				\addplot[draw=none, fill=red, fill opacity=0.5]
+				coordinates {(\LeftSD,0) (\LeftSD,\LeftHeight) (\RightSD,\RightHeight) (\RightSD,0)}
+				\closedcycle;
+				\else
+				\ifdim\LeftSD pt<#3pt
+				\ifdim\RightSD pt>#3pt
+				\addplot[draw=none, fill=red, fill opacity=0.5]
+				coordinates {(\LeftSD,0) (\LeftSD,\LeftHeight) (#3,\PeakHeight) (\RightSD,\RightHeight) (\RightSD,0)}
+				\closedcycle;
+				\else
+				\addplot[draw=none, fill=red, fill opacity=0.5]
+				coordinates {(\LeftSD,0) (\LeftSD,\LeftHeight) (\RightSD,\RightHeight) (\RightSD,0)}
+				\closedcycle;
+				\fi
+				\else
+				\addplot[draw=none, fill=red, fill opacity=0.5]
+				coordinates {(\LeftSD,0) (\LeftSD,\LeftHeight) (\RightSD,\RightHeight) (\RightSD,0)}
+				\closedcycle;
+				\fi
+				\fi
+				\fi
+				
 				\addplot[ultra thick, blue]
 				coordinates {(#2,0) (#3,\PeakHeight) (#4,0)};
 				
@@ -126,16 +179,66 @@
 				\addplot[red, densely dotted, thick]
 				coordinates {(\RightSD,0) (\RightSD,\GuideHeight)};
 				
-				\addplot[draw=none, fill=red, fill opacity=0.5]
-				coordinates {(\LeftSD,0) (\LeftSD,\ShadeHeight) (\RightSD,\ShadeHeight) (\RightSD,0)}
-				\closedcycle;
-				
 				\node[font=\small, above] at (axis cs:\LeftSD,\GuideHeight) {$E[#1]-\sigma$};
 				\node[font=\small, above] at (axis cs:\RightSD,\GuideHeight) {$E[#1]+\sigma$};
 			\end{axis}
 		\end{tikzpicture}
 	\end{center}
 }
+
+% \NormalMeanSDGraph: 6 parameters
+% #1 = variable symbol
+% #2 = mean E[#1]
+% #3 = standard deviation sigma
+% #4 = xmin
+% #5 = xmax
+% #6 = ymax
+\newcommand{\NormalMeanSDGraph}[6]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\PeakHeight}{1/((#3)*sqrt(2*pi))}
+			\pgfmathsetmacro{\LeftTwoSD}{(#2)-2*(#3)}
+			\pgfmathsetmacro{\LeftOneSD}{(#2)-(#3)}
+			\pgfmathsetmacro{\RightOneSD}{(#2)+(#3)}
+			\pgfmathsetmacro{\RightTwoSD}{(#2)+2*(#3)}
+			\pgfmathsetmacro{\OneSDHeight}{\PeakHeight*exp(-0.5)}
+			\pgfmathsetmacro{\TwoSDHeight}{\PeakHeight*exp(-2)}
+			\begin{axis}[
+				width=9cm,
+				height=5cm,
+				axis lines=left,
+				xlabel={$#1$},
+				ylabel={$f(#1)$},
+				xmin=#4,
+				xmax=#5,
+				ymin=0,
+				ymax=#6,
+				grid=both,
+				xtick={\LeftTwoSD,\LeftOneSD,#2,\RightOneSD,\RightTwoSD},
+				ytick=\empty
+				]
+				\addplot[very thick, blue, domain=#4:#5, samples=240]
+				{1/((#3)*sqrt(2*pi))*exp(-((x-(#2))^2)/(2*(#3)^2))};
+				
+				\addplot[dashed]
+				coordinates {(#2,0) (#2,\PeakHeight)};
+				
+				\addplot[densely dotted]
+				coordinates {(\LeftOneSD,0) (\LeftOneSD,\OneSDHeight)};
+				
+				\addplot[densely dotted]
+				coordinates {(\RightOneSD,0) (\RightOneSD,\OneSDHeight)};
+				
+				\addplot[densely dotted]
+				coordinates {(\LeftTwoSD,0) (\LeftTwoSD,\TwoSDHeight)};
+				
+				\addplot[densely dotted]
+				coordinates {(\RightTwoSD,0) (\RightTwoSD,\TwoSDHeight)};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
 
 \newcommand{\UniformDistGraph}[5]{
 \begin{center}
@@ -410,30 +513,9 @@ Intervals:
 \[
 [\mu-\sigma,\mu+\sigma]=[62,78],\qquad [\mu-2\sigma,\mu+2\sigma]=[54,86].
 \]
-\begin{center}
-\begin{tikzpicture}
-\begin{axis}[
-  width=9cm,
-  height=5cm,
-  axis lines=left,
-  xlabel={$s$},
-  ylabel={$f(s)$},
-  xmin=48,
-  xmax=92,
-  ymin=0,
-  grid=both,
-  xtick={54,62,70,78,86},
-  ytick=\empty
-]
-\addplot[very thick, blue, domain=48:92, samples=240] {1/(8*sqrt(2*pi))*exp(-((x-70)^2)/(2*8^2))};
-\addplot[dashed] coordinates {(70,0) (70,0.055)};
-\addplot[densely dotted] coordinates {(62,0) (62,0.03)};
-\addplot[densely dotted] coordinates {(78,0) (78,0.03)};
-\addplot[densely dotted] coordinates {(54,0) (54,0.015)};
-\addplot[densely dotted] coordinates {(86,0) (86,0.015)};
-\end{axis}
-\end{tikzpicture}
-\end{center}
+
+\NormalMeanSDGraph{s}{70}{8}{48}{92}{0.06}
+
 The normal curve is symmetric about 70, so values equally distant from 70 have equal density; values near 70 are most likely.
 
 % --------------------------------------------------
