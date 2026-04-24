@@ -1,3 +1,12 @@
+/*
+  Purpose:
+  Stores the dated schedule dataset generated from the authoring CSV source.
+
+  Responsibilities:
+  - Exposes window.SCHEDULE_DATA as the global schedule input for table rendering
+  - Provides class entries with section, date, weekday, materials, and summary fields
+  - Supplies content consumed by schedule/class page scripts without adding UI behavior
+*/
 // AUTO-GENERATED FILE
 // Generated from teacher/authoring/schedule.csv
 // Do not edit manually.

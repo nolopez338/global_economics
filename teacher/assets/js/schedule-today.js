@@ -1,3 +1,12 @@
+/*
+  Purpose:
+  Highlights today within schedule tables and inserts a visual “Today” divider row.
+
+  Responsibilities:
+  - Parses schedule date cells and compares them against the current local date
+  - Applies/removes today-specific row classes and indicator rows in standard schedule tables
+  - Skips full-schedule pages so dedicated full-schedule marker logic can run separately
+*/
 const isFullSchedulePage = () =>
   /\/full_schedule\.html$/i.test(window.location.pathname || "");
 

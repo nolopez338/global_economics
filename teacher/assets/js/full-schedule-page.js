@@ -1,6 +1,11 @@
 /*
-  Loaded after class-page/schedule scripts so this adapter can replace the single-class
-  markup and render the combined table while still allowing schedule-today.js to run.
+  Purpose:
+  Adapts class schedule data into the combined full-schedule page format.
+
+  Responsibilities:
+  - Normalizes class identifiers, dates, and slot values from schedule sources
+  - Flattens and sorts entries so the full schedule table can be rendered consistently
+  - Coordinates with existing class/schedule scripts to replace single-class output with aggregate output
 */
 (() => {
   const parseClassId = (rawClassId) => {

@@ -1,3 +1,12 @@
+/*
+  Purpose:
+  Defines and injects the weekly schedule table markup used on the main schedule view.
+
+  Responsibilities:
+  - Provides the base HTML structure for weekday headers and class time slots
+  - Renders the static table shell that other schedule scripts enhance with behavior
+  - Controls the initial schedule table layout expected by linked class and weekday UI logic
+*/
 (function () {
   const weeklyScheduleSectionMarkup = `    <section class="table-wrap" aria-label="Weekly schedule table">
       <div class="schedule-table-wrap">

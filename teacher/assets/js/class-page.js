@@ -1,3 +1,12 @@
+/*
+  Purpose:
+  Builds the class detail page for a selected grade/section and renders its schedule context.
+
+  Responsibilities:
+  - Reads class metadata from #class-page data attributes and query parameters
+  - Creates page sections such as breadcrumbs, header, notes, and class resources
+  - Connects class-level data sources (student lists, notes, schedule rows) to DOM rendering
+*/
 const buildClassKey = (grade, section) => {
   if (!grade || !section) {
     return "";

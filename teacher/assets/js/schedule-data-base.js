@@ -1,3 +1,12 @@
+/*
+  Purpose:
+  Stores the base schedule dataset generated from the authoring CSV source.
+
+  Responsibilities:
+  - Exposes window.SCHEDULE_DATA as a global input for schedule-rendering scripts
+  - Provides baseline term/class records used before or without dated schedule overrides
+  - Serves as generated data only, with no runtime rendering logic
+*/
 // AUTO-GENERATED FILE
 // Generated from teacher/authoring/schedule.csv
 // Do not edit manually.
