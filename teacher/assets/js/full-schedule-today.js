@@ -85,7 +85,9 @@
         return;
       }
 
-      const rowDateNormalized = normalizeDateString(dateCell.textContent);
+      const rowDateNormalized = normalizeDateString(
+        row.dataset.date || dateCell.textContent
+      );
       if (!rowDateNormalized) {
         return;
       }
