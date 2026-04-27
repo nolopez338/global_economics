@@ -3815,7 +3815,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "Work on C4 C5 Proyect",
+    "Description": "Work on C4 C5 Proyect Session 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
@@ -3828,7 +3828,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 2",
-    "Description": "Work on C4 C5 Proyect",
+    "Description": "Work on C4 C5 Proyect Session 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -4309,7 +4309,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 1",
-    "Description": "Work on C4 C5 Proyect",
+    "Description": "Work on C4 C5 Proyect Session 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
@@ -4322,7 +4322,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 4",
-    "Description": "Work on C4 C5 Proyect",
+    "Description": "Work on C4 C5 Proyect Session 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5"
