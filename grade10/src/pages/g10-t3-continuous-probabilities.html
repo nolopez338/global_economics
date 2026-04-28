@@ -857,10 +857,12 @@
                 <div class="field col-12">
                   <label for="modeMeanInput">Mean</label>
                   <input id="modeMeanInput" type="number" step="any" value="0.5" />
+                  <input id="modeMeanSlider" class="param-slider" type="range" step="0.001" />
                 </div>
                 <div class="field col-12">
                   <label for="modeStdInput">Std</label>
-                  <input id="modeStdInput" type="number" min="0" step="any" value="0.288675" />
+                  <input id="modeStdInput" type="number" min="0.001" step="any" value="0.288675" />
+                  <input id="modeStdSlider" class="param-slider" type="range" step="0.001" min="0.001" />
                 </div>
               </div>
             </div>
@@ -1052,7 +1054,9 @@
         useMeanStdToggle: document.getElementById('useMeanStdToggle'),
         meanStdParams: document.getElementById('meanStdParams'),
         modeMeanInput: document.getElementById('modeMeanInput'),
-        modeStdInput: document.getElementById('modeStdInput')
+        modeStdInput: document.getElementById('modeStdInput'),
+        modeMeanSlider: document.getElementById('modeMeanSlider'),
+        modeStdSlider: document.getElementById('modeStdSlider')
       };
 
       const setRightPanelCollapsed = (collapsed) => {
@@ -1263,7 +1267,9 @@
           [els.trapB, els.trapBSlider],
           [els.trapC, els.trapCSlider],
           [els.trapD, els.trapDSlider],
-          [els.trapHeight, els.trapHeightSlider]
+          [els.trapHeight, els.trapHeightSlider],
+          [els.modeMeanInput, els.modeMeanSlider],
+          [els.modeStdInput, els.modeStdSlider]
         ].forEach(([input, slider]) => syncInputSlider(input, slider));
 
         Array.from(els.piecewiseRows.querySelectorAll('tr')).forEach((row) => {
@@ -1301,6 +1307,13 @@
         setSliderBounds(els.trapCSlider, pb, pd - EPS);
         setSliderBounds(els.trapDSlider, pc + EPS, rangeMax);
         setSliderBounds(els.trapHeightSlider, 0, heightMax, 0.0005);
+
+        const meanRangePadding = Math.max(1, span * 0.5);
+        const meanMin = rangeMin - meanRangePadding;
+        const meanMax = rangeMax + meanRangePadding;
+        const stdMax = Math.max(0.5, span * 2, Number(els.modeStdInput.value));
+        setSliderBounds(els.modeMeanSlider, meanMin, meanMax, 0.001);
+        setSliderBounds(els.modeStdSlider, EPS, stdMax, 0.001);
 
         const rows = Array.from(els.piecewiseRows.querySelectorAll('tr'));
         rows.forEach((row, i) => {
@@ -1389,7 +1402,7 @@
         let mean = Number(els.modeMeanInput.value);
         let std = Number(els.modeStdInput.value);
         if (!Number.isFinite(mean)) mean = 0;
-        if (!Number.isFinite(std) || std < 0) std = 0;
+        if (!Number.isFinite(std) || std < EPS) std = EPS;
         els.modeMeanInput.value = toInputNumber(mean);
         els.modeStdInput.value = toInputNumber(std);
         return { mean, std };
@@ -3012,10 +3025,8 @@
         state.useMeanStdMode = els.useMeanStdToggle.checked;
         evaluateAndDraw();
       });
-      els.modeMeanInput.addEventListener('input', evaluateAndDraw);
-      els.modeMeanInput.addEventListener('change', evaluateAndDraw);
-      els.modeStdInput.addEventListener('input', evaluateAndDraw);
-      els.modeStdInput.addEventListener('change', evaluateAndDraw);
+      bindInputAndSlider(els.modeMeanInput, els.modeMeanSlider, evaluateAndDraw);
+      bindInputAndSlider(els.modeStdInput, els.modeStdSlider, evaluateAndDraw);
       els.autoadjustToggles.forEach((toggle) => {
         toggle.addEventListener('change', () => {
           setAutoadjustValue(toggle.checked);
