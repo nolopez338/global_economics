@@ -432,6 +432,96 @@
       display: block;
     }
 
+
+    .generated-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: end;
+      margin-bottom: 0.6rem;
+    }
+
+    .generated-controls .field {
+      min-width: 170px;
+      gap: 0.2rem;
+    }
+
+    .generated-controls .field label {
+      font-size: 0.82rem;
+      color: #334155;
+    }
+
+    .generated-controls button {
+      padding: 0.45rem 0.65rem;
+      font-size: 0.88rem;
+    }
+
+    .generated-sample-count {
+      margin-left: auto;
+      color: #334155;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .generated-chart-wrap {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .generated-canvas {
+      width: 100%;
+      height: 220px;
+      display: block;
+    }
+
+    .generated-scatter-section {
+      margin-top: 0.7rem;
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .generated-scatter-section h4,
+    .generated-table-section h3 {
+      margin: 0;
+      font-size: 0.98rem;
+    }
+
+    .generated-table-section {
+      margin-top: 0.9rem;
+      display: grid;
+      gap: 0.45rem;
+    }
+
+    .generated-table-wrap {
+      max-height: 300px;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .generated-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .generated-table th,
+    .generated-table td {
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0.45rem 0.55rem;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    .generated-table th {
+      position: sticky;
+      top: 0;
+      background: #f8fafc;
+      z-index: 1;
+    }
+
     @media (max-width: 840px) {
       .col-6, .col-4, .col-3 { grid-column: span 12; }
       canvas { height: 340px; }
@@ -640,6 +730,47 @@
           <input id="xMaxInput" type="number" step="any" value="3" />
         </div>
       </div>
+
+      <details id="generatedHistogramDetails" class="prob-cdf-details" open>
+        <summary>Generated data histogram</summary>
+        <div class="prob-cdf-body">
+          <div class="generated-controls">
+            <div class="field">
+              <label for="generationMode">Mode</label>
+              <select id="generationMode">
+                <option value="scratch">Generate Data from Scratch</option>
+                <option value="add">Add Data</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="generationBatchSize">Batch size</label>
+              <select id="generationBatchSize">
+                <option value="1">1</option>
+                <option value="10">10</option>
+                <option value="100" selected>100</option>
+                <option value="1000">1000</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="histogramBinCount">Histogram bins</label>
+              <input id="histogramBinCount" type="number" min="3" max="60" step="1" value="20" />
+            </div>
+            <button id="generateDataBtn" type="button" class="btn-primary">Generate Data</button>
+            <button id="clearDataBtn" type="button" class="btn-secondary">Clear Data</button>
+            <div id="generatedSampleCount" class="generated-sample-count">Samples: 0</div>
+          </div>
+          <div class="generated-chart-wrap">
+            <canvas id="histogramCanvas" class="generated-canvas"></canvas>
+          </div>
+          <div class="generated-scatter-section">
+            <h4>Generated data scatter plot</h4>
+            <div class="generated-chart-wrap">
+              <canvas id="scatterCanvas" class="generated-canvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </details>
+
       <div id="probabilitySummary" class="probability-summary" aria-live="polite"></div>
       <details id="sharedCdfDetails" class="prob-cdf-details">
         <summary>CDF view</summary>
@@ -659,6 +790,16 @@
           </div>
         </div>
       </details>
+
+      <section class="generated-table-section" aria-live="polite">
+        <h3>Generated data table</h3>
+        <div class="generated-table-wrap">
+          <table class="generated-table">
+            <thead><tr><th>ID</th><th>Value</th></tr></thead>
+            <tbody id="generatedDataTableBody"></tbody>
+          </table>
+        </div>
+      </section>
     </section>
   </main>
 
@@ -721,7 +862,16 @@
         sharedCdfDetails: document.getElementById('sharedCdfDetails'),
         cdfYTopInput: document.getElementById('cdfYTopInput'),
         cdfAutoYTopToggle: document.getElementById('cdfAutoYTopToggle'),
-        sharedCdfCanvas: document.getElementById('sharedCdfCanvas')
+        sharedCdfCanvas: document.getElementById('sharedCdfCanvas'),
+        generationMode: document.getElementById('generationMode'),
+        generationBatchSize: document.getElementById('generationBatchSize'),
+        histogramBinCount: document.getElementById('histogramBinCount'),
+        generateDataBtn: document.getElementById('generateDataBtn'),
+        clearDataBtn: document.getElementById('clearDataBtn'),
+        generatedSampleCount: document.getElementById('generatedSampleCount'),
+        histogramCanvas: document.getElementById('histogramCanvas'),
+        scatterCanvas: document.getElementById('scatterCanvas'),
+        generatedDataTableBody: document.getElementById('generatedDataTableBody')
       };
 
       const defaults = {
@@ -845,7 +995,8 @@
         probabilityMarkers: [],
         hoveredProbabilityRegion: null,
         cdfView: { autoYTopEnabled: true, yTop: 1.05 },
-        plot: { m: { l: 62, r: 20, t: 18, b: 46 }, w: 1, h: 1, rectWidth: 1, rectHeight: 420 }
+        plot: { m: { l: 62, r: 20, t: 18, b: 46 }, w: 1, h: 1, rectWidth: 1, rectHeight: 420 },
+        generatedData: []
       };
 
       function getAutoadjustValue() {
@@ -1604,6 +1755,195 @@
         return targets;
       }
 
+      function buildSamplerFromCurrentPdf() {
+        if (!state.x.length || !state.y.length) return null;
+        const segments = [];
+        let totalArea = 0;
+        for (let i = 0; i < state.x.length - 1; i++) {
+          const xa = state.x[i];
+          const xb = state.x[i + 1];
+          const ya = Math.max(0, state.y[i]);
+          const yb = Math.max(0, state.y[i + 1]);
+          const dx = xb - xa;
+          if (!(dx > 0)) continue;
+          const area = dx * (ya + yb) / 2;
+          if (area <= 0) continue;
+          segments.push({ xa, xb, ya, yb, dx, area, cumulativeStart: totalArea });
+          totalArea += area;
+        }
+        if (!(totalArea > 0) || !segments.length) return null;
+
+        return function sampleOne() {
+          const targetArea = Math.random() * totalArea;
+          let seg = segments[segments.length - 1];
+          for (let i = 0; i < segments.length; i++) {
+            const candidate = segments[i];
+            if (targetArea <= candidate.cumulativeStart + candidate.area) {
+              seg = candidate;
+              break;
+            }
+          }
+
+          const localArea = targetArea - seg.cumulativeStart;
+          const slope = (seg.yb - seg.ya) / seg.dx;
+          let t;
+          if (Math.abs(slope) < 1e-12) {
+            t = seg.ya > 0 ? localArea / seg.ya : seg.dx * Math.random();
+          } else {
+            const disc = Math.max(0, seg.ya * seg.ya + 2 * slope * localArea);
+            const root = Math.sqrt(disc);
+            const t1 = (-seg.ya + root) / slope;
+            const t2 = (-seg.ya - root) / slope;
+            const valid = [t1, t2].find((v) => Number.isFinite(v) && v >= -1e-9 && v <= seg.dx + 1e-9);
+            t = Number.isFinite(valid) ? valid : clamp(t1, 0, seg.dx);
+          }
+          return clamp(seg.xa + t, seg.xa, seg.xb);
+        };
+      }
+
+      function drawSimpleAxes(ctx, m, w, h, xmin, xmax, ymin, ymax, yLabel, xLabel) {
+        drawAxesWithLabel(ctx, m, w, h, xmin, xmax, ymin, ymax, yLabel);
+        ctx.fillStyle = '#111827';
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(xLabel, m.l + w / 2, m.t + h + 32);
+      }
+
+      function renderGeneratedTable() {
+        const rows = state.generatedData;
+        if (!rows.length) {
+          els.generatedDataTableBody.innerHTML = '<tr><td colspan="2" class="muted">No generated data yet.</td></tr>';
+          return;
+        }
+        els.generatedDataTableBody.innerHTML = rows.map((row) => `<tr><td>${row.id}</td><td>${fmt(row.value, 6)}</td></tr>`).join('');
+      }
+
+      function setupCanvas(canvas, targetHeight = 220) {
+        const rect = canvas.getBoundingClientRect();
+        const width = Math.max(220, rect.width || 220);
+        const dpr = Math.max(1, window.devicePixelRatio || 1);
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(targetHeight * dpr);
+        canvas.style.height = `${targetHeight}px`;
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, width, targetHeight);
+        return { ctx, width, height: targetHeight };
+      }
+
+      function renderHistogram() {
+        const { ctx, width, height } = setupCanvas(els.histogramCanvas);
+        const m = { l: 52, r: 16, t: 14, b: 36 };
+        const w = width - m.l - m.r;
+        const h = height - m.t - m.b;
+        const data = state.generatedData.map((d) => d.value);
+        const xmin = state.x.length ? state.x[0] : 0;
+        const xmax = state.x.length ? state.x[state.x.length - 1] : 1;
+
+        if (!data.length) {
+          drawAxesWithLabel(ctx, m, w, h, xmin, xmax, 0, 1, 'Count');
+          ctx.fillStyle = '#64748b';
+          ctx.font = '13px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('No generated data yet.', m.l + w / 2, m.t + h / 2);
+          return;
+        }
+
+        const requestedBins = Math.round(Number(els.histogramBinCount.value));
+        const binCount = clamp(Number.isFinite(requestedBins) ? requestedBins : 20, 3, 60);
+        els.histogramBinCount.value = String(binCount);
+        const span = Math.max(1e-9, xmax - xmin);
+        const binWidth = span / binCount;
+        const counts = new Array(binCount).fill(0);
+        data.forEach((v) => {
+          const idx = clamp(Math.floor((v - xmin) / binWidth), 0, binCount - 1);
+          counts[idx] += 1;
+        });
+        const yMax = Math.max(1, ...counts) * 1.1;
+
+        drawAxesWithLabel(ctx, m, w, h, xmin, xmax, 0, yMax, 'Count');
+        ctx.fillStyle = 'rgba(37, 99, 235, 0.72)';
+        ctx.strokeStyle = '#1d4ed8';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < binCount; i++) {
+          const x0 = m.l + (i / binCount) * w;
+          const x1 = m.l + ((i + 1) / binCount) * w;
+          const barH = (counts[i] / yMax) * h;
+          const y0 = m.t + h - barH;
+          ctx.fillRect(x0 + 1, y0, Math.max(1, x1 - x0 - 2), barH);
+          ctx.strokeRect(x0 + 1, y0, Math.max(1, x1 - x0 - 2), barH);
+        }
+      }
+
+      function renderScatterPlot() {
+        const { ctx, width, height } = setupCanvas(els.scatterCanvas);
+        const m = { l: 52, r: 16, t: 14, b: 40 };
+        const w = width - m.l - m.r;
+        const h = height - m.t - m.b;
+        const rows = state.generatedData;
+        const xMax = Math.max(1, rows.length);
+        const yMinBase = state.x.length ? state.x[0] : 0;
+        const yMaxBase = state.x.length ? state.x[state.x.length - 1] : 1;
+
+        if (!rows.length) {
+          drawAxesWithLabel(ctx, m, w, h, 1, 1, yMinBase, yMaxBase, 'Generated value');
+          ctx.fillStyle = '#64748b';
+          ctx.font = '13px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('No generated data yet.', m.l + w / 2, m.t + h / 2);
+          return;
+        }
+
+        const yVals = rows.map((r) => r.value);
+        const yMin = Math.min(yMinBase, ...yVals);
+        const yMax = Math.max(yMaxBase, ...yVals);
+        const safeYMax = yMax > yMin ? yMax : yMin + 1;
+        drawAxesWithLabel(ctx, m, w, h, 1, xMax, yMin, safeYMax, 'Generated value');
+
+        const px = (v) => m.l + ((v - 1) / (xMax - 1 || 1)) * w;
+        const py = (v) => m.t + h - ((v - yMin) / (safeYMax - yMin || 1)) * h;
+        const radius = rows.length > 800 ? 1.4 : rows.length > 200 ? 1.9 : 2.6;
+        ctx.fillStyle = 'rgba(124, 58, 237, 0.72)';
+        rows.forEach((row) => {
+          ctx.beginPath();
+          ctx.arc(px(row.id), py(row.value), radius, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        ctx.fillStyle = '#111827';
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Sample ID', m.l + w / 2, m.t + h + 32);
+      }
+
+      function renderGeneratedDataViews() {
+        els.generatedSampleCount.textContent = `Samples: ${state.generatedData.length}`;
+        renderHistogram();
+        renderScatterPlot();
+        renderGeneratedTable();
+      }
+
+      function generateData() {
+        const sampler = buildSamplerFromCurrentPdf();
+        if (!sampler) {
+          setStatus('warn', 'Unable to sample from the current PDF. Adjust parameters and try again.');
+          return;
+        }
+        const mode = els.generationMode.value;
+        const batchSize = Number(els.generationBatchSize.value);
+        if (mode === 'scratch') state.generatedData = [];
+        for (let i = 0; i < batchSize; i++) {
+          state.generatedData.push({ id: state.generatedData.length + 1, value: sampler() });
+        }
+        renderGeneratedDataViews();
+      }
+
+      function clearGeneratedData() {
+        state.generatedData = [];
+        renderGeneratedDataViews();
+      }
+
+
       function evaluateAndDraw() {
         showPanels();
         const model = readAndSanitize();
@@ -1674,6 +2014,7 @@
         setErrors(errors);
         renderProbabilitySummary();
         drawGraph();
+        renderGeneratedDataViews();
       }
 
       function dataToPixel(xVal, yVal) {
@@ -2302,6 +2643,7 @@
         state.probabilityMarkers = [];
         state.hoveredProbabilityRegion = null;
         state.cdfView = { autoYTopEnabled: true, yTop: 1.05 };
+        state.generatedData = [];
         els.cdfAutoYTopToggle.checked = true;
         els.cdfYTopInput.value = '1.05';
         els.cdfYTopInput.disabled = true;
@@ -2316,6 +2658,7 @@
         resizeTimer = setTimeout(() => {
           drawGraph();
           drawSharedCdfSection();
+          renderGeneratedDataViews();
         }, 140);
       });
 
@@ -2384,6 +2727,12 @@
         els.cdfAutoYTopToggle.checked = false;
         drawSharedCdfSection();
       });
+
+      els.generateDataBtn.addEventListener('click', generateData);
+      els.clearDataBtn.addEventListener('click', clearGeneratedData);
+      els.histogramBinCount.addEventListener('change', renderHistogram);
+      els.histogramBinCount.addEventListener('input', renderHistogram);
+
       els.canvas.addEventListener('pointermove', movePointer);
       els.canvas.addEventListener('pointerdown', startDrag);
       els.canvas.addEventListener('pointerup', endDrag);
