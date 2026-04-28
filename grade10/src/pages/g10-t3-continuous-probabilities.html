@@ -522,6 +522,132 @@
       z-index: 1;
     }
 
+    .subsection {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #f8fafc;
+      overflow: hidden;
+      margin-top: 0.45rem;
+    }
+
+    .subsection > summary {
+      cursor: pointer;
+      padding: 0.55rem 0.7rem;
+      font-weight: 700;
+      background: #eef2ff;
+      color: #1e3a8a;
+    }
+
+    .subsection-body {
+      padding: 0.7rem;
+    }
+
+    .graph-control-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.9rem;
+      align-items: start;
+    }
+
+    .graph-main-content {
+      min-width: 0;
+    }
+
+    .right-control-panel {
+      width: 320px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      overflow: hidden;
+      transition: width 0.22s ease;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+    }
+
+    .right-control-panel.collapsed {
+      width: 52px;
+    }
+
+    .right-control-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.5rem 0.6rem;
+      background: #eef2ff;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .right-control-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      white-space: nowrap;
+    }
+
+    .right-control-panel.collapsed .right-control-title {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      margin: 0 auto;
+      font-size: 0.8rem;
+    }
+
+    .right-control-toggle {
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      color: #1e3a8a;
+      padding: 0.25rem 0.42rem;
+      min-width: 1.95rem;
+      line-height: 1;
+    }
+
+    .right-control-body {
+      padding: 0.7rem;
+      display: grid;
+      gap: 0.65rem;
+    }
+
+    .right-control-panel.collapsed .right-control-body {
+      display: none;
+    }
+
+    .right-control-body .grid {
+      grid-template-columns: 1fr;
+      gap: 0.6rem;
+    }
+
+    .right-control-body .col-6,
+    .right-control-body .col-4,
+    .right-control-body .col-3,
+    .right-control-body .col-12 {
+      grid-column: span 12;
+    }
+
+    .right-control-body .actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .right-control-body .actions button {
+      width: 100%;
+    }
+
+    .right-control-body .input-toggle-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.45rem;
+    }
+
+    .right-control-body .input-toggle-row input[type="number"] {
+      min-width: 0;
+      width: 100%;
+      flex: none;
+    }
+
+    .right-control-body .status,
+    .right-control-body .error-box {
+      margin-top: 0;
+    }
+
     @media (max-width: 840px) {
       .col-6, .col-4, .col-3 { grid-column: span 12; }
       canvas { height: 340px; }
@@ -537,6 +663,21 @@
       }
       .graph-x-range .field:last-child input {
         margin-left: 0;
+      }
+      .graph-control-layout {
+        grid-template-columns: 1fr;
+      }
+      .right-control-panel,
+      .right-control-panel.collapsed {
+        width: 100%;
+      }
+      .right-control-panel.collapsed .right-control-title {
+        writing-mode: horizontal-tb;
+        transform: none;
+        margin: 0;
+      }
+      .right-control-panel.collapsed .right-control-body {
+        display: none;
       }
     }
   </style>
@@ -564,142 +705,39 @@
 
     <section class="card content-card">
       <h2>PDF Input</h2>
-      <div class="grid">
-        <div class="field col-12">
-          <label for="distributionType">Distribution type</label>
-          <select id="distributionType">
-            <option value="uniform">Uniform</option>
-            <option value="triangular">Triangular</option>
-            <option value="trapezoid">Trapezoid</option>
-            <option value="piecewise">Piecewise linear</option>
-          </select>
-        </div>
-
-        <div class="field col-12">
-          <label for="exampleSelector">Practice example</label>
-          <select id="exampleSelector">
-            <option value="none">None</option>
-            <option value="1">Problem 1</option>
-            <option value="2">Problem 2</option>
-            <option value="3">Problem 3</option>
-            <option value="4">Problem 4</option>
-            <option value="5">Problem 5</option>
-            <option value="6">Problem 6</option>
-            <option value="7">Problem 7</option>
-            <option value="8">Problem 8</option>
-            <option value="9">Problem 9</option>
-            <option value="10">Problem 10</option>
-          </select>
-        </div>
-
-        <div id="uniformParams" class="params-panel col-12">
+      <details class="subsection" open>
+        <summary>Distribution &amp; practice selection</summary>
+        <div class="subsection-body">
           <div class="grid">
-            <div class="field col-6">
-              <label for="uniformA">a (left bound)</label>
-              <input id="uniformA" type="number" step="any" value="0" />
-              <input id="uniformASlider" class="param-slider" type="range" step="0.001" />
+            <div class="field col-12">
+              <label for="distributionType">Distribution type</label>
+              <select id="distributionType">
+                <option value="uniform">Uniform</option>
+                <option value="triangular">Triangular</option>
+                <option value="trapezoid">Trapezoid</option>
+                <option value="piecewise">Piecewise linear</option>
+              </select>
             </div>
-            <div class="field col-6">
-              <label for="uniformB">b (right bound)</label>
-              <input id="uniformB" type="number" step="any" value="1" />
-              <input id="uniformBSlider" class="param-slider" type="range" step="0.001" />
-            </div>
-            <div class="field col-6" id="uniformHeightField">
-              <label for="uniformHeight">Height</label>
-              <div class="input-toggle-row">
-                <input id="uniformHeight" type="number" step="any" value="1" min="0" />
-                <label class="toggle-inline"><input data-autoadjust-toggle type="checkbox" checked /> autoadjust</label>
-              </div>
-              <input id="uniformHeightSlider" class="param-slider" type="range" step="0.001" />
+
+            <div class="field col-12">
+              <label for="exampleSelector">Practice example</label>
+              <select id="exampleSelector">
+                <option value="none">None</option>
+                <option value="1">Problem 1</option>
+                <option value="2">Problem 2</option>
+                <option value="3">Problem 3</option>
+                <option value="4">Problem 4</option>
+                <option value="5">Problem 5</option>
+                <option value="6">Problem 6</option>
+                <option value="7">Problem 7</option>
+                <option value="8">Problem 8</option>
+                <option value="9">Problem 9</option>
+                <option value="10">Problem 10</option>
+              </select>
             </div>
           </div>
         </div>
-
-        <div id="triangularParams" class="params-panel col-12" hidden>
-          <div class="grid">
-            <div class="field col-4">
-              <label for="triA">a (left bound)</label>
-              <input id="triA" type="number" step="any" value="0" />
-              <input id="triASlider" class="param-slider" type="range" step="0.001" />
-            </div>
-            <div class="field col-4">
-              <label for="triM">m (mode)</label>
-              <input id="triM" type="number" step="any" value="1" />
-              <input id="triMSlider" class="param-slider" type="range" step="0.001" />
-            </div>
-            <div class="field col-4">
-              <label for="triB">b (right bound)</label>
-              <input id="triB" type="number" step="any" value="2" />
-              <input id="triBSlider" class="param-slider" type="range" step="0.001" />
-            </div>
-            <div class="field col-4" id="triHeightField">
-              <label for="triHeight">Height of m</label>
-              <div class="input-toggle-row">
-                <input id="triHeight" type="number" step="any" value="1" min="0" />
-                <label class="toggle-inline"><input data-autoadjust-toggle type="checkbox" checked /> autoadjust</label>
-              </div>
-              <input id="triHeightSlider" class="param-slider" type="range" step="0.001" />
-            </div>
-          </div>
-        </div>
-
-        <div id="trapezoidParams" class="params-panel col-12" hidden>
-          <div class="grid">
-            <div class="field col-3">
-              <label for="trapA">a (left bound)</label>
-              <input id="trapA" type="number" step="any" value="0" />
-              <input id="trapASlider" class="param-slider" type="range" step="0.001" />
-            </div>
-            <div class="field col-3">
-              <label for="trapB">b (start plateau)</label>
-              <input id="trapB" type="number" step="any" value="1" />
-              <input id="trapBSlider" class="param-slider" type="range" step="0.001" />
-            </div>
-            <div class="field col-3">
-              <label for="trapC">c (end plateau)</label>
-              <input id="trapC" type="number" step="any" value="2" />
-              <input id="trapCSlider" class="param-slider" type="range" step="0.001" />
-            </div>
-            <div class="field col-3">
-              <label for="trapD">d (right bound)</label>
-              <input id="trapD" type="number" step="any" value="3" />
-              <input id="trapDSlider" class="param-slider" type="range" step="0.001" />
-            </div>
-            <div class="field col-3" id="trapHeightField">
-              <label for="trapHeight">Height of plateau</label>
-              <div class="input-toggle-row">
-                <input id="trapHeight" type="number" step="any" value="1" min="0" />
-                <label class="toggle-inline"><input data-autoadjust-toggle type="checkbox" checked /> autoadjust</label>
-              </div>
-              <input id="trapHeightSlider" class="param-slider" type="range" step="0.001" />
-            </div>
-          </div>
-        </div>
-
-        <div id="piecewiseParams" class="params-panel col-12" hidden>
-          <div class="actions" style="justify-content: space-between;">
-            <label>Points (x, y)</label>
-            <label class="toggle-inline"><input data-autoadjust-toggle type="checkbox" checked /> autoadjust</label>
-          </div>
-          <table class="points-table">
-            <thead>
-              <tr><th>x</th><th>y</th><th>Action</th></tr>
-            </thead>
-            <tbody id="piecewiseRows"></tbody>
-          </table>
-          <div class="actions" style="margin-top:0.6rem;">
-            <button id="addPointBtn" class="btn-secondary" type="button">Add row</button>
-          </div>
-        </div>
-
-        <div class="actions col-12">
-          <button id="updateBtn" class="btn-primary" type="button">Update graph</button>
-          <button id="resetBtn" class="btn-secondary" type="button">Reset</button>
-        </div>
-      </div>
-
-      <div id="status" class="status warn" role="status">Adjust the distribution parameters to update the graph.</div>
-      <div id="errorBox" class="error-box" role="alert" hidden></div>
+      </details>
     </section>
 
     <section class="card content-card">
@@ -709,97 +747,216 @@
 
     <section class="card content-card">
       <h2>PDF graph</h2>
-      <div class="graph-overlay-controls">
-        <div class="field">
-          <label for="yTopInput">y-top</label>
-          <input id="yTopInput" type="number" step="any" value="1" />
-        </div>
-        <label class="toggle-inline"><input id="autoYTopToggle" type="checkbox" checked /> Auto-adjust y-top from PDF</label>
-      </div>
-      <div class="graph-wrap" id="graphWrap">
-        <canvas id="pdfCanvas"></canvas>
-        <div class="tooltip" id="tooltip"></div>
-      </div>
-      <div class="graph-x-range">
-        <div class="field">
-          <label for="xMinInput">x-min</label>
-          <input id="xMinInput" type="number" step="any" value="-1" />
-        </div>
-        <div class="field">
-          <label for="xMaxInput">x-max</label>
-          <input id="xMaxInput" type="number" step="any" value="3" />
-        </div>
-      </div>
+      <div class="graph-control-layout">
+        <div class="graph-main-content">
+          <div class="graph-overlay-controls">
+            <div class="field">
+              <label for="yTopInput">y-top</label>
+              <input id="yTopInput" type="number" step="any" value="1" />
+            </div>
+            <label class="toggle-inline"><input id="autoYTopToggle" type="checkbox" checked /> Auto-adjust y-top from PDF</label>
+          </div>
+          <div class="graph-wrap" id="graphWrap">
+            <canvas id="pdfCanvas"></canvas>
+            <div class="tooltip" id="tooltip"></div>
+          </div>
+          <div class="graph-x-range">
+            <div class="field">
+              <label for="xMinInput">x-min</label>
+              <input id="xMinInput" type="number" step="any" value="-1" />
+            </div>
+            <div class="field">
+              <label for="xMaxInput">x-max</label>
+              <input id="xMaxInput" type="number" step="any" value="3" />
+            </div>
+          </div>
 
-      <details id="generatedHistogramDetails" class="prob-cdf-details" open>
-        <summary>Generated data histogram</summary>
-        <div class="prob-cdf-body">
-          <div class="generated-controls">
-            <div class="field">
-              <label for="generationMode">Mode</label>
-              <select id="generationMode">
-                <option value="scratch">Generate Data from Scratch</option>
-                <option value="add">Add Data</option>
-              </select>
+          <details id="generatedHistogramDetails" class="prob-cdf-details" open>
+            <summary>Generated data histogram</summary>
+            <div class="prob-cdf-body">
+              <div class="generated-controls">
+                <div class="field">
+                  <label for="generationMode">Mode</label>
+                  <select id="generationMode">
+                    <option value="scratch">Generate Data from Scratch</option>
+                    <option value="add">Add Data</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="generationBatchSize">Batch size</label>
+                  <select id="generationBatchSize">
+                    <option value="1">1</option>
+                    <option value="10">10</option>
+                    <option value="100" selected>100</option>
+                    <option value="1000">1000</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="histogramBinCount">Histogram bins</label>
+                  <input id="histogramBinCount" type="number" min="3" max="60" step="1" value="20" />
+                </div>
+                <button id="generateDataBtn" type="button" class="btn-primary">Generate Data</button>
+                <button id="clearDataBtn" type="button" class="btn-secondary">Clear Data</button>
+                <div id="generatedSampleCount" class="generated-sample-count">Samples: 0</div>
+              </div>
+              <div class="generated-chart-wrap">
+                <canvas id="histogramCanvas" class="generated-canvas"></canvas>
+              </div>
+              <div class="generated-scatter-section">
+                <h4>Generated data scatter plot</h4>
+                <div class="generated-chart-wrap">
+                  <canvas id="scatterCanvas" class="generated-canvas"></canvas>
+                </div>
+              </div>
             </div>
-            <div class="field">
-              <label for="generationBatchSize">Batch size</label>
-              <select id="generationBatchSize">
-                <option value="1">1</option>
-                <option value="10">10</option>
-                <option value="100" selected>100</option>
-                <option value="1000">1000</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="histogramBinCount">Histogram bins</label>
-              <input id="histogramBinCount" type="number" min="3" max="60" step="1" value="20" />
-            </div>
-            <button id="generateDataBtn" type="button" class="btn-primary">Generate Data</button>
-            <button id="clearDataBtn" type="button" class="btn-secondary">Clear Data</button>
-            <div id="generatedSampleCount" class="generated-sample-count">Samples: 0</div>
-          </div>
-          <div class="generated-chart-wrap">
-            <canvas id="histogramCanvas" class="generated-canvas"></canvas>
-          </div>
-          <div class="generated-scatter-section">
-            <h4>Generated data scatter plot</h4>
-            <div class="generated-chart-wrap">
-              <canvas id="scatterCanvas" class="generated-canvas"></canvas>
-            </div>
-          </div>
-        </div>
-      </details>
+          </details>
 
-      <div id="probabilitySummary" class="probability-summary" aria-live="polite"></div>
-      <details id="sharedCdfDetails" class="prob-cdf-details">
-        <summary>CDF view</summary>
-        <div class="prob-cdf-body">
-          <div class="prob-cdf-controls">
-            <div class="field">
-              <label for="cdfYTopInput">y-top (CDF)</label>
-              <input id="cdfYTopInput" type="number" step="any" value="1.05" />
+          <div id="probabilitySummary" class="probability-summary" aria-live="polite"></div>
+          <details id="sharedCdfDetails" class="prob-cdf-details">
+            <summary>CDF view</summary>
+            <div class="prob-cdf-body">
+              <div class="prob-cdf-controls">
+                <div class="field">
+                  <label for="cdfYTopInput">y-top (CDF)</label>
+                  <input id="cdfYTopInput" type="number" step="any" value="1.05" />
+                </div>
+                <label class="toggle-inline" for="cdfAutoYTopToggle">
+                  <input id="cdfAutoYTopToggle" type="checkbox" checked />
+                  Auto-adjust local y-top
+                </label>
+              </div>
+              <div class="prob-cdf-wrap">
+                <canvas id="sharedCdfCanvas" class="prob-cdf-canvas"></canvas>
+              </div>
             </div>
-            <label class="toggle-inline" for="cdfAutoYTopToggle">
-              <input id="cdfAutoYTopToggle" type="checkbox" checked />
-              Auto-adjust local y-top
-            </label>
-          </div>
-          <div class="prob-cdf-wrap">
-            <canvas id="sharedCdfCanvas" class="prob-cdf-canvas"></canvas>
-          </div>
-        </div>
-      </details>
+          </details>
 
-      <section class="generated-table-section" aria-live="polite">
-        <h3>Generated data table</h3>
-        <div class="generated-table-wrap">
-          <table class="generated-table">
-            <thead><tr><th>ID</th><th>Value</th></tr></thead>
-            <tbody id="generatedDataTableBody"></tbody>
-          </table>
+          <section class="generated-table-section" aria-live="polite">
+            <h3>Generated data table</h3>
+            <div class="generated-table-wrap">
+              <table class="generated-table">
+                <thead><tr><th>ID</th><th>Value</th></tr></thead>
+                <tbody id="generatedDataTableBody"></tbody>
+              </table>
+            </div>
+          </section>
         </div>
-      </section>
+        <aside id="rightControlPanel" class="right-control-panel" aria-label="Distribution controls">
+          <div class="right-control-header">
+            <span class="right-control-title">Distribution controls</span>
+            <button id="rightControlToggle" class="right-control-toggle" type="button" aria-expanded="true" aria-controls="rightControlBody" title="Collapse controls">⮞</button>
+          </div>
+          <div id="rightControlBody" class="right-control-body">
+            <div id="uniformParams" class="params-panel">
+              <div class="grid">
+                <div class="field col-6">
+                  <label for="uniformA">a (left bound)</label>
+                  <input id="uniformA" type="number" step="any" value="0" />
+                  <input id="uniformASlider" class="param-slider" type="range" step="0.001" />
+                </div>
+                <div class="field col-6">
+                  <label for="uniformB">b (right bound)</label>
+                  <input id="uniformB" type="number" step="any" value="1" />
+                  <input id="uniformBSlider" class="param-slider" type="range" step="0.001" />
+                </div>
+                <div class="field col-6" id="uniformHeightField">
+                  <label for="uniformHeight">Height</label>
+                  <div class="input-toggle-row">
+                    <input id="uniformHeight" type="number" step="any" value="1" min="0" />
+                    <label class="toggle-inline"><input data-autoadjust-toggle type="checkbox" checked /> autoadjust</label>
+                  </div>
+                  <input id="uniformHeightSlider" class="param-slider" type="range" step="0.001" />
+                </div>
+              </div>
+            </div>
+
+            <div id="triangularParams" class="params-panel" hidden>
+              <div class="grid">
+                <div class="field col-4">
+                  <label for="triA">a (left bound)</label>
+                  <input id="triA" type="number" step="any" value="0" />
+                  <input id="triASlider" class="param-slider" type="range" step="0.001" />
+                </div>
+                <div class="field col-4">
+                  <label for="triM">m (mode)</label>
+                  <input id="triM" type="number" step="any" value="1" />
+                  <input id="triMSlider" class="param-slider" type="range" step="0.001" />
+                </div>
+                <div class="field col-4">
+                  <label for="triB">b (right bound)</label>
+                  <input id="triB" type="number" step="any" value="2" />
+                  <input id="triBSlider" class="param-slider" type="range" step="0.001" />
+                </div>
+                <div class="field col-4" id="triHeightField">
+                  <label for="triHeight">Height of m</label>
+                  <div class="input-toggle-row">
+                    <input id="triHeight" type="number" step="any" value="1" min="0" />
+                    <label class="toggle-inline"><input data-autoadjust-toggle type="checkbox" checked /> autoadjust</label>
+                  </div>
+                  <input id="triHeightSlider" class="param-slider" type="range" step="0.001" />
+                </div>
+              </div>
+            </div>
+
+            <div id="trapezoidParams" class="params-panel" hidden>
+              <div class="grid">
+                <div class="field col-3">
+                  <label for="trapA">a (left bound)</label>
+                  <input id="trapA" type="number" step="any" value="0" />
+                  <input id="trapASlider" class="param-slider" type="range" step="0.001" />
+                </div>
+                <div class="field col-3">
+                  <label for="trapB">b (start plateau)</label>
+                  <input id="trapB" type="number" step="any" value="1" />
+                  <input id="trapBSlider" class="param-slider" type="range" step="0.001" />
+                </div>
+                <div class="field col-3">
+                  <label for="trapC">c (end plateau)</label>
+                  <input id="trapC" type="number" step="any" value="2" />
+                  <input id="trapCSlider" class="param-slider" type="range" step="0.001" />
+                </div>
+                <div class="field col-3">
+                  <label for="trapD">d (right bound)</label>
+                  <input id="trapD" type="number" step="any" value="3" />
+                  <input id="trapDSlider" class="param-slider" type="range" step="0.001" />
+                </div>
+                <div class="field col-3" id="trapHeightField">
+                  <label for="trapHeight">Height of plateau</label>
+                  <div class="input-toggle-row">
+                    <input id="trapHeight" type="number" step="any" value="1" min="0" />
+                    <label class="toggle-inline"><input data-autoadjust-toggle type="checkbox" checked /> autoadjust</label>
+                  </div>
+                  <input id="trapHeightSlider" class="param-slider" type="range" step="0.001" />
+                </div>
+              </div>
+            </div>
+
+            <div id="piecewiseParams" class="params-panel" hidden>
+              <div class="actions" style="justify-content: space-between;">
+                <label>Points (x, y)</label>
+                <label class="toggle-inline"><input data-autoadjust-toggle type="checkbox" checked /> autoadjust</label>
+              </div>
+              <table class="points-table">
+                <thead>
+                  <tr><th>x</th><th>y</th><th>Action</th></tr>
+                </thead>
+                <tbody id="piecewiseRows"></tbody>
+              </table>
+              <div class="actions" style="margin-top:0.6rem;">
+                <button id="addPointBtn" class="btn-secondary" type="button">Add row</button>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button id="updateBtn" class="btn-primary" type="button">Update graph</button>
+              <button id="resetBtn" class="btn-secondary" type="button">Reset</button>
+            </div>
+
+            <div id="status" class="status warn" role="status">Adjust the distribution parameters to update the graph.</div>
+            <div id="errorBox" class="error-box" role="alert" hidden></div>
+          </div>
+        </aside>
+      </div>
     </section>
   </main>
 
@@ -871,7 +1028,17 @@
         generatedSampleCount: document.getElementById('generatedSampleCount'),
         histogramCanvas: document.getElementById('histogramCanvas'),
         scatterCanvas: document.getElementById('scatterCanvas'),
-        generatedDataTableBody: document.getElementById('generatedDataTableBody')
+        generatedDataTableBody: document.getElementById('generatedDataTableBody'),
+        rightControlPanel: document.getElementById('rightControlPanel'),
+        rightControlToggle: document.getElementById('rightControlToggle')
+      };
+
+      const setRightPanelCollapsed = (collapsed) => {
+        if (!els.rightControlPanel || !els.rightControlToggle) return;
+        els.rightControlPanel.classList.toggle('collapsed', collapsed);
+        els.rightControlToggle.setAttribute('aria-expanded', String(!collapsed));
+        els.rightControlToggle.textContent = collapsed ? '⮜' : '⮞';
+        els.rightControlToggle.title = collapsed ? 'Expand controls' : 'Collapse controls';
       };
 
       const defaults = {
@@ -2688,6 +2855,9 @@
         const problemId = els.exampleSelector.value;
         if (problemId === 'none') return;
         applyExampleSelection(problemId);
+      });
+      els.rightControlToggle.addEventListener('click', () => {
+        setRightPanelCollapsed(!els.rightControlPanel.classList.contains('collapsed'));
       });
 
       els.addPointBtn.addEventListener('click', () => {
