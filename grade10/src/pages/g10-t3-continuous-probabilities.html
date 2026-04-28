@@ -258,8 +258,15 @@
       text-align: right;
     }
 
-    .graph-x-range .field:last-child input {
+    .graph-x-range .field:last-child input[type="number"] {
       margin-left: auto;
+    }
+
+    .graph-x-range input[type="range"] {
+      width: 100%;
+      padding: 0;
+      margin-top: 0.3rem;
+      accent-color: var(--primary);
     }
 
     canvas {
@@ -661,7 +668,7 @@
         margin-left: 0;
         text-align: left;
       }
-      .graph-x-range .field:last-child input {
+      .graph-x-range .field:last-child input[type="number"] {
         margin-left: 0;
       }
       .graph-control-layout {
@@ -771,10 +778,12 @@
             <div class="field">
               <label for="xMinInput">x-min</label>
               <input id="xMinInput" type="number" step="any" value="-1" />
+              <input id="xMinSlider" class="param-slider" type="range" step="0.001" />
             </div>
             <div class="field">
               <label for="xMaxInput">x-max</label>
               <input id="xMaxInput" type="number" step="any" value="3" />
+              <input id="xMaxSlider" class="param-slider" type="range" step="0.001" />
             </div>
           </div>
 
@@ -1042,6 +1051,8 @@
         errorBox: document.getElementById('errorBox'),
         xMinInput: document.getElementById('xMinInput'),
         xMaxInput: document.getElementById('xMaxInput'),
+        xMinSlider: document.getElementById('xMinSlider'),
+        xMaxSlider: document.getElementById('xMaxSlider'),
         yTopInput: document.getElementById('yTopInput'),
         autoYTopToggle: document.getElementById('autoYTopToggle'),
         probabilitySummary: document.getElementById('probabilitySummary'),
@@ -1323,6 +1334,16 @@
         const rangeMin = state.xmin - 0.25 * span;
         const rangeMax = state.xmax + 0.25 * span;
         const heightMax = Math.max(2, state.yAutoTop * 2, Number(els.uniformHeight.value), Number(els.triHeight.value), Number(els.trapHeight.value));
+        const supportMin = Number.isFinite(state.x[0]) ? state.x[0] : state.xmin;
+        const supportMax = Number.isFinite(state.x[state.x.length - 1]) ? state.x[state.x.length - 1] : state.xmax;
+        const supportSpan = Math.max(1, supportMax - supportMin);
+        const xPad = supportSpan * 0.35;
+        const xOuterMin = Math.min(supportMin - xPad, state.xmin - 0.25 * span);
+        const xOuterMax = Math.max(supportMax + xPad, state.xmax + 0.25 * span);
+        setSliderBounds(els.xMinSlider, xOuterMin, state.xmax - EPS, 0.001);
+        setSliderBounds(els.xMaxSlider, state.xmin + EPS, xOuterMax, 0.001);
+        syncInputSlider(els.xMinInput, els.xMinSlider);
+        syncInputSlider(els.xMaxInput, els.xMaxSlider);
 
         const { a: ua, b: ub } = sanitizeUniformBoundsForCurrentRange();
         setSliderBounds(els.uniformASlider, state.xmin, ub);
@@ -3021,6 +3042,8 @@
       });
 
       [
+        [els.xMinInput, els.xMinSlider],
+        [els.xMaxInput, els.xMaxSlider],
         [els.uniformA, els.uniformASlider],
         [els.uniformB, els.uniformBSlider],
         [els.triA, els.triASlider],
@@ -3072,10 +3095,6 @@
           evaluateAndDraw();
         });
       });
-      els.xMinInput.addEventListener('change', evaluateAndDraw);
-      els.xMinInput.addEventListener('input', evaluateAndDraw);
-      els.xMaxInput.addEventListener('change', evaluateAndDraw);
-      els.xMaxInput.addEventListener('input', evaluateAndDraw);
       els.autoYTopToggle.addEventListener('change', evaluateAndDraw);
       els.yTopInput.addEventListener('change', evaluateAndDraw);
       els.yTopInput.addEventListener('input', evaluateAndDraw);
