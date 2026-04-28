@@ -270,6 +270,592 @@
 	\end{center}
 }
 
+% \UniformIntervalComparisonGraph: 8 parameters
+% #1 = variable symbol
+% #2 = xmin
+% #3 = xmax
+% #4 = ymax
+% #5 = left endpoint a
+% #6 = right endpoint b
+% #7 = first center
+% #8 = second center
+\newcommand{\UniformIntervalComparisonGraph}[8]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\PDFHeight}{1/((#6)-(#5))}
+			
+			% Intervals around the first center
+			\pgfmathsetmacro{\AOneL}{#7-0.5}
+			\pgfmathsetmacro{\AOneR}{#7+0.5}
+			\pgfmathsetmacro{\ATwoL}{#7-1}
+			\pgfmathsetmacro{\ATwoR}{#7+1}
+			\pgfmathsetmacro{\AThreeL}{#7-1.5}
+			\pgfmathsetmacro{\AThreeR}{#7+1.5}
+			\pgfmathsetmacro{\AFourL}{#7-2}
+			\pgfmathsetmacro{\AFourR}{#7+2}
+			
+			% Intervals around the second center
+			\pgfmathsetmacro{\BOneL}{#8-0.5}
+			\pgfmathsetmacro{\BOneR}{#8+0.5}
+			\pgfmathsetmacro{\BTwoL}{#8-1}
+			\pgfmathsetmacro{\BTwoR}{#8+1}
+			\pgfmathsetmacro{\BThreeL}{#8-1.5}
+			\pgfmathsetmacro{\BThreeR}{#8+1.5}
+			\pgfmathsetmacro{\BFourL}{#8-2}
+			\pgfmathsetmacro{\BFourR}{#8+2}
+			
+			\begin{axis}[
+				width=12cm,
+				height=5.8cm,
+				axis lines=left,
+				xlabel={$#1$},
+				ylabel={$f(#1)$},
+				xmin=#2,
+				xmax=#3,
+				ymin=0,
+				ymax=#4,
+				grid=both,
+				xtick={0,2,4,6,8,10,12,14,16},
+				ytick=\empty,
+				clip=false
+				]
+				
+				% Length 4 intervals (lightest)
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0.7pt]
+				coordinates {(\AFourL,0) (\AFourL,\PDFHeight) (\AFourR,\PDFHeight) (\AFourR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0.7pt]
+				coordinates {(\BFourL,0) (\BFourL,\PDFHeight) (\BFourR,\PDFHeight) (\BFourR,0)}
+				\closedcycle;
+				
+				% Length 3 intervals
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0.7pt]
+				coordinates {(\AThreeL,0) (\AThreeL,\PDFHeight) (\AThreeR,\PDFHeight) (\AThreeR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0.7pt]
+				coordinates {(\BThreeL,0) (\BThreeL,\PDFHeight) (\BThreeR,\PDFHeight) (\BThreeR,0)}
+				\closedcycle;
+				
+				% Length 2 intervals
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0.7pt]
+				coordinates {(\ATwoL,0) (\ATwoL,\PDFHeight) (\ATwoR,\PDFHeight) (\ATwoR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0.7pt]
+				coordinates {(\BTwoL,0) (\BTwoL,\PDFHeight) (\BTwoR,\PDFHeight) (\BTwoR,0)}
+				\closedcycle;
+				
+				% Length 1 intervals (darkest)
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0.7pt]
+				coordinates {(\AOneL,0) (\AOneL,\PDFHeight) (\AOneR,\PDFHeight) (\AOneR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0.7pt]
+				coordinates {(\BOneL,0) (\BOneL,\PDFHeight) (\BOneR,\PDFHeight) (\BOneR,0)}
+				\closedcycle;
+				
+				% Uniform PDF
+				\addplot[ultra thick, blue]
+				coordinates {(#5,0) (#5,\PDFHeight) (#6,\PDFHeight) (#6,0)};
+				
+				% Center guide lines
+				\addplot[densely dotted, thick]
+				coordinates {(#7,0) (#7,\PDFHeight)};
+				\addplot[densely dotted, thick]
+				coordinates {(#8,0) (#8,\PDFHeight)};
+				
+				\node[font=\small, above] at (axis cs:#7,\PDFHeight) {center \(#7\)};
+				\node[font=\small, above] at (axis cs:#8,\PDFHeight) {center \(#8\)};
+				
+				% Legend outside, top-right
+				\node[
+				font=\scriptsize,
+				align=left,
+				anchor=north west,
+				fill=white,
+				draw=black,
+				inner sep=4pt
+				] at (axis description cs:1.03,1.00) {%
+					\begin{tabular}{@{}l l@{}}
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0.07pt] (0,0) rectangle (0.45,0.012);} & Length \(1\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0.07pt] (0,0) rectangle (0.45,0.012);} & Length \(2\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0.07pt] (0,0) rectangle (0.45,0.012);} & Length \(3\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0.07pt] (0,0) rectangle (0.45,0.012);} & Length \(4\)
+					\end{tabular}
+				};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+% \TriangularLeftModeIntervalComparisonGraph: 8 parameters
+% #1 = variable symbol
+% #2 = xmin
+% #3 = xmax
+% #4 = ymax
+% #5 = left endpoint a, also the mode c
+% #6 = right endpoint b
+% #7 = first center
+% #8 = second center
+\newcommand{\TriangularLeftModeIntervalComparisonGraph}[8]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\PeakHeight}{2/((#6)-(#5))}
+			\pgfmathsetmacro{\Denom}{((#6)-(#5))*((#6)-(#5))}
+			
+			% Intervals around the first center
+			\pgfmathsetmacro{\AOneL}{#7-0.5}
+			\pgfmathsetmacro{\AOneR}{#7+0.5}
+			\pgfmathsetmacro{\ATwoL}{#7-1}
+			\pgfmathsetmacro{\ATwoR}{#7+1}
+			\pgfmathsetmacro{\AThreeL}{#7-1.5}
+			\pgfmathsetmacro{\AThreeR}{#7+1.5}
+			\pgfmathsetmacro{\AFourL}{#7-2}
+			\pgfmathsetmacro{\AFourR}{#7+2}
+			
+			% Intervals around the second center
+			\pgfmathsetmacro{\BOneL}{#8-0.5}
+			\pgfmathsetmacro{\BOneR}{#8+0.5}
+			\pgfmathsetmacro{\BTwoL}{#8-1}
+			\pgfmathsetmacro{\BTwoR}{#8+1}
+			\pgfmathsetmacro{\BThreeL}{#8-1.5}
+			\pgfmathsetmacro{\BThreeR}{#8+1.5}
+			\pgfmathsetmacro{\BFourL}{#8-2}
+			\pgfmathsetmacro{\BFourR}{#8+2}
+			
+			% Heights on the triangular PDF
+			\pgfmathsetmacro{\HAOneL}{2*((#6)-\AOneL)/\Denom}
+			\pgfmathsetmacro{\HAOneR}{2*((#6)-\AOneR)/\Denom}
+			\pgfmathsetmacro{\HATwoL}{2*((#6)-\ATwoL)/\Denom}
+			\pgfmathsetmacro{\HATwoR}{2*((#6)-\ATwoR)/\Denom}
+			\pgfmathsetmacro{\HAThreeL}{2*((#6)-\AThreeL)/\Denom}
+			\pgfmathsetmacro{\HAThreeR}{2*((#6)-\AThreeR)/\Denom}
+			\pgfmathsetmacro{\HAFourL}{2*((#6)-\AFourL)/\Denom}
+			\pgfmathsetmacro{\HAFourR}{2*((#6)-\AFourR)/\Denom}
+			
+			\pgfmathsetmacro{\HBOneL}{2*((#6)-\BOneL)/\Denom}
+			\pgfmathsetmacro{\HBOneR}{2*((#6)-\BOneR)/\Denom}
+			\pgfmathsetmacro{\HBTwoL}{2*((#6)-\BTwoL)/\Denom}
+			\pgfmathsetmacro{\HBTwoR}{2*((#6)-\BTwoR)/\Denom}
+			\pgfmathsetmacro{\HBThreeL}{2*((#6)-\BThreeL)/\Denom}
+			\pgfmathsetmacro{\HBThreeR}{2*((#6)-\BThreeR)/\Denom}
+			\pgfmathsetmacro{\HBFourL}{2*((#6)-\BFourL)/\Denom}
+			\pgfmathsetmacro{\HBFourR}{2*((#6)-\BFourR)/\Denom}
+			
+			\pgfmathsetmacro{\CenterAHeight}{2*((#6)-(#7))/\Denom}
+			\pgfmathsetmacro{\CenterBHeight}{2*((#6)-(#8))/\Denom}
+			
+			\begin{axis}[
+				width=12cm,
+				height=5.8cm,
+				axis lines=left,
+				xlabel={$#1$},
+				ylabel={$f(#1)$},
+				xmin=#2,
+				xmax=#3,
+				ymin=0,
+				ymax=#4,
+				grid=both,
+				xtick={0,2,4,6,8,10,12,14,16},
+				ytick=\empty,
+				clip=false
+				]
+				
+				% Length 4 intervals (lightest)
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0.7pt]
+				coordinates {(\AFourL,0) (\AFourL,\HAFourL) (\AFourR,\HAFourR) (\AFourR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0.7pt]
+				coordinates {(\BFourL,0) (\BFourL,\HBFourL) (\BFourR,\HBFourR) (\BFourR,0)}
+				\closedcycle;
+				
+				% Length 3 intervals
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0.7pt]
+				coordinates {(\AThreeL,0) (\AThreeL,\HAThreeL) (\AThreeR,\HAThreeR) (\AThreeR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0.7pt]
+				coordinates {(\BThreeL,0) (\BThreeL,\HBThreeL) (\BThreeR,\HBThreeR) (\BThreeR,0)}
+				\closedcycle;
+				
+				% Length 2 intervals
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0.7pt]
+				coordinates {(\ATwoL,0) (\ATwoL,\HATwoL) (\ATwoR,\HATwoR) (\ATwoR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0.7pt]
+				coordinates {(\BTwoL,0) (\BTwoL,\HBTwoL) (\BTwoR,\HBTwoR) (\BTwoR,0)}
+				\closedcycle;
+				
+				% Length 1 intervals (darkest)
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0.7pt]
+				coordinates {(\AOneL,0) (\AOneL,\HAOneL) (\AOneR,\HAOneR) (\AOneR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0.7pt]
+				coordinates {(\BOneL,0) (\BOneL,\HBOneL) (\BOneR,\HBOneR) (\BOneR,0)}
+				\closedcycle;
+				
+				% Triangular PDF
+				\addplot[ultra thick, blue]
+				coordinates {(#5,0) (#5,\PeakHeight) (#6,0)};
+				
+				% Center guide lines
+				\addplot[densely dotted, thick]
+				coordinates {(#7,0) (#7,\CenterAHeight)};
+				\addplot[densely dotted, thick]
+				coordinates {(#8,0) (#8,\CenterBHeight)};
+				
+				\node[font=\small, above] at (axis cs:#7,\CenterAHeight) {center \(#7\)};
+				\node[font=\small, above] at (axis cs:#8,\CenterBHeight) {center \(#8\)};
+				
+				% Legend outside, top-right
+				\node[
+				font=\scriptsize,
+				align=left,
+				anchor=north west,
+				fill=white,
+				draw=black,
+				inner sep=4pt
+				] at (axis description cs:1.03,1.00) {%
+					\begin{tabular}{@{}l l@{}}
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(1\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(2\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(3\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(4\)
+					\end{tabular}
+				};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+% \TriangularIntervalComparisonGraph: 9 parameters
+% #1 = variable symbol
+% #2 = xmin
+% #3 = xmax
+% #4 = ymax
+% #5 = left endpoint a
+% #6 = mode c
+% #7 = right endpoint b
+% #8 = first center
+% #9 = second center
+\newcommand{\TriangularIntervalComparisonGraph}[9]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\PeakHeight}{2/((#7)-(#5))}
+			\pgfmathsetmacro{\DenomLeft}{((#7)-(#5))*((#6)-(#5))}
+			\pgfmathsetmacro{\DenomRight}{((#7)-(#5))*((#7)-(#6))}
+			
+			% Intervals around the first center
+			\pgfmathsetmacro{\AOneL}{#8-0.5}
+			\pgfmathsetmacro{\AOneR}{#8+0.5}
+			\pgfmathsetmacro{\ATwoL}{#8-1}
+			\pgfmathsetmacro{\ATwoR}{#8+1}
+			\pgfmathsetmacro{\AThreeL}{#8-1.5}
+			\pgfmathsetmacro{\AThreeR}{#8+1.5}
+			\pgfmathsetmacro{\AFourL}{#8-2}
+			\pgfmathsetmacro{\AFourR}{#8+2}
+			
+			% Intervals around the second center
+			\pgfmathsetmacro{\BOneL}{#9-0.5}
+			\pgfmathsetmacro{\BOneR}{#9+0.5}
+			\pgfmathsetmacro{\BTwoL}{#9-1}
+			\pgfmathsetmacro{\BTwoR}{#9+1}
+			\pgfmathsetmacro{\BThreeL}{#9-1.5}
+			\pgfmathsetmacro{\BThreeR}{#9+1.5}
+			\pgfmathsetmacro{\BFourL}{#9-2}
+			\pgfmathsetmacro{\BFourR}{#9+2}
+			
+			% Heights on the triangular PDF
+			\pgfmathsetmacro{\HAOneL}{(\AOneL <= (#6) ? 2*(\AOneL-(#5))/\DenomLeft : 2*((#7)-\AOneL)/\DenomRight)}
+			\pgfmathsetmacro{\HAOneR}{(\AOneR <= (#6) ? 2*(\AOneR-(#5))/\DenomLeft : 2*((#7)-\AOneR)/\DenomRight)}
+			\pgfmathsetmacro{\HATwoL}{(\ATwoL <= (#6) ? 2*(\ATwoL-(#5))/\DenomLeft : 2*((#7)-\ATwoL)/\DenomRight)}
+			\pgfmathsetmacro{\HATwoR}{(\ATwoR <= (#6) ? 2*(\ATwoR-(#5))/\DenomLeft : 2*((#7)-\ATwoR)/\DenomRight)}
+			\pgfmathsetmacro{\HAThreeL}{(\AThreeL <= (#6) ? 2*(\AThreeL-(#5))/\DenomLeft : 2*((#7)-\AThreeL)/\DenomRight)}
+			\pgfmathsetmacro{\HAThreeR}{(\AThreeR <= (#6) ? 2*(\AThreeR-(#5))/\DenomLeft : 2*((#7)-\AThreeR)/\DenomRight)}
+			\pgfmathsetmacro{\HAFourL}{(\AFourL <= (#6) ? 2*(\AFourL-(#5))/\DenomLeft : 2*((#7)-\AFourL)/\DenomRight)}
+			\pgfmathsetmacro{\HAFourR}{(\AFourR <= (#6) ? 2*(\AFourR-(#5))/\DenomLeft : 2*((#7)-\AFourR)/\DenomRight)}
+			
+			\pgfmathsetmacro{\HBOneL}{(\BOneL <= (#6) ? 2*(\BOneL-(#5))/\DenomLeft : 2*((#7)-\BOneL)/\DenomRight)}
+			\pgfmathsetmacro{\HBOneR}{(\BOneR <= (#6) ? 2*(\BOneR-(#5))/\DenomLeft : 2*((#7)-\BOneR)/\DenomRight)}
+			\pgfmathsetmacro{\HBTwoL}{(\BTwoL <= (#6) ? 2*(\BTwoL-(#5))/\DenomLeft : 2*((#7)-\BTwoL)/\DenomRight)}
+			\pgfmathsetmacro{\HBTwoR}{(\BTwoR <= (#6) ? 2*(\BTwoR-(#5))/\DenomLeft : 2*((#7)-\BTwoR)/\DenomRight)}
+			\pgfmathsetmacro{\HBThreeL}{(\BThreeL <= (#6) ? 2*(\BThreeL-(#5))/\DenomLeft : 2*((#7)-\BThreeL)/\DenomRight)}
+			\pgfmathsetmacro{\HBThreeR}{(\BThreeR <= (#6) ? 2*(\BThreeR-(#5))/\DenomLeft : 2*((#7)-\BThreeR)/\DenomRight)}
+			\pgfmathsetmacro{\HBFourL}{(\BFourL <= (#6) ? 2*(\BFourL-(#5))/\DenomLeft : 2*((#7)-\BFourL)/\DenomRight)}
+			\pgfmathsetmacro{\HBFourR}{(\BFourR <= (#6) ? 2*(\BFourR-(#5))/\DenomLeft : 2*((#7)-\BFourR)/\DenomRight)}
+			
+			\pgfmathsetmacro{\CenterAHeight}{(#8 <= (#6) ? 2*((#8)-(#5))/\DenomLeft : 2*((#7)-(#8))/\DenomRight)}
+			\pgfmathsetmacro{\CenterBHeight}{(#9 <= (#6) ? 2*((#9)-(#5))/\DenomLeft : 2*((#7)-(#9))/\DenomRight)}
+			
+			\begin{axis}[
+				width=12cm,
+				height=5.8cm,
+				axis lines=left,
+				xlabel={$#1$},
+				ylabel={$f(#1)$},
+				xmin=#2,
+				xmax=#3,
+				ymin=0,
+				ymax=#4,
+				grid=both,
+				xtick={0,2,4,6,8,10,12,14,16},
+				ytick=\empty,
+				clip=false
+				]
+				
+				% Length 4 intervals (lightest)
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0.7pt]
+				coordinates {(\AFourL,0) (\AFourL,\HAFourL) (\AFourR,\HAFourR) (\AFourR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0.7pt]
+				coordinates {(\BFourL,0) (\BFourL,\HBFourL) (\BFourR,\HBFourR) (\BFourR,0)}
+				\closedcycle;
+				
+				% Length 3 intervals
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0.7pt]
+				coordinates {(\AThreeL,0) (\AThreeL,\HAThreeL) (\AThreeR,\HAThreeR) (\AThreeR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0.7pt]
+				coordinates {(\BThreeL,0) (\BThreeL,\HBThreeL) (\BThreeR,\HBThreeR) (\BThreeR,0)}
+				\closedcycle;
+				
+				% Length 2 intervals
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0.7pt]
+				coordinates {(\ATwoL,0) (\ATwoL,\HATwoL) (\ATwoR,\HATwoR) (\ATwoR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0.7pt]
+				coordinates {(\BTwoL,0) (\BTwoL,\HBTwoL) (\BTwoR,\HBTwoR) (\BTwoR,0)}
+				\closedcycle;
+				
+				% Length 1 intervals (darkest)
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0.7pt]
+				coordinates {(\AOneL,0) (\AOneL,\HAOneL) (\AOneR,\HAOneR) (\AOneR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0.7pt]
+				coordinates {(\BOneL,0) (\BOneL,\HBOneL) (\BOneR,\HBOneR) (\BOneR,0)}
+				\closedcycle;
+				
+				% Triangular PDF
+				\addplot[ultra thick, blue]
+				coordinates {(#5,0) (#6,\PeakHeight) (#7,0)};
+				
+				% Center guide lines
+				\addplot[densely dotted, thick]
+				coordinates {(#8,0) (#8,\CenterAHeight)};
+				\addplot[densely dotted, thick]
+				coordinates {(#9,0) (#9,\CenterBHeight)};
+				
+				\node[font=\small, above] at (axis cs:#8,\CenterAHeight) {center \(#8\)};
+				\node[font=\small, above] at (axis cs:#9,\CenterBHeight) {center \(#9\)};
+				
+				% Legend outside, top-right
+				\node[
+				font=\scriptsize,
+				align=left,
+				anchor=north west,
+				fill=white,
+				draw=black,
+				inner sep=4pt
+				] at (axis description cs:1.03,1.00) {%
+					\begin{tabular}{@{}l l@{}}
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(1\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(2\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(3\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(4\)
+					\end{tabular}
+				};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+% Replace the previous \NormalIntervalComparisonGraph command with this one.
+
+% \NormalIntervalComparisonGraph: 8 parameters
+% #1 = variable symbol
+% #2 = mean mu
+% #3 = standard deviation sigma
+% #4 = xmin
+% #5 = xmax
+% #6 = ymax
+% #7 = first center
+% #8 = second center
+\newcommand{\NormalIntervalComparisonGraph}[8]{%
+	\begin{center}
+		\begin{tikzpicture}
+			% Intervals around the first center
+			\pgfmathsetmacro{\AOneL}{#7-0.5}
+			\pgfmathsetmacro{\AOneR}{#7+0.5}
+			\pgfmathsetmacro{\ATwoL}{#7-1}
+			\pgfmathsetmacro{\ATwoR}{#7+1}
+			\pgfmathsetmacro{\AThreeL}{#7-1.5}
+			\pgfmathsetmacro{\AThreeR}{#7+1.5}
+			\pgfmathsetmacro{\AFourL}{#7-2}
+			\pgfmathsetmacro{\AFourR}{#7+2}
+			
+			% Intervals around the second center
+			\pgfmathsetmacro{\BOneL}{#8-0.5}
+			\pgfmathsetmacro{\BOneR}{#8+0.5}
+			\pgfmathsetmacro{\BTwoL}{#8-1}
+			\pgfmathsetmacro{\BTwoR}{#8+1}
+			\pgfmathsetmacro{\BThreeL}{#8-1.5}
+			\pgfmathsetmacro{\BThreeR}{#8+1.5}
+			\pgfmathsetmacro{\BFourL}{#8-2}
+			\pgfmathsetmacro{\BFourR}{#8+2}
+			
+			\pgfmathsetmacro{\CenterAHeight}{1/((#3)*sqrt(2*pi))*exp(-(((#7)-(#2))^2)/(2*(#3)^2))}
+			\pgfmathsetmacro{\CenterBHeight}{1/((#3)*sqrt(2*pi))*exp(-(((#8)-(#2))^2)/(2*(#3)^2))}
+			
+			\begin{axis}[
+				width=12cm,
+				height=5.8cm,
+				axis lines=left,
+				xlabel={$#1$},
+				ylabel={$f(#1)$},
+				xmin=#4,
+				xmax=#5,
+				ymin=0,
+				ymax=#6,
+				grid=both,
+				xtick={-6,-2,0,2,4,6,8,10,12,14,18},
+				ytick=\empty,
+				clip=false
+				]
+				
+				% Length 4 intervals (lightest)
+				\addplot[
+				draw=orange!80!black,
+				fill=orange,
+				fill opacity=0.12,
+				line width=0.7pt,
+				domain=\AFourL:\AFourR,
+				samples=120
+				]
+				{1/((#3)*sqrt(2*pi))*exp(-((x-(#2))^2)/(2*(#3)^2))}
+				\closedcycle;
+				
+				\addplot[
+				draw=orange!80!black,
+				fill=orange,
+				fill opacity=0.12,
+				line width=0.7pt,
+				domain=\BFourL:\BFourR,
+				samples=120
+				]
+				{1/((#3)*sqrt(2*pi))*exp(-((x-(#2))^2)/(2*(#3)^2))}
+				\closedcycle;
+				
+				% Length 3 intervals
+				\addplot[
+				draw=orange!80!black,
+				fill=orange,
+				fill opacity=0.22,
+				line width=0.7pt,
+				domain=\AThreeL:\AThreeR,
+				samples=120
+				]
+				{1/((#3)*sqrt(2*pi))*exp(-((x-(#2))^2)/(2*(#3)^2))}
+				\closedcycle;
+				
+				\addplot[
+				draw=orange!80!black,
+				fill=orange,
+				fill opacity=0.22,
+				line width=0.7pt,
+				domain=\BThreeL:\BThreeR,
+				samples=120
+				]
+				{1/((#3)*sqrt(2*pi))*exp(-((x-(#2))^2)/(2*(#3)^2))}
+				\closedcycle;
+				
+				% Length 2 intervals
+				\addplot[
+				draw=orange!80!black,
+				fill=orange,
+				fill opacity=0.35,
+				line width=0.7pt,
+				domain=\ATwoL:\ATwoR,
+				samples=120
+				]
+				{1/((#3)*sqrt(2*pi))*exp(-((x-(#2))^2)/(2*(#3)^2))}
+				\closedcycle;
+				
+				\addplot[
+				draw=orange!80!black,
+				fill=orange,
+				fill opacity=0.35,
+				line width=0.7pt,
+				domain=\BTwoL:\BTwoR,
+				samples=120
+				]
+				{1/((#3)*sqrt(2*pi))*exp(-((x-(#2))^2)/(2*(#3)^2))}
+				\closedcycle;
+				
+				% Length 1 intervals (darkest)
+				\addplot[
+				draw=orange!80!black,
+				fill=orange,
+				fill opacity=0.50,
+				line width=0.7pt,
+				domain=\AOneL:\AOneR,
+				samples=120
+				]
+				{1/((#3)*sqrt(2*pi))*exp(-((x-(#2))^2)/(2*(#3)^2))}
+				\closedcycle;
+				
+				\addplot[
+				draw=orange!80!black,
+				fill=orange,
+				fill opacity=0.50,
+				line width=0.7pt,
+				domain=\BOneL:\BOneR,
+				samples=120
+				]
+				{1/((#3)*sqrt(2*pi))*exp(-((x-(#2))^2)/(2*(#3)^2))}
+				\closedcycle;
+				
+				% Normal PDF
+				\addplot[
+				ultra thick,
+				blue,
+				domain=#4:#5,
+				samples=240
+				]
+				{1/((#3)*sqrt(2*pi))*exp(-((x-(#2))^2)/(2*(#3)^2))};
+				
+				% Mean guide line
+				\addplot[dashed, thick]
+				coordinates {(#2,0) (#2,{1/((#3)*sqrt(2*pi))})};
+				
+				\node[font=\small, above] at (axis cs:#2,{1/((#3)*sqrt(2*pi))}) {$E[#1]=#2$};
+				
+				% Center guide lines
+				\addplot[densely dotted, thick]
+				coordinates {(#7,0) (#7,\CenterAHeight)};
+				\addplot[densely dotted, thick]
+				coordinates {(#8,0) (#8,\CenterBHeight)};
+				
+				\node[font=\small, above] at (axis cs:#7,\CenterAHeight) {center \(#7\)};
+				\node[font=\small, above] at (axis cs:#8,\CenterBHeight) {center \(#8\)};
+				
+				% Legend outside, top-right
+				\node[
+				font=\scriptsize,
+				align=left,
+				anchor=north west,
+				fill=white,
+				draw=black,
+				inner sep=4pt
+				] at (axis description cs:1.03,1.00) {%
+					\begin{tabular}{@{}l l@{}}
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(1\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(2\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(3\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(4\)
+					\end{tabular}
+				};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
 \newcommand{\UniformDistGraph}[5]{
 \begin{center}
 \begin{tikzpicture}
@@ -444,121 +1030,6 @@ E[X]=\frac{a+b}{2},\qquad \mathrm{Var}(X)=\frac{(b-a)^2}{12}.
 	\approx 0.577.
 	\]
 	
-	% \UniformIntervalComparisonGraph: 8 parameters
-	% #1 = variable symbol
-	% #2 = xmin
-	% #3 = xmax
-	% #4 = ymax
-	% #5 = left endpoint a
-	% #6 = right endpoint b
-	% #7 = first center
-	% #8 = second center
-	\newcommand{\UniformIntervalComparisonGraph}[8]{%
-		\begin{center}
-			\begin{tikzpicture}
-				\pgfmathsetmacro{\PDFHeight}{1/((#6)-(#5))}
-				
-				% Intervals around the first center
-				\pgfmathsetmacro{\AOneL}{#7-0.5}
-				\pgfmathsetmacro{\AOneR}{#7+0.5}
-				\pgfmathsetmacro{\ATwoL}{#7-1}
-				\pgfmathsetmacro{\ATwoR}{#7+1}
-				\pgfmathsetmacro{\AThreeL}{#7-1.5}
-				\pgfmathsetmacro{\AThreeR}{#7+1.5}
-				\pgfmathsetmacro{\AFourL}{#7-2}
-				\pgfmathsetmacro{\AFourR}{#7+2}
-				
-				% Intervals around the second center
-				\pgfmathsetmacro{\BOneL}{#8-0.5}
-				\pgfmathsetmacro{\BOneR}{#8+0.5}
-				\pgfmathsetmacro{\BTwoL}{#8-1}
-				\pgfmathsetmacro{\BTwoR}{#8+1}
-				\pgfmathsetmacro{\BThreeL}{#8-1.5}
-				\pgfmathsetmacro{\BThreeR}{#8+1.5}
-				\pgfmathsetmacro{\BFourL}{#8-2}
-				\pgfmathsetmacro{\BFourR}{#8+2}
-				
-				\begin{axis}[
-					width=12cm,
-					height=5.8cm,
-					axis lines=left,
-					xlabel={$#1$},
-					ylabel={$f(#1)$},
-					xmin=#2,
-					xmax=#3,
-					ymin=0,
-					ymax=#4,
-					grid=both,
-					xtick={0,2,4,6,8,10,12,14,16},
-					ytick=\empty,
-					clip=false
-					]
-					
-					% Length 4 intervals (lightest)
-					\addplot[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0.7pt]
-					coordinates {(\AFourL,0) (\AFourL,\PDFHeight) (\AFourR,\PDFHeight) (\AFourR,0)}
-					\closedcycle;
-					\addplot[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0.7pt]
-					coordinates {(\BFourL,0) (\BFourL,\PDFHeight) (\BFourR,\PDFHeight) (\BFourR,0)}
-					\closedcycle;
-					
-					% Length 3 intervals
-					\addplot[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0.7pt]
-					coordinates {(\AThreeL,0) (\AThreeL,\PDFHeight) (\AThreeR,\PDFHeight) (\AThreeR,0)}
-					\closedcycle;
-					\addplot[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0.7pt]
-					coordinates {(\BThreeL,0) (\BThreeL,\PDFHeight) (\BThreeR,\PDFHeight) (\BThreeR,0)}
-					\closedcycle;
-					
-					% Length 2 intervals
-					\addplot[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0.7pt]
-					coordinates {(\ATwoL,0) (\ATwoL,\PDFHeight) (\ATwoR,\PDFHeight) (\ATwoR,0)}
-					\closedcycle;
-					\addplot[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0.7pt]
-					coordinates {(\BTwoL,0) (\BTwoL,\PDFHeight) (\BTwoR,\PDFHeight) (\BTwoR,0)}
-					\closedcycle;
-					
-					% Length 1 intervals (darkest)
-					\addplot[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0.7pt]
-					coordinates {(\AOneL,0) (\AOneL,\PDFHeight) (\AOneR,\PDFHeight) (\AOneR,0)}
-					\closedcycle;
-					\addplot[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0.7pt]
-					coordinates {(\BOneL,0) (\BOneL,\PDFHeight) (\BOneR,\PDFHeight) (\BOneR,0)}
-					\closedcycle;
-					
-					% Uniform PDF
-					\addplot[ultra thick, blue]
-					coordinates {(#5,0) (#5,\PDFHeight) (#6,\PDFHeight) (#6,0)};
-					
-					% Center guide lines
-					\addplot[densely dotted, thick]
-					coordinates {(#7,0) (#7,\PDFHeight)};
-					\addplot[densely dotted, thick]
-					coordinates {(#8,0) (#8,\PDFHeight)};
-					
-					\node[font=\small, above] at (axis cs:#7,\PDFHeight) {center \(#7\)};
-					\node[font=\small, above] at (axis cs:#8,\PDFHeight) {center \(#8\)};
-					
-					% Legend outside, top-right
-					\node[
-					font=\scriptsize,
-					align=left,
-					anchor=north west,
-					fill=white,
-					draw=black,
-					inner sep=4pt
-					] at (axis description cs:1.03,1.00) {%
-						\begin{tabular}{@{}l l@{}}
-							\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0.07pt] (0,0) rectangle (0.45,0.012);} & Length \(1\) \\[3pt]
-							\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0.07pt] (0,0) rectangle (0.45,0.012);} & Length \(2\) \\[3pt]
-							\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0.07pt] (0,0) rectangle (0.45,0.012);} & Length \(3\) \\[3pt]
-							\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0.07pt] (0,0) rectangle (0.45,0.012);} & Length \(4\)
-						\end{tabular}
-					};
-				\end{axis}
-			\end{tikzpicture}
-		\end{center}
-	}
 	
 	\item Since this is a continuous model, the probability of any exact single value is \(0\). So we compare intervals of the same length around \(4\) and around \(12\).
 	
@@ -576,10 +1047,10 @@ E[X]=\frac{a+b}{2},\qquad \mathrm{Var}(X)=\frac{(b-a)^2}{12}.
 			\hline
 			Interval length & Around \(4\) & Probability & Around \(12\) & Probability & Difference \\
 			\hline
-			\(1\) & \([3.5,4.5]\) & \(\frac{1}{12}\) & \([11.5,12.5]\) & \(\frac{1}{12}\) & \(0\) \\
-			\(2\) & \([3,5]\) & \(\frac{2}{12}=\frac{1}{6}\) & \([11,13]\) & \(\frac{2}{12}=\frac{1}{6}\) & \(0\) \\
-			\(3\) & \([2.5,5.5]\) & \(\frac{3}{12}=\frac{1}{4}\) & \([10.5,13.5]\) & \(\frac{3}{12}=\frac{1}{4}\) & \(0\) \\
-			\(4\) & \([2,6]\) & \(\frac{4}{12}=\frac{1}{3}\) & \([10,14]\) & \(\frac{4}{12}=\frac{1}{3}\) & \(0\) \\
+			\(1\) & \([3.5,4.5]\) & \(\frac{1}{12}\) & \([11.5,12.5]\) & \(\frac{1}{12}\) & \(\frac{0}{12}\) \\
+			\(2\) & \([3,5]\) & \(\frac{2}{12}\) & \([11,13]\) & \(\frac{2}{12}\) & \(\frac{0}{12}\) \\
+			\(3\) & \([2.5,5.5]\) & \(\frac{3}{12}\) & \([10.5,13.5]\) & \(\frac{3}{12}\) & \(\frac{0}{12}\) \\
+			\(4\) & \([2,6]\) & \(\frac{4}{12}\) & \([10,14]\) & \(\frac{4}{12}\) & \(\frac{0}{12}\) \\
 			\hline
 		\end{tabular}
 	\end{center}
@@ -796,15 +1267,19 @@ E[W]=\frac{a+b+c}{3},\qquad
 	\frac{1}{2}(\text{interval length})(f(r)+f(s)).
 	\]
 	
+		The following graph shows the \(8\) intervals. Intervals of length \(1\) are the darkest, and intervals of length \(4\) are the lightest.
+	
+	\TriangularLeftModeIntervalComparisonGraph{W}{0}{16}{0.19}{2}{14}{4}{12}
+	
 	\begin{center}
 		\begin{tabular}{c c c c c c}
 			\hline
 			Interval length & Around \(4\) & Probability & Around \(12\) & Probability & Difference \\
 			\hline
-			\(1\) & \([3.5,4.5]\) & \(\frac{5}{36}\) & \([11.5,12.5]\) & \(\frac{1}{36}\) & \(\frac{1}{9}\) \\
-			\(2\) & \([3,5]\) & \(\frac{5}{18}\) & \([11,13]\) & \(\frac{1}{18}\) & \(\frac{2}{9}\) \\
-			\(3\) & \([2.5,5.5]\) & \(\frac{5}{12}\) & \([10.5,13.5]\) & \(\frac{1}{12}\) & \(\frac{1}{3}\) \\
-			\(4\) & \([2,6]\) & \(\frac{5}{9}\) & \([10,14]\) & \(\frac{1}{9}\) & \(\frac{4}{9}\) \\
+			\(1\) & \([3.5,4.5]\) & \(\frac{5}{36}\) & \([11.5,12.5]\) & \(\frac{1}{36}\) & \(\frac{4}{36}\) \\
+			\(2\) & \([3,5]\) & \(\frac{10}{36}\) & \([11,13]\) & \(\frac{2}{36}\) & \(\frac{8}{36}\) \\
+			\(3\) & \([2.5,5.5]\) & \(\frac{15}{36}\) & \([10.5,13.5]\) & \(\frac{3}{36}\) & \(\frac{12}{36}\) \\
+			\(4\) & \([2,6]\) & \(\frac{20}{36}\) & \([10,14]\) & \(\frac{4}{36}\) & \(\frac{16}{36}\) \\
 			\hline
 		\end{tabular}
 	\end{center}
@@ -1072,15 +1547,19 @@ E[W]=\frac{a+b+c}{3},\qquad
 	\frac{1}{2}(\text{interval length})(f(r)+f(s)).
 	\]
 	
+	The following graph shows the \(8\) intervals. Intervals of length \(1\) are the darkest, and intervals of length \(4\) are the lightest.
+	
+	\TriangularIntervalComparisonGraph{W}{0}{16}{0.19}{2}{6}{14}{4}{12}
+	
 	\begin{center}
 		\begin{tabular}{c c c c c c}
 			\hline
 			Interval length & Around \(4\) & Probability & Around \(12\) & Probability & Difference \\
 			\hline
-			\(1\) & \([3.5,4.5]\) & \(\frac{1}{12}\) & \([11.5,12.5]\) & \(\frac{1}{24}\) & \(\frac{1}{24}\) \\
-			\(2\) & \([3,5]\) & \(\frac{1}{6}\) & \([11,13]\) & \(\frac{1}{12}\) & \(\frac{1}{12}\) \\
-			\(3\) & \([2.5,5.5]\) & \(\frac{1}{4}\) & \([10.5,13.5]\) & \(\frac{1}{8}\) & \(\frac{1}{8}\) \\
-			\(4\) & \([2,6]\) & \(\frac{1}{3}\) & \([10,14]\) & \(\frac{1}{6}\) & \(\frac{1}{6}\) \\
+			\(1\) & \([3.5,4.5]\) & \(\frac{2}{24}\) & \([11.5,12.5]\) & \(\frac{1}{24}\) & \(\frac{1}{24}\) \\
+			\(2\) & \([3,5]\) & \(\frac{4}{24}\) & \([11,13]\) & \(\frac{2}{24}\) & \(\frac{2}{24}\) \\
+			\(3\) & \([2.5,5.5]\) & \(\frac{6}{24}\) & \([10.5,13.5]\) & \(\frac{3}{24}\) & \(\frac{3}{24}\) \\
+			\(4\) & \([2,6]\) & \(\frac{8}{24}\) & \([10,14]\) & \(\frac{4}{24}\) & \(\frac{4}{24}\) \\
 			\hline
 		\end{tabular}
 	\end{center}
@@ -1213,6 +1692,10 @@ E[S]=\mu,
 	Z=\frac{S-6}{4},
 	\]
 	each interval probability can be found by converting the endpoints to \(z\)-scores and using the standard normal distribution.
+	
+	The following graph shows the \(8\) intervals. Intervals of length \(1\) are the darkest, and intervals of length \(4\) are the lightest.
+	
+	\NormalIntervalComparisonGraph{S}{6}{4}{-6}{18}{0.11}{4}{12}
 	
 	\begin{center}
 		\begin{tabular}{c c c c c c}
