@@ -222,6 +222,24 @@
       min-width: 120px;
     }
 
+    .param-slider {
+      width: 100%;
+      padding: 0;
+      margin-top: 0.25rem;
+      accent-color: var(--primary);
+    }
+
+    .pw-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .pw-cell input[type="range"] {
+      padding: 0;
+      margin: 0;
+    }
+
     .graph-x-range {
       margin-top: 0.7rem;
       display: flex;
@@ -489,10 +507,12 @@
             <div class="field col-6">
               <label for="uniformA">a (left bound)</label>
               <input id="uniformA" type="number" step="any" value="0" />
+              <input id="uniformASlider" class="param-slider" type="range" step="0.001" />
             </div>
             <div class="field col-6">
               <label for="uniformB">b (right bound)</label>
               <input id="uniformB" type="number" step="any" value="1" />
+              <input id="uniformBSlider" class="param-slider" type="range" step="0.001" />
             </div>
             <div class="field col-6" id="uniformHeightField">
               <label for="uniformHeight">Height</label>
@@ -500,6 +520,7 @@
                 <input id="uniformHeight" type="number" step="any" value="1" min="0" />
                 <label class="toggle-inline"><input data-autoadjust-toggle type="checkbox" checked /> autoadjust</label>
               </div>
+              <input id="uniformHeightSlider" class="param-slider" type="range" step="0.001" />
             </div>
           </div>
         </div>
@@ -509,14 +530,17 @@
             <div class="field col-4">
               <label for="triA">a (left bound)</label>
               <input id="triA" type="number" step="any" value="0" />
+              <input id="triASlider" class="param-slider" type="range" step="0.001" />
             </div>
             <div class="field col-4">
               <label for="triM">m (mode)</label>
               <input id="triM" type="number" step="any" value="1" />
+              <input id="triMSlider" class="param-slider" type="range" step="0.001" />
             </div>
             <div class="field col-4">
               <label for="triB">b (right bound)</label>
               <input id="triB" type="number" step="any" value="2" />
+              <input id="triBSlider" class="param-slider" type="range" step="0.001" />
             </div>
             <div class="field col-4" id="triHeightField">
               <label for="triHeight">Height of m</label>
@@ -524,6 +548,7 @@
                 <input id="triHeight" type="number" step="any" value="1" min="0" />
                 <label class="toggle-inline"><input data-autoadjust-toggle type="checkbox" checked /> autoadjust</label>
               </div>
+              <input id="triHeightSlider" class="param-slider" type="range" step="0.001" />
             </div>
           </div>
         </div>
@@ -533,18 +558,22 @@
             <div class="field col-3">
               <label for="trapA">a (left bound)</label>
               <input id="trapA" type="number" step="any" value="0" />
+              <input id="trapASlider" class="param-slider" type="range" step="0.001" />
             </div>
             <div class="field col-3">
               <label for="trapB">b (start plateau)</label>
               <input id="trapB" type="number" step="any" value="1" />
+              <input id="trapBSlider" class="param-slider" type="range" step="0.001" />
             </div>
             <div class="field col-3">
               <label for="trapC">c (end plateau)</label>
               <input id="trapC" type="number" step="any" value="2" />
+              <input id="trapCSlider" class="param-slider" type="range" step="0.001" />
             </div>
             <div class="field col-3">
               <label for="trapD">d (right bound)</label>
               <input id="trapD" type="number" step="any" value="3" />
+              <input id="trapDSlider" class="param-slider" type="range" step="0.001" />
             </div>
             <div class="field col-3" id="trapHeightField">
               <label for="trapHeight">Height of plateau</label>
@@ -552,6 +581,7 @@
                 <input id="trapHeight" type="number" step="any" value="1" min="0" />
                 <label class="toggle-inline"><input data-autoadjust-toggle type="checkbox" checked /> autoadjust</label>
               </div>
+              <input id="trapHeightSlider" class="param-slider" type="range" step="0.001" />
             </div>
           </div>
         </div>
@@ -660,6 +690,18 @@
         uniformHeight: document.getElementById('uniformHeight'),
         triHeight: document.getElementById('triHeight'),
         trapHeight: document.getElementById('trapHeight'),
+        uniformASlider: document.getElementById('uniformASlider'),
+        uniformBSlider: document.getElementById('uniformBSlider'),
+        uniformHeightSlider: document.getElementById('uniformHeightSlider'),
+        triASlider: document.getElementById('triASlider'),
+        triMSlider: document.getElementById('triMSlider'),
+        triBSlider: document.getElementById('triBSlider'),
+        triHeightSlider: document.getElementById('triHeightSlider'),
+        trapASlider: document.getElementById('trapASlider'),
+        trapBSlider: document.getElementById('trapBSlider'),
+        trapCSlider: document.getElementById('trapCSlider'),
+        trapDSlider: document.getElementById('trapDSlider'),
+        trapHeightSlider: document.getElementById('trapHeightSlider'),
         piecewiseRows: document.getElementById('piecewiseRows'),
         addPointBtn: document.getElementById('addPointBtn'),
         updateBtn: document.getElementById('updateBtn'),
@@ -829,6 +871,109 @@
         return String(Number(v.toFixed(6)));
       }
 
+
+      function setSliderBounds(slider, min, max, step = 0.001) {
+        if (!slider) return;
+        const lo = Number.isFinite(min) ? min : 0;
+        const hi = Number.isFinite(max) ? max : lo + 1;
+        const safeHi = hi > lo ? hi : lo + 1;
+        slider.min = toInputNumber(lo);
+        slider.max = toInputNumber(safeHi);
+        slider.step = toInputNumber(step);
+      }
+
+      function syncInputSlider(input, slider) {
+        if (!input || !slider) return;
+        const n = Number(input.value);
+        if (!Number.isFinite(n)) return;
+        slider.value = toInputNumber(clamp(n, Number(slider.min), Number(slider.max)));
+      }
+
+      function bindInputAndSlider(input, slider, onInput) {
+        if (!input || !slider) return;
+        const handler = () => {
+          syncInputSlider(input, slider);
+          if (typeof onInput === 'function') onInput();
+        };
+        input.addEventListener('input', handler);
+        input.addEventListener('change', handler);
+        slider.addEventListener('input', () => {
+          input.value = slider.value;
+          if (typeof onInput === 'function') onInput();
+        });
+        slider.addEventListener('change', () => {
+          input.value = slider.value;
+          if (typeof onInput === 'function') onInput();
+        });
+      }
+
+      function syncFixedSlidersFromInputs() {
+        [
+          [els.uniformA, els.uniformASlider],
+          [els.uniformB, els.uniformBSlider],
+          [els.uniformHeight, els.uniformHeightSlider],
+          [els.triA, els.triASlider],
+          [els.triM, els.triMSlider],
+          [els.triB, els.triBSlider],
+          [els.triHeight, els.triHeightSlider],
+          [els.trapA, els.trapASlider],
+          [els.trapB, els.trapBSlider],
+          [els.trapC, els.trapCSlider],
+          [els.trapD, els.trapDSlider],
+          [els.trapHeight, els.trapHeightSlider]
+        ].forEach(([input, slider]) => syncInputSlider(input, slider));
+
+        Array.from(els.piecewiseRows.querySelectorAll('tr')).forEach((row) => {
+          syncInputSlider(row.querySelector('.pw-x'), row.querySelector('.pw-x-slider'));
+          syncInputSlider(row.querySelector('.pw-y'), row.querySelector('.pw-y-slider'));
+        });
+      }
+
+      function updateSliderRanges() {
+        const span = Math.max(1, state.xmax - state.xmin);
+        const rangeMin = state.xmin - 0.25 * span;
+        const rangeMax = state.xmax + 0.25 * span;
+        const heightMax = Math.max(2, state.yAutoTop * 2, Number(els.uniformHeight.value), Number(els.triHeight.value), Number(els.trapHeight.value));
+
+        const ua = Number(els.uniformA.value);
+        const ub = Number(els.uniformB.value);
+        setSliderBounds(els.uniformASlider, rangeMin, ub - EPS);
+        setSliderBounds(els.uniformBSlider, ua + EPS, rangeMax);
+        setSliderBounds(els.uniformHeightSlider, 0, heightMax, 0.0005);
+
+        const ta = Number(els.triA.value);
+        const tm = Number(els.triM.value);
+        const tb = Number(els.triB.value);
+        setSliderBounds(els.triASlider, rangeMin, tm - EPS);
+        setSliderBounds(els.triMSlider, ta + EPS, tb - EPS);
+        setSliderBounds(els.triBSlider, tm + EPS, rangeMax);
+        setSliderBounds(els.triHeightSlider, 0, heightMax, 0.0005);
+
+        const pa = Number(els.trapA.value);
+        const pb = Number(els.trapB.value);
+        const pc = Number(els.trapC.value);
+        const pd = Number(els.trapD.value);
+        setSliderBounds(els.trapASlider, rangeMin, pb - EPS);
+        setSliderBounds(els.trapBSlider, pa + EPS, pc);
+        setSliderBounds(els.trapCSlider, pb, pd - EPS);
+        setSliderBounds(els.trapDSlider, pc + EPS, rangeMax);
+        setSliderBounds(els.trapHeightSlider, 0, heightMax, 0.0005);
+
+        const rows = Array.from(els.piecewiseRows.querySelectorAll('tr'));
+        rows.forEach((row, i) => {
+          const xInput = row.querySelector('.pw-x');
+          const yInput = row.querySelector('.pw-y');
+          const xSlider = row.querySelector('.pw-x-slider');
+          const ySlider = row.querySelector('.pw-y-slider');
+          const prev = i === 0 ? rangeMin : Number(rows[i - 1].querySelector('.pw-x').value) + EPS;
+          const next = i === rows.length - 1 ? rangeMax : Number(rows[i + 1].querySelector('.pw-x').value) - EPS;
+          setSliderBounds(xSlider, prev, next, 0.001);
+          setSliderBounds(ySlider, 0, heightMax, 0.0005);
+          syncInputSlider(xInput, xSlider);
+          syncInputSlider(yInput, ySlider);
+        });
+      }
+
       function showPanels() {
         const t = els.distributionType.value;
         els.uniformParams.hidden = t !== 'uniform';
@@ -839,8 +984,14 @@
         els.uniformHeight.disabled = autoadjust;
         els.triHeight.disabled = autoadjust;
         els.trapHeight.disabled = autoadjust;
-        Array.from(els.piecewiseRows.querySelectorAll('.pw-y')).forEach((input) => {
-          input.disabled = autoadjust;
+        els.uniformHeightSlider.disabled = autoadjust;
+        els.triHeightSlider.disabled = autoadjust;
+        els.trapHeightSlider.disabled = autoadjust;
+        Array.from(els.piecewiseRows.querySelectorAll('tr')).forEach((row) => {
+          const yInput = row.querySelector('.pw-y');
+          const ySlider = row.querySelector('.pw-y-slider');
+          if (yInput) yInput.disabled = autoadjust;
+          if (ySlider) ySlider.disabled = autoadjust;
         });
       }
 
@@ -951,14 +1102,18 @@
         const row = els.piecewiseRows.querySelectorAll('tr')[index];
         if (!row) return;
         const input = row.querySelector('.pw-x');
+        const slider = row.querySelector('.pw-x-slider');
         input.value = toInputNumber(value);
+        syncInputSlider(input, slider);
       }
 
       function setPiecewiseY(index, value) {
         const row = els.piecewiseRows.querySelectorAll('tr')[index];
         if (!row) return;
         const input = row.querySelector('.pw-y');
+        const slider = row.querySelector('.pw-y-slider');
         input.value = toInputNumber(Math.max(0, value));
+        syncInputSlider(input, slider);
       }
 
       function clamp(v, lo, hi) {
@@ -1494,6 +1649,8 @@
         if (!state.interactionTargets.some((t) => t.id === state.hoverTargetId)) state.hoverTargetId = null;
         state.yAutoTop = Math.max(1e-6, Math.max(...y) * 1.08);
         syncYTopInput(state.yAutoTop);
+        updateSliderRanges();
+        syncFixedSlidersFromInputs();
 
         updateResults({
           type: model.type,
@@ -2075,26 +2232,39 @@
       function addPiecewiseRow(x = 0, y = 0) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><input class="pw-x" type="number" step="any" value="${x}" /></td>
-          <td><input class="pw-y" type="number" step="any" value="${y}" min="0" /></td>
+          <td>
+            <div class="pw-cell">
+              <input class="pw-x" type="number" step="any" value="${x}" />
+              <input class="pw-x-slider" type="range" step="0.001" />
+            </div>
+          </td>
+          <td>
+            <div class="pw-cell">
+              <input class="pw-y" type="number" step="any" value="${y}" min="0" />
+              <input class="pw-y-slider" type="range" step="0.001" min="0" />
+            </div>
+          </td>
           <td><button type="button" class="btn-secondary remove-row">Remove</button></td>
         `;
+        const xInput = tr.querySelector('.pw-x');
         const yInput = tr.querySelector('.pw-y');
+        const xSlider = tr.querySelector('.pw-x-slider');
+        const ySlider = tr.querySelector('.pw-y-slider');
         yInput.dataset.manualY = toInputNumber(y);
-        tr.querySelectorAll('input').forEach((input) => {
-          input.addEventListener('input', evaluateAndDraw);
-          input.addEventListener('change', evaluateAndDraw);
+
+        bindInputAndSlider(xInput, xSlider, evaluateAndDraw);
+        bindInputAndSlider(yInput, ySlider, () => {
+          if (!getAutoadjustValue()) yInput.dataset.manualY = yInput.value;
+          evaluateAndDraw();
         });
+
         yInput.addEventListener('input', () => {
-          if (!getAutoadjustValue()) {
-            yInput.dataset.manualY = yInput.value;
-          }
+          if (!getAutoadjustValue()) yInput.dataset.manualY = yInput.value;
         });
         yInput.addEventListener('change', () => {
-          if (!getAutoadjustValue()) {
-            yInput.dataset.manualY = yInput.value;
-          }
+          if (!getAutoadjustValue()) yInput.dataset.manualY = yInput.value;
         });
+
         tr.querySelector('.remove-row').addEventListener('click', () => {
           if (els.piecewiseRows.children.length <= 2) {
             setStatus('warn', 'Piecewise linear distribution needs at least two points.');
@@ -2104,6 +2274,9 @@
           evaluateAndDraw();
         });
         els.piecewiseRows.appendChild(tr);
+        updateSliderRanges();
+        syncInputSlider(xInput, xSlider);
+        syncInputSlider(yInput, ySlider);
       }
 
       function resetAll() {
@@ -2147,22 +2320,19 @@
       });
 
       [
-        els.uniformA,
-        els.uniformB,
-        els.triA,
-        els.triM,
-        els.triB,
-        els.trapA,
-        els.trapB,
-        els.trapC,
-        els.trapD,
-        els.uniformHeight,
-        els.triHeight,
-        els.trapHeight
-      ].forEach((el) => {
-        el.addEventListener('change', evaluateAndDraw);
-        el.addEventListener('input', evaluateAndDraw);
-      });
+        [els.uniformA, els.uniformASlider],
+        [els.uniformB, els.uniformBSlider],
+        [els.triA, els.triASlider],
+        [els.triM, els.triMSlider],
+        [els.triB, els.triBSlider],
+        [els.trapA, els.trapASlider],
+        [els.trapB, els.trapBSlider],
+        [els.trapC, els.trapCSlider],
+        [els.trapD, els.trapDSlider],
+        [els.uniformHeight, els.uniformHeightSlider],
+        [els.triHeight, els.triHeightSlider],
+        [els.trapHeight, els.trapHeightSlider]
+      ].forEach(([input, slider]) => bindInputAndSlider(input, slider, evaluateAndDraw));
 
       els.distributionType.addEventListener('change', () => {
         if (!applyingExampleSelection) {
