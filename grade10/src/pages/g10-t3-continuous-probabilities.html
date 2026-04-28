@@ -269,6 +269,24 @@
       accent-color: var(--primary);
     }
 
+    .slider-endpoints {
+      margin-top: 0.3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .slider-endpoint-input {
+      width: 56px;
+      min-width: 56px;
+      padding: 0.16rem 0.22rem;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      line-height: 1.1;
+      text-align: center;
+    }
+
     canvas {
       width: 100%;
       height: 420px;
@@ -779,11 +797,19 @@
               <label for="xMinInput">x-min</label>
               <input id="xMinInput" type="number" step="any" value="-1" />
               <input id="xMinSlider" class="param-slider" type="range" step="0.001" />
+              <div class="slider-endpoints">
+                <input id="xMinSliderMinInput" class="slider-endpoint-input" type="number" step="any" value="-2" aria-label="x-min slider minimum" />
+                <input id="xMinSliderMaxInput" class="slider-endpoint-input" type="number" step="any" value="4" aria-label="x-min slider maximum" />
+              </div>
             </div>
             <div class="field">
               <label for="xMaxInput">x-max</label>
               <input id="xMaxInput" type="number" step="any" value="3" />
               <input id="xMaxSlider" class="param-slider" type="range" step="0.001" />
+              <div class="slider-endpoints">
+                <input id="xMaxSliderMinInput" class="slider-endpoint-input" type="number" step="any" value="-2" aria-label="x-max slider minimum" />
+                <input id="xMaxSliderMaxInput" class="slider-endpoint-input" type="number" step="any" value="4" aria-label="x-max slider maximum" />
+              </div>
             </div>
           </div>
 
@@ -1053,6 +1079,10 @@
         xMaxInput: document.getElementById('xMaxInput'),
         xMinSlider: document.getElementById('xMinSlider'),
         xMaxSlider: document.getElementById('xMaxSlider'),
+        xMinSliderMinInput: document.getElementById('xMinSliderMinInput'),
+        xMinSliderMaxInput: document.getElementById('xMinSliderMaxInput'),
+        xMaxSliderMinInput: document.getElementById('xMaxSliderMinInput'),
+        xMaxSliderMaxInput: document.getElementById('xMaxSliderMaxInput'),
         yTopInput: document.getElementById('yTopInput'),
         autoYTopToggle: document.getElementById('autoYTopToggle'),
         probabilitySummary: document.getElementById('probabilitySummary'),
@@ -1212,7 +1242,11 @@
         plot: { m: { l: 62, r: 20, t: 18, b: 46 }, w: 1, h: 1, rectWidth: 1, rectHeight: 420 },
         generatedData: [],
         useMeanStdMode: false,
-        skipMeanStdCanonicalOnce: false
+        skipMeanStdCanonicalOnce: false,
+        sliderRanges: {
+          xMin: { min: -2, max: 4 },
+          xMax: { min: -2, max: 4 }
+        }
       };
 
       function getAutoadjustValue() {
@@ -1272,6 +1306,45 @@
           input.value = slider.value;
           if (typeof onInput === 'function') onInput();
         });
+      }
+
+      function setDefaultXSliderRangesFromValues(xmin, xmax) {
+        const safeMin = Number.isFinite(xmin) ? xmin : -1;
+        const safeMax = Number.isFinite(xmax) ? xmax : 3;
+        const span = Math.max(1, safeMax - safeMin);
+        const pad = span * 0.25;
+        const rangeMin = safeMin - pad;
+        const rangeMax = safeMax + pad;
+        state.sliderRanges.xMin.min = rangeMin;
+        state.sliderRanges.xMin.max = rangeMax;
+        state.sliderRanges.xMax.min = rangeMin;
+        state.sliderRanges.xMax.max = rangeMax;
+        els.xMinSliderMinInput.value = toInputNumber(rangeMin);
+        els.xMinSliderMaxInput.value = toInputNumber(rangeMax);
+        els.xMaxSliderMinInput.value = toInputNumber(rangeMin);
+        els.xMaxSliderMaxInput.value = toInputNumber(rangeMax);
+      }
+
+      function sanitizeXSliderRangeInputs() {
+        const fallbackMin = Math.min(state.xmin, state.xmax) - 1;
+        const fallbackMax = Math.max(state.xmin, state.xmax) + 1;
+        const sanitizePair = (minInput, maxInput, target) => {
+          let min = Number(minInput.value);
+          let max = Number(maxInput.value);
+          if (!Number.isFinite(min)) min = Number.isFinite(target.min) ? target.min : fallbackMin;
+          if (!Number.isFinite(max)) max = Number.isFinite(target.max) ? target.max : fallbackMax;
+          if (!(max - min > EPS)) max = min + 1;
+          target.min = min;
+          target.max = max;
+          minInput.value = toInputNumber(min);
+          maxInput.value = toInputNumber(max);
+        };
+        sanitizePair(els.xMinSliderMinInput, els.xMinSliderMaxInput, state.sliderRanges.xMin);
+        sanitizePair(els.xMaxSliderMinInput, els.xMaxSliderMaxInput, state.sliderRanges.xMax);
+        if (state.sliderRanges.xMax.max - state.sliderRanges.xMin.min <= EPS) {
+          state.sliderRanges.xMax.max = state.sliderRanges.xMin.min + 1;
+          els.xMaxSliderMaxInput.value = toInputNumber(state.sliderRanges.xMax.max);
+        }
       }
 
       function syncFixedSlidersFromInputs() {
@@ -1334,14 +1407,11 @@
         const rangeMin = state.xmin - 0.25 * span;
         const rangeMax = state.xmax + 0.25 * span;
         const heightMax = Math.max(2, state.yAutoTop * 2, Number(els.uniformHeight.value), Number(els.triHeight.value), Number(els.trapHeight.value));
-        const supportMin = Number.isFinite(state.x[0]) ? state.x[0] : state.xmin;
-        const supportMax = Number.isFinite(state.x[state.x.length - 1]) ? state.x[state.x.length - 1] : state.xmax;
-        const supportSpan = Math.max(1, supportMax - supportMin);
-        const xPad = supportSpan * 0.35;
-        const xOuterMin = Math.min(supportMin - xPad, state.xmin - 0.25 * span);
-        const xOuterMax = Math.max(supportMax + xPad, state.xmax + 0.25 * span);
-        setSliderBounds(els.xMinSlider, xOuterMin, state.xmax - EPS, 0.001);
-        setSliderBounds(els.xMaxSlider, state.xmin + EPS, xOuterMax, 0.001);
+        sanitizeXSliderRangeInputs();
+        const xMinRange = state.sliderRanges.xMin;
+        const xMaxRange = state.sliderRanges.xMax;
+        setSliderBounds(els.xMinSlider, xMinRange.min, Math.min(xMinRange.max, state.xmax - EPS), 0.001);
+        setSliderBounds(els.xMaxSlider, Math.max(xMaxRange.min, state.xmin + EPS), xMaxRange.max, 0.001);
         syncInputSlider(els.xMinInput, els.xMinSlider);
         syncInputSlider(els.xMaxInput, els.xMaxSlider);
 
@@ -1561,6 +1631,7 @@
       }
 
       function resolveXAxisRange(defaultMin, defaultMax, errors) {
+        sanitizeXSliderRangeInputs();
         let xmin = Number(els.xMinInput.value);
         let xmax = Number(els.xMaxInput.value);
         const hasValid = Number.isFinite(xmin) && Number.isFinite(xmax) && (xmax - xmin > EPS);
@@ -1571,6 +1642,28 @@
           }
           xmin = defaultMin;
           xmax = defaultMax;
+        }
+
+        xmin = clamp(xmin, state.sliderRanges.xMin.min, state.sliderRanges.xMin.max);
+        xmax = clamp(xmax, state.sliderRanges.xMax.min, state.sliderRanges.xMax.max);
+
+        if (!(xmax - xmin > EPS)) {
+          const xMinLimit = Math.min(state.sliderRanges.xMin.max, xmax - EPS);
+          if (xMinLimit >= state.sliderRanges.xMin.min) xmin = clamp(xmin, state.sliderRanges.xMin.min, xMinLimit);
+          const xMaxLimit = Math.max(state.sliderRanges.xMax.min, xmin + EPS);
+          if (xMaxLimit <= state.sliderRanges.xMax.max) xmax = clamp(xmax, xMaxLimit, state.sliderRanges.xMax.max);
+        }
+
+        if (!(xmax - xmin > EPS)) {
+          const fallbackXMinMax = Math.min(state.sliderRanges.xMin.max, state.sliderRanges.xMax.max - EPS);
+          xmin = clamp(defaultMin, state.sliderRanges.xMin.min, fallbackXMinMax);
+          const fallbackXMaxMin = Math.max(state.sliderRanges.xMax.min, xmin + EPS);
+          xmax = clamp(defaultMax, fallbackXMaxMin, state.sliderRanges.xMax.max);
+          if (!(xmax - xmin > EPS)) {
+            xmin = state.sliderRanges.xMin.min;
+            xmax = Math.max(xmin + EPS, state.sliderRanges.xMax.max);
+          }
+          errors.push('x-range was clamped to satisfy fixed slider limits and x-max > x-min.');
         }
 
         els.xMinInput.value = toInputNumber(xmin);
@@ -2925,6 +3018,7 @@
         if (config.xRange) {
           els.xMinInput.value = toInputNumber(config.xRange.min);
           els.xMaxInput.value = toInputNumber(config.xRange.max);
+          setDefaultXSliderRangesFromValues(config.xRange.min, config.xRange.max);
         }
 
         applyingExampleSelection = false;
@@ -3019,6 +3113,7 @@
         els.yTopInput.value = '1';
         els.xMinInput.value = '-1';
         els.xMaxInput.value = '3';
+        setDefaultXSliderRangesFromValues(-1, 3);
         state.probabilityMarkers = [];
         state.hoveredProbabilityRegion = null;
         state.cdfView = { autoYTopEnabled: true, yTop: 1.05 };
@@ -3098,6 +3193,10 @@
       els.autoYTopToggle.addEventListener('change', evaluateAndDraw);
       els.yTopInput.addEventListener('change', evaluateAndDraw);
       els.yTopInput.addEventListener('input', evaluateAndDraw);
+      [els.xMinSliderMinInput, els.xMinSliderMaxInput, els.xMaxSliderMinInput, els.xMaxSliderMaxInput].forEach((input) => {
+        input.addEventListener('input', evaluateAndDraw);
+        input.addEventListener('change', evaluateAndDraw);
+      });
       els.sharedCdfDetails.addEventListener('toggle', drawSharedCdfSection);
       els.cdfAutoYTopToggle.addEventListener('change', () => {
         state.cdfView.autoYTopEnabled = els.cdfAutoYTopToggle.checked;
