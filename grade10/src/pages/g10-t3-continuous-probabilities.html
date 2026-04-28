@@ -847,6 +847,24 @@
             <button id="rightControlToggle" class="right-control-toggle" type="button" aria-expanded="true" aria-controls="rightControlBody" title="Collapse controls">⮞</button>
           </div>
           <div id="rightControlBody" class="right-control-body">
+            <label class="toggle-inline">
+              <input id="useMeanStdToggle" type="checkbox" />
+              Use Mean and Std
+            </label>
+
+            <div id="meanStdParams" class="params-panel" hidden>
+              <div class="grid">
+                <div class="field col-12">
+                  <label for="modeMeanInput">Mean</label>
+                  <input id="modeMeanInput" type="number" step="any" value="0.5" />
+                </div>
+                <div class="field col-12">
+                  <label for="modeStdInput">Std</label>
+                  <input id="modeStdInput" type="number" min="0" step="any" value="0.288675" />
+                </div>
+              </div>
+            </div>
+
             <div id="uniformParams" class="params-panel">
               <div class="grid">
                 <div class="field col-6">
@@ -1030,7 +1048,11 @@
         scatterCanvas: document.getElementById('scatterCanvas'),
         generatedDataTableBody: document.getElementById('generatedDataTableBody'),
         rightControlPanel: document.getElementById('rightControlPanel'),
-        rightControlToggle: document.getElementById('rightControlToggle')
+        rightControlToggle: document.getElementById('rightControlToggle'),
+        useMeanStdToggle: document.getElementById('useMeanStdToggle'),
+        meanStdParams: document.getElementById('meanStdParams'),
+        modeMeanInput: document.getElementById('modeMeanInput'),
+        modeStdInput: document.getElementById('modeStdInput')
       };
 
       const setRightPanelCollapsed = (collapsed) => {
@@ -1057,7 +1079,8 @@
           { x: 1, y: 1 },
           { x: 2, y: 0 }
         ],
-        autoadjust: true
+        autoadjust: true,
+        useMeanStdMode: false
       };
 
 
@@ -1163,7 +1186,9 @@
         hoveredProbabilityRegion: null,
         cdfView: { autoYTopEnabled: true, yTop: 1.05 },
         plot: { m: { l: 62, r: 20, t: 18, b: 46 }, w: 1, h: 1, rectWidth: 1, rectHeight: 420 },
-        generatedData: []
+        generatedData: [],
+        useMeanStdMode: false,
+        skipMeanStdCanonicalOnce: false
       };
 
       function getAutoadjustValue() {
@@ -1294,10 +1319,12 @@
 
       function showPanels() {
         const t = els.distributionType.value;
-        els.uniformParams.hidden = t !== 'uniform';
-        els.triangularParams.hidden = t !== 'triangular';
-        els.trapezoidParams.hidden = t !== 'trapezoid';
-        els.piecewiseParams.hidden = t !== 'piecewise';
+        const useMeanStd = state.useMeanStdMode;
+        els.meanStdParams.hidden = !useMeanStd;
+        els.uniformParams.hidden = useMeanStd || t !== 'uniform';
+        els.triangularParams.hidden = useMeanStd || t !== 'triangular';
+        els.trapezoidParams.hidden = useMeanStd || t !== 'trapezoid';
+        els.piecewiseParams.hidden = useMeanStd || t !== 'piecewise';
         const autoadjust = getAutoadjustValue();
         els.uniformHeight.disabled = autoadjust;
         els.triHeight.disabled = autoadjust;
@@ -1358,14 +1385,105 @@
         return { ok: true, value: area };
       }
 
-      function updateResults({ type, mean, variance }) {
+      function modeInputs() {
+        let mean = Number(els.modeMeanInput.value);
+        let std = Number(els.modeStdInput.value);
+        if (!Number.isFinite(mean)) mean = 0;
+        if (!Number.isFinite(std) || std < 0) std = 0;
+        els.modeMeanInput.value = toInputNumber(mean);
+        els.modeStdInput.value = toInputNumber(std);
+        return { mean, std };
+      }
+
+      function applyCanonicalParamsFromMeanStd(type, mean, std) {
+        const safeStd = Math.max(0, std);
+        if (type === 'uniform') {
+          const halfWidth = Math.sqrt(3) * safeStd;
+          const a = mean - halfWidth;
+          const b = mean + halfWidth + (safeStd === 0 ? EPS : 0);
+          els.uniformA.value = toInputNumber(a);
+          els.uniformB.value = toInputNumber(Math.max(b, a + EPS));
+          return;
+        }
+        if (type === 'triangular') {
+          // Canonical family: symmetric triangle with mode at mean.
+          const halfWidth = Math.sqrt(6) * safeStd;
+          const a = mean - halfWidth;
+          const m = mean;
+          const b = mean + halfWidth + (safeStd === 0 ? EPS : 0);
+          els.triA.value = toInputNumber(a);
+          els.triM.value = toInputNumber(m);
+          els.triB.value = toInputNumber(Math.max(b, m + EPS));
+          return;
+        }
+        if (type === 'trapezoid') {
+          // Canonical family: symmetric trapezoid with fixed shoulder ratio q.
+          const q = 0.5;
+          const factor = (q * q + 2 * q + 3) / 18;
+          const halfWidth = safeStd / Math.sqrt(factor || 1);
+          const a = mean - halfWidth;
+          const d = mean + halfWidth + (safeStd === 0 ? EPS : 0);
+          const b = mean - q * halfWidth;
+          const c = mean + q * halfWidth;
+          els.trapA.value = toInputNumber(a);
+          els.trapB.value = toInputNumber(Math.max(a + EPS, b));
+          els.trapC.value = toInputNumber(Math.max(Number(els.trapB.value), c));
+          els.trapD.value = toInputNumber(Math.max(Number(els.trapC.value) + EPS, d));
+          return;
+        }
+        if (type === 'piecewise') {
+          // Canonical family: symmetric 4-point piecewise-linear plateau with fixed shoulder ratio q.
+          const q = 1 / 3;
+          const factor = (q * q + 2 * q + 3) / 18;
+          const halfWidth = safeStd / Math.sqrt(factor || 1);
+          const points = [
+            { x: mean - halfWidth, y: 0 },
+            { x: mean - q * halfWidth, y: 1 },
+            { x: mean + q * halfWidth, y: 1 },
+            { x: mean + halfWidth + (safeStd === 0 ? EPS : 0), y: 0 }
+          ];
+          replacePiecewiseRows(points);
+        }
+      }
+
+      function updateModeInputsFromStats(mean, variance) {
+        if (!state.useMeanStdMode) return;
+        const std = Number.isFinite(variance) && variance >= 0 ? Math.sqrt(variance) : 0;
+        if (Number.isFinite(mean)) els.modeMeanInput.value = toInputNumber(mean);
+        if (Number.isFinite(std)) els.modeStdInput.value = toInputNumber(std);
+      }
+
+      function updateResults({ type, mean, variance, params, meanStdDriven }) {
         const std = Number.isFinite(variance) && variance >= 0 ? Math.sqrt(variance) : NaN;
-        const cards = [
-          ['Type', type],
-          ['Mean E[X]', fmt(mean)],
-          ['Variance Var(X)', fmt(variance)],
-          ['Std dev σ', fmt(std)]
-        ];
+        const cards = [['Type', type]];
+        if (meanStdDriven) {
+          cards.push(['Mode', 'Mean & Std inputs']);
+          cards.push(['Input Mean', fmt(mean)]);
+          cards.push(['Input Std', fmt(std)]);
+          cards.push(['Derived parameters', 'From Mean & Std']);
+          if (type === 'uniform') {
+            cards.push(['a (derived)', fmt(params.a)]);
+            cards.push(['b (derived)', fmt(params.b)]);
+          } else if (type === 'triangular') {
+            cards.push(['a (derived)', fmt(params.a)]);
+            cards.push(['m (derived)', fmt(params.m)]);
+            cards.push(['b (derived)', fmt(params.b)]);
+          } else if (type === 'trapezoid') {
+            cards.push(['a (derived)', fmt(params.a)]);
+            cards.push(['b (derived)', fmt(params.b)]);
+            cards.push(['c (derived)', fmt(params.c)]);
+            cards.push(['d (derived)', fmt(params.d)]);
+          } else if (type === 'piecewise') {
+            (params.raw || []).forEach((p, i) => {
+              cards.push([`P${i + 1} (derived)`, `(${fmt(p.x, 3)}, ${fmt(p.y, 3)})`]);
+            });
+          }
+          cards.push(['Variance Var(X)=σ²', fmt(std * std)]);
+        } else {
+          cards.push(['Mean E[X]', fmt(mean)]);
+          cards.push(['Variance Var(X)', fmt(variance)]);
+          cards.push(['Std dev σ', fmt(std)]);
+        }
         els.results.innerHTML = cards.map(([k, v]) => `<div class="metric"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
       }
 
@@ -1440,10 +1558,21 @@
 
       function readAndSanitize() {
         const type = els.distributionType.value;
-        const autoadjust = getAutoadjustValue();
+        let autoadjust = getAutoadjustValue();
+        const useMeanStd = state.useMeanStdMode;
         const errors = [];
         let params = {};
         let points = [];
+
+        if (useMeanStd && !state.skipMeanStdCanonicalOnce) {
+          const { mean, std } = modeInputs();
+          applyCanonicalParamsFromMeanStd(type, mean, std);
+          if (!autoadjust) {
+            setAutoadjustValue(true);
+            autoadjust = true;
+          }
+        }
+        state.skipMeanStdCanonicalOnce = false;
 
         if (type === 'uniform') {
           let a = Number(els.uniformA.value);
@@ -2158,11 +2287,14 @@
         syncYTopInput(state.yAutoTop);
         updateSliderRanges();
         syncFixedSlidersFromInputs();
+        updateModeInputsFromStats(mean, varianceRes.value);
 
         updateResults({
           type: model.type,
+          params: model.params,
           mean,
-          variance: varianceRes.value
+          variance: varianceRes.value,
+          meanStdDriven: state.useMeanStdMode
         });
 
         const autoadjust = getAutoadjustValue();
@@ -2495,6 +2627,7 @@
         if (!state.drag) return;
         const { xVal, yVal } = pixelToData(clientX, clientY);
         const type = els.distributionType.value;
+        const useMeanStd = state.useMeanStdMode;
         const dragId = state.drag.id;
         const markerFromPoint = dragId.endsWith('-point') ? dragId.slice(0, -6) : null;
         const markerId = markerFromPoint || dragId;
@@ -2582,6 +2715,7 @@
           }
         }
 
+        if (useMeanStd) state.skipMeanStdCanonicalOnce = true;
         evaluateAndDraw();
       }
 
@@ -2721,6 +2855,7 @@
         }
 
         applyingExampleSelection = false;
+        if (state.useMeanStdMode) state.skipMeanStdCanonicalOnce = true;
         evaluateAndDraw();
       }
 
@@ -2802,6 +2937,10 @@
         els.uniformHeight.value = defaults.manualHeight.uniform;
         els.triHeight.value = defaults.manualHeight.triangular;
         els.trapHeight.value = defaults.manualHeight.trapezoid;
+        state.useMeanStdMode = defaults.useMeanStdMode;
+        els.useMeanStdToggle.checked = defaults.useMeanStdMode;
+        els.modeMeanInput.value = '0.5';
+        els.modeStdInput.value = '0.288675';
         setAutoadjustValue(defaults.autoadjust);
         els.autoYTopToggle.checked = true;
         els.yTopInput.value = '1';
@@ -2869,6 +3008,14 @@
 
       els.updateBtn.addEventListener('click', evaluateAndDraw);
       els.resetBtn.addEventListener('click', resetAll);
+      els.useMeanStdToggle.addEventListener('change', () => {
+        state.useMeanStdMode = els.useMeanStdToggle.checked;
+        evaluateAndDraw();
+      });
+      els.modeMeanInput.addEventListener('input', evaluateAndDraw);
+      els.modeMeanInput.addEventListener('change', evaluateAndDraw);
+      els.modeStdInput.addEventListener('input', evaluateAndDraw);
+      els.modeStdInput.addEventListener('change', evaluateAndDraw);
       els.autoadjustToggles.forEach((toggle) => {
         toggle.addEventListener('change', () => {
           setAutoadjustValue(toggle.checked);
