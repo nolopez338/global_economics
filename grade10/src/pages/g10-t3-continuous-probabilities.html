@@ -741,6 +741,7 @@
                 <option value="triangular">Triangular</option>
                 <option value="trapezoid">Trapezoid</option>
                 <option value="piecewise">Piecewise linear</option>
+                <option value="normal">Normal</option>
               </select>
             </div>
 
@@ -1242,6 +1243,8 @@
         plot: { m: { l: 62, r: 20, t: 18, b: 46 }, w: 1, h: 1, rectWidth: 1, rectHeight: 420 },
         generatedData: [],
         useMeanStdMode: false,
+        currentModel: null,
+        normalRangeInitialized: false,
         skipMeanStdCanonicalOnce: false,
         sliderRanges: {
           xMin: { min: -2, max: 4 },
@@ -1449,12 +1452,19 @@
 
       function showPanels() {
         const t = els.distributionType.value;
+        if (t === 'normal') {
+          state.useMeanStdMode = true;
+          els.useMeanStdToggle.checked = true;
+          els.useMeanStdToggle.disabled = true;
+        } else {
+          els.useMeanStdToggle.disabled = false;
+        }
         const useMeanStd = state.useMeanStdMode;
         els.meanStdParams.hidden = !useMeanStd;
-        els.uniformParams.hidden = useMeanStd || t !== 'uniform';
-        els.triangularParams.hidden = useMeanStd || t !== 'triangular';
-        els.trapezoidParams.hidden = useMeanStd || t !== 'trapezoid';
-        els.piecewiseParams.hidden = useMeanStd || t !== 'piecewise';
+        els.uniformParams.hidden = t === 'normal' || useMeanStd || t !== 'uniform';
+        els.triangularParams.hidden = t === 'normal' || useMeanStd || t !== 'triangular';
+        els.trapezoidParams.hidden = t === 'normal' || useMeanStd || t !== 'trapezoid';
+        els.piecewiseParams.hidden = t === 'normal' || useMeanStd || t !== 'piecewise';
         const autoadjust = getAutoadjustValue();
         els.uniformHeight.disabled = autoadjust;
         els.triHeight.disabled = autoadjust;
@@ -1578,6 +1588,7 @@
 
       function updateModeInputsFromStats(mean, variance) {
         if (!state.useMeanStdMode) return;
+        if (els.distributionType.value === 'normal') return;
         const std = Number.isFinite(variance) && variance >= 0 ? Math.sqrt(variance) : 0;
         if (Number.isFinite(mean)) els.modeMeanInput.value = toInputNumber(mean);
         if (Number.isFinite(std)) els.modeStdInput.value = toInputNumber(std);
@@ -1719,7 +1730,7 @@
 
         if (useMeanStd && !state.skipMeanStdCanonicalOnce) {
           const { mean, std } = modeInputs();
-          applyCanonicalParamsFromMeanStd(type, mean, std);
+          if (type !== 'normal') applyCanonicalParamsFromMeanStd(type, mean, std);
           if (!autoadjust) {
             setAutoadjustValue(true);
             autoadjust = true;
@@ -1876,6 +1887,27 @@
           }
         }
 
+        if (type === 'normal') {
+          const meanStd = modeInputs();
+          const mean = meanStd.mean;
+          const std = Math.max(EPS, meanStd.std);
+          els.modeStdInput.value = toInputNumber(std);
+          params = { mean, std };
+          const xminInput = Number(els.xMinInput.value);
+          const xmaxInput = Number(els.xMaxInput.value);
+          const safeXmin = Number.isFinite(xminInput) ? xminInput : mean - 4 * std;
+          const safeXmax = Number.isFinite(xmaxInput) && xmaxInput > safeXmin + EPS ? xmaxInput : mean + 4 * std;
+          const sampleCount = INTERNAL_SAMPLES;
+          const step = (safeXmax - safeXmin) / Math.max(1, sampleCount - 1);
+          points = [];
+          for (let i = 0; i < sampleCount; i++) {
+            const xVal = safeXmin + i * step;
+            const z = (xVal - mean) / std;
+            const yVal = Math.exp(-0.5 * z * z) / (std * Math.sqrt(2 * Math.PI));
+            points.push({ x: xVal, y: yVal });
+          }
+        }
+
         return { type, params, points, errors };
       }
 
@@ -1894,7 +1926,33 @@
         return 0;
       }
 
+      function erfApprox(x) {
+        const sign = x >= 0 ? 1 : -1;
+        const ax = Math.abs(x);
+        const a1 = 0.254829592;
+        const a2 = -0.284496736;
+        const a3 = 1.421413741;
+        const a4 = -1.453152027;
+        const a5 = 1.061405429;
+        const p = 0.3275911;
+        const t = 1 / (1 + p * ax);
+        const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-ax * ax);
+        return sign * y;
+      }
+
+      function normalCdf(x, mean, std) {
+        const safeStd = Math.max(EPS, std);
+        const z = (x - mean) / (safeStd * Math.sqrt(2));
+        const erfFn = typeof Math.erf === 'function' ? Math.erf : erfApprox;
+        return 0.5 * (1 + erfFn(z));
+      }
+
       function cdfAtX(xVal) {
+        if (state.currentModel?.type === 'normal') {
+          const mean = Number(state.currentModel.params?.mean);
+          const std = Math.max(EPS, Number(state.currentModel.params?.std));
+          return clamp(normalCdf(xVal, Number.isFinite(mean) ? mean : 0, std), 0, 1);
+        }
         if (!state.x.length || !state.y.length) return 0;
         if (xVal <= state.x[0]) return 0;
         if (xVal >= state.x[state.x.length - 1]) return 1;
@@ -2175,6 +2233,14 @@
           });
         }
 
+        if (model.type === 'normal') {
+          const mean = model.params.mean;
+          const std = Math.max(EPS, model.params.std);
+          pushLine('normal-mean', mean, 'μ');
+          pushLine('normal-left-sd', mean - std, 'μ−σ');
+          pushLine('normal-right-sd', mean + std, 'μ+σ');
+        }
+
         state.probabilityMarkers.forEach((marker, index) => {
           const xVal = clamp(marker.x, state.xmin, state.xmax);
           const yVal = evaluatePiecewise(model.points, xVal);
@@ -2205,6 +2271,18 @@
       }
 
       function buildSamplerFromCurrentPdf() {
+        if (state.currentModel?.type === 'normal') {
+          const mean = Number(state.currentModel.params?.mean);
+          const std = Math.max(EPS, Number(state.currentModel.params?.std));
+          return function sampleNormalOne() {
+            let u = 0;
+            let v = 0;
+            while (u === 0) u = Math.random();
+            while (v === 0) v = Math.random();
+            const z = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+            return (Number.isFinite(mean) ? mean : 0) + std * z;
+          };
+        }
         if (!state.x.length || !state.y.length) return null;
         const segments = [];
         let totalArea = 0;
@@ -2420,9 +2498,11 @@
         const areaRes = trapezoidIntegralSafe(x, y);
         const xf = x.map((v, i) => v * y[i]);
         const meanRes = trapezoidIntegralSafe(x, xf);
-        const mean = meanRes.ok ? meanRes.value : NaN;
-        const varf = x.map((v, i) => (v - mean) * (v - mean) * y[i]);
+        const integratedMean = meanRes.ok ? meanRes.value : NaN;
+        const varf = x.map((v, i) => (v - integratedMean) * (v - integratedMean) * y[i]);
         const varianceRes = trapezoidIntegralSafe(x, varf);
+        const mean = model.type === 'normal' ? model.params.mean : integratedMean;
+        const variance = model.type === 'normal' ? model.params.std * model.params.std : varianceRes.value;
 
         if (!areaRes.ok) errors.push(`Area integration failed: ${areaRes.reason}`);
         if (!meanRes.ok) errors.push(`Mean integration failed: ${meanRes.reason}`);
@@ -2433,6 +2513,10 @@
         state.xmin = xmin;
         state.xmax = xmax;
         state.points = points;
+        state.currentModel = {
+          type: model.type,
+          params: { ...model.params }
+        };
         clampMarkersToRange();
         state.interactionTargets = buildInteractionTargets(model);
         if (!state.interactionTargets.some((t) => t.id === state.hoverTargetId)) state.hoverTargetId = null;
@@ -2440,13 +2524,13 @@
         syncYTopInput(state.yAutoTop);
         updateSliderRanges();
         syncFixedSlidersFromInputs();
-        updateModeInputsFromStats(mean, varianceRes.value);
+        updateModeInputsFromStats(mean, variance);
 
         updateResults({
           type: model.type,
           params: model.params,
           mean,
-          variance: varianceRes.value,
+          variance,
           meanStdDriven: state.useMeanStdMode
         });
 
@@ -2868,14 +2952,30 @@
           }
         }
 
-        if (useMeanStd) state.skipMeanStdCanonicalOnce = true;
+        if (type === 'normal') {
+          let mean = Number(els.modeMeanInput.value);
+          let std = Number(els.modeStdInput.value);
+          if (!Number.isFinite(mean)) mean = 0;
+          if (!Number.isFinite(std) || std < EPS) std = EPS;
+          if (dragId === 'normal-mean') mean = xVal;
+          if (dragId === 'normal-left-sd') std = Math.max(EPS, Math.abs(mean - xVal));
+          if (dragId === 'normal-right-sd') std = Math.max(EPS, Math.abs(xVal - mean));
+          els.modeMeanInput.value = toInputNumber(mean);
+          els.modeStdInput.value = toInputNumber(std);
+        }
+
+        if (useMeanStd && type !== 'normal') state.skipMeanStdCanonicalOnce = true;
         evaluateAndDraw();
       }
 
       function startDrag(evt) {
         if (evt.button !== 0) return;
         const target = hitTestTarget(evt.clientX, evt.clientY);
-        if (!target) return;
+        if (!target) {
+          createProbabilityMarker(evt.clientX);
+          if (evt.cancelable) evt.preventDefault();
+          return;
+        }
         const dragId = target.markerId || target.id;
         state.drag = { id: dragId, pointerId: evt.pointerId };
         state.hoverTargetId = dragId;
@@ -3095,6 +3195,7 @@
         els.useMeanStdToggle.checked = defaults.useMeanStdMode;
         els.modeMeanInput.value = '0.5';
         els.modeStdInput.value = '0.288675';
+        state.normalRangeInitialized = false;
         setAutoadjustValue(defaults.autoadjust);
         els.autoYTopToggle.checked = true;
         els.yTopInput.value = '1';
@@ -3141,6 +3242,25 @@
       ].forEach(([input, slider]) => bindInputAndSlider(input, slider, evaluateAndDraw));
 
       els.distributionType.addEventListener('change', () => {
+        const nextType = els.distributionType.value;
+        if (nextType === 'normal') {
+          state.useMeanStdMode = true;
+          els.useMeanStdToggle.checked = true;
+          if (!state.normalRangeInitialized) {
+            const mean = Number(els.modeMeanInput.value);
+            let std = Number(els.modeStdInput.value);
+            const safeMean = Number.isFinite(mean) ? mean : 0;
+            if (!Number.isFinite(std) || std < EPS) std = 1;
+            els.modeMeanInput.value = toInputNumber(safeMean);
+            els.modeStdInput.value = toInputNumber(std);
+            els.xMinInput.value = toInputNumber(safeMean - 4 * std);
+            els.xMaxInput.value = toInputNumber(safeMean + 4 * std);
+            setDefaultXSliderRangesFromValues(safeMean - 4 * std, safeMean + 4 * std);
+            state.normalRangeInitialized = true;
+          }
+        } else {
+          state.normalRangeInitialized = false;
+        }
         if (!applyingExampleSelection) {
           els.exampleSelector.value = defaults.exampleSelector;
         }
@@ -3166,6 +3286,11 @@
       els.updateBtn.addEventListener('click', evaluateAndDraw);
       els.resetBtn.addEventListener('click', resetAll);
       els.useMeanStdToggle.addEventListener('change', () => {
+        if (els.distributionType.value === 'normal') {
+          state.useMeanStdMode = true;
+          els.useMeanStdToggle.checked = true;
+          return;
+        }
         state.useMeanStdMode = els.useMeanStdToggle.checked;
         evaluateAndDraw();
       });
