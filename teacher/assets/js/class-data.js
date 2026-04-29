@@ -61,7 +61,7 @@ window.CLASS_STUDENT_LISTS = {
 };
 
 window.CLASS_NOTES = {
-  "10A": [],
+  "10A": ["El grupo de los niños del condón - Jerónimo Londoño, Tomás Murillo"],
   "10B": [],
   "10C": [],
   "10D": [],
