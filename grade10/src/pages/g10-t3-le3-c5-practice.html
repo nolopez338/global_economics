@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>G10 T3 C5 Practice Activity</title>
+  <link rel="stylesheet" href="../../../assets/css/base.css">
+  <link rel="stylesheet" href="../../../assets/css/components.css">
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+</head>
+<body class="theme-grade10">
+  <main class="term-layout">
+    <section class="content-card">
+      <h1>G10 T3 C5 Practice Activity</h1>
+      <pre>
+\makeatletter
+\def\input@path{{./}{../}{../../}{../../../}{../../../../}{preamble/}{../preamble/}{../../preamble/}{../../..//preamble/}}
+\makeatother	
+
+\input{preamble_exams.tex}
+
+\newcommand{\StandardNormalLeftTailGraph}[3]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\ShadeCenterX}{(-3.5 + (#1))/2}
+			\pgfmathsetmacro{\ShadeCenterY}{0.5*exp(-(\ShadeCenterX)^2/2)/sqrt(2*pi)}
+			\begin{axis}[
+				width=11cm,
+				height=6cm,
+				axis lines=left,
+				xlabel={$z$},
+				ylabel={$\phi(z)$},
+				xmin=-3.5, xmax=3.5,
+				ymin=0, ymax=0.45,
+				grid=both,
+				xtick={-3,-2,-1,0,1,2,3,#1},
+				tick label style={font=\scriptsize}
+				]
+				\addplot[
+				domain=-3.5:#1,
+				draw=none,
+				fill=blue!55,
+				fill opacity=0.55
+				] {exp(-x^2/2)/sqrt(2*pi)} \closedcycle;
+				
+				\addplot[
+				smooth,
+				thick,
+				black,
+				domain=-3.5:3.5
+				] {exp(-x^2/2)/sqrt(2*pi)};
+				
+				\addplot[dashed]
+				coordinates {(#1,0) (#1,{exp(-(#1)^2/2)/sqrt(2*pi)})};
+				
+				\node[font=\scriptsize, anchor=south]
+				at (axis cs:#1,0.04) {$#2$};
+				
+				\ifdim\ShadeCenterX pt&lt;0pt
+				\draw[-&gt;, thick]
+				(axis cs:\ShadeCenterX,\ShadeCenterY)
+				-- (axis cs:-2.0,0.34);
+				
+				\node[
+				font=\scriptsize,
+				anchor=east,
+				fill=white,
+				inner sep=2pt
+				]
+				at (axis cs:-2.0,0.34) {$#3$};
+				\else
+				\draw[-&gt;, thick]
+				(axis cs:\ShadeCenterX,\ShadeCenterY)
+				-- (axis cs:2.0,0.34);
+				
+				\node[
+				font=\scriptsize,
+				anchor=west,
+				fill=white,
+				inner sep=2pt
+				]
+				at (axis cs:2.0,0.34) {$#3$};
+				\fi
+				
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\StandardNormalComplementMirrorGraph}[3]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\TableCenterX}{(-3.5 + (#1))/2}
+			\pgfmathsetmacro{\TableCenterY}{0.5*exp(-(\TableCenterX)^2/2)/sqrt(2*pi)}
+			\pgfmathsetmacro{\CompCenterX}{((#1)+3.5)/2}
+			\pgfmathsetmacro{\CompCenterY}{0.5*exp(-(\CompCenterX)^2/2)/sqrt(2*pi)}
+			\begin{axis}[
+				width=11cm,
+				height=6cm,
+				axis lines=left,
+				xlabel={$z$},
+				ylabel={$\phi(z)$},
+				xmin=-3.5, xmax=3.5,
+				ymin=0, ymax=0.45,
+				grid=both,
+				xtick={-3,-2,-1,0,1,2,3,#1},
+				tick label style={font=\scriptsize}
+				]
+				% Orange region: probability obtained from the table
+				\addplot[
+				domain=-3.5:#1,
+				draw=none,
+				fill=orange!70,
+				fill opacity=0.55
+				] {exp(-x^2/2)/sqrt(2*pi)} \closedcycle;
+				
+				% Blue region: complementary right tail
+				\addplot[
+				domain=#1:3.5,
+				draw=none,
+				fill=green!60!black,
+				fill opacity=0.45
+				] {exp(-x^2/2)/sqrt(2*pi)} \closedcycle;
+				
+				% Normal curve
+				\addplot[smooth, thick, black, domain=-3.5:3.5] {exp(-x^2/2)/sqrt(2*pi)};
+				
+				% Vertical guide at z
+				\addplot[dashed] coordinates {(#1,0) (#1,{exp(-(#1)^2/2)/sqrt(2*pi)})};
+				
+				% Label for the bound
+				\node[font=\scriptsize, anchor=south] at (axis cs:#1,0.04) {$z=#1$};
+				
+				% Arrows and region labels
+				\draw[-&gt;, thick]
+				(axis cs:\TableCenterX,\TableCenterY)
+				-- (axis cs:-1,0.38);
+				\node[
+				font=\scriptsize,
+				anchor=east,
+				fill=white,
+				inner sep=2pt
+				] at (axis cs:-1,0.38) {$#2$};
+				
+				\draw[-&gt;, thick]
+				(axis cs:\CompCenterX,\CompCenterY)
+				-- (axis cs:1,0.38);
+				\node[
+				font=\scriptsize,
+				anchor=west,
+				fill=white,
+				inner sep=2pt
+				] at (axis cs:1,0.38) {$#3$};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\StandardNormalSymmetryGraph}[3]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\LeftCenterX}{(-3.5-(#1))/2}
+			\pgfmathsetmacro{\LeftCenterY}{0.5*exp(-(\LeftCenterX)^2/2)/sqrt(2*pi)}
+			\pgfmathsetmacro{\RightCenterX}{((#1)+3.5)/2}
+			\pgfmathsetmacro{\RightCenterY}{0.5*exp(-(\RightCenterX)^2/2)/sqrt(2*pi)}
+			\begin{axis}[
+				width=11cm,
+				height=6cm,
+				axis lines=left,
+				xlabel={$z$},
+				ylabel={$\phi(z)$},
+				xmin=-3.5, xmax=3.5,
+				ymin=0, ymax=0.45,
+				grid=both,
+				xtick={-3,-2,-1,0,1,2,3,-#1,#1},
+				tick label style={font=\scriptsize}
+				]
+				% Blue region: wanted left-tail area
+				\addplot[
+				domain=-3.5:-#1,
+				draw=none,
+				fill=blue!55,
+				fill opacity=0.55
+				] {exp(-x^2/2)/sqrt(2*pi)} \closedcycle;
+				
+				% Green region: mirror right-tail area
+				\addplot[
+				domain=#1:3.5,
+				draw=none,
+				fill=green!60!black,
+				fill opacity=0.45
+				] {exp(-x^2/2)/sqrt(2*pi)} \closedcycle;
+				
+				% Normal curve
+				\addplot[smooth, thick, black, domain=-3.5:3.5] {exp(-x^2/2)/sqrt(2*pi)};
+				
+				% Symmetric vertical guides
+				\addplot[dashed] coordinates {(-#1,0) (-#1,{exp(-(#1)^2/2)/sqrt(2*pi)})};
+				\addplot[dashed] coordinates {(#1,0) (#1,{exp(-(#1)^2/2)/sqrt(2*pi)})};
+				
+				% Symmetry axis
+				\addplot[densely dotted] coordinates {(0,0) (0,0.42)};
+				
+				% Labels for the bounds
+				\node[font=\scriptsize, anchor=south] at (axis cs:-#1,0.04) {$z=-#1$};
+				\node[font=\scriptsize, anchor=south] at (axis cs:#1,0.04) {$z=#1$};
+				
+				% Arrows and region labels
+				\draw[-&gt;, thick]
+				(axis cs:\LeftCenterX,\LeftCenterY)
+				-- (axis cs:-1.4,0.35);
+				\node[
+				font=\scriptsize,
+				anchor=east,
+				fill=white,
+				inner sep=2pt
+				] at (axis cs:-1.4,0.35) {$#2$};
+				
+				\draw[-&gt;, thick]
+				(axis cs:\RightCenterX,\RightCenterY)
+				-- (axis cs:1.4,0.35);
+				\node[
+				font=\scriptsize,
+				anchor=west,
+				fill=white,
+				inner sep=2pt
+				] at (axis cs:1.4,0.35) {$#3$};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\StandardNormalRightTailGraph}[3]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\ShadeCenterX}{((#1)+3.5)/2}
+			\pgfmathsetmacro{\ShadeCenterY}{0.5*exp(-(\ShadeCenterX)^2/2)/sqrt(2*pi)}
+			\begin{axis}[
+				width=11cm,
+				height=6cm,
+				axis lines=left,
+				xlabel={$z$},
+				ylabel={$\phi(z)$},
+				xmin=-3.5, xmax=3.5,
+				ymin=0, ymax=0.45,
+				grid=both,
+				xtick={-3,-2,-1,0,1,2,3,#1},
+				tick label style={font=\scriptsize}
+				]
+				\addplot[
+				domain=#1:3.5,
+				draw=none,
+				fill=blue!55,
+				fill opacity=0.55
+				] {exp(-x^2/2)/sqrt(2*pi)} \closedcycle;
+				
+				\addplot[
+				smooth,
+				thick,
+				black,
+				domain=-3.5:3.5
+				] {exp(-x^2/2)/sqrt(2*pi)};
+				
+				\addplot[dashed]
+				coordinates {(#1,0) (#1,{exp(-(#1)^2/2)/sqrt(2*pi)})};
+				
+				\node[font=\scriptsize, anchor=south]
+				at (axis cs:#1,0.04) {$#2$};
+				
+				\ifdim\ShadeCenterX pt&lt;0pt
+				\draw[-&gt;, thick]
+				(axis cs:\ShadeCenterX,\ShadeCenterY)
+				-- (axis cs:-2.0,0.34);
+				\node[
+				font=\scriptsize,
+				anchor=east,
+				fill=white,
+				inner sep=2pt
+				] at (axis cs:-2.0,0.34) {$#3$};
+				\else
+				\draw[-&gt;, thick]
+				(axis cs:\ShadeCenterX,\ShadeCenterY)
+				-- (axis cs:2.0,0.34);
+				\node[
+				font=\scriptsize,
+				anchor=west,
+				fill=white,
+				inner sep=2pt
+				] at (axis cs:2.0,0.34) {$#3$};
+				\fi
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\StandardNormalRightTailGraphSmall}[3]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\ShadeCenterX}{((#1)+3.5)/2}
+			\pgfmathsetmacro{\ShadeCenterY}{0.5*exp(-(\ShadeCenterX)^2/2)/sqrt(2*pi)}
+			\begin{axis}[
+				width=6.6cm,
+				height=4.3cm,
+				axis lines=left,
+				xlabel={$z$},
+				ylabel={$\phi(z)$},
+				xmin=-3.5, xmax=3.5,
+				ymin=0, ymax=0.45,
+				grid=both,
+				xtick={-3,-2,-1,0,1,2,3,#1},
+				tick label style={font=\scriptsize}
+				]
+				\addplot[
+				domain=#1:3.5,
+				draw=none,
+				fill=blue!55,
+				fill opacity=0.55
+				] {exp(-x^2/2)/sqrt(2*pi)} \closedcycle;
+				
+				\addplot[
+				smooth,
+				thick,
+				black,
+				domain=-3.5:3.5
+				] {exp(-x^2/2)/sqrt(2*pi)};
+				
+				\addplot[dashed]
+				coordinates {(#1,0) (#1,{exp(-(#1)^2/2)/sqrt(2*pi)})};
+				
+				\node[font=\scriptsize, anchor=south]
+				at (axis cs:#1,0.04) {$#2$};
+				
+				\ifdim\ShadeCenterX pt&lt;0pt
+				\draw[-&gt;, thick]
+				(axis cs:\ShadeCenterX,\ShadeCenterY)
+				-- (axis cs:-1.75,0.33);
+				\node[
+				font=\scriptsize,
+				anchor=east,
+				fill=white,
+				inner sep=2pt
+				] at (axis cs:-1.75,0.33) {$#3$};
+				\else
+				\draw[-&gt;, thick]
+				(axis cs:\ShadeCenterX,\ShadeCenterY)
+				-- (axis cs:1.75,0.33);
+				\node[
+				font=\scriptsize,
+				anchor=west,
+				fill=white,
+				inner sep=2pt
+				] at (axis cs:1.75,0.33) {$#3$};
+				\fi
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\StandardNormalLeftTailOrangeGraphSmall}[3]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\ShadeCenterX}{(-3.5 + (#1))/2}
+			\pgfmathsetmacro{\ShadeCenterY}{0.5*exp(-(\ShadeCenterX)^2/2)/sqrt(2*pi)}
+			\begin{axis}[
+				width=6.6cm,
+				height=4.3cm,
+				axis lines=left,
+				xlabel={$z$},
+				ylabel={$\phi(z)$},
+				xmin=-3.5, xmax=3.5,
+				ymin=0, ymax=0.45,
+				grid=both,
+				xtick={-3,-2,-1,0,1,2,3,#1},
+				tick label style={font=\scriptsize}
+				]
+				\addplot[
+				domain=-3.5:#1,
+				draw=none,
+				fill=orange!70,
+				fill opacity=0.55
+				] {exp(-x^2/2)/sqrt(2*pi)} \closedcycle;
+				
+				\addplot[
+				smooth,
+				thick,
+				black,
+				domain=-3.5:3.5
+				] {exp(-x^2/2)/sqrt(2*pi)};
+				
+				\addplot[dashed]
+				coordinates {(#1,0) (#1,{exp(-(#1)^2/2)/sqrt(2*pi)})};
+				
+				\node[font=\scriptsize, anchor=south]
+				at (axis cs:#1,0.04) {$#2$};
+				
+				\ifdim\ShadeCenterX pt&lt;0pt
+				\draw[-&gt;, thick]
+				(axis cs:\ShadeCenterX,\ShadeCenterY)
+				-- (axis cs:-1.75,0.33);
+				\node[
+				font=\scriptsize,
+				anchor=east,
+				fill=white,
+				inner sep=2pt
+				] at (axis cs:-1.75,0.33) {$#3$};
+				\else
+				\draw[-&gt;, thick]
+				(axis cs:\ShadeCenterX,\ShadeCenterY)
+				-- (axis cs:1.75,0.33);
+				\node[
+				font=\scriptsize,
+				anchor=west,
+				fill=white,
+				inner sep=2pt
+				] at (axis cs:1.75,0.33) {$#3$};
+				\fi
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\StandardNormalCentralBandGraph}[5]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\ShadeCenterX}{((#1)+(#2))/2}
+			\pgfmathsetmacro{\ShadeCenterY}{0.5*exp(-(\ShadeCenterX)^2/2)/sqrt(2*pi)}
+			\begin{axis}[
+				width=11cm,
+				height=6cm,
+				axis lines=left,
+				xlabel={$z$},
+				ylabel={$\phi(z)$},
+				xmin=-3.5, xmax=3.5,
+				ymin=0, ymax=0.45,
+				grid=both,
+				xtick={-3,-2,-1,0,1,2,3,#1,#2},
+				tick label style={font=\scriptsize}
+				]
+				\addplot[domain=#1:#2, draw=none, fill=blue!55, fill opacity=0.55] {exp(-x^2/2)/sqrt(2*pi)} \closedcycle;
+				\addplot[smooth, thick, black, domain=-3.5:3.5] {exp(-x^2/2)/sqrt(2*pi)};
+				\addplot[dashed] coordinates {(#1,0) (#1,{exp(-(#1)^2/2)/sqrt(2*pi)})};
+				\addplot[dashed] coordinates {(#2,0) (#2,{exp(-(#2)^2/2)/sqrt(2*pi)})};
+				\node[font=\scriptsize, anchor=south] at (axis cs:#1,0.04) {$#3$};
+				\node[font=\scriptsize, anchor=south] at (axis cs:#2,0.04) {$#4$};
+				\ifdim\ShadeCenterX pt&lt;0pt
+				\draw[-&gt;, thick]
+				(axis cs:\ShadeCenterX,\ShadeCenterY)
+				-- (axis cs:-2.0,0.34);
+				\node[
+				font=\scriptsize,
+				anchor=east,
+				fill=white,
+				inner sep=2pt
+				] at (axis cs:-2.0,0.34) {$#5$};
+				\else
+				\draw[-&gt;, thick]
+				(axis cs:\ShadeCenterX,\ShadeCenterY)
+				-- (axis cs:2.0,0.34);
+				\node[
+				font=\scriptsize,
+				anchor=west,
+				fill=white,
+				inner sep=2pt
+				] at (axis cs:2.0,0.34) {$#5$};
+				\fi
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\StandardNormalTwoTailGraph}[6]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\LeftCenterX}{(-3.5 + (#1))/2}
+			\pgfmathsetmacro{\LeftCenterY}{0.5*exp(-(\LeftCenterX)^2/2)/sqrt(2*pi)}
+			\pgfmathsetmacro{\RightCenterX}{((#2)+3.5)/2}
+			\pgfmathsetmacro{\RightCenterY}{0.5*exp(-(\RightCenterX)^2/2)/sqrt(2*pi)}
+			\begin{axis}[
+				width=11cm,
+				height=6cm,
+				axis lines=left,
+				xlabel={$z$},
+				ylabel={$\phi(z)$},
+				xmin=-3.5, xmax=3.5,
+				ymin=0, ymax=0.45,
+				grid=both,
+				xtick={-3,-2,-1,0,1,2,3,#1,#2},
+				tick label style={font=\scriptsize}
+				]
+				\addplot[domain=-3.5:#1, draw=none, fill=blue!55, fill opacity=0.55] {exp(-x^2/2)/sqrt(2*pi)} \closedcycle;
+				\addplot[domain=#2:3.5, draw=none, fill=blue!55, fill opacity=0.55] {exp(-x^2/2)/sqrt(2*pi)} \closedcycle;
+				\addplot[smooth, thick, black, domain=-3.5:3.5] {exp(-x^2/2)/sqrt(2*pi)};
+				\addplot[dashed] coordinates {(#1,0) (#1,{exp(-(#1)^2/2)/sqrt(2*pi)})};
+				\addplot[dashed] coordinates {(#2,0) (#2,{exp(-(#2)^2/2)/sqrt(2*pi)})};
+				\node[font=\scriptsize, anchor=south] at (axis cs:#1,0.04) {$#3$};
+				\node[font=\scriptsize, anchor=south] at (axis cs:#2,0.04) {$#4$};
+				\draw[-&gt;, thick]
+				(axis cs:\LeftCenterX,\LeftCenterY)
+				-- (axis cs:-2.65,0.33);
+				\node[
+				font=\scriptsize,
+				anchor=east,
+				fill=white,
+				inner sep=2pt
+				] at (axis cs:-2.65,0.33) {$#5$};
+				\draw[-&gt;, thick]
+				(axis cs:\RightCenterX,\RightCenterY)
+				-- (axis cs:2.0,0.33);
+				\node[
+				font=\scriptsize,
+				anchor=west,
+				fill=white,
+				inner sep=2pt
+				] at (axis cs:2.0,0.33) {$#6$};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+\title{Term 3 Practice Activity: C5 Standard Normal Table}
+\author{}
+\date{}
+
+\begin{document}
+	\maketitle
+	
+	\setcounter{tocdepth}{1}
+	\setcounter{secnumdepth}{2}
+	\tableofcontents
+	
+	\section*{Evaluated criteria}
+	\begin{itemize}
+		\item C5. Uses the normal standard distribution and its tables to calculate probabilities in contextual situations.
+	\end{itemize}
+	
+	
+	\noindent\textbf{Meaning of the notation.}
+	The expression \(P(Z&lt;x)\) means the probability that the standard normal random variable \(Z\) is less than the value \(x\). In the graph of the standard normal distribution, this corresponds to the area under the curve to the left of \(x\).
+	
+	For example $P(Z&lt;0.85)$ means the area under the standard normal curve to the left of \(x=0.85\). Since the table gives values of \(\Phi(z)=P(Z&lt;x)\), this value can be read directly from the table as
+	\[
+	P(Z&lt;0.85)=\Phi(0.85)=0.8023.
+	\]
+	Here are five examples of left-tail probabilities read directly from the table.
+	\begin{center}
+		\begin{tabular}{c c c}
+			\toprule
+			\(x\) &amp; \(P(Z&lt;x)=\Phi(x)\) &amp; Value \\
+			\midrule
+			\(0.25\) &amp; \(P(Z&lt;0.25)=\Phi(0.25)\) &amp; \(0.5987\) \\
+			\(0.70\) &amp; \(P(Z&lt;0.70)=\Phi(0.70)\) &amp; \(0.7580\) \\
+			\(0.85\) &amp; \(P(Z&lt;0.85)=\Phi(0.85)\) &amp; \(0.8023\) \\
+			\(1.20\) &amp; \(P(Z&lt;1.20)=\Phi(1.20)\) &amp; \(0.8849\) \\
+			\(1.65\) &amp; \(P(Z&lt;1.65)=\Phi(1.65)\) &amp; \(0.9505\) \\
+			\bottomrule
+		\end{tabular}
+	\end{center}
+	
+	If the value is negative, such as $	P(Z&lt;-1.20)$, the expression means the area to the left of \(z=-1.20\). Since the table only shows positive \(z\)-values, symmetry and the complement rule can be used:
+	\[
+	P(Z&lt;-1.20)=P(Z&gt;1.20)=1-P(Z&lt;1.20)=1-\Phi(1.20).
+	\]
+	Since \(\Phi(1.20)=0.8849\),
+	\[
+	P(Z&lt;-1.20)=1-0.8849=0.1151.
+	\]
+	
+	The same idea can be summarized as follows.
+	
+	\begin{center}
+		\begin{tabular}{c c c c c}
+			\toprule
+			\(X\) &amp; \(-X\) &amp; \(P(Z&lt;-X)\) &amp; \(1-P(Z&lt;-X)\) &amp; \(P(Z&lt;X)\) \\
+			\midrule
+			\(-0.25\) &amp; \(0.25\) &amp; \(0.5987\) &amp; \(0.4013\) &amp; \(0.4013\) \\
+			\(-0.70\) &amp; \(0.70\) &amp; \(0.7580\) &amp; \(0.2420\) &amp; \(0.2420\) \\
+			\(-0.85\) &amp; \(0.85\) &amp; \(0.8023\) &amp; \(0.1977\) &amp; \(0.1977\) \\
+			\(-1.20\) &amp; \(1.20\) &amp; \(0.8849\) &amp; \(0.1151\) &amp; \(0.1151\) \\
+			\(-1.65\) &amp; \(1.65\) &amp; \(0.9505\) &amp; \(0.0495\) &amp; \(0.0495\) \\
+			\bottomrule
+		\end{tabular}
+	\end{center}
+	
+	\noindent\textbf{Standard normal table (values of \(\Phi(z)\)).} Use this same table for all problems in this section.
+	\begin{center}
+		\begin{tabular}{c|cccccccccc}
+			\toprule
+			$z$ &amp; 0.00 &amp; 0.01 &amp; 0.02 &amp; 0.03 &amp; 0.04 &amp; 0.05 &amp; 0.06 &amp; 0.07 &amp; 0.08 &amp; 0.09 \\
+			\midrule
+			0.0 &amp; 0.5000 &amp; 0.5040 &amp; 0.5080 &amp; 0.5120 &amp; 0.5160 &amp; 0.5199 &amp; 0.5239 &amp; 0.5279 &amp; 0.5319 &amp; 0.5359 \\
+			0.1 &amp; 0.5398 &amp; 0.5438 &amp; 0.5478 &amp; 0.5517 &amp; 0.5557 &amp; 0.5596 &amp; 0.5636 &amp; 0.5675 &amp; 0.5714 &amp; 0.5753 \\
+			0.2 &amp; 0.5793 &amp; 0.5832 &amp; 0.5871 &amp; 0.5910 &amp; 0.5948 &amp; 0.5987 &amp; 0.6026 &amp; 0.6064 &amp; 0.6103 &amp; 0.6141 \\
+			0.3 &amp; 0.6179 &amp; 0.6217 &amp; 0.6255 &amp; 0.6293 &amp; 0.6331 &amp; 0.6368 &amp; 0.6406 &amp; 0.6443 &amp; 0.6480 &amp; 0.6517 \\
+			0.4 &amp; 0.6554 &amp; 0.6591 &amp; 0.6628 &amp; 0.6664 &amp; 0.6700 &amp; 0.6736 &amp; 0.6772 &amp; 0.6808 &amp; 0.6844 &amp; 0.6879 \\
+			0.5 &amp; 0.6915 &amp; 0.6950 &amp; 0.6985 &amp; 0.7019 &amp; 0.7054 &amp; 0.7088 &amp; 0.7123 &amp; 0.7157 &amp; 0.7190 &amp; 0.7224 \\
+			0.6 &amp; 0.7257 &amp; 0.7291 &amp; 0.7324 &amp; 0.7357 &amp; 0.7389 &amp; 0.7422 &amp; 0.7454 &amp; 0.7486 &amp; 0.7517 &amp; 0.7549 \\
+			0.7 &amp; 0.7580 &amp; 0.7611 &amp; 0.7642 &amp; 0.7673 &amp; 0.7704 &amp; 0.7734 &amp; 0.7764 &amp; 0.7794 &amp; 0.7823 &amp; 0.7852 \\
+			0.8 &amp; 0.7881 &amp; 0.7910 &amp; 0.7939 &amp; 0.7967 &amp; 0.7995 &amp; 0.8023 &amp; 0.8051 &amp; 0.8078 &amp; 0.8106 &amp; 0.8133 \\
+			0.9 &amp; 0.8159 &amp; 0.8186 &amp; 0.8212 &amp; 0.8238 &amp; 0.8264 &amp; 0.8289 &amp; 0.8315 &amp; 0.8340 &amp; 0.8365 &amp; 0.8389 \\
+			1.0 &amp; 0.8413 &amp; 0.8438 &amp; 0.8461 &amp; 0.8485 &amp; 0.8508 &amp; 0.8531 &amp; 0.8554 &amp; 0.8577 &amp; 0.8599 &amp; 0.8621 \\
+			1.1 &amp; 0.8643 &amp; 0.8665 &amp; 0.8686 &amp; 0.8708 &amp; 0.8729 &amp; 0.8749 &amp; 0.8770 &amp; 0.8790 &amp; 0.8810 &amp; 0.8830 \\
+			1.2 &amp; 0.8849 &amp; 0.8869 &amp; 0.8888 &amp; 0.8907 &amp; 0.8925 &amp; 0.8944 &amp; 0.8962 &amp; 0.8980 &amp; 0.8997 &amp; 0.9015 \\
+			1.3 &amp; 0.9032 &amp; 0.9049 &amp; 0.9066 &amp; 0.9082 &amp; 0.9099 &amp; 0.9115 &amp; 0.9131 &amp; 0.9147 &amp; 0.9162 &amp; 0.9177 \\
+			1.4 &amp; 0.9192 &amp; 0.9207 &amp; 0.9222 &amp; 0.9236 &amp; 0.9251 &amp; 0.9265 &amp; 0.9279 &amp; 0.9292 &amp; 0.9306 &amp; 0.9319 \\
+			1.5 &amp; 0.9332 &amp; 0.9345 &amp; 0.9357 &amp; 0.9370 &amp; 0.9382 &amp; 0.9394 &amp; 0.9406 &amp; 0.9418 &amp; 0.9429 &amp; 0.9441 \\
+			1.6 &amp; 0.9452 &amp; 0.9463 &amp; 0.9474 &amp; 0.9484 &amp; 0.9495 &amp; 0.9505 &amp; 0.9515 &amp; 0.9525 &amp; 0.9535 &amp; 0.9545 \\
+			1.7 &amp; 0.9554 &amp; 0.9564 &amp; 0.9573 &amp; 0.9582 &amp; 0.9591 &amp; 0.9599 &amp; 0.9608 &amp; 0.9616 &amp; 0.9625 &amp; 0.9633 \\
+			1.8 &amp; 0.9641 &amp; 0.9649 &amp; 0.9656 &amp; 0.9664 &amp; 0.9671 &amp; 0.9678 &amp; 0.9686 &amp; 0.9693 &amp; 0.9699 &amp; 0.9706 \\
+			1.9 &amp; 0.9713 &amp; 0.9719 &amp; 0.9726 &amp; 0.9732 &amp; 0.9738 &amp; 0.9744 &amp; 0.9750 &amp; 0.9756 &amp; 0.9761 &amp; 0.9767 \\
+			2.0 &amp; 0.9772 &amp; 0.9778 &amp; 0.9783 &amp; 0.9788 &amp; 0.9793 &amp; 0.9798 &amp; 0.9803 &amp; 0.9808 &amp; 0.9812 &amp; 0.9817 \\
+			\bottomrule
+		\end{tabular}
+	\end{center}
+	
+	\section{Problem 1: Left Tail with Positive and Negative Bounds}
+	\textbf{Problem.} Let \(Z\sim N(0,1)\).
+	
+	\textbf{Questions/Tasks.}
+	\begin{enumerate}[label=\textbf{\alph*)}]
+		\item Find \(P(Z&lt;0.85)\) using the table.
+		\item Find \(P(Z&lt;-1.20)\) using the table.
+	\end{enumerate}
+	
+	\subsection*{Solution}
+	
+	\textbf{a)}
+	From the table, \(\Phi(0.85)=0.8023\), so
+	\[
+	P(Z&lt;0.85)=0.8023.
+	\]
+	
+	\StandardNormalLeftTailGraph{0.85}{z=0.85}{P(Z&lt;0.85)=0.8023}
+	
+	\textbf{b)}
+	The goal is to find the left-tail probability
+	\[
+	P(Z&lt;-1.20).
+	\]
+	
+	\StandardNormalLeftTailGraph{-1.20}{z=-1.20}{P(Z&lt;-1.20)}
+	
+	\[	\text{By Symmetry: } P(Z&lt;-1.20)=P(Z&gt;1.20).	\]
+	
+	\StandardNormalSymmetryGraph{1.20}{P(Z&lt;-1.20)}{P(Z&gt;1.20)}
+	
+	Now use the table value
+	\[
+	P(Z&lt;1.20)=\Phi(1.20)=0.8849.
+	\]
+	Using the complement rule
+	\[
+	P(Z&gt;1.20)=1-\Phi(1.20)=1-0.8849=0.1151.
+	\]
+	
+	\StandardNormalComplementMirrorGraph
+	{1.20}
+	{P(Z&lt;1.20)=0.8849}
+	{P(Z&gt;1.20)=0.1151}
+	
+	Therefore,
+	\[
+	P(Z&lt;-1.20)=P(Z&gt;1.20)=0.1151.
+	\]
+	
+	\textbf{Interpretation.} About 80.2\% of values are below 0.85, while 11.5\% are below \(-1.20\).
+	
+	\section{Problem 2: Right Tail with Positive and Negative Bounds}
+	\textbf{Problem.} Let \(Z\sim N(0,1)\).
+	
+	\textbf{Questions/Tasks.}
+	\begin{enumerate}[label=\textbf{\alph*)}]
+		\item Find \(P(Z&gt;1.35)\) using the table.
+		\item Find \(P(Z&gt;-0.70)\) using the table.
+	\end{enumerate}
+	
+	\subsection*{Solution}
+	
+	\textbf{a)}
+	The goal is to find the right-tail probability
+	\[
+	P(Z&gt;1.35).
+	\]
+	
+	\StandardNormalRightTailGraph{1.35}{z=1.35}{P(Z&gt;1.35)}
+	
+	Now use the table value
+	\[
+	P(Z&lt;1.35)=\Phi(1.35)=0.9115.
+	\]
+	Using the complement rule,
+	\[
+	P(Z&gt;1.35)=1-\Phi(1.35)=1-0.9115=0.0885.
+	\]
+	
+	\StandardNormalComplementMirrorGraph
+	{1.35}
+	{P(Z&lt;1.35)=0.9115}
+	{P(Z&gt;1.35)=0.0885}
+	
+	\textbf{b)}
+	The goal is to find the right-tail probability
+	\[
+	P(Z&gt;-0.70).
+	\]
+	
+	The next two graphs show the wanted area and its mirrored left-tail image.
+	
+	\begin{center}
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\StandardNormalRightTailGraphSmall{-0.70}{z=-0.70}{P(Z&gt;-0.70)}
+		\end{minipage}
+		\hfill
+		\begin{minipage}{0.48\textwidth}
+			\centering
+			\StandardNormalLeftTailOrangeGraphSmall{0.70}{z=0.70}{P(Z&lt;0.70)}
+		\end{minipage}
+	\end{center}
+	
+	By symmetry of the standard normal distribution,
+	\[
+	P(Z&gt;-0.70)=P(Z&lt;0.70)=\Phi(0.70)=0.7580.
+	\]
+	
+	\textbf{Interpretation.} The right tail above 1.35 is small (8.9\%), but above -0.70 it is much larger (75.8\%).
+	
+	\section{Problem 3: Mixed Left-Tail and Right-Tail Reasoning}
+\textbf{Problem.} Let \(Z\sim N(0,1)\).
+
+\textbf{Questions/Tasks.} Calculate \(P(Z&lt;1.05)\) and \(P(Z&gt;-0.55)\), and identify which is left-tail reasoning and which is right-tail reasoning.
+
+\subsection*{C5}
+For \(P(Z&lt;1.05)\), this is a left-tail probability:
+\StandardNormalLeftTailGraph{1.05}{z=1.05}{P(Z&lt;1.05)=0.8531}
+\[
+P(Z&lt;1.05)=\Phi(1.05)=0.8531.
+\]
+For \(P(Z&gt;-0.55)\), this is a right-tail probability with a negative bound:
+
+\begin{center}
+\begin{minipage}{0.48\textwidth}
+\centering
+\StandardNormalRightTailGraphSmall{-0.55}{z=-0.55}{P(Z&gt;-0.55)}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+\centering
+\StandardNormalLeftTailOrangeGraphSmall{0.55}{z=0.55}{P(Z&lt;0.55)}
+\end{minipage}
+\end{center}
+
+\[
+P(Z&gt;-0.55)=P(Z&lt;0.55)=\Phi(0.55)=0.7088.
+\]
+\textbf{Interpretation.} Left-tail and right-tail setups use different formulas even when both answers are fairly large.
+
+\section{Problem 4: Central Band with Positive Bounds}
+\textbf{Problem.} Let \(Z\sim N(0,1)\).
+
+\textbf{Questions/Tasks.} Compute \(P(0.35&lt;Z&lt;1.40)\).
+
+\subsection*{C5}
+The target central-band probability is
+\[
+P(0.35&lt;Z&lt;1.40).
+\]
+\StandardNormalCentralBandGraph{0.35}{1.40}{z=0.35}{z=1.40}{P(0.35&lt;Z&lt;1.40)}
+Using \(P(a&lt;Z&lt;b)=\Phi(b)-\Phi(a)\), first read the cumulative areas:
+\[
+P(Z&lt;1.40)=\Phi(1.40)=0.9192
+\]
+\[
+P(Z&lt;0.35)=\Phi(0.35)=0.6368.
+\]
+The central band is the difference of these cumulative areas:
+\[
+P(0.35&lt;Z&lt;1.40)=\Phi(1.40)-\Phi(0.35)=0.9192-0.6368=0.2824.
+\]
+\textbf{Interpretation.} About 28.2\% of values are between 0.35 and 1.40.
+
+\section{Problem 5: Central Band with a Negative and a Positive Bound}
+\textbf{Problem.} Let \(Z\sim N(0,1)\).
+
+\textbf{Questions/Tasks.} Compute \(P(-0.95&lt;Z&lt;1.15)\).
+
+\subsection*{C5}
+The target central-band probability is
+\[
+P(-0.95&lt;Z&lt;1.15).
+\]
+\StandardNormalCentralBandGraph{-0.95}{1.15}{z=-0.95}{z=1.15}{P(-0.95&lt;Z&lt;1.15)}
+\[
+\Phi(-0.95)=1-\Phi(0.95)=1-0.8289=0.1711.
+\]
+\[
+\Phi(1.15)=0.8749.
+\]
+\[
+P(-0.95&lt;Z&lt;1.15)=0.8749-0.1711=0.7038.
+\]
+\textbf{Interpretation.} About 70.4\% of values lie between -0.95 and 1.15.
+
+\section{Problem 6: Central Band with Two Negative Bounds}
+\textbf{Problem.} Let \(Z\sim N(0,1)\).
+
+\textbf{Questions/Tasks.} Compute \(P(-1.80&lt;Z&lt;-0.25)\).
+
+\subsection*{C5}
+The target central-band probability is
+\[
+P(-1.80&lt;Z&lt;-0.25).
+\]
+\StandardNormalCentralBandGraph{-1.80}{-0.25}{z=-1.80}{z=-0.25}{P(-1.80&lt;Z&lt;-0.25)}
+\[
+\Phi(-1.80)=1-\Phi(1.80)=1-0.9641=0.0359
+\]
+\[
+\Phi(-0.25)=1-\Phi(0.25)=1-0.5987=0.4013.
+\]
+\[
+P(-1.80&lt;Z&lt;-0.25)=0.4013-0.0359=0.3654.
+\]
+\textbf{Interpretation.} About 36.5\% of values are between -1.80 and -0.25.
+
+\section{Problem 7: Two Tails with Positive Bounds}
+\textbf{Problem.} Let \(Z\sim N(0,1)\).
+
+\textbf{Questions/Tasks.} Find \(P(Z&lt;0.55\ \text{or}\ Z&gt;1.65)\).
+
+\subsection*{C5}
+The target union probability is
+\[
+P(Z&lt;0.55\ \text{or}\ Z&gt;1.65).
+\]
+\StandardNormalTwoTailGraph{0.55}{1.65}{z=0.55}{z=1.65}{P(Z&lt;0.55)}{P(Z&gt;1.65)}
+These two events are disjoint, so we add probabilities.
+Note that \(Z&lt;0.55\) is a left region with a \emph{positive} bound, not a negative tail.
+\[
+P(Z&lt;0.55)=\Phi(0.55)=0.7088.
+\]
+\StandardNormalComplementMirrorGraph
+{1.65}
+{P(Z&lt;1.65)=0.9505}
+{P(Z&gt;1.65)=0.0495}
+\[
+P(Z&gt;1.65)=1-\Phi(1.65)=1-0.9505=0.0495.
+\]
+\[
+P(Z&lt;0.55\ \text{or}\ Z&gt;1.65)=0.7088+0.0495=0.7583.
+\]
+\textbf{Interpretation.} Most values satisfy this union because all values below 0.55 are included plus a small far-right tail.
+
+\section{Problem 8: Two Tails with One Negative and One Positive Bound}
+\textbf{Problem.} Let \(Z\sim N(0,1)\).
+
+\textbf{Questions/Tasks.} Find \(P(Z&lt;-1.05\ \text{or}\ Z&gt;1.20)\).
+
+\subsection*{C5}
+The target union probability is
+\[
+P(Z&lt;-1.05\ \text{or}\ Z&gt;1.20).
+\]
+\StandardNormalTwoTailGraph{-1.05}{1.20}{z=-1.05}{z=1.20}{P(Z&lt;-1.05)}{P(Z&gt;1.20)}
+The events are disjoint, so add them.
+\[
+P(Z&lt;-1.05)=P(Z&gt;1.05)
+\]
+\[
+P(Z&lt;-1.05)=1-\Phi(1.05)=1-0.8531=0.1469.
+\]
+\[
+P(Z&gt;1.20)=1-\Phi(1.20)=1-0.8849=0.1151.
+\]
+\[
+P(Z&lt;-1.05\ \text{or}\ Z&gt;1.20)=0.1469+0.1151=0.2620.
+\]
+\textbf{Interpretation.} About 26.2\% of values are in these two outer regions.
+
+\section{Problem 9: Two Tails with Two Negative Bounds}
+\textbf{Problem.} Let \(Z\sim N(0,1)\).
+
+\textbf{Questions/Tasks.} Find \(P(Z&lt;-1.90\ \text{or}\ Z&gt;-0.35)\).
+
+\subsection*{C5}
+The target union probability is
+\[
+P(Z&lt;-1.90\ \text{or}\ Z&gt;-0.35).
+\]
+\StandardNormalTwoTailGraph{-1.90}{-0.35}{z=-1.90}{z=-0.35}{P(Z&lt;-1.90)}{P(Z&gt;-0.35)}
+The two events are disjoint because one is far left of \(-1.90\) and the other is to the right of \(-0.35\).
+\[
+P(Z&lt;-1.90)=1-\Phi(1.90)=1-0.9713=0.0287.
+\]
+For the right-tail bound at a negative value:
+
+\begin{center}
+\begin{minipage}{0.48\textwidth}
+\centering
+\StandardNormalRightTailGraphSmall{-0.35}{z=-0.35}{P(Z&gt;-0.35)}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+\centering
+\StandardNormalLeftTailOrangeGraphSmall{0.35}{z=0.35}{P(Z&lt;0.35)}
+\end{minipage}
+\end{center}
+
+\[
+P(Z&gt;-0.35)=P(Z&lt;0.35)=\Phi(0.35)=0.6368.
+\]
+So
+\[
+P(Z&lt;-1.90\ \text{or}\ Z&gt;-0.35)=0.0287+0.6368=0.6655.
+\]
+\textbf{Interpretation.} This probability is large because all values above -0.35 are included, plus a small far-left tail.
+
+\end{document}
+
+      </pre>
+    </section>
+  </main>
+</body>
+</html>
