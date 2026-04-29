@@ -1,217 +1,135 @@
 \makeatletter
 \def\input@path{{./}{../}{../../}{../../../}{../../../../}{preamble/}{../preamble/}{../../preamble/}{../../../preamble/}}
-\makeatother	
+\makeatother
 
 \input{preamble_exams.tex}
+
+\newcommand{\MinNGraph}[5]{%
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[width=0.72\textwidth,height=5.2cm,xlabel={$n$},ylabel={$k\sqrt{n}$ and critical value},xmin=0,xmax=#3,ymin=0,ymax=#4,grid=both,legend style={at={(0.02,0.98)},anchor=north west,font=\scriptsize}]
+\addplot[blue,thick,domain=1:#3,samples=120]{#1*sqrt(x)};
+\addlegendentry{$#1\sqrt{n}$}
+\addplot[red,dashed] coordinates {(0,#2) (#3,#2)};
+\addlegendentry{critical $=#2$}
+\addplot[black,densely dotted] coordinates {(#5,0) (#5,#4)};
+\addlegendentry{$n_{\min}=#5$}
+\end{axis}
+\end{tikzpicture}
+\end{center}}
 
 \title{Term 3 --- Lesson 1 Practice Activity (C7) with Solutions}
 \author{}
 \date{}
 
 \begin{document}
+\maketitle
+\tableofcontents
 
-	\maketitle
-
-	\setcounter{tocdepth}{1}
-	\setcounter{secnumdepth}{2}
-	\tableofcontents
-
-\section*{Evaluated criteria}
+\section*{Evaluated criterion}
 \begin{itemize}
-    \item C7: Contrasts p-values in hypothesis tests with the reference probability \(\alpha\), uses the comparison to decide reject \(H_0\) or fail to reject \(H_0\), and interprets decision meaning in context.
+\item C7: Uses one-sample mean \(z\)-tests with known \(\sigma\) to find the minimum sample size required to reject \(H_0\), then interprets the result in context.
 \end{itemize}
 
-\section{General Problem: p-value versus reference probability \(\alpha\)}
-A public service office tests whether the average waiting time is below 20 minutes.
-A one-sample test reports p-value \(=0.032\) at significance level \(\alpha=0.05\).
+\section{Reference rule for all problems}
+\[z(n)=\frac{\bar x-\mu_0}{\sigma/\sqrt{n}}\]
+Reject \(H_0\) when: higher-tail \(z(n)\ge z_\alpha\), lower-tail \(z(n)\le -z_\alpha\), two-tailed \(|z(n)|\ge z_{\alpha/2}\).
 
-\begin{enumerate}
-    \item Explain what the p-value represents.
-    \item Explain what \(\alpha\) represents as a reference probability.
-    \item State the decision rule using p-value and \(\alpha\).
-    \item Make the test decision and interpret it in context.
-\end{enumerate}
-
+\section{Problem 1: Higher-tail, one significance level}
 \subsection*{C7}
 \begin{itemize}
-    \item The p-value \((0.032)\) is evidence from the sample: it measures how extreme the observed result is under \(H_0\).
-    \item The reference probability \(\alpha=0.05\) is the chosen decision threshold for statistical significance.
-    \item Decision rule: if p-value \(\le \alpha\), reject \(H_0\); if p-value \(>\alpha\), fail to reject \(H_0\).
-    \item Comparison: \(0.032 \le 0.05\).
-    \item Decision: reject \(H_0\).
-    \item Context interpretation: at the 5\% significance standard, there is sufficient evidence that average waiting time is below 20 minutes.
+\item \textbf{Context:} Export price records (historical benchmark and new customs sample).
+\item \textbf{Parameter:} \(\mu\) average export price.
+\item \textbf{Hypotheses:} \(H_0:\mu=120\), \(H_a:\mu>120\).
+\item \textbf{Known standard deviation:} \(\sigma=20\), \textbf{Observed mean:} \(\bar x=124\), \textbf{Significance:} \(\alpha=5\%\).
+\item \textbf{Test statistic:} \(z(n)=\frac{124-120}{20/\sqrt n}=0.2\sqrt n\).
+\item \textbf{Critical value:} \(z_{5\%}=1.645\).
+\item \textbf{Inequality:} \(0.2\sqrt n\ge1.645\Rightarrow n\ge67.65\).
+\item \textbf{Minimum sample size:} \(n_{\min}=68\).
+\item \textbf{Interpretation:} Need at least 68 records to reject \(H_0\).
 \end{itemize}
+\MinNGraph{0.2}{1.645}{100}{4}{68}
 
-\section{Problem 1: clear reject case (service performance)}
-A call center tests \(H_0:p=0.80\) against \(H_a:p>0.80\) for first-call resolution.
-The test output gives p-value \(=0.004\), with \(\alpha=0.05\).
-
+\section{Problem 2: Lower-tail, one significance level}
 \subsection*{C7}
 \begin{itemize}
-    \item p-value: \(0.004\).
-    \item Reference probability: \(\alpha=0.05\).
-    \item Comparison: \(0.004 \le 0.05\).
-    \item Decision: reject \(H_0\).
-    \item Interpretation: evidence is strong that first-call resolution is above 80\%.
+\item \textbf{Context:} Trade logistics study on delivery-time records.
+\item \textbf{Parameter:} \(\mu\) average delivery days.
+\item \textbf{Hypotheses:} \(H_0:\mu=18\), \(H_a:\mu<18\).
+\item \textbf{Known standard deviation:} \(\sigma=4\), \textbf{Observed mean:} \(\bar x=17\), \textbf{Significance:} \(\alpha=10\%\).
+\item \textbf{Test statistic:} \(z(n)=-0.25\sqrt n\).
+\item \textbf{Critical value:} \(-z_{10\%}=-1.282\).
+\item \textbf{Inequality:} \(-0.25\sqrt n\le-1.282\Rightarrow n\ge26.30\).
+\item \textbf{Minimum sample size:} \(n_{\min}=27\).
+\item \textbf{Interpretation:} Need at least 27 observations to reject \(H_0\).
 \end{itemize}
+\MinNGraph{0.25}{1.282}{80}{4}{27}
 
-\section{Problem 2: clear fail-to-reject case (quality control)}
-A plant tests \(H_0:p=0.95\) against \(H_a:p<0.95\) for defect-free units.
-The reported p-value is \(0.41\), with \(\alpha=0.05\).
-
+\section{Problem 3: Two-tailed, one significance level}
 \subsection*{C7}
 \begin{itemize}
-    \item p-value: \(0.41\).
-    \item Reference probability: \(\alpha=0.05\).
-    \item Comparison: \(0.41>0.05\).
-    \item Decision: fail to reject \(H_0\).
-    \item Interpretation: the sample does not provide statistically significant evidence that the defect-free rate is below 95\%.
+\item \textbf{Context:} Household survey on imported food spending.
+\item \textbf{Parameter:} \(\mu\) average weekly spending.
+\item \textbf{Hypotheses:} \(H_0:\mu=75\), \(H_a:\mu\ne75\).
+\item \textbf{Known standard deviation:} \(\sigma=12\), \textbf{Observed mean:} \(\bar x=78\), \textbf{Significance:} \(\alpha=5\%\).
+\item \textbf{Test statistic:} \(|z(n)|=0.25\sqrt n\).
+\item \textbf{Critical value:} \(z_{5\%/2}=1.96\).
+\item \textbf{Inequality:} \(0.25\sqrt n\ge1.96\Rightarrow n\ge61.47\).
+\item \textbf{Minimum sample size:} \(n_{\min}=62\).
+\item \textbf{Interpretation:} Need at least 62 surveyed households to reject \(H_0\).
 \end{itemize}
+\MinNGraph{0.25}{1.96}{100}{4}{62}
 
-\section{Problem 3: near-boundary case (education benchmark)}
-A district tests whether mean mathematics score differs from 500:
-\(H_0:\mu=500\), \(H_a:\mu\ne 500\).
-The test returns p-value \(=0.048\), with \(\alpha=0.05\).
-
+\section{Problem 4: Higher-tail, multiple significance levels}
 \subsection*{C7}
 \begin{itemize}
-    \item p-value: \(0.048\).
-    \item Reference probability: \(\alpha=0.05\).
-    \item Comparison: \(0.048\le 0.05\).
-    \item Decision: reject \(H_0\).
-    \item Interpretation: evidence of a difference from 500 is statistically significant but near the threshold, so this is tentative-to-moderate evidence rather than overwhelming evidence.
+\item Income survey context: \(\mu_0=900\), \(\bar x=915\), \(\sigma=60\), so \(z(n)=0.25\sqrt n\), \(H_a:\mu>900\).
+\item \(\alpha=10\%\Rightarrow n_{\min}=27\), \(\alpha=5\%\Rightarrow n_{\min}=44\), \(\alpha=1\%\Rightarrow n_{\min}=87\).
+\item Stricter \(\alpha\) needs larger \(n\).
 \end{itemize}
+\MinNGraph{0.25}{2.326}{110}{4}{87}
 
-\section{Problem 4: same evidence with lower-tail framing}
-For one dataset, a standardized test statistic is \(z=-1.75\).
-Use \(\alpha=0.05\).
-Frame A: \(H_0:\mu=50\), \(H_a:\mu<50\) (lower-tail).
-
+\section{Problem 5: Lower-tail, multiple significance levels}
 \subsection*{C7}
 \begin{itemize}
-    \item Lower-tail p-value: \(P(Z\le -1.75)\approx 0.040\).
-    \item Reference probability: \(\alpha=0.05\).
-    \item Comparison: \(0.040\le 0.05\).
-    \item Decision: reject \(H_0\) for the lower-tail claim.
-    \item Interpretation: at 5\%, evidence supports that the mean is below 50.
+\item Production-cost records: \(\mu_0=52\), \(\bar x=50.8\), \(\sigma=6\), \(H_a:\mu<52\), so \(z(n)=-0.2\sqrt n\).
+\item \(\alpha=10\%\Rightarrow n_{\min}=42\), \(\alpha=5\%\Rightarrow n_{\min}=68\), \(\alpha=1\%\Rightarrow n_{\min}=136\).
 \end{itemize}
+\MinNGraph{0.2}{2.326}{160}{4}{136}
 
-\section{Problem 5: same evidence with higher-tail framing}
-Use the same dataset and statistic \(z=-1.75\), same \(\alpha=0.05\).
-Frame B: \(H_0:\mu=50\), \(H_a:\mu>50\) (higher-tail).
-
+\section{Problem 6: Two-tailed, multiple significance levels}
 \subsection*{C7}
 \begin{itemize}
-    \item Higher-tail p-value: \(P(Z\ge -1.75)\approx 0.960\).
-    \item Reference probability: \(\alpha=0.05\).
-    \item Comparison: \(0.960>0.05\).
-    \item Decision: fail to reject \(H_0\) for the higher-tail claim.
-    \item Interpretation: the same evidence does not support that the mean is above 50.
-    \item Framing note: the data are unchanged; p-value changed because the alternative direction changed.
+\item Inflation-expectation survey: \(\mu_0=4.0\%\), \(\bar x=4.3\%\), \(\sigma=1.2\%\), \(H_a:\mu\ne4.0\), so \(|z(n)|=0.25\sqrt n\).
+\item \(\alpha=10\%\Rightarrow n_{\min}=44\), \(\alpha=5\%\Rightarrow n_{\min}=62\), \(\alpha=1\%\Rightarrow n_{\min}=107\).
 \end{itemize}
+\MinNGraph{0.25}{2.576}{130}{4}{107}
 
-\section{Problem 6: same evidence with two-tailed framing}
-Use the same dataset and statistic \(z=-1.75\), same \(\alpha=0.05\).
-Frame C: \(H_0:\mu=50\), \(H_a:\mu\ne 50\) (two-tailed).
-
+\section{Problem 7: Compare two proposed sample sizes}
 \subsection*{C7}
 \begin{itemize}
-    \item Two-tailed p-value: \(2P(Z\le -1.75)\approx 2(0.040)=0.080\).
-    \item Reference probability: \(\alpha=0.05\).
-    \item Comparison: \(0.080>0.05\).
-    \item Decision: fail to reject \(H_0\) for the two-tailed claim.
-    \item Interpretation: at 5\%, evidence is not sufficient to conclude the mean is different from 50.
-    \item Comparison summary for Problems 4--6: same data, same \(\alpha\), but different test framing gives different p-values and decisions.
+\item Shipment-delay dataset: \(\mu_0=10\), \(\bar x=9.4\), \(\sigma=3\), \(H_a:\mu<10\), \(\alpha=5\%\), \(z(n)=-0.2\sqrt n\).
+\item Minimum for rejection: \(n_{\min}=68\).
+\item Compare: \(n=50\) not enough; \(n=80\) enough.
 \end{itemize}
+\MinNGraph{0.2}{1.645}{100}{4}{68}
 
-\section{Problem 7: same p-value, different reference probabilities (app adoption)}
-A product team obtains p-value \(=0.037\) for testing whether adoption exceeds the benchmark.
-Interpret this same p-value under \(\alpha=0.10\), \(0.05\), and \(0.01\).
-
+\section{Problem 8: Small observed difference (large required \(n\))}
 \subsection*{C7}
 \begin{itemize}
-    \item Fixed p-value from evidence: \(0.037\).
-    \item At \(\alpha=0.10\): \(0.037\le 0.10\) \(\Rightarrow\) reject \(H_0\).
-    \item At \(\alpha=0.05\): \(0.037\le 0.05\) \(\Rightarrow\) reject \(H_0\).
-    \item At \(\alpha=0.01\): \(0.037>0.01\) \(\Rightarrow\) fail to reject \(H_0\).
-    \item Interpretation: the p-value does not change; the decision changes because the reference probability changes.
+\item Import-cost records: \(\mu_0=210\), \(\bar x=210.8\), \(\sigma=16\), \(H_a:\mu>210\), \(\alpha=1\%\).
+\item \(z(n)=0.05\sqrt n\), inequality \(0.05\sqrt n\ge2.326\Rightarrow n\ge2164.95\).
+\item \(n_{\min}=2165\).
 \end{itemize}
+\MinNGraph{0.05}{2.326}{2500}{4}{2165}
 
-\section{Problem 8: threshold sensitivity in quality compliance}
-A compliance audit for a safety rate reports p-value \(=0.018\).
-Interpret at three standards: internal screening \((\alpha=0.10)\), operational control \((\alpha=0.05)\), and regulatory enforcement \((\alpha=0.01)\).
-
+\section{Problem 9: Larger observed difference (smaller required \(n\))}
 \subsection*{C7}
 \begin{itemize}
-    \item Fixed p-value: \(0.018\).
-    \item \(\alpha=0.10\): \(0.018\le 0.10\) \(\Rightarrow\) reject \(H_0\).
-    \item \(\alpha=0.05\): \(0.018\le 0.05\) \(\Rightarrow\) reject \(H_0\).
-    \item \(\alpha=0.01\): \(0.018>0.01\) \(\Rightarrow\) fail to reject \(H_0\).
-    \item Interpretation: evidence is significant for 10\% and 5\% standards, but not for a very strict 1\% standard.
+\item Agricultural-yield study: \(\mu_0=3.2\), \(\bar x=3.8\), \(\sigma=1.2\), \(H_a:\mu>3.2\), \(\alpha=5\%\).
+\item \(z(n)=0.5\sqrt n\), inequality \(0.5\sqrt n\ge1.645\Rightarrow n\ge10.82\).
+\item \(n_{\min}=11\).
 \end{itemize}
-
-\section{Problem 9: threshold sensitivity in public policy reporting}
-A policy evaluation gives p-value \(=0.072\) for an improvement claim.
-Compare decisions at \(\alpha=0.10\), \(0.05\), and \(0.01\).
-
-\subsection*{C7}
-\begin{itemize}
-    \item Fixed p-value: \(0.072\).
-    \item \(\alpha=0.10\): \(0.072\le 0.10\) \(\Rightarrow\) reject \(H_0\).
-    \item \(\alpha=0.05\): \(0.072>0.05\) \(\Rightarrow\) fail to reject \(H_0\).
-    \item \(\alpha=0.01\): \(0.072>0.01\) \(\Rightarrow\) fail to reject \(H_0\).
-    \item Interpretation: this is threshold-sensitive evidence; rejection occurs only under the more lenient 10\% reference probability.
-\end{itemize}
-
-\section{Problem 10: synthesis dashboard I --- classify evidence patterns}
-Classify each case as robust rejection, threshold-sensitive rejection, borderline evidence, or clear non-significance.
-All decisions are at the given \(\alpha\).
-
-\begin{center}
-\begin{tabular}{|c|c|c|}
-\hline
-Case & p-value & \(\alpha\) \\
-\hline
-A & 0.002 & 0.05 \\
-B & 0.043 & 0.05 \\
-C & 0.061 & 0.05 \\
-D & 0.280 & 0.05 \\
-\hline
-\end{tabular}
-\end{center}
-
-\subsection*{C7}
-\begin{itemize}
-    \item Case A: \(0.002\le 0.05\) \(\Rightarrow\) reject \(H_0\); classification = robust rejection (very small p-value).
-    \item Case B: \(0.043\le 0.05\) \(\Rightarrow\) reject \(H_0\); classification = borderline or threshold-sensitive rejection (close to cutoff).
-    \item Case C: \(0.061>0.05\) \(\Rightarrow\) fail to reject \(H_0\); classification = borderline non-significant evidence.
-    \item Case D: \(0.280>0.05\) \(\Rightarrow\) fail to reject \(H_0\); classification = clear non-significance.
-    \item Synthesis interpretation: cases near 0.05 require careful wording because small threshold changes can alter conclusions.
-\end{itemize}
-
-\section{Problem 11: synthesis dashboard II --- practical interpretation across domains}
-A report summarizes three independent tests.
-
-\begin{center}
-\begin{tabular}{|c|c|c|c|}
-\hline
-Indicator & p-value & \(\alpha\) & Context \\
-\hline
-Service speed & 0.009 & 0.01 & claim: process is faster \\
-Loan default & 0.047 & 0.05 & claim: default increased \\
-Exam pass rate & 0.19 & 0.05 & claim: pass rate changed \\
-\hline
-\end{tabular}
-\end{center}
-
-For each indicator: compare p-value with \(\alpha\), state decision, classify evidence, and interpret practical consequence.
-
-\subsection*{C7}
-\begin{itemize}
-    \item Service speed: \(0.009\le 0.01\) \(\Rightarrow\) reject \(H_0\). Classification: robust rejection under a strict threshold. Consequence: strong evidence supports faster processing.
-    \item Loan default: \(0.047\le 0.05\) \(\Rightarrow\) reject \(H_0\). Classification: moderate or threshold-sensitive rejection. Consequence: evidence suggests an increase in default; monitoring and follow-up are justified.
-    \item Exam pass rate: \(0.19>0.05\) \(\Rightarrow\) fail to reject \(H_0\). Classification: stable fail-to-reject/non-significant. Consequence: no statistically significant evidence of pass-rate change from this sample.
-    \item Final synthesis: practical decisions should reflect evidence strength, not only whether p-value crosses the threshold.
-\end{itemize}
+\MinNGraph{0.5}{1.645}{40}{4}{11}
 
 \end{document}
