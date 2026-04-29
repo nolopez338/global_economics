@@ -176,7 +176,11 @@
                 <span class="block warm">10E-2</span>
               </a>
             </td>
-            <td class="empty">—</td>
+            <td>
+              <a class="class-link" href="pages/magis.html" aria-label="Open schedule page for Teams">
+                <span class="block" style="background: #d3b3f3;">10-Cr</span>
+              </a>
+            </td>
           </tr>
 
           <tr>
