@@ -1371,35 +1371,22 @@
         });
       }
 
-      function sanitizeUniformBoundsForCurrentRange() {
-        const xMin = state.xmin;
-        const xMax = state.xmax;
+      function getUniformSliderBoundValues() {
         let a = Number(els.uniformA.value);
         let b = Number(els.uniformB.value);
 
         if (!Number.isFinite(a)) a = defaults.uniform.a;
         if (!Number.isFinite(b)) b = defaults.uniform.b;
 
-        a = clamp(a, xMin, xMax);
-        b = clamp(b, xMin, xMax);
+        const aSliderMaxRaw = Number.isFinite(b) ? Math.min(b - EPS, state.xmax) : state.xmax;
+        const bSliderMinRaw = Number.isFinite(a) ? Math.max(a + EPS, state.xmin) : state.xmin;
 
-        if (!(b - a > EPS)) {
-          if (a + EPS <= xMax) {
-            b = a + EPS;
-          } else if (b - EPS >= xMin) {
-            a = b - EPS;
-          } else {
-            a = xMin;
-            b = xMax;
-          }
-        }
-
-        a = clamp(a, xMin, Math.min(xMax, b - EPS));
-        b = clamp(b, Math.max(xMin, a + EPS), xMax);
-
-        els.uniformA.value = toInputNumber(a);
-        els.uniformB.value = toInputNumber(b);
-        return { a, b };
+        return {
+          aSliderMin: state.xmin,
+          aSliderMax: Math.max(state.xmin + EPS, aSliderMaxRaw),
+          bSliderMin: Math.min(state.xmax - EPS, bSliderMinRaw),
+          bSliderMax: state.xmax
+        };
       }
 
       function updateSliderRanges() {
@@ -1415,9 +1402,9 @@
         syncInputSlider(els.xMinInput, els.xMinSlider);
         syncInputSlider(els.xMaxInput, els.xMaxSlider);
 
-        const { a: ua, b: ub } = sanitizeUniformBoundsForCurrentRange();
-        setSliderBounds(els.uniformASlider, state.xmin, ub);
-        setSliderBounds(els.uniformBSlider, ua, state.xmax);
+        const uniformSliderBounds = getUniformSliderBoundValues();
+        setSliderBounds(els.uniformASlider, uniformSliderBounds.aSliderMin, uniformSliderBounds.aSliderMax);
+        setSliderBounds(els.uniformBSlider, uniformSliderBounds.bSliderMin, uniformSliderBounds.bSliderMax);
         setSliderBounds(els.uniformHeightSlider, 0, heightMax, 0.0005);
 
         const ta = Number(els.triA.value);
