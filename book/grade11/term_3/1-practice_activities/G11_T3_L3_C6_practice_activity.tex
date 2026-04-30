@@ -4,247 +4,567 @@
 
 \input{preamble_exams.tex}
 
+\providecommand{\PropDecisionLine}[8]{%
+	\begin{center}
+		\begin{tikzpicture}[x=48cm,y=1cm,>=stealth]
+			\def\Zcrit{1.645}%
+			\ifnum#8=10 \def\Zcrit{1.282}\fi
+			\ifnum#8=5 \def\Zcrit{1.645}\fi
+			\ifnum#8=2 \def\Zcrit{2.054}\fi
+			\ifnum#8=1 \def\Zcrit{2.326}\fi
+			\pgfmathsetmacro{\ArrowEnd}{#1 + (#3)*(0.025)*abs(#6)}
+			\pgfmathsetmacro{\CritPos}{#1 + (#3)*(0.025)*\Zcrit}
+			\pgfmathsetmacro{\LineLeft}{#7 - 0.10}
+			\pgfmathsetmacro{\LineRight}{#7 + 0.10}
+			\pgfmathsetmacro{\TickA}{#7 - 0.08}
+			\pgfmathsetmacro{\TickB}{#7 - 0.04}
+			\pgfmathsetmacro{\TickC}{#7}
+			\pgfmathsetmacro{\TickD}{#7 + 0.04}
+			\pgfmathsetmacro{\TickE}{#7 + 0.08}
+			\draw[thick] (\LineLeft,0) -- (\LineRight,0);
+			\foreach \x in {\TickA,\TickB,\TickC,\TickD,\TickE}{
+				\draw (\x,0.025) -- (\x,-0.025);
+				\node[below,font=\scriptsize] at (\x,-0.025) {\(\pgfmathprintnumber[fixed,precision=2]{\x}\)};
+			}
+			\filldraw[black] (#1,0) circle (1.8pt);
+			\node[above,font=\scriptsize] at (#1,0.11) {\(\mu_0=#1\)};
+			\filldraw[#4] (#2,0) circle (1.8pt);
+			\node[above,font=\scriptsize,#4] at (#2,0.11) {\(\bar x=#2\)};
+			\draw[thick] (\CritPos,0.05) -- (\CritPos,0.27);
+			\node[below,font=\scriptsize] at (\CritPos,-0.24) {\(\alpha=#8\%\)};
+			\draw[->,very thick,#4] (#1,0.16) -- (\ArrowEnd,0.16);
+			\node[#4,font=\scriptsize] at (#7,-0.59) {#5};
+		\end{tikzpicture}
+	\end{center}
+}
+
+\providecommand{\PropDecisionLineTwoTail}[7]{%
+	\begin{center}
+		\begin{tikzpicture}[x=48cm,y=1cm,>=stealth]
+			\def\Zcrit{1.960}%
+			\ifnum#7=10 \def\Zcrit{1.645}\fi
+			\ifnum#7=5 \def\Zcrit{1.960}\fi
+			\ifnum#7=2 \def\Zcrit{2.326}\fi
+			\ifnum#7=1 \def\Zcrit{2.576}\fi
+			\pgfmathsetmacro{\ArrowOffset}{(0.025)*abs(#5)}
+			\pgfmathsetmacro{\LeftArrowEnd}{#1 - \ArrowOffset}
+			\pgfmathsetmacro{\RightArrowEnd}{#1 + \ArrowOffset}
+			\pgfmathsetmacro{\LeftCrit}{#1 - (0.025)*\Zcrit}
+			\pgfmathsetmacro{\RightCrit}{#1 + (0.025)*\Zcrit}
+			\pgfmathsetmacro{\LineLeft}{#6 - 0.10}
+			\pgfmathsetmacro{\LineRight}{#6 + 0.10}
+			\pgfmathsetmacro{\TickA}{#6 - 0.08}
+			\pgfmathsetmacro{\TickB}{#6 - 0.04}
+			\pgfmathsetmacro{\TickC}{#6}
+			\pgfmathsetmacro{\TickD}{#6 + 0.04}
+			\pgfmathsetmacro{\TickE}{#6 + 0.08}
+			\draw[thick] (\LineLeft,0) -- (\LineRight,0);
+			\foreach \x in {\TickA,\TickB,\TickC,\TickD,\TickE}{
+				\draw (\x,0.025) -- (\x,-0.025);
+				\node[below,font=\scriptsize] at (\x,-0.025) {\(\pgfmathprintnumber[fixed,precision=2]{\x}\)};
+			}
+			\filldraw[black] (#1,0) circle (1.8pt);
+			\node[above,font=\scriptsize] at (#1,0.11) {\(\mu_0=#1\)};
+			\filldraw[#3] (#2,0) circle (1.8pt);
+			\node[above,font=\scriptsize,#3] at (#2,0.11) {\(\bar x=#2\)};
+			\draw[thick] (\LeftCrit,0.05) -- (\LeftCrit,0.27);
+			\draw[thick] (\RightCrit,0.05) -- (\RightCrit,0.27);
+			\node[below,font=\scriptsize] at (#6,0.94) {\(\alpha=#7\%\)};
+			\draw[->,very thick,#3] (#1,0.16) -- (\LeftArrowEnd,0.16);
+			\draw[->,very thick,#3] (#1,0.16) -- (\RightArrowEnd,0.16);
+			\node[#3,font=\scriptsize] at (#6,-0.59) {#4};
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\PropDecisionLineFixed}[8]{%
+	\begin{center}
+		\begin{tikzpicture}[x=48cm,y=1cm,>=stealth]
+			\def\Zcrit{1.645}%
+			\ifnum#8=10 \def\Zcrit{1.282}\fi
+			\ifnum#8=5 \def\Zcrit{1.645}\fi
+			\ifnum#8=2 \def\Zcrit{2.054}\fi
+			\ifnum#8=1 \def\Zcrit{2.326}\fi
+			\pgfmathsetmacro{\ArrowEnd}{#1 + (#3)*(0.025)*abs(#6)}
+			\pgfmathsetmacro{\CritPos}{#1 + (#3)*(0.025)*\Zcrit}
+			\pgfmathsetmacro{\LineLeft}{#7 - 0.10}
+			\pgfmathsetmacro{\LineRight}{#7 + 0.10}
+			\pgfmathsetmacro{\TickA}{#7 - 0.08}
+			\pgfmathsetmacro{\TickB}{#7 - 0.04}
+			\pgfmathsetmacro{\TickC}{#7}
+			\pgfmathsetmacro{\TickD}{#7 + 0.04}
+			\pgfmathsetmacro{\TickE}{#7 + 0.08}
+			\draw[thick] (\LineLeft,0) -- (\LineRight,0);
+			\foreach \x in {\TickA,\TickB,\TickC,\TickD,\TickE}{
+				\draw (\x,0.025) -- (\x,-0.025);
+				\node[below,font=\scriptsize] at (\x,-0.025) {\(\pgfmathprintnumber[fixed,precision=2]{\x}\)};
+			}
+			\filldraw[black] (#1,0) circle (1.8pt);
+			\node[above,font=\scriptsize] at (#1,0.11) {\(\mu_0=#1\)};
+			\filldraw[#4] (#2,0) circle (1.8pt);
+			\node[above,font=\scriptsize,#4] at (#2,0.11) {\(\bar x=#2\)};
+			\draw[thick] (\CritPos,0.05) -- (\CritPos,0.27);
+			\node[below,font=\scriptsize] at (\CritPos,-0.24) {\(\alpha=#8\%\)};
+			\draw[->,very thick,#4] (#1,0.16) -- (\ArrowEnd,0.16);
+			\node[#4,font=\scriptsize] at (#7,-0.59) {#5};
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\NormalBase}{%
+	\draw[->] (-3.4,0) -- (3.4,0);
+	\draw[thick,samples=120,smooth,domain=-3.2:3.2] plot (\x,{0.4*exp(-\x*\x/2)});
+	\node[below] at (0,0) {0};
+}
+
+\newcommand{\OneTailGraph}[4]{%
+	% #1: 0=left, 1=right; #2: z_obs; #3: optional z_crit; #4: label
+	\begin{tikzpicture}[x=0.9cm,y=3.0cm]
+		\NormalBase
+		\ifnum#1=0
+		\fill[blue!20,domain=-3.2:#2] (-3.2,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (#2,0) -- cycle;
+		\else
+		\fill[blue!20,domain=#2:3.2] (#2,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (3.2,0) -- cycle;
+		\fi
+		\def\ObsColor{black}
+		\if\relax\detokenize{#3}\relax\else
+		\ifnum#1=0
+		\pgfmathtruncatemacro{\RejectFlag}{#2<=#3}
+		\else
+		\pgfmathtruncatemacro{\RejectFlag}{#2>=#3}
+		\fi
+		\ifnum\RejectFlag=1
+		\def\ObsColor{green!60!black}
+		\else
+		\def\ObsColor{red}
+		\fi
+		\draw[dashed] (#3,0) -- (#3,{0.4*exp(-#3*#3/2)});
+		\node[below] at (#3,-0.05) {\scriptsize $z_{\alpha}=#3$};
+		\fi
+		\draw[\ObsColor,dashed] (#2,0) -- (#2,{0.4*exp(-#2*#2/2)});
+		\node[above,text=\ObsColor] at (#2,{0.4*exp(-#2*#2/2)}) {\scriptsize $z_{obs}=#2$};
+		\node at (0,0.46) {\scriptsize #4};
+	\end{tikzpicture}%
+}
+
+\newcommand{\TwoTailGraph}[3]{%
+	% #1: |z_obs|; #2: optional z_crit>0; #3: label
+	\begin{tikzpicture}[x=0.9cm,y=3.0cm]
+		\NormalBase
+		\fill[blue!20,domain=-3.2:-#1] (-3.2,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (-#1,0) -- cycle;
+		\fill[blue!20,domain=#1:3.2] (#1,0) -- plot[samples=90] (\x,{0.4*exp(-\x*\x/2)}) -- (3.2,0) -- cycle;
+		\def\ObsColor{black}
+		\if\relax\detokenize{#2}\relax\else
+		\pgfmathtruncatemacro{\RejectFlag}{#1>=#2}
+		\ifnum\RejectFlag=1
+		\def\ObsColor{green!60!black}
+		\else
+		\def\ObsColor{red}
+		\fi
+		\draw[dashed] (#2,0) -- (#2,{0.4*exp(-#2*#2/2)});
+		\draw[dashed] (-#2,0) -- (-#2,{0.4*exp(-#2*#2/2)});
+		\node[below] at (#2,-0.05) {\scriptsize $z_{\alpha/2}=#2$};
+		\fi
+		\draw[\ObsColor,dashed] (-#1,0) -- (-#1,{0.4*exp(-#1*#1/2)});
+		\draw[\ObsColor,dashed] (#1,0) -- (#1,{0.4*exp(-#1*#1/2)});
+		\node[above,text=\ObsColor] at (#1,{0.4*exp(-#1*#1/2)}) {\scriptsize $|z_{obs}|=#1$};
+		\node at (0,0.46) {\scriptsize #3};
+	\end{tikzpicture}%
+}
+
+
 \title{Term 3 --- Lesson 1 Practice Activity (C6) with Solutions}
 \author{}
 \date{}
 
 \begin{document}
-
+	
 	\maketitle
-
+	
 	\setcounter{tocdepth}{1}
 	\setcounter{secnumdepth}{2}
 	\tableofcontents
-
-\section*{Evaluated criteria}
-\begin{itemize}
-    \item C6: Interprets decisions from hypothesis tests in terms of the context of the problem.
-\end{itemize}
-
-\section{General Problem: decision outcomes and error ladder}
-A policy team reviews a hypothesis-test report about a population parameter (mean or proportion). The report provides either a direct decision or a p-value that must be read against one or more significance levels. Your goal is to interpret the decision in context without recalculating the test statistic.
-
-Use the following framework in every interpretation:
-\begin{itemize}
-    \item If the report says \textit{reject \(H_0\)}, the immediate statistical risk is a \textbf{Type I error} (rejecting \(H_0\) when \(H_0\) is true).
-    \item If the report says \textit{fail to reject \(H_0\)}, the immediate statistical risk is a \textbf{Type II error} (failing to reject \(H_0\) when \(H_0\) is false).
-    \item Changing \(\alpha\) changes decision strictness: smaller \(\alpha\) gives stronger protection against Type I error but can increase exposure to Type II error.
-    \item A statistical decision is evidence-based, not proof with certainty.
-\end{itemize}
-
-Questions: In each applied problem, identify the reported decision, identify the immediate error concern, explain what that error means in context, and state what can and cannot be concluded.
-
-\subsection*{C6}
-\begin{itemize}
-    \item \textbf{Core interpretation rule:} decision first, then error mapping. Reject \(H_0\) $\rightarrow$ immediate Type I concern; fail to reject \(H_0\) $\rightarrow$ immediate Type II concern.
-    \item \textbf{Certainty rule:} reject \(H_0\) supports the alternative claim but does not prove it with certainty; fail to reject \(H_0\) does not prove \(H_0\) is true.
-    \item \textbf{Threshold rule:} stricter \(\alpha\) (for example 1\%) reduces tolerance for false positives, while looser \(\alpha\) (for example 10\%) reduces tolerance for missed true effects.
-\end{itemize}
-
-\section{Fuel-price monitoring report (foundational reject case)}
-A city transport authority tests whether mean monthly fuel inflation is above the 4.0\% value used in the fare budget. The report states
-\[
-H_0\colon \mu=4.0,\qquad H_1\colon \mu>4.0,\qquad \alpha=0.05,
-\]
-and the reported decision is \textit{reject \(H_0\)}.
-
-Interpret the decision for planners. State the supported claim, the immediate error risk, and what overclaim must be avoided.
-
-\subsection*{C6}
-\begin{itemize}
-    \item \textbf{Reported decision:} reject \(H_0\).
-    \item \textbf{Supported conclusion:} evidence supports that the population mean fuel inflation is above 4.0\%.
-    \item \textbf{Immediate error risk:} Type I error. In context, this means the authority could announce inflation is above 4.0\% when the true mean is actually at the 4.0\% benchmark.
-    \item \textbf{What to avoid:} do not claim certainty and do not claim every fuel product has inflation above 4.0\%; the inference is about the population mean.
-\end{itemize}
-
-\section{Public employment office review (foundational fail-to-reject case)}
-A labor ministry evaluates whether a job-matching reform reduced average unemployment duration below the 11-week benchmark:
-\[
-H_0\colon \mu=11,\qquad H_1\colon \mu<11,\qquad \alpha=0.10.
-\]
-The report gives \textit{fail to reject \(H_0\)}.
-
-Interpret this outcome and identify the immediate error concern.
-
-\subsection*{C6}
-\begin{itemize}
-    \item \textbf{Reported decision:} fail to reject \(H_0\).
-    \item \textbf{Supported conclusion:} evidence is insufficient to conclude that the population mean unemployment duration is below 11 weeks at the 10\% level.
-    \item \textbf{Immediate error risk:} Type II error. In context, a real reduction below 11 weeks may exist, but the ministry may fail to detect it.
-    \item \textbf{What to avoid:} do not say the reform had no effect or that \(\mu=11\) is proven true.
-\end{itemize}
-
-\section{Export quality audit under strict and lenient standards}
-A manufacturer tests whether the true defect proportion is below the contractual reference 5\%:
-\[
-H_0\colon p=0.05,\qquad H_1\colon p<0.05,
-\]
-with reported p-value \(=0.004\). Interpret at \(\alpha=0.05\) and \(\alpha=0.01\).
-
-\subsection*{C6}
-\begin{itemize}
-    \item \textbf{At \(\alpha=0.05\):} reject \(H_0\), so evidence supports \(p<0.05\).
-    \item \textbf{At \(\alpha=0.01\):} reject \(H_0\), so evidence still supports \(p<0.05\) under the stricter threshold.
-    \item \textbf{Immediate error concern (both decisions):} Type I error remains the relevant risk because the decision is reject \(H_0\) at both thresholds.
-    \item \textbf{Robustness interpretation:} the conclusion is robust across strict and lenient standards, but still not certainty.
-\end{itemize}
-
-\section{Digital payment adoption with threshold-sensitive evidence}
-A central bank tests whether regular digital-payment use is above the 70\% policy benchmark:
-\[
-H_0\colon p=0.70,\qquad H_1\colon p>0.70,
-\]
-with reported p-value \(=0.041\). Compare \(\alpha=0.05\) and \(\alpha=0.01\).
-
-\subsection*{C6}
-\begin{itemize}
-    \item \textbf{At \(\alpha=0.05\):} reject \(H_0\), so evidence supports \(p>0.70\). Immediate concern: Type I error.
-    \item \textbf{At \(\alpha=0.01\):} fail to reject \(H_0\), so evidence is insufficient under a stricter rule. Immediate concern: Type II error.
-    \item \textbf{Threshold lesson:} tightening \(\alpha\) changed the decision and shifted the immediate practical concern from false-positive risk to missed-improvement risk.
-\end{itemize}
-
-\section{Transport reliability monitoring with stable non-rejection}
-A rail agency checks whether average delay is below a 7.0-minute benchmark:
-\[
-H_0\colon \mu=7.0,\qquad H_1\colon \mu<7.0,
-\]
-with p-value \(=0.186\). Interpret at \(\alpha=0.10\) and \(\alpha=0.05\).
-
-\subsection*{C6}
-\begin{itemize}
-    \item \textbf{At \(\alpha=0.10\):} fail to reject \(H_0\).
-    \item \textbf{At \(\alpha=0.05\):} fail to reject \(H_0\).
-    \item \textbf{Immediate error concern (both decisions):} Type II error, because a true reduction in delay could exist but remain undetected.
-    \item \textbf{Interpretation:} non-rejection is stable across thresholds, so evidence for improvement is weak under both standards.
-\end{itemize}
-
-\section{Public health screening decision design}
-A ministry evaluates a low-cost screening program for early disease detection.
-\begin{itemize}
-    \item The tested claim is that the detection rate is above the historical benchmark.
-    \item A Type I error would trigger large emergency spending when the true detection rate has not improved.
-    \item A Type II error would delay treatment scale-up when detection actually has improved.
-\end{itemize}
-Explain which error is more harmful in this context and justify whether a stricter or more lenient \(\alpha\) is more appropriate.
-
-\subsection*{C6}
-\begin{itemize}
-    \item \textbf{Type I meaning:} false alarm of improvement, causing unnecessary emergency expansion costs.
-    \item \textbf{Type II meaning:} missed real improvement, delaying access to beneficial treatment pathways.
-    \item \textbf{Context-based judgment:} when missing real early detection is medically costly, planners may justify a somewhat more lenient \(\alpha\) to reduce Type II risk, while still monitoring false positives through follow-up diagnostics.
-    \item \textbf{Decision principle:} the choice of \(\alpha\) reflects policy trade-offs, not a purely mechanical rule.
-\end{itemize}
-
-\section{Labor policy evaluation and retraining expansion}
-A ministry considers expanding a retraining program. The test examines whether average post-training earnings exceed a benchmark. The report at \(\alpha=0.05\) says \textit{reject \(H_0\)}.
-
-Discuss the practical consequences of Type I and Type II errors and indicate which should receive greater caution for budget planning.
-
-\subsection*{C6}
-\begin{itemize}
-    \item \textbf{Reported decision:} reject \(H_0\), so evidence supports higher mean earnings after retraining.
-    \item \textbf{Immediate error concern:} Type I error. The ministry might scale up an ineffective program if the true gain is not above benchmark.
-    \item \textbf{Type II consequence (counterfactual planning concern):} with a stricter threshold, the ministry could miss a genuinely effective program and underinvest in workers.
-    \item \textbf{Policy emphasis:} if expansion is very costly and hard to reverse, stronger caution against Type I error is justified; if unemployment costs are severe, planners may tolerate slightly higher Type I risk to avoid Type II misses.
-\end{itemize}
-
-\section{Educational intervention review with precision notes}
-An education board evaluates whether a reading-support intervention increased the pass rate above 68\%. A sample of \(n=1600\) schools yields a margin of error of \(\pm 2.4\%\), and the test report at \(\alpha=0.05\) says \textit{fail to reject \(H_0\)}.
-
-Interpret the decision, include the immediate error risk, and explain how sample size and margin of error affect confidence in interpretation.
-
-\subsection*{C6}
-\begin{itemize}
-    \item \textbf{Reported decision:} fail to reject \(H_0\).
-    \item \textbf{Supported conclusion:} evidence is insufficient to claim the true pass rate is above 68\% at 5\% significance.
-    \item \textbf{Immediate error concern:} Type II error, meaning a true improvement above 68\% may exist but was not detected.
-    \item \textbf{Precision interpretation:} a large sample and relatively small margin of error make estimates more precise, but they still do not convert non-rejection into proof that no improvement exists.
-\end{itemize}
-
-\section{Service regulation dashboard with two independent tests}
-A regulator reports two independent service checks.
-
-\textbf{Test A (consumer complaints).} \(H_0\colon \mu=24\) hours vs \(H_1\colon \mu>24\), \(\alpha=0.05\), decision: \textit{reject \(H_0\)}.
-
-\textbf{Test B (network outage rate).} \(H_0\colon p=0.030\) vs \(H_1\colon p<0.030\), \(\alpha=0.05\), decision: \textit{fail to reject \(H_0\)}.
-
-Interpret both tests separately and identify the immediate error concern for each.
-
-\subsection*{C6}
-\begin{itemize}
-    \item \textbf{Test A decision:} reject \(H_0\). Evidence supports that mean complaint response time exceeds 24 hours.
-    \item \textbf{Test A immediate error concern:} Type I error (false claim of slower response than benchmark).
-    \item \textbf{Test B decision:} fail to reject \(H_0\). Evidence is insufficient to claim outage rate is below 3.0\%.
-    \item \textbf{Test B immediate error concern:} Type II error (true improvement in outage rate may be missed).
-    \item \textbf{Dashboard lesson:} one report can contain different decisions and different error priorities across indicators.
-\end{itemize}
-
-\section{Economic monitoring dashboard with three independent tests}
-A planning office reviews three indicators with p-values interpreted at \(\alpha=0.10\) and \(\alpha=0.05\).
-\begin{itemize}
-    \item \textbf{Test A (fuel inflation above 4.0\%):} p-value \(=0.006\).
-    \item \textbf{Test B (unemployment duration below 11 weeks):} p-value \(=0.033\).
-    \item \textbf{Test C (broadband access different from 76\%):} p-value \(=0.081\).
-\end{itemize}
-Classify each finding as robust or threshold-sensitive and explain which error concern dominates for each decision.
-
-\subsection*{C6}
-\begin{itemize}
-    \item \textbf{Test A:} reject at 10\% and 5\% $\rightarrow$ robust rejection; immediate concern Type I at both thresholds.
-    \item \textbf{Test B:} reject at 10\% and 5\% $\rightarrow$ robust rejection; immediate concern Type I at both thresholds.
-    \item \textbf{Test C:} reject at 10\% but fail to reject at 5\% $\rightarrow$ threshold-sensitive finding; Type I concern under 10\% decision and Type II concern under 5\% decision.
-    \item \textbf{Communication implication:} robust findings can be reported with stronger confidence language; threshold-sensitive findings should be reported as conditional on confidence standard.
-\end{itemize}
-
-\section{Consumer protection and quality assurance synthesis}
-A national report combines three independent tests, each reviewed at \(\alpha=0.10\), \(0.05\), and \(0.01\):
-\begin{itemize}
-    \item \textbf{Test A (unsafe-product complaint rate lower than benchmark):} p-value \(=0.008\).
-    \item \textbf{Test B (factory defect rate lower than benchmark):} p-value \(=0.037\).
-    \item \textbf{Test C (service-access equity improved above benchmark):} p-value \(=0.094\).
-\end{itemize}
-Classify each as robust, moderate, or tentative evidence, then connect each class to likely Type I/Type II consequence concerns.
-
-\subsection*{C6}
-\begin{itemize}
-    \item \textbf{Test A (0.008):} reject at 10\%, 5\%, and 1\% $\rightarrow$ \textbf{robust evidence}. Immediate concern remains Type I, but risk is controlled even under strict standard.
-    \item \textbf{Test B (0.037):} reject at 10\% and 5\%, fail to reject at 1\% $\rightarrow$ \textbf{moderate evidence}. Type I caution is still relevant, especially for high-stakes enforcement claims.
-    \item \textbf{Test C (0.094):} reject only at 10\% $\rightarrow$ \textbf{tentative evidence}. With stricter standards, Type II concern becomes central because possible improvement may remain unconfirmed.
-    \item \textbf{Synthesis:} evidence class should guide communication strength and policy reversibility.
-\end{itemize}
-
-\section{Integrated policy planning under alternative error tolerances}
-A cabinet committee must choose one of two reporting standards for next year's action plan:
-\begin{itemize}
-    \item \textbf{Standard S (stricter):} use \(\alpha=0.01\) for all flagship claims.
-    \item \textbf{Standard L (less strict):} use \(\alpha=0.05\) for program-expansion claims and \(\alpha=0.01\) only for high-cost irreversible actions.
-\end{itemize}
-Current p-values are:
-\begin{itemize}
-    \item Public-health early detection improvement: \(p=0.018\).
-    \item Labor retraining earnings improvement: \(p=0.044\).
-    \item Safety-critical transport failure increase: \(p=0.009\).
-\end{itemize}
-For each standard, state which claims are supported. Then justify which standard better balances Type I and Type II costs across these domains.
-
-\subsection*{C6}
-\begin{itemize}
-    \item \textbf{Under Standard S (\(\alpha=0.01\) everywhere):}
-    \begin{itemize}
-        \item Public health (0.018): fail to reject \(H_0\).
-        \item Labor retraining (0.044): fail to reject \(H_0\).
-        \item Transport safety risk (0.009): reject \(H_0\).
-    \end{itemize}
-    Immediate concern is mostly Type II for the first two domains and Type I for the transport-safety rejection.
-    \item \textbf{Under Standard L (mixed rule):}
-    \begin{itemize}
-        \item Public health at 5\%: reject \(H_0\).
-        \item Labor retraining at 5\%: reject \(H_0\).
-        \item Transport safety at 1\%: reject \(H_0\).
-    \end{itemize}
-    This rule accepts more Type I exposure for expansion claims to reduce Type II misses, while keeping strict Type I protection for irreversible safety actions.
-    \item \textbf{Policy judgment:} Standard L is often preferable when missing true beneficial programs is costly, but Standard S is preferable when false positives are extremely costly or politically irreversible.
-\end{itemize}
-
+	
+	\section*{Evaluated criteria}
+	\begin{itemize}
+		\item C6: Interprets decisions from hypothesis tests in terms of the context of the problem.
+	\end{itemize}
+	
+	\section{General Problem: decision outcomes and error ladder}
+	A policy team reviews a hypothesis-test report about a population parameter (mean or proportion). The report provides either a direct decision or a p-value that must be read against one or more significance levels. Your goal is to interpret the decision in context without recalculating the test statistic.
+	
+	Use the following framework in every interpretation:
+	\begin{itemize}
+		\item If the report says \textit{reject \(H_0\)}, the immediate statistical risk is a \textbf{Type I error} (rejecting \(H_0\) when \(H_0\) is true).
+		\item If the report says \textit{fail to reject \(H_0\)}, the immediate statistical risk is a \textbf{Type II error} (failing to reject \(H_0\) when \(H_0\) is false).
+		\item Changing \(\alpha\) changes decision strictness: smaller \(\alpha\) gives stronger protection against Type I error but can increase exposure to Type II error.
+		\item A statistical decision is evidence-based, not proof with certainty.
+	\end{itemize}
+	
+	\noindent\textbf{Decision-outcome table with explanations}
+	
+	\renewcommand{\arraystretch}{1.4}
+	\begin{center}
+		\begin{tabular}{|p{3.4cm}|p{5.6cm}|p{5.6cm}|}
+			\hline
+			& \centering\textbf{\(H_0\) is false} & \centering\textbf{\(H_0\) is true} \tabularnewline
+			\hline
+			\textbf{Reject \(H_0\)} 
+			& Correct decision. The evidence leads to rejection, and in reality the null hypothesis is false. This is the desired outcome when the alternative is true. 
+			& \textbf{Type I error.} We reject \(H_0\) even though \(H_0\) is actually true. This is a false positive. \tabularnewline
+			\hline
+			\textbf{Fail to reject \(H_0\)} 
+			& \textbf{Type II error.} We do not reject \(H_0\) even though \(H_0\) is actually false. This is a missed real effect. 
+			& Correct decision. We do not reject \(H_0\), and in reality the null hypothesis is true. This is the desired cautious outcome when there is no real effect. \tabularnewline
+			\hline
+		\end{tabular}
+	\end{center}
+	
+	\medskip
+	
+	\noindent\textbf{Decision-outcome table with graph representations}
+	
+	\begin{center}
+		\renewcommand{\arraystretch}{1.25}
+		\begin{tabular}{|p{3.2cm}|p{5.8cm}|p{5.8cm}|}
+			\hline
+			& \centering\textbf{\(H_0\) is false} & \centering\textbf{\(H_0\) is true} \tabularnewline
+			\hline
+			\textbf{Reject \(H_0\)}
+			&
+			\begin{minipage}[c]{5.6cm}
+				\centering
+				\OneTailGraph{1}{2.05}{1.645}{Correct rejection}
+				
+				\smallskip
+				\scriptsize The observed statistic falls in the rejection region, and \(H_0\) is false.
+			\end{minipage}
+			&
+			\begin{minipage}[c]{5.6cm}
+				\centering
+				\OneTailGraph{1}{2.05}{1.645}{Type I error}
+				
+				\smallskip
+				\scriptsize The observed statistic falls in the rejection region, but \(H_0\) is actually true.
+			\end{minipage}
+			\tabularnewline
+			\hline
+			\textbf{Fail to reject \(H_0\)}
+			&
+			\begin{minipage}[c]{5.6cm}
+				\centering
+				\OneTailGraph{1}{1.10}{1.645}{Type II error}
+				
+				\smallskip
+				\scriptsize The observed statistic does not reach the rejection region, even though \(H_0\) is false.
+			\end{minipage}
+			&
+			\begin{minipage}[c]{5.6cm}
+				\centering
+				\OneTailGraph{1}{1.10}{1.645}{Correct non-rejection}
+				
+				\smallskip
+				\scriptsize The observed statistic does not reach the rejection region, and \(H_0\) is true.
+			\end{minipage}
+			\tabularnewline
+			\hline
+		\end{tabular}
+	\end{center}
+	
+	
+	\subsection*{C6}
+	\begin{itemize}
+		\item \textbf{Core interpretation rule:} decision first, then error mapping. Reject \(H_0\) $\rightarrow$ immediate Type I concern; fail to reject \(H_0\) $\rightarrow$ immediate Type II concern.
+		\item \textbf{Certainty rule:} reject \(H_0\) supports the alternative claim but does not prove it with certainty; fail to reject \(H_0\) does not prove \(H_0\) is true.
+		\item \textbf{Threshold rule:} stricter \(\alpha\) (for example 1\%) reduces tolerance for false positives, while looser \(\alpha\) (for example 10\%) reduces tolerance for missed true effects.
+	\end{itemize}
+	
+	\section{Fuel-price monitoring report (foundational reject case)}
+	A city transport authority tests whether mean monthly fuel inflation is above the 4.0\% value used in the fare budget. The report states
+	\[
+	H_0\colon \mu=4.0,\qquad H_1\colon \mu>4.0,\qquad \alpha=0.05,
+	\]
+	and the reported decision is \textit{reject \(H_0\)}.
+	
+	Interpret the decision for planners. State the supported claim, the immediate error risk, and what overclaim must be avoided.
+	
+	\begin{center}
+		\OneTailGraph{1}{2.05}{1.645}{Fuel inflation test at \(\alpha=5\%\)}
+	\end{center}
+	
+	\subsection*{C6}
+	\begin{itemize}
+		\item \textbf{Reported decision:} reject \(H_0\).
+		\item \textbf{Supported conclusion:} evidence supports that the population mean fuel inflation is above 4.0\%.
+		\item \textbf{Immediate error risk:} Type I error. In context, this means the authority could announce inflation is above 4.0\% when the true mean is actually at the 4.0\% benchmark.
+		\item \textbf{What to avoid:} do not claim certainty and do not claim every fuel product has inflation above 4.0\%; the inference is about the population mean.
+	\end{itemize}
+	
+	\section{Public employment office review (foundational fail-to-reject case)}
+	A labor ministry evaluates whether a job-matching reform reduced average unemployment duration below the 11-week benchmark:
+	\[
+	H_0\colon \mu=11,\qquad H_1\colon \mu<11,\qquad \alpha=0.10.
+	\]
+	The report gives \textit{fail to reject \(H_0\)}.
+	
+	Interpret this outcome and identify the immediate error concern.
+	
+	\begin{center}
+		\OneTailGraph{0}{-0.85}{-1.282}{Unemployment-duration test at \(\alpha=10\%\)}
+	\end{center}
+	
+	\subsection*{C6}
+	\begin{itemize}
+		\item \textbf{Reported decision:} fail to reject \(H_0\).
+		\item \textbf{Supported conclusion:} evidence is insufficient to conclude that the population mean unemployment duration is below 11 weeks at the 10\% level.
+		\item \textbf{Immediate error risk:} Type II error. In context, a real reduction below 11 weeks may exist, but the ministry may fail to detect it.
+		\item \textbf{What to avoid:} do not say the reform had no effect or that \(\mu=11\) is proven true.
+	\end{itemize}
+	
+	\section{Export quality audit under strict and lenient standards}
+	A manufacturer tests whether the true defect proportion is below the contractual reference 5\%:
+	\[
+	H_0\colon p=0.05,\qquad H_1\colon p<0.05,
+	\]
+	with reported p-value \(=0.004\). Interpret at \(\alpha=0.05\) and \(\alpha=0.01\).
+	
+	\begin{center}
+		\OneTailGraph{0}{-2.65}{-1.645}{\(\alpha=5\%\)}
+		\hspace{0.8cm}
+		\OneTailGraph{0}{-2.65}{-2.326}{\(\alpha=1\%\)}
+	\end{center}
+	
+	\subsection*{C6}
+	\begin{itemize}
+		\item \textbf{At \(\alpha=0.05\):} reject \(H_0\), so evidence supports \(p<0.05\).
+		\item \textbf{At \(\alpha=0.01\):} reject \(H_0\), so evidence still supports \(p<0.05\) under the stricter threshold.
+		\item \textbf{Immediate error concern (both decisions):} Type I error remains the relevant risk because the decision is reject \(H_0\) at both thresholds.
+		\item \textbf{Robustness interpretation:} the conclusion is robust across strict and lenient standards, but still not certainty.
+	\end{itemize}
+	
+	\section{Digital payment adoption with threshold-sensitive evidence}
+	A central bank tests whether regular digital-payment use is above the 70\% policy benchmark:
+	\[
+	H_0\colon p=0.70,\qquad H_1\colon p>0.70,
+	\]
+	with reported p-value \(=0.041\). Compare \(\alpha=0.05\) and \(\alpha=0.01\).
+	
+	\begin{center}
+		\OneTailGraph{1}{1.74}{1.645}{\(\alpha=5\%\)}
+		\hspace{0.8cm}
+		\OneTailGraph{1}{1.74}{2.326}{\(\alpha=1\%\)}
+	\end{center}
+	
+	\subsection*{C6}
+	\begin{itemize}
+		\item \textbf{At \(\alpha=0.05\):} reject \(H_0\), so evidence supports \(p>0.70\). Immediate concern: Type I error.
+		\item \textbf{At \(\alpha=0.01\):} fail to reject \(H_0\), so evidence is insufficient under a stricter rule. Immediate concern: Type II error.
+		\item \textbf{Threshold lesson:} tightening \(\alpha\) changed the decision and shifted the immediate practical concern from false-positive risk to missed-improvement risk.
+	\end{itemize}
+	
+	\section{Transport reliability monitoring with stable non-rejection}
+	A rail agency checks whether average delay is below a 7.0-minute benchmark:
+	\[
+	H_0\colon \mu=7.0,\qquad H_1\colon \mu<7.0,
+	\]
+	with p-value \(=0.186\). Interpret at \(\alpha=0.10\) and \(\alpha=0.05\).
+	
+	\begin{center}
+		\OneTailGraph{0}{-0.89}{-1.282}{\(\alpha=10\%\)}
+		\hspace{0.8cm}
+		\OneTailGraph{0}{-0.89}{-1.645}{\(\alpha=5\%\)}
+	\end{center}
+	
+	\subsection*{C6}
+	\begin{itemize}
+		\item \textbf{At \(\alpha=0.10\):} fail to reject \(H_0\).
+		\item \textbf{At \(\alpha=0.05\):} fail to reject \(H_0\).
+		\item \textbf{Immediate error concern (both decisions):} Type II error, because a true reduction in delay could exist but remain undetected.
+		\item \textbf{Interpretation:} non-rejection is stable across thresholds, so evidence for improvement is weak under both standards.
+	\end{itemize}
+	
+	\section{Public health screening decision design}
+	A ministry evaluates a low-cost screening program for early disease detection.
+	\begin{itemize}
+		\item The tested claim is that the detection rate is above the historical benchmark.
+		\item A Type I error would trigger large emergency spending when the true detection rate has not improved.
+		\item A Type II error would delay treatment scale-up when detection actually has improved.
+	\end{itemize}
+	Explain which error is more harmful in this context and justify whether a stricter or more lenient \(\alpha\) is more appropriate.
+	
+	\begin{center}
+		\OneTailGraph{1}{1.40}{1.282}{More lenient rule}
+		\hspace{0.8cm}
+		\OneTailGraph{1}{1.40}{1.645}{Stricter rule}
+	\end{center}
+	
+	\subsection*{C6}
+	\begin{itemize}
+		\item \textbf{Type I meaning:} false alarm of improvement, causing unnecessary emergency expansion costs.
+		\item \textbf{Type II meaning:} missed real improvement, delaying access to beneficial treatment pathways.
+		\item \textbf{Context-based judgment:} when missing real early detection is medically costly, planners may justify a somewhat more lenient \(\alpha\) to reduce Type II risk, while still monitoring false positives through follow-up diagnostics.
+		\item \textbf{Decision principle:} the choice of \(\alpha\) reflects policy trade-offs, not a purely mechanical rule.
+	\end{itemize}
+	
+	\section{Labor policy evaluation and retraining expansion}
+	A ministry considers expanding a retraining program. The test examines whether average post-training earnings exceed a benchmark. The report at \(\alpha=0.05\) says \textit{reject \(H_0\)}.
+	
+	Discuss the practical consequences of Type I and Type II errors and indicate which should receive greater caution for budget planning.
+	
+	\begin{center}
+		\OneTailGraph{1}{2.00}{1.645}{Retraining-earnings test at \(\alpha=5\%\)}
+	\end{center}
+	
+	\subsection*{C6}
+	\begin{itemize}
+		\item \textbf{Reported decision:} reject \(H_0\), so evidence supports higher mean earnings after retraining.
+		\item \textbf{Immediate error concern:} Type I error. The ministry might scale up an ineffective program if the true gain is not above benchmark.
+		\item \textbf{Type II consequence (counterfactual planning concern):} with a stricter threshold, the ministry could miss a genuinely effective program and underinvest in workers.
+		\item \textbf{Policy emphasis:} if expansion is very costly and hard to reverse, stronger caution against Type I error is justified; if unemployment costs are severe, planners may tolerate slightly higher Type I risk to avoid Type II misses.
+	\end{itemize}
+	
+	\section{Educational intervention review with precision notes}
+	An education board evaluates whether a reading-support intervention increased the pass rate above 68\%. A sample of \(n=1600\) schools yields a margin of error of \(\pm 2.4\%\), and the test report at \(\alpha=0.05\) says \textit{fail to reject \(H_0\)}.
+	
+	Interpret the decision, include the immediate error risk, and explain how sample size and margin of error affect confidence in interpretation.
+	
+	\begin{center}
+		\OneTailGraph{1}{1.20}{1.645}{Pass-rate test at \(\alpha=5\%\)}
+	\end{center}
+	
+	\subsection*{C6}
+	\begin{itemize}
+		\item \textbf{Reported decision:} fail to reject \(H_0\).
+		\item \textbf{Supported conclusion:} evidence is insufficient to claim the true pass rate is above 68\% at 5\% significance.
+		\item \textbf{Immediate error concern:} Type II error, meaning a true improvement above 68\% may exist but was not detected.
+		\item \textbf{Precision interpretation:} a large sample and relatively small margin of error make estimates more precise, but they still do not convert non-rejection into proof that no improvement exists.
+	\end{itemize}
+	
+	\section{Service regulation dashboard with two independent tests}
+	A regulator reports two independent service checks.
+	
+	\textbf{Test A (consumer complaints).} \(H_0\colon \mu=24\) hours vs \(H_1\colon \mu>24\), \(\alpha=0.05\), decision: \textit{reject \(H_0\)}.
+	
+	\textbf{Test B (network outage rate).} \(H_0\colon p=0.030\) vs \(H_1\colon p<0.030\), \(\alpha=0.05\), decision: \textit{fail to reject \(H_0\)}.
+	
+	Interpret both tests separately and identify the immediate error concern for each.
+	
+	\begin{center}
+		\OneTailGraph{1}{2.00}{1.645}{Test A}
+		\hspace{0.8cm}
+		\OneTailGraph{0}{-1.10}{-1.645}{Test B}
+	\end{center}
+	
+	\subsection*{C6}
+	\begin{itemize}
+		\item \textbf{Test A decision:} reject \(H_0\). Evidence supports that mean complaint response time exceeds 24 hours.
+		\item \textbf{Test A immediate error concern:} Type I error (false claim of slower response than benchmark).
+		\item \textbf{Test B decision:} fail to reject \(H_0\). Evidence is insufficient to claim outage rate is below 3.0\%.
+		\item \textbf{Test B immediate error concern:} Type II error (true improvement in outage rate may be missed).
+		\item \textbf{Dashboard lesson:} one report can contain different decisions and different error priorities across indicators.
+	\end{itemize}
+	
+	\section{Economic monitoring dashboard with three independent tests}
+	A planning office reviews three indicators with p-values interpreted at \(\alpha=0.10\) and \(\alpha=0.05\).
+	\begin{itemize}
+		\item \textbf{Test A (fuel inflation above 4.0\%):} p-value \(=0.006\).
+		\item \textbf{Test B (unemployment duration below 11 weeks):} p-value \(=0.033\).
+		\item \textbf{Test C (broadband access different from 76\%):} p-value \(=0.081\).
+	\end{itemize}
+	Classify each finding as robust or threshold-sensitive and explain which error concern dominates for each decision.
+	
+	\begin{center}
+		\OneTailGraph{1}{2.51}{1.645}{Test A at \(\alpha=5\%\)}
+		\hspace{0.6cm}
+		\OneTailGraph{0}{-1.84}{-1.645}{Test B at \(\alpha=5\%\)}
+	\end{center}
+	
+	\begin{center}
+		\TwoTailGraph{1.74}{1.645}{Test C at \(\alpha=10\%\)}
+		\hspace{0.8cm}
+		\TwoTailGraph{1.74}{1.960}{Test C at \(\alpha=5\%\)}
+	\end{center}
+	
+	\subsection*{C6}
+	\begin{itemize}
+		\item \textbf{Test A:} reject at 10\% and 5\% $\rightarrow$ robust rejection; immediate concern Type I at both thresholds.
+		\item \textbf{Test B:} reject at 10\% and 5\% $\rightarrow$ robust rejection; immediate concern Type I at both thresholds.
+		\item \textbf{Test C:} reject at 10\% but fail to reject at 5\% $\rightarrow$ threshold-sensitive finding; Type I concern under 10\% decision and Type II concern under 5\% decision.
+		\item \textbf{Communication implication:} robust findings can be reported with stronger confidence language; threshold-sensitive findings should be reported as conditional on confidence standard.
+	\end{itemize}
+	
+	\section{Consumer protection and quality assurance synthesis}
+	A national report combines three independent tests, each reviewed at \(\alpha=0.10\), \(0.05\), and \(0.01\):
+	\begin{itemize}
+		\item \textbf{Test A (unsafe-product complaint rate lower than benchmark):} p-value \(=0.008\).
+		\item \textbf{Test B (factory defect rate lower than benchmark):} p-value \(=0.037\).
+		\item \textbf{Test C (service-access equity improved above benchmark):} p-value \(=0.094\).
+	\end{itemize}
+	Classify each as robust, moderate, or tentative evidence, then connect each class to likely Type I/Type II consequence concerns.
+	
+	\begin{center}
+		\OneTailGraph{0}{-2.41}{-2.326}{Test A at \(\alpha=1\%\)}
+		\hspace{0.5cm}
+		\OneTailGraph{0}{-1.79}{-2.326}{Test B at \(\alpha=1\%\)}
+		\hspace{0.5cm}
+		\OneTailGraph{1}{1.32}{1.282}{Test C at \(\alpha=10\%\)}
+	\end{center}
+	
+	\subsection*{C6}
+	\begin{itemize}
+		\item \textbf{Test A (0.008):} reject at 10\%, 5\%, and 1\% $\rightarrow$ \textbf{robust evidence}. Immediate concern remains Type I, but risk is controlled even under strict standard.
+		\item \textbf{Test B (0.037):} reject at 10\% and 5\%, fail to reject at 1\% $\rightarrow$ \textbf{moderate evidence}. Type I caution is still relevant, especially for high-stakes enforcement claims.
+		\item \textbf{Test C (0.094):} reject only at 10\% $\rightarrow$ \textbf{tentative evidence}. With stricter standards, Type II concern becomes central because possible improvement may remain unconfirmed.
+		\item \textbf{Synthesis:} evidence class should guide communication strength and policy reversibility.
+	\end{itemize}
+	
+	\section{Integrated policy planning under alternative error tolerances}
+	A cabinet committee must choose one of two reporting standards for next year's action plan:
+	\begin{itemize}
+		\item \textbf{Standard S (stricter):} use \(\alpha=0.01\) for all flagship claims.
+		\item \textbf{Standard L (less strict):} use \(\alpha=0.05\) for program-expansion claims and \(\alpha=0.01\) only for high-cost irreversible actions.
+	\end{itemize}
+	Current p-values are:
+	\begin{itemize}
+		\item Public-health early detection improvement: \(p=0.018\).
+		\item Labor retraining earnings improvement: \(p=0.044\).
+		\item Safety-critical transport failure increase: \(p=0.009\).
+	\end{itemize}
+	For each standard, state which claims are supported. Then justify which standard better balances Type I and Type II costs across these domains.
+	
+	\begin{center}
+		\OneTailGraph{1}{2.10}{2.326}{Public health under Standard S}
+		\hspace{0.5cm}
+		\OneTailGraph{1}{1.71}{2.326}{Labor under Standard S}
+		\hspace{0.5cm}
+		\OneTailGraph{1}{2.37}{2.326}{Transport under Standard S}
+	\end{center}
+	
+	\begin{center}
+		\OneTailGraph{1}{2.10}{1.645}{Public health under Standard L}
+		\hspace{0.5cm}
+		\OneTailGraph{1}{1.71}{1.645}{Labor under Standard L}
+		\hspace{0.5cm}
+		\OneTailGraph{1}{2.37}{2.326}{Transport under Standard L}
+	\end{center}
+	
+	\subsection*{C6}
+	\begin{itemize}
+		\item \textbf{Under Standard S (\(\alpha=0.01\) everywhere):}
+		\begin{itemize}
+			\item Public health (0.018): fail to reject \(H_0\).
+			\item Labor retraining (0.044): fail to reject \(H_0\).
+			\item Transport safety risk (0.009): reject \(H_0\).
+		\end{itemize}
+		Immediate concern is mostly Type II for the first two domains and Type I for the transport-safety rejection.
+		\item \textbf{Under Standard L (mixed rule):}
+		\begin{itemize}
+			\item Public health at 5\%: reject \(H_0\).
+			\item Labor retraining at 5\%: reject \(H_0\).
+			\item Transport safety at 1\%: reject \(H_0\).
+		\end{itemize}
+		This rule accepts more Type I exposure for expansion claims to reduce Type II misses, while keeping strict Type I protection for irreversible safety actions.
+		\item \textbf{Policy judgment:} Standard L is often preferable when missing true beneficial programs is costly, but Standard S is preferable when false positives are extremely costly or politically irreversible.
+	\end{itemize}
+	
 \end{document}
