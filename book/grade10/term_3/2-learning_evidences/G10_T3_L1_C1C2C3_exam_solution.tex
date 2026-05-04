@@ -206,6 +206,34 @@
 	\end{center}
 }
 
+\newcommand{\CtwoThresholdGraph}[7]{
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\supportA}{#1}
+			\pgfmathsetmacro{\supportB}{#2}
+			\pgfmathsetmacro{\pad}{0.12*(\supportB-\supportA)}
+			\begin{axis}[
+				width=9cm,
+				height=5cm,
+				axis lines=left,
+				xlabel={$x$},
+				ylabel={$f(x)$},
+				xmin={\supportA-\pad},
+				xmax={\supportB+\pad},
+				ymin=0,
+				ymax=#6,
+				grid=both,
+				xtick={#5}
+				]
+				\addplot[domain=#1:#4, samples=400, const plot, draw=none, fill=red!25, fill opacity=0.55] {#3} \closedcycle;
+				\addplot[domain=#4:#2, samples=400, const plot, draw=none, fill=green!25, fill opacity=0.55] {#3} \closedcycle;
+				\addplot[domain=#1:#2, samples=400, const plot, very thick, blue] {#3};
+				\addplot[dashed, thick, black] coordinates {(#4,0) (#4,#7)};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
 \newcommand{\LinearProbGraph}[6]{
 	\begin{center}
 		\begin{tikzpicture}
@@ -228,6 +256,34 @@
 				\addplot[domain=#1:#2, samples=150, draw=none, fill=blue!20, fill opacity=0.35] {#3} \closedcycle;
 				\addplot[domain=#4:#5, samples=150, draw=none, fill=blue!60, fill opacity=0.55] {#3} \closedcycle;
 				\addplot[smooth, domain=#1:#2, samples=150] {#3};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\LinearThresholdGraph}[7]{
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\supportA}{#1}
+			\pgfmathsetmacro{\supportB}{#2}
+			\pgfmathsetmacro{\pad}{0.12*(\supportB-\supportA)}
+			\begin{axis}[
+				width=9cm,
+				height=5cm,
+				axis lines=left,
+				xlabel={$x$},
+				ylabel={$f(x)$},
+				xmin={\supportA-\pad},
+				xmax={\supportB+\pad},
+				ymin=0,
+				ymax=#6,
+				grid=both,
+				xtick={#5}
+				]
+				\addplot[domain=#1:#4, samples=180, draw=none, fill=red!25, fill opacity=0.55] {#3} \closedcycle;
+				\addplot[domain=#4:#2, samples=180, draw=none, fill=green!25, fill opacity=0.55] {#3} \closedcycle;
+				\addplot[smooth, domain=#1:#2, samples=180, very thick, blue] {#3};
+				\addplot[dashed, thick, black] coordinates {(#4,0) (#4,#7)};
 			\end{axis}
 		\end{tikzpicture}
 	\end{center}
@@ -626,8 +682,6 @@ So
 \[
 P(\text{loss})=P(V<40)=\frac12(10)\left(\frac{1}{45}\right)\qquad \longrightarrow \qquad P(\text{loss})=\frac{10}{90}\qquad \longrightarrow \qquad P(\text{loss})=\frac{1}{9}.
 \]
-\LinearProbGraph{30}{60}{(x-30)/450}{30}{40}{30,40,50,60}
-
 \textbf{Probability of earning.}
 An earning occurs when the final value is above the purchase price of $40$ million pesos. Since the total probability is $1$ and a loss occurs when the final value is below $40$, we use the complement rule
 \[
@@ -638,7 +692,7 @@ P(\text{earning})=P(V>40)=1-P(V<40).
 \qquad\qquad
 \text{Earning} \rightarrow P(V>40)=1-\frac{1}{9}=\frac{8}{9}
 \]
-\LinearProbGraph{30}{60}{(x-30)/450}{40}{60}{30,40,50,60}
+\LinearThresholdGraph{30}{60}{(x-30)/450}{40}{30,40,50,60}{0.075}{1/15}
 
 \secInicio[sec:online-coffee-sales-investment-c1]
 
@@ -1171,8 +1225,6 @@ Therefore,
 \[
 P(\text{loss})=P(V<65)=\frac{1}{5}+\frac{1}{5}=\frac{2}{5}.
 \]
-\CtwoProbGraph{50}{90}{x < 60 ? 1/50 : (x <= 70 ? 1/25 : 1/50)}{50}{65}{50,60,65,70,90}{6e-2}
-
 \textbf{Probability of earning.}
 An earning occurs when the final value is above the purchase price of $65$ million pesos. Since the total probability is $1$ and a loss occurs when the final value is below $65$, we use the complement rule
 \[
@@ -1186,7 +1238,7 @@ Therefore,
 \[
 P(V>65)=1-\frac{2}{5}\qquad \longrightarrow \qquad P(V>65)=\frac{3}{5}.
 \]
-\CtwoProbGraph{50}{90}{x < 60 ? 1/50 : (x <= 70 ? 1/25 : 1/50)}{65}{90}{50,60,65,70,90}{6e-2}
+\CtwoThresholdGraph{50}{90}{x < 60 ? 1/50 : (x <= 70 ? 1/25 : 1/50)}{65}{50,60,65,70,90}{6e-2}{1/25}
 
 \secInicio[sec:two-scenario-inventory-investment-c2]
 
@@ -1860,33 +1912,7 @@ So this is a valid pdf.
 \subsection*{c) \textbf{(3)} Find the probability of loss and the probability of earning.}
 \phantomsection
 \label{subsec:small-business-investment-c3-c}
-{\renewcommand{\PiecewiseProbGraph}[6]{
-		\begin{center}
-			\begin{tikzpicture}
-				\pgfmathsetmacro{\supportA}{#1}
-				\pgfmathsetmacro{\supportB}{#2}
-				\pgfmathsetmacro{\pad}{0.12*(\supportB-\supportA)}
-				\begin{axis}[
-					width=9cm,
-					height=5cm,
-					axis lines=left,
-					xlabel={$x$},
-					ylabel={$f(x)$},
-					xmin={\supportA-\pad},
-					xmax={\supportB+\pad},
-					ymin=0,
-					ymax=0.1,
-					grid=both,
-					xtick={#6}
-					]
-					\addplot[domain=#1:#2, samples=200, draw=none, fill=blue!20, fill opacity=0.35] {#3} \closedcycle;
-					\addplot[domain=#4:#5, samples=200, draw=none, fill=blue!60, fill opacity=0.55] {#3} \closedcycle;
-					\addplot[smooth, domain=#1:#2, samples=200] {#3};
-				\end{axis}
-			\end{tikzpicture}
-		\end{center}
-	}
-	\textbf{Probability of loss.} A loss occurs when the final value is below the purchase price of $6$ million pesos. On the graph, this is the small triangle from $0$ to $6$.
+\textbf{Probability of loss.} A loss occurs when the final value is below the purchase price of $6$ million pesos. On the graph, this is the small triangle from $0$ to $6$.
 	
 	Its base is
 	\[
@@ -1900,23 +1926,20 @@ So this is a valid pdf.
 	\[
 	P(\text{loss})=P(V<6)=\frac12(6)\left(\frac{1}{30}\right)=\frac{6}{60}=\frac{1}{10}.
 	\]
-	\PiecewiseProbGraph{0}{30}{x <= 12 ? x/180 : (30-x)/270}{0}{6}{0,6,12,30}
-	
-	\textbf{Probability of earning.}
-	An earning occurs when the final value is above the purchase price of $6$ million pesos. Since the total probability is $1$ and a loss occurs when the final value is below $6$, we use the complement rule
-	\[
-	P(\text{earning})=P(V>6)=1-P(V<6).
-	\]
-	From the previous result,
-	\[
-	P(V<6)=\frac{1}{10}.
-	\]
-	Therefore,
-	\[
-	P(V>6)=1-\frac{1}{10}=\frac{9}{10}.
-	\]
-	\PiecewiseProbGraph{0}{30}{x <= 12 ? x/180 : (30-x)/270}{6}{30}{0,6,12,30}
-}
+\textbf{Probability of earning.}
+An earning occurs when the final value is above the purchase price of $6$ million pesos. Since the total probability is $1$ and a loss occurs when the final value is below $6$, we use the complement rule
+\[
+P(\text{earning})=P(V>6)=1-P(V<6).
+\]
+From the previous result,
+\[
+P(V<6)=\frac{1}{10}.
+\]
+Therefore,
+\[
+P(V>6)=1-\frac{1}{10}=\frac{9}{10}.
+\]
+\LinearThresholdGraph{0}{30}{x <= 12 ? x/180 : (30-x)/270}{6}{0,6,12,30}{0.1}{1/30}
 
 \secInicio[sec:small-business-investment-c3]
 
