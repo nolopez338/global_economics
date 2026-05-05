@@ -1,85 +1,135 @@
-% ----------------------------------------------------------
-% GENERAL 
-
-% File
+% ==========================================================
+% DOCUMENT CLASS AND PAGE GEOMETRY
+% ==========================================================
+% Base document type and page margins.
 \documentclass[11pt]{article}
 
-% Margins
-\usepackage[margin=0.5in]{geometry}
+\usepackage[margin=0.4in]{geometry}
 
-\linespread{1.2}            % Line spacing
+% Global page spacing.
+\linespread{1.2}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+% ==========================================================
+% ENCODING AND TYPOGRAPHY
+% ==========================================================
+% Input/font encoding and improved typographic spacing.
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{microtype}
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{6pt}
-\usepackage{booktabs}
 
-% ----------------------------------------------------------
-% TABLES
-\usepackage{multicol}
-\usepackage{longtable} 
-\usepackage{array}
-\usepackage{booktabs}
-\usepackage{tabularx}
-\usepackage{multirow}
+% Optional language configuration.
+% \usepackage[spanish]{babel}
+% \selectlanguage{spanish}
 
-% ----------------------------------------------------------
+% ==========================================================
 % MATHEMATICS
+% ==========================================================
+% Standard mathematics packages.
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsfonts}
 \usepackage{mathtools}
 
-% ----------------------------------------------------------
-% HIDDEN CONTENT
+% ==========================================================
+% TABLES AND MULTICOLUMN LAYOUTS
+% ==========================================================
+% Table, long table, flexible column, and multicolumn support.
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{tabularx}
+
+% Custom table column types.
+% L{width}: left-aligned fixed-width paragraph column.
+% Y: left-aligned flexible tabularx column.
+% C: centered flexible tabularx column.
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+
+% Slightly increases row height in tables.
+\renewcommand{\arraystretch}{1.1}
+
+% ==========================================================
+% CONDITIONALS AND COMMAND-DEFINITION HELPERS
+% ==========================================================
+% ifthen is used for boolean content switching.
+% etoolbox is used for robust conditional tests such as \ifstrempty.
+% xparse is available for future structured command definitions.
 \usepackage{ifthen}
-% Define a boolean switch
+\usepackage{etoolbox}
+\usepackage{xparse}
+
+% Boolean switch for optional explanations.
+% Use \mostrarExplicaciones{true} to show explanations.
+% Use \mostrarExplicaciones{false} to hide explanations.
 \newboolean{explicaciones}
-% Set the boolean switch to true or false
-% Change to true to show the content
 
-% Explanations
-\newcommand{\explicacion}[2]{
-	\ifthenelse{\boolean{explicaciones}}{#1}{#2}
+% \explicacion{shown text}{hidden-mode text}
+% Displays the first argument when explanations are enabled;
+% otherwise displays the second argument.
+% Usage example: \explicacion{Detailed explanation.}{}
+\newcommand{\explicacion}[2]{%
+	\ifthenelse{\boolean{explicaciones}}{#1}{#2}%
 }
-\newcommand{\mostrarExplicaciones}[1]{\setboolean{explicaciones}{#1}}
 
-% ----------------------------------------------------------
-% NUMBERING
+% Sets the explanation switch.
+% Usage example: \mostrarExplicaciones{true}
+\newcommand{\mostrarExplicaciones}[1]{%
+	\setboolean{explicaciones}{#1}%
+}
 
+% Toggle for simplified section-start navigation icons.
+\newif\ifSimpleSecInicio
+\SimpleSecIniciofalse
+
+% ==========================================================
+% PAGE NUMBERING AND TABLE OF CONTENTS
+% ==========================================================
+% Page style setup. The document is configured with no visible page numbers.
 \usepackage{fancyhdr}
-\pagestyle{empty} % Ensures the entire document has no page numbers
+\pagestyle{empty}
 
+% Table of contents formatting.
 \usepackage{tocloft}
-\renewcommand{\cftdot}{} % Remove dots for sections, if any
-\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}} % Remove dots for sections, if any
-\cftpagenumbersoff{section} % Removes page numbers from sections
-\cftpagenumbersoff{subsection} % Removes page numbers from subsections
 
-% ----------------------------------------------------------
-% IMAGES 
+% Removes visible dot leaders and page numbers from section entries.
+\renewcommand{\cftdot}{}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\cftpagenumbersoff{section}
+\cftpagenumbersoff{subsection}
 
-% General settings
-\usepackage{graphicx}       % Insert images
-\usepackage{float}          % Position images
-% \usepackage{subfigure}      % Subfigures
-\graphicspath{{imgs}}       % Image location
-\usepackage{subcaption}     % Subfigures II
+% ==========================================================
+% GRAPHICS, FIGURES, TIKZ, AND PGFPLOTS
+% ==========================================================
+% Image inclusion and figure placement.
+\usepackage{graphicx}
+\usepackage{float}
+% \usepackage{subfigure} % Optional legacy subfigure package.
+\usepackage{subcaption}
 \usepackage{verbatim}
 
-% Figures
+% Default image folder.
+\graphicspath{{imgs}}
+
+% TikZ and plot support.
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,trees}
 \usetikzlibrary{patterns}
 
-\usepackage{xparse}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
 
+% ==========================================================
+% COLORS
+% ==========================================================
+% Shared color palette for links, boxes, backgrounds, and figures.
+\usepackage{xcolor}
 
-% Colors
-\usepackage{xcolor}     
 \definecolor{popUp}{HTML}{666666}
 \definecolor{popUpIn}{HTML}{CED9E0}
 \definecolor{backgroundC}{HTML}{D0E8F2}
@@ -90,26 +140,29 @@
 \definecolor{tocLinkDark}{HTML}{8C3F33}
 \definecolor{taskLinkDarkBlue}{HTML}{0B3D91}
 
-% ----------------------------------------------------------
-% FRAMES
-
-% General settings
+% ==========================================================
+% BOXES AND FRAMES
+% ==========================================================
+% Box and frame packages.
+\usepackage{adjustbox}
+\usepackage{mdframed}
 \usepackage{tcolorbox}
-\usepackage{adjustbox}          % Adjusted frame  
-\setlength{\fboxrule}{3pt}  % Line width
-\setlength{\fboxsep}{3pt}   % Box padding
 
-% General frames
-\usepackage{mdframed}   
+% Global framed-box settings.
+\setlength{\fboxrule}{3pt}
+\setlength{\fboxsep}{3pt}
 
-\mdfdefinestyle{estiloGeneral}{    % General style
+% General mdframed style for highlighted content blocks.
+\mdfdefinestyle{estiloGeneral}{
 	linecolor=black,
 	linewidth=1.5pt,
 	roundcorner=10pt,
 	backgroundcolor=backgroundC,
 	innerbottommargin=0pt
 }
-\mdfdefinestyle{code}{          % Code style
+
+% mdframed style for code-like blocks.
+\mdfdefinestyle{code}{
 	linecolor=black,
 	linewidth=1.5pt,
 	roundcorner=10pt,
@@ -117,50 +170,41 @@
 	innerbottommargin=0pt
 }
 
-% Image frame
+% Inline tcolorbox used for framed links and linked images.
 \newtcbox{\fboxC}{
 	colback=backgroundC,
 	colframe=popUp,
 	arc=10pt,
 	boxrule=3pt,
-	boxsep=0pt, % Change the padding here
+	boxsep=0pt,
 	nobeforeafter
 }
 
-% ----------------------------------------------------------
-% PAGE SETTINGS
+% \cuadro{content}
+% Wraps content in the standard general frame.
+% Usage example: \cuadro{Important information.}
+\newcommand{\cuadro}[1]{%
+	\begin{mdframed}[style=estiloGeneral]
+		#1
+	\end{mdframed}%
+}
 
-% Background 
-\newcommand{\background}[0]{\begin{tikzpicture}[remember picture,overlay]
-		\fill[backgroundC] (-2,2) rectangle (25cm, -550);
-\end{tikzpicture}}
-
-\newcommand{\backgroundC}[0]{\begin{tikzpicture}[remember picture,overlay]
-		\fill[backgroundCC] (-2,2) rectangle (25cm, -550);
-\end{tikzpicture}}
-
-% Page width 
-\newcommand{\anchoPag}[0]{20cm}
-
-% ----------------------------------------------------------
-% FONT
-
-% General
-\usepackage{listings}       % Code typesetting
-% \usepackage[spanish]{babel} % Load Spanish
-% \selectlanguage{spanish}    % Select Spanish
+% ==========================================================
+% LISTS AND CODE FORMATTING
+% ==========================================================
+% List customization.
 \usepackage{enumitem}
-\usepackage{bookmark}
 
-\setlist[itemize]{leftmargin=1.2em, itemsep=0.35em, topsep=0.35em}
+\setlist[itemize]{
+	leftmargin=1.2em,
+	itemsep=0.35em,
+	topsep=0.35em
+}
 
-% --- Table helpers ---
-\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
-\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
-\newcolumntype{C}{>{\centering\arraybackslash}X}
-\renewcommand{\arraystretch}{1.1}
+% Code typesetting.
+\usepackage{listings}
 
-% Python style
+% Python listings style.
 \lstdefinestyle{python}{
 	language=Python,
 	basicstyle=\ttfamily\small,
@@ -175,106 +219,75 @@
 	showspaces=false
 }
 
-% ----------------------------------------------------------
-% HYPERLINKS
+% ==========================================================
+% HYPERLINKS AND NAVIGATION
+% ==========================================================
+% Hyperref should be loaded near the end of the preamble.
+\usepackage{hyperref}
 
-% General
-\usepackage{hyperref}       
 \hypersetup{
 	colorlinks=true,
 	linkcolor=tocLinkDark,
-	filecolor=magenta,      
+	filecolor=magenta,
 	urlcolor=taskLinkDarkBlue,
-	citecolor=tocLinkDark,
+	citecolor=tocLinkDark
 }
 
-% Custom commands 
+% Improved PDF bookmarks; loaded after hyperref.
+\usepackage{bookmark}
 
-% Large link
-\newcommand{\bigLink}[2]{\begin{center} \fboxC{\LARGE{\href{#1}{#2}}}\end{center}}
+% \bigLink{url}{text}
+% Creates a large centered framed hyperlink.
+% Usage example: \bigLink{https://example.com}{Open resource}
+\newcommand{\bigLink}[2]{%
+	\begin{center}
+		\fboxC{\LARGE{\href{#1}{#2}}}
+	\end{center}%
+}
 
-% Small link
-\newcommand{\smallLink}[2]{\begin{center}\fboxC{\href{#1}{#2}}\end{center}}
+% \smallLink{url}{text}
+% Creates a small centered framed hyperlink.
+% Usage example: \smallLink{https://example.com}{Open}
+\newcommand{\smallLink}[2]{%
+	\begin{center}
+		\fboxC{\href{#1}{#2}}
+	\end{center}%
+}
 
-% Bold link
-\newcommand{\bfLink}[2]{\href{#1}{\textbf{#2}}}
+% \bfLink{url}{text}
+% Creates a bold inline hyperlink.
+% Usage example: \bfLink{https://example.com}{Important link}
+\newcommand{\bfLink}[2]{%
+	\href{#1}{\textbf{#2}}%
+}
+
+% \TaskHyperref{label}{text}
+% Creates an internal link using the task-link color.
+% Usage example: \TaskHyperref{sec:task-one}{Go to Task 1}
 \newcommand{\TaskHyperref}[2]{%
 	\hyperref[#1]{\textcolor{taskLinkDarkBlue}{#2}}%
 }
 
-
-% Small URL
-\newcommand{\smallUrl}[1]{\begin{center}\fboxC{\url{#1}}\end{center}}
-
-
-% ----------------------------------------------------------
-% CUSTOM COMMANDS FOR FIGURES
-
-\newcommand{\espacioImagenes}[0]{-1.2cm}
-
-% Without frame
-\newcommand{\fig}[3][\espacioImagenes]{
-	\hspace*{#1}
-	\centering
-	\includegraphics[width=#2\textwidth]{#3}
+% \smallUrl{url}
+% Displays a centered framed URL.
+% Usage example: \smallUrl{https://example.com}
+\newcommand{\smallUrl}[1]{%
+	\begin{center}
+		\fboxC{\url{#1}}
+	\end{center}%
 }
 
-% With frame
-\newcommand{\ffig}[2]{\begin{figure}[h]
-		\hspace*{\espacioImagenes}
-		\centering
-		\fbox{\includegraphics[width=#1\textwidth]{#2}}
-\end{figure}}
-
-% Hyperlink with frame
-\newcommand{\hfig}[3]{\begin{figure}[h]
-		\hspace*{-1.4cm}
-		\centering
-		\color{popUp}
-		\fboxC{\href{#1}{\includegraphics[width=#2\textwidth]{#3}}}
-	\end{figure}
+% \subSecLink{url}{title}
+% Creates an unnumbered subsubsection title as a hyperlink.
+% Usage example: \subSecLink{https://example.com}{Additional practice}
+\newcommand{\subSecLink}[2]{%
+	\subsubsection*{\href{#1}{\textbf{#2}}}%
 }
 
-% Hyperlink without frame
-\newcommand{\hffig}[3]{\begin{figure}[h]
-		\hspace*{-1.1cm}
-		\centering
-		\color{popUp}
-		\href{#1}{\includegraphics[width=#2\textwidth]{#3}}
-	\end{figure}
-}
-
-% ----------------------------------------------------------
-
-% Start and Contents
-\newcommand{\cuadro}[1]{
-	\begin{mdframed}[style=estiloGeneral]
-		#1 
-	\end{mdframed}
-}
-
-% Explanation video image
-\newcommand{\linkExplicacion}[1]{
-	\hffig{#1}{0.5}{principal/videoExplicacion}
-	\vspace{-0.5cm}
-}
-
-\newcommand{\subSecLink}[2]{
-	\subsubsection*{\href{#1}{\textbf{#2}}}
-}
-
-% Spacing
-\newcommand{\esp}[0]{\vspace{4mm}}
-
-\usepackage{etoolbox}
-% Toggle for a simplified section-start icon
-\newif\ifSimpleSecInicio
-\SimpleSecIniciofalse
-
-% Back to table of contents or another linked section
-% Default target: toc
-% Example: \secInicio
-% Example: \secInicio[sec:inicio]
+% \secInicioIcon{color}
+% Draws the navigation icon used by \secInicio.
+% When \SimpleSecIniciotrue is set, the icon is simplified to an arrow.
+% Usage example: \secInicioIcon{links}
 \newcommand{\secInicioIcon}[1]{%
 	\begin{tikzpicture}[scale=0.55]
 		\ifSimpleSecInicio
@@ -302,6 +315,12 @@
 	\end{tikzpicture}%
 }
 
+% \secInicio
+% \secInicio[target-label]
+% Without an argument, links to the table of contents label "toc".
+% With an argument, shows a link to the target and a separate link to "toc".
+% Usage example: \secInicio
+% Usage example: \secInicio[sec:inicio]
 \newcommand{\secInicio}[1][]{%
 	\begin{center}
 		\ifstrempty{#1}{%
@@ -312,4 +331,97 @@
 			\hyperref[toc]{\secInicioIcon{links}}%
 		}%
 	\end{center}%
+}
+
+% ==========================================================
+% CUSTOM LAYOUT AND PAGE COMMANDS
+% ==========================================================
+% \background
+% Draws a large colored background rectangle behind the page content.
+% Usage example: \background
+\newcommand{\background}[0]{%
+	\begin{tikzpicture}[remember picture,overlay]
+		\fill[backgroundC] (-2,2) rectangle (25cm,-550);
+	\end{tikzpicture}%
+}
+
+% \backgroundC
+% Draws a large white background rectangle behind the page content.
+% Kept with its original name for compatibility.
+% Usage example: \backgroundC
+\newcommand{\backgroundC}[0]{%
+	\begin{tikzpicture}[remember picture,overlay]
+		\fill[backgroundCC] (-2,2) rectangle (25cm,-550);
+	\end{tikzpicture}%
+}
+
+% \anchoPag
+% Stores the intended page/content width used by custom layouts.
+% Usage example: \parbox{\anchoPag}{Content}
+\newcommand{\anchoPag}[0]{20cm}
+
+% General vertical spacing helper.
+% Usage example: Text before.\esp Text after.
+\newcommand{\esp}[0]{%
+	\vspace{4mm}%
+}
+
+% ==========================================================
+% CUSTOM FIGURE COMMANDS
+% ==========================================================
+% Horizontal offset used by image commands.
+% Usage example: \hspace*{\espacioImagenes}
+\newcommand{\espacioImagenes}[0]{-1.2cm}
+
+% \fig[horizontal offset]{width fraction}{image path}
+% Inserts an image without a frame.
+% Usage example: \fig{0.8}{example-image}
+% Usage example: \fig[-1cm]{0.8}{example-image}
+\newcommand{\fig}[3][\espacioImagenes]{%
+	\hspace*{#1}
+	\centering
+	\includegraphics[width=#2\textwidth]{#3}%
+}
+
+% \ffig{width fraction}{image path}
+% Inserts a framed image inside a figure environment.
+% Usage example: \ffig{0.8}{example-image}
+\newcommand{\ffig}[2]{%
+	\begin{figure}[h]
+		\hspace*{\espacioImagenes}
+		\centering
+		\fbox{\includegraphics[width=#1\textwidth]{#2}}
+	\end{figure}%
+}
+
+% \hfig{url}{width fraction}{image path}
+% Inserts a framed linked image inside a figure environment.
+% Usage example: \hfig{https://example.com}{0.8}{example-image}
+\newcommand{\hfig}[3]{%
+	\begin{figure}[h]
+		\hspace*{-1.4cm}
+		\centering
+		\color{popUp}
+		\fboxC{\href{#1}{\includegraphics[width=#2\textwidth]{#3}}}
+	\end{figure}%
+}
+
+% \hffig{url}{width fraction}{image path}
+% Inserts a linked image without a frame inside a figure environment.
+% Usage example: \hffig{https://example.com}{0.8}{example-image}
+\newcommand{\hffig}[3]{%
+	\begin{figure}[h]
+		\hspace*{-1.1cm}
+		\centering
+		\color{popUp}
+		\href{#1}{\includegraphics[width=#2\textwidth]{#3}}
+	\end{figure}%
+}
+
+% \linkExplicacion{url}
+% Inserts the standard explanation-video image as a clickable figure.
+% Usage example: \linkExplicacion{https://example.com/video}
+\newcommand{\linkExplicacion}[1]{%
+	\hffig{#1}{0.5}{principal/videoExplicacion}
+	\vspace{-0.5cm}%
 }
