@@ -27,6 +27,7 @@
       --warning-border: #fb923c;
       --flag-bg: #fff1f2;
       --flag-border: #f43f5e;
+      --flag-text: #881337;
     }
 
     * {
@@ -317,7 +318,23 @@
     .integrity-status.flagged {
       border-color: var(--flag-border);
       background: var(--flag-bg);
-      color: #881337;
+      color: var(--flag-text);
+    }
+
+    .certificate-notice {
+      margin-top: 0.75rem;
+      padding: 0.9rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      color: #334e68;
+    }
+
+    .certificate-notice.flagged {
+      border-color: var(--flag-border);
+      background: var(--flag-bg);
+      color: var(--flag-text);
+      font-weight: 700;
     }
 
     .monitoring-summary {
@@ -912,6 +929,7 @@
 
     let activityLog = [];
     let attemptFlagged = false;
+    let suspiciousInterruptionCount = 0;
     let isPracticeActive = false;
     let hasGeneratedQrCode = false;
 
@@ -950,22 +968,13 @@
       });
     }
 
-    function markAttemptFlagged() {
+    function recordSuspiciousInterruption(eventType, description, extraData = {}) {
+      suspiciousInterruptionCount += 1;
       attemptFlagged = true;
-    }
-
-    function getInterruptionCount() {
-      const interruptionEventTypes = [
-        "fullscreen_exited",
-        "fullscreen_request_failed",
-        "fullscreen_unavailable",
-        "page_hidden",
-        "window_blur"
-      ];
-
-      return activityLog.filter(entry =>
-        interruptionEventTypes.includes(entry.eventType)
-      ).length;
+      addActivityLogEntry(eventType, description, {
+        suspiciousInterruption: true,
+        ...extraData
+      });
     }
 
     function resetPracticeState() {
@@ -975,6 +984,7 @@
       hasSubmitted = false;
       activityLog = [];
       attemptFlagged = false;
+      suspiciousInterruptionCount = 0;
       isPracticeActive = false;
 
       resultContainer.innerHTML = "";
@@ -1016,11 +1026,10 @@
 
     function requestPracticeFullscreen() {
       if (!practiceSection.requestFullscreen) {
-        addActivityLogEntry(
+        recordSuspiciousInterruption(
           "fullscreen_unavailable",
           "Fullscreen mode was unavailable in this browser."
         );
-        markAttemptFlagged();
         return;
       }
 
@@ -1033,11 +1042,10 @@
           return;
         }
 
-        addActivityLogEntry(
+        recordSuspiciousInterruption(
           "fullscreen_request_failed",
           "Fullscreen mode did not start or was rejected by the browser."
         );
-        markAttemptFlagged();
       });
     }
 
@@ -1161,9 +1169,17 @@
         ? "Integrity status: Flagged. One or more focus, visibility, or fullscreen interruptions were detected."
         : "Integrity status: No focus or fullscreen interruptions detected.";
 
+      const certificateMessage = attemptFlagged
+        ? "A red flagged certificate will be generated for this attempt because an interruption was detected."
+        : "A normal certificate will be generated for this attempt.";
+
       const integrityClass = attemptFlagged
         ? "integrity-status flagged"
         : "integrity-status";
+
+      const certificateNoticeClass = attemptFlagged
+        ? "certificate-notice flagged"
+        : "certificate-notice";
 
       const logItems = activityLog
         .map(entry => {
@@ -1185,12 +1201,16 @@
           ${integrityMessage}
         </div>
 
+        <div class="${certificateNoticeClass}">
+          ${certificateMessage}
+        </div>
+
         <details class="monitoring-summary" open>
           <summary>Activity Monitoring Summary</summary>
           <div class="monitoring-summary-content">
             <p>Total number of monitoring events: ${activityLog.length}</p>
             <p>Attempt flagged: ${attemptFlagged ? "Yes" : "No"}</p>
-            <p>Recorded interruptions: ${getInterruptionCount()}</p>
+            <p>Suspicious interruptions: ${suspiciousInterruptionCount}</p>
             <ol class="activity-log-list">
               ${logItems}
             </ol>
@@ -1221,17 +1241,21 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
+      if (attemptFlagged) {
+        generateFlaggedCertificate(doc, studentName);
+      } else {
+        generateNormalCertificate(doc, studentName);
+      }
+
+      doc.save(`${studentName.replace(/\s+/g, "_")}_Cellular_Respiration_Certificate.pdf`);
+    }
+
+    function generateNormalCertificate(doc, studentName) {
       const completionDate = new Date().toLocaleDateString(undefined, {
         year: "numeric",
         month: "long",
         day: "numeric"
       });
-
-      const integrityStatus = attemptFlagged
-        ? "Flagged: focus, visibility, or fullscreen interruption detected"
-        : "No focus or fullscreen interruptions detected";
-
-      const interruptionCount = getInterruptionCount();
 
       doc.setFont("helvetica", "bold");
       doc.setFontSize(24);
@@ -1252,28 +1276,95 @@
       doc.text(`Student name: ${studentName}`, 30, 93);
       doc.text(`Date: ${completionDate}`, 30, 108);
       doc.text(`Score: ${lastScore} / 5`, 30, 123);
-      doc.text(`Integrity status: ${integrityStatus}`, 30, 138, {
+      doc.text("Integrity status: No focus or fullscreen interruptions detected", 30, 138, {
         maxWidth: 150
       });
-      doc.text(`Recorded interruptions: ${interruptionCount}`, 30, 153);
 
       doc.setFont("helvetica", "bold");
       doc.setFontSize(12);
-      doc.text("Activity note", 30, 178);
+      doc.text("Activity note", 30, 165);
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(11);
       doc.text(
         "This certificate records completion and basic browser activity during the practice attempt. It is not a secure proctoring report.",
         30,
-        190,
+        177,
         { maxWidth: 150 }
       );
 
       doc.setDrawColor(180, 190, 200);
       doc.roundedRect(20, 18, 170, 245, 5, 5);
+    }
 
-      doc.save(`${studentName.replace(/\s+/g, "_")}_Cellular_Respiration_Certificate.pdf`);
+    function generateFlaggedCertificate(doc, studentName) {
+      const completionDate = new Date().toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      });
+
+      doc.setFillColor(185, 28, 28);
+      doc.rect(20, 18, 170, 32, "F");
+
+      doc.setDrawColor(185, 28, 28);
+      doc.setLineWidth(2);
+      doc.roundedRect(20, 18, 170, 245, 5, 5);
+
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(23);
+      doc.text("Flagged Practice Certificate", 105, 38, {
+        align: "center"
+      });
+
+      doc.setTextColor(185, 28, 28);
+      doc.setFontSize(16);
+      doc.text("FLAGGED ATTEMPT", 105, 68, {
+        align: "center"
+      });
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(12);
+      doc.text(
+        "One or more focus, visibility, or fullscreen interruptions were detected during the practice attempt.",
+        30,
+        82,
+        { maxWidth: 150 }
+      );
+
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(31, 41, 51);
+      doc.setFontSize(13);
+      doc.text(`Biology topic: ${biologyTopic}`, 30, 108);
+      doc.text(`Student name: ${studentName}`, 30, 123);
+      doc.text(`Date: ${completionDate}`, 30, 138);
+      doc.text(`Score: ${lastScore} / 5`, 30, 153);
+      doc.text(`Recorded monitoring events: ${activityLog.length}`, 30, 168);
+      doc.text(`Suspicious interruptions: ${suspiciousInterruptionCount}`, 30, 183);
+
+      doc.setTextColor(185, 28, 28);
+      doc.setFont("helvetica", "bold");
+      doc.text(
+        "Integrity status: Flagged: focus, visibility, or fullscreen interruption detected",
+        30,
+        198,
+        { maxWidth: 150 }
+      );
+
+      doc.setTextColor(31, 41, 51);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.text("Activity note", 30, 225);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+      doc.text(
+        "This certificate records completion and basic browser activity during the practice attempt. It is not a secure proctoring report.",
+        30,
+        237,
+        { maxWidth: 150 }
+      );
     }
 
     function openQrModal() {
@@ -1314,11 +1405,10 @@
       }
 
       if (document.hidden) {
-        addActivityLogEntry(
+        recordSuspiciousInterruption(
           "page_hidden",
           "The page became hidden during the practice attempt."
         );
-        markAttemptFlagged();
       } else {
         addActivityLogEntry(
           "page_visible",
@@ -1332,11 +1422,10 @@
         return;
       }
 
-      addActivityLogEntry(
+      recordSuspiciousInterruption(
         "window_blur",
         "The browser window lost focus during the practice attempt."
       );
-      markAttemptFlagged();
     });
 
     window.addEventListener("focus", () => {
@@ -1361,11 +1450,10 @@
           "Fullscreen mode started for the practice attempt."
         );
       } else {
-        addActivityLogEntry(
+        recordSuspiciousInterruption(
           "fullscreen_exited",
           "Fullscreen mode ended during the practice attempt."
         );
-        markAttemptFlagged();
       }
     });
 
