@@ -254,6 +254,9 @@ const practiceTopic = "[CERTIFICATE TOPIC]";
     const resultContainer = document.getElementById("resultContainer");
     const studentNameInput = document.getElementById("studentName");
 
+    const templateSettings = window.INTERACTIVE_TEMPLATE_SETTINGS || {};
+    const isQRCodeEnabled = templateSettings.enableQRCode === true;
+
     const qrButton = document.getElementById("qrButton");
     const qrModalOverlay = document.getElementById("qrModalOverlay");
     const qrCodeContainer = document.getElementById("qrCodeContainer");
@@ -269,6 +272,53 @@ const practiceTopic = "[CERTIFICATE TOPIC]";
     let suspiciousInterruptionCount = 0;
     let isPracticeActive = false;
     let hasGeneratedQrCode = false;
+
+    function hideQrFeatureUi() {
+      if (qrButton) {
+        qrButton.classList.add("hidden");
+      }
+
+      if (qrModalOverlay) {
+        qrModalOverlay.classList.add("hidden");
+        qrModalOverlay.setAttribute("aria-hidden", "true");
+      }
+    }
+
+    function loadQrLibrary() {
+      return new Promise((resolve, reject) => {
+        if (typeof QRCode !== "undefined") {
+          resolve();
+          return;
+        }
+
+        const script = document.createElement("script");
+        script.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error("Failed to load QR code library."));
+        document.head.appendChild(script);
+      });
+    }
+
+    function initializeQRCodeFeature() {
+      if (!isQRCodeEnabled) {
+        hideQrFeatureUi();
+        return;
+      }
+
+      if (!qrButton || !qrModalOverlay || !qrCodeContainer || !closeQrModalButton) {
+        hideQrFeatureUi();
+        return;
+      }
+
+      qrButton.classList.remove("hidden");
+      qrButton.addEventListener("click", openQrModal);
+      closeQrModalButton.addEventListener("click", closeQrModal);
+
+      loadQrLibrary().catch(() => {
+        qrCodeContainer.textContent = "The QR code library could not be loaded.";
+      });
+    }
 
     function shuffleArray(array) {
       const copiedArray = [...array];
@@ -682,6 +732,10 @@ const practiceTopic = "[CERTIFICATE TOPIC]";
     }
 
     function openQrModal() {
+      if (!isQRCodeEnabled || !qrModalOverlay || !qrCodeContainer || !closeQrModalButton) {
+        return;
+      }
+
       qrModalOverlay.classList.remove("hidden");
       qrModalOverlay.setAttribute("aria-hidden", "false");
 
@@ -708,6 +762,10 @@ const practiceTopic = "[CERTIFICATE TOPIC]";
     }
 
     function closeQrModal() {
+      if (!isQRCodeEnabled || !qrModalOverlay || !qrButton) {
+        return;
+      }
+
       qrModalOverlay.classList.add("hidden");
       qrModalOverlay.setAttribute("aria-hidden", "true");
       qrButton.focus();
@@ -776,5 +834,4 @@ const practiceTopic = "[CERTIFICATE TOPIC]";
     quizForm.addEventListener("submit", submitAnswers);
     downloadButton.addEventListener("click", downloadCertificate);
 
-    qrButton.addEventListener("click", openQrModal);
-    closeQrModalButton.addEventListener("click", closeQrModal);
+    initializeQRCodeFeature();
