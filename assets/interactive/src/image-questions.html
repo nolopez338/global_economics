@@ -10,6 +10,9 @@
     input,textarea,button{width:100%;padding:.55rem;border:1px solid #94a3b8;border-radius:8px} button{font-weight:700;cursor:pointer;background:#2563eb;color:#fff;border:none;margin-top:.6rem}
     .img-wrap{position:relative;border:1px solid #cbd5e1;border-radius:10px;overflow:hidden} img{width:100%;display:block} canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
     .msg{margin-top:.5rem;font-weight:700}
+    .slider-row{margin-top:.5rem}
+    .slider-row .label-line{display:flex;justify-content:space-between;align-items:center;font-weight:700;margin-bottom:.25rem}
+    .slider-row .value{color:#1d4ed8}
   </style>
 </head>
 <body>
@@ -26,6 +29,14 @@
       <label>Question ID</label><input id="questionId" type="text" placeholder="image-question-1" />
       <label>Question Title</label><input id="questionTitle" type="text" placeholder="Identify the target region" />
       <label>Question Prompt</label><textarea id="questionPrompt">Draw over the requested region in the image.</textarea>
+      <div class="slider-row">
+        <div class="label-line"><label for="studentInkPercent">Student ink</label><span class="value" id="studentInkValue">150%</span></div>
+        <input id="studentInkPercent" type="range" min="100" max="200" value="150" step="1" />
+      </div>
+      <div class="slider-row">
+        <div class="label-line"><label for="coverGoalPercent">Cover goal</label><span class="value" id="coverGoalValue">90%</span></div>
+        <input id="coverGoalPercent" type="range" min="30" max="100" value="90" step="1" />
+      </div>
       <label>Brush Size</label><input id="brushSize" type="range" min="1" max="8" value="3" />
       <button id="clearBtn" type="button">Clear Drawing</button>
       <button id="downloadBtn" type="button">Download image-questions-settings.js</button>
@@ -34,6 +45,10 @@
 </div>
 <script>
 const GRID_W=100,GRID_H=100;const img=document.getElementById('targetImage');const canvas=document.getElementById('drawCanvas');const ctx=canvas.getContext('2d');const cells=new Set();const msg=document.getElementById('message');let drawing=false;
+const studentInkSlider=document.getElementById('studentInkPercent');const coverGoalSlider=document.getElementById('coverGoalPercent');const studentInkValue=document.getElementById('studentInkValue');const coverGoalValue=document.getElementById('coverGoalValue');
+function clampPercent(value,min,max,def){const n=Number(value);if(!Number.isFinite(n))return def;return Math.min(max,Math.max(min,Math.round(n)));}
+function updateSliderValues(){studentInkValue.textContent=`${clampPercent(studentInkSlider.value,100,200,150)}%`;coverGoalValue.textContent=`${clampPercent(coverGoalSlider.value,30,100,90)}%`;}
+studentInkSlider.addEventListener('input',updateSliderValues);coverGoalSlider.addEventListener('input',updateSliderValues);updateSliderValues();
 function sync(){const r=img.getBoundingClientRect();canvas.width=Math.max(1,Math.round(r.width));canvas.height=Math.max(1,Math.round(r.height));redraw();}
 function redraw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle='rgba(37,99,235,.35)';cells.forEach(i=>{const x=i%GRID_W,y=Math.floor(i/GRID_W);ctx.fillRect(x*canvas.width/GRID_W,y*canvas.height/GRID_H,canvas.width/GRID_W,canvas.height/GRID_H);});}
 function paint(e){if(!drawing)return;const rect=canvas.getBoundingClientRect();const px=(e.clientX-rect.left)/rect.width*GRID_W;const py=(e.clientY-rect.top)/rect.height*GRID_H;const rad=Number(document.getElementById('brushSize').value);
@@ -43,7 +58,8 @@ window.addEventListener('resize',sync);
 document.getElementById('loadImageBtn').onclick=()=>{const url=document.getElementById('imageUrl').value.trim();if(!url){msg.textContent='Please provide an image URL before loading.';return;}img.src=url;img.onload=()=>{msg.textContent='Image loaded.';sync();};img.onerror=()=>{msg.textContent='Failed to load image.';}};
 document.getElementById('clearBtn').onclick=()=>{cells.clear();redraw();};
 document.getElementById('downloadBtn').onclick=()=>{const imageUrl=document.getElementById('imageUrl').value.trim();if(!imageUrl){msg.textContent='Please provide an image URL.';return;}if(!cells.size){msg.textContent='Draw at least one region before download.';return;}const id=(document.getElementById('questionId').value.trim()||'image-question-1');const title=(document.getElementById('questionTitle').value.trim()||'Identify the target region');const prompt=(document.getElementById('questionPrompt').value.trim()||'Draw over the requested region in the image.');const filledCells=[...cells].sort((a,b)=>a-b);
-const js=`window.InteractiveImageQuestionSettings = {\n  imageQuestions: [\n    {\n      id: ${JSON.stringify(id)},\n      title: ${JSON.stringify(title)},\n      prompt: ${JSON.stringify(prompt)},\n      imageUrl: ${JSON.stringify(imageUrl)},\n      goalRegion: {\n        type: "normalized-mask",\n        width: 100,\n        height: 100,\n        filledCells: ${JSON.stringify(filledCells)}\n      }\n    }\n  ]\n};\n`;
+const studentInkPercent=clampPercent(studentInkSlider.value,100,200,150);const coverGoalPercent=clampPercent(coverGoalSlider.value,30,100,90);
+const js=`window.InteractiveImageQuestionSettings = {\n  imageQuestions: [\n    {\n      id: ${JSON.stringify(id)},\n      title: ${JSON.stringify(title)},\n      prompt: ${JSON.stringify(prompt)},\n      imageUrl: ${JSON.stringify(imageUrl)},\n      studentInkPercent: ${studentInkPercent},\n      coverGoalPercent: ${coverGoalPercent},\n      goalRegion: {\n        type: "normalized-mask",\n        width: 100,\n        height: 100,\n        filledCells: ${JSON.stringify(filledCells)}\n      }\n    }\n  ]\n};\n`;
 const blob=new Blob([js],{type:'application/javascript'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='image-questions-settings.js';a.click();URL.revokeObjectURL(a.href);msg.textContent='Downloaded image-questions-settings.js';};
 </script>
 </body></html>
