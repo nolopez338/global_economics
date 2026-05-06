@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grade 9 History Practice - The French Revolution</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --success: #166534;
+      --success-bg: #dcfce7;
+      --danger: #991b1b;
+      --danger-bg: #fee2e2;
+      --border: #d1d5db;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.55;
+    }
+
+    header {
+      background: linear-gradient(120deg, #1e3a8a, #2563eb);
+      color: white;
+      padding: 1.5rem 1rem;
+      text-align: center;
+    }
+
+    .header-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.7rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+    }
+
+    #qrBtn {
+      padding: 0.45rem 0.8rem;
+      border: 1px solid rgba(255,255,255,0.65);
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+      font-size: 0.95rem;
+    }
+
+    #qrBtn:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 1.25rem auto 2rem;
+      padding: 0 1rem;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.1rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    h2, h3 { margin-top: 0; }
+
+    .intro-grid {
+      display: grid;
+      gap: 0.75rem;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+    .intro-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      padding: 0.8rem;
+      border-radius: 10px;
+    }
+
+    .muted { color: var(--muted); }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: end;
+      margin-bottom: 1rem;
+    }
+
+    label { font-weight: 600; display: block; margin-bottom: 0.25rem; }
+
+    input[type="text"] {
+      width: min(330px, 100%);
+      padding: 0.55rem 0.7rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 1rem;
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-size: 0.98rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--primary);
+      color: white;
+    }
+
+    button:hover { background: var(--primary-dark); }
+    button:disabled { background: #93c5fd; cursor: not-allowed; }
+
+    .question-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.85rem;
+      margin-bottom: 0.85rem;
+      background: #fafafa;
+    }
+
+    .options { display: grid; gap: 0.5rem; margin-top: 0.6rem; }
+
+    .option {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem;
+      background: white;
+    }
+
+    .feedback {
+      margin-top: 0.55rem;
+      padding: 0.6rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+
+    .correct {
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid #86efac;
+    }
+
+    .incorrect {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid #fca5a5;
+    }
+
+    #scoreArea {
+      margin-top: 0.8rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .hidden { display: none; }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+
+    .modal {
+      width: min(420px, 100%);
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.24);
+    }
+
+    #qrcode {
+      margin: 0.8rem auto 1rem;
+      width: 260px;
+      min-height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+    }
+
+    @media (max-width: 700px) {
+      .controls { flex-direction: column; align-items: stretch; }
+      input[type="text"] { width: 100%; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-row">
+      <h1>Grade 9 History Practice: The French Revolution (1789-1799)</h1>
+      <button id="qrBtn" type="button" aria-label="Show QR code for this page">QR</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="card" aria-labelledby="intro-title">
+      <h2 id="intro-title">Historical Introduction</h2>
+      <p>
+        The French Revolution was a major political and social change in France between 1789 and 1799. It began when many people in France challenged the old system of absolute monarchy and unfair social privileges. The revolution changed not only France, but also ideas about rights and government across Europe and the world.
+      </p>
+      <div class="intro-grid">
+        <div class="intro-box">
+          <h3>Key Causes / Background</h3>
+          <ul>
+            <li>French society was divided into three estates, and the Third Estate paid most taxes.</li>
+            <li>France faced severe financial debt from wars and royal spending.</li>
+            <li>Food shortages and high bread prices increased anger among ordinary people.</li>
+            <li>Enlightenment ideas promoted liberty, equality, and popular sovereignty.</li>
+          </ul>
+        </div>
+        <div class="intro-box">
+          <h3>Main Events / Developments</h3>
+          <ul>
+            <li>1789: The Estates-General met, and the Third Estate formed the National Assembly.</li>
+            <li>1789: The storming of the Bastille became a symbol of resistance to royal power.</li>
+            <li>1789: The Declaration of the Rights of Man and of the Citizen announced key rights.</li>
+            <li>1793-1794: The Reign of Terror used executions to defend the revolution.</li>
+            <li>1799: Napoleon Bonaparte took power, ending the revolutionary government phase.</li>
+          </ul>
+        </div>
+        <div class="intro-box">
+          <h3>Main Consequences / Importance</h3>
+          <ul>
+            <li>The monarchy was weakened and eventually abolished.</li>
+            <li>Ideas of citizenship and equality before the law spread widely.</li>
+            <li>Old feudal privileges declined.</li>
+            <li>The revolution inspired later political movements in Europe and beyond.</li>
+          </ul>
+        </div>
+      </div>
+      <p><strong>Summary:</strong> The French Revolution started because of inequality, economic crisis, and new political ideas. Through dramatic events, it transformed France and reshaped modern ideas about rights, government, and citizenship.</p>
+    </section>
+
+    <section class="card" aria-labelledby="practice-title">
+      <h2 id="practice-title">Practice Section</h2>
+      <p class="muted">Enter your name, start the practice, answer 5 random questions, and submit to see your score and explanations.</p>
+
+      <div class="controls">
+        <div>
+          <label for="studentName">Student Name</label>
+          <input type="text" id="studentName" placeholder="Enter your full name" />
+        </div>
+        <button id="startBtn" type="button">Start Practice (5 Random Questions)</button>
+      </div>
+
+      <form id="quizForm" class="hidden" aria-live="polite"></form>
+      <button id="submitBtn" class="hidden" type="button">Submit Answers</button>
+      <div id="scoreArea" aria-live="polite"></div>
+      <button id="downloadBtn" class="hidden" type="button">Download PDF Certificate</button>
+    </section>
+  </main>
+
+
+  <div id="qrModalOverlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="qrModalTitle">
+    <div class="modal">
+      <h2 id="qrModalTitle">Page QR Code</h2>
+      <div id="qrcode" aria-label="QR code for current page"></div>
+      <button id="closeQrBtn" type="button">Close</button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    const questionBank = [
+      { q: "What was a major social cause of the French Revolution?", options: ["Universal voting rights", "Equal taxation for all estates", "Privileges of the First and Second Estates", "Strong industrial unions"], answer: 2, explanation: "The clergy and nobility had many privileges, while the Third Estate carried most tax burdens." },
+      { q: "Why was France in serious financial trouble before 1789?", options: ["No tax system existed", "War debts and royal spending were very high", "Farmers stopped producing food", "France had no trade partners"], answer: 1, explanation: "France had huge debts from wars, including support for the American Revolution, and expensive court life." },
+      { q: "Which group represented most of the French population?", options: ["First Estate", "Second Estate", "Third Estate", "Royal Council"], answer: 2, explanation: "The Third Estate included peasants, workers, and the middle class, making up the vast majority." },
+      { q: "What did the Third Estate do in 1789 when political reform stalled?", options: ["Joined the king's private army", "Formed the National Assembly", "Moved to Britain", "Ended all taxation"], answer: 1, explanation: "Representatives of the Third Estate declared themselves the National Assembly to create a constitution." },
+      { q: "The storming of the Bastille in July 1789 mainly symbolized what?", options: ["Support for absolute monarchy", "The end of all wars", "Resistance to royal authority", "A new trade policy"], answer: 2, explanation: "The Bastille was seen as a symbol of royal power and oppression, so its capture had political meaning." },
+      { q: "Which document declared natural rights during the Revolution?", options: ["Magna Carta", "Napoleonic Code", "Declaration of the Rights of Man and of the Citizen", "Treaty of Versailles"], answer: 2, explanation: "This 1789 declaration proclaimed rights such as liberty and equality before the law." },
+      { q: "Which idea came from Enlightenment thinkers and influenced revolutionaries?", options: ["Kings rule by divine right only", "Citizens should have rights and representation", "Nobles should pay no taxes", "Trade should be banned"], answer: 1, explanation: "Enlightenment writers argued for reason, rights, and government based on the people." },
+      { q: "What was one immediate effect of rising bread prices in the late 1780s?", options: ["Public anger and unrest increased", "Taxes disappeared", "People supported the nobility", "Rural populations declined to zero"], answer: 0, explanation: "Bread was a basic food, so high prices hit ordinary people and fueled protests." },
+      { q: "Which event happened first?", options: ["Reign of Terror", "Napoleon's coup of 1799", "Storming of the Bastille", "Execution of Louis XVI"], answer: 2, explanation: "The Bastille was stormed in 1789, before the other listed events." },
+      { q: "What happened to King Louis XVI during the Revolution?", options: ["He became prime minister", "He fled permanently and ruled from abroad", "He was executed in 1793", "He wrote the Declaration of Rights"], answer: 2, explanation: "Louis XVI was tried for treason and executed by guillotine in 1793." },
+      { q: "The Reign of Terror is best described as a period when...", options: ["France had no government", "Revolutionary leaders used executions against suspected enemies", "The monarchy became stronger", "All European wars ended"], answer: 1, explanation: "Under leaders like Robespierre, many were executed to protect the revolution from perceived threats." },
+      { q: "Who emerged as a key leader in 1799, ending the revolutionary phase?", options: ["Maximilien Robespierre", "Napoleon Bonaparte", "Voltaire", "Louis XVI"], answer: 1, explanation: "Napoleon took power in 1799 through a coup, marking a new phase in French history." },
+      { q: "Why is the French Revolution historically important beyond France?", options: ["It ended all monarchies immediately", "It spread ideas about rights and citizenship", "It created the first democracy in human history", "It prevented all future revolutions"], answer: 1, explanation: "Its ideas influenced reforms and revolutions in many countries." },
+      { q: "Which statement best describes the estate system before 1789?", options: ["All estates had equal political voice", "The Third Estate had the most privileges", "Society was legally unequal by social order", "The estates were elected every year"], answer: 2, explanation: "The legal structure gave different rights and burdens based on estate membership." },
+      { q: "What was a key political goal of many revolutionaries in 1789?", options: ["To strengthen feudal dues", "To create constitutional government", "To restore medieval law", "To abolish education"], answer: 1, explanation: "Many wanted a constitution to limit royal power and recognize citizens' rights." },
+      { q: "Which pair is in correct chronological order?", options: ["Napoleon's coup -> Bastille", "Declaration of Rights -> Estates-General meeting", "Bastille -> Reign of Terror", "Execution of Louis XVI -> National Assembly formed"], answer: 2, explanation: "The Bastille (1789) came before the Reign of Terror (1793-1794)." },
+      { q: "How did the Revolution affect feudal privileges?", options: ["They were expanded", "They were reduced or abolished", "They were exported to colonies", "They were unchanged everywhere"], answer: 1, explanation: "Revolutionary reforms challenged inherited privileges and feudal structures." },
+      { q: "What does 'popular sovereignty' mean in the context of the Revolution?", options: ["Power belongs to foreign allies", "Power belongs to the church", "Political authority comes from the people", "Only nobles may govern"], answer: 2, explanation: "Popular sovereignty means governments gain legitimacy from citizens, not divine right." },
+      { q: "Which factor is an example of an economic cause of revolution?", options: ["High state debt and unfair taxes", "A peaceful transfer of power", "Universal literacy", "Rapid technological automation"], answer: 0, explanation: "Economic pressure from debt and unequal taxation deepened the crisis." },
+      { q: "Which best summarizes the Revolution's long-term impact?", options: ["It preserved absolute monarchy in Europe", "It promoted modern political ideas about rights and equality", "It had no effect after 1800", "It ended social class differences worldwide"], answer: 1, explanation: "Although outcomes were mixed, the revolution advanced influential ideas about rights, law, and citizenship." }
+    ];
+
+    const startBtn = document.getElementById('startBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const quizForm = document.getElementById('quizForm');
+    const scoreArea = document.getElementById('scoreArea');
+    const studentNameInput = document.getElementById('studentName');
+    const qrBtn = document.getElementById('qrBtn');
+    const qrModalOverlay = document.getElementById('qrModalOverlay');
+    const closeQrBtn = document.getElementById('closeQrBtn');
+    const qrCodeContainer = document.getElementById('qrcode');
+
+    let currentSet = [];
+    let lastScore = 0;
+
+    function getRandomQuestions(pool, count) {
+      const copy = [...pool];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy.slice(0, count);
+    }
+
+    function renderQuiz(questions) {
+      quizForm.innerHTML = '';
+      questions.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.innerHTML = `
+          <p><strong>Q${idx + 1}.</strong> ${item.q}</p>
+          <div class="options">
+            ${item.options.map((opt, optIdx) => `
+              <label class="option">
+                <input type="radio" name="q${idx}" value="${optIdx}"> ${opt}
+              </label>
+            `).join('')}
+          </div>
+          <div class="feedback hidden" id="feedback-${idx}"></div>
+        `;
+        quizForm.appendChild(card);
+      });
+    }
+
+    startBtn.addEventListener('click', () => {
+      scoreArea.textContent = '';
+      downloadBtn.classList.add('hidden');
+      currentSet = getRandomQuestions(questionBank, 5);
+      renderQuiz(currentSet);
+      quizForm.classList.remove('hidden');
+      submitBtn.classList.remove('hidden');
+    });
+
+    submitBtn.addEventListener('click', () => {
+      if (currentSet.length !== 5) return;
+
+      let score = 0;
+      currentSet.forEach((q, idx) => {
+        const selected = quizForm.querySelector(`input[name="q${idx}"]:checked`);
+        const feedback = document.getElementById(`feedback-${idx}`);
+
+        if (!selected) {
+          feedback.className = 'feedback incorrect';
+          feedback.innerHTML = `No answer selected.<br><strong>Correct answer:</strong> ${q.options[q.answer]}<br><strong>Explanation:</strong> ${q.explanation}`;
+          return;
+        }
+
+        const picked = Number(selected.value);
+        const isCorrect = picked === q.answer;
+        if (isCorrect) score++;
+
+        feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+        feedback.innerHTML = `${isCorrect ? 'Correct ✅' : 'Incorrect ❌'}<br><strong>Correct answer:</strong> ${q.options[q.answer]}<br><strong>Explanation:</strong> ${q.explanation}`;
+      });
+
+      lastScore = score;
+      scoreArea.textContent = `Score: ${score} / 5`;
+      downloadBtn.classList.remove('hidden');
+    });
+
+    function showQrModal() {
+      qrCodeContainer.innerHTML = '';
+      new QRCode(qrCodeContainer, {
+        text: window.location.href,
+        width: 240,
+        height: 240,
+        correctLevel: QRCode.CorrectLevel.M
+      });
+      qrModalOverlay.classList.remove('hidden');
+    }
+
+    qrBtn.addEventListener('click', showQrModal);
+    closeQrBtn.addEventListener('click', () => qrModalOverlay.classList.add('hidden'));
+
+    downloadBtn.addEventListener('click', () => {
+      const name = studentNameInput.value.trim();
+      if (!name) {
+        alert('Please enter your name before downloading the certificate.');
+        studentNameInput.focus();
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const date = new Date().toLocaleDateString();
+
+      doc.setFontSize(22);
+      doc.text('Practice Certificate', 105, 30, { align: 'center' });
+      doc.setFontSize(13);
+      doc.text('Historical Topic: The French Revolution (1789-1799)', 20, 55);
+      doc.text(`Student Name: ${name}`, 20, 70);
+      doc.text(`Date: ${date}`, 20, 85);
+      doc.text(`Score: ${lastScore} / 5`, 20, 100);
+      doc.text('This certificate confirms completion of the practice activity.', 20, 120);
+
+      doc.save(`history_practice_certificate_${name.replace(/\s+/g, '_')}.pdf`);
+    });
+  </script>
+</body>
+</html>
