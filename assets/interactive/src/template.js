@@ -254,7 +254,13 @@ const practiceTopic = "[CERTIFICATE TOPIC]";
     const resultContainer = document.getElementById("resultContainer");
     const studentNameInput = document.getElementById("studentName");
 
-    const templateSettings = window.INTERACTIVE_TEMPLATE_SETTINGS || {};
+    const templateSettings = window.InteractiveTemplateSettings || {};
+    const subjects = templateSettings.subjects || {};
+    const selectedSubjectKey = templateSettings.selectedSubjectKey || "math";
+    const selectedSubject = subjects[selectedSubjectKey] || subjects.math || {
+      label: "Math",
+      paletteClass: "subject-math"
+    };
     const isQRCodeEnabled = templateSettings.enableQRCode === true;
     const isFullscreenMonitoringEnabled =
       templateSettings.enableFullscreenMonitoring === true;
@@ -264,6 +270,25 @@ const practiceTopic = "[CERTIFICATE TOPIC]";
     const qrCodeContainer = document.getElementById("qrCodeContainer");
     const closeQrModalButton = document.getElementById("closeQrModalButton");
     const monitoringNotice = document.getElementById("monitoringNotice");
+
+    function applySubjectPalette() {
+      const body = document.body;
+      if (!body) {
+        return;
+      }
+
+      const availablePaletteClasses = Object.values(subjects)
+        .map(subject => subject && subject.paletteClass)
+        .filter(Boolean);
+
+      if (availablePaletteClasses.length > 0) {
+        body.classList.remove(...availablePaletteClasses);
+      }
+
+      body.classList.add(selectedSubject.paletteClass || "subject-math");
+    }
+
+    applySubjectPalette();
 
     if (monitoringNotice && !isFullscreenMonitoringEnabled) {
       monitoringNotice.classList.add("hidden");
