@@ -46,6 +46,12 @@ let isPracticeActive = false;
 let hasGeneratedQrCode = false;
 let imageQuestionStates = {};
 
+function sanitizePercent(value, min, max, defaultValue) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return defaultValue;
+  return Math.min(max, Math.max(min, Math.round(n)));
+}
+
 function sanitizeImageQuestion(question) {
   if (!question || !question.goalRegion || question.goalRegion.type !== "normalized-mask") return null;
   const width = Number(question.goalRegion.width);
@@ -55,7 +61,9 @@ function sanitizeImageQuestion(question) {
   const max = width * height;
   const dedup = [...new Set(cells.map(Number).filter(i => Number.isInteger(i) && i >= 0 && i < max))].sort((a,b)=>a-b);
   if (dedup.length === 0) return null;
-  return { ...question, goalRegion: { type: "normalized-mask", width, height, filledCells: dedup } };
+  const studentInkPercent = sanitizePercent(question.studentInkPercent, 100, 200, 150);
+  const coverGoalPercent = sanitizePercent(question.coverGoalPercent, 30, 100, 90);
+  return { ...question, studentInkPercent, coverGoalPercent, goalRegion: { type: "normalized-mask", width, height, filledCells: dedup } };
 }
 
 function buildSelectedQuestions() {
@@ -91,15 +99,34 @@ function renderImageQuestion(questionCard, questionItem, questionIndex) {
   const img = document.createElement("img"); img.className = "image-question-image"; img.src = questionItem.imageUrl || ""; img.alt = questionItem.title || "Image question";
   const canvas = document.createElement("canvas"); canvas.className = "image-question-canvas";
   const controls = document.createElement("div"); controls.className = "image-question-controls";
-  const inkIndicator = document.createElement("div"); inkIndicator.className = "ink-indicator";
+  const metrics = document.createElement("div"); metrics.className = "image-question-metrics";
+  const inkAvailable = document.createElement("div"); inkAvailable.className = "ink-indicator";
+  const inkRemaining = document.createElement("div"); inkRemaining.className = "ink-indicator";
+  const coverageRequired = document.createElement("div"); coverageRequired.className = "ink-indicator";
   const clearBtn = document.createElement("button"); clearBtn.type = "button"; clearBtn.textContent = "Clear Drawing"; clearBtn.className = "secondary-button";
-  controls.append(inkIndicator, clearBtn); wrapper.append(img, canvas); questionCard.append(wrapper, status, controls);
+  metrics.append(inkAvailable, inkRemaining, coverageRequired);
+  controls.append(metrics, clearBtn); wrapper.append(img, canvas); questionCard.append(wrapper, status, controls);
 
   const goalSet = new Set(questionItem.goalRegion.filledCells);
-  const budget = Math.floor(goalSet.size * 1.5);
-  const state = imageQuestionStates[questionIndex] || { covered: new Set(), unavailable: false, loaded: false };
+  const goalArea = goalSet.size;
+  const studentInkPercent = sanitizePercent(questionItem.studentInkPercent, 100, 200, 150);
+  const coverGoalPercent = sanitizePercent(questionItem.coverGoalPercent, 30, 100, 90);
+  const budget = goalArea * (studentInkPercent / 100);
+  const requiredCoveredGoalCells = Math.ceil(goalArea * (coverGoalPercent / 100));
+
+  const state = imageQuestionStates[questionIndex] || { covered: new Set(), unavailable: false, loaded: false, studentInkPercent, coverGoalPercent, inkBudget: budget, requiredCoveredGoalCells };
+  state.studentInkPercent = studentInkPercent;
+  state.coverGoalPercent = coverGoalPercent;
+  state.inkBudget = budget;
+  state.requiredCoveredGoalCells = requiredCoveredGoalCells;
   imageQuestionStates[questionIndex] = state;
-  const updateInk = () => { inkIndicator.textContent = `Ink remaining: ${Math.max(0, budget - state.covered.size)} / ${budget}`; };
+
+  const updateInk = () => {
+    const remaining = Math.max(0, Math.floor(state.inkBudget - state.covered.size));
+    inkAvailable.textContent = `Ink available: ${state.studentInkPercent}% of goal area`;
+    inkRemaining.textContent = `Ink remaining: ${remaining} / ${Math.floor(state.inkBudget)}`;
+    coverageRequired.textContent = `Required coverage: ${state.coverGoalPercent}% of goal region`;
+  };
   updateInk();
 
   function syncCanvas(){const rect=img.getBoundingClientRect();canvas.width=Math.max(1,Math.round(rect.width));canvas.height=Math.max(1,Math.round(rect.height));const ctx=canvas.getContext("2d");ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle="rgba(37,99,235,0.35)";state.covered.forEach(index=>{const x=index%questionItem.goalRegion.width;const y=Math.floor(index/questionItem.goalRegion.width);ctx.fillRect(x*canvas.width/questionItem.goalRegion.width,y*canvas.height/questionItem.goalRegion.height,canvas.width/questionItem.goalRegion.width,canvas.height/questionItem.goalRegion.height);});}
@@ -110,7 +137,7 @@ function renderImageQuestion(questionCard, questionItem, questionIndex) {
 
   let drawing=false;
   const brushRadius=2;
-  function paint(ev){if(!drawing||hasSubmitted||state.unavailable||!state.loaded) return;const rect=canvas.getBoundingClientRect();const px=(ev.clientX-rect.left)/rect.width*questionItem.goalRegion.width;const py=(ev.clientY-rect.top)/rect.height*questionItem.goalRegion.height;for(let y=Math.floor(py-brushRadius);y<=Math.ceil(py+brushRadius);y++){for(let x=Math.floor(px-brushRadius);x<=Math.ceil(px+brushRadius);x++){if(x<0||y<0||x>=questionItem.goalRegion.width||y>=questionItem.goalRegion.height)continue;const dx=x+0.5-px,dy=y+0.5-py;if(dx*dx+dy*dy>brushRadius*brushRadius)continue;const idx=y*questionItem.goalRegion.width+x;if(!state.covered.has(idx)){if(state.covered.size>=budget)break;state.covered.add(idx);}}}syncCanvas();updateInk();}
+  function paint(ev){if(!drawing||hasSubmitted||state.unavailable||!state.loaded) return;const rect=canvas.getBoundingClientRect();const px=(ev.clientX-rect.left)/rect.width*questionItem.goalRegion.width;const py=(ev.clientY-rect.top)/rect.height*questionItem.goalRegion.height;for(let y=Math.floor(py-brushRadius);y<=Math.ceil(py+brushRadius);y++){for(let x=Math.floor(px-brushRadius);x<=Math.ceil(px+brushRadius);x++){if(x<0||y<0||x>=questionItem.goalRegion.width||y>=questionItem.goalRegion.height)continue;const dx=x+0.5-px,dy=y+0.5-py;if(dx*dx+dy*dy>brushRadius*brushRadius)continue;const idx=y*questionItem.goalRegion.width+x;if(!state.covered.has(idx)){if(state.covered.size>=state.inkBudget) return;state.covered.add(idx);}}}syncCanvas();updateInk();}
   canvas.addEventListener("pointerdown",e=>{drawing=true;canvas.setPointerCapture(e.pointerId);paint(e);});
   canvas.addEventListener("pointermove",paint);
   canvas.addEventListener("pointerup",()=>drawing=false);
@@ -118,10 +145,12 @@ function renderImageQuestion(questionCard, questionItem, questionIndex) {
   clearBtn.addEventListener("click",()=>{if(hasSubmitted) return;state.covered.clear();syncCanvas();updateInk();});
 
   if (hasSubmitted) {
-    const missing = [...goalSet].some(i => !state.covered.has(i));
+    let coveredGoalCells = 0;
+    goalSet.forEach(i => { if (state.covered.has(i)) coveredGoalCells += 1; });
+    const isCorrect = !state.unavailable && coveredGoalCells >= state.requiredCoveredGoalCells;
     const feedback = document.createElement("div");
-    feedback.className = `feedback ${!state.unavailable && !missing ? "correct" : "incorrect"}`;
-    feedback.innerHTML = `<strong>${!state.unavailable && !missing ? "Correct." : "Incorrect."}</strong> ${questionItem.explanation || "You must fully cover the goal region."}`;
+    feedback.className = `feedback ${isCorrect ? "correct" : "incorrect"}`;
+    feedback.innerHTML = `<strong>${isCorrect ? "Correct." : "Incorrect."}</strong> ${questionItem.explanation || "Cover the required percentage of the goal region to be marked correct."}`;
     questionCard.appendChild(feedback);
     clearBtn.disabled = true;
   }
@@ -131,7 +160,7 @@ function renderQuestions(){questionsContainer.innerHTML="";selectedQuestions.for
 if(questionItem.type==="image"){renderImageQuestion(card,questionItem,questionIndex);}else{const options=document.createElement("div");options.className="options";questionItem.options.forEach((text,optionIndex)=>{const optionId=`question-${questionIndex}-option-${optionIndex}`;const label=document.createElement("label");label.className="option-label";label.setAttribute("for",optionId);const input=document.createElement("input");input.type="radio";input.id=optionId;input.name=`question-${questionIndex}`;input.value=String(optionIndex);input.disabled=hasSubmitted;if(selectedAnswers[questionIndex]===String(optionIndex))input.checked=true;if(hasSubmitted){const selected=Number(selectedAnswers[questionIndex]);if(optionIndex===questionItem.correctIndex)label.classList.add("correct-answer");if(optionIndex===selected&&selected!==questionItem.correctIndex)label.classList.add("incorrect-answer");}const span=document.createElement("span");span.textContent=text;label.append(input,span);options.appendChild(label);});card.appendChild(options);if(hasSubmitted){const ok=Number(selectedAnswers[questionIndex])===questionItem.correctIndex;const feedback=document.createElement("div");feedback.className=`feedback ${ok?"correct":"incorrect"}`;feedback.innerHTML=`<strong>${ok?"Correct.":"Incorrect."}</strong> Correct answer: ${questionItem.options[questionItem.correctIndex]}<br />${questionItem.explanation}`;card.appendChild(feedback);}}
 questionsContainer.appendChild(card);});}
 
-function submitAnswers(event){event.preventDefault();const formData=new FormData(quizForm);selectedAnswers=selectedQuestions.map((item,i)=>item.type==="image"?"image":formData.get(`question-${i}`));const unanswered=selectedQuestions.findIndex((item,i)=>item.type!=="image"&&selectedAnswers[i]===null);if(unanswered!==-1){alert(`Please answer question ${unanswered+1}.`);return;}lastScore=selectedQuestions.reduce((score,item,i)=>{if(item.type==="image"){const st=imageQuestionStates[i];if(!st||st.unavailable)return score;const goal=item.goalRegion.filledCells;const ok=goal.every(index=>st.covered.has(index));return ok?score+1:score;}return Number(selectedAnswers[i])===item.correctIndex?score+1:score;},0);hasSubmitted=true;isPracticeActive=false;submitButton.disabled=true;downloadButton.classList.remove("hidden");renderQuestions();renderSubmissionResult();}
+function submitAnswers(event){event.preventDefault();const formData=new FormData(quizForm);selectedAnswers=selectedQuestions.map((item,i)=>item.type==="image"?"image":formData.get(`question-${i}`));const unanswered=selectedQuestions.findIndex((item,i)=>item.type!=="image"&&selectedAnswers[i]===null);if(unanswered!==-1){alert(`Please answer question ${unanswered+1}.`);return;}lastScore=selectedQuestions.reduce((score,item,i)=>{if(item.type==="image"){const st=imageQuestionStates[i];if(!st||st.unavailable)return score;const goal=item.goalRegion.filledCells;const coveredGoalCells=goal.reduce((count,index)=>count+(st.covered.has(index)?1:0),0);const ok=coveredGoalCells>=st.requiredCoveredGoalCells;return ok?score+1:score;}return Number(selectedAnswers[i])===item.correctIndex?score+1:score;},0);hasSubmitted=true;isPracticeActive=false;submitButton.disabled=true;downloadButton.classList.remove("hidden");renderQuestions();renderSubmissionResult();}
 function renderSubmissionResult(){const integrityMessage=isFullscreenMonitoringEnabled?(attemptFlagged?"Integrity status: Flagged. One or more focus, visibility, or fullscreen interruptions were detected.":"Integrity status: No focus or fullscreen interruptions detected."):"Integrity status: Monitoring disabled for fullscreen, focus, and visibility events.";const certificateMessage=isFullscreenMonitoringEnabled?(attemptFlagged?"A red flagged certificate will be generated for this attempt because an interruption was detected.":"A normal certificate will be generated for this attempt."):"A normal certificate will be generated for this attempt.";resultContainer.innerHTML=`<div class="score-box">Score: ${lastScore} / ${selectedQuestions.length}</div><div class="${attemptFlagged?"integrity-status flagged":"integrity-status"}">${integrityMessage}</div><div class="${attemptFlagged?"certificate-notice flagged":"certificate-notice"}">${certificateMessage}</div>`;}
 
 function downloadCertificate(){/* unchanged behavior */const studentName=studentNameInput.value.trim();if(!studentName){alert("Please enter your name before downloading the certificate.");studentNameInput.focus();return;}if(!hasSubmitted){alert("Please submit the practice activity before downloading the certificate.");return;}if(!window.jspdf||!window.jspdf.jsPDF){alert("The PDF library could not be loaded. Please check your internet connection and try again.");return;}const {jsPDF}=window.jspdf;const doc=new jsPDF();if(attemptFlagged){generateFlaggedCertificate(doc,studentName);}else{generateNormalCertificate(doc,studentName);}doc.save(`${studentName.replace(/\s+/g,"_")}_${practiceTopic.replace(/[^a-z0-9]+/gi,"_")}_Certificate.pdf`);}
