@@ -36,9 +36,29 @@
       text-align: center;
     }
 
+    .header-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.7rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
     header h1 {
       margin: 0;
       font-size: clamp(1.5rem, 3vw, 2.2rem);
+    }
+
+    #qrBtn {
+      padding: 0.45rem 0.8rem;
+      border: 1px solid rgba(255,255,255,0.65);
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+      font-size: 0.95rem;
+    }
+
+    #qrBtn:hover {
+      background: rgba(255,255,255,0.3);
     }
 
     main {
@@ -150,6 +170,37 @@
 
     .hidden { display: none; }
 
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+
+    .modal {
+      width: min(420px, 100%);
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.24);
+    }
+
+    #qrcode {
+      margin: 0.8rem auto 1rem;
+      width: 260px;
+      min-height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+    }
+
     @media (max-width: 700px) {
       .controls { flex-direction: column; align-items: stretch; }
       input[type="text"] { width: 100%; }
@@ -159,7 +210,10 @@
 </head>
 <body>
   <header>
-    <h1>Grade 9 History Practice: The French Revolution (1789-1799)</h1>
+    <div class="header-row">
+      <h1>Grade 9 History Practice: The French Revolution (1789-1799)</h1>
+      <button id="qrBtn" type="button" aria-label="Show QR code for this page">QR</button>
+    </div>
   </header>
 
   <main>
@@ -220,7 +274,17 @@
     </section>
   </main>
 
+
+  <div id="qrModalOverlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="qrModalTitle">
+    <div class="modal">
+      <h2 id="qrModalTitle">Page QR Code</h2>
+      <div id="qrcode" aria-label="QR code for current page"></div>
+      <button id="closeQrBtn" type="button">Close</button>
+    </div>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script>
     const questionBank = [
       { q: "What was a major social cause of the French Revolution?", options: ["Universal voting rights", "Equal taxation for all estates", "Privileges of the First and Second Estates", "Strong industrial unions"], answer: 2, explanation: "The clergy and nobility had many privileges, while the Third Estate carried most tax burdens." },
@@ -251,6 +315,10 @@
     const quizForm = document.getElementById('quizForm');
     const scoreArea = document.getElementById('scoreArea');
     const studentNameInput = document.getElementById('studentName');
+    const qrBtn = document.getElementById('qrBtn');
+    const qrModalOverlay = document.getElementById('qrModalOverlay');
+    const closeQrBtn = document.getElementById('closeQrBtn');
+    const qrCodeContainer = document.getElementById('qrcode');
 
     let currentSet = [];
     let lastScore = 0;
@@ -319,6 +387,20 @@
       scoreArea.textContent = `Score: ${score} / 5`;
       downloadBtn.classList.remove('hidden');
     });
+
+    function showQrModal() {
+      qrCodeContainer.innerHTML = '';
+      new QRCode(qrCodeContainer, {
+        text: window.location.href,
+        width: 240,
+        height: 240,
+        correctLevel: QRCode.CorrectLevel.M
+      });
+      qrModalOverlay.classList.remove('hidden');
+    }
+
+    qrBtn.addEventListener('click', showQrModal);
+    closeQrBtn.addEventListener('click', () => qrModalOverlay.classList.add('hidden'));
 
     downloadBtn.addEventListener('click', () => {
       const name = studentNameInput.value.trim();
