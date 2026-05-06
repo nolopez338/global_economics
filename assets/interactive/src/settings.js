@@ -1,6 +1,8 @@
 window.InteractiveTemplateSettings = {
   enableQRCode: true,
   enableFullscreenMonitoring: true,
+  enableImageQuestions: true,
+  numberOfImageQuestions: 1,
 
   selectedSubjectKey: "math",
 
