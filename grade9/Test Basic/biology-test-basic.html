@@ -25,6 +25,8 @@
       --info-border: #10b981;
       --warning-bg: #fff7ed;
       --warning-border: #fb923c;
+      --flag-bg: #fff1f2;
+      --flag-border: #f43f5e;
     }
 
     * {
@@ -104,6 +106,17 @@
       box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
     }
 
+    #practiceSection:fullscreen {
+      overflow: auto;
+      background: var(--bg);
+      padding: 2rem;
+    }
+
+    #practiceSection:fullscreen .practice-fullscreen-inner {
+      width: min(1050px, 100%);
+      margin: 0 auto;
+    }
+
     h2 {
       margin-top: 0;
       color: #102a43;
@@ -140,6 +153,15 @@
       padding: 1rem;
       border-radius: 10px;
       margin-top: 1rem;
+    }
+
+    .monitoring-notice {
+      background: #f8fafc;
+      border-left: 5px solid var(--info-border);
+      border-radius: 10px;
+      padding: 0.9rem;
+      margin-top: 1rem;
+      color: #243b53;
     }
 
     .practice-controls {
@@ -280,6 +302,64 @@
       font-size: 1.25rem;
       font-weight: 700;
       color: #065f46;
+    }
+
+    .integrity-status {
+      margin-top: 0.75rem;
+      padding: 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--success-border);
+      background: var(--success-bg);
+      color: #14532d;
+      font-weight: 700;
+    }
+
+    .integrity-status.flagged {
+      border-color: var(--flag-border);
+      background: var(--flag-bg);
+      color: #881337;
+    }
+
+    .monitoring-summary {
+      margin-top: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #ffffff;
+      overflow: hidden;
+    }
+
+    .monitoring-summary summary {
+      cursor: pointer;
+      padding: 1rem;
+      font-weight: 700;
+      background: #f8fafc;
+      color: #102a43;
+    }
+
+    .monitoring-summary-content {
+      padding: 1rem;
+    }
+
+    .monitoring-summary-content p {
+      margin: 0 0 0.6rem;
+    }
+
+    .activity-log-list {
+      margin: 0.75rem 0 0;
+      padding-left: 1.2rem;
+    }
+
+    .activity-log-list li {
+      margin-bottom: 0.5rem;
+    }
+
+    .event-type {
+      font-family: Consolas, Monaco, monospace;
+      font-size: 0.95rem;
+      color: #334e68;
+      background: #f1f5f9;
+      padding: 0.12rem 0.28rem;
+      border-radius: 5px;
     }
 
     .muted {
@@ -482,47 +562,54 @@
       </div>
     </section>
 
-    <section aria-labelledby="practice-title">
-      <h2 id="practice-title">Interactive Practice</h2>
-      <p class="muted">
-        Enter your name, start the task, answer 5 randomly selected questions,
-        and download your certificate after submitting.
-      </p>
+    <section id="practiceSection" aria-labelledby="practice-title">
+      <div class="practice-fullscreen-inner">
+        <h2 id="practice-title">Interactive Practice</h2>
+        <p class="muted">
+          Enter your name, start the task, answer 5 randomly selected questions,
+          and download your certificate after submitting.
+        </p>
 
-      <div class="practice-controls">
-        <div>
-          <label for="studentName">Student name</label>
-          <input
-            type="text"
-            id="studentName"
-            name="studentName"
-            placeholder="Enter your full name"
-            autocomplete="name"
-          />
+        <div class="monitoring-notice">
+          When the activity starts, the page will enter fullscreen mode and will
+          record focus, visibility, and fullscreen interruptions.
         </div>
 
-        <button id="startButton" type="button">Start Practice</button>
-        <button id="resetButton" type="button" class="secondary-button hidden">
-          New Random Task
-        </button>
-      </div>
+        <div class="practice-controls">
+          <div>
+            <label for="studentName">Student name</label>
+            <input
+              type="text"
+              id="studentName"
+              name="studentName"
+              placeholder="Enter your full name"
+              autocomplete="name"
+            />
+          </div>
 
-      <form id="quizForm" class="hidden" aria-live="polite">
-        <div id="questionsContainer"></div>
-
-        <div class="button-row">
-          <button id="submitButton" type="submit">Submit Answers</button>
-          <button
-            id="downloadButton"
-            type="button"
-            class="certificate-button hidden"
-          >
-            Download PDF Certificate
+          <button id="startButton" type="button">Start Practice</button>
+          <button id="resetButton" type="button" class="secondary-button hidden">
+            New Random Task
           </button>
         </div>
-      </form>
 
-      <div id="resultContainer" aria-live="polite"></div>
+        <form id="quizForm" class="hidden" aria-live="polite">
+          <div id="questionsContainer"></div>
+
+          <div class="button-row">
+            <button id="submitButton" type="submit">Submit Answers</button>
+            <button
+              id="downloadButton"
+              type="button"
+              class="certificate-button hidden"
+            >
+              Download PDF Certificate
+            </button>
+          </div>
+        </form>
+
+        <div id="resultContainer" aria-live="polite"></div>
+      </div>
     </section>
   </main>
 
@@ -803,6 +890,7 @@
       }
     ];
 
+    const practiceSection = document.getElementById("practiceSection");
     const startButton = document.getElementById("startButton");
     const resetButton = document.getElementById("resetButton");
     const submitButton = document.getElementById("submitButton");
@@ -821,6 +909,10 @@
     let selectedAnswers = [];
     let lastScore = 0;
     let hasSubmitted = false;
+
+    let activityLog = [];
+    let attemptFlagged = false;
+    let isPracticeActive = false;
     let hasGeneratedQrCode = false;
 
     function shuffleArray(array) {
@@ -837,6 +929,59 @@
       return copiedArray;
     }
 
+    function getTimestamp() {
+      return new Date().toISOString();
+    }
+
+    function formatTimestamp(timestamp) {
+      return new Date(timestamp).toLocaleString();
+    }
+
+    function isFullscreenActive() {
+      return Boolean(document.fullscreenElement);
+    }
+
+    function addActivityLogEntry(eventType, description, extraData = {}) {
+      activityLog.push({
+        eventType,
+        timestamp: getTimestamp(),
+        description,
+        ...extraData
+      });
+    }
+
+    function markAttemptFlagged() {
+      attemptFlagged = true;
+    }
+
+    function getInterruptionCount() {
+      const interruptionEventTypes = [
+        "fullscreen_exited",
+        "fullscreen_request_failed",
+        "fullscreen_unavailable",
+        "page_hidden",
+        "window_blur"
+      ];
+
+      return activityLog.filter(entry =>
+        interruptionEventTypes.includes(entry.eventType)
+      ).length;
+    }
+
+    function resetPracticeState() {
+      selectedQuestions = [];
+      selectedAnswers = [];
+      lastScore = 0;
+      hasSubmitted = false;
+      activityLog = [];
+      attemptFlagged = false;
+      isPracticeActive = false;
+
+      resultContainer.innerHTML = "";
+      downloadButton.classList.add("hidden");
+      submitButton.disabled = false;
+    }
+
     function startPractice() {
       const studentName = studentNameInput.value.trim();
 
@@ -846,18 +991,54 @@
         return;
       }
 
-      selectedQuestions = shuffleArray(questionDatabase).slice(0, 5);
-      selectedAnswers = [];
-      lastScore = 0;
-      hasSubmitted = false;
+      resetPracticeState();
 
-      resultContainer.innerHTML = "";
-      downloadButton.classList.add("hidden");
+      selectedQuestions = shuffleArray(questionDatabase).slice(0, 5);
+      isPracticeActive = true;
+
+      addActivityLogEntry(
+        "activity_started",
+        "The Biology practice activity started.",
+        {
+          currentUrl: window.location.href,
+          initialFullscreenStatus: isFullscreenActive(),
+          initialVisibilityState: document.visibilityState
+        }
+      );
+
+      requestPracticeFullscreen();
+
       resetButton.classList.remove("hidden");
-      submitButton.disabled = false;
       quizForm.classList.remove("hidden");
 
       renderQuestions();
+    }
+
+    function requestPracticeFullscreen() {
+      if (!practiceSection.requestFullscreen) {
+        addActivityLogEntry(
+          "fullscreen_unavailable",
+          "Fullscreen mode was unavailable in this browser."
+        );
+        markAttemptFlagged();
+        return;
+      }
+
+      if (isFullscreenActive()) {
+        return;
+      }
+
+      practiceSection.requestFullscreen().catch(() => {
+        if (!isPracticeActive || hasSubmitted) {
+          return;
+        }
+
+        addActivityLogEntry(
+          "fullscreen_request_failed",
+          "Fullscreen mode did not start or was rejected by the browser."
+        );
+        markAttemptFlagged();
+      });
     }
 
     function renderQuestions() {
@@ -967,16 +1148,55 @@
       }, 0);
 
       hasSubmitted = true;
+      isPracticeActive = false;
       submitButton.disabled = true;
       downloadButton.classList.remove("hidden");
+
+      renderQuestions();
+      renderSubmissionResult();
+    }
+
+    function renderSubmissionResult() {
+      const integrityMessage = attemptFlagged
+        ? "Integrity status: Flagged. One or more focus, visibility, or fullscreen interruptions were detected."
+        : "Integrity status: No focus or fullscreen interruptions detected.";
+
+      const integrityClass = attemptFlagged
+        ? "integrity-status flagged"
+        : "integrity-status";
+
+      const logItems = activityLog
+        .map(entry => {
+          return `
+            <li>
+              <span class="event-type">${entry.eventType}</span>
+              ${formatTimestamp(entry.timestamp)} — ${entry.description}
+            </li>
+          `;
+        })
+        .join("");
 
       resultContainer.innerHTML = `
         <div class="score-box">
           Score: ${lastScore} / 5
         </div>
-      `;
 
-      renderQuestions();
+        <div class="${integrityClass}">
+          ${integrityMessage}
+        </div>
+
+        <details class="monitoring-summary" open>
+          <summary>Activity Monitoring Summary</summary>
+          <div class="monitoring-summary-content">
+            <p>Total number of monitoring events: ${activityLog.length}</p>
+            <p>Attempt flagged: ${attemptFlagged ? "Yes" : "No"}</p>
+            <p>Recorded interruptions: ${getInterruptionCount()}</p>
+            <ol class="activity-log-list">
+              ${logItems}
+            </ol>
+          </div>
+        </details>
+      `;
     }
 
     function downloadCertificate() {
@@ -1007,6 +1227,12 @@
         day: "numeric"
       });
 
+      const integrityStatus = attemptFlagged
+        ? "Flagged: focus, visibility, or fullscreen interruption detected"
+        : "No focus or fullscreen interruptions detected";
+
+      const interruptionCount = getInterruptionCount();
+
       doc.setFont("helvetica", "bold");
       doc.setFontSize(24);
       doc.text("Practice Certificate", 105, 30, { align: "center" });
@@ -1026,17 +1252,21 @@
       doc.text(`Student name: ${studentName}`, 30, 93);
       doc.text(`Date: ${completionDate}`, 30, 108);
       doc.text(`Score: ${lastScore} / 5`, 30, 123);
+      doc.text(`Integrity status: ${integrityStatus}`, 30, 138, {
+        maxWidth: 150
+      });
+      doc.text(`Recorded interruptions: ${interruptionCount}`, 30, 153);
 
       doc.setFont("helvetica", "bold");
       doc.setFontSize(12);
-      doc.text("Activity details", 30, 148);
+      doc.text("Activity note", 30, 178);
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(11);
       doc.text(
-        "The student completed a five-question Biology practice task selected randomly from a database of twenty questions.",
+        "This certificate records completion and basic browser activity during the practice attempt. It is not a secure proctoring report.",
         30,
-        160,
+        190,
         { maxWidth: 150 }
       );
 
@@ -1077,6 +1307,67 @@
       qrModalOverlay.setAttribute("aria-hidden", "true");
       qrButton.focus();
     }
+
+    document.addEventListener("visibilitychange", () => {
+      if (!isPracticeActive || hasSubmitted) {
+        return;
+      }
+
+      if (document.hidden) {
+        addActivityLogEntry(
+          "page_hidden",
+          "The page became hidden during the practice attempt."
+        );
+        markAttemptFlagged();
+      } else {
+        addActivityLogEntry(
+          "page_visible",
+          "The page became visible again during the practice attempt."
+        );
+      }
+    });
+
+    window.addEventListener("blur", () => {
+      if (!isPracticeActive || hasSubmitted) {
+        return;
+      }
+
+      addActivityLogEntry(
+        "window_blur",
+        "The browser window lost focus during the practice attempt."
+      );
+      markAttemptFlagged();
+    });
+
+    window.addEventListener("focus", () => {
+      if (!isPracticeActive || hasSubmitted) {
+        return;
+      }
+
+      addActivityLogEntry(
+        "window_focus",
+        "The browser window regained focus during the practice attempt."
+      );
+    });
+
+    document.addEventListener("fullscreenchange", () => {
+      if (!isPracticeActive || hasSubmitted) {
+        return;
+      }
+
+      if (document.fullscreenElement) {
+        addActivityLogEntry(
+          "fullscreen_entered",
+          "Fullscreen mode started for the practice attempt."
+        );
+      } else {
+        addActivityLogEntry(
+          "fullscreen_exited",
+          "Fullscreen mode ended during the practice attempt."
+        );
+        markAttemptFlagged();
+      }
+    });
 
     startButton.addEventListener("click", startPractice);
     resetButton.addEventListener("click", startPractice);
