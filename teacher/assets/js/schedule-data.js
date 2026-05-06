@@ -838,7 +838,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Wednesday",
     "Day": "Day 5",
-    "Description": "C4: Learning Evidence",
+    "Description": "No class: Environment talk",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -851,7 +851,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 1",
-    "Description": "C5 C6 C7: Problems on Normal Distributions",
+    "Description": "C4: Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7"
