@@ -256,11 +256,18 @@ const practiceTopic = "[CERTIFICATE TOPIC]";
 
     const templateSettings = window.INTERACTIVE_TEMPLATE_SETTINGS || {};
     const isQRCodeEnabled = templateSettings.enableQRCode === true;
+    const isFullscreenMonitoringEnabled =
+      templateSettings.enableFullscreenMonitoring === true;
 
     const qrButton = document.getElementById("qrButton");
     const qrModalOverlay = document.getElementById("qrModalOverlay");
     const qrCodeContainer = document.getElementById("qrCodeContainer");
     const closeQrModalButton = document.getElementById("closeQrModalButton");
+    const monitoringNotice = document.getElementById("monitoringNotice");
+
+    if (monitoringNotice && !isFullscreenMonitoringEnabled) {
+      monitoringNotice.classList.add("hidden");
+    }
 
     let selectedQuestions = [];
     let selectedAnswers = [];
@@ -403,7 +410,9 @@ const practiceTopic = "[CERTIFICATE TOPIC]";
         }
       );
 
-      requestPracticeFullscreen();
+      if (isFullscreenMonitoringEnabled) {
+        requestPracticeFullscreen();
+      }
 
       resetButton.classList.remove("hidden");
       quizForm.classList.remove("hidden");
@@ -435,6 +444,71 @@ const practiceTopic = "[CERTIFICATE TOPIC]";
         );
       });
     }
+
+    function initializeFullscreenMonitoringFeature() {
+      if (!isFullscreenMonitoringEnabled) {
+        return;
+      }
+
+      document.addEventListener("visibilitychange", () => {
+        if (!isPracticeActive || hasSubmitted) {
+          return;
+        }
+
+        if (document.hidden) {
+          recordSuspiciousInterruption(
+            "page_hidden",
+            "The page became hidden during the practice attempt."
+          );
+        } else {
+          addActivityLogEntry(
+            "page_visible",
+            "The page became visible again during the practice attempt."
+          );
+        }
+      });
+
+      window.addEventListener("blur", () => {
+        if (!isPracticeActive || hasSubmitted) {
+          return;
+        }
+
+        recordSuspiciousInterruption(
+          "window_blur",
+          "The browser window lost focus during the practice attempt."
+        );
+      });
+
+      window.addEventListener("focus", () => {
+        if (!isPracticeActive || hasSubmitted) {
+          return;
+        }
+
+        addActivityLogEntry(
+          "window_focus",
+          "The browser window regained focus during the practice attempt."
+        );
+      });
+
+      document.addEventListener("fullscreenchange", () => {
+        if (!isPracticeActive || hasSubmitted) {
+          return;
+        }
+
+        if (document.fullscreenElement) {
+          addActivityLogEntry(
+            "fullscreen_entered",
+            "Fullscreen mode started for the practice attempt."
+          );
+        } else {
+          recordSuspiciousInterruption(
+            "fullscreen_exited",
+            "Fullscreen mode ended during the practice attempt."
+          );
+        }
+      });
+    }
+
 
     function renderQuestions() {
       questionsContainer.innerHTML = "";
@@ -552,12 +626,16 @@ const practiceTopic = "[CERTIFICATE TOPIC]";
     }
 
     function renderSubmissionResult() {
-      const integrityMessage = attemptFlagged
-        ? "Integrity status: Flagged. One or more focus, visibility, or fullscreen interruptions were detected."
-        : "Integrity status: No focus or fullscreen interruptions detected.";
+      const integrityMessage = isFullscreenMonitoringEnabled
+        ? attemptFlagged
+          ? "Integrity status: Flagged. One or more focus, visibility, or fullscreen interruptions were detected."
+          : "Integrity status: No focus or fullscreen interruptions detected."
+        : "Integrity status: Monitoring disabled for fullscreen, focus, and visibility events.";
 
-      const certificateMessage = attemptFlagged
-        ? "A red flagged certificate will be generated for this attempt because an interruption was detected."
+      const certificateMessage = isFullscreenMonitoringEnabled
+        ? attemptFlagged
+          ? "A red flagged certificate will be generated for this attempt because an interruption was detected."
+          : "A normal certificate will be generated for this attempt."
         : "A normal certificate will be generated for this attempt.";
 
       const integrityClass = attemptFlagged
@@ -771,67 +849,10 @@ const practiceTopic = "[CERTIFICATE TOPIC]";
       qrButton.focus();
     }
 
-    document.addEventListener("visibilitychange", () => {
-      if (!isPracticeActive || hasSubmitted) {
-        return;
-      }
-
-      if (document.hidden) {
-        recordSuspiciousInterruption(
-          "page_hidden",
-          "The page became hidden during the practice attempt."
-        );
-      } else {
-        addActivityLogEntry(
-          "page_visible",
-          "The page became visible again during the practice attempt."
-        );
-      }
-    });
-
-    window.addEventListener("blur", () => {
-      if (!isPracticeActive || hasSubmitted) {
-        return;
-      }
-
-      recordSuspiciousInterruption(
-        "window_blur",
-        "The browser window lost focus during the practice attempt."
-      );
-    });
-
-    window.addEventListener("focus", () => {
-      if (!isPracticeActive || hasSubmitted) {
-        return;
-      }
-
-      addActivityLogEntry(
-        "window_focus",
-        "The browser window regained focus during the practice attempt."
-      );
-    });
-
-    document.addEventListener("fullscreenchange", () => {
-      if (!isPracticeActive || hasSubmitted) {
-        return;
-      }
-
-      if (document.fullscreenElement) {
-        addActivityLogEntry(
-          "fullscreen_entered",
-          "Fullscreen mode started for the practice attempt."
-        );
-      } else {
-        recordSuspiciousInterruption(
-          "fullscreen_exited",
-          "Fullscreen mode ended during the practice attempt."
-        );
-      }
-    });
-
     startButton.addEventListener("click", startPractice);
     resetButton.addEventListener("click", startPractice);
     quizForm.addEventListener("submit", submitAnswers);
     downloadButton.addEventListener("click", downloadCertificate);
 
     initializeQRCodeFeature();
+    initializeFullscreenMonitoringFeature();
