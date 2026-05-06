@@ -284,51 +284,50 @@
 	\subsubsection*{\href{#1}{\textbf{#2}}}%
 }
 
-% \secInicioIcon{color}
+% \secInicioIcon{color}{direction}
 % Draws the navigation icon used by \secInicio.
-% When \SimpleSecIniciotrue is set, the icon is simplified to an arrow.
-% Usage example: \secInicioIcon{links}
-\newcommand{\secInicioIcon}[1]{%
+% direction can be: up, down, toc.
+% When \SimpleSecIniciotrue is set, the icon is simplified to arrows.
+% Usage example: \secInicioIcon{links}{toc}
+\NewDocumentCommand{\secInicioIcon}{m m}{%
 	\begin{tikzpicture}[scale=0.55]
 		\ifSimpleSecInicio
-		\draw[
-		->,
-		draw=#1,
-		line width=2.4pt,
-		line cap=round
-		] (0,-1.10) -- (0,0.50);
+			\IfEqCase{#2}{%
+				{down}{\draw[->,draw=#1,line width=2.4pt,line cap=round] (0,0.60) -- (0,-1.00);}%
+			}{%
+				\draw[->,draw=#1,line width=2.4pt,line cap=round] (0,-1.10) -- (0,0.50);%
+			}%
 		\else
-		\draw[
-		draw=#1,
-		line width=1.4pt,
-		line join=round
-		]
-		(-0.35,-1.20) --
-		(0.35,-1.20) --
-		(0.35,0.10) --
-		(0.75,0.10) --
-		(0,1.10) --
-		(-0.75,0.10) --
-		(-0.35,0.10) --
-		cycle;
+			\IfEqCase{#2}{%
+				{down}{\draw[draw=#1,line width=1.4pt,line join=round,rotate=180] (-0.35,-1.20) -- (0.35,-1.20) -- (0.35,0.10) -- (0.75,0.10) -- (0,1.10) -- (-0.75,0.10) -- (-0.35,0.10) -- cycle;}%
+			}{%
+				\draw[draw=#1,line width=1.4pt,line join=round] (-0.35,-1.20) -- (0.35,-1.20) -- (0.35,0.10) -- (0.75,0.10) -- (0,1.10) -- (-0.75,0.10) -- (-0.35,0.10) -- cycle;%
+			}%
 		\fi
 	\end{tikzpicture}%
 }
 
 % \secInicio
-% \secInicio[target-label]
-% Without an argument, links to the table of contents label "toc".
-% With an argument, shows a link to the target and a separate link to "toc".
+% \secInicio[current-section-label]
+% \secInicio[current-section-label][next-section-label]
+% Without arguments, links to the table of contents label "toc".
+% With one argument, shows current-section and toc links.
+% With two arguments, also shows next-section link.
 % Usage example: \secInicio
 % Usage example: \secInicio[sec:inicio]
-\newcommand{\secInicio}[1][]{%
+% Usage example: \secInicio[sec:inicio][sec:siguiente]
+\NewDocumentCommand{\secInicio}{O{} O{}}{%
 	\begin{center}
 		\ifstrempty{#1}{%
-			\hyperref[toc]{\secInicioIcon{links}}%
+			\hyperref[toc]{\secInicioIcon{links}{toc}}%
 		}{%
-			\hyperref[#1]{\secInicioIcon{blue!70!black}}%
+			\hyperref[#1]{\secInicioIcon{blue!70!black}{up}}%
 			\hspace{0.8em}%
-			\hyperref[toc]{\secInicioIcon{links}}%
+			\hyperref[toc]{\secInicioIcon{links}{toc}}%
+			\ifstrempty{#2}{}{%
+				\hspace{0.8em}%
+				\hyperref[#2]{\secInicioIcon{blue!70!black}{down}}%
+			}%
 		}%
 	\end{center}%
 }
