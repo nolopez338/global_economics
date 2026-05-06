@@ -1,8 +1,6 @@
 window.InteractiveTemplateSettings = {
   enableQRCode: true,
   enableFullscreenMonitoring: true,
-  enableImageQuestions: true,
-  numberOfImageQuestions: 1,
 
   selectedSubjectKey: "math",
 
@@ -31,5 +29,11 @@ window.InteractiveTemplateSettings = {
       label: "History",
       paletteClass: "subject-history"
     }
-  }
+  },
+
+  totalQuestions: 5,
+  enableMultipleChoiceQuestions: true,
+
+  enableImageQuestions: true,
+  numberOfImageQuestions: 1
 };
