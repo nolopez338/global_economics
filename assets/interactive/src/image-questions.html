@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Question Authoring Tool</title>
+  <style>
+    body{font-family:Arial,sans-serif;margin:1rem;background:#f8fafc;color:#0f172a} .panel{max-width:1100px;margin:auto;background:#fff;padding:1rem;border:1px solid #cbd5e1;border-radius:12px}
+    .grid{display:grid;grid-template-columns:1fr 280px;gap:1rem} .controls label{display:block;font-weight:700;margin-top:.6rem}
+    input,textarea,button{width:100%;padding:.55rem;border:1px solid #94a3b8;border-radius:8px} button{font-weight:700;cursor:pointer;background:#2563eb;color:#fff;border:none;margin-top:.6rem}
+    .img-wrap{position:relative;border:1px solid #cbd5e1;border-radius:10px;overflow:hidden} img{width:100%;display:block} canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+    .msg{margin-top:.5rem;font-weight:700}
+  </style>
+</head>
+<body>
+<div class="panel">
+  <h1>Image Question Settings Generator</h1>
+  <div class="grid">
+    <div>
+      <div class="img-wrap"><img id="targetImage" alt="Target" /><canvas id="drawCanvas"></canvas></div>
+      <div class="msg" id="message"></div>
+    </div>
+    <div class="controls">
+      <label>Image URL</label><input id="imageUrl" type="text" placeholder="https://..." />
+      <button id="loadImageBtn" type="button">Load Image</button>
+      <label>Question ID</label><input id="questionId" type="text" placeholder="image-question-1" />
+      <label>Question Title</label><input id="questionTitle" type="text" placeholder="Identify the target region" />
+      <label>Question Prompt</label><textarea id="questionPrompt">Draw over the requested region in the image.</textarea>
+      <label>Brush Size</label><input id="brushSize" type="range" min="1" max="8" value="3" />
+      <button id="clearBtn" type="button">Clear Drawing</button>
+      <button id="downloadBtn" type="button">Download image-questions-settings.js</button>
+    </div>
+  </div>
+</div>
+<script>
+const GRID_W=100,GRID_H=100;const img=document.getElementById('targetImage');const canvas=document.getElementById('drawCanvas');const ctx=canvas.getContext('2d');const cells=new Set();const msg=document.getElementById('message');let drawing=false;
+function sync(){const r=img.getBoundingClientRect();canvas.width=Math.max(1,Math.round(r.width));canvas.height=Math.max(1,Math.round(r.height));redraw();}
+function redraw(){ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle='rgba(37,99,235,.35)';cells.forEach(i=>{const x=i%GRID_W,y=Math.floor(i/GRID_W);ctx.fillRect(x*canvas.width/GRID_W,y*canvas.height/GRID_H,canvas.width/GRID_W,canvas.height/GRID_H);});}
+function paint(e){if(!drawing)return;const rect=canvas.getBoundingClientRect();const px=(e.clientX-rect.left)/rect.width*GRID_W;const py=(e.clientY-rect.top)/rect.height*GRID_H;const rad=Number(document.getElementById('brushSize').value);
+for(let y=Math.floor(py-rad);y<=Math.ceil(py+rad);y++)for(let x=Math.floor(px-rad);x<=Math.ceil(px+rad);x++){if(x<0||y<0||x>=GRID_W||y>=GRID_H)continue;const dx=x+0.5-px,dy=y+0.5-py;if(dx*dx+dy*dy<=rad*rad)cells.add(y*GRID_W+x);}redraw();}
+canvas.addEventListener('pointerdown',e=>{drawing=true;canvas.setPointerCapture(e.pointerId);paint(e);});canvas.addEventListener('pointermove',paint);canvas.addEventListener('pointerup',()=>drawing=false);canvas.addEventListener('pointerleave',()=>drawing=false);
+window.addEventListener('resize',sync);
+document.getElementById('loadImageBtn').onclick=()=>{const url=document.getElementById('imageUrl').value.trim();if(!url){msg.textContent='Please provide an image URL before loading.';return;}img.src=url;img.onload=()=>{msg.textContent='Image loaded.';sync();};img.onerror=()=>{msg.textContent='Failed to load image.';}};
+document.getElementById('clearBtn').onclick=()=>{cells.clear();redraw();};
+document.getElementById('downloadBtn').onclick=()=>{const imageUrl=document.getElementById('imageUrl').value.trim();if(!imageUrl){msg.textContent='Please provide an image URL.';return;}if(!cells.size){msg.textContent='Draw at least one region before download.';return;}const id=(document.getElementById('questionId').value.trim()||'image-question-1');const title=(document.getElementById('questionTitle').value.trim()||'Identify the target region');const prompt=(document.getElementById('questionPrompt').value.trim()||'Draw over the requested region in the image.');const filledCells=[...cells].sort((a,b)=>a-b);
+const js=`window.InteractiveImageQuestionSettings = {\n  imageQuestions: [\n    {\n      id: ${JSON.stringify(id)},\n      title: ${JSON.stringify(title)},\n      prompt: ${JSON.stringify(prompt)},\n      imageUrl: ${JSON.stringify(imageUrl)},\n      goalRegion: {\n        type: "normalized-mask",\n        width: 100,\n        height: 100,\n        filledCells: ${JSON.stringify(filledCells)}\n      }\n    }\n  ]\n};\n`;
+const blob=new Blob([js],{type:'application/javascript'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='image-questions-settings.js';a.click();URL.revokeObjectURL(a.href);msg.textContent='Downloaded image-questions-settings.js';};
+</script>
+</body></html>
