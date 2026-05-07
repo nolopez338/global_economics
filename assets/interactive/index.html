@@ -4,33 +4,53 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Interactive Template Control Page</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 1rem; background: #f8fafc; color: #0f172a; }
-    .panel { max-width: 900px; margin: 0 auto; background: #fff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 1.2rem; }
-    h1 { margin-top: 0; }
-    ul { padding-left: 1.2rem; }
-    li { margin-bottom: .9rem; }
-    a { font-weight: 700; color: #1d4ed8; }
-    p { margin: .35rem 0 0; color: #334155; }
-  </style>
+  <link rel="stylesheet" href="shared/interactive.css" />
+  <script src="template/src/settings.js"></script>
 </head>
 <body>
-  <div class="panel">
-    <h1>Interactive Template Control Page</h1>
-    <ul>
-      <li>
-        <a href="template/template.html">Open Interactive Test Template</a>
-        <p>Launch the student-facing interactive template and test flow.</p>
-      </li>
-      <li>
-        <a href="tools/image-questions.html">Open Image Questions Tool</a>
-        <p>Create or merge image-question settings and download the database file.</p>
-      </li>
-      <li>
-        <a href="tools/multiple_choice_questions.html">Open Multiple Choice Questions Tool</a>
-        <p>Upload CSV/XLSX question data, preview rows, and download the multiple-choice database file.</p>
-      </li>
-    </ul>
+  <div class="page-shell">
+    <header class="page-header"><h1>Interactive Template Control Page</h1><p class="page-description">Configure settings.js and validate question capacity using uploaded databases.</p></header>
+    <nav class="tool-nav">
+      <a class="button-link" href="template/template.html">Open Interactive Test Template</a>
+      <a class="button-link" href="tools/image-questions.html">Open Image Questions Tool</a>
+      <a class="button-link" href="tools/multiple_choice_questions.html">Open Multiple Choice Questions Tool</a>
+    </nav>
+    <section class="panel-card"><h2>Runtime settings</h2><p class="muted-note">Upload database files to refine valid ranges.</p>
+      <div class="form-row inline"><input id="enableQRCode" type="checkbox"><label for="enableQRCode">Enable QR code</label></div>
+      <div class="form-row inline"><input id="enableFullscreenMonitoring" type="checkbox"><label for="enableFullscreenMonitoring">Enable fullscreen monitoring</label></div>
+      <div class="form-row"><label for="selectedSubjectKey">Subject</label><select id="selectedSubjectKey"></select><div id="subjectList" class="muted-note"></div></div>
+      <div class="form-row"><label for="totalQuestions">Total questions</label><input id="totalQuestions" type="number" min="1" max="999"></div>
+      <div class="form-row inline"><input id="enableMultipleChoiceQuestions" type="checkbox"><label for="enableMultipleChoiceQuestions">Enable multiple-choice questions</label></div>
+      <div class="form-row inline"><input id="enableImageQuestions" type="checkbox"><label for="enableImageQuestions">Enable image questions</label></div>
+      <div class="form-row"><label for="numberOfImageQuestions">Number of image questions</label><input id="numberOfImageQuestions" type="number" min="0" max="999"></div>
+    </section>
+    <section class="panel-card"><h2>Database uploads</h2>
+      <div class="form-row"><label for="imageDb">Image questions settings (.js)</label><input id="imageDb" type="file" accept=".js"><div id="imageDbMsg" class="status-message"></div></div>
+      <div class="form-row"><label for="mcqDb">Multiple-choice database (.js)</label><input id="mcqDb" type="file" accept=".js"><div id="mcqDbMsg" class="status-message"></div></div>
+      <div class="database-summary-grid">
+        <div class="summary-item">Valid image questions: <strong id="imageCount">0</strong></div>
+        <div class="summary-item">Valid multiple-choice questions: <strong id="mcqCount">0</strong></div>
+        <div class="summary-item">Total available questions: <strong id="totalAvailable">0</strong></div>
+      </div>
+    </section>
+    <section class="panel-card"><h2>Live preview</h2><pre id="preview"></pre><div id="validation" class="validation-message"></div><div class="download-row"><button id="downloadBtn" type="button">Download settings.js</button></div></section>
   </div>
+<script>
+const defaults=window.InteractiveTemplateSettings||{}; const subjects=defaults.subjects||{};
+const state={imageUploaded:false,mcqUploaded:false,imageCount:0,mcqCount:0};
+const el=id=>document.getElementById(id); const ids=['enableQRCode','enableFullscreenMonitoring','selectedSubjectKey','totalQuestions','enableMultipleChoiceQuestions','enableImageQuestions','numberOfImageQuestions'];
+function isValidMcq(q){if(!q||!q.prompt||!Array.isArray(q.options)||q.options.length<2||!q.correctOptionId)return false;const ids=new Set(q.options.map(o=>String(o&&o.id||'').trim().toUpperCase()).filter(Boolean));return ids.has(String(q.correctOptionId).trim().toUpperCase());}
+function isValidImage(q){const g=q&&q.goalRegion;return !!(q&&q.imageUrl&&g&&g.type==='normalized-mask'&&Number.isFinite(Number(g.width))&&Number.isFinite(Number(g.height))&&Array.isArray(g.filledCells)&&g.filledCells.length);}
+function parseUploaded(text,key){const fakeWindow={};new Function('window',text)(fakeWindow);return fakeWindow[key];}
+function setMsg(node,cls,msg){node.className='status-message '+cls; node.textContent=msg;}
+function getConfig(){const c={enableQRCode:el('enableQRCode').checked,enableFullscreenMonitoring:el('enableFullscreenMonitoring').checked,selectedSubjectKey:el('selectedSubjectKey').value,subjects,totalQuestions:Number(el('totalQuestions').value),enableMultipleChoiceQuestions:el('enableMultipleChoiceQuestions').checked,enableImageQuestions:el('enableImageQuestions').checked,numberOfImageQuestions:Number(el('numberOfImageQuestions').value)}; if(!c.enableImageQuestions)c.numberOfImageQuestions=0; return c;}
+function getMaxTotal(cfg){if(!state.imageUploaded&&!state.mcqUploaded) return 999; const mcq=cfg.enableMultipleChoiceQuestions?state.mcqCount:0; const img=cfg.enableImageQuestions?state.imageCount:0; return Math.max(1,mcq+img);}
+function refreshRanges(){const cfg=getConfig(); const maxTotal=getMaxTotal(cfg); el('totalQuestions').max=String(maxTotal); if(cfg.totalQuestions>maxTotal)el('totalQuestions').value=maxTotal; if(Number(el('totalQuestions').value)<1)el('totalQuestions').value=1; const imgMax=Math.min(Number(el('totalQuestions').value), cfg.enableImageQuestions?state.imageCount:0); el('numberOfImageQuestions').max=String(Math.max(0,imgMax)); el('numberOfImageQuestions').disabled=!cfg.enableImageQuestions; if(!cfg.enableImageQuestions)el('numberOfImageQuestions').value=0; if(Number(el('numberOfImageQuestions').value)>imgMax)el('numberOfImageQuestions').value=imgMax; }
+function validate(){const cfg=getConfig();const errs=[];if(!subjects[cfg.selectedSubjectKey])errs.push('selectedSubjectKey must exist in subjects.');if(!cfg.enableImageQuestions&&!cfg.enableMultipleChoiceQuestions)errs.push('Both question types cannot be disabled.');if(cfg.totalQuestions<1)errs.push('totalQuestions must be at least 1.');if((state.imageUploaded||state.mcqUploaded)&&cfg.totalQuestions>getMaxTotal(cfg))errs.push('totalQuestions exceeds available uploaded questions.');if(cfg.numberOfImageQuestions>cfg.totalQuestions)errs.push('numberOfImageQuestions exceeds totalQuestions.');if(state.imageUploaded&&cfg.numberOfImageQuestions>state.imageCount)errs.push('numberOfImageQuestions exceeds uploaded image question count.');if(!cfg.enableMultipleChoiceQuestions&&state.imageUploaded&&cfg.totalQuestions>state.imageCount)errs.push('Not enough image questions for totalQuestions when multiple-choice is disabled.');return errs;}
+function refreshPreview(){refreshRanges(); const cfg=getConfig(); const inferred=Math.max(0,cfg.totalQuestions-cfg.numberOfImageQuestions); el('imageCount').textContent=state.imageCount; el('mcqCount').textContent=state.mcqCount; el('totalAvailable').textContent=state.imageCount+state.mcqCount; el('preview').textContent=JSON.stringify({selectedSubject:cfg.selectedSubjectKey,enableQRCode:cfg.enableQRCode,enableFullscreenMonitoring:cfg.enableFullscreenMonitoring,enableMultipleChoiceQuestions:cfg.enableMultipleChoiceQuestions,enableImageQuestions:cfg.enableImageQuestions,totalQuestions:cfg.totalQuestions,numberOfImageQuestions:cfg.numberOfImageQuestions,inferredMultipleChoiceQuestions:inferred,validUploadedMultipleChoiceQuestionCount:state.mcqCount,validUploadedImageQuestionCount:state.imageCount},null,2); const errs=validate(); const v=el('validation'); if(errs.length){v.className='validation-message status-error';v.textContent=errs.join(' ');} else {v.className='validation-message status-success';v.textContent='Settings are valid.';} }
+async function handleUpload(inputId,msgId,key,validator,stateKeys){const file=el(inputId).files&&el(inputId).files[0]; if(!file)return; const msg=el(msgId); if(!file.name.toLowerCase().endsWith('.js')){setMsg(msg,'status-warning','Please upload a .js file.'); return;} try{const parsed=parseUploaded(await file.text(),key); const list=parsed&&(key==='InteractiveImageQuestionSettings'?parsed.imageQuestions:parsed.questions); if(!Array.isArray(list)) throw new Error('missing array'); const count=list.filter(validator).length; state[stateKeys.upload]=true; state[stateKeys.count]=count; setMsg(msg,'status-success',`Valid entries detected: ${count}.`);}catch(e){state[stateKeys.upload]=true; state[stateKeys.count]=0; setMsg(msg,'status-warning','Malformed or invalid file. Count reset to 0.');} refreshPreview();}
+function downloadSettings(){const errs=validate(); if(errs.length){refreshPreview(); return;} const cfg=getConfig(); const out={...cfg,subjects}; const js=`window.InteractiveTemplateSettings = ${JSON.stringify(out,null,2)};\n`; const blob=new Blob([js],{type:'application/javascript'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='settings.js'; a.click(); URL.revokeObjectURL(a.href);} 
+(function init(){ el('enableQRCode').checked=defaults.enableQRCode!==false; el('enableFullscreenMonitoring').checked=defaults.enableFullscreenMonitoring!==false; const keys=Object.keys(subjects); el('selectedSubjectKey').innerHTML=keys.map(k=>`<option value="${k}">${subjects[k].label||k}</option>`).join(''); el('selectedSubjectKey').value=defaults.selectedSubjectKey||keys[0]||''; el('subjectList').textContent='Available subjects: '+keys.map(k=>`${subjects[k].label} (${k})`).join(', '); el('totalQuestions').value=Number(defaults.totalQuestions||5); el('enableMultipleChoiceQuestions').checked=defaults.enableMultipleChoiceQuestions!==false; el('enableImageQuestions').checked=defaults.enableImageQuestions!==false; el('numberOfImageQuestions').value=Number(defaults.numberOfImageQuestions||0); ids.forEach(i=>el(i).addEventListener('input',refreshPreview)); el('imageDb').addEventListener('change',()=>handleUpload('imageDb','imageDbMsg','InteractiveImageQuestionSettings',isValidImage,{upload:'imageUploaded',count:'imageCount'})); el('mcqDb').addEventListener('change',()=>handleUpload('mcqDb','mcqDbMsg','InteractiveMultipleChoiceQuestionSettings',isValidMcq,{upload:'mcqUploaded',count:'mcqCount'})); el('downloadBtn').addEventListener('click',downloadSettings); refreshPreview(); })();
+</script>
 </body>
 </html>
