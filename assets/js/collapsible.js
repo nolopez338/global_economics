@@ -122,6 +122,32 @@
     expandSection(mainSection);
   }
 
+
+  function isPdfPageLink(link) {
+    const href = (link.getAttribute('href') || '').trim().toLowerCase();
+    if (!href || href.startsWith('#') || href.startsWith('javascript:')) return false;
+
+    const text = (link.textContent || '').toLowerCase();
+    const section = link.closest('section, article, div');
+    const parentId = (section?.id || '').toLowerCase();
+    const parentClass = (section?.className || '').toLowerCase();
+
+    return href.endsWith('.pdf')
+      || href.includes('.pdf?')
+      || href.includes('/:b:/')
+      || text.includes('pdf')
+      || parentId.includes('pdf')
+      || parentClass.includes('pdf');
+  }
+
+  function setPdfPageLinksToNewTab() {
+    const links = document.querySelectorAll('a.page-link[href]');
+    links.forEach((link) => {
+      if (!isPdfPageLink(link)) return;
+      link.setAttribute('target', '_blank');
+      link.setAttribute('rel', 'noopener noreferrer');
+    });
+  }
   document.addEventListener('DOMContentLoaded', () => {
     document.documentElement.classList.add('js-enabled');
     const sections = Array.from(document.querySelectorAll('.collapsible'));
@@ -161,6 +187,8 @@
     });
 
     const mainToc = document.getElementById('table-of-contents');
+    setPdfPageLinksToNewTab();
+
     if (mainToc) {
       mainToc.addEventListener('click', (event) => {
         const link = event.target.closest('a[href^="#"]');
