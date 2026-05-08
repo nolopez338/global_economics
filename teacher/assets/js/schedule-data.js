@@ -3828,7 +3828,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Thursday",
     "Day": "Day 2",
-    "Description": "Work on C4 C5 Proyect Session 2",
+    "Description": "No class",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -3841,7 +3841,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 4",
-    "Description": "C6: Minimum Number of samples",
+    "Description": "Work on C4 C5 Proyect Session 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C6"
@@ -3854,7 +3854,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 2",
-    "Description": "C7: p-values vs Hypothesis, Error Types.",
+    "Description": "No Class: Sky Zone",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7"
@@ -3867,7 +3867,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 4",
-    "Description": "C6 C7: Exam practice",
+    "Description": "C6 C7: Error Types, minimum number of samples",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7"
@@ -4868,7 +4868,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Friday",
     "Day": "Day 2",
-    "Description": "C6: Minimum Number of samples",
+    "Description": "No Class: Sky Zone",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7"
@@ -4881,7 +4881,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 3",
-    "Description": "C7: p-values vs Hypothesis, Error Types.",
+    "Description": "C6 C7: Error Types, Minimum Number of samples.",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7"
