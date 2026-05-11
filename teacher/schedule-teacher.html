@@ -74,6 +74,16 @@
     </section>
 
     <div id="weekly-schedule-table-root" data-weekly-schedule-table-root></div>
+
+    <section class="theme-toggle-section" aria-label="Theme controls">
+      <label class="theme-toggle" for="dark-mode-toggle">
+        <span class="theme-toggle-label">Dark mode</span>
+        <span class="theme-toggle-control">
+          <input type="checkbox" id="dark-mode-toggle" aria-label="Toggle dark mode">
+          <span class="theme-toggle-slider" aria-hidden="true"></span>
+        </span>
+      </label>
+    </section>
   </main>
   <div class="weekday-menu" id="weekday-menu" role="menu" aria-hidden="true" hidden>
     <button type="button" role="menuitem" data-weekday="Monday">Monday</button>
@@ -87,5 +97,31 @@
     window.renderWeeklyScheduleTable("[data-weekly-schedule-table-root]");
   </script>
   <script src="./assets/js/principal-schedule.js"></script>
+  <script>
+    (function () {
+      const STORAGE_KEY = "scheduleTeacherTheme";
+      const body = document.body;
+      const toggle = document.querySelector("#dark-mode-toggle");
+
+      if (!toggle) {
+        return;
+      }
+
+      const applyTheme = (theme) => {
+        const isDark = theme === "dark";
+        body.classList.toggle("dark-theme", isDark);
+        toggle.checked = isDark;
+      };
+
+      const savedTheme = localStorage.getItem(STORAGE_KEY);
+      applyTheme(savedTheme === "dark" ? "dark" : "light");
+
+      toggle.addEventListener("change", function () {
+        const theme = toggle.checked ? "dark" : "light";
+        applyTheme(theme);
+        localStorage.setItem(STORAGE_KEY, theme);
+      });
+    }());
+  </script>
 </body>
 </html>
