@@ -73,18 +73,18 @@
             <th scope="row">07:05 - 07:55</th>
             <td>
               <a class="class-link" href="pages/class_schedules/10B.html" aria-label="Open schedule page for class 10B">
-                <span class="block warm">10B-1</span>
+                <span class="block grade-10b">10B-1</span>
               </a>
             </td>
             <td class="empty">—</td>
             <td>
               <a class="class-link" href="pages/class_schedules/11E.html" aria-label="Open schedule page for class 11E">
-                <span class="block cool">11E-2</span>
+                <span class="block grade-11e">11E-2</span>
               </a>
             </td>
             <td>
               <a class="class-link" href="pages/class_schedules/10D.html" aria-label="Open schedule page for class 10D">
-                <span class="block warm">10D-2</span>
+                <span class="block grade-10d">10D-2</span>
               </a>
             </td>
             <td class="empty">—</td>
@@ -100,13 +100,13 @@
             <td class="empty">—</td>
             <td>
               <a class="class-link" href="pages/class_schedules/10A.html" aria-label="Open schedule page for class 10A">
-                <span class="block warm-2">10A-2</span>
+                <span class="block grade-10a">10A-2</span>
               </a>
             </td>
             <td class="empty">—</td>
             <td>
               <a class="class-link" href="pages/class_schedules/10C.html" aria-label="Open schedule page for class 10C">
-                <span class="block warm">10C-2</span>
+                <span class="block grade-10c">10C-2</span>
               </a>
             </td>
           </tr>
@@ -115,19 +115,19 @@
             <th scope="row">08:45 - 09:35</th>
             <td>
               <a class="class-link" href="pages/class_schedules/10A.html" aria-label="Open schedule page for class 10A">
-                <span class="block warm-2">10A-1</span>
+                <span class="block grade-10a">10A-1</span>
               </a>
             </td>
             <td class="empty">—</td>
             <td>
               <a class="class-link" href="pages/class_schedules/11A.html" aria-label="Open schedule page for class 11A">
-                <span class="block cool-2">11A-2</span>
+                <span class="block grade-11a">11A-2</span>
               </a>
             </td>
             <td class="empty">—</td>
             <td>
               <a class="class-link" href="pages/class_schedules/11B.html" aria-label="Open schedule page for class 11B">
-                <span class="block cool">11B-2</span>
+                <span class="block grade-11b">11B-2</span>
               </a>
             </td>
           </tr>
@@ -146,7 +146,7 @@
             <td class="empty">—</td>
             <td>
               <a class="class-link" href="pages/class_schedules/11E.html" aria-label="Open schedule page for class 11E">
-                <span class="block cool">11E-1</span>
+                <span class="block grade-11e">11E-1</span>
               </a>
             </td>
             <td class="empty">—</td>
@@ -158,7 +158,7 @@
             <th scope="row">11:00 - 11:55</th>
             <td>
               <a class="class-link" href="pages/class_schedules/11A.html" aria-label="Open schedule page for class 11A">
-                <span class="block cool-2">11A-1</span>
+                <span class="block grade-11a">11A-1</span>
               </a>
             </td>
             <td>
@@ -168,12 +168,12 @@
             </td>
             <td>
               <a class="class-link" href="pages/class_schedules/10D.html" aria-label="Open schedule page for class 10D">
-                <span class="block warm">10D-1</span>
+                <span class="block grade-10d">10D-1</span>
               </a>
             </td>
             <td>
               <a class="class-link" href="pages/class_schedules/10E.html" aria-label="Open schedule page for class 10E">
-                <span class="block warm">10E-2</span>
+                <span class="block grade-10e">10E-2</span>
               </a>
             </td>
             <td>
@@ -187,7 +187,7 @@
             <th scope="row">11:55 - 12:50</th>
             <td>
               <a class="class-link" href="pages/class_schedules/11D.html" aria-label="Open schedule page for class 11D">
-                <span class="block cool">11D-1</span>
+                <span class="block grade-11d">11D-1</span>
               </a>
             </td>
             <td>
@@ -197,17 +197,17 @@
             </td>
             <td>
               <a class="class-link" href="pages/class_schedules/10E.html" aria-label="Open schedule page for class 10E">
-                <span class="block warm">10E-1</span>
+                <span class="block grade-10e">10E-1</span>
               </a>
             </td>
             <td>
               <a class="class-link" href="pages/class_schedules/11D.html" aria-label="Open schedule page for class 11D">
-                <span class="block cool">11D-2</span>
+                <span class="block grade-11d">11D-2</span>
               </a>
             </td>
             <td>
               <a class="class-link" href="pages/class_schedules/10B.html" aria-label="Open schedule page for class 10B">
-                <span class="block warm">10B-2</span>
+                <span class="block grade-10b">10B-2</span>
               </a>
             </td>
           </tr>
@@ -225,22 +225,22 @@
             <th scope="row">13:50 - 14:45</th>
             <td>
               <a class="class-link" href="pages/class_schedules/10C.html" aria-label="Open schedule page for class 10C">
-                <span class="block warm">10C-1</span>
+                <span class="block grade-10c">10C-1</span>
               </a>
             </td>
             <td>
               <a class="class-link" href="pages/class_schedules/11C.html" aria-label="Open schedule page for class 11C">
-                <span class="block cool">11C-1</span>
+                <span class="block grade-11c">11C-1</span>
               </a>
             </td>
             <td>
               <a class="class-link" href="pages/class_schedules/11B.html" aria-label="Open schedule page for class 11B">
-                <span class="block cool">11B-1</span>
+                <span class="block grade-11b">11B-1</span>
               </a>
             </td>
             <td>
               <a class="class-link" href="pages/class_schedules/11C.html" aria-label="Open schedule page for class 11C">
-                <span class="block cool">11C-2</span>
+                <span class="block grade-11c">11C-2</span>
               </a>
             </td>
             <td class="empty">—</td>
