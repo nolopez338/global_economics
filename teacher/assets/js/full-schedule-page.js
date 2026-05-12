@@ -187,6 +187,22 @@
     return section;
   };
 
+  const createThemeToggleSection = () => {
+    const section = document.createElement("section");
+    section.className = "theme-toggle-section";
+    section.setAttribute("aria-label", "Theme controls");
+    section.innerHTML = [
+      '<label class="theme-toggle" for="dark-mode-toggle">',
+      '  <span class="theme-toggle-label">Dark mode</span>',
+      '  <span class="theme-toggle-control">',
+      '    <input type="checkbox" id="dark-mode-toggle" aria-label="Toggle dark mode">',
+      '    <span class="theme-toggle-slider" aria-hidden="true"></span>',
+      "  </span>",
+      "</label>",
+    ].join("");
+    return section;
+  };
+
   const createCalendarSection = (entries) => {
     const calendarSection = document.createElement("section");
     calendarSection.className = "page-card";
@@ -412,7 +428,8 @@
       header,
       createNotesSection(),
       calendarSection,
-      createBreadcrumbs()
+      createBreadcrumbs(),
+      createThemeToggleSection()
     );
 
     table.dataset.rendered = "true";
