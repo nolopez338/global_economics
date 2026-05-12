@@ -206,6 +206,24 @@ const createCalendarSection = (classKey, grade, section) => {
   return calendarSection;
 };
 
+
+const createThemeToggleSection = () => {
+  const section = document.createElement("section");
+  section.className = "theme-toggle-section";
+  section.setAttribute("aria-label", "Theme controls");
+  section.innerHTML = [
+    '<label class="theme-toggle" for="dark-mode-toggle">',
+    '  <span class="theme-toggle-label">Dark mode</span>',
+    '  <span class="theme-toggle-control">',
+    '    <input type="checkbox" id="dark-mode-toggle" aria-label="Toggle dark mode">',
+    '    <span class="theme-toggle-slider" aria-hidden="true"></span>',
+    '  </span>',
+    '</label>'
+  ].join("");
+
+  return section;
+};
+
 const renderClassPage = () => {
   const metadata = getClassMetadata();
   if (!metadata) {
@@ -230,7 +248,8 @@ const renderClassPage = () => {
     createHeader(classKey),
     createNotesSection(classKey, studentList, notes, mode),
     createCalendarSection(classKey, grade, section),
-    createBreadcrumbs(origin)
+    createBreadcrumbs(origin),
+    createThemeToggleSection()
   );
 };
 
