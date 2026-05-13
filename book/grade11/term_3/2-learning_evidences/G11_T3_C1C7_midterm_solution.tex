@@ -1,0 +1,743 @@
+\documentclass[12pt]{article}
+
+% Page size and tighter margins
+\usepackage[a4paper,left=1.2cm,right=1.2cm,top=1.5cm,bottom=1.5cm]{geometry}
+
+% Core packages
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{multicol}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+% Mathematics and graphs
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\setlength{\parindent}{0pt}
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.15}
+
+% Column types
+\newcolumntype{Y}{>{\raggedright\arraybackslash}m{\dimexpr0.42\textwidth-2\tabcolsep-2\arrayrulewidth\relax}}
+\newcolumntype{Z}{>{\raggedright\arraybackslash}m{\dimexpr0.58\textwidth-2\tabcolsep-2\arrayrulewidth\relax}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}m{#1}}
+
+% Gray subsection header box
+\newcommand{\SubsectionBox}[1]{%
+	\noindent\colorbox{gray!30}{%
+		\parbox{\linewidth}{\textbf{#1}}%
+	}\par\vspace{0.35cm}%
+}
+
+% Centered multi-line cell helper
+\newcommand{\CellCenter}[1]{%
+	\parbox{\linewidth}{\centering #1}%
+}
+
+% Decision helpers
+\newcommand{\RejectDecision}[1]{%
+	\textcolor{green!60!black}{\textbf{Reject \(H_0\).}} #1%
+}
+
+\newcommand{\FailDecision}[1]{%
+	\textcolor{red}{\textbf{Fail to reject \(H_0\).}} #1%
+}
+
+% Standard normal density
+\newcommand{\NormalDensity}{1/sqrt(2*pi)*exp(-x^2/2)}
+
+% Right-tailed normal graph
+\newcommand{\ZNormalRight}[2]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\Boundary}{#1}
+			\pgfmathsetmacro{\BoundaryHeight}{1/sqrt(2*pi)*exp(-(\Boundary)^2/2)}
+			\pgfmathsetmacro{\LabelX}{\Boundary+1.05}
+			\begin{axis}[
+				width=0.58\textwidth,
+				height=4.2cm,
+				axis lines=left,
+				xmin=-3.5,
+				xmax=3.5,
+				ymin=0,
+				ymax=0.45,
+				grid=both,
+				xlabel={$z$},
+				ylabel={$\phi(z)$},
+				xtick={-3,-2,-1,0,1,2,3},
+				ytick={0,0.1,0.2,0.3,0.4},
+				]
+				\addplot[domain=-3.5:3.5,samples=160,black,thick]{\NormalDensity};
+				\addplot[domain=#1:3.5,samples=90,draw=none,fill=gray!35]{\NormalDensity}\closedcycle;
+				\addplot[dashed,thick] coordinates {(#1,0) (#1,\BoundaryHeight)};
+				\node[fill=white,draw=black,inner sep=2pt,font=\scriptsize] at (axis cs:\LabelX,0.20) {#2};
+				\draw[->,thick] (axis cs:\LabelX,0.18) -- (axis cs:\Boundary+0.45,0.055);
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+% Left-tailed normal graph
+\newcommand{\ZNormalLeft}[2]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\Boundary}{#1}
+			\pgfmathsetmacro{\BoundaryHeight}{1/sqrt(2*pi)*exp(-(\Boundary)^2/2)}
+			\pgfmathsetmacro{\LabelX}{\Boundary-1.05}
+			\begin{axis}[
+				width=0.58\textwidth,
+				height=4.2cm,
+				axis lines=left,
+				xmin=-3.5,
+				xmax=3.5,
+				ymin=0,
+				ymax=0.45,
+				grid=both,
+				xlabel={$z$},
+				ylabel={$\phi(z)$},
+				xtick={-3,-2,-1,0,1,2,3},
+				ytick={0,0.1,0.2,0.3,0.4},
+				]
+				\addplot[domain=-3.5:3.5,samples=160,black,thick]{\NormalDensity};
+				\addplot[domain=-3.5:#1,samples=90,draw=none,fill=gray!35]{\NormalDensity}\closedcycle;
+				\addplot[dashed,thick] coordinates {(#1,0) (#1,\BoundaryHeight)};
+				\node[fill=white,draw=black,inner sep=2pt,font=\scriptsize] at (axis cs:\LabelX,0.20) {#2};
+				\draw[->,thick] (axis cs:\LabelX,0.18) -- (axis cs:\Boundary-0.45,0.055);
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+% Two-tailed normal graph
+\newcommand{\ZNormalTwoTail}[3]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\LeftBoundary}{#1}
+			\pgfmathsetmacro{\RightBoundary}{#2}
+			\pgfmathsetmacro{\LeftHeight}{1/sqrt(2*pi)*exp(-(\LeftBoundary)^2/2)}
+			\pgfmathsetmacro{\RightHeight}{1/sqrt(2*pi)*exp(-(\RightBoundary)^2/2)}
+			\begin{axis}[
+				width=0.58\textwidth,
+				height=4.2cm,
+				axis lines=left,
+				xmin=-3.5,
+				xmax=3.5,
+				ymin=0,
+				ymax=0.45,
+				grid=both,
+				xlabel={$z$},
+				ylabel={$\phi(z)$},
+				xtick={-3,-2,-1,0,1,2,3},
+				ytick={0,0.1,0.2,0.3,0.4},
+				]
+				\addplot[domain=-3.5:3.5,samples=160,black,thick]{\NormalDensity};
+				\addplot[domain=-3.5:#1,samples=70,draw=none,fill=gray!35]{\NormalDensity}\closedcycle;
+				\addplot[domain=#2:3.5,samples=70,draw=none,fill=gray!35]{\NormalDensity}\closedcycle;
+				\addplot[dashed,thick] coordinates {(#1,0) (#1,\LeftHeight)};
+				\addplot[dashed,thick] coordinates {(#2,0) (#2,\RightHeight)};
+				\node[fill=white,draw=black,inner sep=2pt,font=\scriptsize] at (axis cs:0,0.34) {#3};
+				\draw[->,thick] (axis cs:-0.35,0.32) -- (axis cs:#1-0.35,0.04);
+				\draw[->,thick] (axis cs:0.35,0.32) -- (axis cs:#2+0.35,0.04);
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+\begin{document}
+	
+	% =========================
+	% HEADER BOX
+	% =========================
+	\noindent
+	\begin{tabularx}{\textwidth}{|C{2.8cm}|C{\dimexpr\textwidth-6cm-4\tabcolsep-4\arrayrulewidth\relax}|C{2.8cm}|}
+		\hline
+		\centering
+		\vspace{3mm}
+		\IfFileExists{../../../preamble/logo.png}{%
+			\includegraphics[width=2.5cm]{../../../preamble/logo.png}%
+		}{%
+			\fbox{\parbox{2.3cm}{\centering Logo}}%
+		}
+		&
+		\CellCenter{%
+			\vspace{-5mm}
+			\textbf{GLOBAL ECONOMICS}\par
+			\textbf{GRADE: 11TH}\par
+			\textbf{TERM 3 --- SOLVED LEARNING EVIDENCE}\par
+			\textbf{HYPOTHESIS TEST DESIGN AND DECISION (C1--C7)}\par
+			\textbf{TEACHER'S NAME: Nicolás López Cuéllar}
+		}
+		&
+		\CellCenter{%
+			\textbf{THIRD TERM}\par
+			\textbf{2025--2026}%
+		}
+		\\
+		\hline
+	\end{tabularx}
+	
+	\vspace{0.5cm}
+	
+	% =========================
+	% OBJECTIVE + CRITERIA
+	% =========================
+	\noindent
+	\begin{tabular}{|Y|Z|}
+		\hline
+		{\small
+			\textbf{Learning objective:} Design and apply hypothesis tests from real contexts by identifying the parameter, writing hypotheses, selecting the test direction, applying a proportion test and a mean test, interpreting statistical errors, and determining the minimum sample size needed to reject the null hypothesis.
+		}
+		&
+		{\footnotesize
+			\textbf{Evaluated criteria:}\par
+			C1: Describes the concept of a statistical hypothesis.\par
+			C2: Identifies the null and alternative hypotheses in a statistical test.\par
+			C3: Determines whether a test should be one-tailed or two-tailed.\par
+			C4: Applies a hypothesis test in a population proportion setting.\par
+			C5: Applies a hypothesis test in a population mean counting setting.\par
+			C6: Identifies Type I or Type II error and its consequences.\par
+			C7: Finds the minimum sample size needed to reject \(H_0\).\par
+		}
+		\\
+		\hline
+	\end{tabular}
+	
+	\vspace{0.25cm}
+	
+	\SubsectionBox{Critical values used}
+	
+	\[
+	z_{0.95}=1.645,
+	\qquad
+	z_{0.975}=1.960,
+	\qquad
+	z_{0.99}=2.326.
+	\]
+	
+	For right-tailed tests, reject when \(z>z_{\text{critical}}\). For left-tailed tests, reject when \(z<-z_{\text{critical}}\). For two-tailed tests, reject when \(|z|>z_{\text{critical}}\).
+	
+	\section*{Problem 1 --- Grade 11 punctuality audit}
+	
+	The school compares punctuality between Prom 2025 and Prom 2026. The variable is the number of late arrivals to first class per morning.
+	
+	The binary variable is defined as
+	
+	\[
+	1=\text{more than }9\text{ late arrivals},
+	\qquad
+	0=\text{not more than }9\text{ late arrivals}.
+	\]
+	
+	\begin{multicols}{2}
+		\begin{center}
+			\scriptsize
+			\begin{tabular}{|c|c|c|c|c|}
+				\hline
+				\textbf{\#} & \textbf{Prom 2025} & \textbf{2025-bin} & \textbf{Prom 2026} & \textbf{2026-bin} \\
+				\hline
+				1 & 5 & 0 & 5 & 0 \\
+				2 & 6 & 0 & 7 & 0 \\
+				3 & 7 & 0 & 8 & 0 \\
+				4 & 8 & 0 & 9 & 0 \\
+				5 & 9 & 0 & 10 & 1 \\
+				6 & 4 & 0 & 5 & 0 \\
+				7 & 6 & 0 & 8 & 0 \\
+				8 & 7 & 0 & 9 & 0 \\
+				9 & 10 & 1 & 11 & 1 \\
+				10 & 5 & 0 & 6 & 0 \\
+				11 & 8 & 0 & 10 & 1 \\
+				12 & 7 & 0 & 8 & 0 \\
+				13 & 6 & 0 & 7 & 0 \\
+				14 & 9 & 0 & 10 & 1 \\
+				15 & 11 & 1 & 12 & 1 \\
+				\hline
+			\end{tabular}
+		\end{center}
+		
+		\columnbreak
+		
+		\begin{center}
+			\scriptsize
+			\begin{tabular}{|c|c|c|c|c|}
+				\hline
+				\textbf{\#} & \textbf{Prom 2025} & \textbf{2025-bin} & \textbf{Prom 2026} & \textbf{2026-bin} \\
+				\hline
+				16 & 5 & 0 & 6 & 0 \\
+				17 & 7 & 0 & 8 & 0 \\
+				18 & 8 & 0 & 10 & 1 \\
+				19 & 10 & 1 & 11 & 1 \\
+				20 & 6 & 0 & 7 & 0 \\
+				21 & 10 & 1 & 10 & 1 \\
+				22 & 7 & 0 & 8 & 0 \\
+				23 & 6 & 0 & 7 & 0 \\
+				24 & 8 & 0 & 10 & 1 \\
+				25 & 11 & 1 & 12 & 1 \\
+				26 & 5 & 0 & 6 & 0 \\
+				27 & 7 & 0 & 8 & 0 \\
+				28 & 9 & 0 & 10 & 1 \\
+				29 & 12 & 1 & 11 & 1 \\
+				30 & 10 & 1 & 9 & 0 \\
+				\hline
+			\end{tabular}
+		\end{center}
+	\end{multicols}
+	
+	Summary data:
+	
+	\[
+	n_{25}=30,
+	\qquad
+	\bar{x}_{25}=7.63,
+	\qquad
+	\sigma_{25}=2.09,
+	\qquad
+	x_{25}=7,
+	\qquad
+	\hat{p}_{25}=\frac{7}{30}\approx 0.2333.
+	\]
+	
+	\[
+	n_{26}=30,
+	\qquad
+	\bar{x}_{26}=8.60,
+	\qquad
+	\sigma_{26}=1.98,
+	\qquad
+	x_{26}=12,
+	\qquad
+	\hat{p}_{26}=\frac{12}{30}=0.40.
+	\]
+	
+	Use \(\alpha=0.05\).
+	
+	\subsection*{C1}
+	
+	\textbf{Mean setting.}
+	
+	\[
+	\mu_{25}=\text{true mean number of late arrivals per morning for Prom 2025.}
+	\]
+	
+	\[
+	\mu_{26}=\text{true mean number of late arrivals per morning for Prom 2026.}
+	\]
+	
+	\[
+	n_{25}=30,
+	\qquad
+	\bar{x}_{25}=7.63,
+	\qquad
+	\sigma_{25}=2.09.
+	\]
+	
+	\[
+	n_{26}=30,
+	\qquad
+	\bar{x}_{26}=8.60,
+	\qquad
+	\sigma_{26}=1.98.
+	\]
+	
+	\textbf{Proportion setting.}
+	
+	\[
+	p_{25}=\text{true proportion of high-lateness mornings for Prom 2025.}
+	\]
+	
+	\[
+	p_{26}=\text{true proportion of high-lateness mornings for Prom 2026.}
+	\]
+	
+	\[
+	x_{25}=7,
+	\qquad
+	n_{25}=30,
+	\qquad
+	\hat{p}_{25}=\frac{7}{30}\approx 0.2333.
+	\]
+	
+	\[
+	x_{26}=12,
+	\qquad
+	n_{26}=30,
+	\qquad
+	\hat{p}_{26}=\frac{12}{30}=0.40.
+	\]
+	
+	\subsection*{Using Prom 2025 as benchmark}
+	
+	\subsubsection*{C2}
+	
+	\textbf{Proportion test.}
+	
+	\[
+	H_0\colon p=p_0
+	\qquad
+	H_a\colon p>p_0
+	\]
+	
+	\[
+	p=p_{26},
+	\qquad
+	p_0=\hat{p}_{25}=\frac{7}{30}\approx 0.2333.
+	\]
+	
+	\[
+	H_0\colon p_{26}=0.2333
+	\qquad
+	H_a\colon p_{26}>0.2333.
+	\]
+	
+	\textbf{Mean test.}
+	
+	\[
+	H_0\colon \mu=\mu_0
+	\qquad
+	H_a\colon \mu>\mu_0
+	\]
+	
+	\[
+	\mu=\mu_{26},
+	\qquad
+	\mu_0=\bar{x}_{25}=7.63.
+	\]
+	
+	\[
+	H_0\colon \mu_{26}=7.63
+	\qquad
+	H_a\colon \mu_{26}>7.63.
+	\]
+	
+	\subsubsection*{C3}
+	
+	Both tests are right-tailed.
+	
+	\[
+	H_a\colon p_{26}>0.2333,
+	\qquad
+	H_a\colon \mu_{26}>7.63.
+	\]
+	
+	\ZNormalRight{1.645}{Right tail, \(\alpha=0.05\)}
+	
+	\subsubsection*{C4}
+	
+	\[
+	\hat{p}_{25}=0.2333,
+	\qquad
+	\hat{p}_{26}=0.40,
+	\qquad
+	n_{26}=30.
+	\]
+	
+	\[
+	z=
+	\frac{\hat{p}_{26}-\hat{p}_{25}}{\sqrt{\frac{\hat{p}_{25}(1-\hat{p}_{25})}{n_{26}}}}
+	=
+	\frac{0.40-0.2333}{\sqrt{\frac{0.2333(0.7667)}{30}}}.
+	\]
+	
+	\[
+	z=
+	\frac{0.1667}{0.07722}
+	\approx 2.16.
+	\]
+	
+	\[
+	z_{\text{critical}}=1.645.
+	\]
+	
+	\[
+	2.16>1.645.
+	\]
+	
+	\RejectDecision{There is enough evidence to conclude that \(p_{26}>0.2333\).}
+	
+	\subsubsection*{C5}
+	
+	\[
+	\bar{x}_{25}=7.63,
+	\qquad
+	\bar{x}_{26}=8.60,
+	\qquad
+	\sigma_{25}=2.09,
+	\qquad
+	\sigma_{26}=1.98,
+	\qquad
+	n_{26}=30.
+	\]
+	
+	The test sample is Prom 2026, so the statistic uses \(\sigma_{26}\).
+	
+	\[
+	z=
+	\frac{\bar{x}_{26}-\bar{x}_{25}}{\frac{\sigma_{26}}{\sqrt{n_{26}}}}
+	=
+	\frac{8.60-7.63}{\frac{1.98}{\sqrt{30}}}.
+	\]
+	
+	\[
+	z=
+	\frac{0.97}{0.3615}
+	\approx
+	2.68.
+	\]
+	
+	\[
+	z_{\text{critical}}=1.645.
+	\]
+	
+	\[
+	2.68>1.645.
+	\]
+	
+	\RejectDecision{There is enough evidence to conclude that \(\mu_{26}>7.63\).}
+	
+	\subsubsection*{C6}
+	
+	Both tests reject \(H_0\). A wrong rejection is a Type I error.
+	
+	For the proportion test, this means concluding that Prom 2026 has a higher proportion of high-lateness mornings than Prom 2025 when it does not.
+	
+	For the mean test, this means concluding that Prom 2026 has a higher mean number of late arrivals than Prom 2025 when it does not.
+	
+	\subsubsection*{C7}
+	
+	\textbf{Proportion test.}
+	
+	\[
+	\hat{p}_{26}-\hat{p}_{25}=0.40-0.2333=0.1667.
+	\]
+	
+	\[
+	\frac{0.1667}{\sqrt{\frac{0.2333(0.7667)}{n_{26}}}}>1.645.
+	\]
+	
+	\[
+	n_{26}>
+	\left(
+	\frac{1.645\sqrt{0.2333(0.7667)}}{0.1667}
+	\right)^2
+	\approx
+	17.43.
+	\]
+	
+	\[
+	n_{26,\min}=18.
+	\]
+	
+	\textbf{Mean test.}
+	
+	\[
+	\bar{x}_{26}-\bar{x}_{25}=8.60-7.63=0.97.
+	\]
+	
+	\[
+	\frac{0.97}{\frac{1.98}{\sqrt{n_{26}}}}>1.645.
+	\]
+	
+	\[
+	n_{26}>
+	\left(
+	\frac{1.645(1.98)}{0.97}
+	\right)^2
+	\approx
+	11.28.
+	\]
+	
+	\[
+	n_{26,\min}=12.
+	\]
+	
+	\subsection*{Using Prom 2026 as benchmark}
+	
+	\subsubsection*{C2}
+	
+	\textbf{Proportion test.}
+	
+	\[
+	H_0\colon p=p_0
+	\qquad
+	H_a\colon p<p_0
+	\]
+	
+	\[
+	p=p_{25},
+	\qquad
+	p_0=\hat{p}_{26}=\frac{12}{30}=0.40.
+	\]
+	
+	\[
+	H_0\colon p_{25}=0.40
+	\qquad
+	H_a\colon p_{25}<0.40.
+	\]
+	
+	\textbf{Mean test.}
+	
+	\[
+	H_0\colon \mu=\mu_0
+	\qquad
+	H_a\colon \mu<\mu_0
+	\]
+	
+	\[
+	\mu=\mu_{25},
+	\qquad
+	\mu_0=\bar{x}_{26}=8.60.
+	\]
+	
+	\[
+	H_0\colon \mu_{25}=8.60
+	\qquad
+	H_a\colon \mu_{25}<8.60.
+	\]
+	
+	\subsubsection*{C3}
+	
+	Both tests are left-tailed.
+	
+	\[
+	H_a\colon p_{25}<0.40,
+	\qquad
+	H_a\colon \mu_{25}<8.60.
+	\]
+	
+	\ZNormalLeft{-1.645}{Left tail, \(\alpha=0.05\)}
+	
+	\subsubsection*{C4}
+	
+	\[
+	\hat{p}_{26}=0.40,
+	\qquad
+	\hat{p}_{25}=0.2333,
+	\qquad
+	n_{25}=30.
+	\]
+	
+	\[
+	z=
+	\frac{\hat{p}_{25}-\hat{p}_{26}}{\sqrt{\frac{\hat{p}_{26}(1-\hat{p}_{26})}{n_{25}}}}
+	=
+	\frac{0.2333-0.40}{\sqrt{\frac{0.40(0.60)}{30}}}.
+	\]
+	
+	\[
+	z=
+	\frac{-0.1667}{0.08944}
+	\approx -1.86.
+	\]
+	
+	\[
+	z_{\text{critical}}=-1.645.
+	\]
+	
+	\[
+	-1.86<-1.645.
+	\]
+	
+	\RejectDecision{There is enough evidence to conclude that \(p_{25}<0.40\).}
+	
+	\subsubsection*{C5}
+	
+	\[
+	\bar{x}_{26}=8.60,
+	\qquad
+	\bar{x}_{25}=7.63,
+	\qquad
+	\sigma_{26}=1.98,
+	\qquad
+	\sigma_{25}=2.09,
+	\qquad
+	n_{25}=30.
+	\]
+	
+	The test sample is Prom 2025, so the statistic uses \(\sigma_{25}\).
+	
+	\[
+	z=
+	\frac{\bar{x}_{25}-\bar{x}_{26}}{\frac{\sigma_{25}}{\sqrt{n_{25}}}}
+	=
+	\frac{7.63-8.60}{\frac{2.09}{\sqrt{30}}}.
+	\]
+	
+	\[
+	z=
+	\frac{-0.97}{0.3816}
+	\approx
+	-2.54.
+	\]
+	
+	\[
+	z_{\text{critical}}=-1.645.
+	\]
+	
+	\[
+	-2.54<-1.645.
+	\]
+	
+	\RejectDecision{There is enough evidence to conclude that \(\mu_{25}<8.60\).}
+	
+	\subsubsection*{C6}
+	
+	Both tests reject \(H_0\). A wrong rejection is a Type I error.
+	
+	For the proportion test, this means concluding that Prom 2025 has a lower proportion of high-lateness mornings than Prom 2026 when it does not.
+	
+	For the mean test, this means concluding that Prom 2025 has a lower mean number of late arrivals than Prom 2026 when it does not.
+	
+	\subsubsection*{C7}
+	
+	\textbf{Proportion test.}
+	
+	\[
+	\hat{p}_{26}-\hat{p}_{25}=0.40-0.2333=0.1667.
+	\]
+	
+	\[
+	\frac{0.1667}{\sqrt{\frac{0.40(0.60)}{n_{25}}}}>1.645.
+	\]
+	
+	\[
+	n_{25}>
+	\left(
+	\frac{1.645\sqrt{0.40(0.60)}}{0.1667}
+	\right)^2
+	\approx
+	23.38.
+	\]
+	
+	\[
+	n_{25,\min}=24.
+	\]
+	
+	\textbf{Mean test.}
+	
+	\[
+	\bar{x}_{26}-\bar{x}_{25}=8.60-7.63=0.97.
+	\]
+	
+	\[
+	\frac{0.97}{\frac{2.09}{\sqrt{n_{25}}}}>1.645.
+	\]
+	
+	\[
+	n_{25}>
+	\left(
+	\frac{1.645(2.09)}{0.97}
+	\right)^2
+	\approx
+	12.56.
+	\]
+	
+	\[
+	n_{25,\min}=13.
+	\]
+	
+\end{document}
