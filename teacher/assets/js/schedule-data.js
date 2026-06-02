@@ -2918,7 +2918,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Monday",
     "Day": "Day 1",
-    "Description": "C8 C9 C10 Proyect development",
+    "Description": "Dudney Dissections",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C10"
@@ -4946,7 +4946,7 @@ window.SCHEDULE_DATA = [
     "Term": 3,
     "Weekday": "Tuesday",
     "Day": "Day 2",
-    "Description": "C8 C9 C10 Proyect development",
+    "Description": "Dudney Dissections",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C10"
