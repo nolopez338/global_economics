@@ -1,0 +1,2262 @@
+\makeatletter
+\def\input@path{{./}{../}{../../}{../../../}{../../../../}{preamble/}{../preamble/}{../../preamble/}{../../../preamble/}}
+\makeatother	
+
+\input{preamble.tex}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\title{Term 3 Practice Activity: C4 Variance and Standard Deviation}
+\author{}
+\date{}
+
+\begin{document}
+	\maketitle
+
+	\setcounter{tocdepth}{1}
+	\setcounter{secnumdepth}{2}
+	\tableofcontents
+
+	\section*{Evaluated criteria}
+	\begin{itemize}
+		\item [C4] Interprets the concept of variance and standard deviation of a probability function.
+	\end{itemize}
+	
+	
+% \UniformMeanSDGraph: 9 parameters
+% #1 = variable symbol
+% #2 = xmin
+% #3 = xmax
+% #4 = ymax
+% #5 = left endpoint
+% #6 = mean - sigma
+% #7 = mean
+% #8 = mean + sigma
+% #9 = right endpoint
+\newcommand{\UniformMeanSDGraph}[9]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\BlueHeight}{1/((#9)-(#5))}
+			\pgfmathsetmacro{\ShadeHeight}{\BlueHeight}
+			\pgfmathsetmacro{\GuideHeight}{0.8*(#4)}
+			\pgfmathsetmacro{\MeanLineHeight}{0.97*(#4)}
+			\begin{axis}[
+				width=10cm,
+				height=5.5cm,
+				axis lines=left,
+				xlabel={$#1$},
+				xlabel style={at={(axis description cs:1.02,-0.06)}, anchor=north west},
+				ylabel={$f(#1)$},
+				xmin=#2,
+				xmax=#3,
+				ymin=0,
+				ymax=#4,
+				grid=both,
+				xtick={#5,#6,#7,#8,#9},
+				xticklabels={$#5$,,{$E[#1]=#7$},,{$#9$}},
+				ytick=\empty
+				]
+				\addplot[ultra thick, blue]
+				coordinates {(#5,0) (#5,\BlueHeight) (#9,\BlueHeight) (#9,0)};
+				
+				\addplot[ultra thick, orange]
+				coordinates {(#7,0) (#7,\MeanLineHeight)};
+				
+				\addplot[red, densely dotted, thick]
+				coordinates {(#6,0) (#6,\GuideHeight)};
+				
+				\addplot[red, densely dotted, thick]
+				coordinates {(#8,0) (#8,\GuideHeight)};
+				
+				\addplot[draw=none, fill=red, fill opacity=0.5]
+				coordinates {(#6,0) (#6,\ShadeHeight) (#8,\ShadeHeight) (#8,0)}
+				\closedcycle;
+				
+				\node[font=\small, above] at (axis cs:#6,\GuideHeight) {$E[#1]-\sigma$};
+				\node[font=\small, above] at (axis cs:#8,\GuideHeight) {$E[#1]+\sigma$};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+
+% \TriangularMeanSDGraph: 7 parameters
+% #1 = variable symbol
+% #2 = left endpoint a
+% #3 = mode c
+% #4 = right endpoint b
+% #5 = xmin
+% #6 = xmax
+% #7 = ymax
+\newcommand{\TriangularMeanSDGraph}[7]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\TriMean}{((#2)+(#3)+(#4))/3}
+			\pgfmathsetmacro{\TriVar}{((#2)^2+(#3)^2+(#4)^2-(#2)*(#3)-(#2)*(#4)-(#3)*(#4))/18}
+			\pgfmathsetmacro{\TriSigma}{sqrt(\TriVar)}
+			\pgfmathsetmacro{\LeftSD}{\TriMean-\TriSigma}
+			\pgfmathsetmacro{\RightSD}{\TriMean+\TriSigma}
+			\pgfmathsetmacro{\PeakHeight}{2/((#4)-(#2))}
+			\pgfmathsetmacro{\GuideHeight}{0.82*(#7)}
+			\pgfmathsetmacro{\MeanLineHeight}{0.71*(#7)}
+			
+			\ifdim#3pt=#2pt
+			\pgfmathsetmacro{\LeftHeight}{2*((#4)-(\LeftSD))/(((#4)-(#2))*((#4)-(#3)))}
+			\pgfmathsetmacro{\RightHeight}{2*((#4)-(\RightSD))/(((#4)-(#2))*((#4)-(#3)))}
+			\else
+			\ifdim#3pt=#4pt
+			\pgfmathsetmacro{\LeftHeight}{2*((\LeftSD)-(#2))/(((#4)-(#2))*((#3)-(#2)))}
+			\pgfmathsetmacro{\RightHeight}{2*((\RightSD)-(#2))/(((#4)-(#2))*((#3)-(#2)))}
+			\else
+			\ifdim\LeftSD pt<#3pt
+			\pgfmathsetmacro{\LeftHeight}{2*((\LeftSD)-(#2))/(((#4)-(#2))*((#3)-(#2)))}
+			\else
+			\pgfmathsetmacro{\LeftHeight}{2*((#4)-(\LeftSD))/(((#4)-(#2))*((#4)-(#3)))}
+			\fi
+			
+			\ifdim\RightSD pt<#3pt
+			\pgfmathsetmacro{\RightHeight}{2*((\RightSD)-(#2))/(((#4)-(#2))*((#3)-(#2)))}
+			\else
+			\pgfmathsetmacro{\RightHeight}{2*((#4)-(\RightSD))/(((#4)-(#2))*((#4)-(#3)))}
+			\fi
+			\fi
+			\fi
+			
+			\begin{axis}[
+				width=10cm,
+				height=5.5cm,
+				axis lines=left,
+				xlabel={$#1$},
+				xlabel style={at={(axis description cs:1.02,-0.06)}, anchor=north west},
+				ylabel={$f(#1)$},
+				xmin=#5,
+				xmax=#6,
+				ymin=0,
+				ymax=#7,
+				grid=both,
+				xtick={#2,\LeftSD,\TriMean,\RightSD,#4},
+				xticklabels={$#2$,,$E[#1]=\pgfmathprintnumber[precision=2]{\TriMean}$,,$#4$},
+				ytick=\empty
+				]
+				
+				\ifdim#3pt=#2pt
+				\addplot[draw=none, fill=red, fill opacity=0.5]
+				coordinates {(\LeftSD,0) (\LeftSD,\LeftHeight) (\RightSD,\RightHeight) (\RightSD,0)}
+				\closedcycle;
+				\else
+				\ifdim#3pt=#4pt
+				\addplot[draw=none, fill=red, fill opacity=0.5]
+				coordinates {(\LeftSD,0) (\LeftSD,\LeftHeight) (\RightSD,\RightHeight) (\RightSD,0)}
+				\closedcycle;
+				\else
+				\ifdim\LeftSD pt<#3pt
+				\ifdim\RightSD pt>#3pt
+				\addplot[draw=none, fill=red, fill opacity=0.5]
+				coordinates {(\LeftSD,0) (\LeftSD,\LeftHeight) (#3,\PeakHeight) (\RightSD,\RightHeight) (\RightSD,0)}
+				\closedcycle;
+				\else
+				\addplot[draw=none, fill=red, fill opacity=0.5]
+				coordinates {(\LeftSD,0) (\LeftSD,\LeftHeight) (\RightSD,\RightHeight) (\RightSD,0)}
+				\closedcycle;
+				\fi
+				\else
+				\addplot[draw=none, fill=red, fill opacity=0.5]
+				coordinates {(\LeftSD,0) (\LeftSD,\LeftHeight) (\RightSD,\RightHeight) (\RightSD,0)}
+				\closedcycle;
+				\fi
+				\fi
+				\fi
+				
+				\addplot[ultra thick, blue]
+				coordinates {(#2,0) (#3,\PeakHeight) (#4,0)};
+				
+				\addplot[ultra thick, orange]
+				coordinates {(\TriMean,0) (\TriMean,\MeanLineHeight)};
+				
+				\addplot[red, densely dotted, thick]
+				coordinates {(\LeftSD,0) (\LeftSD,\GuideHeight)};
+				
+				\addplot[red, densely dotted, thick]
+				coordinates {(\RightSD,0) (\RightSD,\GuideHeight)};
+				
+				\node[font=\small, above] at (axis cs:\LeftSD,\GuideHeight) {$E[#1]-\sigma$};
+				\node[font=\small, above] at (axis cs:\RightSD,\GuideHeight) {$E[#1]+\sigma$};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+% \NormalMeanSDGraph: 6 parameters
+% #1 = variable symbol
+% #2 = mean mu
+% #3 = standard deviation sigma
+% #4 = xmin
+% #5 = xmax
+% #6 = ymax
+\newcommand{\NormalMeanSDGraph}[6]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\Mu}{#2}
+			\pgfmathsetmacro{\Sigma}{#3}
+			\pgfmathsetmacro{\LeftSD}{\Mu-\Sigma}
+			\pgfmathsetmacro{\RightSD}{\Mu+\Sigma}
+			\pgfmathsetmacro{\LeftTwoSD}{\Mu-2*\Sigma}
+			\pgfmathsetmacro{\RightTwoSD}{\Mu+2*\Sigma}
+			\pgfmathsetmacro{\PeakHeight}{1/(\Sigma*sqrt(2*pi))}
+			\pgfmathsetmacro{\OneSDHeight}{1/(\Sigma*sqrt(2*pi))*exp(-0.5)}
+			\pgfmathsetmacro{\TwoSDHeight}{1/(\Sigma*sqrt(2*pi))*exp(-2)}
+			
+			\begin{axis}[
+				width=10cm,
+				height=5.5cm,
+				axis lines=left,
+				xlabel={$#1$},
+				xlabel style={at={(axis description cs:1.02,-0.06)}, anchor=north west},
+				ylabel={$f(#1)$},
+				xmin=#4,
+				xmax=#5,
+				ymin=0,
+				ymax=#6,
+				grid=both,
+				xtick={\LeftTwoSD,\LeftSD,\Mu,\RightSD,\RightTwoSD},
+				xticklabels={
+					$\pgfmathprintnumber[precision=2]{\LeftTwoSD}$,
+					,
+					$E[#1]=\pgfmathprintnumber[precision=2]{\Mu}$,
+					,
+					$\pgfmathprintnumber[precision=2]{\RightTwoSD}$
+				},
+				ytick=\empty
+				]
+				
+				\addplot[
+				draw=none,
+				fill=red,
+				fill opacity=0.5,
+				domain=\LeftSD:\RightSD,
+				samples=160
+				]
+				{1/(\Sigma*sqrt(2*pi))*exp(-((x-\Mu)^2)/(2*\Sigma^2))}
+				\closedcycle;
+				
+				\addplot[
+				ultra thick,
+				blue,
+				domain=#4:#5,
+				samples=240
+				]
+				{1/(\Sigma*sqrt(2*pi))*exp(-((x-\Mu)^2)/(2*\Sigma^2))};
+				
+				\addplot[ultra thick, orange]
+				coordinates {(\Mu,0) (\Mu,\PeakHeight)};
+				
+				\addplot[red, densely dotted, thick]
+				coordinates {(\LeftSD,0) (\LeftSD,\OneSDHeight)};
+				
+				\addplot[red, densely dotted, thick]
+				coordinates {(\RightSD,0) (\RightSD,\OneSDHeight)};
+				
+				\addplot[densely dotted, thick]
+				coordinates {(\LeftTwoSD,0) (\LeftTwoSD,\TwoSDHeight)};
+				
+				\addplot[densely dotted, thick]
+				coordinates {(\RightTwoSD,0) (\RightTwoSD,\TwoSDHeight)};
+				
+				\node[font=\small, above] at (axis cs:\LeftSD,\OneSDHeight) {$E[#1]-\sigma$};
+				\node[font=\small, above] at (axis cs:\RightSD,\OneSDHeight) {$E[#1]+\sigma$};
+				
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+% \UniformIntervalComparisonGraph: 8 parameters
+% #1 = variable symbol
+% #2 = xmin
+% #3 = xmax
+% #4 = ymax
+% #5 = left endpoint a
+% #6 = right endpoint b
+% #7 = first center
+% #8 = second center
+\newcommand{\UniformIntervalComparisonGraph}[8]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\PDFHeight}{1/((#6)-(#5))}
+			
+			% Intervals around the first center
+			\pgfmathsetmacro{\AOneL}{#7-0.5}
+			\pgfmathsetmacro{\AOneR}{#7+0.5}
+			\pgfmathsetmacro{\ATwoL}{#7-1}
+			\pgfmathsetmacro{\ATwoR}{#7+1}
+			\pgfmathsetmacro{\AThreeL}{#7-1.5}
+			\pgfmathsetmacro{\AThreeR}{#7+1.5}
+			\pgfmathsetmacro{\AFourL}{#7-2}
+			\pgfmathsetmacro{\AFourR}{#7+2}
+			
+			% Intervals around the second center
+			\pgfmathsetmacro{\BOneL}{#8-0.5}
+			\pgfmathsetmacro{\BOneR}{#8+0.5}
+			\pgfmathsetmacro{\BTwoL}{#8-1}
+			\pgfmathsetmacro{\BTwoR}{#8+1}
+			\pgfmathsetmacro{\BThreeL}{#8-1.5}
+			\pgfmathsetmacro{\BThreeR}{#8+1.5}
+			\pgfmathsetmacro{\BFourL}{#8-2}
+			\pgfmathsetmacro{\BFourR}{#8+2}
+			
+			\begin{axis}[
+				width=12cm,
+				height=5.8cm,
+				axis lines=left,
+				xlabel={$#1$},
+				ylabel={$f(#1)$},
+				xmin=#2,
+				xmax=#3,
+				ymin=0,
+				ymax=#4,
+				grid=both,
+				xtick={0,2,4,6,8,10,12,14,16},
+				ytick=\empty,
+				clip=false
+				]
+				
+				% Length 4 intervals (lightest)
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0.7pt]
+				coordinates {(\AFourL,0) (\AFourL,\PDFHeight) (\AFourR,\PDFHeight) (\AFourR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0.7pt]
+				coordinates {(\BFourL,0) (\BFourL,\PDFHeight) (\BFourR,\PDFHeight) (\BFourR,0)}
+				\closedcycle;
+				
+				% Length 3 intervals
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0.7pt]
+				coordinates {(\AThreeL,0) (\AThreeL,\PDFHeight) (\AThreeR,\PDFHeight) (\AThreeR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0.7pt]
+				coordinates {(\BThreeL,0) (\BThreeL,\PDFHeight) (\BThreeR,\PDFHeight) (\BThreeR,0)}
+				\closedcycle;
+				
+				% Length 2 intervals
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0.7pt]
+				coordinates {(\ATwoL,0) (\ATwoL,\PDFHeight) (\ATwoR,\PDFHeight) (\ATwoR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0.7pt]
+				coordinates {(\BTwoL,0) (\BTwoL,\PDFHeight) (\BTwoR,\PDFHeight) (\BTwoR,0)}
+				\closedcycle;
+				
+				% Length 1 intervals (darkest)
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0.7pt]
+				coordinates {(\AOneL,0) (\AOneL,\PDFHeight) (\AOneR,\PDFHeight) (\AOneR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0.7pt]
+				coordinates {(\BOneL,0) (\BOneL,\PDFHeight) (\BOneR,\PDFHeight) (\BOneR,0)}
+				\closedcycle;
+				
+				% Uniform PDF
+				\addplot[ultra thick, blue]
+				coordinates {(#5,0) (#5,\PDFHeight) (#6,\PDFHeight) (#6,0)};
+				
+				% Center guide lines
+				\addplot[densely dotted, thick]
+				coordinates {(#7,0) (#7,\PDFHeight)};
+				\addplot[densely dotted, thick]
+				coordinates {(#8,0) (#8,\PDFHeight)};
+				
+				\node[font=\small, above] at (axis cs:#7,\PDFHeight) {center \(#7\)};
+				\node[font=\small, above] at (axis cs:#8,\PDFHeight) {center \(#8\)};
+				
+				% Legend outside, top-right
+				\node[
+				font=\scriptsize,
+				align=left,
+				anchor=north west,
+				fill=white,
+				draw=black,
+				inner sep=4pt
+				] at (axis description cs:1.03,1.00) {%
+					\begin{tabular}{@{}l l@{}}
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0.07pt] (0,0) rectangle (0.45,0.012);} & Length \(1\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0.07pt] (0,0) rectangle (0.45,0.012);} & Length \(2\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0.07pt] (0,0) rectangle (0.45,0.012);} & Length \(3\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0.07pt] (0,0) rectangle (0.45,0.012);} & Length \(4\)
+					\end{tabular}
+				};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+% \TriangularLeftModeIntervalComparisonGraph: 8 parameters
+% #1 = variable symbol
+% #2 = xmin
+% #3 = xmax
+% #4 = ymax
+% #5 = left endpoint a, also the mode c
+% #6 = right endpoint b
+% #7 = first center
+% #8 = second center
+\newcommand{\TriangularLeftModeIntervalComparisonGraph}[8]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\PeakHeight}{2/((#6)-(#5))}
+			\pgfmathsetmacro{\Denom}{((#6)-(#5))*((#6)-(#5))}
+			
+			% Intervals around the first center
+			\pgfmathsetmacro{\AOneL}{#7-0.5}
+			\pgfmathsetmacro{\AOneR}{#7+0.5}
+			\pgfmathsetmacro{\ATwoL}{#7-1}
+			\pgfmathsetmacro{\ATwoR}{#7+1}
+			\pgfmathsetmacro{\AThreeL}{#7-1.5}
+			\pgfmathsetmacro{\AThreeR}{#7+1.5}
+			\pgfmathsetmacro{\AFourL}{#7-2}
+			\pgfmathsetmacro{\AFourR}{#7+2}
+			
+			% Intervals around the second center
+			\pgfmathsetmacro{\BOneL}{#8-0.5}
+			\pgfmathsetmacro{\BOneR}{#8+0.5}
+			\pgfmathsetmacro{\BTwoL}{#8-1}
+			\pgfmathsetmacro{\BTwoR}{#8+1}
+			\pgfmathsetmacro{\BThreeL}{#8-1.5}
+			\pgfmathsetmacro{\BThreeR}{#8+1.5}
+			\pgfmathsetmacro{\BFourL}{#8-2}
+			\pgfmathsetmacro{\BFourR}{#8+2}
+			
+			% Heights on the triangular PDF
+			\pgfmathsetmacro{\HAOneL}{2*((#6)-\AOneL)/\Denom}
+			\pgfmathsetmacro{\HAOneR}{2*((#6)-\AOneR)/\Denom}
+			\pgfmathsetmacro{\HATwoL}{2*((#6)-\ATwoL)/\Denom}
+			\pgfmathsetmacro{\HATwoR}{2*((#6)-\ATwoR)/\Denom}
+			\pgfmathsetmacro{\HAThreeL}{2*((#6)-\AThreeL)/\Denom}
+			\pgfmathsetmacro{\HAThreeR}{2*((#6)-\AThreeR)/\Denom}
+			\pgfmathsetmacro{\HAFourL}{2*((#6)-\AFourL)/\Denom}
+			\pgfmathsetmacro{\HAFourR}{2*((#6)-\AFourR)/\Denom}
+			
+			\pgfmathsetmacro{\HBOneL}{2*((#6)-\BOneL)/\Denom}
+			\pgfmathsetmacro{\HBOneR}{2*((#6)-\BOneR)/\Denom}
+			\pgfmathsetmacro{\HBTwoL}{2*((#6)-\BTwoL)/\Denom}
+			\pgfmathsetmacro{\HBTwoR}{2*((#6)-\BTwoR)/\Denom}
+			\pgfmathsetmacro{\HBThreeL}{2*((#6)-\BThreeL)/\Denom}
+			\pgfmathsetmacro{\HBThreeR}{2*((#6)-\BThreeR)/\Denom}
+			\pgfmathsetmacro{\HBFourL}{2*((#6)-\BFourL)/\Denom}
+			\pgfmathsetmacro{\HBFourR}{2*((#6)-\BFourR)/\Denom}
+			
+			\pgfmathsetmacro{\CenterAHeight}{2*((#6)-(#7))/\Denom}
+			\pgfmathsetmacro{\CenterBHeight}{2*((#6)-(#8))/\Denom}
+			
+			\begin{axis}[
+				width=12cm,
+				height=5.8cm,
+				axis lines=left,
+				xlabel={$#1$},
+				ylabel={$f(#1)$},
+				xmin=#2,
+				xmax=#3,
+				ymin=0,
+				ymax=#4,
+				grid=both,
+				xtick={0,2,4,6,8,10,12,14,16},
+				ytick=\empty,
+				clip=false
+				]
+				
+				% Length 4 intervals (lightest)
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0.7pt]
+				coordinates {(\AFourL,0) (\AFourL,\HAFourL) (\AFourR,\HAFourR) (\AFourR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0.7pt]
+				coordinates {(\BFourL,0) (\BFourL,\HBFourL) (\BFourR,\HBFourR) (\BFourR,0)}
+				\closedcycle;
+				
+				% Length 3 intervals
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0.7pt]
+				coordinates {(\AThreeL,0) (\AThreeL,\HAThreeL) (\AThreeR,\HAThreeR) (\AThreeR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0.7pt]
+				coordinates {(\BThreeL,0) (\BThreeL,\HBThreeL) (\BThreeR,\HBThreeR) (\BThreeR,0)}
+				\closedcycle;
+				
+				% Length 2 intervals
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0.7pt]
+				coordinates {(\ATwoL,0) (\ATwoL,\HATwoL) (\ATwoR,\HATwoR) (\ATwoR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0.7pt]
+				coordinates {(\BTwoL,0) (\BTwoL,\HBTwoL) (\BTwoR,\HBTwoR) (\BTwoR,0)}
+				\closedcycle;
+				
+				% Length 1 intervals (darkest)
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0.7pt]
+				coordinates {(\AOneL,0) (\AOneL,\HAOneL) (\AOneR,\HAOneR) (\AOneR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0.7pt]
+				coordinates {(\BOneL,0) (\BOneL,\HBOneL) (\BOneR,\HBOneR) (\BOneR,0)}
+				\closedcycle;
+				
+				% Triangular PDF
+				\addplot[ultra thick, blue]
+				coordinates {(#5,0) (#5,\PeakHeight) (#6,0)};
+				
+				% Center guide lines
+				\addplot[densely dotted, thick]
+				coordinates {(#7,0) (#7,\CenterAHeight)};
+				\addplot[densely dotted, thick]
+				coordinates {(#8,0) (#8,\CenterBHeight)};
+				
+				\node[font=\small, above] at (axis cs:#7,\CenterAHeight) {center \(#7\)};
+				\node[font=\small, above] at (axis cs:#8,\CenterBHeight) {center \(#8\)};
+				
+				% Legend outside, top-right
+				\node[
+				font=\scriptsize,
+				align=left,
+				anchor=north west,
+				fill=white,
+				draw=black,
+				inner sep=4pt
+				] at (axis description cs:1.03,1.00) {%
+					\begin{tabular}{@{}l l@{}}
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(1\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(2\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(3\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(4\)
+					\end{tabular}
+				};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+% \TriangularIntervalComparisonGraph: 9 parameters
+% #1 = variable symbol
+% #2 = xmin
+% #3 = xmax
+% #4 = ymax
+% #5 = left endpoint a
+% #6 = mode c
+% #7 = right endpoint b
+% #8 = first center
+% #9 = second center
+\newcommand{\TriangularIntervalComparisonGraph}[9]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\PeakHeight}{2/((#7)-(#5))}
+			\pgfmathsetmacro{\DenomLeft}{((#7)-(#5))*((#6)-(#5))}
+			\pgfmathsetmacro{\DenomRight}{((#7)-(#5))*((#7)-(#6))}
+			
+			% Intervals around the first center
+			\pgfmathsetmacro{\AOneL}{#8-0.5}
+			\pgfmathsetmacro{\AOneR}{#8+0.5}
+			\pgfmathsetmacro{\ATwoL}{#8-1}
+			\pgfmathsetmacro{\ATwoR}{#8+1}
+			\pgfmathsetmacro{\AThreeL}{#8-1.5}
+			\pgfmathsetmacro{\AThreeR}{#8+1.5}
+			\pgfmathsetmacro{\AFourL}{#8-2}
+			\pgfmathsetmacro{\AFourR}{#8+2}
+			
+			% Intervals around the second center
+			\pgfmathsetmacro{\BOneL}{#9-0.5}
+			\pgfmathsetmacro{\BOneR}{#9+0.5}
+			\pgfmathsetmacro{\BTwoL}{#9-1}
+			\pgfmathsetmacro{\BTwoR}{#9+1}
+			\pgfmathsetmacro{\BThreeL}{#9-1.5}
+			\pgfmathsetmacro{\BThreeR}{#9+1.5}
+			\pgfmathsetmacro{\BFourL}{#9-2}
+			\pgfmathsetmacro{\BFourR}{#9+2}
+			
+			% Heights on the triangular PDF
+			\pgfmathsetmacro{\HAOneL}{(\AOneL <= (#6) ? 2*(\AOneL-(#5))/\DenomLeft : 2*((#7)-\AOneL)/\DenomRight)}
+			\pgfmathsetmacro{\HAOneR}{(\AOneR <= (#6) ? 2*(\AOneR-(#5))/\DenomLeft : 2*((#7)-\AOneR)/\DenomRight)}
+			\pgfmathsetmacro{\HATwoL}{(\ATwoL <= (#6) ? 2*(\ATwoL-(#5))/\DenomLeft : 2*((#7)-\ATwoL)/\DenomRight)}
+			\pgfmathsetmacro{\HATwoR}{(\ATwoR <= (#6) ? 2*(\ATwoR-(#5))/\DenomLeft : 2*((#7)-\ATwoR)/\DenomRight)}
+			\pgfmathsetmacro{\HAThreeL}{(\AThreeL <= (#6) ? 2*(\AThreeL-(#5))/\DenomLeft : 2*((#7)-\AThreeL)/\DenomRight)}
+			\pgfmathsetmacro{\HAThreeR}{(\AThreeR <= (#6) ? 2*(\AThreeR-(#5))/\DenomLeft : 2*((#7)-\AThreeR)/\DenomRight)}
+			\pgfmathsetmacro{\HAFourL}{(\AFourL <= (#6) ? 2*(\AFourL-(#5))/\DenomLeft : 2*((#7)-\AFourL)/\DenomRight)}
+			\pgfmathsetmacro{\HAFourR}{(\AFourR <= (#6) ? 2*(\AFourR-(#5))/\DenomLeft : 2*((#7)-\AFourR)/\DenomRight)}
+			
+			\pgfmathsetmacro{\HBOneL}{(\BOneL <= (#6) ? 2*(\BOneL-(#5))/\DenomLeft : 2*((#7)-\BOneL)/\DenomRight)}
+			\pgfmathsetmacro{\HBOneR}{(\BOneR <= (#6) ? 2*(\BOneR-(#5))/\DenomLeft : 2*((#7)-\BOneR)/\DenomRight)}
+			\pgfmathsetmacro{\HBTwoL}{(\BTwoL <= (#6) ? 2*(\BTwoL-(#5))/\DenomLeft : 2*((#7)-\BTwoL)/\DenomRight)}
+			\pgfmathsetmacro{\HBTwoR}{(\BTwoR <= (#6) ? 2*(\BTwoR-(#5))/\DenomLeft : 2*((#7)-\BTwoR)/\DenomRight)}
+			\pgfmathsetmacro{\HBThreeL}{(\BThreeL <= (#6) ? 2*(\BThreeL-(#5))/\DenomLeft : 2*((#7)-\BThreeL)/\DenomRight)}
+			\pgfmathsetmacro{\HBThreeR}{(\BThreeR <= (#6) ? 2*(\BThreeR-(#5))/\DenomLeft : 2*((#7)-\BThreeR)/\DenomRight)}
+			\pgfmathsetmacro{\HBFourL}{(\BFourL <= (#6) ? 2*(\BFourL-(#5))/\DenomLeft : 2*((#7)-\BFourL)/\DenomRight)}
+			\pgfmathsetmacro{\HBFourR}{(\BFourR <= (#6) ? 2*(\BFourR-(#5))/\DenomLeft : 2*((#7)-\BFourR)/\DenomRight)}
+			
+			\pgfmathsetmacro{\CenterAHeight}{(#8 <= (#6) ? 2*((#8)-(#5))/\DenomLeft : 2*((#7)-(#8))/\DenomRight)}
+			\pgfmathsetmacro{\CenterBHeight}{(#9 <= (#6) ? 2*((#9)-(#5))/\DenomLeft : 2*((#7)-(#9))/\DenomRight)}
+			
+			\begin{axis}[
+				width=12cm,
+				height=5.8cm,
+				axis lines=left,
+				xlabel={$#1$},
+				ylabel={$f(#1)$},
+				xmin=#2,
+				xmax=#3,
+				ymin=0,
+				ymax=#4,
+				grid=both,
+				xtick={0,2,4,6,8,10,12,14,16},
+				ytick=\empty,
+				clip=false
+				]
+				
+				% Length 4 intervals (lightest)
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0.7pt]
+				coordinates {(\AFourL,0) (\AFourL,\HAFourL) (\AFourR,\HAFourR) (\AFourR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0.7pt]
+				coordinates {(\BFourL,0) (\BFourL,\HBFourL) (\BFourR,\HBFourR) (\BFourR,0)}
+				\closedcycle;
+				
+				% Length 3 intervals
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0.7pt]
+				coordinates {(\AThreeL,0) (\AThreeL,\HAThreeL) (\AThreeR,\HAThreeR) (\AThreeR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0.7pt]
+				coordinates {(\BThreeL,0) (\BThreeL,\HBThreeL) (\BThreeR,\HBThreeR) (\BThreeR,0)}
+				\closedcycle;
+				
+				% Length 2 intervals
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0.7pt]
+				coordinates {(\ATwoL,0) (\ATwoL,\HATwoL) (\ATwoR,\HATwoR) (\ATwoR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0.7pt]
+				coordinates {(\BTwoL,0) (\BTwoL,\HBTwoL) (\BTwoR,\HBTwoR) (\BTwoR,0)}
+				\closedcycle;
+				
+				% Length 1 intervals (darkest)
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0.7pt]
+				coordinates {(\AOneL,0) (\AOneL,\HAOneL) (\AOneR,\HAOneR) (\AOneR,0)}
+				\closedcycle;
+				\addplot[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0.7pt]
+				coordinates {(\BOneL,0) (\BOneL,\HBOneL) (\BOneR,\HBOneR) (\BOneR,0)}
+				\closedcycle;
+				
+				% Triangular PDF
+				\addplot[ultra thick, blue]
+				coordinates {(#5,0) (#6,\PeakHeight) (#7,0)};
+				
+				% Center guide lines
+				\addplot[densely dotted, thick]
+				coordinates {(#8,0) (#8,\CenterAHeight)};
+				\addplot[densely dotted, thick]
+				coordinates {(#9,0) (#9,\CenterBHeight)};
+				
+				\node[font=\small, above] at (axis cs:#8,\CenterAHeight) {center \(#8\)};
+				\node[font=\small, above] at (axis cs:#9,\CenterBHeight) {center \(#9\)};
+				
+				% Legend outside, top-right
+				\node[
+				font=\scriptsize,
+				align=left,
+				anchor=north west,
+				fill=white,
+				draw=black,
+				inner sep=4pt
+				] at (axis description cs:1.03,1.00) {%
+					\begin{tabular}{@{}l l@{}}
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(1\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(2\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(3\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(4\)
+					\end{tabular}
+				};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+% Replace the previous \NormalIntervalComparisonGraph command with this one.
+
+% \NormalIntervalComparisonGraph: 8 parameters
+% #1 = variable symbol
+% #2 = mean mu
+% #3 = standard deviation sigma
+% #4 = xmin
+% #5 = xmax
+% #6 = ymax
+% #7 = first center
+% #8 = second center
+\newcommand{\NormalIntervalComparisonGraph}[8]{%
+	\begin{center}
+		\begin{tikzpicture}
+			% Intervals around the first center
+			\pgfmathsetmacro{\AOneL}{#7-0.5}
+			\pgfmathsetmacro{\AOneR}{#7+0.5}
+			\pgfmathsetmacro{\ATwoL}{#7-1}
+			\pgfmathsetmacro{\ATwoR}{#7+1}
+			\pgfmathsetmacro{\AThreeL}{#7-1.5}
+			\pgfmathsetmacro{\AThreeR}{#7+1.5}
+			\pgfmathsetmacro{\AFourL}{#7-2}
+			\pgfmathsetmacro{\AFourR}{#7+2}
+			
+			% Intervals around the second center
+			\pgfmathsetmacro{\BOneL}{#8-0.5}
+			\pgfmathsetmacro{\BOneR}{#8+0.5}
+			\pgfmathsetmacro{\BTwoL}{#8-1}
+			\pgfmathsetmacro{\BTwoR}{#8+1}
+			\pgfmathsetmacro{\BThreeL}{#8-1.5}
+			\pgfmathsetmacro{\BThreeR}{#8+1.5}
+			\pgfmathsetmacro{\BFourL}{#8-2}
+			\pgfmathsetmacro{\BFourR}{#8+2}
+			
+			\pgfmathsetmacro{\CenterAHeight}{1/((#3)*sqrt(2*pi))*exp(-(((#7)-(#2))^2)/(2*(#3)^2))}
+			\pgfmathsetmacro{\CenterBHeight}{1/((#3)*sqrt(2*pi))*exp(-(((#8)-(#2))^2)/(2*(#3)^2))}
+			
+			\begin{axis}[
+				width=12cm,
+				height=5.8cm,
+				axis lines=left,
+				xlabel={$#1$},
+				ylabel={$f(#1)$},
+				xmin=#4,
+				xmax=#5,
+				ymin=0,
+				ymax=#6,
+				grid=both,
+				xtick={-6,-2,0,2,4,6,8,10,12,14,18},
+				ytick=\empty,
+				clip=false
+				]
+				
+				% Length 4 intervals (lightest)
+				\addplot[
+				draw=orange!80!black,
+				fill=orange,
+				fill opacity=0.12,
+				line width=0.7pt,
+				domain=\AFourL:\AFourR,
+				samples=120
+				]
+				{1/((#3)*sqrt(2*pi))*exp(-((x-(#2))^2)/(2*(#3)^2))}
+				\closedcycle;
+				
+				\addplot[
+				draw=orange!80!black,
+				fill=orange,
+				fill opacity=0.12,
+				line width=0.7pt,
+				domain=\BFourL:\BFourR,
+				samples=120
+				]
+				{1/((#3)*sqrt(2*pi))*exp(-((x-(#2))^2)/(2*(#3)^2))}
+				\closedcycle;
+				
+				% Length 3 intervals
+				\addplot[
+				draw=orange!80!black,
+				fill=orange,
+				fill opacity=0.22,
+				line width=0.7pt,
+				domain=\AThreeL:\AThreeR,
+				samples=120
+				]
+				{1/((#3)*sqrt(2*pi))*exp(-((x-(#2))^2)/(2*(#3)^2))}
+				\closedcycle;
+				
+				\addplot[
+				draw=orange!80!black,
+				fill=orange,
+				fill opacity=0.22,
+				line width=0.7pt,
+				domain=\BThreeL:\BThreeR,
+				samples=120
+				]
+				{1/((#3)*sqrt(2*pi))*exp(-((x-(#2))^2)/(2*(#3)^2))}
+				\closedcycle;
+				
+				% Length 2 intervals
+				\addplot[
+				draw=orange!80!black,
+				fill=orange,
+				fill opacity=0.35,
+				line width=0.7pt,
+				domain=\ATwoL:\ATwoR,
+				samples=120
+				]
+				{1/((#3)*sqrt(2*pi))*exp(-((x-(#2))^2)/(2*(#3)^2))}
+				\closedcycle;
+				
+				\addplot[
+				draw=orange!80!black,
+				fill=orange,
+				fill opacity=0.35,
+				line width=0.7pt,
+				domain=\BTwoL:\BTwoR,
+				samples=120
+				]
+				{1/((#3)*sqrt(2*pi))*exp(-((x-(#2))^2)/(2*(#3)^2))}
+				\closedcycle;
+				
+				% Length 1 intervals (darkest)
+				\addplot[
+				draw=orange!80!black,
+				fill=orange,
+				fill opacity=0.50,
+				line width=0.7pt,
+				domain=\AOneL:\AOneR,
+				samples=120
+				]
+				{1/((#3)*sqrt(2*pi))*exp(-((x-(#2))^2)/(2*(#3)^2))}
+				\closedcycle;
+				
+				\addplot[
+				draw=orange!80!black,
+				fill=orange,
+				fill opacity=0.50,
+				line width=0.7pt,
+				domain=\BOneL:\BOneR,
+				samples=120
+				]
+				{1/((#3)*sqrt(2*pi))*exp(-((x-(#2))^2)/(2*(#3)^2))}
+				\closedcycle;
+				
+				% Normal PDF
+				\addplot[
+				ultra thick,
+				blue,
+				domain=#4:#5,
+				samples=240
+				]
+				{1/((#3)*sqrt(2*pi))*exp(-((x-(#2))^2)/(2*(#3)^2))};
+				
+				% Mean guide line
+				\addplot[dashed, thick]
+				coordinates {(#2,0) (#2,{1/((#3)*sqrt(2*pi))})};
+				
+				\node[font=\small, above] at (axis cs:#2,{1/((#3)*sqrt(2*pi))}) {$E[#1]=#2$};
+				
+				% Center guide lines
+				\addplot[densely dotted, thick]
+				coordinates {(#7,0) (#7,\CenterAHeight)};
+				\addplot[densely dotted, thick]
+				coordinates {(#8,0) (#8,\CenterBHeight)};
+				
+				\node[font=\small, above] at (axis cs:#7,\CenterAHeight) {center \(#7\)};
+				\node[font=\small, above] at (axis cs:#8,\CenterBHeight) {center \(#8\)};
+				
+				% Legend outside, top-right
+				\node[
+				font=\scriptsize,
+				align=left,
+				anchor=north west,
+				fill=white,
+				draw=black,
+				inner sep=4pt
+				] at (axis description cs:1.03,1.00) {%
+					\begin{tabular}{@{}l l@{}}
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.50, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(1\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.35, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(2\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.22, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(3\) \\[3pt]
+						\tikz{\draw[draw=orange!80!black, fill=orange, fill opacity=0.12, line width=0pt] (0,0) rectangle (0.45,0.022);} & Length \(4\)
+					\end{tabular}
+				};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\UniformDistGraph}[5]{
+\begin{center}
+\begin{tikzpicture}
+\pgfmathsetmacro{\ua}{#1}
+\pgfmathsetmacro{\ub}{#2}
+\pgfmathsetmacro{\uh}{1/(\ub-\ua)}
+\begin{axis}[
+  width=9cm,
+  height=5cm,
+  axis lines=left,
+  xlabel={$x$},
+  ylabel={$f(x)$},
+  xmin=#3,
+  xmax=#4,
+  ymin=0,
+  ymax={1.6*\uh},
+  grid=both,
+  xtick={#5},
+  ytick=\empty
+]
+\addplot[very thick, blue, domain=\ua:\ub] {\uh};
+\addplot[very thick, blue] coordinates {(\ua,0) (\ua,\uh)};
+\addplot[very thick, blue] coordinates {(\ub,\uh) (\ub,0)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+}
+
+\newcommand{\TriangularDistGraph}[6]{
+\begin{center}
+\begin{tikzpicture}
+\pgfmathsetmacro{\ta}{#1}
+\pgfmathsetmacro{\tc}{#2}
+\pgfmathsetmacro{\tb}{#3}
+\pgfmathsetmacro{\th}{2/(\tb-\ta)}
+\begin{axis}[
+  width=9cm,
+  height=5cm,
+  axis lines=left,
+  xlabel={$x$},
+  ylabel={$f(x)$},
+  xmin=#4,
+  xmax=#5,
+  ymin=0,
+  ymax={1.6*\th},
+  grid=both,
+  xtick={#6},
+  ytick=\empty
+]
+\addplot[very thick, blue] coordinates {(\ta,0) (\tc,\th) (\tb,0)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+}
+
+\newcommand{\NormalDistGraph}[5]{
+\begin{center}
+\begin{tikzpicture}
+\pgfmathsetmacro{\mu}{#1}
+\pgfmathsetmacro{\sig}{#2}
+\begin{axis}[
+  width=9cm,
+  height=5cm,
+  axis lines=left,
+  xlabel={$x$},
+  ylabel={$f(x)$},
+  xmin=#3,
+  xmax=#4,
+  ymin=0,
+  grid=both,
+  xtick={#5},
+  ytick=\empty
+]
+\addplot[very thick, blue, domain=#3:#4, samples=220] {1/(\sig*sqrt(2*pi))*exp(-((x-\mu)^2)/(2*\sig^2))};
+\end{axis}
+\end{tikzpicture}
+\end{center}
+}
+
+% --------------------------------------------------
+\section{Uniform Distribution}
+
+\textbf{Problem.}
+A student's daily streaming time \(X\) (minutes) is modeled by
+\[
+X\sim \text{Uniform}(2,14).
+\]
+
+\textbf{Questions/Tasks.}
+\begin{enumerate}[label=\textbf{\alph*)}]
+	\item Find \(E[X]\).
+	\item Find \(\mathrm{Var}(X)\) and the standard deviation.
+	\item Write the PDF of \(X\).
+	\item Draw the graph of the PDF, indicate \(E[X]\), and draw an interval of one standard deviation around \(E[X]\).
+	\item Calculate the probability of the highlighted interval.
+	\item Compare the probabilities of intervals of the same length around \(4\) and around \(12\). What is the difference between these probabilities?
+\end{enumerate}
+
+\subsection*{C4}
+For \(X\sim\text{Uniform}(a,b)\):
+\[
+E[X]=\frac{a+b}{2},\qquad \mathrm{Var}(X)=\frac{(b-a)^2}{12}.
+\]
+
+\begin{enumerate}[label=\textbf{\alph*)}]
+	\item With \(a=2\) and \(b=14\),
+	\[
+	E[X]=\frac{2+14}{2}=8.
+	\]
+	
+	\item Using the same endpoints,
+	\[
+	\mathrm{Var}(X)=\frac{(14-2)^2}{12}=\frac{144}{12}=12,
+	\]
+	so
+	\[
+	\sigma=\sqrt{12}=2\sqrt{3}\approx 3.46.
+	\]
+	
+	\item Since \(X\sim\text{Uniform}(2,14)\), the PDF is constant on the support \([2,14]\). Its height is
+	\[
+	\frac{1}{14-2}=\frac{1}{12}.
+	\]
+	Therefore,
+	\[
+	f(x)=
+	\begin{cases}
+		\frac{1}{12}, & 2\le x\le 14,\\
+		0, & \text{otherwise}.
+	\end{cases}
+	\]
+	
+	\item From parts a and b, the mean is \(E[X]=8\) and the standard deviation is \(\sigma=2\sqrt{3}\). Therefore, one standard deviation around the mean is
+	\[
+	\left[E[X]-\sigma,\;E[X]+\sigma\right]
+	=
+	\left[8-2\sqrt{3},\;8+2\sqrt{3}\right]
+	\approx [4.54,\;11.46].
+	\]
+	
+	\UniformMeanSDGraph{X}{0}{16}{0.13}{2}{4.54}{8}{11.46}{14}
+	
+	\item The highlighted interval is the interval found in part d:
+	\[
+	\left[8-2\sqrt{3},\;8+2\sqrt{3}\right].
+	\]
+	So the probability of the highlighted interval is
+	\[
+	P\left(8-2\sqrt{3}\le X\le 8+2\sqrt{3}\right).
+	\]
+	
+	Using the PDF from part c, the height of the rectangle is \(\frac{1}{12}\). The base of the rectangle is the length of the highlighted interval:
+	\[
+	\left(8+2\sqrt{3}\right)-\left(8-2\sqrt{3}\right)=4\sqrt{3}.
+	\]
+	
+	Therefore,
+	\[
+	P\left(8-2\sqrt{3}\le X\le 8+2\sqrt{3}\right)
+	=
+	(\text{base})(\text{height})
+	=
+	(4\sqrt{3})\left(\frac{1}{12}\right).
+	\]
+	Thus,
+	\[
+	P\left(8-2\sqrt{3}\le X\le 8+2\sqrt{3}\right)
+	=
+	\frac{4\sqrt{3}}{12}
+	=
+	\frac{\sqrt{3}}{3}
+	\approx 0.577.
+	\]
+	
+	
+	\item Since this is a continuous model, the probability of any exact single value is \(0\). So we compare intervals of the same length around \(4\) and around \(12\).
+	
+	Using the PDF from part c, any interval inside \([2,14]\) with length \(L\) has probability
+	\[
+	P(\text{interval})=L\left(\frac{1}{12}\right)=\frac{L}{12}.
+	\]
+	
+	The following graph shows the \(8\) intervals. Intervals of length \(1\) are the darkest, and intervals of length \(4\) are the lightest.
+	
+	\UniformIntervalComparisonGraph{X}{0}{16}{0.13}{2}{14}{4}{12}
+	
+	\begin{center}
+		\begin{tabular}{c c c c c c}
+			\hline
+			Interval length & Around \(4\) & Probability & Around \(12\) & Probability & Difference \\
+			\hline
+			\(1\) & \([3.5,4.5]\) & \(\frac{1}{12}\) & \([11.5,12.5]\) & \(\frac{1}{12}\) & \(\frac{0}{12}\) \\
+			\(2\) & \([3,5]\) & \(\frac{2}{12}\) & \([11,13]\) & \(\frac{2}{12}\) & \(\frac{0}{12}\) \\
+			\(3\) & \([2.5,5.5]\) & \(\frac{3}{12}\) & \([10.5,13.5]\) & \(\frac{3}{12}\) & \(\frac{0}{12}\) \\
+			\(4\) & \([2,6]\) & \(\frac{4}{12}\) & \([10,14]\) & \(\frac{4}{12}\) & \(\frac{0}{12}\) \\
+			\hline
+		\end{tabular}
+	\end{center}
+	
+	In each row, the two intervals have the same length and lie completely inside the support \([2,14]\). Since the distribution is uniform, their probabilities are equal.
+	
+	The difference between the probabilities around \(4\) and around \(12\) is always
+	\[
+	0.
+	\]
+	
+\end{enumerate}
+
+% --------------------------------------------------
+\section{Triangular Distribution 1}
+
+\textbf{Problem.}
+A bus wait time \(W\) (minutes) is modeled by a triangular distribution with minimum \(a=2\), mode \(c=2\), and maximum \(b=14\):
+\[
+W\sim \text{Triangular}(2,2,14).
+\]
+
+\textbf{Questions/Tasks.}
+\begin{enumerate}[label=\textbf{\alph*)}]
+	\item Find \(E[W]\).
+	\item Find \(\mathrm{Var}(W)\) and the standard deviation.
+	\item Write the PDF of \(W\).
+	\item Draw the graph of the PDF, indicate \(E[W]\), and draw an interval of one standard deviation around \(E[W]\).
+	\item Calculate the probability of the highlighted interval.
+	\item Compare the probabilities of intervals of the same length around \(4\) and around \(12\). What is the difference between these probabilities?
+\end{enumerate}
+
+\subsection*{C4}
+For \(\text{Triangular}(a,c,b)\):
+\[
+E[W]=\frac{a+b+c}{3},\qquad
+\mathrm{Var}(W)=\frac{a^2+b^2+c^2-ab-ac-bc}{18}.
+\]
+
+\begin{enumerate}[label=\textbf{\alph*)}]
+	\item With \(a=2\), \(c=2\), and \(b=14\),
+	\[
+	E[W]=\frac{2+14+2}{3}=\frac{18}{3}=6.
+	\]
+	
+	\item Using the same parameters,
+	\[
+	\mathrm{Var}(W)=\frac{2^2+14^2+2^2-(2)(14)-(2)(2)-(14)(2)}{18}
+	=
+	\frac{4+196+4-28-4-28}{18}
+	=
+	\frac{144}{18}=8.
+	\]
+	Therefore,
+	\[
+	\sigma=\sqrt{8}=2\sqrt{2}\approx 2.83.
+	\]
+	
+		\item Since the mode is at the left endpoint, the PDF is a decreasing straight line from \(w=2\) to \(w=14\). The total area under the PDF must be \(1\). Therefore, the maximum height is found from the area of the full triangle:
+	\[
+	A_{\triangle} = \frac{1}{2}(\text{base})(\text{height})=1
+	\qquad , \qquad
+	\text{base}=14-2=12.
+	\]
+	So
+	\[
+	A_{\triangle}=\frac{1}{2}(12)(\text{height})=1
+	\qquad \longrightarrow \qquad
+	6(\text{height})=1
+	\qquad \longrightarrow \qquad
+	\text{height}=\frac{1}{6}.
+	\]
+	
+	The PDF has height \(\frac{1}{6}\) at \(w=2\) and height \(0\) at \(w=14\). Since this is one decreasing line segment, use the basic line form
+	\[
+	f(w)=m(w-c),
+	\]
+	To find \(c\), use the fact that the line has height \(0\) at \(w=14\):
+	\[
+	f(14)=0
+	\qquad \longrightarrow \qquad
+	m(14-c)=0
+	\qquad \longrightarrow \qquad
+	14-c=0
+	\qquad \longrightarrow \qquad
+	c=14.
+	\]
+	Therefore, the line has the form
+	\[
+	f(w)=m(w-14),
+	\qquad 2\le w\le 14.
+	\]
+	
+	To find \(m\), use the fact that the line has height \(\frac{1}{6}\) at the mode \(w=2\):
+	\[
+	f(2)=\frac{1}{6}
+	\qquad \longrightarrow \qquad
+	m(2-14)=\frac{1}{6}
+	\qquad \longrightarrow \qquad
+	-12m=\frac{1}{6}
+	\qquad \longrightarrow \qquad
+	m=-\frac{1}{72}.
+	\]
+	Therefore,
+	\[
+	f(w)=-\frac{1}{72}(w-14)
+	=
+	\frac{14-w}{72},
+	\qquad 2\le w\le 14.
+	\]
+	
+	Thus,
+	\[
+	f(w)=
+	\begin{cases}
+		\frac{14-w}{72}, & 2\le w\le 14,\\
+		0, & \text{otherwise}.
+	\end{cases}
+	\]
+	
+	\item From parts a and b, the mean is \(E[W]=6\) and the standard deviation is \(\sigma=2\sqrt{2}\). Therefore, one standard deviation around the mean is
+	\[
+	[E[W]-\sigma,\;E[W]+\sigma]
+	=
+	[6-2\sqrt{2},\;6+2\sqrt{2}]
+	\approx [3.17,\;8.83].
+	\]
+	
+	\TriangularMeanSDGraph{W}{2}{2}{14}{0}{16}{0.19}
+	
+		\item The highlighted interval is the interval found in part d:
+	\[
+	[6-2\sqrt{2},\;6+2\sqrt{2}].
+	\]
+	The probability of this interval is represented by the area under the PDF above the highlighted interval:
+	\[
+	P(6-2\sqrt{2}\le W\le 6+2\sqrt{2}).
+	\]
+	
+	Since the PDF is a straight line over this interval, the highlighted region is a trapezoid. Therefore,
+	\[
+	P(6-2\sqrt{2}\le W\le 6+2\sqrt{2})
+	=
+	\frac{1}{2}(\text{width})(\text{left height}+\text{right height}).
+	\]
+	
+	Using the PDF from part c, the height at the left endpoint of the highlighted interval is
+	\[
+	\text{left height}=f(6-2\sqrt{2})
+	=
+	\frac{14-(6-2\sqrt{2})}{72}
+	=
+	\frac{8+2\sqrt{2}}{72}
+	=
+	\frac{4+\sqrt{2}}{36}.
+	\]
+	The height at the right endpoint is
+	\[
+	\text{right height}=f(6+2\sqrt{2})
+	=
+	\frac{14-(6+2\sqrt{2})}{72}
+	=
+	\frac{8-2\sqrt{2}}{72}
+	=
+	\frac{4-\sqrt{2}}{36}.
+	\]
+	
+	The width of the trapezoid is
+	\[
+	\text{width}
+	=
+	(6+2\sqrt{2})-(6-2\sqrt{2})
+	=
+	4\sqrt{2}.
+	\]
+	
+	Substituting the width and the two heights into the trapezoid area formula,
+	\[
+	P(6-2\sqrt{2}\le W\le 6+2\sqrt{2})
+	=
+	\frac{1}{2}(4\sqrt{2})
+	\left(
+	\frac{4+\sqrt{2}}{36}
+	+
+	\frac{4-\sqrt{2}}{36}
+	\right).
+	\]
+	Since
+	\[
+	\frac{4+\sqrt{2}}{36}
+	+
+	\frac{4-\sqrt{2}}{36}
+	=
+	\frac{8}{36}
+	=
+	\frac{2}{9},
+	\]
+	we get
+	\[
+	P(6-2\sqrt{2}\le W\le 6+2\sqrt{2})
+	=
+	\frac{1}{2}(4\sqrt{2})\left(\frac{2}{9}\right)
+	=
+	\frac{4\sqrt{2}}{9}
+	\approx 0.629.
+	\]
+	
+	\item Since this is a continuous model, the probability of any exact single value is \(0\). So we compare intervals of the same length around \(4\) and around \(12\).
+	
+	Using the PDF from part c, each interval probability is found as the area of a trapezoid:
+	\[
+	P(r\le W\le s)
+	=
+	\frac{1}{2}(\text{interval length})(f(r)+f(s)).
+	\]
+	
+		The following graph shows the \(8\) intervals. Intervals of length \(1\) are the darkest, and intervals of length \(4\) are the lightest.
+	
+	\TriangularLeftModeIntervalComparisonGraph{W}{0}{16}{0.19}{2}{14}{4}{12}
+	
+	\begin{center}
+		\begin{tabular}{c c c c c c}
+			\hline
+			Interval length & Around \(4\) & Probability & Around \(12\) & Probability & Difference \\
+			\hline
+			\(1\) & \([3.5,4.5]\) & \(\frac{5}{36}\) & \([11.5,12.5]\) & \(\frac{1}{36}\) & \(\frac{4}{36}\) \\
+			\(2\) & \([3,5]\) & \(\frac{10}{36}\) & \([11,13]\) & \(\frac{2}{36}\) & \(\frac{8}{36}\) \\
+			\(3\) & \([2.5,5.5]\) & \(\frac{15}{36}\) & \([10.5,13.5]\) & \(\frac{3}{36}\) & \(\frac{12}{36}\) \\
+			\(4\) & \([2,6]\) & \(\frac{20}{36}\) & \([10,14]\) & \(\frac{4}{36}\) & \(\frac{16}{36}\) \\
+			\hline
+		\end{tabular}
+	\end{center}
+	
+	The intervals around \(4\) have larger probability than the intervals around \(12\). This happens because the density is higher near the left side of the distribution and decreases as \(W\) increases.
+	
+\end{enumerate}
+
+% --------------------------------------------------
+\section{Triangular Distribution 2}
+
+\textbf{Problem.}
+A bus wait time \(W\) (minutes) is modeled by a triangular distribution with minimum \(a=2\), mode \(c=6\), and maximum \(b=14\):
+\[
+W\sim \text{Triangular}(2,6,14).
+\]
+
+\textbf{Questions/Tasks.}
+\begin{enumerate}[label=\textbf{\alph*)}]
+	\item Find \(E[W]\).
+	\item Find \(\mathrm{Var}(W)\) and the standard deviation.
+	\item Write the PDF of \(W\).
+	\item Draw the graph of the PDF, indicate \(E[W]\), and draw an interval of one standard deviation around \(E[W]\).
+	\item Calculate the probability of the highlighted interval.
+	\item Compare the probabilities of intervals of the same length around \(4\) and around \(12\). What is the difference between these probabilities?
+\end{enumerate}
+
+\subsection*{C4}
+For \(\text{Triangular}(a,c,b)\):
+\[
+E[W]=\frac{a+b+c}{3},\qquad
+\mathrm{Var}(W)=\frac{a^2+b^2+c^2-ab-ac-bc}{18}.
+\]
+
+\begin{enumerate}[label=\textbf{\alph*)}]
+	\item With \(a=2\), \(c=6\), and \(b=14\),
+	\[
+	E[W]=\frac{2+14+6}{3}=\frac{22}{3}\approx 7.33.
+	\]
+	
+	\item Using the same parameters,
+	\[
+	\mathrm{Var}(W)=\frac{2^2+14^2+6^2-(2)(14)-(2)(6)-(14)(6)}{18}
+	=
+	\frac{4+196+36-28-12-84}{18}
+	=
+	\frac{112}{18}
+	=
+	\frac{56}{9}.
+	\]
+	Therefore,
+	\[
+	\sigma=\sqrt{\frac{56}{9}}=\frac{2\sqrt{14}}{3}\approx 2.49.
+	\]
+	
+	\item Since the mode is at \(w=6\), the PDF increases linearly from \(w=2\) to \(w=6\), then decreases linearly from \(w=6\) to \(w=14\). The total area under the PDF must be \(1\). Therefore, the maximum height is found from the area of the full triangle:
+	\[
+	A_{\triangle} = \frac{1}{2}(\text{base})(\text{height})=1
+	\qquad , \qquad
+	\text{base}=14-2=12.
+	\]
+	So
+	\[
+	A_{\triangle}=\frac{1}{2}(12)(\text{height})=1
+	\qquad \longrightarrow \qquad
+	6(\text{height})=1
+	\qquad \longrightarrow \qquad
+	\text{height}=\frac{1}{6}.
+	\]
+	
+	The graph has two line segments. For each segment, use the basic line form
+	\[
+	f(w)=m(w-c).
+	\]
+	
+	For the left side, the line has height \(0\) at \(w=2\). To find \(c\), use
+	\[
+	f(2)=0
+	\qquad \longrightarrow \qquad
+	m_1(2-c)=0
+	\qquad \longrightarrow \qquad
+	2-c=0
+	\qquad \longrightarrow \qquad
+	c=2.
+	\]
+	Therefore, the left side has the form
+	\[
+	f(w)=m_1(w-2),
+	\qquad 2\le w\le 6.
+	\]
+	
+	To find \(m_1\), use the fact that the line has height \(\frac{1}{6}\) at the mode \(w=6\):
+	\[
+	f(6)=\frac{1}{6}
+	\qquad \longrightarrow \qquad
+	m_1(6-2)=\frac{1}{6}
+	\qquad \longrightarrow \qquad
+	4m_1=\frac{1}{6}
+	\qquad \longrightarrow \qquad
+	m_1=\frac{1}{24}.
+	\]
+	Therefore,
+	\[
+	f(w)=\frac{1}{24}(w-2)
+	=
+	\frac{w-2}{24},
+	\qquad 2\le w\le 6.
+	\]
+	
+	For the right side, the line has height \(0\) at \(w=14\). To find \(c\), use
+	\[
+	f(14)=0
+	\qquad \longrightarrow \qquad
+	m_2(14-c)=0
+	\qquad \longrightarrow \qquad
+	14-c=0
+	\qquad \longrightarrow \qquad
+	c=14.
+	\]
+	Therefore, the right side has the form
+	\[
+	f(w)=m_2(w-14),
+	\qquad 6\le w\le 14.
+	\]
+	
+	To find \(m_2\), use the fact that the line has height \(\frac{1}{6}\) at the mode \(w=6\):
+	\[
+	f(6)=\frac{1}{6}
+	\qquad \longrightarrow \qquad
+	m_2(6-14)=\frac{1}{6}
+	\qquad \longrightarrow \qquad
+	-8m_2=\frac{1}{6}
+	\qquad \longrightarrow \qquad
+	m_2=-\frac{1}{48}.
+	\]
+	Therefore,
+	\[
+	f(w)=-\frac{1}{48}(w-14)
+	=
+	\frac{14-w}{48},
+	\qquad 6\le w\le 14.
+	\]
+	
+	Thus,
+	\[
+	f(w)=
+	\begin{cases}
+		\frac{w-2}{24}, & 2\le w\le 6,\\
+		\frac{14-w}{48}, & 6\le w\le 14,\\
+		0, & \text{otherwise}.
+	\end{cases}
+	\]
+	
+	\item From parts a and b, the mean is \(E[W]=\frac{22}{3}\) and the standard deviation is \(\sigma=\frac{2\sqrt{14}}{3}\). Therefore, one standard deviation around the mean is
+	\[
+	[E[W]-\sigma,\;E[W]+\sigma]
+	=
+	\left[\frac{22-2\sqrt{14}}{3},\;\frac{22+2\sqrt{14}}{3}\right]
+	\approx [4.84,\;9.83].
+	\]
+	
+	\TriangularMeanSDGraph{W}{2}{6}{14}{0}{16}{0.19}
+	
+		\item The highlighted interval is the interval found in part d:
+	\[
+	\left[\frac{22-2\sqrt{14}}{3},\;\frac{22+2\sqrt{14}}{3}\right].
+	\]
+	The probability of this interval is represented by the area under the PDF above the highlighted interval:
+	\[
+	P\left(\frac{22-2\sqrt{14}}{3}\le W\le \frac{22+2\sqrt{14}}{3}\right).
+	\]
+	
+	Instead of calculating the highlighted area directly, use the complement rule. The total area under the PDF is \(1\), so the highlighted probability is
+	\[
+	1-(\text{left extreme triangle})-(\text{right extreme triangle}).
+	\]
+	
+	Using the PDF from part c, the height at the left endpoint of the highlighted interval is
+	\[
+	\text{left height}
+	=
+	f\left(\frac{22-2\sqrt{14}}{3}\right)
+	=
+	\frac{\frac{22-2\sqrt{14}}{3}-2}{24}
+	=
+	\frac{8-\sqrt{14}}{36}.
+	\]
+	The base of the left extreme triangle is
+	\[
+	\text{left base}
+	=
+	\frac{22-2\sqrt{14}}{3}-2
+	=
+	\frac{16-2\sqrt{14}}{3}.
+	\]
+	Therefore, the area of the left extreme triangle is
+	\[
+	A_{L\triangle}
+	=
+	\frac{1}{2}
+	\left(\frac{16-2\sqrt{14}}{3}\right)
+	\left(\frac{8-\sqrt{14}}{36}\right)
+	=
+	\frac{13}{18}-\frac{4\sqrt{14}}{27}.
+	\]
+	
+	Using the PDF from part c, the height at the right endpoint of the highlighted interval is
+	\[
+	\text{right height}
+	=
+	f\left(\frac{22+2\sqrt{14}}{3}\right)
+	=
+	\frac{14-\frac{22+2\sqrt{14}}{3}}{48}
+	=
+	\frac{10-\sqrt{14}}{72}.
+	\]
+	The base of the right extreme triangle is
+	\[
+	\text{right base}
+	=
+	14-\frac{22+2\sqrt{14}}{3}
+	=
+	\frac{20-2\sqrt{14}}{3}.
+	\]
+	Therefore, the area of the right extreme triangle is
+	\[
+	A_{R\triangle}
+	=
+	\frac{1}{2}
+	\left(\frac{20-2\sqrt{14}}{3}\right)
+	\left(\frac{10-\sqrt{14}}{72}\right)
+	=
+	\frac{19}{36}-\frac{5\sqrt{14}}{54}.
+	\]
+	
+	By the complement rule,
+	\[
+	P\left(\frac{22-2\sqrt{14}}{3}\le W\le \frac{22+2\sqrt{14}}{3}\right)
+	=
+	1-A_{L\triangle}-A_{R\triangle}
+	\]
+	Substituting the two triangle areas,
+	\[
+	P\left(\frac{22-2\sqrt{14}}{3}\le W\le \frac{22+2\sqrt{14}}{3}\right)
+	=
+	1-
+	\left(\frac{13}{18}-\frac{4\sqrt{14}}{27}\right)
+	-
+	\left(\frac{19}{36}-\frac{5\sqrt{14}}{54}\right).
+	\]
+	Thus,
+	\[
+	P\left(\frac{22-2\sqrt{14}}{3}\le W\le \frac{22+2\sqrt{14}}{3}\right)
+	=
+	-\frac{1}{4}+\frac{13\sqrt{14}}{54}
+	\approx 0.651.
+	\]
+	
+	\item Since this is a continuous model, the probability of any exact single value is \(0\). So we compare intervals of the same length around \(4\) and around \(12\).
+	
+	Using the PDF from part c, each interval probability is found as the area of a trapezoid:
+	\[
+	P(r\le W\le s)
+	=
+	\frac{1}{2}(\text{interval length})(f(r)+f(s)).
+	\]
+	
+	The following graph shows the \(8\) intervals. Intervals of length \(1\) are the darkest, and intervals of length \(4\) are the lightest.
+	
+	\TriangularIntervalComparisonGraph{W}{0}{16}{0.19}{2}{6}{14}{4}{12}
+	
+	\begin{center}
+		\begin{tabular}{c c c c c c}
+			\hline
+			Interval length & Around \(4\) & Probability & Around \(12\) & Probability & Difference \\
+			\hline
+			\(1\) & \([3.5,4.5]\) & \(\frac{2}{24}\) & \([11.5,12.5]\) & \(\frac{1}{24}\) & \(\frac{1}{24}\) \\
+			\(2\) & \([3,5]\) & \(\frac{4}{24}\) & \([11,13]\) & \(\frac{2}{24}\) & \(\frac{2}{24}\) \\
+			\(3\) & \([2.5,5.5]\) & \(\frac{6}{24}\) & \([10.5,13.5]\) & \(\frac{3}{24}\) & \(\frac{3}{24}\) \\
+			\(4\) & \([2,6]\) & \(\frac{8}{24}\) & \([10,14]\) & \(\frac{4}{24}\) & \(\frac{4}{24}\) \\
+			\hline
+		\end{tabular}
+	\end{center}
+	
+	The intervals around \(4\) have larger probability than the intervals around \(12\). This happens because \(4\) is closer to the mode than \(12\), so the density is higher around \(4\).
+	
+\end{enumerate}
+
+% --------------------------------------------------
+\section{Normal Distribution}
+
+\textbf{Problem.}
+Quiz scores \(S\) are modeled by
+\[
+S\sim N(6,4^2).
+\]
+
+\textbf{Questions/Tasks.}
+\begin{enumerate}[label=\textbf{\alph*)}]
+	\item State \(E[S]\).
+	\item State \(\mathrm{Var}(S)\) and the standard deviation.
+	\item Write the PDF of \(S\).
+	\item Give the intervals \([\mu-\sigma,\mu+\sigma]\) and \([\mu-2\sigma,\mu+2\sigma]\), draw the graph of the PDF, indicate \(E[S]\), and draw the interval of one standard deviation around \(E[S]\).
+	\item Find the probability of the highlighted interval \([\mu-\sigma,\mu+\sigma]\).
+	\item Compare the probabilities of intervals of the same length around \(6\) and around \(-2\). What is the difference between these probabilities?
+\end{enumerate}
+
+\subsection*{C4}
+For \(N(\mu,\sigma^2)\),
+\[
+E[S]=\mu,
+\qquad
+\mathrm{Var}(S)=\sigma^2.
+\]
+
+\begin{enumerate}[label=\textbf{\alph*)}]
+	\item Since
+	\[
+	S\sim N(6,4^2),
+	\]
+	the mean is
+	\[
+	E[S]=\mu=6.
+	\]
+	
+	\item Using the same parameters,
+	\[
+	\mathrm{Var}(S)=\sigma^2=4^2=16.
+	\]
+	Therefore,
+	\[
+	\sigma=4.
+	\]
+	
+	\item For a normal distribution, the PDF is
+	\[
+	f(s)=\frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(s-\mu)^2}{2\sigma^2}}.
+	\]
+	
+	Using \(\mu=6\) and \(\sigma=4\), the PDF is
+	\[
+	f(s)=\frac{1}{4\sqrt{2\pi}}e^{-\frac{(s-6)^2}{2(4)^2}}.
+	\]
+	Equivalently,
+	\[
+	f(s)=\frac{1}{4\sqrt{2\pi}}e^{-\frac{(s-6)^2}{32}},
+	\qquad -\infty<s<\infty.
+	\]
+	
+	\item From parts a and b, the mean is \(E[S]=6\) and the standard deviation is \(\sigma=4\). Therefore,
+	\[
+	[\mu-\sigma,\mu+\sigma]
+	=
+	[6-4,\;6+4]
+	=
+	[2,10].
+	\]
+	Also,
+	\[
+	[\mu-2\sigma,\mu+2\sigma]
+	=
+	[6-2(4),\;6+2(4)]
+	=
+	[-2,14].
+	\]
+	
+	\NormalMeanSDGraph{S}{6}{4}{-6}{18}{0.11}
+	
+	\item The highlighted interval is the interval found in part d:
+	\[
+	[2,10].
+	\]
+	The probability of this interval is represented by the area under the normal curve above the highlighted interval:
+	\[
+	P(2\le S\le 10).
+	\]
+	
+	To use the standard normal distribution, standardize with
+	\[
+	Z=\frac{S-\mu}{\sigma}
+	=
+	\frac{S-6}{4}.
+	\]
+	Then
+	\[
+	P(2\le S\le 10)
+	=
+	P\left(\frac{2-6}{4}\le Z\le \frac{10-6}{4}\right).
+	\]
+	So
+	\[
+	P(2\le S\le 10)
+	=
+	P(-1\le Z\le 1).
+	\]
+	
+	Using the standard normal distribution,
+	\[
+	P(-1\le Z\le 1)\approx 0.6827.
+	\]
+	Therefore,
+	\[
+	P(2\le S\le 10)\approx 0.6827.
+	\]
+	
+		\item Since this is a continuous model, the probability of any exact single value is \(0\). So we compare intervals of the same length around \(4\) and around \(12\).
+	
+	Using the standardization formula from part e,
+	\[
+	Z=\frac{S-6}{4},
+	\]
+	each interval probability can be found by converting the endpoints to \(z\)-scores and using the standard normal distribution.
+	
+	The following graph shows the \(8\) intervals. Intervals of length \(1\) are the darkest, and intervals of length \(4\) are the lightest.
+	
+	\NormalIntervalComparisonGraph{S}{6}{4}{-6}{18}{0.11}{4}{12}
+	
+	\begin{center}
+		\begin{tabular}{c c c c c c}
+			\hline
+			Interval length & Around \(4\) & Probability & Around \(12\) & Probability & Difference \\
+			\hline
+			\(1\) & \([3.5,4.5]\) & \(0.0878\) & \([11.5,12.5]\) & \(0.0325\) & \(0.0553\) \\
+			\(2\) & \([3,5]\) & \(0.1747\) & \([11,13]\) & \(0.0656\) & \(0.1091\) \\
+			\(4\) & \([2,6]\) & \(0.3413\) & \([10,14]\) & \(0.1359\) & \(0.2054\) \\
+			\(8\) & \([0,8]\) & \(0.6247\) & \([8,16]\) & \(0.3023\) & \(0.3223\) \\
+			\hline
+		\end{tabular}
+	\end{center}
+	
+	The intervals around \(4\) have larger probability than the intervals around \(12\). This happens because \(4\) is closer to the mean \(6\), where the normal density is highest. The value \(12\) is farther from the mean, so intervals around \(12\) have less area under the curve.
+	
+\end{enumerate}
+
+% --------------------------------------------------
+\section{Comparing Uniform Distributions}
+
+\textbf{Problem.}
+Compare these uniform models for download times (seconds):
+\[
+X_1\sim \text{Uniform}(4,10),\qquad X_2\sim \text{Uniform}(6,12),\qquad X_3\sim \text{Uniform}(4,14).
+\]
+
+\textbf{Questions/Tasks.}
+\begin{enumerate}[label=\textbf{\alph*)}]
+  \item Find \(E[X_i]\) and \(\mathrm{Var}(X_i)\) for \(i=1,2,3\).
+  \item Compare \(X_1\) and \(X_2\): only location changes. How do center and spread change?
+  \item Compare \(X_1\) and \(X_3\): only width changes from 6 to 10. How does variance change?
+  \item Which model has the widest spread, and why?
+\end{enumerate}
+
+\subsection*{C4}
+Using \(E=\frac{a+b}{2}\), \(\mathrm{Var}=\frac{(b-a)^2}{12}\):
+\[
+E[X_1]=7,\quad \mathrm{Var}(X_1)=\frac{6^2}{12}=3;
+\]
+\[
+E[X_2]=9,\quad \mathrm{Var}(X_2)=\frac{6^2}{12}=3;
+\]
+\[
+E[X_3]=9,\quad \mathrm{Var}(X_3)=\frac{10^2}{12}=\frac{25}{3}.
+\]
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  width=10cm,
+  height=5.6cm,
+  axis lines=left,
+  xlabel={$x$},
+  ylabel={$f(x)$},
+  xmin=3,
+  xmax=15,
+  ymin=0,
+  ymax=0.21,
+  grid=both,
+  xtick={4,6,10,12,14},
+  ytick=\empty,
+  legend style={at={(0.98,0.98)},anchor=north east,draw=none,fill=none}
+]
+\addplot[very thick, blue] coordinates {(4,0) (4,1/6) (10,1/6) (10,0)};
+\addlegendentry{$X_1\sim U(4,10)$}
+\addplot[very thick, red] coordinates {(6,0) (6,1/6) (12,1/6) (12,0)};
+\addlegendentry{$X_2\sim U(6,12)$}
+\addplot[very thick, teal!70!black] coordinates {(4,0) (4,1/10) (14,1/10) (14,0)};
+\addlegendentry{$X_3\sim U(4,14)$}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+Shifting both endpoints by the same amount changes the mean but not spread. Increasing interval width increases variance.
+
+% --------------------------------------------------
+\section{Comparing Triangular Distributions}
+
+\textbf{Problem.}
+A packing process time \(T\) (minutes) follows triangular models:
+\[
+T_1\sim \text{Triangular}(2,5,10),\quad
+T_2\sim \text{Triangular}(2,7,10),\quad
+T_3\sim \text{Triangular}(4,7,12).
+\]
+
+\textbf{Questions/Tasks.}
+\begin{enumerate}[label=\textbf{\alph*)}]
+  \item Compute \(E[T_i]\) and \(\mathrm{Var}(T_i)\) for each model.
+  \item Compare \(T_1\) and \(T_2\): only mode changes. How do center and shape change?
+  \item Compare \(T_2\) and \(T_3\): all three parameters shift by +2. What stays the same and what changes?
+  \item Which model is most concentrated near larger times? Explain using the peak location.
+\end{enumerate}
+
+\subsection*{C4}
+Using triangular formulas:
+\[
+E[T_1]=\frac{2+5+10}{3}=\frac{17}{3},\quad
+\mathrm{Var}(T_1)=\frac{2^2+5^2+10^2-2\cdot5-2\cdot10-5\cdot10}{18}=\frac{49}{18}.
+\]
+\[
+E[T_2]=\frac{2+7+10}{3}=\frac{19}{3},\quad
+\mathrm{Var}(T_2)=\frac{2^2+7^2+10^2-2\cdot7-2\cdot10-7\cdot10}{18}=\frac{49}{18}.
+\]
+\[
+E[T_3]=\frac{4+7+12}{3}=\frac{23}{3},\quad
+\mathrm{Var}(T_3)=\frac{4^2+7^2+12^2-4\cdot7-4\cdot12-7\cdot12}{18}=\frac{49}{18}.
+\]
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  width=10cm,
+  height=5.6cm,
+  axis lines=left,
+  xlabel={$t$},
+  ylabel={$f(t)$},
+  xmin=1,
+  xmax=13,
+  ymin=0,
+  ymax=0.28,
+  grid=both,
+  xtick={2,4,5,7,10,12},
+  ytick=\empty,
+  legend style={at={(0.98,0.98)},anchor=north east,draw=none,fill=none}
+]
+\addplot[very thick, blue] coordinates {(2,0) (5,0.25) (10,0)};
+\addlegendentry{$T_1:(2,5,10)$}
+\addplot[very thick, red] coordinates {(2,0) (7,0.25) (10,0)};
+\addlegendentry{$T_2:(2,7,10)$}
+\addplot[very thick, teal!70!black] coordinates {(4,0) (7,0.25) (12,0)};
+\addlegendentry{$T_3:(4,7,12)$}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+Changing only the mode shifts peak and mean but here keeps variance unchanged; shifting all parameters by +2 shifts location but not spread.
+
+% --------------------------------------------------
+\section{Comparing Normal Distributions}
+
+\textbf{Problem.}
+Daily step counts (thousands) are modeled as:
+\[
+N_1\sim N(9,1.5^2),\qquad N_2\sim N(11,1.5^2),\qquad N_3\sim N(9,2.5^2).
+\]
+
+\textbf{Questions/Tasks.}
+\begin{enumerate}[label=\textbf{\alph*)}]
+  \item State mean and variance for each distribution.
+  \item Compare \(N_1\) and \(N_2\): only mean changes. What changes on the graph?
+  \item Compare \(N_1\) and \(N_3\): only standard deviation changes. What happens to spread and peak height?
+  \item Which distribution gives a higher chance of being far from its mean? Explain.
+\end{enumerate}
+
+\subsection*{C4}
+\[
+E[N_1]=9,\ \mathrm{Var}(N_1)=2.25;
+\qquad
+E[N_2]=11,\ \mathrm{Var}(N_2)=2.25;
+\qquad
+E[N_3]=9,\ \mathrm{Var}(N_3)=6.25.
+\]
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[
+  width=10cm,
+  height=5.6cm,
+  axis lines=left,
+  xlabel={$x$ (thousands)},
+  ylabel={$f(x)$},
+  xmin=1,
+  xmax=19,
+  ymin=0,
+  grid=both,
+  xtick={6,9,11,12,14},
+  ytick=\empty,
+  legend style={at={(0.98,0.98)},anchor=north east,draw=none,fill=none}
+]
+\addplot[very thick, blue, domain=1:19, samples=220] {1/(1.5*sqrt(2*pi))*exp(-((x-9)^2)/(2*1.5^2))};
+\addlegendentry{$N_1:N(9,1.5^2)$}
+\addplot[very thick, red, domain=1:19, samples=220] {1/(1.5*sqrt(2*pi))*exp(-((x-11)^2)/(2*1.5^2))};
+\addlegendentry{$N_2:N(11,1.5^2)$}
+\addplot[very thick, teal!70!black, domain=1:19, samples=220] {1/(2.5*sqrt(2*pi))*exp(-((x-9)^2)/(2*2.5^2))};
+\addlegendentry{$N_3:N(9,2.5^2)$}
+\end{axis}
+\end{tikzpicture}
+\end{center}
+Changing \(\mu\) moves the center left or right without changing shape width. Increasing \(\sigma\) makes the curve wider and less peaked, so far-from-mean values become more likely.
+
+% --------------------------------------------------
+\section{Uniform with Parameters}
+
+\textbf{Problem.}
+A random time \(X\) (minutes) is
+\[
+X\sim \text{Uniform}(p,p+12),\qquad p\in\mathbb{R}.
+\]
+
+\textbf{Questions/Tasks.}
+\begin{enumerate}[label=\textbf{\alph*)}]
+  \item Express \(E[X]\) in terms of \(p\).
+  \item Express \(\mathrm{Var}(X)\) in terms of \(p\).
+  \item Which parameter controls location and which controls spread?
+  \item If \(p\) increases by 5, how do mean and variance change?
+\end{enumerate}
+
+\subsection*{C4}
+\[
+E[X]=\frac{p+(p+12)}{2}=p+6,
+\qquad
+\mathrm{Var}(X)=\frac{((p+12)-p)^2}{12}=\frac{12^2}{12}=12.
+\]
+\begin{center}
+\begin{tikzpicture}
+\draw[->] (0,0) -- (8,0) node[right] {$x$};
+\draw[->] (0,0) -- (0,3.4) node[above] {$f(x)$};
+\draw[very thick, blue] (1.4,0) -- (1.4,2.1) -- (6.6,2.1) -- (6.6,0);
+\node[below] at (1.4,0) {$p$};
+\node[below] at (6.6,0) {$p+12$};
+\node[below] at (4.0,0) {$p+6$};
+\draw[dashed] (4.0,0) -- (4.0,2.1);
+\node[left] at (0,2.1) {$\frac{1}{12}$};
+\end{tikzpicture}
+\end{center}
+So \(p\) controls location; spread is fixed by width 12 and does not depend on \(p\).
+
+% --------------------------------------------------
+\section{Triangular with Parameters}
+
+\textbf{Problem.}
+A project completion time \(Y\) (days) is modeled by
+\[
+Y\sim \text{Triangular}(4,4+m,14),\qquad 0\le m\le 10.
+\]
+
+\textbf{Questions/Tasks.}
+\begin{enumerate}[label=\textbf{\alph*)}]
+  \item Write \(E[Y]\) and \(\mathrm{Var}(Y)\) as functions of \(m\).
+  \item State the condition on \(m\) that makes the model valid.
+  \item How does the mean change as \(m\) increases?
+  \item How does moving the mode affect the shape (left/right skewness)?
+\end{enumerate}
+
+\subsection*{C4}
+Here \(a=4\), \(c=4+m\), \(b=14\).
+\[
+E[Y]=\frac{a+b+c}{3}=\frac{4+14+(4+m)}{3}=\frac{22+m}{3}.
+\]
+\[
+\mathrm{Var}(Y)=\frac{a^2+b^2+c^2-ab-ac-bc}{18}
+=\frac{16+196+(4+m)^2-56-4(4+m)-14(4+m)}{18}
+=\frac{m^2-10m+100}{18}.
+\]
+\begin{center}
+\begin{tikzpicture}
+\draw[->] (0,0) -- (9,0) node[right] {$y$};
+\draw[->] (0,0) -- (0,3.5) node[above] {$f(y)$};
+\draw[very thick, blue] (1.2,0) -- (3.8,2.4) -- (7.8,0);
+\node[below] at (1.2,0) {$4$};
+\node[below] at (3.8,0) {$4+m$};
+\node[below] at (7.8,0) {$14$};
+\end{tikzpicture}
+\end{center}
+Validity needs \(a\le c\le b\Rightarrow 4\le 4+m\le 14\Rightarrow 0\le m\le 10\).
+Mean increases linearly with \(m\). As mode moves right, the distribution becomes less right-skewed and can become left-skewed when the mode passes midpoint 9.
+
+% --------------------------------------------------
+\section{Normal with Parameters}
+
+\textbf{Problem.}
+A test score variable is
+\[
+Z\sim N(60+k,\,(2k)^2),\qquad k>0.
+\]
+
+\textbf{Questions/Tasks.}
+\begin{enumerate}[label=\textbf{\alph*)}]
+  \item Express mean and variance in terms of \(k\).
+  \item Determine valid values of \(k\).
+  \item As \(k\) increases, how do center and spread change?
+  \item Identify which part of the model controls location and which controls spread.
+\end{enumerate}
+
+\subsection*{C4}
+\[
+E[Z]=60+k,
+\qquad
+\mathrm{Var}(Z)=(2k)^2=4k^2,
+\qquad
+\sigma=2k.
+\]
+\begin{center}
+\begin{tikzpicture}
+\draw[->] (0,0) -- (10,0) node[right] {$z$};
+\draw[->] (0,0) -- (0,3.4) node[above] {$f(z)$};
+\draw[very thick, blue] plot[smooth] coordinates {(1.0,0.15) (2.4,0.8) (3.7,1.9) (5.0,2.7) (6.3,1.9) (7.6,0.8) (9.0,0.15)};
+\draw[dashed] (5.0,0) -- (5.0,2.7);
+\node[below] at (5.0,0) {$60+k$};
+\node[below] at (3.2,0) {$60-k$};
+\node[below] at (6.8,0) {$60+3k$};
+\end{tikzpicture}
+\end{center}
+For a valid non-degenerate normal spread, \(k>0\). Increasing \(k\) shifts mean right and also increases spread quadratically through variance.
+
+% --------------------------------------------------
+\section{Uniform with Parameters}
+
+\textbf{Problem.}
+Commute time \(C\) (minutes) is modeled by
+\[
+C\sim \text{Uniform}(10-r,10+r),\qquad r>0.
+\]
+
+\textbf{Questions/Tasks.}
+\begin{enumerate}[label=\textbf{\alph*)}]
+  \item Find \(E[C]\) and \(\mathrm{Var}(C)\) in terms of \(r\).
+  \item What condition on \(r\) is needed for a valid interval?
+  \item As \(r\) increases, what happens to interval width and spread?
+  \item For what \(r\) is the distribution narrower, and why?
+\end{enumerate}
+
+\subsection*{C4}
+\[
+E[C]=\frac{(10-r)+(10+r)}{2}=10,
+\]
+\[
+\mathrm{Var}(C)=\frac{((10+r)-(10-r))^2}{12}=\frac{(2r)^2}{12}=\frac{r^2}{3}.
+\]
+\begin{center}
+\begin{tikzpicture}
+\draw[->] (0,0) -- (9,0) node[right] {$c$};
+\draw[->] (0,0) -- (0,3.4) node[above] {$f(c)$};
+\draw[very thick, blue] (1.5,0) -- (1.5,2.0) -- (7.0,2.0) -- (7.0,0);
+\draw[dashed] (4.25,0) -- (4.25,2.0);
+\node[below] at (1.5,0) {$10-r$};
+\node[below] at (4.25,0) {$10$};
+\node[below] at (7.0,0) {$10+r$};
+\end{tikzpicture}
+\end{center}
+Need \(r>0\). Width is \(2r\), so larger \(r\) means wider interval and larger variance; smaller positive \(r\) means narrower distribution.
+
+% --------------------------------------------------
+\section{Triangular with Parameters}
+
+\textbf{Problem.}
+A completion score \(Q\) is modeled by
+\[
+Q\sim \text{Triangular}(a,a+3,a+9),\qquad a\in\mathbb{R}.
+\]
+
+\textbf{Questions/Tasks.}
+\begin{enumerate}[label=\textbf{\alph*)}]
+  \item Express \(E[Q]\) and \(\mathrm{Var}(Q)\) in terms of \(a\).
+  \item Is this model always valid for any real \(a\)? Explain.
+  \item Which parameter controls location? Which controls spread?
+  \item If \(a\) increases, what happens to center, spread, and shape?
+\end{enumerate}
+
+\subsection*{C4}
+\[
+E[Q]=\frac{a+(a+3)+(a+9)}{3}=a+4.
+\]
+\[
+\mathrm{Var}(Q)=\frac{a^2+(a+3)^2+(a+9)^2-a(a+3)-a(a+9)-(a+3)(a+9)}{18}=\frac{7}{2}.
+\]
+\begin{center}
+\begin{tikzpicture}
+\draw[->] (0,0) -- (9,0) node[right] {$q$};
+\draw[->] (0,0) -- (0,3.4) node[above] {$f(q)$};
+\draw[very thick, blue] (1.2,0) -- (3.4,2.2) -- (7.8,0);
+\node[below] at (1.2,0) {$a$};
+\node[below] at (3.4,0) {$a+3$};
+\node[below] at (7.8,0) {$a+9$};
+\end{tikzpicture}
+\end{center}
+Since \(a\le a+3\le a+9\) always holds, the distribution is valid for all real \(a\). Parameter \(a\) shifts location; spread and shape remain unchanged.
+
+% --------------------------------------------------
+\section{Normal with Parameters}
+
+\textbf{Problem.}
+Reaction time \(R\) (seconds) is modeled by
+\[
+R\sim N(m,\,(1+s)^2),\qquad s> -1.
+\]
+
+\textbf{Questions/Tasks.}
+\begin{enumerate}[label=\textbf{\alph*)}]
+  \item Express \(E[R]\) and \(\mathrm{Var}(R)\) in terms of \(m\) and \(s\).
+  \item Give the condition(s) needed for a valid nonzero spread.
+  \item Explain how increasing \(m\) changes the distribution.
+  \item Explain how increasing \(s\) changes the distribution width and likelihood of values far from the mean.
+\end{enumerate}
+
+\subsection*{C4}
+\[
+E[R]=m,
+\qquad
+\mathrm{Var}(R)=(1+s)^2,
+\qquad
+\sigma=1+s.
+\]
+\begin{center}
+\begin{tikzpicture}
+\draw[->] (0,0) -- (10,0) node[right] {$r$};
+\draw[->] (0,0) -- (0,3.4) node[above] {$f(r)$};
+\draw[very thick, blue] plot[smooth] coordinates {(1.1,0.2) (2.5,0.9) (3.8,2.0) (5.0,2.6) (6.2,2.0) (7.5,0.9) (8.9,0.2)};
+\draw[dashed] (5.0,0) -- (5.0,2.6);
+\node[below] at (5.0,0) {$m$};
+\node[below] at (3.4,0) {$m-(1+s)$};
+\node[below] at (6.6,0) {$m+(1+s)$};
+\end{tikzpicture}
+\end{center}
+A valid standard deviation needs \(\sigma>0\Rightarrow 1+s>0\Rightarrow s>-1\).
+Increasing \(m\) shifts the center only. Increasing \(s\) increases spread, making the bell wider and less concentrated around the mean.
+
+% --------------------------------------------------
+\section{Uniform with Parameters}
+
+\textbf{Problem.}
+A delivery time \(U\) (minutes) for a local route is modeled by
+\[
+U\sim \text{Uniform}(h-2w,\,h+w),\qquad w>0.
+\]
+
+\textbf{Questions/Tasks.}
+\begin{enumerate}[label=\textbf{\alph*)}]
+  \item Derive \(E[U]\), \(\mathrm{Var}(U)\), and \(\sigma_U\) in terms of \(h\) and \(w\).
+  \item Identify which parameter controls the center and which controls the interval width.
+  \item Compare Case A: \((h,w)=(30,4)\) and Case B: \((h,w)=(35,4)\). Does the distribution shift, widen, or both?
+  \item Compare Case C: \((h,w)=(30,4)\) and Case D: \((h,w)=(30,7)\). How do center, width, and spread change?
+  \item If both \(h\) and \(w\) increase by 2 at the same time, explain whether the model shifts, widens, or both.
+\end{enumerate}
+
+\subsection*{C4}
+For \(U\sim\text{Uniform}(a,b)\), \(E[U]=\frac{a+b}{2}\), \(\mathrm{Var}(U)=\frac{(b-a)^2}{12}\).
+Here \(a=h-2w\), \(b=h+w\), so
+\[
+E[U]=\frac{(h-2w)+(h+w)}{2}=h-\frac{w}{2},
+\]
+\[
+\mathrm{Var}(U)=\frac{\big((h+w)-(h-2w)\big)^2}{12}=\frac{(3w)^2}{12}=\frac{3w^2}{4},
+\]
+\[
+\sigma_U=\sqrt{\frac{3w^2}{4}}=\frac{\sqrt{3}}{2}\,w \quad (w>0).
+\]
+The center \(h-\frac{w}{2}\) depends on both \(h\) and \(w\), while the width \(b-a=3w\) depends only on \(w\).
+Case A \(\to\) B keeps \(w\) fixed, so width and spread stay the same, and the model shifts right by 5.
+Case C \(\to\) D keeps \(h\) fixed and increases \(w\), so width grows from \(12\) to \(21\), spread increases, and the center moves from \(28\) to \(26.5\) (left).
+If \(h\) and \(w\) both increase by 2, then width increases by \(3(2)=6\) (widens) and
+\[
+E[U]'-(E[U])=\left(h+2-\frac{w+2}{2}\right)-\left(h-\frac{w}{2}\right)=1,
+\]
+so it also shifts right by 1.
+\begin{center}
+\begin{tikzpicture}
+\draw[->] (0,0) -- (10,0) node[right] {$u$};
+\draw[->] (0,0) -- (0,3.4) node[above] {$f(u)$};
+\draw[very thick, blue] (1.2,0) -- (1.2,2.0) -- (8.0,2.0) -- (8.0,0);
+\draw[dashed] (4.6,0) -- (4.6,2.0);
+\node[below] at (1.2,0) {$h-2w$};
+\node[below] at (8.0,0) {$h+w$};
+\node[below] at (4.6,0) {$h-\frac{w}{2}$};
+\end{tikzpicture}
+\end{center}
+
+% --------------------------------------------------
+\section{Triangular with Parameters}
+
+\textbf{Problem.}
+A machine-cycle time \(T\) (seconds) is modeled by
+\[
+T\sim \text{Triangular}(k,\,k+r,\,k+3r),\qquad r>0.
+\]
+
+\textbf{Questions/Tasks.}
+\begin{enumerate}[label=\textbf{\alph*)}]
+  \item Derive \(E[T]\), \(\mathrm{Var}(T)\), and \(\sigma_T\) in terms of \(k\) and \(r\).
+  \item State the validity conditions on \(k\) and \(r\), and explain why they are sufficient.
+  \item How do \(k\) and \(r\) separately affect center and spread?
+  \item Compare shape with the symmetric triangular model having the same endpoints \(k\) and \(k+3r\). Is this model symmetric, left-skewed, or right-skewed?
+  \item For fixed \(k\), compare \(r=2\) and \(r=5\): discuss changes in mean, variance, and skewness direction.
+\end{enumerate}
+
+\subsection*{C4}
+For \(\text{Triangular}(a,c,b)\):
+\[
+E[T]=\frac{a+b+c}{3},\qquad
+\mathrm{Var}(T)=\frac{a^2+b^2+c^2-ab-ac-bc}{18}.
+\]
+With \(a=k\), \(c=k+r\), \(b=k+3r\):
+\[
+E[T]=\frac{k+(k+r)+(k+3r)}{3}=k+\frac{4r}{3}.
+\]
+For variance,
+\[
+\mathrm{Var}(T)=\frac{k^2+(k+3r)^2+(k+r)^2-k(k+3r)-k(k+r)-(k+3r)(k+r)}{18}
+=\frac{7r^2}{18}.
+\]
+Thus
+\[
+\sigma_T=\sqrt{\frac{7r^2}{18}}=r\sqrt{\frac{7}{18}}.
+\]
+Validity requires \(a\le c\le b\), i.e.
+\[
+k\le k+r\le k+3r,
+\]
+which holds whenever \(r\ge 0\); with \(r>0\), spread is nonzero, so the model is valid and non-degenerate for any real \(k\).
+Parameter \(k\) shifts location only. Parameter \(r\) increases both mean offset (\(\frac{4r}{3}\)) and spread (\(\propto r^2\)).
+For endpoints \(k\) and \(k+3r\), symmetry would need mode at midpoint \(k+\frac{3r}{2}\), but here mode is \(k+r\), left of midpoint; therefore the model is right-skewed.
+Comparing \(r=2\) and \(r=5\) (fixed \(k\)): mean increases by \(\frac{4}{3}(5-2)=4\), variance scales from \(\frac{28}{18}\) to \(\frac{175}{18}\), and skewness direction stays right-skewed.
+\begin{center}
+\begin{tikzpicture}
+\draw[->] (0,0) -- (10,0) node[right] {$t$};
+\draw[->] (0,0) -- (0,3.5) node[above] {$f(t)$};
+\draw[very thick, blue] (1.2,0) -- (3.5,2.4) -- (8.4,0);
+\node[below] at (1.2,0) {$k$};
+\node[below] at (3.5,0) {$k+r$};
+\node[below] at (8.4,0) {$k+3r$};
+\end{tikzpicture}
+\end{center}
+
+% --------------------------------------------------
+\section{Normal with Parameters}
+
+\textbf{Problem.}
+The daily amount \(N\) (GB) of network data used by a class is modeled by
+\[
+N\sim N\!\left(50+3p,\,(2+q)^2\right),\qquad p\in\mathbb{R},\ q>-2.
+\]
+
+\textbf{Questions/Tasks.}
+\begin{enumerate}[label=\textbf{\alph*)}]
+  \item Derive \(E[N]\), \(\mathrm{Var}(N)\), and \(\sigma_N\) in terms of \(p\) and \(q\).
+  \item Explain the role of \(p\) and \(q\): which controls location and which controls spread?
+  \item Compare Case A: \((p,q)=(0,1)\) and Case B: \((p,q)=(-2,1)\). What changes in center, concentration around the mean, and tail likelihood?
+  \item Compare Case C: \((p,q)=(0,1)\) and Case D: \((p,q)=(0,4)\). What changes in center, spread, concentration near the mean, and likelihood of values far from the mean?
+  \item Between models \(M_1:(p,q)=(1,0)\) and \(M_2:(p,q)=(-1,3)\), which model is more likely to produce values at least 15 GB above its own mean? Justify conceptually.
+\end{enumerate}
+
+\subsection*{C4}
+For \(N(\mu,\sigma^2)\), \(E[N]=\mu\), \(\mathrm{Var}(N)=\sigma^2\), \(\sigma>0\).
+So
+\[
+E[N]=50+3p,\qquad
+\mathrm{Var}(N)=(2+q)^2,\qquad
+\sigma_N=2+q \quad (q>-2).
+\]
+Parameter \(p\) changes only location (horizontal shift). Parameter \(q\) changes spread: larger \(q\) gives larger \(\sigma\), wider curve, lower peak, and heavier tails.
+Case A \(\to\) B keeps \(q=1\), so \(\sigma=3\) is unchanged: concentration and tail behavior relative to each mean stay the same, but mean shifts from \(50\) to \(44\) (left by 6).
+Case C \(\to\) D keeps \(p=0\), so mean stays 50, but \(\sigma\) increases from \(3\) to \(6\): values are less concentrated near 50 and far-from-mean values become more likely.
+For \(M_1\), \(\sigma=2\); for \(M_2\), \(\sigma=5\). A value 15 GB above its own mean is \(15/\sigma\) standard deviations above mean: \(7.5\sigma\) for \(M_1\) versus \(3\sigma\) for \(M_2\). The \(3\sigma\) event is much less extreme, so \(M_2\) is more likely.
+\begin{center}
+\begin{tikzpicture}
+\draw[->] (0,0) -- (10,0) node[right] {$n$};
+\draw[->] (0,0) -- (0,3.4) node[above] {$f(n)$};
+\draw[very thick, blue] plot[smooth] coordinates {(1.0,0.15) (2.4,0.8) (3.8,1.9) (5.0,2.6) (6.2,1.9) (7.6,0.8) (9.0,0.15)};
+\draw[dashed] (5.0,0) -- (5.0,2.6);
+\node[below] at (5.0,0) {$50+3p$};
+\node[below] at (3.4,0) {$\mu-\sigma$};
+\node[below] at (6.6,0) {$\mu+\sigma$};
+\node[right] at (8.9,1.8) {$\sigma=2+q$};
+\end{tikzpicture}
+\end{center}
+
+\end{document}
