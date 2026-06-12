@@ -4,6 +4,84 @@
 
 \input{preamble.tex}
 
+% Requires:
+% \usepackage{booktabs}
+% \usepackage{tabularx}
+% \usepackage{array}
+% \usepackage{xparse}
+
+\ExplSyntaxOn
+
+\seq_new:N \l_decision_alternatives_seq
+\seq_new:N \l_decision_states_seq
+\int_new:N \l_decision_slot_count_int
+\dim_new:N \l_decision_slot_width_dim
+
+\cs_new_protected:Npn \decision_prepare_lists:nn #1 #2
+{
+	\seq_set_split:Nnn \l_decision_alternatives_seq { ; } { #1 }
+	\seq_set_split:Nnn \l_decision_states_seq { ; } { #2 }
+	
+	\seq_set_map:NNn \l_decision_alternatives_seq \l_decision_alternatives_seq
+	{
+		\tl_trim_spaces:n {##1}
+	}
+	\seq_set_map:NNn \l_decision_states_seq \l_decision_states_seq
+	{
+		\tl_trim_spaces:n {##1}
+	}
+	
+	\int_set:Nn \l_decision_slot_count_int
+	{
+		\int_max:nn
+		{ \seq_count:N \l_decision_alternatives_seq }
+		{ \seq_count:N \l_decision_states_seq }
+	}
+}
+
+\cs_new_protected:Npn \decision_print_slots:Nn #1 #2
+{
+	\dim_set:Nn \l_decision_slot_width_dim
+	{
+		\linewidth / \int_use:N \l_decision_slot_count_int
+	}
+	
+	\int_step_inline:nn { \l_decision_slot_count_int }
+	{
+		\parbox[t]{\l_decision_slot_width_dim}
+		{
+			\raggedright
+			\int_compare:nTF {##1 <= \seq_count:N #1}
+			{
+				\textbf{#2##1:}~\seq_item:Nn #1 {##1}
+			}
+			{
+				\strut
+			}
+		}%
+	}
+}
+
+\NewDocumentCommand{\DecisionElementsTable}{mmmm}
+{
+	\decision_prepare_lists:nn {#1} {#2}
+	
+	\begin{center}
+		\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+			\toprule
+			Element & Description \\
+			\midrule
+			Alternatives & \decision_print_slots:Nn \l_decision_alternatives_seq {A} \\
+			States of nature & \decision_print_slots:Nn \l_decision_states_seq {S} \\
+			Events & #3 \\
+			Consequences & #4 \\
+			\bottomrule
+		\end{tabularx}
+	\end{center}
+}
+
+\ExplSyntaxOff
+
 \title{Grade 10 Term 1 Lesson 1 Practice Activity 1\\Decision Alternatives, Events, Consequences, States, and Payoff Tables}
 \author{}
 \date{}
@@ -25,21 +103,24 @@
 	
 	\section{Local Café Investment (C1--C2)}
 	\label{sec:problem1-local-cafe-investment-c1-c2}
-	A small café is deciding whether to launch a new line of artisan desserts. The transaction is daily café sales, where profit is earned from each dessert plate sold.
-	
-	The owner has two options:
-	\begin{enumerate}[label=\arabic*.]
-		\item \textbf{Launch the dessert line}, with profit outcomes depending on foot traffic:
-		\begin{enumerate}[label=\roman*)]
-			\item High traffic $\to 42$ thousand USD
-			\item Low traffic $\to 8$ thousand USD
+	A small café is deciding whether to launch a new line of artisan desserts. The transaction is daily café sales, where profit is earned from each dessert plate sold. The owner has two options:
+	\begin{multicols}{2}
+		\begin{enumerate}[label=\arabic*.]
+			\item \textbf{Launch the dessert line}, with profit outcomes depending on foot traffic:
+			\begin{enumerate}[label=\roman*)]
+				\item High traffic $\to 42$ thousand USD
+				\item Low traffic $\to 8$ thousand USD
+			\end{enumerate}
+			
+			\columnbreak
+			
+			\item \textbf{Keep the current menu}, with profit outcomes based on historical data:
+			\begin{enumerate}[label=\roman*)]
+				\item High traffic $\to 28$ thousand USD
+				\item Low traffic $\to 20$ thousand USD
+			\end{enumerate}
 		\end{enumerate}
-		\item \textbf{Keep the current menu}, with profit outcomes:
-		\begin{enumerate}[label=\roman*)]
-			\item High traffic $\to 28$ thousand USD
-			\item Low traffic $\to 20$ thousand USD
-		\end{enumerate}
-	\end{enumerate}
+	\end{multicols}
 	
 	\textbf{Questions/Tasks.}
 	\begin{enumerate}[label=\textbf{\alph*)}]
@@ -50,18 +131,12 @@
 	\subsection*{a) \textbf{(C1)} Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem1-local-cafe-investment-c1}
-	\begin{center}
-		\begin{tabularx}{\textwidth}{@{}lY@{}}
-			\toprule
-			Element & Description \\
-			\midrule
-			Alternatives & Launch dessert line; Keep current menu \\
-			States of nature & High traffic; Low traffic \\
-			Events & Actual foot traffic after the decision \\
-			Consequences & Profit in thousand USD for each alternative--state pair \\
-			\bottomrule
-		\end{tabularx}
-	\end{center}
+	
+	\DecisionElementsTable
+	{Launch dessert line; Keep current menu}
+	{High traffic; Low traffic}
+	{Actual foot traffic after the decision}
+	{Profit in thousand USD for each alternative--state pair}
 	
 	\secInicio[sec:problem1-local-cafe-investment-c1-c2]
 	
