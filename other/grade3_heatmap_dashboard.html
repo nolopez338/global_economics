@@ -273,10 +273,46 @@
       background: #f8fafc;
       border-left: 1px solid var(--grid);
       border-bottom: 1px solid var(--grid);
-      padding: 12px;
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 700;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .fullscreenBtn {
+      width: 38px;
+      height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--grid);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(17, 24, 39, 0.06);
+    }
+    .fullscreenBtn:hover {
+      background: #f1f5f9;
+    }
+    .fullscreenBtn:focus {
+      outline: none;
+      border-color: #7aa7ff;
+      box-shadow: 0 0 0 4px rgba(122, 167, 255, 0.18);
+    }
+    .vizPanel:fullscreen {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      border-radius: 0;
+      padding: 18px;
+      background: var(--panel);
+    }
+    .vizPanel:fullscreen .dashboardScroll {
+      max-height: calc(100vh - 190px);
+      overflow: auto;
     }
     .names {
       position: sticky;
@@ -516,7 +552,11 @@
             </label>
           </div>
           <div class="topBars" id="topBars"></div>
-          <div class="rightHeader">Row accumulations<br><span style="font-weight:500">green · yellow · red</span></div>
+          <div class="rightHeader">
+            <button id="fullscreenBtn" class="fullscreenBtn" type="button" aria-label="Open visualization in fullscreen" title="Fullscreen">
+              ⛶
+            </button>
+          </div>
           <div class="names" id="names"></div>
           <div class="heatmap" id="heatmap"></div>
           <div class="rightBars" id="rightBars"></div>
@@ -550,6 +590,8 @@
     const rightBarsEl = document.getElementById('rightBars');
     const gridEl = document.getElementById('dashboardGrid');
     const tooltip = document.getElementById('tooltip');
+    const vizPanel = document.querySelector('.vizPanel');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
 
     function cloneRows(rows) {
       return rows.map(row => ({
@@ -992,7 +1034,43 @@
       renderRightBars(rows, colOrder);
     }
 
+    function isVizPanelFullscreen() {
+      return document.fullscreenElement === vizPanel;
+    }
+
+    function updateFullscreenButton() {
+      if (!fullscreenBtn) return;
+
+      const active = isVizPanelFullscreen();
+      fullscreenBtn.setAttribute(
+        'aria-label',
+        active ? 'Exit fullscreen' : 'Open visualization in fullscreen'
+      );
+      fullscreenBtn.setAttribute(
+        'title',
+        active ? 'Exit fullscreen' : 'Fullscreen'
+      );
+      fullscreenBtn.textContent = active ? '×' : '⛶';
+    }
+
+    async function toggleFullscreen() {
+      if (!vizPanel) return;
+
+      try {
+        if (isVizPanelFullscreen()) {
+          await document.exitFullscreen();
+        } else {
+          await vizPanel.requestFullscreen();
+        }
+      } catch (error) {
+        console.warn('Fullscreen mode could not be toggled:', error);
+      }
+    }
+
     [resultView, groupFilter, sortRows, sortCols, searchBox, showNames, showMissing].forEach(control => control.addEventListener('input', render));
+    if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
+    document.addEventListener('fullscreenchange', updateFullscreenButton);
+    updateFullscreenButton();
     render();
   </script>
 </body>
