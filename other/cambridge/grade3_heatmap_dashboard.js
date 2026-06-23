@@ -149,17 +149,17 @@ function rowCounts(row, colOrder) {
 
 function ratioSortConfig(sortValue) {
   const configs = {
-    posNegRatioDesc: {
+    posNegRatio: {
       numerator: 'pos',
       denominator: 'neg',
       label: 'Positive / Negative ratio'
     },
-    posZeroRatioDesc: {
+    posZeroRatio: {
       numerator: 'pos',
       denominator: 'zero',
       label: 'Positive / Non responses ratio'
     },
-    negZeroRatioDesc: {
+    negZeroRatio: {
       numerator: 'neg',
       denominator: 'zero',
       label: 'Negative / Non responses ratio'
@@ -468,9 +468,9 @@ function sortedRows(rows, colOrder) {
         ? a.name.localeCompare(b.name, 'es')
         : b.name.localeCompare(a.name, 'es'));
     }
-    if (sort === 'positiveDesc') sorted.sort((a, b) => compareMetric(rowCounts(a, colOrder).pos, rowCounts(b, colOrder).pos, sortRowsDirection) || a.name.localeCompare(b.name, 'es'));
-    if (sort === 'negativeDesc') sorted.sort((a, b) => compareMetric(rowCounts(a, colOrder).neg, rowCounts(b, colOrder).neg, sortRowsDirection) || a.name.localeCompare(b.name, 'es'));
-    if (sort === 'zeroDesc') sorted.sort((a, b) => compareMetric(rowCounts(a, colOrder).zero, rowCounts(b, colOrder).zero, sortRowsDirection) || a.name.localeCompare(b.name, 'es'));
+    if (sort === 'positive') sorted.sort((a, b) => compareMetric(rowCounts(a, colOrder).pos, rowCounts(b, colOrder).pos, sortRowsDirection) || a.name.localeCompare(b.name, 'es'));
+    if (sort === 'negative') sorted.sort((a, b) => compareMetric(rowCounts(a, colOrder).neg, rowCounts(b, colOrder).neg, sortRowsDirection) || a.name.localeCompare(b.name, 'es'));
+    if (sort === 'zero') sorted.sort((a, b) => compareMetric(rowCounts(a, colOrder).zero, rowCounts(b, colOrder).zero, sortRowsDirection) || a.name.localeCompare(b.name, 'es'));
   }
   return sorted;
 }
@@ -488,9 +488,9 @@ function sortedCols(dataset, rows) {
       return compareMetric(aRatio, bRatio, sortColsDirection) || a - b;
     });
   } else {
-    if (sort === 'positiveDesc') cols.sort((a, b) => compareMetric(colCounts(rows, a).pos, colCounts(rows, b).pos, sortColsDirection) || a - b);
-    if (sort === 'negativeDesc') cols.sort((a, b) => compareMetric(colCounts(rows, a).neg, colCounts(rows, b).neg, sortColsDirection) || a - b);
-    if (sort === 'zeroDesc') cols.sort((a, b) => compareMetric(colCounts(rows, a).zero, colCounts(rows, b).zero, sortColsDirection) || a - b);
+    if (sort === 'positive') cols.sort((a, b) => compareMetric(colCounts(rows, a).pos, colCounts(rows, b).pos, sortColsDirection) || a - b);
+    if (sort === 'negative') cols.sort((a, b) => compareMetric(colCounts(rows, a).neg, colCounts(rows, b).neg, sortColsDirection) || a - b);
+    if (sort === 'zero') cols.sort((a, b) => compareMetric(colCounts(rows, a).zero, colCounts(rows, b).zero, sortColsDirection) || a - b);
   }
   return cols;
 }
