@@ -171,27 +171,26 @@ function attrSafe(value) {
 }
 
 function tooltipRows(c, total) {
+  const visibleTotal = total || c.pos + c.zero + c.neg || 1;
   const rows = [
     ['pos', 'Positive units', c.pos],
-    ['zero', 'Zero', c.zero],
-    ['neg', 'Negative', c.neg],
-    ['miss', 'Missing', c.miss]
+    ['zero', 'Non Responses', c.zero],
+    ['neg', 'Negative units', c.neg]
   ];
   return `<div class='tipRows'>${rows.map(([key, label, value]) => `
     <div class='tipRow'>
       <span><i class='tipMiniSwatch ${key}'></i>${label}</span>
-      <span>${value} · ${pct(value, total)}%</span>
+      <span>${value} · ${pct(value, visibleTotal)}%</span>
     </div>
   `).join('')}</div>`;
 }
 
 function expandedBarTooltip(title, c, orientation = 'vertical') {
-  const total = c.pos + c.zero + c.neg + c.miss || 1;
+  const total = c.pos + c.zero + c.neg || 1;
   const parts = [
     ['pos', c.pos],
     ['zero', c.zero],
-    ['neg', c.neg],
-    ['miss', c.miss]
+    ['neg', c.neg]
   ];
   const segments = parts.map(([key, value]) => {
     const size = Math.max(value > 0 ? pct(value, total) : 0, value > 0 ? 1 : 0);
@@ -345,9 +344,7 @@ function renderStats(dataset, rows, colOrder) {
     </div>
   `;
 
-  activeSummary.textContent = showMissing.checked
-    ? `${dataset.label} · ${dataset.questions.length} questions · ${rows.length} visible students · ${c.miss} missing`
-    : `${dataset.label} · ${dataset.questions.length} questions · ${rows.length} visible students · missing hidden`;
+  activeSummary.textContent = `${dataset.label} · ${dataset.questions.length} questions · ${rows.length} students`;
 }
 
 function renderTopBars(dataset, rows, colOrder, effectiveCellW) {
@@ -412,9 +409,14 @@ function renderHeatmap(dataset, rows, colOrder, effectiveCellW, effectiveCellH) 
       const q = dataset.questions[colIndex];
       const fill = colorForValue(value);
       const textColor = value === 0 ? '#3c3108' : '#ffffff';
-      const shown = value === null || value === undefined || Number.isNaN(value) ? '' : value;
-      const tip = attrSafe(`<b>${safe(row.name)}</b><br>View: ${safe(dataset.label)}<br>Group: ${safe(row.grupo)} · No. ${safe(row.no || '—')}<br>Question: ${safe(q)}<br>Value: ${shown === '' ? 'Missing' : safe(shown)}<br>Class: ${labelForValue(value)}`);
-      svg += `<rect x="${x}" y="${y}" width="${effectiveCellW}" height="${effectiveCellH}" fill="${fill}" stroke="#ffffff" stroke-width="1" data-tip="${tip}" />`;
+      const isMissing = value === null || value === undefined || Number.isNaN(value);
+      const shown = isMissing ? '' : value;
+      if (isMissing) {
+        svg += `<rect x="${x}" y="${y}" width="${effectiveCellW}" height="${effectiveCellH}" fill="${fill}" stroke="#ffffff" stroke-width="1" />`;
+      } else {
+        const tip = attrSafe(`<b>${safe(row.name)}</b><br>View: ${safe(dataset.label)}<br>Group: ${safe(row.grupo)} · No. ${safe(row.no || '—')}<br>Question: ${safe(q)}<br>Value: ${safe(shown)}<br>Class: ${labelForValue(value)}`);
+        svg += `<rect x="${x}" y="${y}" width="${effectiveCellW}" height="${effectiveCellH}" fill="${fill}" stroke="#ffffff" stroke-width="1" data-tip="${tip}" />`;
+      }
       if (showCellText && shown !== '') svg += `<text x="${x + effectiveCellW / 2}" y="${y + effectiveCellH / 2 + 4}" font-size="11" text-anchor="middle" fill="${textColor}" font-weight="750" pointer-events="none">${shown}</text>`;
     });
   });
