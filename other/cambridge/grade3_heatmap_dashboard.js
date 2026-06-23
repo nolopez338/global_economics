@@ -31,6 +31,7 @@ let questionOverviewMode = false;
 let studentOverviewMode = false;
 let sortRowsDirection = 'desc';
 let sortColsDirection = 'desc';
+const accumulatedDiagnosticsWarned = new Set();
 
 function cloneRows(rows) {
   return rows.map(row => ({
@@ -45,6 +46,59 @@ function normalizeMatricula(value) {
 
 function nullAnswers(length) {
   return Array.from({ length }, () => null);
+}
+
+function studentMatchLabel(row) {
+  const matricula = normalizeMatricula(row.matricula) || 'blank matrícula';
+  const name = row.name || 'blank name';
+  return `${name} (${matricula})`;
+}
+
+function warnAccumulatedDiagnostic(code, message) {
+  if (accumulatedDiagnosticsWarned.has(code)) return;
+  accumulatedDiagnosticsWarned.add(code);
+  console.warn(`[Accumulated matching] ${message}`);
+}
+
+function warnAccumulatedMatchingDiagnostics(rows, blankNameMatches) {
+  const namesToMatriculas = new Map();
+  const matriculasToNames = new Map();
+
+  rows.forEach(row => {
+    const name = row.name || '';
+    const matricula = normalizeMatricula(row.matricula);
+
+    if (name && matricula) {
+      if (!namesToMatriculas.has(name)) namesToMatriculas.set(name, new Set());
+      namesToMatriculas.get(name).add(matricula);
+
+      if (!matriculasToNames.has(matricula)) matriculasToNames.set(matricula, new Set());
+      matriculasToNames.get(matricula).add(name);
+    }
+  });
+
+  namesToMatriculas.forEach((matriculas, name) => {
+    if (matriculas.size < 2) return;
+    warnAccumulatedDiagnostic(
+      `name:${name}:${[...matriculas].sort().join('|')}`,
+      `Exact name appears with multiple matrículas: ${name} (${[...matriculas].sort().join(', ')}).`
+    );
+  });
+
+  matriculasToNames.forEach((names, matricula) => {
+    if (names.size < 2) return;
+    warnAccumulatedDiagnostic(
+      `matricula:${matricula}:${[...names].sort().join('|')}`,
+      `Matrícula appears with multiple names: ${matricula} (${[...names].sort().join(' | ')}).`
+    );
+  });
+
+  blankNameMatches.forEach(({ row, matched }) => {
+    warnAccumulatedDiagnostic(
+      `blank:${row.name}:${matched.matricula || ''}`,
+      `Blank matrícula matched by exact name: ${studentMatchLabel(row)} -> ${studentMatchLabel(matched)}.`
+    );
+  });
 }
 
 function orderedDatasetIds() {
@@ -62,18 +116,23 @@ function buildAccumulatedDataset() {
   const datasetIds = orderedDatasetIds();
   const records = new Map();
   const nameIndex = new Map();
+  const sourceRows = [];
+  const blankNameMatches = [];
 
   datasetIds.forEach(paperId => {
     const dataset = DATASETS[paperId];
     dataset.rows.forEach(row => {
+      sourceRows.push(row);
       const matricula = normalizeMatricula(row.matricula);
       const matriculaKey = matricula ? `m:${matricula}` : '';
       const nameKey = `n:${row.name}`;
       let key = '';
 
       if (matriculaKey && records.has(matriculaKey)) key = matriculaKey;
-      else if (nameIndex.has(row.name)) key = nameIndex.get(row.name);
-      else key = matriculaKey || nameKey;
+      else if (nameIndex.has(row.name)) {
+        key = nameIndex.get(row.name);
+        if (!matriculaKey) blankNameMatches.push({ row, matched: records.get(key) });
+      } else key = matriculaKey || nameKey;
 
       if (!records.has(key)) {
         records.set(key, {
@@ -96,6 +155,8 @@ function buildAccumulatedDataset() {
       record.papers[paperId] = [...row.answers];
     });
   });
+
+  warnAccumulatedMatchingDiagnostics(sourceRows, blankNameMatches);
 
   const rows = Array.from(records.values()).map(record => {
     const answers = datasetIds.flatMap(paperId => {
