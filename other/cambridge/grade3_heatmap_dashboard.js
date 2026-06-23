@@ -185,7 +185,7 @@ function tooltipRows(c, total) {
   `).join('')}</div>`;
 }
 
-function expandedBarTooltip(title, c, orientation = 'vertical') {
+function expandedBarTooltip(title, c, orientation = 'vertical', subtitle = 'Expanded stacked bar') {
   const total = c.pos + c.zero + c.neg || 1;
   const parts = [
     ['pos', c.pos],
@@ -198,13 +198,13 @@ function expandedBarTooltip(title, c, orientation = 'vertical') {
     return `<span class='tipSeg ${key}' style='${dim}'></span>`;
   }).join('');
   if (orientation === 'vertical') {
-    return `<b>${safe(title)}</b><br><span>Expanded stacked bar</span>
+    return `<b>${safe(title)}</b><br><span>${subtitle}</span>
       <div class='tipGrid'>
         <div class='tipVBar'>${segments}</div>
         ${tooltipRows(c, total)}
       </div>`;
   }
-  return `<b>${safe(title)}</b><br><span>Expanded stacked bar</span>
+  return `<b>${safe(title)}</b><br><span>${subtitle}</span>
     <div class='tipHBar'>${segments}</div>
     ${tooltipRows(c, total)}`;
 }
@@ -425,12 +425,21 @@ function renderHeatmap(dataset, rows, colOrder, effectiveCellW, effectiveCellH) 
   attachSvgTips(heatmapEl);
 }
 
+function studentBarTooltip(row, c) {
+  return expandedBarTooltip(
+    row.name,
+    c,
+    'horizontal',
+    `Group: ${safe(row.grupo)} · No. ${safe(row.no || '—')}`
+  );
+}
+
 function renderRightBars(rows, colOrder, effectiveCellH) {
   rightBarsContentEl.style.setProperty('--cellH', effectiveCellH + 'px');
   rightBarsContentEl.innerHTML = rows.map(row => {
     const c = rowCounts(row, colOrder);
     const total = c.pos + c.zero + c.neg + c.miss || 1;
-    const tip = attrSafe(expandedBarTooltip(row.name, c, 'horizontal'));
+    const tip = attrSafe(studentBarTooltip(row, c));
     return `
       <div class="rowBar" data-tip="${tip}">
         <div class="stack">
@@ -485,16 +494,13 @@ function renderQuestionOverviewHistogram(dataset, rows, colOrder, effectiveCellW
 }
 
 function renderStudentOverviewHistogram(rows, colOrder, effectiveCellH) {
-  const width = 180;
+  const width = 198;
   const height = rows.length * effectiveCellH;
-  const barW = 118;
-  const labelX = 124;
+  const barW = 172;
   const maxTotal = Math.max(1, ...rows.map(row => {
     const c = rowCounts(row, colOrder);
     return c.pos + c.zero + c.neg + c.miss;
   }));
-  const fontSize = effectiveCellH < 12 ? 8 : effectiveCellH < 18 ? 9 : 10;
-  const every = Math.max(1, Math.ceil(rows.length / Math.max(1, Math.floor(height / Math.max(10, fontSize + 2)))));
   let svg = `<svg width="${width}" height="${height}" role="img" aria-label="Compressed student overview histogram">`;
   rows.forEach((row, index) => {
     const c = rowCounts(row, colOrder);
@@ -503,14 +509,13 @@ function renderStudentOverviewHistogram(rows, colOrder, effectiveCellH) {
     const h = Math.max(1, effectiveCellH - 1);
     let x = 0;
     const scaledW = Math.max(1, (total / maxTotal) * barW);
-    const tip = attrSafe(expandedBarTooltip(row.name, c, 'horizontal'));
+    const tip = attrSafe(studentBarTooltip(row, c));
     [['pos', c.pos], ['zero', c.zero], ['neg', c.neg], ['miss', c.miss]].forEach(([key, value]) => {
       const w = (value / total) * scaledW;
       if (w > 0) svg += `<rect x="${x}" y="${y}" width="${Math.max(1, w)}" height="${h}" fill="${colors[key]}" data-tip="${tip}" />`;
       x += w;
     });
-    svg += `<line x1="${barW + 2}" y1="${y}" x2="${barW + 8}" y2="${y}" stroke="#94a3b8" stroke-width="1" />`;
-    if (index % every === 0) svg += `<text x="${labelX}" y="${y + Math.max(fontSize, effectiveCellH / 2 + fontSize / 3)}" font-size="${fontSize}" fill="#334155" font-weight="700">${safe(firstLastName(row.name))}</text>`;
+    svg += `<line x1="${barW + 4}" y1="${y}" x2="${barW + 14}" y2="${y}" stroke="#94a3b8" stroke-width="1" />`;
   });
   svg += '</svg>';
   rightBarsContentEl.innerHTML = svg;
@@ -544,8 +549,10 @@ function render() {
 
   const colOrder = sortedCols(dataset, rowsPreSort);
   const rows = sortedRows(rowsPreSort, colOrder);
-  const nameColumnWidth = showNames.checked ? 260 : compactNameColumnWidth(rows);
-  const availableHeatmapWidth = Math.max(120, (dashboardScroll?.clientWidth || window.innerWidth) - nameColumnWidth - 180);
+  gridEl.classList.toggle('studentOverviewActive', studentOverviewMode);
+  const nameColumnWidth = studentOverviewMode ? 0 : (showNames.checked ? 260 : compactNameColumnWidth(rows));
+  const rightColumnWidth = studentOverviewMode ? 210 : 180;
+  const availableHeatmapWidth = Math.max(120, (dashboardScroll?.clientWidth || window.innerWidth) - nameColumnWidth - rightColumnWidth);
   const availableHeatmapHeight = Math.max(180, (dashboardScroll?.clientHeight || window.innerHeight - 360) - topH);
   const effectiveCellW = questionOverviewMode && colOrder.length
     ? Math.max(4, Math.floor(availableHeatmapWidth / colOrder.length))
@@ -554,7 +561,7 @@ function render() {
     ? Math.max(4, Math.floor(availableHeatmapHeight / rows.length))
     : cellH;
   const heatmapWidth = colOrder.length * effectiveCellW;
-  gridEl.style.gridTemplateColumns = `${nameColumnWidth}px ${heatmapWidth}px 180px`;
+  gridEl.style.gridTemplateColumns = `${nameColumnWidth}px ${heatmapWidth}px ${rightColumnWidth}px`;
   renderStats(dataset, rows, colOrder);
   if (questionOverviewMode) renderQuestionOverviewHistogram(dataset, rows, colOrder, effectiveCellW);
   else renderTopBars(dataset, rows, colOrder, effectiveCellW);
