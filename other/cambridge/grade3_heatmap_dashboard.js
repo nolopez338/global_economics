@@ -19,8 +19,6 @@ const rightBarsEl = document.getElementById('rightBars');
 const rightBarsContentEl = document.getElementById('rightBarsContent') || rightBarsEl;
 const gridEl = document.getElementById('dashboardGrid');
 const tooltip = document.getElementById('tooltip');
-const cellQuestionTooltip = document.getElementById('cellQuestionTooltip');
-const cellStudentTooltip = document.getElementById('cellStudentTooltip');
 const vizPanel = document.querySelector('.vizPanel');
 const vizToolbar = document.getElementById('vizToolbar');
 const vizToolbarCollapseBtn = document.getElementById('vizToolbarCollapseBtn');
@@ -283,6 +281,56 @@ function tooltipRows(c, total) {
   `).join('')}</div>`;
 }
 
+
+function tooltipCountsWithoutMissing(c) {
+  return {
+    pos: c.pos || 0,
+    zero: c.zero || 0,
+    neg: c.neg || 0
+  };
+}
+
+function verticalMiniBarHtml(c) {
+  const clean = tooltipCountsWithoutMissing(c);
+  const total = clean.pos + clean.zero + clean.neg || 1;
+  const parts = [
+    ['pos', clean.pos],
+    ['zero', clean.zero],
+    ['neg', clean.neg]
+  ];
+  return `<div class='mergedTipVBar'>${parts.map(([key, value]) => {
+    const size = value > 0 ? Math.max(pct(value, total), 1) : 0;
+    return `<span class='tipSeg ${key}' style='height:${size}%'></span>`;
+  }).join('')}</div>`;
+}
+
+function mergedCellTooltipHtml(dataset, rows, row, colOrder, colIndex) {
+  const question = dataset.questions[colIndex];
+  const questionCounts = colCounts(rows, colIndex);
+  const studentCounts = rowCounts(row, colOrder);
+
+  return `
+    <div class='mergedCellTip'>
+      <div class='mergedCellTipSection'>
+        <div class='mergedCellTipTitle'>Question ${safe(question)}</div>
+        <div class='mergedCellTipBody'>
+          ${verticalMiniBarHtml(questionCounts)}
+          ${tooltipRows(questionCounts)}
+        </div>
+      </div>
+      <div class='mergedCellTipDivider'></div>
+      <div class='mergedCellTipSection'>
+        <div class='mergedCellTipTitle'>${safe(row.name)}</div>
+        <div class='mergedCellTipSub'>Group ${safe(row.grupo)} · No. ${safe(row.no || '—')}</div>
+        <div class='mergedCellTipBody'>
+          ${verticalMiniBarHtml(studentCounts)}
+          ${tooltipRows(studentCounts)}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function expandedBarTooltip(title, c, orientation = 'vertical', subtitle = 'Expanded stacked bar') {
   const total = c.pos + c.zero + c.neg || 1;
   const parts = [
@@ -333,24 +381,18 @@ function colorForValue(value) {
 }
 
 function ensureTooltipInFullscreenContext() {
-  const tooltipEls = [tooltip, cellQuestionTooltip, cellStudentTooltip].filter(Boolean);
-  if (!tooltipEls.length) return;
+  if (!tooltip) return;
 
   const fullscreenRoot = document.fullscreenElement;
   if (fullscreenRoot && vizPanel && fullscreenRoot.contains(vizPanel)) {
-    tooltipEls.forEach(el => {
-      if (el.parentElement !== fullscreenRoot) fullscreenRoot.appendChild(el);
-    });
-  } else if (!fullscreenRoot) {
-    tooltipEls.forEach(el => {
-      if (el.parentElement !== document.body) document.body.appendChild(el);
-    });
+    if (tooltip.parentElement !== fullscreenRoot) fullscreenRoot.appendChild(tooltip);
+  } else if (!fullscreenRoot && tooltip.parentElement !== document.body) {
+    document.body.appendChild(tooltip);
   }
 }
 
 function showTip(html, event) {
   ensureTooltipInFullscreenContext();
-  hideCellContextTips();
   tooltip.innerHTML = html;
   tooltip.style.opacity = 1;
   moveTip(event);
@@ -368,51 +410,6 @@ function moveTip(event) {
 }
 
 function hideTip() { tooltip.style.opacity = 0; }
-
-function showCellContextTips(questionHtml, studentHtml, event) {
-  ensureTooltipInFullscreenContext();
-  hideTip();
-
-  cellQuestionTooltip.innerHTML = questionHtml;
-  cellStudentTooltip.innerHTML = studentHtml;
-
-  cellQuestionTooltip.style.opacity = 1;
-  cellStudentTooltip.style.opacity = 1;
-
-  moveCellContextTips(event);
-}
-
-function moveCellContextTips(event) {
-  const pad = 12;
-
-  const qRect = cellQuestionTooltip.getBoundingClientRect();
-  const sRect = cellStudentTooltip.getBoundingClientRect();
-
-  let qX = event.clientX - qRect.width / 2;
-  let qY = event.clientY - qRect.height - pad;
-
-  let sX = event.clientX + pad;
-  let sY = event.clientY - sRect.height / 2;
-
-  qX = Math.max(8, Math.min(qX, window.innerWidth - qRect.width - 8));
-  qY = Math.max(8, Math.min(qY, window.innerHeight - qRect.height - 8));
-
-  if (sX + sRect.width > window.innerWidth - 8) {
-    sX = event.clientX - sRect.width - pad;
-  }
-  sY = Math.max(8, Math.min(sY, window.innerHeight - sRect.height - 8));
-
-  cellQuestionTooltip.style.left = qX + 'px';
-  cellQuestionTooltip.style.top = qY + 'px';
-
-  cellStudentTooltip.style.left = sX + 'px';
-  cellStudentTooltip.style.top = sY + 'px';
-}
-
-function hideCellContextTips() {
-  if (cellQuestionTooltip) cellQuestionTooltip.style.opacity = 0;
-  if (cellStudentTooltip) cellStudentTooltip.style.opacity = 0;
-}
 
 function firstLastName(name) {
   return String(name || '').trim().split(/\s+/)[0] || '';
@@ -648,16 +645,15 @@ function renderHeatmap(dataset, rows, colOrder, effectiveCellW, effectiveCellH) 
       if (isMissing) {
         svg += `<rect x="${x}" y="${y}" width="${effectiveCellW}" height="${effectiveCellH}" fill="${fill}" stroke="#ffffff" stroke-width="1" />`;
       } else {
-        const questionTip = attrSafe(questionTooltipHtml(dataset, rows, colIndex));
-        const studentTip = attrSafe(studentTooltipHtml(row, colOrder));
-        svg += `<rect x="${x}" y="${y}" width="${effectiveCellW}" height="${effectiveCellH}" fill="${fill}" stroke="#ffffff" stroke-width="1" data-question-tip="${questionTip}" data-student-tip="${studentTip}" />`;
+        const tip = attrSafe(mergedCellTooltipHtml(dataset, rows, row, colOrder, colIndex));
+        svg += `<rect x="${x}" y="${y}" width="${effectiveCellW}" height="${effectiveCellH}" fill="${fill}" stroke="#ffffff" stroke-width="1" data-tip="${tip}" />`;
       }
       if (showCellText && shown !== '') svg += `<text x="${x + effectiveCellW / 2}" y="${y + effectiveCellH / 2 + 4}" font-size="11" text-anchor="middle" fill="${textColor}" font-weight="750" pointer-events="none">${shown}</text>`;
     });
   });
   svg += '</svg>';
   heatmapEl.innerHTML = svg;
-  attachHeatmapCellTips(heatmapEl);
+  attachSvgTips(heatmapEl);
 }
 
 function studentBarTooltip(row, c) {
@@ -818,20 +814,6 @@ function attachHtmlTips(root) {
     el.addEventListener('mouseenter', event => showTip(el.getAttribute('data-tip'), event));
     el.addEventListener('mousemove', moveTip);
     el.addEventListener('mouseleave', hideTip);
-  });
-}
-
-function attachHeatmapCellTips(root) {
-  root.querySelectorAll('[data-question-tip][data-student-tip]').forEach(el => {
-    el.addEventListener('mouseenter', event => {
-      showCellContextTips(
-        el.getAttribute('data-question-tip'),
-        el.getAttribute('data-student-tip'),
-        event
-      );
-    });
-    el.addEventListener('mousemove', moveCellContextTips);
-    el.addEventListener('mouseleave', hideCellContextTips);
   });
 }
 
