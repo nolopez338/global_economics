@@ -802,14 +802,6 @@ function attachTips(root) {
 }
 
 
-function updateQuestionOverviewButtonPosition() {
-  if (!dashboardScroll || !questionOverviewBtn) return;
-
-  const left = Math.max(8, dashboardScroll.scrollLeft + dashboardScroll.clientWidth - questionOverviewBtn.offsetWidth - 8);
-  const top = Math.max(8, dashboardScroll.scrollTop + 8);
-  questionOverviewBtn.style.transform = `translate(${left}px, ${top}px)`;
-}
-
 function render() {
   const dataset = getActiveDataset();
   const fullColOrder = dataset.questions.map((_, i) => i);
@@ -845,7 +837,6 @@ function render() {
     if (studentOverviewMode) renderStudentOverviewHistogram(rows, colOrder, effectiveCellH);
     else renderRightBars(rows, colOrder, effectiveCellH);
   }
-  updateQuestionOverviewButtonPosition();
 }
 
 function isVizPanelFullscreen() {
@@ -944,7 +935,6 @@ if (vizToolbarCollapseBtn) vizToolbarCollapseBtn.addEventListener('click', () =>
   setVizToolbarCollapsed(!vizToolbar.classList.contains('isCollapsed'));
 });
 window.addEventListener('resize', render);
-if (dashboardScroll) dashboardScroll.addEventListener('scroll', updateQuestionOverviewButtonPosition, { passive: true });
 document.addEventListener('fullscreenchange', () => {
   updateFullscreenButton();
   ensureTooltipInFullscreenContext();
