@@ -262,6 +262,8 @@ function safe(value) {
   }[char]));
 }
 
+// Escapes only enough to place trusted, generated tooltip HTML inside double-quoted data-* attributes.
+// Do not use for untrusted user-provided HTML.
 function attrSafe(value) {
   return String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
 }
