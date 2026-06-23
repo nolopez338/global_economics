@@ -264,6 +264,52 @@ function attrSafe(value) {
   return String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
 }
 
+
+function histogramTooltipAttr(html) {
+  return attrSafe(html);
+}
+
+function responseParts(c, includeMissing = true) {
+  const parts = [
+    ['pos', c.pos],
+    ['zero', c.zero],
+    ['neg', c.neg]
+  ];
+  if (includeMissing) parts.push(['miss', c.miss]);
+  return parts;
+}
+
+function ratioLength(value, maxValue, maxLength) {
+  return value === null ? 0 : (value / maxValue) * maxLength;
+}
+
+function tooltipHitRect(x, y, width, height, tip) {
+  return `<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="transparent" data-tip="${tip}" />`;
+}
+
+function verticalStackedSegmentRects(parts, maxValue, x, baseY, barW, barMaxH, tip, options = {}) {
+  let y = baseY;
+  return parts.map(([key, value]) => {
+    const h = (value / maxValue) * barMaxH;
+    y -= h;
+    if (h <= 0) return '';
+    const rx = options.rx ? ` rx="${options.rx}"` : '';
+    return `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${colors[key]}"${rx} data-tip="${tip}" />`;
+  }).join('');
+}
+
+function horizontalStackedSegmentRects(parts, total, xStart, y, scaledW, h, tip, options = {}) {
+  let x = xStart;
+  return parts.map(([key, value]) => {
+    const w = (value / total) * scaledW;
+    const rect = w > 0
+      ? `<rect x="${x}" y="${y}" width="${options.minVisible ? Math.max(1, w) : w}" height="${h}" fill="${colors[key]}" data-tip="${tip}" />`
+      : '';
+    x += w;
+    return rect;
+  }).join('');
+}
+
 function tooltipRows(c, total) {
   const visibleTotal = total || c.pos + c.zero + c.neg || 1;
   const rows = [
@@ -548,12 +594,12 @@ function renderQuestionRatioHistogram(dataset, rows, colOrder, effectiveCellW) {
     const barW = questionOverviewMode
       ? Math.max(1, effectiveCellW - 1)
       : Math.max(1, effectiveCellW - Math.min(10, Math.max(2, effectiveCellW * 0.3)));
-    const h = item.ratio === null ? 0 : (item.ratio / maxRatio) * barMaxH;
+    const h = ratioLength(item.ratio, maxRatio, barMaxH);
     const y = baseY - h;
-    const tip = attrSafe(ratioBarTooltip(`Question ${q}`, item.counts, ratioConfig, item.ratio));
+    const tip = histogramTooltipAttr(ratioBarTooltip(`Question ${q}`, item.counts, ratioConfig, item.ratio));
 
     if (h > 0) svg += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${colors.ratio}" rx="2" data-tip="${tip}" />`;
-    svg += `<rect x="${visualIndex * effectiveCellW}" y="${baseY - barMaxH}" width="${effectiveCellW}" height="${barMaxH}" fill="transparent" data-tip="${tip}" />`;
+    svg += tooltipHitRect(visualIndex * effectiveCellW, baseY - barMaxH, effectiveCellW, barMaxH, tip);
     svg += questionOverviewMode
       ? `<line x1="${visualIndex * effectiveCellW}" y1="82" x2="${visualIndex * effectiveCellW}" y2="88" stroke="#94a3b8" stroke-width="1" />`
       : `<line x1="${visualIndex * effectiveCellW}" y1="82" x2="${visualIndex * effectiveCellW + effectiveCellW}" y2="82" stroke="#d7dde8" />`;
@@ -585,19 +631,8 @@ function renderTopBars(dataset, rows, colOrder, effectiveCellW) {
     const c = colCounts(rows, colIndex);
     const x = visualIndex * effectiveCellW + Math.min(5, Math.max(1, effectiveCellW * 0.15));
     const barW = Math.max(1, effectiveCellW - Math.min(10, Math.max(2, effectiveCellW * 0.3)));
-    let y = 78;
-    const parts = [
-      ['pos', c.pos],
-      ['zero', c.zero],
-      ['neg', c.neg],
-      ['miss', c.miss]
-    ];
-    const tip = attrSafe(expandedBarTooltip(`Question ${q}`, c, 'vertical'));
-    parts.forEach(([key, value]) => {
-      const h = (value / maxRows) * barMaxH;
-      y -= h;
-      if (h > 0) svg += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${colors[key]}" rx="2" data-tip="${tip}" />`;
-    });
+    const tip = histogramTooltipAttr(expandedBarTooltip(`Question ${q}`, c, 'vertical'));
+    svg += verticalStackedSegmentRects(responseParts(c), maxRows, x, 78, barW, barMaxH, tip, { rx: 2 });
     svg += `<line x1="${visualIndex * effectiveCellW}" y1="82" x2="${visualIndex * effectiveCellW + effectiveCellW}" y2="82" stroke="#d7dde8" />`;
     svg += `<text x="${visualIndex * effectiveCellW + effectiveCellW / 2}" y="${labelY}" font-size="11" text-anchor="middle" fill="#334155" font-weight="700">${safe(q)}</text>`;
   });
@@ -676,10 +711,10 @@ function renderStudentRatioHistogram(rows, colOrder, effectiveCellH) {
     values.forEach((item, index) => {
       const y = index * effectiveCellH;
       const h = Math.max(1, effectiveCellH - 1);
-      const w = item.ratio === null ? 0 : (item.ratio / maxRatio) * barW;
-      const tip = attrSafe(ratioBarTooltip(`${item.row.name} · Group: ${item.row.grupo}`, item.counts, ratioConfig, item.ratio));
+      const w = ratioLength(item.ratio, maxRatio, barW);
+      const tip = histogramTooltipAttr(ratioBarTooltip(`${item.row.name} · Group: ${item.row.grupo}`, item.counts, ratioConfig, item.ratio));
       if (w > 0) svg += `<rect x="0" y="${y}" width="${Math.max(1, w)}" height="${h}" fill="${colors.ratio}" data-tip="${tip}" />`;
-      svg += `<rect x="0" y="${y}" width="${barW}" height="${h}" fill="transparent" data-tip="${tip}" />`;
+      svg += tooltipHitRect(0, y, barW, h, tip);
       svg += `<line x1="${barW + 4}" y1="${y}" x2="${barW + 14}" y2="${y}" stroke="#94a3b8" stroke-width="1" />`;
     });
     svg += '</svg>';
@@ -691,7 +726,7 @@ function renderStudentRatioHistogram(rows, colOrder, effectiveCellH) {
   rightBarsContentEl.style.setProperty('--cellH', effectiveCellH + 'px');
   rightBarsContentEl.innerHTML = values.map(item => {
     const w = item.ratio === null ? 0 : (item.ratio / maxRatio) * 100;
-    const tip = attrSafe(ratioBarTooltip(`${item.row.name} · Group: ${item.row.grupo}`, item.counts, ratioConfig, item.ratio));
+    const tip = histogramTooltipAttr(ratioBarTooltip(`${item.row.name} · Group: ${item.row.grupo}`, item.counts, ratioConfig, item.ratio));
     return `
       <div class="rowBar" data-tip="${tip}">
         <div class="stack" style="background:#edf2f7">
@@ -710,7 +745,7 @@ function renderRightBars(rows, colOrder, effectiveCellH) {
   rightBarsContentEl.innerHTML = rows.map(row => {
     const c = rowCounts(row, colOrder);
     const total = c.pos + c.zero + c.neg + c.miss || 1;
-    const tip = attrSafe(studentBarTooltip(row, c));
+    const tip = histogramTooltipAttr(studentBarTooltip(row, c));
     return `
       <div class="rowBar" data-tip="${tip}">
         <div class="stack">
@@ -743,13 +778,8 @@ function renderQuestionOverviewHistogram(dataset, rows, colOrder, effectiveCellW
     const c = colCounts(rows, colIndex);
     const x = visualIndex * effectiveCellW;
     const barW = Math.max(1, effectiveCellW - 1);
-    let y = baseY;
-    const tip = attrSafe(expandedBarTooltip(`Question ${q}`, c, 'vertical'));
-    [['pos', c.pos], ['zero', c.zero], ['neg', c.neg], ['miss', c.miss]].forEach(([key, value]) => {
-      const h = (value / maxRows) * barMaxH;
-      y -= h;
-      if (h > 0) svg += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${colors[key]}" data-tip="${tip}" />`;
-    });
+    const tip = histogramTooltipAttr(expandedBarTooltip(`Question ${q}`, c, 'vertical'));
+    svg += verticalStackedSegmentRects(responseParts(c), maxRows, x, baseY, barW, barMaxH, tip);
     svg += `<line x1="${x}" y1="82" x2="${x}" y2="88" stroke="#94a3b8" stroke-width="1" />`;
     const labelX = x + effectiveCellW / 2;
     if (rotate) {
@@ -778,14 +808,9 @@ function renderStudentOverviewHistogram(rows, colOrder, effectiveCellH) {
     const total = c.pos + c.zero + c.neg + c.miss || 1;
     const y = index * effectiveCellH;
     const h = Math.max(1, effectiveCellH - 1);
-    let x = 0;
     const scaledW = Math.max(1, (total / maxTotal) * barW);
-    const tip = attrSafe(studentBarTooltip(row, c));
-    [['pos', c.pos], ['zero', c.zero], ['neg', c.neg], ['miss', c.miss]].forEach(([key, value]) => {
-      const w = (value / total) * scaledW;
-      if (w > 0) svg += `<rect x="${x}" y="${y}" width="${Math.max(1, w)}" height="${h}" fill="${colors[key]}" data-tip="${tip}" />`;
-      x += w;
-    });
+    const tip = histogramTooltipAttr(studentBarTooltip(row, c));
+    svg += horizontalStackedSegmentRects(responseParts(c), total, 0, y, scaledW, h, tip, { minVisible: true });
     svg += `<line x1="${barW + 4}" y1="${y}" x2="${barW + 14}" y2="${y}" stroke="#94a3b8" stroke-width="1" />`;
   });
   svg += '</svg>';
