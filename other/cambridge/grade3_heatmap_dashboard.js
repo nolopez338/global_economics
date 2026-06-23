@@ -323,14 +323,14 @@ function renderStats(dataset, rows, colOrder) {
   `;
 
   const selectionCards = [
-    ['Result View', dataset.label, 'Current dataset'],
-    ['Students', rows.length, 'Visible after filters']
+    ['Result View', dataset.label, ''],
+    ['Students', rows.length, '']
   ].map(card).join('');
 
   const responseCards = [
-    ['Positive Units', c.pos, 'Visible positive units'],
-    ['Negative Units', c.neg, 'Visible negative units'],
-    ['Non Responses', c.zero, 'Visible non-response units']
+    ['Positive Units', c.pos, ''],
+    ['Negative Units', c.neg, ''],
+    ['Non Responses', c.zero, '']
   ].map(card).join('');
 
   stats.innerHTML = `
@@ -339,7 +339,7 @@ function renderStats(dataset, rows, colOrder) {
       <div class="statGroupCards">${selectionCards}</div>
     </div>
     <div class="statGroup responseGroup">
-      <div class="statGroupTitle">Response Summary</div>
+      <div class="statGroupTitle">Summary</div>
       <div class="statGroupCards">${responseCards}</div>
     </div>
   `;
