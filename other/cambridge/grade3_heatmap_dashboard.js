@@ -18,6 +18,7 @@ const topBarsContentEl = document.getElementById('topBarsContent') || topBarsEl;
 const rightBarsContentEl = document.getElementById('rightBarsContent') || document.getElementById('rightBars');
 const gridEl = document.getElementById('dashboardGrid');
 const tooltip = document.getElementById('tooltip');
+const detailPanel = document.getElementById('detailPanel');
 const vizPanel = document.querySelector('.vizPanel');
 const vizToolbar = document.getElementById('vizToolbar');
 const vizToolbarCollapseBtn = document.getElementById('vizToolbarCollapseBtn');
@@ -449,6 +450,61 @@ function moveTip(event) {
 
 function hideTip() { tooltip.style.opacity = 0; }
 
+function updateDetailPanel(html) {
+  if (!detailPanel || !html) return;
+  detailPanel.innerHTML = html;
+}
+
+function setActiveDetailTarget(root, target) {
+  root.querySelectorAll('.detailTargetActive').forEach(el => el.classList.remove('detailTargetActive'));
+  if (target) target.classList.add('detailTargetActive');
+}
+
+function showDetailTarget(root, target) {
+  if (!target) return;
+  setActiveDetailTarget(root, target);
+  updateDetailPanel(target.getAttribute('data-tip'));
+}
+
+function detailTargets(root) {
+  return Array.from(root.querySelectorAll('[data-tip]'));
+}
+
+function moveDetailSelection(root, direction) {
+  const targets = detailTargets(root);
+  if (!targets.length) return;
+  const current = root.querySelector('.detailTargetActive');
+  const currentIndex = Math.max(0, targets.indexOf(current));
+  const nextIndex = (currentIndex + direction + targets.length) % targets.length;
+  showDetailTarget(root, targets[nextIndex]);
+}
+
+function activateFirstDetail(root) {
+  const current = root.querySelector('.detailTargetActive');
+  showDetailTarget(root, current || detailTargets(root)[0]);
+}
+
+function prepareDetailGroup(root) {
+  if (!root || root.dataset.detailReady === 'true') return;
+  root.dataset.detailReady = 'true';
+  root.setAttribute('tabindex', '0');
+  root.setAttribute('role', 'group');
+  root.setAttribute('aria-describedby', 'detailPanel');
+  root.addEventListener('focus', () => activateFirstDetail(root));
+  root.addEventListener('keydown', event => {
+    const directions = {
+      ArrowRight: 1,
+      ArrowDown: 1,
+      ArrowLeft: -1,
+      ArrowUp: -1
+    };
+    if (!Object.prototype.hasOwnProperty.call(directions, event.key)) return;
+    event.preventDefault();
+    moveDetailSelection(root, directions[event.key]);
+  });
+}
+
+
 function firstLastName(name) {
   return String(name || '').trim().split(/\s+/)[0] || '';
 }
@@ -819,10 +875,13 @@ function renderStudentOverviewHistogram(rows, colOrder, effectiveCellH) {
 }
 
 function attachTips(root) {
+  prepareDetailGroup(root);
   root.querySelectorAll('[data-tip]').forEach(el => {
     el.addEventListener('mouseenter', event => showTip(el.getAttribute('data-tip'), event));
     el.addEventListener('mousemove', moveTip);
     el.addEventListener('mouseleave', hideTip);
+    el.addEventListener('click', () => showDetailTarget(root, el));
+    el.addEventListener('touchstart', () => showDetailTarget(root, el), { passive: true });
   });
 }
 
