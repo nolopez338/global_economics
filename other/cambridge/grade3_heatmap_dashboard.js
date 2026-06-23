@@ -10,11 +10,19 @@ const activeSummary = document.getElementById('activeSummary');
 const namesEl = document.getElementById('names');
 const heatmapEl = document.getElementById('heatmap');
 const topBarsEl = document.getElementById('topBars');
+const topBarsContent = document.getElementById('topBarsContent') || topBarsEl;
 const rightBarsEl = document.getElementById('rightBars');
+const rightBarsContent = document.getElementById('rightBarsContent') || rightBarsEl;
 const gridEl = document.getElementById('dashboardGrid');
 const tooltip = document.getElementById('tooltip');
 const vizPanel = document.querySelector('.vizPanel');
 const fullscreenBtn = document.getElementById('fullscreenBtn');
+const dashboardScroll = document.querySelector('.dashboardScroll');
+const questionOverviewBtn = document.getElementById('questionOverviewBtn');
+const studentOverviewBtn = document.getElementById('studentOverviewBtn');
+
+let questionOverviewMode = false;
+let studentOverviewMode = false;
 
 function cloneRows(rows) {
   return rows.map(row => ({
@@ -328,8 +336,8 @@ function renderStats(dataset, rows, colOrder) {
     : `${dataset.label} · ${dataset.questions.length} questions · ${rows.length} visible students · missing hidden`;
 }
 
-function renderTopBars(dataset, rows, colOrder) {
-  const width = colOrder.length * cellW;
+function renderTopBars(dataset, rows, colOrder, effectiveCellW) {
+  const width = colOrder.length * effectiveCellW;
   const maxRows = Math.max(1, ...colOrder.map(colIndex => {
     const c = colCounts(rows, colIndex);
     return c.pos + c.zero + c.neg + c.miss;
@@ -340,8 +348,8 @@ function renderTopBars(dataset, rows, colOrder) {
   colOrder.forEach((colIndex, visualIndex) => {
     const q = dataset.questions[colIndex];
     const c = colCounts(rows, colIndex);
-    const x = visualIndex * cellW + 5;
-    const barW = cellW - 10;
+    const x = visualIndex * effectiveCellW + Math.min(5, Math.max(1, effectiveCellW * 0.15));
+    const barW = Math.max(1, effectiveCellW - Math.min(10, Math.max(2, effectiveCellW * 0.3)));
     let y = 78;
     const parts = [
       ['pos', c.pos],
@@ -355,17 +363,17 @@ function renderTopBars(dataset, rows, colOrder) {
       y -= h;
       if (h > 0) svg += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${colors[key]}" rx="2" data-tip="${tip}" />`;
     });
-    svg += `<line x1="${visualIndex * cellW}" y1="82" x2="${visualIndex * cellW + cellW}" y2="82" stroke="#d7dde8" />`;
-    svg += `<text x="${visualIndex * cellW + cellW / 2}" y="${labelY}" font-size="11" text-anchor="middle" fill="#334155" font-weight="700">${safe(q)}</text>`;
+    svg += `<line x1="${visualIndex * effectiveCellW}" y1="82" x2="${visualIndex * effectiveCellW + effectiveCellW}" y2="82" stroke="#d7dde8" />`;
+    svg += `<text x="${visualIndex * effectiveCellW + effectiveCellW / 2}" y="${labelY}" font-size="11" text-anchor="middle" fill="#334155" font-weight="700">${safe(q)}</text>`;
   });
   svg += '</svg>';
-  topBarsEl.innerHTML = svg;
-  attachSvgTips(topBarsEl);
+  topBarsContent.innerHTML = svg;
+  attachSvgTips(topBarsContent);
 }
 
-function renderNames(rows) {
+function renderNames(rows, effectiveCellH) {
   const compact = !showNames.checked;
-  namesEl.style.setProperty('--cellH', cellH + 'px');
+  namesEl.style.setProperty('--cellH', effectiveCellH + 'px');
   namesEl.innerHTML = rows.map(row => {
     const displayName = compact ? firstLastName(row.name) : row.name;
     return `
@@ -377,22 +385,23 @@ function renderNames(rows) {
   }).join('');
 }
 
-function renderHeatmap(dataset, rows, colOrder) {
-  const width = colOrder.length * cellW;
-  const height = rows.length * cellH;
+function renderHeatmap(dataset, rows, colOrder, effectiveCellW, effectiveCellH) {
+  const width = colOrder.length * effectiveCellW;
+  const height = rows.length * effectiveCellH;
+  const showCellText = !questionOverviewMode && !studentOverviewMode;
   let svg = `<svg width="${width}" height="${height}" role="img" aria-label="Raw answer heatmap">`;
   rows.forEach((row, r) => {
     colOrder.forEach((colIndex, c) => {
       const value = row.answers[colIndex];
-      const x = c * cellW;
-      const y = r * cellH;
+      const x = c * effectiveCellW;
+      const y = r * effectiveCellH;
       const q = dataset.questions[colIndex];
       const fill = colorForValue(value);
       const textColor = value === 0 ? '#3c3108' : '#ffffff';
       const shown = value === null || value === undefined || Number.isNaN(value) ? '' : value;
       const tip = attrSafe(`<b>${safe(row.name)}</b><br>View: ${safe(dataset.label)}<br>Group: ${safe(row.grupo)} · No. ${safe(row.no || '—')}<br>Question: ${safe(q)}<br>Value: ${shown === '' ? 'Missing' : safe(shown)}<br>Class: ${labelForValue(value)}`);
-      svg += `<rect x="${x}" y="${y}" width="${cellW}" height="${cellH}" fill="${fill}" stroke="#ffffff" stroke-width="1" data-tip="${tip}" />`;
-      if (shown !== '') svg += `<text x="${x + cellW / 2}" y="${y + cellH / 2 + 4}" font-size="11" text-anchor="middle" fill="${textColor}" font-weight="750" pointer-events="none">${shown}</text>`;
+      svg += `<rect x="${x}" y="${y}" width="${effectiveCellW}" height="${effectiveCellH}" fill="${fill}" stroke="#ffffff" stroke-width="1" data-tip="${tip}" />`;
+      if (showCellText && shown !== '') svg += `<text x="${x + effectiveCellW / 2}" y="${y + effectiveCellH / 2 + 4}" font-size="11" text-anchor="middle" fill="${textColor}" font-weight="750" pointer-events="none">${shown}</text>`;
     });
   });
   svg += '</svg>';
@@ -400,9 +409,9 @@ function renderHeatmap(dataset, rows, colOrder) {
   attachSvgTips(heatmapEl);
 }
 
-function renderRightBars(rows, colOrder) {
-  rightBarsEl.style.setProperty('--cellH', cellH + 'px');
-  rightBarsEl.innerHTML = rows.map(row => {
+function renderRightBars(rows, colOrder, effectiveCellH) {
+  rightBarsContent.style.setProperty('--cellH', effectiveCellH + 'px');
+  rightBarsContent.innerHTML = rows.map(row => {
     const c = rowCounts(row, colOrder);
     const total = c.pos + c.zero + c.neg + c.miss || 1;
     const tip = attrSafe(expandedBarTooltip(row.name, c, 'horizontal'));
@@ -418,7 +427,78 @@ function renderRightBars(rows, colOrder) {
       </div>
     `;
   }).join('');
-  attachHtmlTips(rightBarsEl);
+  attachHtmlTips(rightBarsContent);
+}
+
+function renderQuestionOverviewHistogram(dataset, rows, colOrder, effectiveCellW) {
+  const width = colOrder.length * effectiveCellW;
+  const maxRows = Math.max(1, ...colOrder.map(colIndex => {
+    const c = colCounts(rows, colIndex);
+    return c.pos + c.zero + c.neg + c.miss;
+  }));
+  const barMaxH = 66;
+  const baseY = 78;
+  const labelY = 103;
+  const fontSize = effectiveCellW < 14 ? 8 : effectiveCellW < 22 ? 9 : 10;
+  const rotate = effectiveCellW < 24;
+  let svg = `<svg width="${width}" height="${topH}" role="img" aria-label="Compressed question overview histogram">`;
+  colOrder.forEach((colIndex, visualIndex) => {
+    const q = dataset.questions[colIndex];
+    const c = colCounts(rows, colIndex);
+    const x = visualIndex * effectiveCellW;
+    const barW = Math.max(1, effectiveCellW - 1);
+    let y = baseY;
+    const tip = attrSafe(expandedBarTooltip(`Question ${q}`, c, 'vertical'));
+    [['pos', c.pos], ['zero', c.zero], ['neg', c.neg], ['miss', c.miss]].forEach(([key, value]) => {
+      const h = (value / maxRows) * barMaxH;
+      y -= h;
+      if (h > 0) svg += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${colors[key]}" data-tip="${tip}" />`;
+    });
+    svg += `<line x1="${x}" y1="82" x2="${x}" y2="88" stroke="#94a3b8" stroke-width="1" />`;
+    const labelX = x + effectiveCellW / 2;
+    if (rotate) {
+      svg += `<text x="${labelX}" y="${labelY}" font-size="${fontSize}" text-anchor="end" fill="#334155" font-weight="700" transform="rotate(-55 ${labelX} ${labelY})">${safe(q)}</text>`;
+    } else {
+      svg += `<text x="${labelX}" y="${labelY}" font-size="${fontSize}" text-anchor="middle" fill="#334155" font-weight="700">${safe(q)}</text>`;
+    }
+  });
+  svg += `<line x1="0" y1="82" x2="${width}" y2="82" stroke="#d7dde8" />`;
+  svg += '</svg>';
+  topBarsContent.innerHTML = svg;
+  attachSvgTips(topBarsContent);
+}
+
+function renderStudentOverviewHistogram(rows, colOrder, effectiveCellH) {
+  const width = 180;
+  const height = rows.length * effectiveCellH;
+  const barW = 118;
+  const labelX = 124;
+  const maxTotal = Math.max(1, ...rows.map(row => {
+    const c = rowCounts(row, colOrder);
+    return c.pos + c.zero + c.neg + c.miss;
+  }));
+  const fontSize = effectiveCellH < 12 ? 8 : effectiveCellH < 18 ? 9 : 10;
+  const every = Math.max(1, Math.ceil(rows.length / Math.max(1, Math.floor(height / Math.max(10, fontSize + 2)))));
+  let svg = `<svg width="${width}" height="${height}" role="img" aria-label="Compressed student overview histogram">`;
+  rows.forEach((row, index) => {
+    const c = rowCounts(row, colOrder);
+    const total = c.pos + c.zero + c.neg + c.miss || 1;
+    const y = index * effectiveCellH;
+    const h = Math.max(1, effectiveCellH - 1);
+    let x = 0;
+    const scaledW = Math.max(1, (total / maxTotal) * barW);
+    const tip = attrSafe(expandedBarTooltip(row.name, c, 'horizontal'));
+    [['pos', c.pos], ['zero', c.zero], ['neg', c.neg], ['miss', c.miss]].forEach(([key, value]) => {
+      const w = (value / total) * scaledW;
+      if (w > 0) svg += `<rect x="${x}" y="${y}" width="${Math.max(1, w)}" height="${h}" fill="${colors[key]}" data-tip="${tip}" />`;
+      x += w;
+    });
+    svg += `<line x1="${barW + 2}" y1="${y}" x2="${barW + 8}" y2="${y}" stroke="#94a3b8" stroke-width="1" />`;
+    if (index % every === 0) svg += `<text x="${labelX}" y="${y + Math.max(fontSize, effectiveCellH / 2 + fontSize / 3)}" font-size="${fontSize}" fill="#334155" font-weight="700">${safe(firstLastName(row.name))}</text>`;
+  });
+  svg += '</svg>';
+  rightBarsContent.innerHTML = svg;
+  attachSvgTips(rightBarsContent);
 }
 
 function attachSvgTips(root) {
@@ -449,12 +529,23 @@ function render() {
   const colOrder = sortedCols(dataset, rowsPreSort);
   const rows = sortedRows(rowsPreSort, colOrder);
   const nameColumnWidth = showNames.checked ? 260 : compactNameColumnWidth(rows);
-  gridEl.style.gridTemplateColumns = `${nameColumnWidth}px ${colOrder.length * cellW}px 180px`;
+  const availableHeatmapWidth = Math.max(120, (dashboardScroll?.clientWidth || window.innerWidth) - nameColumnWidth - 180);
+  const availableHeatmapHeight = Math.max(180, (dashboardScroll?.clientHeight || window.innerHeight - 360) - topH);
+  const effectiveCellW = questionOverviewMode && colOrder.length
+    ? Math.max(4, Math.floor(availableHeatmapWidth / colOrder.length))
+    : cellW;
+  const effectiveCellH = studentOverviewMode && rows.length
+    ? Math.max(4, Math.floor(availableHeatmapHeight / rows.length))
+    : cellH;
+  const heatmapWidth = colOrder.length * effectiveCellW;
+  gridEl.style.gridTemplateColumns = `${nameColumnWidth}px ${heatmapWidth}px 180px`;
   renderStats(dataset, rows, colOrder);
-  renderTopBars(dataset, rows, colOrder);
-  renderNames(rows);
-  renderHeatmap(dataset, rows, colOrder);
-  renderRightBars(rows, colOrder);
+  if (questionOverviewMode) renderQuestionOverviewHistogram(dataset, rows, colOrder, effectiveCellW);
+  else renderTopBars(dataset, rows, colOrder, effectiveCellW);
+  renderNames(rows, effectiveCellH);
+  renderHeatmap(dataset, rows, colOrder, effectiveCellW, effectiveCellH);
+  if (studentOverviewMode) renderStudentOverviewHistogram(rows, colOrder, effectiveCellH);
+  else renderRightBars(rows, colOrder, effectiveCellH);
 }
 
 function isVizPanelFullscreen() {
@@ -491,7 +582,18 @@ async function toggleFullscreen() {
 }
 
 [resultView, groupFilter, sortRows, sortCols, searchBox, showNames, showMissing].forEach(control => control.addEventListener('input', render));
+if (questionOverviewBtn) questionOverviewBtn.addEventListener('click', () => {
+  questionOverviewMode = !questionOverviewMode;
+  questionOverviewBtn.setAttribute('aria-pressed', String(questionOverviewMode));
+  render();
+});
+if (studentOverviewBtn) studentOverviewBtn.addEventListener('click', () => {
+  studentOverviewMode = !studentOverviewMode;
+  studentOverviewBtn.setAttribute('aria-pressed', String(studentOverviewMode));
+  render();
+});
 if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
+window.addEventListener('resize', render);
 document.addEventListener('fullscreenchange', updateFullscreenButton);
 updateFullscreenButton();
 render();
