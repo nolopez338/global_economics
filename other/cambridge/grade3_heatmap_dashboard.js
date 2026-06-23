@@ -15,6 +15,8 @@ const rightBarsEl = document.getElementById('rightBars');
 const rightBarsContentEl = document.getElementById('rightBarsContent') || rightBarsEl;
 const gridEl = document.getElementById('dashboardGrid');
 const tooltip = document.getElementById('tooltip');
+const cellQuestionTooltip = document.getElementById('cellQuestionTooltip');
+const cellStudentTooltip = document.getElementById('cellStudentTooltip');
 const vizPanel = document.querySelector('.vizPanel');
 const vizToolbar = document.getElementById('vizToolbar');
 const vizToolbarCollapseBtn = document.getElementById('vizToolbarCollapseBtn');
@@ -209,6 +211,17 @@ function expandedBarTooltip(title, c, orientation = 'vertical', subtitle = 'Expa
     ${tooltipRows(c, total)}`;
 }
 
+function questionTooltipHtml(dataset, rows, colIndex) {
+  const question = dataset.questions[colIndex];
+  const c = colCounts(rows, colIndex);
+  return expandedBarTooltip(`Question ${question}`, c, 'vertical');
+}
+
+function studentTooltipHtml(row, colOrder) {
+  const c = rowCounts(row, colOrder);
+  return studentBarTooltip(row, c);
+}
+
 function labelForValue(value) {
   if (value === null || value === undefined || Number.isNaN(value)) return 'Missing';
   if (value > 0) return 'Positive';
@@ -224,18 +237,24 @@ function colorForValue(value) {
 }
 
 function ensureTooltipInFullscreenContext() {
-  if (!tooltip) return;
+  const tooltipEls = [tooltip, cellQuestionTooltip, cellStudentTooltip].filter(Boolean);
+  if (!tooltipEls.length) return;
 
   const fullscreenRoot = document.fullscreenElement;
   if (fullscreenRoot && vizPanel && fullscreenRoot.contains(vizPanel)) {
-    if (tooltip.parentElement !== fullscreenRoot) fullscreenRoot.appendChild(tooltip);
-  } else if (!fullscreenRoot && tooltip.parentElement !== document.body) {
-    document.body.appendChild(tooltip);
+    tooltipEls.forEach(el => {
+      if (el.parentElement !== fullscreenRoot) fullscreenRoot.appendChild(el);
+    });
+  } else if (!fullscreenRoot) {
+    tooltipEls.forEach(el => {
+      if (el.parentElement !== document.body) document.body.appendChild(el);
+    });
   }
 }
 
 function showTip(html, event) {
   ensureTooltipInFullscreenContext();
+  hideCellContextTips();
   tooltip.innerHTML = html;
   tooltip.style.opacity = 1;
   moveTip(event);
@@ -253,6 +272,51 @@ function moveTip(event) {
 }
 
 function hideTip() { tooltip.style.opacity = 0; }
+
+function showCellContextTips(questionHtml, studentHtml, event) {
+  ensureTooltipInFullscreenContext();
+  hideTip();
+
+  cellQuestionTooltip.innerHTML = questionHtml;
+  cellStudentTooltip.innerHTML = studentHtml;
+
+  cellQuestionTooltip.style.opacity = 1;
+  cellStudentTooltip.style.opacity = 1;
+
+  moveCellContextTips(event);
+}
+
+function moveCellContextTips(event) {
+  const pad = 12;
+
+  const qRect = cellQuestionTooltip.getBoundingClientRect();
+  const sRect = cellStudentTooltip.getBoundingClientRect();
+
+  let qX = event.clientX - qRect.width / 2;
+  let qY = event.clientY - qRect.height - pad;
+
+  let sX = event.clientX + pad;
+  let sY = event.clientY - sRect.height / 2;
+
+  qX = Math.max(8, Math.min(qX, window.innerWidth - qRect.width - 8));
+  qY = Math.max(8, Math.min(qY, window.innerHeight - qRect.height - 8));
+
+  if (sX + sRect.width > window.innerWidth - 8) {
+    sX = event.clientX - sRect.width - pad;
+  }
+  sY = Math.max(8, Math.min(sY, window.innerHeight - sRect.height - 8));
+
+  cellQuestionTooltip.style.left = qX + 'px';
+  cellQuestionTooltip.style.top = qY + 'px';
+
+  cellStudentTooltip.style.left = sX + 'px';
+  cellStudentTooltip.style.top = sY + 'px';
+}
+
+function hideCellContextTips() {
+  if (cellQuestionTooltip) cellQuestionTooltip.style.opacity = 0;
+  if (cellStudentTooltip) cellStudentTooltip.style.opacity = 0;
+}
 
 function firstLastName(name) {
   return String(name || '').trim().split(/\s+/)[0] || '';
@@ -406,7 +470,6 @@ function renderHeatmap(dataset, rows, colOrder, effectiveCellW, effectiveCellH) 
       const value = row.answers[colIndex];
       const x = c * effectiveCellW;
       const y = r * effectiveCellH;
-      const q = dataset.questions[colIndex];
       const fill = colorForValue(value);
       const textColor = value === 0 ? '#3c3108' : '#ffffff';
       const isMissing = value === null || value === undefined || Number.isNaN(value);
@@ -414,15 +477,16 @@ function renderHeatmap(dataset, rows, colOrder, effectiveCellW, effectiveCellH) 
       if (isMissing) {
         svg += `<rect x="${x}" y="${y}" width="${effectiveCellW}" height="${effectiveCellH}" fill="${fill}" stroke="#ffffff" stroke-width="1" />`;
       } else {
-        const tip = attrSafe(`<b>${safe(row.name)}</b><br>View: ${safe(dataset.label)}<br>Group: ${safe(row.grupo)} · No. ${safe(row.no || '—')}<br>Question: ${safe(q)}<br>Value: ${safe(shown)}<br>Class: ${labelForValue(value)}`);
-        svg += `<rect x="${x}" y="${y}" width="${effectiveCellW}" height="${effectiveCellH}" fill="${fill}" stroke="#ffffff" stroke-width="1" data-tip="${tip}" />`;
+        const questionTip = attrSafe(questionTooltipHtml(dataset, rows, colIndex));
+        const studentTip = attrSafe(studentTooltipHtml(row, colOrder));
+        svg += `<rect x="${x}" y="${y}" width="${effectiveCellW}" height="${effectiveCellH}" fill="${fill}" stroke="#ffffff" stroke-width="1" data-question-tip="${questionTip}" data-student-tip="${studentTip}" />`;
       }
       if (showCellText && shown !== '') svg += `<text x="${x + effectiveCellW / 2}" y="${y + effectiveCellH / 2 + 4}" font-size="11" text-anchor="middle" fill="${textColor}" font-weight="750" pointer-events="none">${shown}</text>`;
     });
   });
   svg += '</svg>';
   heatmapEl.innerHTML = svg;
-  attachSvgTips(heatmapEl);
+  attachHeatmapCellTips(heatmapEl);
 }
 
 function studentBarTooltip(row, c) {
@@ -535,6 +599,20 @@ function attachHtmlTips(root) {
     el.addEventListener('mouseenter', event => showTip(el.getAttribute('data-tip'), event));
     el.addEventListener('mousemove', moveTip);
     el.addEventListener('mouseleave', hideTip);
+  });
+}
+
+function attachHeatmapCellTips(root) {
+  root.querySelectorAll('[data-question-tip][data-student-tip]').forEach(el => {
+    el.addEventListener('mouseenter', event => {
+      showCellContextTips(
+        el.getAttribute('data-question-tip'),
+        el.getAttribute('data-student-tip'),
+        event
+      );
+    });
+    el.addEventListener('mousemove', moveCellContextTips);
+    el.addEventListener('mouseleave', hideCellContextTips);
   });
 }
 
