@@ -16,6 +16,8 @@ const rightBarsContent = document.getElementById('rightBarsContent') || rightBar
 const gridEl = document.getElementById('dashboardGrid');
 const tooltip = document.getElementById('tooltip');
 const vizPanel = document.querySelector('.vizPanel');
+const vizToolbar = document.getElementById('vizToolbar');
+const vizToolbarCollapseBtn = document.getElementById('vizToolbarCollapseBtn');
 const fullscreenBtn = document.getElementById('fullscreenBtn');
 const dashboardScroll = document.querySelector('.dashboardScroll');
 const questionOverviewBtn = document.getElementById('questionOverviewBtn');
@@ -222,7 +224,19 @@ function colorForValue(value) {
   return colors.neg;
 }
 
+function ensureTooltipInFullscreenContext() {
+  if (!tooltip) return;
+
+  const fullscreenRoot = document.fullscreenElement;
+  if (fullscreenRoot && vizPanel && fullscreenRoot.contains(vizPanel)) {
+    if (tooltip.parentElement !== fullscreenRoot) fullscreenRoot.appendChild(tooltip);
+  } else if (!fullscreenRoot && tooltip.parentElement !== document.body) {
+    document.body.appendChild(tooltip);
+  }
+}
+
 function showTip(html, event) {
+  ensureTooltipInFullscreenContext();
   tooltip.innerHTML = html;
   tooltip.style.opacity = 1;
   moveTip(event);
@@ -552,6 +566,20 @@ function isVizPanelFullscreen() {
   return document.fullscreenElement === vizPanel;
 }
 
+function setVizToolbarCollapsed(collapsed) {
+  if (!vizToolbar || !vizToolbarCollapseBtn) return;
+
+  vizToolbar.classList.toggle('isCollapsed', collapsed);
+  vizToolbarCollapseBtn.setAttribute('aria-expanded', String(!collapsed));
+  vizToolbarCollapseBtn.setAttribute(
+    'title',
+    collapsed ? 'Expand visualization controls' : 'Collapse visualization controls'
+  );
+
+  const icon = vizToolbarCollapseBtn.querySelector('.collapseIcon');
+  if (icon) icon.textContent = collapsed ? '▸' : '▾';
+}
+
 function updateFullscreenButton() {
   if (!fullscreenBtn) return;
 
@@ -593,7 +621,15 @@ if (studentOverviewBtn) studentOverviewBtn.addEventListener('click', () => {
   render();
 });
 if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
+if (vizToolbarCollapseBtn) vizToolbarCollapseBtn.addEventListener('click', () => {
+  if (!vizToolbar) return;
+  setVizToolbarCollapsed(!vizToolbar.classList.contains('isCollapsed'));
+});
 window.addEventListener('resize', render);
-document.addEventListener('fullscreenchange', updateFullscreenButton);
+document.addEventListener('fullscreenchange', () => {
+  updateFullscreenButton();
+  ensureTooltipInFullscreenContext();
+});
 updateFullscreenButton();
+setVizToolbarCollapsed(false);
 render();
