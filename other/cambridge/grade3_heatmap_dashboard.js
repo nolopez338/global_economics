@@ -2,6 +2,10 @@ const resultView = document.getElementById('resultView');
 const groupFilter = document.getElementById('groupFilter');
 const sortRows = document.getElementById('sortRows');
 const sortCols = document.getElementById('sortCols');
+const sortRowsAscBtn = document.getElementById('sortRowsAscBtn');
+const sortRowsDescBtn = document.getElementById('sortRowsDescBtn');
+const sortColsAscBtn = document.getElementById('sortColsAscBtn');
+const sortColsDescBtn = document.getElementById('sortColsDescBtn');
 const searchBox = document.getElementById('searchBox');
 const showNames = document.getElementById('showNames');
 const showMissing = document.getElementById('showMissing');
@@ -27,6 +31,8 @@ const studentOverviewBtn = document.getElementById('studentOverviewBtn');
 
 let questionOverviewMode = false;
 let studentOverviewMode = false;
+let sortRowsDirection = 'desc';
+let sortColsDirection = 'desc';
 
 function cloneRows(rows) {
   return rows.map(row => ({
@@ -180,6 +186,40 @@ function formatRatio(value) {
   return value === null || value === undefined || Number.isNaN(value)
     ? '—'
     : value.toFixed(2);
+}
+
+function isOriginalSort(value) {
+  return value === 'original';
+}
+
+function directionMultiplier(direction) {
+  return direction === 'asc' ? 1 : -1;
+}
+
+function compareMetric(aValue, bValue, direction) {
+  if (aValue === null && bValue === null) return 0;
+  if (aValue === null) return 1;
+  if (bValue === null) return -1;
+
+  return direction === 'asc'
+    ? aValue - bValue
+    : bValue - aValue;
+}
+
+function updateSortDirectionButtons() {
+  const rowsOriginal = isOriginalSort(sortRows.value);
+  const colsOriginal = isOriginalSort(sortCols.value);
+
+  sortRowsAscBtn.disabled = rowsOriginal;
+  sortRowsDescBtn.disabled = rowsOriginal;
+  sortColsAscBtn.disabled = colsOriginal;
+  sortColsDescBtn.disabled = colsOriginal;
+
+  sortRowsAscBtn.classList.toggle('isActive', !rowsOriginal && sortRowsDirection === 'asc');
+  sortRowsDescBtn.classList.toggle('isActive', !rowsOriginal && sortRowsDirection === 'desc');
+
+  sortColsAscBtn.classList.toggle('isActive', !colsOriginal && sortColsDirection === 'asc');
+  sortColsDescBtn.classList.toggle('isActive', !colsOriginal && sortColsDirection === 'desc');
 }
 
 function ratioTooltipRows(c) {
@@ -421,17 +461,17 @@ function sortedRows(rows, colOrder) {
       const aRatio = ratioValue(rowCounts(a, colOrder), ratioConfig);
       const bRatio = ratioValue(rowCounts(b, colOrder), ratioConfig);
 
-      if (aRatio === null && bRatio === null) return a.name.localeCompare(b.name, 'es');
-      if (aRatio === null) return 1;
-      if (bRatio === null) return -1;
-
-      return bRatio - aRatio || a.name.localeCompare(b.name, 'es');
+      return compareMetric(aRatio, bRatio, sortRowsDirection) || a.name.localeCompare(b.name, 'es');
     });
   } else {
-    if (sort === 'nameAsc') sorted.sort((a, b) => a.name.localeCompare(b.name, 'es'));
-    if (sort === 'positiveDesc') sorted.sort((a, b) => rowCounts(b, colOrder).pos - rowCounts(a, colOrder).pos || a.name.localeCompare(b.name, 'es'));
-    if (sort === 'negativeDesc') sorted.sort((a, b) => rowCounts(b, colOrder).neg - rowCounts(a, colOrder).neg || a.name.localeCompare(b.name, 'es'));
-    if (sort === 'zeroDesc') sorted.sort((a, b) => rowCounts(b, colOrder).zero - rowCounts(a, colOrder).zero || a.name.localeCompare(b.name, 'es'));
+    if (sort === 'nameAsc') {
+      sorted.sort((a, b) => sortRowsDirection === 'asc'
+        ? a.name.localeCompare(b.name, 'es')
+        : b.name.localeCompare(a.name, 'es'));
+    }
+    if (sort === 'positiveDesc') sorted.sort((a, b) => compareMetric(rowCounts(a, colOrder).pos, rowCounts(b, colOrder).pos, sortRowsDirection) || a.name.localeCompare(b.name, 'es'));
+    if (sort === 'negativeDesc') sorted.sort((a, b) => compareMetric(rowCounts(a, colOrder).neg, rowCounts(b, colOrder).neg, sortRowsDirection) || a.name.localeCompare(b.name, 'es'));
+    if (sort === 'zeroDesc') sorted.sort((a, b) => compareMetric(rowCounts(a, colOrder).zero, rowCounts(b, colOrder).zero, sortRowsDirection) || a.name.localeCompare(b.name, 'es'));
   }
   return sorted;
 }
@@ -446,16 +486,12 @@ function sortedCols(dataset, rows) {
       const aRatio = ratioValue(colCounts(rows, a), ratioConfig);
       const bRatio = ratioValue(colCounts(rows, b), ratioConfig);
 
-      if (aRatio === null && bRatio === null) return a - b;
-      if (aRatio === null) return 1;
-      if (bRatio === null) return -1;
-
-      return bRatio - aRatio || a - b;
+      return compareMetric(aRatio, bRatio, sortColsDirection) || a - b;
     });
   } else {
-    if (sort === 'positiveDesc') cols.sort((a, b) => colCounts(rows, b).pos - colCounts(rows, a).pos || a - b);
-    if (sort === 'negativeDesc') cols.sort((a, b) => colCounts(rows, b).neg - colCounts(rows, a).neg || a - b);
-    if (sort === 'zeroDesc') cols.sort((a, b) => colCounts(rows, b).zero - colCounts(rows, a).zero || a - b);
+    if (sort === 'positiveDesc') cols.sort((a, b) => compareMetric(colCounts(rows, a).pos, colCounts(rows, b).pos, sortColsDirection) || a - b);
+    if (sort === 'negativeDesc') cols.sort((a, b) => compareMetric(colCounts(rows, a).neg, colCounts(rows, b).neg, sortColsDirection) || a - b);
+    if (sort === 'zeroDesc') cols.sort((a, b) => compareMetric(colCounts(rows, a).zero, colCounts(rows, b).zero, sortColsDirection) || a - b);
   }
   return cols;
 }
@@ -883,7 +919,39 @@ async function toggleFullscreen() {
   }
 }
 
-[resultView, groupFilter, sortRows, sortCols, searchBox, showNames, showMissing].forEach(control => control.addEventListener('input', render));
+[resultView, groupFilter, searchBox, showNames, showMissing].forEach(control => control.addEventListener('input', render));
+sortRows.addEventListener('input', () => {
+  updateSortDirectionButtons();
+  render();
+});
+sortCols.addEventListener('input', () => {
+  updateSortDirectionButtons();
+  render();
+});
+sortRowsAscBtn.addEventListener('click', () => {
+  if (isOriginalSort(sortRows.value)) return;
+  sortRowsDirection = 'asc';
+  updateSortDirectionButtons();
+  render();
+});
+sortRowsDescBtn.addEventListener('click', () => {
+  if (isOriginalSort(sortRows.value)) return;
+  sortRowsDirection = 'desc';
+  updateSortDirectionButtons();
+  render();
+});
+sortColsAscBtn.addEventListener('click', () => {
+  if (isOriginalSort(sortCols.value)) return;
+  sortColsDirection = 'asc';
+  updateSortDirectionButtons();
+  render();
+});
+sortColsDescBtn.addEventListener('click', () => {
+  if (isOriginalSort(sortCols.value)) return;
+  sortColsDirection = 'desc';
+  updateSortDirectionButtons();
+  render();
+});
 if (questionOverviewBtn) questionOverviewBtn.addEventListener('click', () => {
   questionOverviewMode = !questionOverviewMode;
   questionOverviewBtn.setAttribute('aria-pressed', String(questionOverviewMode));
@@ -905,5 +973,6 @@ document.addEventListener('fullscreenchange', () => {
   ensureTooltipInFullscreenContext();
 });
 updateFullscreenButton();
+updateSortDirectionButtons();
 setVizToolbarCollapsed(false);
 render();
