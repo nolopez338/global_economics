@@ -6,6 +6,7 @@ const path = require('path');
 const vm = require('vm');
 
 const DATA_FILE = path.join(__dirname, 'grade3_heatmap_dashboard_data.js');
+const DASHBOARD_FILE = path.join(__dirname, 'grade3_heatmap_dashboard.js');
 const VALID_ANSWERS = new Set([null, -1, 0, 1, 2]);
 const AGGREGATE_FIELDS = ['bien', 'mal', 'nr'];
 
@@ -18,6 +19,40 @@ function loadDatasets() {
 function rowLabel(row, index) {
   const student = row && row.name ? ` (${row.name})` : '';
   return `row ${index + 1}${student}`;
+}
+
+
+function validateDashboardTooltipSafeguards(errors) {
+  let source;
+
+  try {
+    source = fs.readFileSync(DASHBOARD_FILE, 'utf8');
+  } catch (error) {
+    errors.push(`Unable to load dashboard script from ${DASHBOARD_FILE}: ${error.message}`);
+    return;
+  }
+
+  const requiredSnippets = [
+    ['missing helper', 'function isMissingAnswer(value)'],
+    ['missing heatmap branch documents omitted tooltip attributes', 'no data-tip, data-question-tip, or data-student-tip attributes'],
+    ['non-missing heatmap cells expose question tooltip attribute', 'data-question-tip='],
+    ['non-missing heatmap cells expose student tooltip attribute', 'data-student-tip='],
+    ['histogram tooltip positive row', 'Positive units'],
+    ['histogram tooltip non-response row', 'Non Responses'],
+    ['histogram tooltip negative row', 'Negative units'],
+    ['missing values still feed stacked histogram segments', 'responseParts(c)']
+  ];
+
+  requiredSnippets.forEach(([label, snippet]) => {
+    if (!source.includes(snippet)) errors.push(`dashboard tooltip safeguard missing: ${label}.`);
+  });
+
+  const tooltipRowsMatch = source.match(/function tooltipRows\(c, total\) {[\s\S]*?const rows = \[([\s\S]*?)\];/);
+  if (!tooltipRowsMatch) {
+    errors.push('dashboard tooltip safeguard missing: tooltipRows rows could not be inspected.');
+  } else if (tooltipRowsMatch[1].includes("'miss'")) {
+    errors.push('dashboard tooltip safeguard failed: summary/histogram tooltipRows must not include a separate Missing row.');
+  }
 }
 
 function validate() {
@@ -93,6 +128,8 @@ function validate() {
       });
     });
   }
+
+  validateDashboardTooltipSafeguards(errors);
 
   return errors;
 }
