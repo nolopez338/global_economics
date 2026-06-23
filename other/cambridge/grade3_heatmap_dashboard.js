@@ -577,7 +577,7 @@ function renderQuestionRatioHistogram(dataset, rows, colOrder, effectiveCellW) {
   svg += `<line x1="0" y1="82" x2="${width}" y2="82" stroke="#d7dde8" />`;
   svg += '</svg>';
   topBarsContentEl.innerHTML = svg;
-  attachSvgTips(topBarsContentEl);
+  attachTips(topBarsContentEl);
   return true;
 }
 
@@ -613,7 +613,7 @@ function renderTopBars(dataset, rows, colOrder, effectiveCellW) {
   });
   svg += '</svg>';
   topBarsContentEl.innerHTML = svg;
-  attachSvgTips(topBarsContentEl);
+  attachTips(topBarsContentEl);
 }
 
 function renderNames(rows, effectiveCellH) {
@@ -655,7 +655,7 @@ function renderHeatmap(dataset, rows, colOrder, effectiveCellW, effectiveCellH) 
   });
   svg += '</svg>';
   heatmapEl.innerHTML = svg;
-  attachSvgTips(heatmapEl);
+  attachTips(heatmapEl);
 }
 
 function studentBarTooltip(row, c) {
@@ -694,7 +694,7 @@ function renderStudentRatioHistogram(rows, colOrder, effectiveCellH) {
     });
     svg += '</svg>';
     rightBarsContentEl.innerHTML = svg;
-    attachSvgTips(rightBarsContentEl);
+    attachTips(rightBarsContentEl);
     return true;
   }
 
@@ -711,7 +711,7 @@ function renderStudentRatioHistogram(rows, colOrder, effectiveCellH) {
       </div>
     `;
   }).join('');
-  attachHtmlTips(rightBarsContentEl);
+  attachTips(rightBarsContentEl);
   return true;
 }
 
@@ -733,7 +733,7 @@ function renderRightBars(rows, colOrder, effectiveCellH) {
       </div>
     `;
   }).join('');
-  attachHtmlTips(rightBarsContentEl);
+  attachTips(rightBarsContentEl);
 }
 
 function renderQuestionOverviewHistogram(dataset, rows, colOrder, effectiveCellW) {
@@ -771,7 +771,7 @@ function renderQuestionOverviewHistogram(dataset, rows, colOrder, effectiveCellW
   svg += `<line x1="0" y1="82" x2="${width}" y2="82" stroke="#d7dde8" />`;
   svg += '</svg>';
   topBarsContentEl.innerHTML = svg;
-  attachSvgTips(topBarsContentEl);
+  attachTips(topBarsContentEl);
 }
 
 function renderStudentOverviewHistogram(rows, colOrder, effectiveCellH) {
@@ -800,18 +800,10 @@ function renderStudentOverviewHistogram(rows, colOrder, effectiveCellH) {
   });
   svg += '</svg>';
   rightBarsContentEl.innerHTML = svg;
-  attachSvgTips(rightBarsContentEl);
+  attachTips(rightBarsContentEl);
 }
 
-function attachSvgTips(root) {
-  root.querySelectorAll('[data-tip]').forEach(el => {
-    el.addEventListener('mouseenter', event => showTip(el.getAttribute('data-tip'), event));
-    el.addEventListener('mousemove', moveTip);
-    el.addEventListener('mouseleave', hideTip);
-  });
-}
-
-function attachHtmlTips(root) {
+function attachTips(root) {
   root.querySelectorAll('[data-tip]').forEach(el => {
     el.addEventListener('mouseenter', event => showTip(el.getAttribute('data-tip'), event));
     el.addEventListener('mousemove', moveTip);
