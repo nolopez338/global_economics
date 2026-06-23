@@ -143,6 +143,62 @@ function rowCounts(row, colOrder) {
   return counts(colOrder.map(i => row.answers[i]));
 }
 
+function ratioSortConfig(sortValue) {
+  const configs = {
+    posNegRatioDesc: {
+      numerator: 'pos',
+      denominator: 'neg',
+      label: 'Positive / Negative ratio'
+    },
+    posZeroRatioDesc: {
+      numerator: 'pos',
+      denominator: 'zero',
+      label: 'Positive / Non responses ratio'
+    },
+    negZeroRatioDesc: {
+      numerator: 'neg',
+      denominator: 'zero',
+      label: 'Negative / Non responses ratio'
+    }
+  };
+
+  return configs[sortValue] || null;
+}
+
+function ratioValue(countsObject, config) {
+  if (!config) return null;
+
+  const numerator = countsObject[config.numerator] || 0;
+  const denominator = countsObject[config.denominator] || 0;
+
+  if (denominator === 0) return null;
+
+  return numerator / denominator;
+}
+
+function formatRatio(value) {
+  return value === null || value === undefined || Number.isNaN(value)
+    ? '—'
+    : value.toFixed(2);
+}
+
+function ratioTooltipRows(c) {
+  return `<div class='tipRows'>${[
+    ['pos', 'Positive units', c.pos],
+    ['zero', 'Non Responses', c.zero],
+    ['neg', 'Negative units', c.neg]
+  ].map(([key, label, value]) => `
+    <div class='tipRow'>
+      <span><i class='tipMiniSwatch ${key}'></i>${label}</span>
+      <span>${value}</span>
+    </div>
+  `).join('')}</div>`;
+}
+
+function ratioBarTooltip(title, c, ratioConfig, ratio) {
+  return `<b>${safe(title)}</b><br><span>${safe(ratioConfig.label)}: ${formatRatio(ratio)}</span>${ratioTooltipRows(c)}`;
+}
+
 function hasMissingValues(row, colOrder) {
   return colOrder.some(i => {
     const value = row.answers[i];
@@ -358,19 +414,49 @@ function filteredRows(dataset) {
 function sortedRows(rows, colOrder) {
   const sorted = [...rows];
   const sort = sortRows.value;
-  if (sort === 'nameAsc') sorted.sort((a, b) => a.name.localeCompare(b.name, 'es'));
-  if (sort === 'positiveDesc') sorted.sort((a, b) => rowCounts(b, colOrder).pos - rowCounts(a, colOrder).pos || a.name.localeCompare(b.name, 'es'));
-  if (sort === 'negativeDesc') sorted.sort((a, b) => rowCounts(b, colOrder).neg - rowCounts(a, colOrder).neg || a.name.localeCompare(b.name, 'es'));
-  if (sort === 'zeroDesc') sorted.sort((a, b) => rowCounts(b, colOrder).zero - rowCounts(a, colOrder).zero || a.name.localeCompare(b.name, 'es'));
+  const ratioConfig = ratioSortConfig(sort);
+
+  if (ratioConfig) {
+    sorted.sort((a, b) => {
+      const aRatio = ratioValue(rowCounts(a, colOrder), ratioConfig);
+      const bRatio = ratioValue(rowCounts(b, colOrder), ratioConfig);
+
+      if (aRatio === null && bRatio === null) return a.name.localeCompare(b.name, 'es');
+      if (aRatio === null) return 1;
+      if (bRatio === null) return -1;
+
+      return bRatio - aRatio || a.name.localeCompare(b.name, 'es');
+    });
+  } else {
+    if (sort === 'nameAsc') sorted.sort((a, b) => a.name.localeCompare(b.name, 'es'));
+    if (sort === 'positiveDesc') sorted.sort((a, b) => rowCounts(b, colOrder).pos - rowCounts(a, colOrder).pos || a.name.localeCompare(b.name, 'es'));
+    if (sort === 'negativeDesc') sorted.sort((a, b) => rowCounts(b, colOrder).neg - rowCounts(a, colOrder).neg || a.name.localeCompare(b.name, 'es'));
+    if (sort === 'zeroDesc') sorted.sort((a, b) => rowCounts(b, colOrder).zero - rowCounts(a, colOrder).zero || a.name.localeCompare(b.name, 'es'));
+  }
   return sorted;
 }
 
 function sortedCols(dataset, rows) {
   const cols = dataset.questions.map((q, i) => i);
   const sort = sortCols.value;
-  if (sort === 'positiveDesc') cols.sort((a, b) => colCounts(rows, b).pos - colCounts(rows, a).pos || a - b);
-  if (sort === 'negativeDesc') cols.sort((a, b) => colCounts(rows, b).neg - colCounts(rows, a).neg || a - b);
-  if (sort === 'zeroDesc') cols.sort((a, b) => colCounts(rows, b).zero - colCounts(rows, a).zero || a - b);
+  const ratioConfig = ratioSortConfig(sort);
+
+  if (ratioConfig) {
+    cols.sort((a, b) => {
+      const aRatio = ratioValue(colCounts(rows, a), ratioConfig);
+      const bRatio = ratioValue(colCounts(rows, b), ratioConfig);
+
+      if (aRatio === null && bRatio === null) return a - b;
+      if (aRatio === null) return 1;
+      if (bRatio === null) return -1;
+
+      return bRatio - aRatio || a - b;
+    });
+  } else {
+    if (sort === 'positiveDesc') cols.sort((a, b) => colCounts(rows, b).pos - colCounts(rows, a).pos || a - b);
+    if (sort === 'negativeDesc') cols.sort((a, b) => colCounts(rows, b).neg - colCounts(rows, a).neg || a - b);
+    if (sort === 'zeroDesc') cols.sort((a, b) => colCounts(rows, b).zero - colCounts(rows, a).zero || a - b);
+  }
   return cols;
 }
 
@@ -409,6 +495,55 @@ function renderStats(dataset, rows, colOrder) {
   `;
 
   activeSummary.textContent = `${dataset.label} · ${dataset.questions.length} questions · ${rows.length} students`;
+}
+
+
+function renderQuestionRatioHistogram(dataset, rows, colOrder, effectiveCellW) {
+  const ratioConfig = ratioSortConfig(sortCols.value);
+  if (!ratioConfig) return false;
+
+  const width = colOrder.length * effectiveCellW;
+  const values = colOrder.map(colIndex => {
+    const c = colCounts(rows, colIndex);
+    return { colIndex, counts: c, ratio: ratioValue(c, ratioConfig) };
+  });
+  const maxRatio = Math.max(1, ...values.map(item => item.ratio ?? 0));
+  const barMaxH = 64;
+  const baseY = 82;
+  const labelY = questionOverviewMode ? 103 : 102;
+  const fontSize = questionOverviewMode ? (effectiveCellW < 14 ? 8 : effectiveCellW < 22 ? 9 : 10) : 11;
+  const rotate = questionOverviewMode && effectiveCellW < 24;
+  let svg = `<svg width="${width}" height="${topH}" role="img" aria-label="Question ratio histogram">`;
+
+  values.forEach((item, visualIndex) => {
+    const q = dataset.questions[item.colIndex];
+    const x = questionOverviewMode
+      ? visualIndex * effectiveCellW
+      : visualIndex * effectiveCellW + Math.min(5, Math.max(1, effectiveCellW * 0.15));
+    const barW = questionOverviewMode
+      ? Math.max(1, effectiveCellW - 1)
+      : Math.max(1, effectiveCellW - Math.min(10, Math.max(2, effectiveCellW * 0.3)));
+    const h = item.ratio === null ? 0 : (item.ratio / maxRatio) * barMaxH;
+    const y = baseY - h;
+    const tip = attrSafe(ratioBarTooltip(`Question ${q}`, item.counts, ratioConfig, item.ratio));
+
+    if (h > 0) svg += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${colors.ratio}" rx="2" data-tip="${tip}" />`;
+    svg += `<rect x="${visualIndex * effectiveCellW}" y="${baseY - barMaxH}" width="${effectiveCellW}" height="${barMaxH}" fill="transparent" data-tip="${tip}" />`;
+    svg += questionOverviewMode
+      ? `<line x1="${visualIndex * effectiveCellW}" y1="82" x2="${visualIndex * effectiveCellW}" y2="88" stroke="#94a3b8" stroke-width="1" />`
+      : `<line x1="${visualIndex * effectiveCellW}" y1="82" x2="${visualIndex * effectiveCellW + effectiveCellW}" y2="82" stroke="#d7dde8" />`;
+    const labelX = visualIndex * effectiveCellW + effectiveCellW / 2;
+    if (rotate) {
+      svg += `<text x="${labelX}" y="${labelY}" font-size="${fontSize}" text-anchor="end" fill="#334155" font-weight="700" transform="rotate(-55 ${labelX} ${labelY})">${safe(q)}</text>`;
+    } else {
+      svg += `<text x="${labelX}" y="${labelY}" font-size="${fontSize}" text-anchor="middle" fill="#334155" font-weight="700">${safe(q)}</text>`;
+    }
+  });
+  svg += `<line x1="0" y1="82" x2="${width}" y2="82" stroke="#d7dde8" />`;
+  svg += '</svg>';
+  topBarsContent.innerHTML = svg;
+  attachSvgTips(topBarsContent);
+  return true;
 }
 
 function renderTopBars(dataset, rows, colOrder, effectiveCellW) {
@@ -496,6 +631,54 @@ function studentBarTooltip(row, c) {
     'horizontal',
     `Group: ${safe(row.grupo)} · No. ${safe(row.no || '—')}`
   );
+}
+
+
+function renderStudentRatioHistogram(rows, colOrder, effectiveCellH) {
+  const ratioConfig = ratioSortConfig(sortRows.value);
+  if (!ratioConfig) return false;
+
+  const width = studentOverviewMode ? 198 : 180;
+  const barW = studentOverviewMode ? 172 : 132;
+  const values = rows.map(row => {
+    const c = rowCounts(row, colOrder);
+    return { row, counts: c, ratio: ratioValue(c, ratioConfig) };
+  });
+  const maxRatio = Math.max(1, ...values.map(item => item.ratio ?? 0));
+
+  if (studentOverviewMode) {
+    const height = rows.length * effectiveCellH;
+    let svg = `<svg width="${width}" height="${height}" role="img" aria-label="Student ratio histogram">`;
+    values.forEach((item, index) => {
+      const y = index * effectiveCellH;
+      const h = Math.max(1, effectiveCellH - 1);
+      const w = item.ratio === null ? 0 : (item.ratio / maxRatio) * barW;
+      const tip = attrSafe(ratioBarTooltip(`${item.row.name} · Group: ${item.row.grupo}`, item.counts, ratioConfig, item.ratio));
+      if (w > 0) svg += `<rect x="0" y="${y}" width="${Math.max(1, w)}" height="${h}" fill="${colors.ratio}" data-tip="${tip}" />`;
+      svg += `<rect x="0" y="${y}" width="${barW}" height="${h}" fill="transparent" data-tip="${tip}" />`;
+      svg += `<line x1="${barW + 4}" y1="${y}" x2="${barW + 14}" y2="${y}" stroke="#94a3b8" stroke-width="1" />`;
+    });
+    svg += '</svg>';
+    rightBarsContentEl.innerHTML = svg;
+    attachSvgTips(rightBarsContentEl);
+    return true;
+  }
+
+  rightBarsContentEl.style.setProperty('--cellH', effectiveCellH + 'px');
+  rightBarsContentEl.innerHTML = values.map(item => {
+    const w = item.ratio === null ? 0 : (item.ratio / maxRatio) * 100;
+    const tip = attrSafe(ratioBarTooltip(`${item.row.name} · Group: ${item.row.grupo}`, item.counts, ratioConfig, item.ratio));
+    return `
+      <div class="rowBar" data-tip="${tip}">
+        <div class="stack" style="background:#edf2f7">
+          <div class="segment" style="width:${w}%;background:${colors.ratio}"></div>
+        </div>
+        <div class="barText">${formatRatio(item.ratio)}</div>
+      </div>
+    `;
+  }).join('');
+  attachHtmlTips(rightBarsContentEl);
+  return true;
 }
 
 function renderRightBars(rows, colOrder, effectiveCellH) {
@@ -641,12 +824,16 @@ function render() {
   const heatmapWidth = colOrder.length * effectiveCellW;
   gridEl.style.gridTemplateColumns = `${nameColumnWidth}px ${heatmapWidth}px ${rightColumnWidth}px`;
   renderStats(dataset, rows, colOrder);
-  if (questionOverviewMode) renderQuestionOverviewHistogram(dataset, rows, colOrder, effectiveCellW);
-  else renderTopBars(dataset, rows, colOrder, effectiveCellW);
+  if (!renderQuestionRatioHistogram(dataset, rows, colOrder, effectiveCellW)) {
+    if (questionOverviewMode) renderQuestionOverviewHistogram(dataset, rows, colOrder, effectiveCellW);
+    else renderTopBars(dataset, rows, colOrder, effectiveCellW);
+  }
   renderNames(rows, effectiveCellH);
   renderHeatmap(dataset, rows, colOrder, effectiveCellW, effectiveCellH);
-  if (studentOverviewMode) renderStudentOverviewHistogram(rows, colOrder, effectiveCellH);
-  else renderRightBars(rows, colOrder, effectiveCellH);
+  if (!renderStudentRatioHistogram(rows, colOrder, effectiveCellH)) {
+    if (studentOverviewMode) renderStudentOverviewHistogram(rows, colOrder, effectiveCellH);
+    else renderRightBars(rows, colOrder, effectiveCellH);
+  }
 }
 
 function isVizPanelFullscreen() {
