@@ -14,7 +14,7 @@ const activeSummary = document.getElementById('activeSummary');
 const namesEl = document.getElementById('names');
 const heatmapEl = document.getElementById('heatmap');
 const topBarsEl = document.getElementById('topBars');
-const topBarsContent = document.getElementById('topBarsContent') || topBarsEl;
+const topBarsContentEl = document.getElementById('topBarsContent') || topBarsEl;
 const rightBarsEl = document.getElementById('rightBars');
 const rightBarsContentEl = document.getElementById('rightBarsContent') || rightBarsEl;
 const gridEl = document.getElementById('dashboardGrid');
@@ -577,8 +577,8 @@ function renderQuestionRatioHistogram(dataset, rows, colOrder, effectiveCellW) {
   });
   svg += `<line x1="0" y1="82" x2="${width}" y2="82" stroke="#d7dde8" />`;
   svg += '</svg>';
-  topBarsContent.innerHTML = svg;
-  attachSvgTips(topBarsContent);
+  topBarsContentEl.innerHTML = svg;
+  attachSvgTips(topBarsContentEl);
   return true;
 }
 
@@ -613,8 +613,8 @@ function renderTopBars(dataset, rows, colOrder, effectiveCellW) {
     svg += `<text x="${visualIndex * effectiveCellW + effectiveCellW / 2}" y="${labelY}" font-size="11" text-anchor="middle" fill="#334155" font-weight="700">${safe(q)}</text>`;
   });
   svg += '</svg>';
-  topBarsContent.innerHTML = svg;
-  attachSvgTips(topBarsContent);
+  topBarsContentEl.innerHTML = svg;
+  attachSvgTips(topBarsContentEl);
 }
 
 function renderNames(rows, effectiveCellH) {
@@ -772,8 +772,8 @@ function renderQuestionOverviewHistogram(dataset, rows, colOrder, effectiveCellW
   });
   svg += `<line x1="0" y1="82" x2="${width}" y2="82" stroke="#d7dde8" />`;
   svg += '</svg>';
-  topBarsContent.innerHTML = svg;
-  attachSvgTips(topBarsContent);
+  topBarsContentEl.innerHTML = svg;
+  attachSvgTips(topBarsContentEl);
 }
 
 function renderStudentOverviewHistogram(rows, colOrder, effectiveCellH) {
@@ -835,6 +835,15 @@ function attachHeatmapCellTips(root) {
   });
 }
 
+
+function updateQuestionOverviewButtonPosition() {
+  if (!dashboardScroll || !questionOverviewBtn) return;
+
+  const left = Math.max(8, dashboardScroll.scrollLeft + dashboardScroll.clientWidth - questionOverviewBtn.offsetWidth - 8);
+  const top = Math.max(8, dashboardScroll.scrollTop + 8);
+  questionOverviewBtn.style.transform = `translate(${left}px, ${top}px)`;
+}
+
 function render() {
   const dataset = getActiveDataset();
   const fullColOrder = dataset.questions.map((_, i) => i);
@@ -870,6 +879,7 @@ function render() {
     if (studentOverviewMode) renderStudentOverviewHistogram(rows, colOrder, effectiveCellH);
     else renderRightBars(rows, colOrder, effectiveCellH);
   }
+  updateQuestionOverviewButtonPosition();
 }
 
 function isVizPanelFullscreen() {
@@ -968,6 +978,7 @@ if (vizToolbarCollapseBtn) vizToolbarCollapseBtn.addEventListener('click', () =>
   setVizToolbarCollapsed(!vizToolbar.classList.contains('isCollapsed'));
 });
 window.addEventListener('resize', render);
+if (dashboardScroll) dashboardScroll.addEventListener('scroll', updateQuestionOverviewButtonPosition, { passive: true });
 document.addEventListener('fullscreenchange', () => {
   updateFullscreenButton();
   ensureTooltipInFullscreenContext();
