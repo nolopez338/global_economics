@@ -12,7 +12,7 @@ const heatmapEl = document.getElementById('heatmap');
 const topBarsEl = document.getElementById('topBars');
 const topBarsContent = document.getElementById('topBarsContent') || topBarsEl;
 const rightBarsEl = document.getElementById('rightBars');
-const rightBarsContent = document.getElementById('rightBarsContent') || rightBarsEl;
+const rightBarsContentEl = document.getElementById('rightBarsContent') || rightBarsEl;
 const gridEl = document.getElementById('dashboardGrid');
 const tooltip = document.getElementById('tooltip');
 const vizPanel = document.querySelector('.vizPanel');
@@ -424,8 +424,8 @@ function renderHeatmap(dataset, rows, colOrder, effectiveCellW, effectiveCellH) 
 }
 
 function renderRightBars(rows, colOrder, effectiveCellH) {
-  rightBarsContent.style.setProperty('--cellH', effectiveCellH + 'px');
-  rightBarsContent.innerHTML = rows.map(row => {
+  rightBarsContentEl.style.setProperty('--cellH', effectiveCellH + 'px');
+  rightBarsContentEl.innerHTML = rows.map(row => {
     const c = rowCounts(row, colOrder);
     const total = c.pos + c.zero + c.neg + c.miss || 1;
     const tip = attrSafe(expandedBarTooltip(row.name, c, 'horizontal'));
@@ -441,7 +441,7 @@ function renderRightBars(rows, colOrder, effectiveCellH) {
       </div>
     `;
   }).join('');
-  attachHtmlTips(rightBarsContent);
+  attachHtmlTips(rightBarsContentEl);
 }
 
 function renderQuestionOverviewHistogram(dataset, rows, colOrder, effectiveCellW) {
@@ -511,8 +511,8 @@ function renderStudentOverviewHistogram(rows, colOrder, effectiveCellH) {
     if (index % every === 0) svg += `<text x="${labelX}" y="${y + Math.max(fontSize, effectiveCellH / 2 + fontSize / 3)}" font-size="${fontSize}" fill="#334155" font-weight="700">${safe(firstLastName(row.name))}</text>`;
   });
   svg += '</svg>';
-  rightBarsContent.innerHTML = svg;
-  attachSvgTips(rightBarsContent);
+  rightBarsContentEl.innerHTML = svg;
+  attachSvgTips(rightBarsContentEl);
 }
 
 function attachSvgTips(root) {
