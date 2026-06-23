@@ -194,9 +194,13 @@ function getActiveDataset() {
   };
 }
 
+function isMissingAnswer(value) {
+  return value === null || value === undefined || Number.isNaN(value);
+}
+
 function counts(values) {
   return values.reduce((acc, value) => {
-    if (value === null || value === undefined || Number.isNaN(value)) acc.miss += 1;
+    if (isMissingAnswer(value)) acc.miss += 1;
     else if (value > 0) acc.pos += Number(value);
     else if (value === 0) acc.zero += 1;
     else acc.neg += 1;
@@ -296,10 +300,7 @@ function ratioBarTooltip(title, c, ratioConfig, ratio) {
 }
 
 function hasMissingValues(row, colOrder) {
-  return colOrder.some(i => {
-    const value = row.answers[i];
-    return value === null || value === undefined || Number.isNaN(value);
-  });
+  return colOrder.some(i => isMissingAnswer(row.answers[i]));
 }
 
 function colCounts(rows, colIndex) {
@@ -472,9 +473,16 @@ function studentTooltipHtml(row, colOrder) {
   return studentBarTooltip(row, c);
 }
 
+function heatmapCellTooltipAttributes(dataset, rows, row, colOrder, colIndex) {
+  const questionTip = attrSafe(questionTooltipHtml(dataset, rows, colIndex));
+  const studentTip = attrSafe(studentTooltipHtml(row, colOrder));
+  const mergedTip = attrSafe(mergedCellTooltipHtml(dataset, rows, row, colOrder, colIndex));
+  return `data-tip="${mergedTip}" data-question-tip="${questionTip}" data-student-tip="${studentTip}"`;
+}
+
 
 function colorForValue(value) {
-  if (value === null || value === undefined || Number.isNaN(value)) return colors.miss;
+  if (isMissingAnswer(value)) return colors.miss;
   if (value > 0) return colors.pos;
   if (value === 0) return colors.zero;
   return colors.neg;
@@ -784,13 +792,17 @@ function renderHeatmap(dataset, rows, colOrder, effectiveCellW, effectiveCellH) 
       const y = r * effectiveCellH;
       const fill = colorForValue(value);
       const textColor = value === 0 ? '#3c3108' : '#ffffff';
-      const isMissing = value === null || value === undefined || Number.isNaN(value);
+      const isMissing = isMissingAnswer(value);
       const shown = isMissing ? '' : value;
       if (isMissing) {
+        // Missing cells stay visible using the missing color, but intentionally have
+        // no data-tip, data-question-tip, or data-student-tip attributes. That
+        // keeps missing values in filtering/counts/histogram segments without
+        // surfacing a separate missing-value row in individual cell tooltips.
         svg += `<rect x="${x}" y="${y}" width="${effectiveCellW}" height="${effectiveCellH}" fill="${fill}" stroke="#ffffff" stroke-width="1" />`;
       } else {
-        const tip = attrSafe(mergedCellTooltipHtml(dataset, rows, row, colOrder, colIndex));
-        svg += `<rect x="${x}" y="${y}" width="${effectiveCellW}" height="${effectiveCellH}" fill="${fill}" stroke="#ffffff" stroke-width="1" data-tip="${tip}" />`;
+        const tooltipAttributes = heatmapCellTooltipAttributes(dataset, rows, row, colOrder, colIndex);
+        svg += `<rect x="${x}" y="${y}" width="${effectiveCellW}" height="${effectiveCellH}" fill="${fill}" stroke="#ffffff" stroke-width="1" ${tooltipAttributes} />`;
       }
       if (showCellText && shown !== '') svg += `<text x="${x + effectiveCellW / 2}" y="${y + effectiveCellH / 2 + 4}" font-size="11" text-anchor="middle" fill="${textColor}" font-weight="750" pointer-events="none">${shown}</text>`;
     });
