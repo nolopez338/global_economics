@@ -15,8 +15,7 @@ const namesEl = document.getElementById('names');
 const heatmapEl = document.getElementById('heatmap');
 const topBarsEl = document.getElementById('topBars');
 const topBarsContentEl = document.getElementById('topBarsContent') || topBarsEl;
-const rightBarsEl = document.getElementById('rightBars');
-const rightBarsContentEl = document.getElementById('rightBarsContent') || rightBarsEl;
+const rightBarsContentEl = document.getElementById('rightBarsContent') || document.getElementById('rightBars');
 const gridEl = document.getElementById('dashboardGrid');
 const tooltip = document.getElementById('tooltip');
 const vizPanel = document.querySelector('.vizPanel');
@@ -190,9 +189,6 @@ function isOriginalSort(value) {
   return value === 'original';
 }
 
-function directionMultiplier(direction) {
-  return direction === 'asc' ? 1 : -1;
-}
 
 function compareMetric(aValue, bValue, direction) {
   if (aValue === null && bValue === null) return 0;
@@ -368,12 +364,6 @@ function studentTooltipHtml(row, colOrder) {
   return studentBarTooltip(row, c);
 }
 
-function labelForValue(value) {
-  if (value === null || value === undefined || Number.isNaN(value)) return 'Missing';
-  if (value > 0) return 'Positive';
-  if (value === 0) return 'Zero';
-  return 'Negative';
-}
 
 function colorForValue(value) {
   if (value === null || value === undefined || Number.isNaN(value)) return colors.miss;
