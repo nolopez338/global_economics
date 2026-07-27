@@ -22,6 +22,7 @@
   <body>
     <h1>Schedule Authoring Tool (Browser-only Prototype)</h1>
     <p>Load <code>teacher/authoring/schedule.csv</code>, validate it, and generate JS artifacts.</p>
+    <p class="errors"><strong>Known schema block:</strong> the tracked CSV does not contain the normalized columns this prototype requires, and the authoritative <code>slots.csv</code> is unavailable. Do not install this tool's output as runtime data until the schema and slot source are designated.</p>
 
     <div class="grid">
       <div class="panel">
@@ -263,16 +264,19 @@
       }
 
       async function loadDefaultCSVs() {
-        const [scheduleRes, slotsRes] = await Promise.all([
-          fetch("../authoring/schedule.csv"),
-          fetch("../authoring/slots.csv")
-        ]);
+        const scheduleRes = await fetch("../authoring/schedule.csv");
+        if (!scheduleRes.ok) throw new Error(`Unable to load schedule.csv (${scheduleRes.status}).`);
         const scheduleText = await scheduleRes.text();
-        const slotsText = await slotsRes.text();
         document.getElementById("csvText").value = scheduleText;
 
-        const slotParsed = parseCSV(slotsText);
-        allowedSlots = slotParsed.rows.map((r) => r.slot).filter(Boolean);
+        const slotsRes = await fetch("../authoring/slots.csv");
+        if (slotsRes.ok) {
+          const slotParsed = parseCSV(await slotsRes.text());
+          allowedSlots = slotParsed.rows.map((r) => r.slot).filter(Boolean);
+        } else {
+          allowedSlots = [];
+          writeValidation(["authoritative slots.csv is unavailable; slot membership cannot be validated"]);
+        }
       }
 
       async function parseInputs() {
@@ -311,7 +315,11 @@
       }
 
       document.getElementById("loadDefaultsBtn").addEventListener("click", async () => {
-        await loadDefaultCSVs();
+        try {
+          await loadDefaultCSVs();
+        } catch (error) {
+          writeValidation([error instanceof Error ? error.message : String(error)]);
+        }
       });
 
       document.getElementById("validateBtn").addEventListener("click", async () => {
