@@ -98,7 +98,7 @@ grouped rather than listed individually.
 │   ├── README.md
 │   ├── clean-latex.bat
 │   ├── grade9/                         # One Term 3 source
-│   ├── grade10/{term_1,term_3}/        # Term 1 contains many G10_T2-labelled files
+│   ├── grade10/{term_1,term_3}/        # Term 1 uses G10_T1-labelled files
 │   ├── grade11/{term_2,term_3}/
 │   ├── olympiad/                       # Enrichment, Cambridge, diploma, and workbook material
 │   └── preamble/                       # Separate year-local TeX resources and images
@@ -124,7 +124,7 @@ an HTTP origin rather than a reliable `file:` workflow.
 | Path | Verified role | Requirements and incoming navigation |
 | --- | --- | --- |
 | `index.html` | Root student navigation. | Links to both grade hubs and `teacher/schedule.html`; loads `assets/css/base.css`, `components.css`, and `theme.css`. |
-| `grade10/index.html` | Grade 10 hub. | Links to `src/G10_T1.html`, `G10_T2.html`, and `G10_T3.html`; linked from the root page. |
+| `grade10/index.html` | Grade 10 hub. | Links to the canonical `src/G10_T1.html` and `G10_T3.html`; linked from the root page. |
 | `grade11/index.html` | Grade 11 hub. | Links to `src/G11_T1.html`, `G11_T2.html`, and `G11_T3.html`; linked from the root page. |
 | `teacher/schedule.html` | Main weekly teacher schedule/navigation shell. | Loads the weekly-table renderer before its inline invocation, then `principal-schedule.js` and `theme-toggle.js`; linked from `index.html`. |
 | `teacher/schedule-teacher.html` | Teacher-mode variant of the weekly shell. | Uses the same renderer/controller sequence; it is linked from schedule UI code rather than the root landing page. |
@@ -217,14 +217,14 @@ Both grades follow the convention `gradeNN/index.html` →
 `gradeNN/src/GNN_T1.html` through `GNN_T3.html` → topic pages in
 `gradeNN/src/pages/`. Practice filenames usually encode grade, term, learning
 evidence/lesson, and criterion identifiers (for example,
-`g10-t2-le2-c6-practice.html`). This convention is common but not universal:
+`g10-t1-le2-c6-practice.html`). This convention is common but not universal:
 generic names such as `formulas.html`, `main_examples.html`, and
 `practice_activity3_1.html` also exist.
 
 ### Grade 10
 
 - `grade10/index.html` is the navigational hub for all three term pages.
-- `G10_T2.html` connects economics/statistics material to practice pages,
+- `G10_T1.html` connects decision-analysis material to practice pages,
   formula and expected-value resources, a payoff builder, and
   `teacher/pages/sum_symbol.html?origin=grade10`.
 - `G10_T3.html` links discrete/continuous probability explorers and the Term 3
@@ -339,10 +339,9 @@ the `.tex`, `.csv`, image, and spreadsheet files are authoring inputs.
   standalone probability/statistics/pedagogy sources, four diploma documents,
   and `Cambridge/` Paper 1/Paper 2 question/solution documents with an `.xlsx`
   workbook.
-- **Naming anomaly:** many `G10_T2_*` sources are located below
-  `grade10/term_1/`; repository evidence does not say whether the path or label
-  is erroneous. Copy-named, `proyect`, `soution`, and `suplementary` filenames
-  also remain as-is.
+- **Grade 10 Term 1 naming:** sources below `grade10/term_1/` use the
+  confirmed `G10_T1_*` identifier. Copy-named, `proyect`, `soution`, and
+  `suplementary` filenames remain as-is.
 - **Status:** lifecycle is unconfirmed; a newer year name is not proof that the
   tree is the active or published collection.
 
@@ -455,9 +454,9 @@ outputs are intentionally absent from the tree above.
    demonstrate same-year dependencies but do not establish a universal command.
 6. **Academic-year lifecycle:** neither year README identifies its tree as
    active or archived, and no copy-forward/backport policy exists.
-7. **Naming and placement ambiguities:** `book2026-2027/grade10/term_1/`
-   contains many Term 2 labels; Grade 10 datasets occur under the Grade 11 Term
-   3 evidence directory; and spelling/copy suffix anomalies occur throughout.
+7. **Naming and placement ambiguities:** Grade 10 datasets occur under the
+   Grade 11 Term 3 evidence directory, and spelling/copy suffix anomalies occur
+   throughout.
    Intent is unconfirmed.
 8. **External dependencies:** CDN-dependent browser features and externally
    hosted teaching links may be unavailable offline or access-controlled.

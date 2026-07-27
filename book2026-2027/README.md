@@ -26,12 +26,10 @@ academic-year tree. Do not replace duplicated files with cross-year imports or
 symlinks. Copy-forward and archive/backport policy remain unconfirmed; review
 cross-year fixes explicitly rather than applying them automatically.
 
-Several `G10_T2_*` filenames are currently located below
-`grade10/term_1/`. Repository evidence does not establish whether this is a
-curricular label or a placement error. They have deliberately not been moved or
-renamed. The same rule applies to spelling, capitalization, and apparent grade
-prefix anomalies until an owner confirms the intended identifiers and a
-supported compilation workflow is available.
+Grade 10 Term 1 sources below `grade10/term_1/` use the confirmed
+`G10_T1_*` identifier. Spelling, capitalization, and apparent grade-prefix
+anomalies outside this authorized term migration remain unchanged pending an
+owner decision and a supported compilation workflow.
 
 PDFs and compiler auxiliary files are ignored by the root `.gitignore`.
 `clean-latex.bat` removes common generated files on Windows.
