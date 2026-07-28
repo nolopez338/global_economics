@@ -136,7 +136,9 @@
 \definecolor{backgroundCC}{HTML}{FFFFFF}
 \definecolor{borders}{HTML}{8c120d}
 \definecolor{padding}{HTML}{77D0D7}
-\definecolor{links}{HTML}{FFAB00}
+\definecolor{links}{HTML}{FFAB00}  % Orange
+\definecolor{links2}{HTML}{0000B3} % Dark blue
+\definecolor{links3}{HTML}{B0005A} % Dark red
 \definecolor{tocLinkDark}{HTML}{8C3F33}
 \definecolor{taskLinkDarkBlue}{HTML}{0B3D91}
 
@@ -289,57 +291,61 @@
 % direction can be: up, down, toc.
 % When \SimpleSecIniciotrue is set, the icon is simplified to arrows.
 % Usage example: \secInicioIcon{links}{toc}
+\newcommand{\secInicioIconMultiplier}{0.5}
+
 \NewDocumentCommand{\secInicioIcon}{m m}{%
-	\begin{tikzpicture}[scale=0.55, baseline=-0.5ex]
-		\ifSimpleSecInicio
-		\ifstrequal{#2}{down}{%
-			\draw[
-			->,
-			draw=#1,
-			line width=2.4pt,
-			line cap=round
-			] (0,0.60) -- (0,-1.00);%
-		}{%
-			\draw[
-			->,
-			draw=#1,
-			line width=2.4pt,
-			line cap=round
-			] (0,-1.10) -- (0,0.50);%
-		}%
-		\else
-		\ifstrequal{#2}{down}{%
-			\draw[
-			draw=#1,
-			line width=1.4pt,
-			line join=round,
-			rotate=180
-			]
-			(-0.35,-1.20) --
-			(0.35,-1.20) --
-			(0.35,0.10) --
-			(0.75,0.10) --
-			(0,1.10) --
-			(-0.75,0.10) --
-			(-0.35,0.10) --
-			cycle;%
-		}{%
-			\draw[
-			draw=#1,
-			line width=1.4pt,
-			line join=round
-			]
-			(-0.35,-1.20) --
-			(0.35,-1.20) --
-			(0.35,0.10) --
-			(0.75,0.10) --
-			(0,1.10) --
-			(-0.75,0.10) --
-			(-0.35,0.10) --
-			cycle;%
-		}%
-		\fi
-	\end{tikzpicture}%
+	\scalebox{\secInicioIconMultiplier}{%
+		\begin{tikzpicture}[scale=0.55, baseline=-0.5ex]
+			\ifSimpleSecInicio
+			\ifstrequal{#2}{down}{%
+				\draw[
+				->,
+				draw=#1,
+				line width=2.4pt,
+				line cap=round
+				] (0,0.60) -- (0,-1.00);%
+			}{%
+				\draw[
+				->,
+				draw=#1,
+				line width=2.4pt,
+				line cap=round
+				] (0,-1.10) -- (0,0.50);%
+			}%
+			\else
+			\ifstrequal{#2}{down}{%
+				\draw[
+				draw=#1,
+				line width=1.4pt,
+				line join=round,
+				rotate=180
+				]
+				(-0.35,-1.20) --
+				(0.35,-1.20) --
+				(0.35,0.10) --
+				(0.75,0.10) --
+				(0,1.10) --
+				(-0.75,0.10) --
+				(-0.35,0.10) --
+				cycle;%
+			}{%
+				\draw[
+				draw=#1,
+				line width=1.4pt,
+				line join=round
+				]
+				(-0.35,-1.20) --
+				(0.35,-1.20) --
+				(0.35,0.10) --
+				(0.75,0.10) --
+				(0,1.10) --
+				(-0.75,0.10) --
+				(-0.35,0.10) --
+				cycle;%
+			}%
+			\fi
+		\end{tikzpicture}%
+	}%
 }
 
 % \secInicio
@@ -352,19 +358,39 @@
 % Usage example: \secInicio[sec:inicio]
 % Usage example: \secInicio[sec:inicio][sec:siguiente]
 \NewDocumentCommand{\secInicio}{O{} O{}}{%
-	\begin{center}
-		\ifstrempty{#1}{%
-			\hyperref[toc]{\secInicioIcon{links}{up}}%
-		}{%
-			\hyperref[toc]{\secInicioIcon{links}{up}}%
+	\par\noindent
+	\begingroup
+	\setlength{\fboxsep}{0.45em}%
+	\setlength{\fboxrule}{0.4pt}%
+	\hfill
+	\fcolorbox{white}{white}{%
+		% Always display the TOC arrow
+		\hyperref[toc]{%
+			\secInicioIcon{links}{up}%
+		}%
+		%
+		\ifstrempty{#1}{}{%
 			\hspace{0.8em}%
-			\hyperref[#1]{\secInicioIcon{blue!70!black}{up}}%
-			\ifstrempty{#2}{}{%
+			\ifstrempty{#2}{%
+				% One input: blue arrow
+				\hyperref[#1]{%
+					\secInicioIcon{links2}{up}%
+				}%
+			}{%
+				% Two inputs: dark-red arrow to the first
+				\hyperref[#1]{%
+					\secInicioIcon{links3}{up}%
+				}%
 				\hspace{0.8em}%
-				\hyperref[#2]{\secInicioIcon{blue!70!black}{down}}%
+				% Blue arrow to the second
+				\hyperref[#2]{%
+					\secInicioIcon{links2}{down}%
+				}%
 			}%
 		}%
-	\end{center}%
+	}%
+	\par
+	\endgroup
 }
 
 
