@@ -3,12 +3,16 @@
 
   const interactiveSelector = [
     "a", "button", "input", "select", "textarea", "summary", "label",
-    "[contenteditable]", "[data-mind-map-interactive]"
+    "[contenteditable]", "[data-mind-map-interactive]", "[data-presentation-toolbar]",
+    "[role='button']", "[role='link']", "[role='checkbox']", "[role='radio']",
+    "[role='switch']", "[role='textbox']", "[role='searchbox']", "[role='combobox']",
+    "[role='listbox']", "[role='option']", "[role='menuitem']", "[role='tab']",
+    "[role='slider']", "[role='spinbutton']"
   ].join(",");
   const instances = new WeakMap();
 
   const isEditable = (element) => Boolean(element?.closest(
-    "input, select, textarea, [contenteditable], [role='textbox'], [role='slider']"
+    "input, select, textarea, [contenteditable]:not([contenteditable='false']), [role='textbox'], [role='searchbox'], [role='combobox']"
   ));
 
   function initialise(root) {
@@ -28,7 +32,7 @@
       progress: Array.from(root.querySelectorAll("[data-presentation-progress]")),
       status: root.querySelector("[data-presentation-status]")
     };
-    const state = { active: false, index: 0, lastNavigation: 0, openTrigger: null };
+    const state = { active: false, index: 0, lastNavigation: 0, openTrigger: null, pointerGesture: null };
     instances.set(root, state);
     root.setAttribute("data-mind-map-initialised", "");
     root.classList.add("mind-map-presentation--enhanced");
@@ -64,7 +68,7 @@
       else trigger.focus({ preventScroll: true });
     };
 
-    const render = ({ focus = false, announce = false } = {}) => {
+    const render = ({ announce = false } = {}) => {
       root.classList.toggle("is-presenting", state.active);
       root.toggleAttribute("data-presentation-fullscreen-active", document.fullscreenElement === root);
       controls.start?.setAttribute("aria-expanded", String(state.active));
@@ -76,13 +80,12 @@
         if (current) {
           slide.setAttribute("aria-current", "step");
           slide.setAttribute("aria-label", `Slide ${index + 1} of ${slides.length}`);
-          slide.tabIndex = -1;
         } else {
           slide.removeAttribute("aria-current");
           slide.removeAttribute("aria-label");
-          if (!state.active) slide.tabIndex = 0;
-          else slide.removeAttribute("tabindex");
         }
+        if (!state.active) slide.tabIndex = 0;
+        else slide.removeAttribute("tabindex");
       });
       const final = state.index === slides.length - 1;
       const progressText = `${state.index + 1} / ${slides.length}`;
@@ -100,7 +103,6 @@
         controls.fullscreen.setAttribute("aria-pressed", String(fullscreen));
       }
       if (announce && controls.status) controls.status.textContent = `Slide ${state.index + 1} of ${slides.length}${final ? ", final slide" : ""}.`;
-      if (focus) slides[state.index].focus({ preventScroll: true });
     };
 
     const go = (index) => {
@@ -109,7 +111,7 @@
       state.lastNavigation = now;
       closeTooltips();
       state.index = index;
-      render({ focus: true, announce: true });
+      render({ announce: true });
     };
 
     const exit = async () => {
@@ -126,7 +128,7 @@
     controls.start?.addEventListener("click", () => {
       state.active = true;
       state.index = 0;
-      render({ focus: true, announce: true });
+      render({ announce: true });
       if (root.requestFullscreen && document.fullscreenEnabled && !document.fullscreenElement) {
         const request = root.requestFullscreen();
         if (request?.catch) request.catch(() => {
@@ -147,7 +149,34 @@
       }
     });
 
+    const isScrollbarGesture = (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return false;
+      const rect = target.getBoundingClientRect();
+      return event.clientX >= rect.left + target.clientWidth || event.clientY >= rect.top + target.clientHeight;
+    };
+
+    root.addEventListener("pointerdown", (event) => {
+      state.pointerGesture = {
+        id: event.pointerId,
+        x: event.clientX,
+        y: event.clientY,
+        target: event.target,
+        scrollbar: isScrollbarGesture(event)
+      };
+    }, true);
+
+    root.addEventListener("pointermove", (event) => {
+      const gesture = state.pointerGesture;
+      if (!gesture || gesture.id !== event.pointerId) return;
+      if (Math.hypot(event.clientX - gesture.x, event.clientY - gesture.y) > 8) gesture.moved = true;
+    }, true);
+
+    root.addEventListener("pointercancel", () => { state.pointerGesture = null; }, true);
+
     root.addEventListener("click", (event) => {
+      const gesture = state.pointerGesture;
+      state.pointerGesture = null;
       const trigger = event.target.closest("[data-criterion-trigger]");
       if (trigger && root.contains(trigger)) {
         event.stopPropagation();
@@ -168,26 +197,21 @@
         }
         return;
       }
-      if (!slides[state.index].contains(event.target)) return;
+      const actualFullscreen = document.fullscreenElement === root;
+      if (!actualFullscreen && !slides[state.index].contains(event.target)) return;
       if (event.target.closest(interactiveSelector) || !window.getSelection()?.isCollapsed) return;
+      if (gesture?.moved || gesture?.scrollbar || (gesture && gesture.target !== event.target)) return;
       go(state.index + 1);
     });
 
     root.addEventListener("keydown", (event) => {
-      if (event.key !== "Escape") return;
       const openTooltipElement = root.querySelector("[data-criterion-tooltip]:not([hidden])");
-      if (!openTooltipElement) return;
-
-      // A dialog gets the first opportunity to consume Escape. Browsers may still
-      // reserve Escape for leaving native fullscreen, but application handlers
-      // must not also advance a slide or exit presentation on this keypress.
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      closeTooltips(null, true);
-    }, true);
-
-    root.addEventListener("keydown", (event) => {
-      const openTooltipElement = root.querySelector("[data-criterion-tooltip]:not([hidden])");
+      if (openTooltipElement && event.key.toLowerCase() === "q" && !isEditable(event.target)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        closeTooltips(null, true);
+        return;
+      }
       if (openTooltipElement && event.key === "Tab") {
         const focusable = Array.from(openTooltipElement.querySelectorAll("button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])")).filter((element) => !element.disabled);
         if (focusable.length) {
@@ -198,6 +222,7 @@
         }
         return;
       }
+      if (openTooltipElement) return;
       if (event.altKey || event.ctrlKey || event.metaKey || isEditable(event.target)) return;
       if (!state.active) {
         const index = slides.indexOf(event.target);
