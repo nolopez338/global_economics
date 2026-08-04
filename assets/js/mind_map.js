@@ -1,6 +1,9 @@
 (() => {
   "use strict";
 
+  if (document.documentElement.hasAttribute("data-mind-map-script-initialised")) return;
+  document.documentElement.setAttribute("data-mind-map-script-initialised", "");
+
   const interactiveSelector = [
     "a", "button", "input", "select", "textarea", "summary", "label",
     "[contenteditable]", "[data-mind-map-interactive]", "[data-presentation-toolbar]",
@@ -14,7 +17,8 @@
     "[role='checkbox']", "[role='radio']", "[role='switch']", "[role='textbox']",
     "[role='searchbox']", "[role='combobox']", "[role='listbox']", "[role='option']",
     "[role='menu']", "[role='menuitem']", "[role='tablist']", "[role='tab']",
-    "[role='slider']", "[role='spinbutton']", "[aria-haspopup]"
+    "[role='slider']", "[role='spinbutton']", "[role='tree']", "[role='grid']",
+    "[aria-haspopup]"
   ].join(",");
   const instances = new WeakMap();
 
@@ -26,7 +30,14 @@
     const fullscreenElement = document.fullscreenElement;
     if (!(fullscreenElement instanceof Element)) return null;
     if (fullscreenElement.matches("[data-mind-map-presentation]")) return fullscreenElement;
-    return fullscreenElement.closest("[data-mind-map-presentation]");
+    return null;
+  };
+
+  const scrollContainerForSlide = (slide) => {
+    if (!slide) return null;
+    return slide.matches("[data-mind-map-slide-scroll]")
+      ? slide
+      : slide.querySelector("[data-mind-map-slide-scroll]") || slide;
   };
 
   function initialise(root) {
@@ -124,6 +135,7 @@
       state.lastNavigation = now;
       closeTooltips();
       state.index = index;
+      scrollContainerForSlide(slides[index]).scrollTop = 0;
       render({ announce: true });
     };
 
@@ -143,6 +155,7 @@
     controls.start?.addEventListener("click", () => {
       state.active = true;
       state.index = 0;
+      scrollContainerForSlide(slides[0]).scrollTop = 0;
       render({ announce: true });
       if (root.requestFullscreen && document.fullscreenEnabled && !document.fullscreenElement) {
         const request = root.requestFullscreen();
@@ -262,7 +275,8 @@
   document.querySelectorAll("[data-mind-map-presentation]").forEach(initialise);
 
   document.addEventListener("keydown", (event) => {
-    if (event.defaultPrevented || !["ArrowRight", "ArrowLeft"].includes(event.key)) return;
+    const arrowKeys = ["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp"];
+    if (event.defaultPrevented || !arrowKeys.includes(event.key)) return;
     if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
 
     const root = presentationForFullscreenElement();
@@ -276,7 +290,19 @@
 
     event.preventDefault();
     event.stopImmediatePropagation();
-    instance.go(instance.state.index + (event.key === "ArrowRight" ? 1 : -1));
+    if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+      instance.go(instance.state.index + (event.key === "ArrowRight" ? 1 : -1));
+      return;
+    }
+
+    const activeSlide = root.querySelector("[data-mind-map-slide][aria-current='step']");
+    if (!activeSlide) return;
+    const scrollContainer = scrollContainerForSlide(activeSlide);
+    const increment = Math.min(96, Math.max(40, scrollContainer.clientHeight * 0.1));
+    scrollContainer.scrollBy({
+      top: event.key === "ArrowDown" ? increment : -increment,
+      behavior: "auto"
+    });
   }, true);
 
   document.addEventListener("fullscreenchange", () => {
