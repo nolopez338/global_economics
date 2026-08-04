@@ -12,7 +12,7 @@
   ));
 
   function initialise(root) {
-    if (instances.has(root)) return instances.get(root);
+    if (instances.has(root) || root.hasAttribute("data-mind-map-initialised")) return instances.get(root) || null;
 
     const map = root.querySelector("[data-mind-map]");
     const slides = map ? Array.from(map.querySelectorAll(":scope > [data-mind-map-slide]")) : [];
@@ -30,6 +30,7 @@
     };
     const state = { active: false, index: 0, lastNavigation: 0, openTrigger: null };
     instances.set(root, state);
+    root.setAttribute("data-mind-map-initialised", "");
     root.classList.add("mind-map-presentation--enhanced");
     map.classList.add("mind-map--enhanced");
     root.querySelectorAll("[data-criterion-tooltip]").forEach((tip) => { tip.hidden = true; });
@@ -171,6 +172,19 @@
       if (event.target.closest(interactiveSelector) || !window.getSelection()?.isCollapsed) return;
       go(state.index + 1);
     });
+
+    root.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      const openTooltipElement = root.querySelector("[data-criterion-tooltip]:not([hidden])");
+      if (!openTooltipElement) return;
+
+      // A dialog gets the first opportunity to consume Escape. Browsers may still
+      // reserve Escape for leaving native fullscreen, but application handlers
+      // must not also advance a slide or exit presentation on this keypress.
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      closeTooltips(null, true);
+    }, true);
 
     root.addEventListener("keydown", (event) => {
       const openTooltipElement = root.querySelector("[data-criterion-tooltip]:not([hidden])");
