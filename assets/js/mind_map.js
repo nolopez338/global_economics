@@ -25,7 +25,7 @@
       next: root.querySelector("[data-presentation-next]"),
       fullscreen: root.querySelector("[data-presentation-fullscreen]"),
       exit: root.querySelector("[data-presentation-exit]"),
-      progress: root.querySelector("[data-presentation-progress]"),
+      progress: Array.from(root.querySelectorAll("[data-presentation-progress]")),
       status: root.querySelector("[data-presentation-status]")
     };
     const state = { active: false, index: 0, lastNavigation: 0, openTrigger: null };
@@ -85,8 +85,8 @@
         }
       });
       const final = state.index === slides.length - 1;
-      const progressText = `${state.index + 1} / ${slides.length}${final ? " · Final slide" : ""}`;
-      if (controls.progress) controls.progress.textContent = progressText;
+      const progressText = `${state.index + 1} / ${slides.length}`;
+      controls.progress.forEach((progress) => { progress.textContent = progressText; });
       if (controls.previous) controls.previous.disabled = state.index === 0;
       if (controls.next) {
         controls.next.disabled = final;
