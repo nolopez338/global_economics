@@ -1,0 +1,690 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,tabularx}
+\usepackage{enumitem}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+
+\definecolor{accent}{HTML}{244A73}
+\definecolor{paleblue}{HTML}{F1F6FA}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newtcolorbox{keybox}[1][Key idea]{
+  colback=paleblue,colframe=accent,fonttitle=\bfseries,
+  title=#1,boxrule=0.6pt,arc=1.5mm,left=2mm,right=2mm,top=1mm,bottom=1mm}
+\newcommand{\Pp}{\operatorname{P}}
+\newcommand{\E}{\operatorname{E}}
+\newcommand{\Bin}{\operatorname{Bin}}
+\newcommand{\N}{\operatorname{N}}
+\newcommand{\dd}{\,\mathrm{d}}
+
+\hypersetup{pdftitle={Ten Essential Concepts in Probability},
+  pdfauthor={Study Notes}}
+\setlist{nosep}
+\setcounter{tocdepth}{2}
+
+\title{\textbf{Ten Essential Concepts in Probability}\\[0.4em]
+  \large A rigorous study guide for competition preparation and review}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Probability measures how likely an event is to occur.  For any event $A$, its
+probability satisfies
+\[
+0\leq \Pp(A)\leq 1,
+\]
+where $0$ means impossible and $1$ means certain.  The same probability can be
+written in equivalent forms, such as
+\[
+\frac{3}{10}=0.3=30\%.
+\]
+Every probability question begins with a \emph{sample space} $S$, the set of all
+possible outcomes under consideration, and an \emph{event} $A$, a subset of that
+sample space.  These notes develop ten essential ideas: estimating probability
+from experiments, computing probabilities from equally likely outcomes, using
+sets and conditional probability, counting with permutations and combinations,
+and recognizing continuous, binomial, and geometric probability models.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{Experimental Probability}\label{sec:experimental}
+\emph{Experimental probability} is a probability estimated from observed data in
+an experiment.  If event $A$ occurs in $n(A)$ of $N$ trials, then the
+experimental probability, or relative frequency, is
+\[
+\widehat{\Pp}(A)=\frac{n(A)}{N}.
+\]
+Here $n(A)$ is the number of trials in which $A$ occurs and $N$ is the total
+number of trials.  This formula is valid when the trials have been actually
+performed and $N>0$.
+
+\subsection{Worked example: flipping a coin}
+Suppose a coin is flipped $10$ times and tails occurs $3$ times.  Then
+\[
+\widehat{\Pp}(\text{tails})=\frac{3}{10}=0.3=30\%.
+\]
+This means that tails occurred in $30\%$ of the flips in this particular
+experiment.  It does \emph{not} mean that the coin's theoretical probability of
+tails is $0.3$.
+
+\subsection{Experimental versus theoretical probability}
+For a fair coin, the theoretical probability of tails is $1/2=0.5=50\%$.
+Experimental probability is a sample proportion, so it can differ from the
+theoretical value, especially when the number of trials is small.  The empirical
+meaning associated with the law of large numbers is that, as the number of
+independent trials becomes large, the relative frequency of an event tends to
+approach its theoretical probability.
+
+\begin{table}[ht]
+\centering
+\caption{Experimental and theoretical probability.}\label{tab:exp-theory}
+\begin{tabularx}{\textwidth}{@{}lYY@{}}
+\toprule
+Type & Based on & Main caution \\
+\midrule
+Experimental probability & Observed outcomes from trials & May vary from one experiment to another \\
+Theoretical probability & A mathematical model of the sample space & Requires correct assumptions about the model \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{keybox}
+Experimental probability answers, ``What happened in these trials?''  Theoretical
+probability answers, ``What should happen according to the model?''
+\end{keybox}
+
+\section{Theoretical Probability}\label{sec:theoretical}
+\emph{Theoretical probability} uses a mathematical description of the experiment
+to compute the probability of an event.  For a finite sample space $S$ whose
+elementary outcomes are equally likely, the probability of event $A\subseteq S$
+is
+\[
+\Pp(A)=\frac{|A|}{|S|}.
+\]
+Here $|A|$ is the number of favorable outcomes and $|S|$ is the total number of
+possible outcomes.  This favorable-outcomes formula is valid only when all
+elementary outcomes in $S$ are equally likely.
+
+\subsection{Worked examples}
+In these examples, assume fair dice, a well-shuffled standard deck, and random
+selection.
+\begin{enumerate}[label=\textbf{\arabic*.}]
+\item Rolling a four on a fair six-sided die:
+\[
+\Pp(\text{four})=\frac{1}{6}.
+\]
+There is one favorable face among six equally likely faces.
+
+\item Rolling an odd number:
+\[
+\Pp(\text{odd})=\frac{3}{6}=\frac{1}{2}=0.5=50\%,
+\]
+because the odd faces are $1,3,5$.
+
+\item Drawing the seven of hearts from a standard $52$-card deck:
+\[
+\Pp(\text{seven of hearts})=\frac{1}{52}.
+\]
+
+\item Drawing a king:
+\[
+\Pp(\text{king})=\frac{4}{52}=\frac{1}{13},
+\]
+because there is one king in each of the four suits.
+
+\item Drawing a red marble from a bag with $3$ red, $2$ blue, and $5$ green
+marbles:
+\[
+\Pp(\text{red})=\frac{3}{3+2+5}=\frac{3}{10}=0.3.
+\]
+\end{enumerate}
+
+\subsection{Complements}
+The \emph{complement} $A^c$ is the event that $A$ does not occur.  Since either
+$A$ occurs or it does not,
+\[
+\Pp(A^c)=1-\Pp(A).
+\]
+For the marble bag above,
+\[
+\Pp(\text{not blue})=1-\Pp(\text{blue})
+=1-\frac{2}{10}=\frac{8}{10}=\frac{4}{5}=0.8=80\%.
+\]
+The notation $A'$ is also sometimes used for a complement, but $A^c$ is more
+standard in many probability texts.
+
+\begin{keybox}[Common error]
+Do not use $\Pp(A)=|A|/|S|$ unless the elementary outcomes are equally likely.
+A biased coin or a nonuniform spinner requires different information.
+\end{keybox}
+
+\section{Probability Using Sets}\label{sec:sets}
+\emph{Probability using sets} describes events as subsets of a sample space and
+uses set operations to combine them.  The main notation is as follows.
+\begin{itemize}
+\item $S$: the sample space, or set of all possible outcomes.
+\item Event: any subset of $S$.
+\item $A^c$: the complement of $A$, meaning outcomes not in $A$.
+\item $A\cap B$: the intersection, meaning outcomes in both $A$ and $B$.
+\item $A\cup B$: the union, meaning outcomes in $A$ or $B$ or both.
+\item Mutually exclusive events: events with no overlap, so $A\cap B=\varnothing$.
+\end{itemize}
+
+The word \emph{and} usually signals an intersection.  The word \emph{or} in
+probability is inclusive: $A$ or $B$ means $A$, $B$, or both.
+
+\subsection{The addition rule}
+For any two events $A$ and $B$,
+\[
+\Pp(A\cup B)=\Pp(A)+\Pp(B)-\Pp(A\cap B).
+\]
+The subtraction removes the overlap, which was counted once in $\Pp(A)$ and
+again in $\Pp(B)$.  If $A$ and $B$ are mutually exclusive, then
+$\Pp(A\cap B)=0$, so $\Pp(A\cup B)=\Pp(A)+\Pp(B)$.
+
+\begin{table}[ht]
+\centering
+\caption{Intersection and union.}\label{tab:and-or}
+\begin{tabularx}{\textwidth}{@{}lYY@{}}
+\toprule
+Operation & Meaning & Probability language \\
+\midrule
+$A\cap B$ & Outcomes common to both events & $A$ and $B$ \\
+$A\cup B$ & Outcomes in at least one event & $A$ or $B$ or both \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Worked example: a sports survey}
+A survey has $100$ respondents.  The verified information is: $8$ respondents
+like both hockey and basketball; $48$ like basketball; $42$ like soccer; and
+$15$ like both basketball and soccer.  The probability that a randomly selected
+respondent likes basketball or soccer is
+\begin{align*}
+\Pp(\text{basketball}\cup\text{soccer})
+&=\frac{48+42-15}{100}\\
+&=\frac{75}{100}=\frac{3}{4}=0.75.
+\end{align*}
+Thus $75\%$ of respondents are known to be in the basketball-or-soccer union.
+The value $8/100=0.08$ is the probability of liking hockey and basketball.  No
+unreported regions of the original Venn diagram are needed for these conclusions.
+
+\begin{keybox}
+When using a Venn diagram, add each region exactly once.  For a union, subtract
+the intersection if the totals for two sets have already counted it twice.
+\end{keybox}
+
+\section{Conditional Probability}\label{sec:conditional}
+\emph{Conditional probability} is the probability of one event under the
+condition that another event has occurred.  The probability of $B$ given $A$ is
+\[
+\Pp(B\mid A)=\frac{\Pp(A\cap B)}{\Pp(A)},\qquad \Pp(A)>0.
+\]
+For a finite equally counted sample, this can be written as
+\[
+\Pp(B\mid A)=\frac{|A\cap B|}{|A|},\qquad |A|>0.
+\]
+Conditioning restricts the relevant sample space from all of $S$ to the event
+$A$.
+
+\subsection{Worked example: school preference}
+In a survey, there are $14$ female respondents, and $10$ of those female
+respondents like school.  Let $F$ be the event ``female'' and $L$ be the event
+``likes school.''  Then
+\[
+\Pp(L\mid F)=\frac{|L\cap F|}{|F|}=\frac{10}{14}=\frac{5}{7}\approx0.7143.
+\]
+Among the female respondents, $5/7$ like school.  This is an association within
+the data, not a statement that being female causes a person to like school.
+
+\begin{keybox}[Common error]
+In $\Pp(B\mid A)$, the denominator is the size or probability of the condition
+$A$, not the entire original sample space.
+\end{keybox}
+
+\section{The Multiplication Law}\label{sec:multiplication}
+The \emph{multiplication law} computes the probability that two events both
+occur.  For any events $A$ and $B$ with $\Pp(A)>0$,
+\[
+\Pp(A\cap B)=\Pp(A)\Pp(B\mid A).
+\]
+If $A$ and $B$ are independent, meaning the occurrence of one does not change
+the probability of the other, then $\Pp(B\mid A)=\Pp(B)$ and
+\[
+\Pp(A\cap B)=\Pp(A)\Pp(B).
+\]
+
+\begin{table}[ht]
+\centering
+\caption{Independent, dependent, and mutually exclusive events.}\label{tab:independent-dependent}
+\begin{tabularx}{\textwidth}{@{}lYY@{}}
+\toprule
+Relationship & Meaning & Important distinction \\
+\midrule
+Independent & Knowing one occurred does not change the probability of the other & Can overlap \\
+Dependent & Knowing one occurred changes the probability of the other & Often occurs in sampling without replacement \\
+Mutually exclusive & Cannot occur together & If both have positive probability, they are not independent \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Worked examples}
+\paragraph{A die and a coin.} Rolling a fair die and flipping a fair coin are
+independent.  Therefore,
+\[
+\Pp(\text{three and tails})=\frac{1}{6}\cdot\frac{1}{2}=\frac{1}{12}.
+\]
+
+\paragraph{Two kings without replacement.} Drawing two kings consecutively from
+a standard deck without replacement is dependent.  The first draw has $4$ kings
+among $52$ cards.  If the first card is a king, then $3$ kings remain among
+$51$ cards, so
+\[
+\Pp(\text{two kings})=\frac{4}{52}\cdot\frac{3}{51}
+=\frac{12}{2652}=\frac{1}{221}.
+\]
+The numerator and denominator change because the first card is not put back.
+
+\begin{keybox}
+Use multiplication for ``and'' in a sequence, but decide first whether the later
+probability must be conditional.
+\end{keybox}
+
+\section{Permutations}\label{sec:permutations}
+A \emph{permutation} is an ordered arrangement of objects.  For a nonnegative
+integer $n$, factorial notation means
+\[
+n!=n(n-1)(n-2)\cdots2\cdot1,\qquad 0!=1.
+\]
+For $0\leq r\leq n$, the number of ordered arrangements of $r$ distinct objects
+chosen from $n$ distinct objects is
+\[
+{}_nP_r=P(n,r)=\frac{n!}{(n-r)!}.
+\]
+This formula applies when order matters and repetition is not allowed.
+
+\subsection{Worked examples}
+The six arrangements of $A,B,C$ are
+\[
+ABC,\ ACB,\ BAC,\ BCA,\ CAB,\ CBA.
+\]
+For first-, second-, and third-place finishes among $10$ runners,
+\[
+{}_{10}P_3=\frac{10!}{7!}=10\cdot9\cdot8=720.
+\]
+For a lock code formed by choosing three distinct numbers in order from $0$
+through $59$, there are
+\[
+{}_{60}P_3=60\cdot59\cdot58=205{,}320
+\]
+possible codes.  Since only one code is correct,
+\[
+\Pp(\text{correct first guess})=\frac{1}{205{,}320}.
+\]
+This corrects the malformed numerical value in the transcript.
+
+\begin{keybox}
+A permutation question asks, ``How many ordered lists can be made?''  If swapping
+two selected objects creates a different outcome, order matters.
+\end{keybox}
+
+\section{Combinations}\label{sec:combinations}
+A \emph{combination} is a selection in which order does not matter.  For
+$0\leq r\leq n$, the number of ways to choose $r$ objects from $n$ distinct
+objects is
+\[
+\binom{n}{r}=\frac{n!}{r!(n-r)!}.
+\]
+The extra factor $r!$ in the denominator removes the different orders of the
+same selected group.
+
+\subsection{Worked examples}
+The number of groups of three from five people is
+\[
+\binom{5}{3}=\frac{5!}{3!2!}=10.
+\]
+Now suppose a team of $6$ is chosen from $7$ children and $11$ adults.  The
+sample space contains
+\[
+\binom{18}{6}=18{,}564
+\]
+teams.  To form a favorable team with exactly one child, choose $1$ of the $7$
+children and $5$ of the $11$ adults:
+\[
+\binom{7}{1}\binom{11}{5}=7\cdot462=3{,}234.
+\]
+Therefore
+\[
+\Pp(\text{exactly one child})=
+\frac{\binom{7}{1}\binom{11}{5}}{\binom{18}{6}}
+=\frac{3234}{18564}=\frac{77}{442}\approx0.1742.
+\]
+
+\begin{table}[ht]
+\centering
+\caption{Permutations and combinations.}\label{tab:perm-comb}
+\begin{tabularx}{\textwidth}{@{}lYY@{}}
+\toprule
+Counting method & Use when & Formula \\
+\midrule
+Permutation & Order matters & ${}_nP_r=\dfrac{n!}{(n-r)!}$ \\
+Combination & Order does not matter & $\binom{n}{r}=\dfrac{n!}{r!(n-r)!}$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{keybox}[Decision rule]
+Ask whether the same objects in a different order should be counted again.  If
+yes, use permutations; if no, use combinations.
+\end{keybox}
+
+\section{Continuous Probability Distributions}\label{sec:continuous}
+A \emph{continuous random variable} can take any value in an interval of real
+numbers.  A \emph{probability density function} (PDF) $f(x)$ assigns density,
+not point probability, and satisfies
+\[
+f(x)\geq0,
+\qquad
+\int_{-\infty}^{\infty} f(x)\dd x=1.
+\]
+For a continuous random variable $X$ with density $f$,
+\[
+\Pp(a\leq X\leq b)=\int_a^b f(x)\dd x.
+\]
+Thus probabilities are areas under the curve, not curve heights.  Also,
+$\Pp(X=x)=0$ for an individual value, so endpoints do not affect interval
+probabilities: $\Pp(a\leq X\leq b)=\Pp(a<X<b)$.
+
+\subsection{The normal distribution}
+A normal distribution is symmetric and bell-shaped.  We write
+$X\sim \N(\mu,\sigma^2)$ when $X$ is normal with mean $\mu$ and standard
+deviation $\sigma$.  Approximately $68\%$, $95\%$, and $99.7\%$ of the area lie
+within $1$, $2$, and $3$ standard deviations of the mean, respectively.
+
+The standard normal distribution is
+\[
+Z\sim \N(0,1),
+\]
+with mean $0$ and standard deviation $1$.  The corresponding cumulative
+distribution function (CDF) is
+\[
+\Phi(z)=\Pp(Z\leq z).
+\]
+To convert a normal value $x$ to a standard normal $z$-score, use
+\[
+z=\frac{x-\mu}{\sigma}.
+\]
+
+\subsection{Worked example: normal-model calculation}
+As a mathematical illustration, suppose
+\[
+X\sim \N(68,10^2),\qquad \text{and find }\Pp(X>76).
+\]
+The standardized value is
+\[
+z=\frac{76-68}{10}=0.8.
+\]
+Using a standard normal table or a normal cumulative-distribution function,
+\[\Phi(0.8)\approx0.7881.\]
+Therefore
+\[
+\Pp(X>76)=1-\Phi(0.8)\approx1-0.7881=0.2119.
+\]
+Under the stated normal-model assumption, the probability is approximately
+$0.2119$, or $21.19\%$.
+
+\begin{table}[ht]
+\centering
+\caption{Discrete and continuous distributions.}\label{tab:discrete-continuous}
+\begin{tabularx}{\textwidth}{@{}lYY@{}}
+\toprule
+Type & Probability tool & Individual values \\
+\midrule
+Discrete & Probability mass function & Can have positive probability \\
+Continuous & Probability density function and area & Have probability $0$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{keybox}[Common error]
+The height of a density curve is not the probability of that exact value.  For a
+continuous random variable, probability comes from area over an interval.
+\end{keybox}
+
+\section{Binomial Probability Distributions}\label{sec:binomial}
+A \emph{binomial probability distribution} models the number of successes in a
+fixed number of Bernoulli trials.  The conditions are:
+\begin{enumerate}
+\item a fixed number $n$ of trials;
+\item two categorized outcomes per trial, called success and failure;
+\item independent trials;
+\item a constant success probability $p$ on every trial.
+\end{enumerate}
+If $X$ is the number of successes, then
+\[
+X\sim\Bin(n,p)
+\]
+and the probability mass function is
+\[
+\Pp(X=k)=\binom{n}{k}p^k(1-p)^{n-k},\qquad k=0,1,\ldots,n.
+\]
+Here $k$ is the number of successes, $n-k$ is the number of failures, and
+$1-p$ is the probability of failure.  The expected value is
+\[
+\E(X)=np.
+\]
+
+\subsection{Worked example: rolling threes}
+Roll a fair six-sided die four times and define success as rolling a three.
+Then
+\[
+X\sim\Bin\left(4,\frac16\right).
+\]
+The complete probability distribution is:
+\begin{table}[ht]
+\centering
+\caption{Number of threes in four rolls.}\label{tab:binomial}
+\begin{tabular}{@{}ccc@{}}
+\toprule
+$k$ & Exact probability $\Pp(X=k)$ & Decimal approximation \\
+\midrule
+$0$ & $\left(\frac56\right)^4=\frac{625}{1296}$ & $0.4823$ \\
+$1$ & $\binom41\left(\frac16\right)\left(\frac56\right)^3=\frac{500}{1296}$ & $0.3858$ \\
+$2$ & $\binom42\left(\frac16\right)^2\left(\frac56\right)^2=\frac{150}{1296}$ & $0.1157$ \\
+$3$ & $\binom43\left(\frac16\right)^3\left(\frac56\right)=\frac{20}{1296}$ & $0.0154$ \\
+$4$ & $\left(\frac16\right)^4=\frac{1}{1296}$ & $0.0008$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+The exact probabilities sum to
+\[
+\frac{625+500+150+20+1}{1296}=\frac{1296}{1296}=1.
+\]
+The expected number of threes is
+\[
+\E(X)=4\left(\frac16\right)=\frac23\approx0.667.
+\]
+This is a long-run average over many repetitions of the four-roll experiment;
+it need not be a possible observed count in one experiment.
+
+\begin{keybox}
+Use a binomial model when the number of trials is fixed and you count how many
+successes occur.
+\end{keybox}
+
+\section{Geometric Probability Distributions}\label{sec:geometric}
+A \emph{geometric probability distribution} models the trial number on which the
+first success occurs.  The conditions are:
+\begin{enumerate}
+\item independent repeated Bernoulli trials;
+\item two categorized outcomes per trial;
+\item constant success probability $p$;
+\item trials continue until the first success.
+\end{enumerate}
+If $X$ is the trial number of the first success, then
+\[
+\Pp(X=k)=(1-p)^{k-1}p,
+\qquad k=1,2,\ldots.
+\]
+The expected waiting time is
+\[
+\E(X)=\frac{1}{p}.
+\]
+
+\subsection{Worked example: rolling doubles}
+Roll two fair six-sided dice repeatedly until doubles appear.  There are $36$
+equally likely ordered outcomes and $6$ doubles, so
+\[
+p=\Pp(\text{doubles})=\frac{6}{36}=\frac16.
+\]
+The probability that the first doubles occur on trial $4$ is
+\[
+\Pp(X=4)=\left(\frac56\right)^3\left(\frac16\right)
+=\frac{125}{1296}\approx0.09645.
+\]
+For fewer than three trials,
+\begin{align*}
+\Pp(X<3)&=\Pp(X=1)+\Pp(X=2)\\
+&=\frac16+\frac56\cdot\frac16
+=\frac{6}{36}+\frac{5}{36}
+=\frac{11}{36}\approx0.3056.
+\end{align*}
+The expected waiting time is
+\[
+\E(X)=\frac{1}{1/6}=6.
+\]
+On average, it takes six rolls of the pair of dice to get doubles.
+
+\begin{table}[ht]
+\centering
+\caption{Binomial and geometric models.}\label{tab:binom-geometric}
+\begin{tabularx}{\textwidth}{@{}lYY@{}}
+\toprule
+Model & Random variable & Experiment stops when \\
+\midrule
+Binomial & Number of successes in $n$ trials & The fixed $n$ trials are completed \\
+Geometric & Trial number of first success & The first success occurs \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{keybox}
+Binomial counts successes in a fixed number of trials; geometric counts trials
+until the first success.
+\end{keybox}
+
+\section{Final Synthesis}\label{sec:synthesis}
+The first five topics organize probability calculations.  Experimental
+probability estimates likelihood from data, while theoretical probability uses a
+model.  Set notation clarifies whether a question asks for an intersection
+(``and''), a union (inclusive ``or''), or a complement (``not'').  Conditional
+probability changes the sample space, and the multiplication law turns
+sequential ``and'' questions into products, using conditional probabilities when
+events are dependent.
+
+The next two topics, permutations and combinations, support probability by
+counting sample spaces and event spaces.  Use permutations when order matters;
+use combinations when only the selected group matters.  The final three topics
+are probability distributions.  Continuous models assign probability through
+areas under density curves.  Binomial and geometric distributions are discrete
+probability mass functions for repeated Bernoulli trials, but they answer
+different questions: ``How many successes in a fixed number of trials?'' versus
+``How long until the first success?''
+
+\section{Formula Reference}\label{sec:formulas}
+\begin{table}[ht]
+\centering
+\caption{Core formulas from the ten topics.}\label{tab:formulas}
+\begin{tabularx}{\textwidth}{@{}lY@{}}
+\toprule
+Topic & Formula and conditions \\
+\midrule
+Experimental probability & $\widehat{\Pp}(A)=n(A)/N$, after $N>0$ observed trials \\
+Equally likely outcomes & $\Pp(A)=|A|/|S|$, finite equally likely sample space \\
+Complement & $\Pp(A^c)=1-\Pp(A)$ \\
+Union & $\Pp(A\cup B)=\Pp(A)+\Pp(B)-\Pp(A\cap B)$ \\
+Conditional probability & $\Pp(B\mid A)=\Pp(A\cap B)/\Pp(A)$, $\Pp(A)>0$ \\
+Multiplication law & $\Pp(A\cap B)=\Pp(A)\Pp(B\mid A)$; if independent, $\Pp(A)\Pp(B)$ \\
+Permutations & ${}_nP_r=n!/(n-r)!$, order matters, no repetition \\
+Combinations & $\binom{n}{r}=n!/[r!(n-r)!]$, order does not matter \\
+Continuous interval & $\Pp(a\leq X\leq b)=\int_a^b f(x)\dd x$, where $f\geq0$ and total area is $1$ \\
+Normal standardization & $z=(x-\mu)/\sigma$ for $X\sim\N(\mu,\sigma^2)$ \\
+Binomial & $\Pp(X=k)=\binom{n}{k}p^k(1-p)^{n-k}$, $X\sim\Bin(n,p)$ \\
+Geometric & $\Pp(X=k)=(1-p)^{k-1}p$, first success on trial $k$ \\
+Expected values & Binomial: $\E(X)=np$; geometric: $\E(X)=1/p$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Mixed Review Exercises}\label{sec:review}
+\begin{enumerate}
+\item A coin is flipped $20$ times and heads appears $11$ times.  Find the
+experimental probability of heads.
+\item A card is drawn from a standard $52$-card deck.  Find the probability that
+it is not a king.
+\item In a class of $30$ students, $18$ play soccer, $12$ play basketball, and
+$7$ play both.  What is the probability that a randomly selected student plays
+soccer or basketball?
+\item A bag contains $4$ red and $6$ blue marbles.  Two marbles are drawn without
+replacement.  Find the probability that both are red.
+\item How many ways can gold, silver, and bronze medals be awarded among $12$
+competitors if no competitor can receive more than one medal?
+\item How many committees of $4$ can be formed from $9$ people?
+\item Suppose $X\sim\N(50,8^2)$.  Express $\Pp(X<42)$ using the standard normal
+CDF $\Phi$.
+\item A fair die is rolled $5$ times.  Let $X$ be the number of sixes.  Find
+$\Pp(X=2)$.
+\item A fair coin is flipped until the first head.  Find the probability that the
+first head occurs on the third flip.
+\item Explain whether the situation in Exercise 8 is binomial or geometric.
+\end{enumerate}
+
+\subsection*{Solutions}
+\begin{enumerate}
+\item $\widehat{\Pp}(\text{heads})=11/20=0.55=55\%$.
+\item $\Pp(\text{not king})=1-4/52=48/52=12/13$.
+\item Use the union rule:
+\[
+\Pp(S\cup B)=\frac{18+12-7}{30}=\frac{23}{30}\approx0.7667.
+\]
+\item The draws are dependent:
+\[
+\Pp(\text{two red})=\frac{4}{10}\cdot\frac{3}{9}=\frac{2}{15}\approx0.1333.
+\]
+\item This is a permutation because medal order matters:
+\[
+{}_{12}P_3=12\cdot11\cdot10=1320.
+\]
+\item This is a combination because committee order does not matter:
+\[
+\binom{9}{4}=126.
+\]
+\item Standardize:
+\[
+z=\frac{42-50}{8}=-1,
+\qquad \Pp(X<42)=\Phi(-1)\approx0.1587.
+\]
+\item Here $X\sim\Bin(5,1/6)$, so
+\[
+\Pp(X=2)=\binom52\left(\frac16\right)^2\left(\frac56\right)^3
+=\frac{625}{3888}\approx0.1608.
+\]
+\item The first two flips must be tails and the third must be heads:
+\[
+\Pp(X=3)=\left(\frac12\right)^2\left(\frac12\right)=\frac18=0.125.
+\]
+\item Exercise 8 is binomial because there is a fixed number of trials, $5$, and
+we count the number of successes.  Exercise 9 is geometric because trials
+continue until the first success.
+\end{enumerate}
+
+\end{document}
