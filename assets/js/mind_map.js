@@ -9,11 +9,25 @@
     "[role='listbox']", "[role='option']", "[role='menuitem']", "[role='tab']",
     "[role='slider']", "[role='spinbutton']"
   ].join(",");
+  const arrowKeyControlSelector = [
+    "input", "select", "textarea", "[contenteditable]:not([contenteditable='false'])",
+    "[role='checkbox']", "[role='radio']", "[role='switch']", "[role='textbox']",
+    "[role='searchbox']", "[role='combobox']", "[role='listbox']", "[role='option']",
+    "[role='menu']", "[role='menuitem']", "[role='tablist']", "[role='tab']",
+    "[role='slider']", "[role='spinbutton']", "[aria-haspopup]"
+  ].join(",");
   const instances = new WeakMap();
 
   const isEditable = (element) => Boolean(element?.closest(
     "input, select, textarea, [contenteditable]:not([contenteditable='false']), [role='textbox'], [role='searchbox'], [role='combobox']"
   ));
+
+  const presentationForFullscreenElement = () => {
+    const fullscreenElement = document.fullscreenElement;
+    if (!(fullscreenElement instanceof Element)) return null;
+    if (fullscreenElement.matches("[data-mind-map-presentation]")) return fullscreenElement;
+    return fullscreenElement.closest("[data-mind-map-presentation]");
+  };
 
   function initialise(root) {
     if (instances.has(root) || root.hasAttribute("data-mind-map-initialised")) return instances.get(root) || null;
@@ -33,7 +47,6 @@
       status: root.querySelector("[data-presentation-status]")
     };
     const state = { active: false, index: 0, lastNavigation: 0, openTrigger: null, pointerGesture: null };
-    instances.set(root, state);
     root.setAttribute("data-mind-map-initialised", "");
     root.classList.add("mind-map-presentation--enhanced");
     map.classList.add("mind-map--enhanced");
@@ -113,6 +126,8 @@
       state.index = index;
       render({ announce: true });
     };
+
+    instances.set(root, { state, render, go });
 
     const exit = async () => {
       if (!state.active) return;
@@ -223,7 +238,7 @@
         return;
       }
       if (openTooltipElement) return;
-      if (event.altKey || event.ctrlKey || event.metaKey || isEditable(event.target)) return;
+      if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || isEditable(event.target)) return;
       if (!state.active) {
         const index = slides.indexOf(event.target);
         if (index < 0 || !["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
@@ -234,17 +249,40 @@
         slides[next].focus();
         return;
       }
-      if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
-        event.preventDefault();
-        go(state.index + (event.key === "ArrowRight" ? 1 : -1));
-      }
-    });
-    document.addEventListener("fullscreenchange", () => {
-      if (state.active) render();
+      if (event.defaultPrevented || !["ArrowRight", "ArrowLeft"].includes(event.key)) return;
+      if (event.target.closest(arrowKeyControlSelector)) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      go(state.index + (event.key === "ArrowRight" ? 1 : -1));
     });
     render();
-    return state;
+    return instances.get(root);
   }
 
   document.querySelectorAll("[data-mind-map-presentation]").forEach(initialise);
+
+  document.addEventListener("keydown", (event) => {
+    if (event.defaultPrevented || !["ArrowRight", "ArrowLeft"].includes(event.key)) return;
+    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+
+    const root = presentationForFullscreenElement();
+    const instance = root && instances.get(root);
+    if (!instance?.state.active) return;
+
+    const target = event.target instanceof Element ? event.target : null;
+    const openTooltip = root.querySelector("[data-criterion-tooltip]:not([hidden])");
+    if (openTooltip || target?.closest("[role='dialog'], [aria-modal='true'], [data-criterion-tooltip]")) return;
+    if (target?.closest(arrowKeyControlSelector) || isEditable(target)) return;
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    instance.go(instance.state.index + (event.key === "ArrowRight" ? 1 : -1));
+  }, true);
+
+  document.addEventListener("fullscreenchange", () => {
+    document.querySelectorAll("[data-mind-map-presentation]").forEach((root) => {
+      const instance = instances.get(root);
+      if (instance?.state.active) instance.render();
+    });
+  });
 })();
