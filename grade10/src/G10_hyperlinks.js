@@ -1,5 +1,5 @@
 // SharePoint document URLs are grouped by Grade 10 term, then by resource purpose.
-const G10_HYPERLINKS = {
+window.TERM_HYPERLINKS = {
   G10_T1: {
     project: "https://correosanbartoloedu-my.sharepoint.com/:b:/g/personal/nicolas_lopez_sanbartolo_edu_co/IQDH9kA9sZWtS6hAj3AyeZRXAXSbKDKlG8BKgUjXs-NP_6A?e=Cpg1VI",
     worksheetC8C9: "https://correosanbartoloedu-my.sharepoint.com/:b:/g/personal/nicolas_lopez_sanbartolo_edu_co/IQBBCtjU-jmiTKaC7FAUC9RUATq4CEyClb1c_G7zE4o0CIY?e=bLGfTB",
@@ -23,11 +23,11 @@ const G10_HYPERLINKS = {
   }
 };
 
-// Resolve declarative dot-separated keys without exposing URL values in diagnostics.
+// Compatibility for existing Grade 10 pages that still use the legacy attribute.
 document.querySelectorAll("[data-g10-link]").forEach((element) => {
   const key = element.dataset.g10Link;
   const segments = key ? key.split(".") : [];
-  let resolved = G10_HYPERLINKS;
+  let resolved = window.TERM_HYPERLINKS;
 
   for (const segment of segments) {
     if (!segment || typeof resolved !== "object" || resolved === null ||
@@ -40,6 +40,8 @@ document.querySelectorAll("[data-g10-link]").forEach((element) => {
 
   if (segments.length < 2 || typeof resolved !== "string" || !resolved) {
     console.warn(`[G10 hyperlinks] Missing or invalid link key: ${key || "(empty)"}`);
+    element.removeAttribute("href");
+    element.setAttribute("aria-disabled", "true");
     return;
   }
 
