@@ -63,6 +63,46 @@
     map.classList.add("mind-map--enhanced");
     root.querySelectorAll("[data-criterion-tooltip]").forEach((tip) => { tip.hidden = true; });
 
+
+    const criterionDetailsForTrigger = (trigger) => {
+      const id = trigger.dataset.criterionId?.trim() || trigger.textContent.trim();
+      const description = trigger.dataset.criterionText?.trim();
+      if (id && description) return { id, description };
+      const controls = trigger.getAttribute("aria-controls");
+      const tip = controls ? root.querySelector(`#${CSS.escape(controls)}`) : null;
+      const fallback = tip?.querySelector("[data-criterion-description], .criterion-dialog-text")?.textContent.trim();
+      return id && fallback ? { id, description: fallback } : null;
+    };
+
+    const criteriaForSlide = (slide) => {
+      const seen = new Set();
+      return Array.from(slide.querySelectorAll("[data-criterion-trigger]")).reduce((criteria, trigger) => {
+        const details = criterionDetailsForTrigger(trigger);
+        if (!details || !details.id || !details.description || seen.has(details.id)) return criteria;
+        seen.add(details.id);
+        criteria.push(details);
+        return criteria;
+      }, []);
+    };
+
+    const renderCriterionList = (tip, criteria) => {
+      const container = tip.querySelector("[data-criterion-list]") || tip.querySelector(".criterion-dialog-text");
+      if (!container || !criteria.length) return;
+      container.replaceChildren();
+      const list = document.createElement("ul");
+      list.className = "criterion-list";
+      list.setAttribute("data-criterion-list-items", "");
+      criteria.forEach(({ id, description }) => {
+        const item = document.createElement("li");
+        const label = document.createElement("strong");
+        label.className = "criterion-list-id";
+        label.textContent = id;
+        item.append(label, document.createTextNode(` ${description}`));
+        list.append(item);
+      });
+      container.append(list);
+    };
+
     const updateScrollLock = () => {
       document.documentElement.classList.toggle("criterion-overlay-open", Boolean(document.querySelector("[data-criterion-tooltip]:not([hidden])")));
     };
@@ -80,10 +120,14 @@
     };
 
     const openTooltip = (trigger) => {
+      const slide = trigger.closest("[data-mind-map-slide]");
+      const criteria = slide ? criteriaForSlide(slide) : [];
       const opening = trigger.getAttribute("aria-expanded") !== "true";
       closeTooltips(trigger);
-      const tip = root.querySelector(`#${CSS.escape(trigger.getAttribute("aria-controls"))}`);
-      if (!tip) return;
+      const controls = trigger.getAttribute("aria-controls");
+      const tip = controls ? root.querySelector(`#${CSS.escape(controls)}`) : null;
+      if (!tip || !criteria.length) return;
+      renderCriterionList(tip, criteria);
       trigger.setAttribute("aria-expanded", String(opening));
       tip.hidden = !opening;
       state.openTrigger = opening ? trigger : null;
