@@ -28,23 +28,44 @@
       progress: root.querySelector("[data-presentation-progress]"),
       status: root.querySelector("[data-presentation-status]")
     };
-    const state = { active: false, index: 0, lastNavigation: 0 };
+    const state = { active: false, index: 0, lastNavigation: 0, openTrigger: null };
     instances.set(root, state);
     root.classList.add("mind-map-presentation--enhanced");
     map.classList.add("mind-map--enhanced");
     root.querySelectorAll("[data-criterion-tooltip]").forEach((tip) => { tip.hidden = true; });
 
-    const closeTooltips = (except = null) => {
+    const updateScrollLock = () => {
+      document.documentElement.classList.toggle("criterion-overlay-open", Boolean(document.querySelector("[data-criterion-tooltip]:not([hidden])")));
+    };
+
+    const closeTooltips = (except = null, restoreFocus = false) => {
       root.querySelectorAll("[data-criterion-trigger][aria-expanded='true']").forEach((trigger) => {
         if (trigger === except) return;
         trigger.setAttribute("aria-expanded", "false");
         const tip = root.querySelector(`#${CSS.escape(trigger.getAttribute("aria-controls"))}`);
         if (tip) tip.hidden = true;
+        if (restoreFocus && trigger === state.openTrigger && trigger.isConnected) trigger.focus({ preventScroll: true });
       });
+      if (!except) state.openTrigger = null;
+      updateScrollLock();
+    };
+
+    const openTooltip = (trigger) => {
+      const opening = trigger.getAttribute("aria-expanded") !== "true";
+      closeTooltips(trigger);
+      const tip = root.querySelector(`#${CSS.escape(trigger.getAttribute("aria-controls"))}`);
+      if (!tip) return;
+      trigger.setAttribute("aria-expanded", String(opening));
+      tip.hidden = !opening;
+      state.openTrigger = opening ? trigger : null;
+      updateScrollLock();
+      if (opening) tip.querySelector("[data-criterion-close]")?.focus({ preventScroll: true });
+      else trigger.focus({ preventScroll: true });
     };
 
     const render = ({ focus = false, announce = false } = {}) => {
       root.classList.toggle("is-presenting", state.active);
+      root.toggleAttribute("data-presentation-fullscreen-active", document.fullscreenElement === root);
       controls.start?.setAttribute("aria-expanded", String(state.active));
       if (controls.toolbar) controls.toolbar.hidden = !state.active;
       slides.forEach((slide, index) => {
@@ -105,6 +126,13 @@
       state.active = true;
       state.index = 0;
       render({ focus: true, announce: true });
+      if (root.requestFullscreen && document.fullscreenEnabled && !document.fullscreenElement) {
+        const request = root.requestFullscreen();
+        if (request?.catch) request.catch(() => {
+          if (controls.status) controls.status.textContent = "Fullscreen was unavailable; presentation mode remains active.";
+          render();
+        });
+      }
     });
     controls.previous?.addEventListener("click", () => go(state.index - 1));
     controls.next?.addEventListener("click", () => go(state.index + 1));
@@ -122,14 +150,16 @@
       const trigger = event.target.closest("[data-criterion-trigger]");
       if (trigger && root.contains(trigger)) {
         event.stopPropagation();
-        const opening = trigger.getAttribute("aria-expanded") !== "true";
-        closeTooltips(trigger);
-        trigger.setAttribute("aria-expanded", String(opening));
-        const tip = root.querySelector(`#${CSS.escape(trigger.getAttribute("aria-controls"))}`);
-        if (tip) tip.hidden = !opening;
+        openTooltip(trigger);
         return;
       }
-      if (!event.target.closest("[data-criterion-tooltip]")) closeTooltips();
+      const tooltip = event.target.closest("[data-criterion-tooltip]");
+      if (tooltip) {
+        event.stopPropagation();
+        if (event.target.closest("[data-criterion-close], [data-criterion-backdrop]")) closeTooltips(null, true);
+        return;
+      }
+      closeTooltips();
       if (!state.active) {
         const selected = event.target.closest("[data-mind-map-slide]");
         if (selected && !event.target.closest(interactiveSelector)) {
@@ -143,6 +173,17 @@
     });
 
     root.addEventListener("keydown", (event) => {
+      const openTooltipElement = root.querySelector("[data-criterion-tooltip]:not([hidden])");
+      if (openTooltipElement && event.key === "Tab") {
+        const focusable = Array.from(openTooltipElement.querySelectorAll("button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])")).filter((element) => !element.disabled);
+        if (focusable.length) {
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+          else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        }
+        return;
+      }
       if (event.altKey || event.ctrlKey || event.metaKey || isEditable(event.target)) return;
       if (!state.active) {
         const index = slides.indexOf(event.target);
