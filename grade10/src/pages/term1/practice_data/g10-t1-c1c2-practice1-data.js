@@ -2339,8 +2339,18 @@ $$
   function initializePracticePage() {
     const controls = document.getElementById("practice-selector-controls");
     const status = document.getElementById("practice-selector-status");
+    const categoryRegion = document.getElementById("selected-practice-section");
+    const categoryHeading = document.getElementById("selected-practice-section-heading");
     const region = document.getElementById("selected-problem");
-    if (!controls || !status || !region) return;
+    if (!controls || !status || !categoryRegion || !categoryHeading || !region) return;
+
+    function hideProblem() {
+      categoryHeading.textContent = "";
+      categoryRegion.hidden = true;
+      region.replaceChildren();
+      region.id = "selected-problem";
+      region.hidden = true;
+    }
 
     try {
       validateData(practiceData);
@@ -2348,13 +2358,13 @@ $$
       console.error(error);
       controls.replaceChildren();
       status.textContent = `Practice data error: ${error.message}`;
-      region.hidden = true;
+      hideProblem();
       return;
     }
 
     if (practiceData.problems.length === 0) {
       status.textContent = "No practice problems are available.";
-      region.hidden = true;
+      hideProblem();
     }
 
     const selects = new Map();
@@ -2423,17 +2433,13 @@ $$
           ${sections}
         </div>
         <div class="back-to-top"><a class="back-to-top-button" href="#practice-selector"><span class="back-to-top-icon" aria-hidden="true">↑</span>Back to Problem Selector</a></div>`;
+      categoryHeading.textContent = problem.labels.section;
+      categoryRegion.hidden = false;
       region.hidden = false;
       if (window.MathJax?.typesetPromise) {
         window.MathJax.typesetPromise([region]).catch((error) => console.error("MathJax typesetting failed:", error));
       }
       status.textContent = `${problem.labels.name} selected.`;
-    }
-
-    function hideProblem() {
-      region.replaceChildren();
-      region.id = "selected-problem";
-      region.hidden = true;
     }
 
     function updateNameOptions() {
