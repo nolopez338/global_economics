@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>2026 General Calendar</title>
+  <title>2026–2027 Academic Calendar</title>
   <link rel="stylesheet" href="../css/general_calendar.css" />
 </head>
 <body>
   <main>
     <div class="page-header">
       <a id="week-view-link" class="header-button" href="/teacher/schedule.html">Week View</a>
-      <h1>2026 General Calendar</h1>
+      <h1>2026–2027 Academic Calendar</h1>
     </div>
     <section id="highlights-legend" class="legend-block" aria-label="Calendar highlights"></section>
     <p id="notice" class="notice" hidden></p>
-    <section id="calendar-year" class="calendar-year" aria-label="Full year calendar"></section>
+    <section id="calendar-year" class="calendar-year" aria-label="2026–2027 academic-year calendar"></section>
     <section id="filter-section" class="filter-section" aria-label="Date range filter">
       <div class="filter-header">
         <h2 class="filter-title">Filters</h2>
@@ -25,11 +25,11 @@
       <div id="filter-content" class="filter-content">
         <div class="filter-field">
           <label for="from-date" class="filter-label">From</label>
-          <input id="from-date" class="filter-input" type="date" value="2026-01-01" min="2026-01-01" max="2026-12-31" />
+          <input id="from-date" class="filter-input" type="date" value="2026-08-01" min="2026-08-01" max="2027-06-30" />
         </div>
         <div class="filter-field">
           <label for="to-date" class="filter-label">To</label>
-          <input id="to-date" class="filter-input" type="date" value="2026-12-31" min="2026-01-01" max="2026-12-31" />
+          <input id="to-date" class="filter-input" type="date" value="2027-06-30" min="2026-08-01" max="2027-06-30" />
         </div>
       </div>
     </section>
@@ -49,6 +49,7 @@
   <script src="../js/theme-toggle.js"></script>
   <script>
     (function initializeYearCalendar() {
+      const calendar = window.academicCalendar;
       const container = document.getElementById("calendar-year");
       const notice = document.getElementById("notice");
       const fromDateInput = document.getElementById("from-date");
@@ -56,334 +57,176 @@
       const filterSection = document.getElementById("filter-section");
       const filterToggleButton = document.getElementById("filter-toggle");
       const legendContainer = document.getElementById("highlights-legend");
-      const DEFAULT_FROM_DATE = "2026-01-01";
-      const DEFAULT_TO_DATE = "2026-12-31";
+      const ACADEMIC_YEAR = "2026-2027";
+      const DEFAULT_FROM_DATE = "2026-08-01";
+      const DEFAULT_TO_DATE = "2027-06-30";
       const FROM_STORAGE_KEY = "generalCalendar.fromDate";
       const TO_STORAGE_KEY = "generalCalendar.toDate";
       const FILTER_VISIBILITY_STORAGE_KEY = "generalCalendar.filtersCollapsed";
       const HIGHLIGHT_COLORS_STORAGE_KEY = "generalCalendar.highlightColors";
-      const CALENDAR_YEAR = "2026";
 
       const weekViewLink = document.getElementById("week-view-link");
-      const originQueryValue = new URLSearchParams(window.location.search).get("origin");
+      const origin = new URLSearchParams(window.location.search).get("origin");
       const returnTargets = {
-        "schedule": "../../schedule.html",
+        schedule: "../../schedule.html",
         "schedule-teacher": "../../schedule-teacher.html",
       };
-      const fallbackReturnTarget = returnTargets.schedule;
       if (weekViewLink) {
-        weekViewLink.setAttribute("href", returnTargets[originQueryValue] || fallbackReturnTarget);
+        weekViewLink.href = returnTargets[origin] || returnTargets.schedule;
       }
 
-      if (!container || !notice || !fromDateInput || !toDateInput || !legendContainer || !filterSection || !filterToggleButton) return;
+      if (!calendar || !container || !notice || !fromDateInput || !toDateInput ||
+          !filterSection || !filterToggleButton || !legendContainer) {
+        if (notice) {
+          notice.hidden = false;
+          notice.textContent = "Unable to load academic calendar data.";
+        }
+        return;
+      }
+
+      const config = calendar.academicYearRegistry[ACADEMIC_YEAR];
+      if (!config) {
+        notice.hidden = false;
+        notice.textContent = `Unable to load the ${ACADEMIC_YEAR} academic calendar.`;
+        return;
+      }
 
       function toIsoLocalDate(date) {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        return `${year}-${month}-${day}`;
+        return [
+          String(date.getFullYear()).padStart(4, "0"),
+          String(date.getMonth() + 1).padStart(2, "0"),
+          String(date.getDate()).padStart(2, "0"),
+        ].join("-");
       }
 
       const todayIsoDate = toIsoLocalDate(new Date());
-      const todayInCalendarYear = todayIsoDate.startsWith(`${CALENDAR_YEAR}-`);
 
-      const highlightGroups = [
-        {
-          id: "academic-tests",
-          label: "Pruebas Academicas",
-          cellClass: "highlight-academic-tests",
-          legendSwatchClass: "legend-swatch-academic-tests",
-          colorVar: "--highlight-academic-tests",
-          defaultColor: "#dff5df",
-          entries: [
-            { date: "2026-05-07" },
-            { date: "2026-05-08" },
-            { date: "2026-05-11" },
-            { date: "2026-05-12" },
-            { date: "2026-05-13" },
-            { date: "2026-05-14" },
-            { date: "2026-05-19" },
-            { date: "2026-05-20" },
-            { date: "2026-05-21" },
-            { date: "2026-05-22" },
-          ],
-        },
-        {
-          id: "holy-week",
-          label: "Holy Week",
-          cellClass: "highlight-holy-week",
-          legendSwatchClass: "legend-swatch-holy-week",
-          colorVar: "--highlight-holy-week",
-          defaultColor: "#fff7bf",
-          entries: [
-            { date: "2026-03-30" },
-            { date: "2026-03-31" },
-            { date: "2026-04-01" },
-            { date: "2026-04-02" },
-            { date: "2026-04-03" },
-            { date: "2026-04-04" },
-            { date: "2026-04-05" },
-          ],
-        },
-        {
-          id: "holidays",
-          label: "Holidays",
-          cellClass: "highlight-holidays",
-          legendSwatchClass: "legend-swatch-holidays",
-          colorVar: "--highlight-holidays",
-          defaultColor: "#e0b52e",
-          entries: Array.isArray(holidays2026) ? holidays2026 : [],
-        },
-        {
-          id: "individual-development",
-          label: "Individual development",
-          cellClass: "highlight-individual-development",
-          legendSwatchClass: "legend-swatch-individual-development",
-          colorVar: "--highlight-individual-development",
-          defaultColor: "#bfe6bf",
-          entries: [
-            { date: "2026-06-16" },
-            { date: "2026-06-17" },
-            { date: "2026-06-18" },
-            { date: "2026-06-19" },
-            { date: "2026-06-22" },
-            { date: "2026-06-23" },
-            { date: "2026-06-24" },
-            { date: "2026-06-25" },
-            { date: "2026-06-26" },
-          ],
-        },
-        {
-          id: "today",
-          label: "Today",
-          cellClass: "highlight-today",
-          legendSwatchClass: "legend-swatch-today",
-          colorVar: "--highlight-today",
-          defaultColor: "#dbe9ff",
-          entries: todayInCalendarYear ? [{ date: todayIsoDate }] : [],
-        },
+      function getAcademicMonths() {
+        const months = [];
+        let year = config.firstMonth.calendarYear;
+        let month = config.firstMonth.month;
+        const lastMonthValue = config.lastMonth.calendarYear * 12 + config.lastMonth.month;
+
+        while (year * 12 + month <= lastMonthValue) {
+          months.push(calendar.getAcademicMonthData(ACADEMIC_YEAR, month, year));
+          month += 1;
+          if (month === 13) {
+            month = 1;
+            year += 1;
+          }
+        }
+        return months;
+      }
+
+      const academicMonths = getAcademicMonths();
+      const termClasses = new Map(config.terms.map((term, index) => [term.name, `term-${index + 1}`]));
+      const legendItems = [
+        ...config.terms.map((term, index) => ({
+          id: `term-${index + 1}`,
+          label: term.name,
+          colorVar: `--term-${index + 1}`,
+          defaultColor: ["#3e5ca8", "#8a4f9e", "#288567"][index] || "#3e5ca8",
+        })),
+        { id: "holidays", label: "Holiday", className: "holiday", colorVar: "--highlight-holidays", defaultColor: "#e0b52e" },
+        { id: "today", label: "Today", className: "today", colorVar: "--highlight-today", defaultColor: "#dbe9ff" },
       ];
 
       function normalizeHexColor(value, fallback) {
         if (typeof value !== "string") return fallback;
-        const trimmed = value.trim();
-        const shortHex = /^#([a-fA-F0-9]{3})$/;
-        const longHex = /^#([a-fA-F0-9]{6})$/;
-
-        if (longHex.test(trimmed)) return trimmed.toLowerCase();
-        if (shortHex.test(trimmed)) {
-          const rgb = trimmed.slice(1).split("").map((char) => `${char}${char}`).join("");
-          return `#${rgb}`.toLowerCase();
-        }
-        return fallback;
+        const match = /^#([a-f\d]{6}|[a-f\d]{3})$/i.exec(value.trim());
+        if (!match) return fallback;
+        const digits = match[1].length === 3
+          ? match[1].split("").map((digit) => digit.repeat(2)).join("")
+          : match[1];
+        return `#${digits.toLowerCase()}`;
       }
 
-      function clampRgb(value) {
-        return Math.max(0, Math.min(255, Math.round(value)));
-      }
-
-      function darkenHexColor(colorHex, ratio) {
-        const normalized = normalizeHexColor(colorHex, "#2f6fd6");
-        const red = parseInt(normalized.slice(1, 3), 16);
-        const green = parseInt(normalized.slice(3, 5), 16);
-        const blue = parseInt(normalized.slice(5, 7), 16);
-
-        const darkenedRed = clampRgb(red * (1 - ratio));
-        const darkenedGreen = clampRgb(green * (1 - ratio));
-        const darkenedBlue = clampRgb(blue * (1 - ratio));
-
-        const toHex = (channel) => channel.toString(16).padStart(2, "0");
-        return `#${toHex(darkenedRed)}${toHex(darkenedGreen)}${toHex(darkenedBlue)}`;
-      }
-
-      function applyHighlightColorsToCss() {
-        highlightGroups.forEach((group) => {
-          document.documentElement.style.setProperty(group.colorVar, group.currentColor);
+      function applyLegendColors() {
+        legendItems.forEach((item) => {
+          document.documentElement.style.setProperty(item.colorVar, item.currentColor);
         });
-
-        const todayGroup = highlightGroups.find((group) => group.id === "today");
-        if (todayGroup) {
-          const todayStrongColor = darkenHexColor(todayGroup.currentColor, 0.28);
-          document.documentElement.style.setProperty("--highlight-today-strong", todayStrongColor);
-        }
       }
 
-      function saveHighlightColors() {
-        const serializableColors = {};
-        highlightGroups.forEach((group) => {
-          serializableColors[group.id] = group.currentColor;
-        });
-
+      function restoreLegendColors() {
+        let stored = {};
         try {
-          localStorage.setItem(HIGHLIGHT_COLORS_STORAGE_KEY, JSON.stringify(serializableColors));
+          stored = JSON.parse(localStorage.getItem(HIGHLIGHT_COLORS_STORAGE_KEY) || "{}") || {};
         } catch (error) {
-          // Ignore storage failures and continue rendering.
+          // Storage is optional.
         }
+        legendItems.forEach((item) => {
+          item.currentColor = normalizeHexColor(stored[item.id], item.defaultColor);
+        });
+        applyLegendColors();
       }
 
-      function restoreHighlightColors() {
-        let parsedData = null;
-
-        highlightGroups.forEach((group) => {
-          group.currentColor = normalizeHexColor(group.defaultColor, group.defaultColor);
-        });
-
+      function saveLegendColors() {
         try {
-          const rawData = localStorage.getItem(HIGHLIGHT_COLORS_STORAGE_KEY);
-          if (!rawData) {
-            applyHighlightColorsToCss();
-            return;
-          }
-
-          const parsed = JSON.parse(rawData);
-          if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-            parsedData = parsed;
-          }
+          localStorage.setItem(
+            HIGHLIGHT_COLORS_STORAGE_KEY,
+            JSON.stringify(Object.fromEntries(legendItems.map((item) => [item.id, item.currentColor])))
+          );
         } catch (error) {
-          parsedData = null;
+          // Storage is optional.
         }
-
-        if (parsedData) {
-          highlightGroups.forEach((group) => {
-            const candidateColor = parsedData[group.id];
-            group.currentColor = normalizeHexColor(candidateColor, group.defaultColor);
-          });
-        }
-
-        applyHighlightColorsToCss();
       }
-
-      const highlightByDate = new Map();
-      highlightGroups.forEach((group) => {
-        group.entries.forEach((entry) => {
-          if (!entry || typeof entry.date !== "string") return;
-
-          const list = highlightByDate.get(entry.date) || [];
-          list.push({
-            group,
-            name: typeof entry.name === "string" ? entry.name : "",
-          });
-          highlightByDate.set(entry.date, list);
-        });
-      });
 
       function renderLegend() {
-        legendContainer.innerHTML = "";
-
         const title = document.createElement("h2");
         title.className = "legend-title";
-        title.textContent = "Highlights";
-        legendContainer.appendChild(title);
+        title.textContent = "Calendar key";
 
-        const legendList = document.createElement("ul");
-        legendList.className = "legend-list";
-
-        highlightGroups.forEach((group) => {
+        const list = document.createElement("ul");
+        list.className = "legend-list";
+        legendItems.forEach((legendItem) => {
+          const { id, label } = legendItem;
           const item = document.createElement("li");
           item.className = "legend-item";
           item.setAttribute("role", "button");
           item.setAttribute("tabindex", "0");
-          item.setAttribute("title", `Change color for ${group.label}`);
-
+          item.title = `Change color for ${label}`;
           const swatch = document.createElement("span");
-          swatch.className = `legend-swatch ${group.legendSwatchClass}`;
+          swatch.className = `legend-swatch legend-${id}`;
           swatch.setAttribute("aria-hidden", "true");
-
-          const label = document.createElement("span");
-          label.textContent = group.label;
-
-          item.appendChild(swatch);
-          item.appendChild(label);
+          item.append(swatch, document.createTextNode(label));
 
           const colorInput = document.createElement("input");
-          colorInput.type = "color";
-          colorInput.value = group.currentColor;
-          colorInput.setAttribute("aria-label", `Pick color for ${group.label}`);
           colorInput.className = "legend-color-input";
-
-          const openColorPicker = () => {
-            colorInput.value = group.currentColor;
-            colorInput.click();
-          };
-
-          item.addEventListener("click", openColorPicker);
+          colorInput.type = "color";
+          colorInput.value = legendItem.currentColor;
+          colorInput.setAttribute("aria-label", `Pick color for ${label}`);
+          const openPicker = () => colorInput.click();
+          item.addEventListener("click", openPicker);
           item.addEventListener("keydown", (event) => {
             if (event.key === "Enter" || event.key === " ") {
               event.preventDefault();
-              openColorPicker();
+              openPicker();
             }
           });
-
-          colorInput.addEventListener("input", (event) => {
-            const nextColor = normalizeHexColor(event.target.value, group.currentColor);
-            group.currentColor = nextColor;
-            applyHighlightColorsToCss();
-            saveHighlightColors();
+          colorInput.addEventListener("input", () => {
+            legendItem.currentColor = normalizeHexColor(colorInput.value, legendItem.defaultColor);
+            applyLegendColors();
+            saveLegendColors();
           });
-
           item.appendChild(colorInput);
-          legendList.appendChild(item);
+          list.appendChild(item);
         });
-
-        legendContainer.appendChild(legendList);
+        legendContainer.replaceChildren(title, list);
       }
-
-      if (
-        typeof calendar2026 === "undefined" ||
-        !calendar2026 ||
-        !Array.isArray(calendar2026.months)
-      ) {
-        notice.hidden = false;
-        notice.textContent = "Unable to load calendar2026 data.";
-        return;
-      }
-
-      const weekdays = Array.isArray(calendar2026.weekdays)
-        ? calendar2026.weekdays
-        : ["su", "mo", "tu", "we", "th", "fr", "sa"];
 
       function isValidDateString(value) {
         if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
-        const parsed = new Date(`${value}T00:00:00Z`);
-        return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+        try {
+          return calendar.normalizeDate(value) === value;
+        } catch (error) {
+          return false;
+        }
       }
 
       function normalizeStoredDate(value, fallback) {
-        if (!isValidDateString(value)) return fallback;
-        if (value < DEFAULT_FROM_DATE || value > DEFAULT_TO_DATE) return fallback;
-        return value;
-      }
-
-      function restoreFilterState() {
-        let storedFrom = null;
-        let storedTo = null;
-
-        try {
-          storedFrom = localStorage.getItem(FROM_STORAGE_KEY);
-          storedTo = localStorage.getItem(TO_STORAGE_KEY);
-        } catch (error) {
-          storedFrom = null;
-          storedTo = null;
-        }
-
-        const normalizedFrom = normalizeStoredDate(storedFrom, DEFAULT_FROM_DATE);
-        const normalizedTo = normalizeStoredDate(storedTo, DEFAULT_TO_DATE);
-        const restoredRangeIsValid = normalizedFrom <= normalizedTo;
-
-        fromDateInput.value = restoredRangeIsValid ? normalizedFrom : DEFAULT_FROM_DATE;
-        toDateInput.value = restoredRangeIsValid ? normalizedTo : DEFAULT_TO_DATE;
-      }
-
-      function saveFilterState() {
-        const { from, to, isValid } = getCurrentRange();
-        if (!isValid) return;
-
-        try {
-          localStorage.setItem(FROM_STORAGE_KEY, from);
-          localStorage.setItem(TO_STORAGE_KEY, to);
-        } catch (error) {
-          // Ignore storage failures and continue rendering.
-        }
+        return isValidDateString(value) && value >= DEFAULT_FROM_DATE && value <= DEFAULT_TO_DATE
+          ? value
+          : fallback;
       }
 
       function getCurrentRange() {
@@ -392,56 +235,59 @@
         return { from, to, isValid: from <= to };
       }
 
-      function isDateInRange(isoDate, range) {
-        return range.isValid && isoDate >= range.from && isoDate <= range.to;
+      function restoreFilterState() {
+        let from = null;
+        let to = null;
+        try {
+          from = localStorage.getItem(FROM_STORAGE_KEY);
+          to = localStorage.getItem(TO_STORAGE_KEY);
+        } catch (error) {
+          // Storage is optional.
+        }
+        fromDateInput.value = normalizeStoredDate(from, DEFAULT_FROM_DATE);
+        toDateInput.value = normalizeStoredDate(to, DEFAULT_TO_DATE);
+        if (fromDateInput.value > toDateInput.value) {
+          fromDateInput.value = DEFAULT_FROM_DATE;
+          toDateInput.value = DEFAULT_TO_DATE;
+        }
       }
 
-      function weekHasVisibleDate(week, numericMonth, range) {
-        if (!Array.isArray(week)) return false;
-
-        return week.some((realDate) => {
-          if (realDate === null || realDate === undefined) return false;
-          const numericDay = String(realDate).padStart(2, "0");
-          const isoDate = `${CALENDAR_YEAR}-${numericMonth}-${numericDay}`;
-          return isDateInRange(isoDate, range);
-        });
-      }
-
-      function getVisibleWeeks(monthWeeks, numericMonth, range) {
-        return monthWeeks
-          .map((week, weekIndex) => ({ week, weekIndex }))
-          .filter(({ week }) => weekHasVisibleDate(week, numericMonth, range));
-      }
-
-      function monthHasVisibleWeek(visibleWeeks) {
-        return Array.isArray(visibleWeeks) && visibleWeeks.length > 0;
+      function saveFilterState() {
+        const range = getCurrentRange();
+        if (!range.isValid) return;
+        try {
+          localStorage.setItem(FROM_STORAGE_KEY, range.from);
+          localStorage.setItem(TO_STORAGE_KEY, range.to);
+        } catch (error) {
+          // Storage is optional.
+        }
       }
 
       function renderCalendar() {
         const range = getCurrentRange();
-        container.innerHTML = "";
-
+        container.replaceChildren();
         if (!range.isValid) {
           notice.hidden = false;
           notice.textContent = "Invalid range: From date must be on or before To date.";
           return;
-        } else {
-          notice.hidden = true;
-          notice.textContent = "";
         }
+        notice.hidden = true;
+        notice.textContent = "";
 
-        calendar2026.months.forEach((month, monthIndex) => {
+        academicMonths.forEach(({ calendarYear, monthData }) => {
           const monthCard = document.createElement("article");
           monthCard.className = "month-card";
+          monthCard.setAttribute("aria-label", `${monthData.name} ${calendarYear}`);
 
-          const monthName = document.createElement("h2");
-          monthName.className = "month-name";
-          monthName.textContent = month?.name || `Month ${monthIndex + 1}`;
-          monthCard.appendChild(monthName);
+          const heading = document.createElement("h2");
+          heading.className = "month-name";
+          heading.textContent = `${monthData.name} ${calendarYear}`;
+          monthCard.appendChild(heading);
 
           const weekdayRow = document.createElement("div");
           weekdayRow.className = "weekday-row";
-          weekdays.forEach((label) => {
+          weekdayRow.setAttribute("aria-hidden", "true");
+          calendar.getCalendarData(calendarYear).weekdays.forEach((label) => {
             const weekday = document.createElement("div");
             weekday.className = "weekday";
             weekday.textContent = label;
@@ -451,96 +297,82 @@
 
           const monthGrid = document.createElement("div");
           monthGrid.className = "month-grid";
-
-          const monthWeeks = Array.isArray(month?.weeks) ? month.weeks : [];
-          const numericMonth = String(month?.month ?? monthIndex + 1).padStart(2, "0");
-          const visibleWeeks = getVisibleWeeks(monthWeeks, numericMonth, range);
-
-          if (!monthHasVisibleWeek(visibleWeeks)) {
-            return;
-          }
-
-          visibleWeeks.forEach(({ week, weekIndex }) => {
+          monthData.weeks.forEach((week) => {
             const weekRow = document.createElement("div");
             weekRow.className = "week-row";
-
-            for (let dayIndex = 0; dayIndex < 7; dayIndex += 1) {
-              const realDate = Array.isArray(week) ? week[dayIndex] : null;
-
+            week.forEach((day) => {
               const dayCell = document.createElement("div");
               dayCell.className = "day-cell";
-
-              if (realDate === null || realDate === undefined) {
+              if (day === null) {
                 dayCell.classList.add("empty");
                 dayCell.setAttribute("aria-hidden", "true");
-              } else {
-                const numericDay = String(realDate).padStart(2, "0");
-                const isoDate = `${CALENDAR_YEAR}-${numericMonth}-${numericDay}`;
-                const inRange = isDateInRange(isoDate, range);
-
-                if (!inRange) {
-                  dayCell.classList.add("filtered");
-                  dayCell.setAttribute("aria-hidden", "true");
-                } else {
-                  const matchingHighlights = highlightByDate.get(isoDate) || [];
-                  matchingHighlights.forEach(({ group }) => {
-                    dayCell.classList.add(group.cellClass);
-                  });
-
-                  const holidayHighlight = matchingHighlights.find(
-                    ({ group }) => group.label === "Holidays"
-                  );
-                  if (holidayHighlight && holidayHighlight.name) {
-                    dayCell.title = holidayHighlight.name;
-                  }
-
-                  const dayNumber = document.createElement("div");
-                  dayNumber.className = "day-number";
-                  dayNumber.textContent = String(realDate);
-
-                  const cycleValue = document.createElement("div");
-                  cycleValue.className = "cycle-day";
-                  let cycleNumber = null;
-                  let cycleDay = null;
-
-                  try {
-                    cycleNumber = getCycleNumber2026(monthIndex + 1, realDate);
-                  } catch (error) {
-                    cycleNumber = null;
-                  }
-
-                  try {
-                    cycleDay = getCycleDay2026(monthIndex + 1, realDate);
-                  } catch (error) {
-                    cycleDay = null;
-                  }
-
-                  if (
-                    cycleNumber === null ||
-                    cycleNumber === undefined ||
-                    cycleDay === null ||
-                    cycleDay === undefined
-                  ) {
-                    cycleValue.classList.add("missing");
-                    cycleValue.textContent = "–";
-                  } else {
-                    cycleValue.textContent = `${cycleNumber}-${cycleDay}`;
-                  }
-
-                  dayCell.appendChild(dayNumber);
-                  dayCell.appendChild(cycleValue);
-                }
+                weekRow.appendChild(dayCell);
+                return;
               }
 
-              weekRow.appendChild(dayCell);
-            }
+              const isoDate = `${calendarYear}-${String(monthData.month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+              if (isoDate < range.from || isoDate > range.to) {
+                dayCell.classList.add("filtered");
+                dayCell.setAttribute("aria-hidden", "true");
+                weekRow.appendChild(dayCell);
+                return;
+              }
 
+              const info = calendar.getAcademicDateInfo(isoDate);
+              const accessibleParts = [isoDate];
+              const dayNumber = document.createElement("span");
+              dayNumber.className = "day-number";
+              dayNumber.textContent = String(day);
+              dayCell.appendChild(dayNumber);
+
+              if (info.term) {
+                dayCell.classList.add(termClasses.get(info.term));
+                accessibleParts.push(info.term);
+              }
+              if (info.cycleNumber !== null && info.cycleDay !== null) {
+                const cycle = document.createElement("span");
+                cycle.className = "cycle-day";
+                cycle.textContent = `${info.cycleNumber}-${info.cycleDay}`;
+                cycle.setAttribute("aria-hidden", "true");
+                dayCell.appendChild(cycle);
+                accessibleParts.push(`cycle ${info.cycleNumber}, day ${info.cycleDay}`);
+              }
+              if (info.holiday) {
+                dayCell.classList.add("holiday");
+                const holiday = document.createElement("span");
+                holiday.className = "special-date";
+                holiday.textContent = info.holiday.name;
+                dayCell.appendChild(holiday);
+                accessibleParts.push(info.holiday.name);
+              }
+              if (isoDate === todayIsoDate) {
+                dayCell.classList.add("today");
+                accessibleParts.push("today");
+              }
+              dayCell.setAttribute("aria-label", accessibleParts.join(", "));
+              weekRow.appendChild(dayCell);
+            });
             monthGrid.appendChild(weekRow);
           });
-
           monthCard.appendChild(monthGrid);
           container.appendChild(monthCard);
         });
+      }
+
+      function setFiltersCollapsed(collapsed) {
+        filterSection.classList.toggle("is-collapsed", collapsed);
+        filterToggleButton.setAttribute("aria-expanded", String(!collapsed));
+        filterToggleButton.textContent = collapsed ? "↓" : "↑";
+      }
+
+      function restoreFilterVisibility() {
+        let collapsed = false;
+        try {
+          collapsed = localStorage.getItem(FILTER_VISIBILITY_STORAGE_KEY) === "true";
+        } catch (error) {
+          // Storage is optional.
+        }
+        setFiltersCollapsed(collapsed);
       }
 
       function handleFilterInput() {
@@ -548,45 +380,21 @@
         renderCalendar();
       }
 
-      function setFiltersCollapsed(isCollapsed) {
-        filterSection.classList.toggle("is-collapsed", isCollapsed);
-        filterToggleButton.setAttribute("aria-expanded", isCollapsed ? "false" : "true");
-        filterToggleButton.textContent = isCollapsed ? "↓" : "↑";
-      }
-
-      function restoreFilterVisibilityState() {
-        let isCollapsed = false;
-
-        try {
-          isCollapsed = localStorage.getItem(FILTER_VISIBILITY_STORAGE_KEY) === "true";
-        } catch (error) {
-          isCollapsed = false;
-        }
-
-        setFiltersCollapsed(isCollapsed);
-      }
-
-      function saveFilterVisibilityState(isCollapsed) {
-        try {
-          localStorage.setItem(FILTER_VISIBILITY_STORAGE_KEY, String(isCollapsed));
-        } catch (error) {
-          // Ignore storage failures and continue rendering.
-        }
-      }
-
       fromDateInput.addEventListener("input", handleFilterInput);
       toDateInput.addEventListener("input", handleFilterInput);
-      fromDateInput.addEventListener("change", handleFilterInput);
-      toDateInput.addEventListener("change", handleFilterInput);
       filterToggleButton.addEventListener("click", () => {
-        const shouldCollapse = !filterSection.classList.contains("is-collapsed");
-        setFiltersCollapsed(shouldCollapse);
-        saveFilterVisibilityState(shouldCollapse);
+        const collapsed = !filterSection.classList.contains("is-collapsed");
+        setFiltersCollapsed(collapsed);
+        try {
+          localStorage.setItem(FILTER_VISIBILITY_STORAGE_KEY, String(collapsed));
+        } catch (error) {
+          // Storage is optional.
+        }
       });
 
-      restoreHighlightColors();
+      restoreLegendColors();
       renderLegend();
-      restoreFilterVisibilityState();
+      restoreFilterVisibility();
       restoreFilterState();
       renderCalendar();
     })();

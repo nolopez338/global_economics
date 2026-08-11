@@ -5,8 +5,8 @@
  * year-indexed registries below. The 2026-2027 academic year is a separate
  * interpretation spanning August 2026 through June 2027. Terms are inclusive
  * date ranges within that academic year. Cycle day is the scheduled day value
- * stored for a date; cycle number is generated chronologically across both
- * calendar years using the existing progression rule.
+ * stored for a date; cycle number is generated chronologically within each
+ * term and restarts at 1 when a new term begins.
  */
 
 const WEEKDAY_CODES = ["mo", "tu", "we", "th", "fr", "sa", "su"];
@@ -597,6 +597,7 @@ function generateAcademicCycleNumbers(config) {
 
   let currentCycle = 1;
   let previousCycleDay = null;
+  let previousTerm = null;
 
   for (const { calendarYear, month } of getAcademicMonthSequence(config)) {
     const calendarData = calendarRegistry[calendarYear];
@@ -667,12 +668,21 @@ function generateAcademicCycleNumbers(config) {
           continue;
         }
 
-        /*
-         * Preserve the established progression rule and the cycle-number
-         * sequence from 1 through 11.
-         */
-        if (previousCycleDay === 5 && cycleDay === 1) {
-          currentCycle = (currentCycle % 11) + 1;
+        const day = calendarMonth.weeks[weekIndex][weekdayIndex];
+        const normalizedDate = formatDateParts(calendarYear, month, day);
+        const term = config.terms.find(
+          item =>
+            normalizedDate >= item.startDate &&
+            normalizedDate <= item.endDate
+        );
+        const termName = term ? term.name : null;
+
+        if (termName !== previousTerm) {
+          currentCycle = 1;
+          previousCycleDay = null;
+          previousTerm = termName;
+        } else if (cycleDay === 1 && previousCycleDay !== null) {
+          currentCycle++;
         }
 
         generatedMonth.weeks[weekIndex][weekdayIndex] = currentCycle;
@@ -687,8 +697,8 @@ function generateAcademicCycleNumbers(config) {
 }
 
 /*
- * Cycle numbers are generated once in chronological academic-year order:
- * August–December 2026 followed by January–June 2027.
+ * Cycle numbers are generated once in chronological academic-year order and
+ * restart independently at the first scheduled cycle day of every term.
  */
 const cycleNumberRegistry = generateAcademicCycleNumbers(academicYearConfig);
 
