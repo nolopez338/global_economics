@@ -55,7 +55,6 @@
       const isActive = Number(cell.dataset.cycleDay) === cycleDay;
       const isDayHeader = cell.classList.contains("rotation-day");
       cell.classList.toggle("is-active-cycle-day", isActive);
-      cell.classList.toggle("is-active", isActive && isDayHeader);
       if (isActive && isDayHeader) {
         cell.setAttribute("aria-current", "date");
       } else {
