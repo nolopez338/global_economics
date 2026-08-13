@@ -111,28 +111,45 @@
 
     const nowMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
     const rows = Array.from(scheduleTable.tBodies[0]?.rows ?? []);
-    const matchingRow = rows.find((row) => {
-      const range = parseTimeRange(row.querySelector("th[scope='row'] time")?.textContent);
-      return range ? nowMinutes >= range.start && nowMinutes <= range.end : false;
+    const intervals = rows.map((row) => {
+      const timeCell = row.querySelector("th[scope='row']");
+      return {
+        row,
+        timeCell,
+        range: parseTimeRange(timeCell?.querySelector("time")?.textContent)
+      };
+    }).filter((interval) => interval.timeCell && interval.range);
+    const matchingInterval = intervals.find(({ range }) => (
+      nowMinutes >= range.start && nowMinutes <= range.end
+    ));
+    const gapIndex = matchingInterval ? -1 : intervals.findIndex(({ range }, index) => {
+      const nextRange = intervals[index + 1]?.range;
+      return nextRange && nowMinutes > range.end && nowMinutes < nextRange.start;
     });
 
-    const timeCell = matchingRow?.querySelector("th[scope='row']");
-    const range = parseTimeRange(timeCell?.querySelector("time")?.textContent);
-    if (!matchingRow || !timeCell || !range) {
+    if (!matchingInterval && gapIndex === -1) {
       currentTimeOverlay.hidden = true;
+      currentTimeLine.classList.remove("is-unshown-gap");
       return;
     }
 
-    const fraction = (nowMinutes - range.start) / (range.end - range.start);
     const wrapRect = scheduleWrap.getBoundingClientRect();
-    const rowRect = matchingRow.getBoundingClientRect();
-    const timeCellRect = timeCell.getBoundingClientRect();
+    const activeInterval = matchingInterval ?? intervals[gapIndex];
+    const rowRect = activeInterval.row.getBoundingClientRect();
+    const timeCellRect = activeInterval.timeCell.getBoundingClientRect();
     const leftOffset = timeCellRect.right - wrapRect.left;
+    const isUnshownGap = gapIndex !== -1;
+    const topOffset = isUnshownGap
+      ? intervals[gapIndex + 1].row.getBoundingClientRect().top - wrapRect.top
+      : rowRect.top - wrapRect.top
+        + rowRect.height * ((nowMinutes - activeInterval.range.start)
+          / (activeInterval.range.end - activeInterval.range.start));
 
     currentTimeOverlay.hidden = false;
+    currentTimeLine.classList.toggle("is-unshown-gap", isUnshownGap);
     currentTimeLine.style.left = `${leftOffset}px`;
     currentTimeLine.style.width = `${wrapRect.width - leftOffset}px`;
-    currentTimeLine.style.top = `${rowRect.top - wrapRect.top + rowRect.height * fraction}px`;
+    currentTimeLine.style.top = `${topOffset}px`;
     if (currentTimeLabel) {
       currentTimeLabel.textContent = now.toLocaleTimeString([], {
         hour: "2-digit",
