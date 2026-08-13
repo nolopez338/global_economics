@@ -19,10 +19,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "-",
+    "Description": "No Class: Day 0",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "No Class"
   },
   {
     "Grade": 10,
@@ -32,10 +32,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "-",
+    "Description": "Introduction outline",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Intro"
   },
   {
     "Grade": 10,
@@ -760,10 +760,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "-",
+    "Description": "Introduction outline",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Intro"
   },
   {
     "Grade": 10,
@@ -1488,10 +1488,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "-",
+    "Description": "No Class: Day 0",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "No Class"
   },
   {
     "Grade": 10,
@@ -2957,10 +2957,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "-",
+    "Description": "No Class: Day 0",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "No Class"
   },
   {
     "Grade": 10,
@@ -3698,10 +3698,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "-",
+    "Description": "No Class: Day 0",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "No Class"
   },
   {
     "Grade": 11,
@@ -3711,10 +3711,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "-",
+    "Description": "Introduction outline and C1: Contexts for probability",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Intro & C1"
   },
   {
     "Grade": 11,
@@ -4439,10 +4439,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 2,
-    "Description": "-",
+    "Description": "Introduction outline and C1: Contexts for probability",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Intro & C1"
   },
   {
     "Grade": 11,
@@ -4452,10 +4452,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "-",
+    "Description": "Excersices C1 and C2: Uniform & Triangular",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1 & C2"
   },
   {
     "Grade": 11,
@@ -5167,10 +5167,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "-",
+    "Description": "No Class: Day 0",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "No Class"
   },
   {
     "Grade": 11,
@@ -5908,10 +5908,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "-",
+    "Description": "Introduction outline and C1: Contexts for probability",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Intro & C1"
   },
   {
     "Grade": 11,
@@ -6636,10 +6636,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "-",
+    "Description": "No Class: Day 0",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "No Class"
   },
   {
     "Grade": 11,
