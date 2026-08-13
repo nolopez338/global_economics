@@ -20,42 +20,33 @@
 Do not change the global names or script order without checking every consumer.
 Files that say `AUTO-GENERATED FILE` must not be edited manually.
 
-## Schedule authoring status
+## Schedule authoring workflow
 
-`teacher/authoring/schedule.csv` is labelled as the source by the headers in
-both retained runtime data files. The current checkout does **not**, however,
-contain a reproducible source-to-runtime generation contract:
-
-- the CSV has 115 records and the primary runtime artifact has 383 records;
-- the current CSV uses the nine display columns beginning with `Grade`, whereas
-  `teacher/tools/schedule_authoring_tool.html` requires normalized columns such
-  as `class_id`, `date`, and `slot`;
-- the authoring tool requests `teacher/authoring/slots.csv`, which is absent;
-- the runtime artifact contains additional `Term` and `Material teacher`
-  fields that the current browser generator does not emit; and
-- the second retained data file has a different, undated field shape.
-
-These differences are verified repository state, not an approved schema choice.
-Consequently, the browser authoring tool is retained as a **prototype**, but its
-default-load/generate workflow must not be used to overwrite
-`teacher/assets/js/schedule-data.js`. No slot list, normalized schema, or adapter
-has been invented in this change.
-
-Resolving the workflow requires a maintainer to designate:
-
-1. the authoritative current dataset;
-2. the authoritative slot source;
-3. whether normalized or display-shaped CSV fields are canonical;
-4. whether `Term` and `Material teacher` must be authoring fields; and
-5. the purpose or retirement status of `schedule-data-base.js`.
-
-After those decisions, a generator must compare record count, keys, types,
-classes, slots, dates/weekdays, collision keys, global name, values, and ordering
-against the retained runtime before replacing it. Until then, validation is
-limited to static references and browser smoke testing:
+`teacher/authoring/schedule.csv` is the source for the display-shaped runtime
+records in `teacher/assets/js/schedule-data.js`. After editing the CSV, regenerate
+and validate the JavaScript with:
 
 ```bash
-python3 tools/validate_local_references.py --self-test
+node teacher/authoring/generate-schedule-data.js
+```
+
+The generator preserves the runtime field order and global name. It also uses
+`year-calendar-data.js` to validate the complete Global Economics meeting
+coverage, supported classes, cycle days and numbers, terms, weekdays, duplicate
+keys, placeholder content, and grade/section/date ordering before writing the
+artifact. A validation failure leaves the existing JavaScript untouched.
+
+The browser authoring tool remains a **prototype** whose normalized schema and
+optional slot-file workflow differ from this canonical generator. Do not use its
+generated output to overwrite `teacher/assets/js/schedule-data.js`.
+
+The second retained data file, `schedule-data-base.js`, has a different, undated
+field shape and no tracked HTML consumer. Its ownership and retirement status
+remain unconfirmed.
+
+Browser smoke testing can be run with:
+
+```bash
 python3 -m http.server 8000
 ```
 
