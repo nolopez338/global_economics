@@ -57,7 +57,7 @@
       progress: Array.from(root.querySelectorAll("[data-presentation-progress]")),
       status: root.querySelector("[data-presentation-status]")
     };
-    const state = { active: false, index: 0, lastNavigation: 0, openTrigger: null, pointerGesture: null, transitioning: false };
+    const state = { active: false, index: 0, effectGroup: 0, effectController: null, lastNavigation: 0, openTrigger: null, pointerGesture: null, transitioning: false };
     root.setAttribute("data-mind-map-initialised", "");
     root.classList.add("mind-map-presentation--enhanced");
     map.classList.add("mind-map--enhanced");
@@ -156,14 +156,15 @@
         else slide.removeAttribute("tabindex");
       });
       const final = state.index === slides.length - 1;
+      const pendingEffects = state.effectGroup < (window.MindMapEffects?.getGroupCount(slides[state.index]) || 0);
       const progressText = `${state.index + 1} / ${slides.length}`;
       controls.progress.forEach((progress) => {
         if (!progress.querySelector("[data-presentation-progress-input]")) progress.textContent = progressText;
       });
       if (controls.previous) controls.previous.disabled = state.index === 0;
       if (controls.next) {
-        controls.next.disabled = final || state.transitioning;
-        controls.next.setAttribute("aria-label", final ? "Final slide reached" : "Next slide");
+        controls.next.disabled = (final && !pendingEffects) || state.transitioning;
+        controls.next.setAttribute("aria-label", pendingEffects ? "Run next effect group" : final ? "Final slide reached" : "Next slide");
       }
       if (controls.fullscreen) {
         const supported = Boolean(root.requestFullscreen && document.fullscreenEnabled);
@@ -201,12 +202,39 @@
         return;
       }
       closeTooltips();
+      window.MindMapEffects?.resetSlide(slides[startingIndex]);
       state.index = index;
+      state.effectGroup = 0;
+      window.MindMapEffects?.resetSlide(slides[index]);
       scrollContainerForSlide(slides[index]).scrollTop = 0;
       render({ announce: true });
     };
 
-    instances.set(root, { state, render, go });
+    const forward = async () => {
+      if (!state.active || state.transitioning) return;
+      const groupCount = window.MindMapEffects?.getGroupCount(slides[state.index]) || 0;
+      if (state.effectGroup >= groupCount) {
+        go(state.index + 1);
+        return;
+      }
+      state.transitioning = true;
+      state.effectController = new AbortController();
+      const controller = state.effectController;
+      render();
+      const startingIndex = state.index;
+      try {
+        const ran = await window.MindMapEffects.runEffectGroup({ slide: slides[startingIndex], groupIndex: state.effectGroup, signal: controller.signal });
+        if (ran && state.active && state.index === startingIndex) state.effectGroup += 1;
+      } finally {
+        if (state.effectController === controller) {
+          state.effectController = null;
+          state.transitioning = false;
+        }
+        render();
+      }
+    };
+
+    instances.set(root, { state, render, go, forward });
 
     const restoreProgress = (progress) => {
       if (!progress.querySelector("[data-presentation-progress-input]")) return;
@@ -267,11 +295,15 @@
 
     const exit = async () => {
       if (!state.active) return;
+      state.effectController?.abort();
+      state.effectController = null;
       if (document.fullscreenElement === root) {
         try { await document.exitFullscreen(); } catch (_) { /* Presentation can still exit. */ }
       }
       state.active = false;
       state.transitioning = false;
+      state.effectGroup = 0;
+      slides.forEach((slide) => window.MindMapEffects?.resetSlide(slide));
       controls.progress.forEach(restoreProgress);
       closeTooltips();
       render();
@@ -280,8 +312,12 @@
 
     controls.start?.addEventListener("click", () => {
       state.active = true;
+      state.effectController?.abort();
+      state.effectController = null;
       state.index = 0;
+      state.effectGroup = 0;
       state.transitioning = false;
+      slides.forEach((slide) => window.MindMapEffects?.resetSlide(slide));
       scrollContainerForSlide(slides[0]).scrollTop = 0;
       render({ announce: true });
       if (root.requestFullscreen && document.fullscreenEnabled && !document.fullscreenElement) {
@@ -293,7 +329,7 @@
       }
     });
     controls.previous?.addEventListener("click", () => go(state.index - 1));
-    controls.next?.addEventListener("click", () => go(state.index + 1));
+    controls.next?.addEventListener("click", forward);
     controls.exit?.addEventListener("click", exit);
     controls.fullscreen?.addEventListener("click", async () => {
       try {
@@ -356,7 +392,7 @@
       if (!actualFullscreen && !slides[state.index].contains(event.target)) return;
       if (event.target.closest(interactiveSelector) || !window.getSelection()?.isCollapsed) return;
       if (gesture?.moved || gesture?.scrollbar || (gesture && gesture.target !== event.target)) return;
-      go(state.index + 1);
+      forward();
     });
 
     root.addEventListener("keydown", (event) => {
@@ -393,7 +429,8 @@
       if (event.target.closest(arrowKeyControlSelector)) return;
       event.preventDefault();
       event.stopImmediatePropagation();
-      go(state.index + (event.key === "ArrowRight" ? 1 : -1));
+      if (event.key === "ArrowRight") forward();
+      else go(state.index - 1);
     });
     render();
     return instances.get(root);
@@ -418,7 +455,8 @@
     event.preventDefault();
     event.stopImmediatePropagation();
     if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
-      instance.go(instance.state.index + (event.key === "ArrowRight" ? 1 : -1));
+      if (event.key === "ArrowRight") instance.forward();
+      else instance.go(instance.state.index - 1);
       return;
     }
 
