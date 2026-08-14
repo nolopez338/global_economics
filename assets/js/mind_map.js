@@ -184,6 +184,8 @@
       const direction = index > startingIndex ? "forward" : "backward";
       if (transition) {
         state.transitioning = true;
+        state.effectController = new AbortController();
+        const controller = state.effectController;
         render();
         try {
           await window.MindMapEffects?.runTransition({
@@ -191,9 +193,11 @@
             slide: slides[startingIndex],
             fromIndex: startingIndex,
             toIndex: index,
-            direction
+            direction,
+            signal: controller.signal
           });
         } finally {
+          if (state.effectController === controller) state.effectController = null;
           state.transitioning = false;
         }
       }
