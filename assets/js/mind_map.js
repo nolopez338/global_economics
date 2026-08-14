@@ -57,7 +57,7 @@
       progress: Array.from(root.querySelectorAll("[data-presentation-progress]")),
       status: root.querySelector("[data-presentation-status]")
     };
-    const state = { active: false, index: 0, lastNavigation: 0, openTrigger: null, pointerGesture: null };
+    const state = { active: false, index: 0, lastNavigation: 0, openTrigger: null, pointerGesture: null, transitioning: false };
     root.setAttribute("data-mind-map-initialised", "");
     root.classList.add("mind-map-presentation--enhanced");
     map.classList.add("mind-map--enhanced");
@@ -160,7 +160,7 @@
       controls.progress.forEach((progress) => { progress.textContent = progressText; });
       if (controls.previous) controls.previous.disabled = state.index === 0;
       if (controls.next) {
-        controls.next.disabled = final;
+        controls.next.disabled = final || state.transitioning;
         controls.next.setAttribute("aria-label", final ? "Final slide reached" : "Next slide");
       }
       if (controls.fullscreen) {
@@ -173,10 +173,29 @@
       if (announce && controls.status) controls.status.textContent = `Slide ${state.index + 1} of ${slides.length}${final ? ", final slide" : ""}.`;
     };
 
-    const go = (index) => {
+    const go = async (index) => {
       const now = Date.now();
-      if (!state.active || index < 0 || index >= slides.length || index === state.index || now - state.lastNavigation < 180) return;
+      if (!state.active || state.transitioning || index < 0 || index >= slides.length || index === state.index || now - state.lastNavigation < 180) return;
       state.lastNavigation = now;
+      const startingIndex = state.index;
+      const direction = index > startingIndex ? "forward" : "backward";
+      state.transitioning = true;
+      render();
+      try {
+        await window.MindMapEffects?.runTransition({
+          root,
+          slide: slides[startingIndex],
+          fromIndex: startingIndex,
+          toIndex: index,
+          direction
+        });
+      } finally {
+        state.transitioning = false;
+      }
+      if (!state.active || state.index !== startingIndex) {
+        render();
+        return;
+      }
       closeTooltips();
       state.index = index;
       scrollContainerForSlide(slides[index]).scrollTop = 0;
@@ -191,6 +210,7 @@
         try { await document.exitFullscreen(); } catch (_) { /* Presentation can still exit. */ }
       }
       state.active = false;
+      state.transitioning = false;
       closeTooltips();
       render();
       controls.start?.focus({ preventScroll: true });
@@ -199,6 +219,7 @@
     controls.start?.addEventListener("click", () => {
       state.active = true;
       state.index = 0;
+      state.transitioning = false;
       scrollContainerForSlide(slides[0]).scrollTop = 0;
       render({ announce: true });
       if (root.requestFullscreen && document.fullscreenEnabled && !document.fullscreenElement) {
