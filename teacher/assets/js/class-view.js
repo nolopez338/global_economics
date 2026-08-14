@@ -17,8 +17,23 @@
   const elapsedFill = document.getElementById("elapsed-fill");
   const classView = document.querySelector(".class-view");
   const fullscreenToggle = document.getElementById("fullscreen-toggle");
+  const timerToggle = document.getElementById("timer-toggle");
+  const timerDialog = document.getElementById("timer-dialog");
+  const timerForm = document.getElementById("timer-form");
+  const timerCancel = document.getElementById("timer-cancel");
+  const timerMinutes = document.getElementById("timer-minutes");
+  const timerSeconds = document.getElementById("timer-seconds");
+  const timerError = document.getElementById("timer-error");
+  const timerVisual = document.getElementById("timer-visual");
+  const timerStart = document.getElementById("timer-start");
+  const timerRemaining = document.getElementById("timer-remaining");
+  const timerLine = document.getElementById("timer-line");
+  const timerElapsedFill = document.getElementById("timer-elapsed-fill");
   let entries = null;
   let loadedDate = "";
+  let timerState = null;
+  let alarmInterval = null;
+  let audioContext = null;
 
   function updateFullscreenControl() {
     const isFullscreen = document.fullscreenElement === classView;
@@ -44,6 +59,103 @@
   returnLink.href = `./${returnPage}`;
   returnLink.textContent = `\u2190 ${origin === "schedule-teacher" ? "Teacher schedule" : "Schedule"}`;
   sourceFrame.src = `./${returnPage}`;
+
+  function timerText(totalSeconds) {
+    const safe = Math.max(0, Math.ceil(totalSeconds));
+    const hours = Math.floor(safe / 3600);
+    const minutes = Math.floor((safe % 3600) / 60);
+    const seconds = safe % 60;
+    return `${hours ? `${hours}:` : ""}${hours ? String(minutes).padStart(2, "0") : minutes}:${String(seconds).padStart(2, "0")}`;
+  }
+
+  function soundAlarmPulse() {
+    if (!audioContext) return;
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    oscillator.type = "square";
+    oscillator.frequency.value = 880;
+    gain.gain.setValueAtTime(0.16, audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.35);
+    oscillator.connect(gain).connect(audioContext.destination);
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + 0.35);
+  }
+
+  function beginAlarm() {
+    if (alarmInterval) return;
+    timerVisual.classList.add("timer-alarm");
+    soundAlarmPulse();
+    alarmInterval = window.setInterval(soundAlarmPulse, 600);
+  }
+
+  function stopAlarm() {
+    window.clearInterval(alarmInterval);
+    alarmInterval = null;
+    timerVisual.classList.remove("timer-alarm");
+  }
+
+  function closeTimer() {
+    stopAlarm();
+    timerState = null;
+    classView.classList.remove("timer-mode");
+    timerVisual.hidden = true;
+    visual.hidden = false;
+    timerLine.style.top = "0%";
+    timerElapsedFill.style.height = "0%";
+    timerRemaining.textContent = "";
+    timerStart.textContent = "";
+    timerForm.reset();
+    timerError.hidden = true;
+    timerToggle.textContent = "Timer";
+    timerToggle.setAttribute("aria-pressed", "false");
+    update();
+  }
+
+  function openTimerDialog() {
+    timerError.hidden = true;
+    timerDialog.showModal();
+    timerMinutes.select();
+  }
+
+  timerToggle.addEventListener("click", () => {
+    if (timerState) closeTimer();
+    else openTimerDialog();
+  });
+  timerCancel.addEventListener("click", () => timerDialog.close());
+  timerForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const durationMs = (Number(timerMinutes.value) * 60 + Number(timerSeconds.value)) * 1000;
+    if (!Number.isFinite(durationMs) || durationMs <= 0) {
+      timerError.hidden = false;
+      return;
+    }
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (AudioContext) {
+      audioContext ||= new AudioContext();
+      audioContext.resume();
+    }
+    const startedAt = Date.now();
+    timerState = { startedAt, durationMs, endsAt: startedAt + durationMs };
+    timerStart.textContent = timerText(durationMs / 1000);
+    timerToggle.textContent = "Close Timer";
+    timerToggle.setAttribute("aria-pressed", "true");
+    classView.classList.add("timer-mode");
+    visual.hidden = true;
+    timerVisual.hidden = false;
+    timerDialog.close();
+    updateTimer(startedAt);
+  });
+
+  function updateTimer(timestamp = Date.now()) {
+    if (!timerState) return;
+    const elapsed = Math.max(0, timestamp - timerState.startedAt);
+    const progress = Math.min(1, elapsed / timerState.durationMs);
+    const position = `${progress * 100}%`;
+    timerLine.style.top = position;
+    timerElapsedFill.style.height = position;
+    timerRemaining.textContent = timerText((timerState.endsAt - timestamp) / 1000);
+    if (progress >= 1) beginAlarm();
+  }
 
   function localDate(date) {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
@@ -115,6 +227,10 @@
     const now = new Date();
     clock.textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
     lineTime.textContent = clock.textContent;
+    if (timerState) {
+      updateTimer(now.getTime());
+      return;
+    }
     const dateKey = localDate(now);
     const info = window.academicCalendar?.getAcademicDateInfo(dateKey);
     const cycleDay = info?.cycleDay;
@@ -163,7 +279,7 @@
     update();
   });
   update();
-  window.setInterval(update, 250);
+  window.setInterval(update, 100);
   document.addEventListener("visibilitychange", update);
   window.addEventListener("focus", update);
 })();
