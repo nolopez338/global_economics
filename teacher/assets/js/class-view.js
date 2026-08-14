@@ -15,8 +15,30 @@
   const line = document.getElementById("time-line");
   const lineTime = document.getElementById("line-time");
   const elapsedFill = document.getElementById("elapsed-fill");
+  const classView = document.querySelector(".class-view");
+  const fullscreenToggle = document.getElementById("fullscreen-toggle");
   let entries = null;
   let loadedDate = "";
+
+  function updateFullscreenControl() {
+    const isFullscreen = document.fullscreenElement === classView;
+    fullscreenToggle.textContent = isFullscreen ? "Exit Fullscreen" : "Fullscreen";
+    fullscreenToggle.setAttribute("aria-pressed", String(isFullscreen));
+  }
+
+  if (classView.requestFullscreen) {
+    fullscreenToggle.addEventListener("click", () => {
+      if (document.fullscreenElement === classView) {
+        document.exitFullscreen();
+      } else {
+        classView.requestFullscreen();
+      }
+    });
+    document.addEventListener("fullscreenchange", updateFullscreenControl);
+    updateFullscreenControl();
+  } else {
+    fullscreenToggle.hidden = true;
+  }
 
   const returnPage = origin === "schedule-teacher" ? "schedule-teacher.html" : "schedule.html";
   returnLink.href = `./${returnPage}`;
