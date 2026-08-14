@@ -2,6 +2,7 @@
   "use strict";
 
   const effectTypes = new Map();
+  const temporaryAnimations = new Set();
   const sleep = (milliseconds, signal) => new Promise((resolve) => {
     if (signal?.aborted) { resolve(false); return; }
     const timeout = window.setTimeout(() => { cleanup(); resolve(true); }, milliseconds);
@@ -80,6 +81,15 @@
     slide.normalize();
   };
 
+  const removeTemporaryAnimations = () => {
+    temporaryAnimations.forEach((element) => element.remove());
+    temporaryAnimations.clear();
+    document.querySelectorAll("[data-mind-map-transition-target]").forEach((slide) => {
+      slide.removeAttribute("data-mind-map-transition-target");
+      slide.hidden = true;
+    });
+  };
+
   effectTypes.set("word-highlight", {
     run: async ({ slide, effect, signal }) => {
       if (signal?.aborted) return;
@@ -96,11 +106,57 @@
     reset: ({ slide }) => resetWordHighlights(slide)
   });
 
-  const runEffect = async ({ slide, effect, direction, signal }) => {
+  effectTypes.set("move-matching-concepts", {
+    run: async ({ root, slide, effect, toIndex, signal }) => {
+      const slides = Array.from(root?.querySelectorAll("[data-mind-map] > [data-mind-map-slide]") || []);
+      const sourceSlide = slide;
+      const destinationSlide = slides[Number(toIndex)];
+      if (!sourceSlide || !destinationSlide || signal?.aborted) return;
+
+      removeTemporaryAnimations();
+      destinationSlide.hidden = false;
+      destinationSlide.setAttribute("data-mind-map-transition-target", "");
+
+      const pairs = Array.from(sourceSlide.querySelectorAll("[data-mind-map-move-source]")).flatMap((source) => {
+        const key = source.dataset.mindMapMoveSource;
+        return Array.from(destinationSlide.querySelectorAll(`[data-mind-map-move-destination="${CSS.escape(key)}"]`))
+          .map((destination) => ({ source, destination }));
+      });
+      const duration = Math.max(0, Number(effect.duration) || 700);
+
+      pairs.forEach(({ source, destination }) => {
+        const start = source.getBoundingClientRect();
+        const finish = destination.getBoundingClientRect();
+        if (!start.width || !start.height || !finish.width || !finish.height) return;
+        const mover = document.createElement("span");
+        mover.className = `mind-map-concept-mover mind-map-concept-mover--${source.dataset.mindMapConcept || "green"}`;
+        mover.textContent = destination.textContent;
+        mover.setAttribute("aria-hidden", "true");
+        Object.assign(mover.style, {
+          left: `${start.left}px`, top: `${start.top}px`, width: `${start.width}px`, height: `${start.height}px`,
+          "--mind-map-move-x": `${finish.left - start.left}px`,
+          "--mind-map-move-y": `${finish.top - start.top}px`,
+          "--mind-map-move-scale-x": String(finish.width / start.width),
+          "--mind-map-move-scale-y": String(finish.height / start.height),
+          "--mind-map-move-duration": `${duration}ms`
+        });
+        document.body.append(mover);
+        temporaryAnimations.add(mover);
+        void mover.offsetWidth;
+        mover.classList.add("is-moving");
+      });
+
+      await sleep(duration, signal);
+      removeTemporaryAnimations();
+    },
+    reset: removeTemporaryAnimations
+  });
+
+  const runEffect = async ({ slide, effect, direction, signal, ...context }) => {
     if (!await sleep(Math.max(0, Number(effect.delay) || 0), signal)) return;
     const handler = effectTypes.get(effect.type);
     const run = typeof handler === "function" ? handler : handler?.run;
-    if (run && !signal?.aborted) await run({ slide, effect, direction, signal });
+    if (run && !signal?.aborted) await run({ slide, effect, direction, signal, ...context });
   };
 
   const runEffectGroup = async ({ slide, groupIndex, signal }) => {
@@ -111,6 +167,7 @@
   };
 
   const resetSlide = (slide) => {
+    removeTemporaryAnimations();
     const resetters = new Set();
     [...parseEffectGroups(slide).flat(), ...parseEffects(slide, "forward"), ...parseEffects(slide, "backward")]
       .forEach((effect) => {
@@ -122,13 +179,13 @@
     resetWordHighlights(slide);
   };
 
-  const runTransition = async ({ slide, direction = "forward" }) => {
+  const runTransition = async ({ slide, direction = "forward", ...context }) => {
     const effects = parseEffects(slide, direction)
       .map((effect, index) => ({ ...effect, _sourceOrder: index }))
       .sort((left, right) => (Number(left.order) || 0) - (Number(right.order) || 0) || left._sourceOrder - right._sourceOrder);
 
     for (const effect of effects) {
-      await runEffect({ slide, effect, direction });
+      await runEffect({ slide, effect, direction, ...context });
     }
   };
 
