@@ -157,7 +157,9 @@
       });
       const final = state.index === slides.length - 1;
       const progressText = `${state.index + 1} / ${slides.length}`;
-      controls.progress.forEach((progress) => { progress.textContent = progressText; });
+      controls.progress.forEach((progress) => {
+        if (!progress.querySelector("[data-presentation-progress-input]")) progress.textContent = progressText;
+      });
       if (controls.previous) controls.previous.disabled = state.index === 0;
       if (controls.next) {
         controls.next.disabled = final || state.transitioning;
@@ -173,24 +175,26 @@
       if (announce && controls.status) controls.status.textContent = `Slide ${state.index + 1} of ${slides.length}${final ? ", final slide" : ""}.`;
     };
 
-    const go = async (index) => {
+    const go = async (index, { transition = true, throttle = true } = {}) => {
       const now = Date.now();
-      if (!state.active || state.transitioning || index < 0 || index >= slides.length || index === state.index || now - state.lastNavigation < 180) return;
+      if (!state.active || state.transitioning || index < 0 || index >= slides.length || index === state.index || (throttle && now - state.lastNavigation < 180)) return;
       state.lastNavigation = now;
       const startingIndex = state.index;
       const direction = index > startingIndex ? "forward" : "backward";
-      state.transitioning = true;
-      render();
-      try {
-        await window.MindMapEffects?.runTransition({
-          root,
-          slide: slides[startingIndex],
-          fromIndex: startingIndex,
-          toIndex: index,
-          direction
-        });
-      } finally {
-        state.transitioning = false;
+      if (transition) {
+        state.transitioning = true;
+        render();
+        try {
+          await window.MindMapEffects?.runTransition({
+            root,
+            slide: slides[startingIndex],
+            fromIndex: startingIndex,
+            toIndex: index,
+            direction
+          });
+        } finally {
+          state.transitioning = false;
+        }
       }
       if (!state.active || state.index !== startingIndex) {
         render();
@@ -204,6 +208,63 @@
 
     instances.set(root, { state, render, go });
 
+    const restoreProgress = (progress) => {
+      if (!progress.querySelector("[data-presentation-progress-input]")) return;
+      progress.textContent = `${state.index + 1} / ${slides.length}`;
+    };
+
+    const editProgress = (progress) => {
+      if (!state.active || progress.querySelector("[data-presentation-progress-input]")) return;
+      const input = document.createElement("input");
+      input.type = "number";
+      input.className = "presentation-progress-input";
+      input.setAttribute("data-presentation-progress-input", "");
+      input.setAttribute("aria-label", `Go to slide (1 to ${slides.length})`);
+      input.inputMode = "numeric";
+      input.min = "1";
+      input.max = String(slides.length);
+      input.step = "1";
+      input.value = String(state.index + 1);
+      progress.replaceChildren(input);
+      input.focus({ preventScroll: true });
+      input.select();
+
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          event.stopPropagation();
+          restoreProgress(progress);
+          progress.focus({ preventScroll: true });
+          return;
+        }
+        if (event.key !== "Enter") return;
+        event.preventDefault();
+        event.stopPropagation();
+        const value = input.value.trim();
+        const slideNumber = Number(value);
+        if (!/^\d+$/.test(value) || !Number.isSafeInteger(slideNumber) || slideNumber < 1 || slideNumber > slides.length) {
+          input.setAttribute("aria-invalid", "true");
+          return;
+        }
+        restoreProgress(progress);
+        go(slideNumber - 1, { transition: false, throttle: false });
+      });
+      input.addEventListener("input", () => input.removeAttribute("aria-invalid"));
+      input.addEventListener("blur", () => restoreProgress(progress));
+    };
+
+    controls.progress.forEach((progress) => {
+      progress.tabIndex = 0;
+      progress.setAttribute("role", "button");
+      progress.setAttribute("aria-label", "Slide progress; activate to go to a slide");
+      progress.addEventListener("click", () => editProgress(progress));
+      progress.addEventListener("keydown", (event) => {
+        if (event.target !== progress || !["Enter", " "].includes(event.key)) return;
+        event.preventDefault();
+        editProgress(progress);
+      });
+    });
+
     const exit = async () => {
       if (!state.active) return;
       if (document.fullscreenElement === root) {
@@ -211,6 +272,7 @@
       }
       state.active = false;
       state.transitioning = false;
+      controls.progress.forEach(restoreProgress);
       closeTooltips();
       render();
       controls.start?.focus({ preventScroll: true });
