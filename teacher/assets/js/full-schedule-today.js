@@ -29,6 +29,9 @@
   };
 
   const getTodayISODate = () => {
+    if (window.fullScheduleDateFocus?.get) {
+      return window.fullScheduleDateFocus.get();
+    }
     const today = new Date();
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, "0");
@@ -146,6 +149,10 @@
     if (table) {
       applyTodayMarkerForFullSchedule(table);
     }
+  });
+
+  document.addEventListener("full-schedule-focus-changed", () => {
+    applyTodayMarkersForFullSchedule();
   });
 
   document.addEventListener("DOMContentLoaded", () => {

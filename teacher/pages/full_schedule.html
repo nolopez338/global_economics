@@ -82,11 +82,53 @@
       outline: 2px solid var(--primary-color);
       outline-offset: 1px;
     }
+
+    .schedule-date-control {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .schedule-date-control label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .schedule-date-picker {
+      min-height: 36px;
+      padding: 6px 9px;
+      border: 1px solid var(--grid);
+      border-radius: 7px;
+      background: var(--bg);
+      color: var(--ink);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .schedule-date-picker:focus-visible {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+    }
+
+    body.dark-theme .schedule-date-picker {
+      color-scheme: dark;
+    }
+
+    @media (max-width: 560px) {
+      .schedule-date-control {
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
   </style>
 </head>
 
 <body>
   <main id="class-page"></main>
+  <script src="../assets/js/year-calendar-data.js" defer></script>
   <script src="../assets/js/class-data.js" defer></script>
   <script src="../assets/js/class-page.js" defer></script>
   <script src="../assets/js/schedule-data.js" defer></script>
@@ -101,6 +143,39 @@
       var ORIGIN_TO_BACK_LINK = {
         schedule: '../schedule.html',
         'schedule-teacher': '../schedule-teacher.html'
+      };
+
+      function isValidISODate(value) {
+        var match = typeof value === 'string' && value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (!match) return false;
+        var date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+        return date.getFullYear() === Number(match[1]) &&
+          date.getMonth() === Number(match[2]) - 1 && date.getDate() === Number(match[3]);
+      }
+
+      function actualTodayISO() {
+        var today = new Date();
+        return [today.getFullYear(), String(today.getMonth() + 1).padStart(2, '0'),
+          String(today.getDate()).padStart(2, '0')].join('-');
+      }
+
+      var requestedDate = new URLSearchParams(window.location.search || '').get('date');
+      var focusedDate = isValidISODate(requestedDate) ? requestedDate : actualTodayISO();
+      window.fullScheduleDateFocus = {
+        get: function () { return focusedDate; },
+        isExplicit: function () { return isValidISODate(requestedDate); },
+        set: function (value) {
+          if (!isValidISODate(value)) return false;
+          focusedDate = value;
+          requestedDate = value;
+          var url = new URL(window.location.href);
+          url.searchParams.set('date', value);
+          window.history.replaceState({}, '', url);
+          document.dispatchEvent(new CustomEvent('full-schedule-focus-changed', {
+            detail: { date: value }
+          }));
+          return true;
+        }
       };
 
       function getBackLinkFromOrigin() {
@@ -145,11 +220,7 @@
       }
 
       function getTodayISODate() {
-        var today = new Date();
-        var yyyy = today.getFullYear();
-        var mm = String(today.getMonth() + 1).padStart(2, '0');
-        var dd = String(today.getDate()).padStart(2, '0');
-        return yyyy + '-' + mm + '-' + dd;
+        return window.fullScheduleDateFocus.get();
       }
 
       function parseCount(input) {
@@ -319,6 +390,15 @@
         wirePastDatesControl(table);
         updateRenderedDateCells(table);
         markDateChangeDividers(table);
+      });
+
+      document.addEventListener('full-schedule-focus-changed', function () {
+        document.querySelectorAll('.class-schedule-table').forEach(function (table) {
+          var toggle = table.querySelector('.past-dates-toggle');
+          var count = table.querySelector('.past-dates-count-input');
+          if (toggle && count) updatePastRows(table, toggle, count);
+          markDateChangeDividers(table);
+        });
       });
 
       if (document.readyState === 'loading') {

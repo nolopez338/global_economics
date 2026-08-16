@@ -150,11 +150,40 @@
   };
 
   const getTodayISODate = () => {
+    if (window.fullScheduleDateFocus?.get) {
+      return window.fullScheduleDateFocus.get();
+    }
     const today = new Date();
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, "0");
     const dd = String(today.getDate()).padStart(2, "0");
     return `${yyyy}-${mm}-${dd}`;
+  };
+
+  const createDateControl = () => {
+    const control = document.createElement("div");
+    control.className = "schedule-date-control";
+
+    const label = document.createElement("label");
+    label.htmlFor = "schedule-focus-date";
+    label.textContent = "Focus date";
+
+    const picker = document.createElement("input");
+    picker.id = "schedule-focus-date";
+    picker.className = "schedule-date-picker";
+    picker.type = "date";
+    picker.min = "2026-08-01";
+    picker.max = "2027-06-30";
+    picker.value = getTodayISODate();
+    picker.setAttribute("aria-label", "Select the full schedule focus date");
+    picker.addEventListener("change", () => {
+      if (window.fullScheduleDateFocus?.set(picker.value)) {
+        renderFullSchedulePage(true);
+      }
+    });
+
+    control.append(label, picker);
+    return control;
   };
 
   const createBreadcrumbs = () => {
@@ -404,7 +433,7 @@
     return { calendarSection, table };
   };
 
-  const renderFullSchedulePage = () => {
+  const renderFullSchedulePage = (bringFocusedDateIntoView = false) => {
     const container = document.querySelector("#class-page");
     if (!container) {
       return;
@@ -418,7 +447,7 @@
     const title = document.createElement("h1");
     title.textContent = "Full Schedule";
     textWrapper.append(title);
-    header.append(textWrapper);
+    header.append(textWrapper, createDateControl());
 
     const { calendarSection, table } = createCalendarSection(combinedSchedule);
 
@@ -438,7 +467,14 @@
         detail: { table },
       })
     );
+
+    if (bringFocusedDateIntoView) {
+      window.requestAnimationFrame(() => {
+        const focusedRow = table.querySelector(".today-row, .today-indicator-row");
+        (focusedRow || table).scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
   };
 
-  renderFullSchedulePage();
+  renderFullSchedulePage(Boolean(window.fullScheduleDateFocus?.isExplicit?.()));
 })();
