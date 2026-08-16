@@ -26,12 +26,22 @@
     fullscreenToggle.setAttribute("aria-pressed", String(isFullscreen));
   }
 
-  if (classView.requestFullscreen) {
-    fullscreenToggle.addEventListener("click", () => {
-      if (document.fullscreenElement === classView) {
-        document.exitFullscreen();
-      } else {
-        classView.requestFullscreen();
+  if (document.fullscreenEnabled && classView.requestFullscreen && document.exitFullscreen) {
+    fullscreenToggle.addEventListener("click", async () => {
+      const exitingFullscreen = document.fullscreenElement === classView;
+      fullscreenToggle.disabled = true;
+      try {
+        if (exitingFullscreen) {
+          await document.exitFullscreen();
+        } else {
+          await classView.requestFullscreen();
+        }
+      } catch (error) {
+        console.error(`Unable to ${exitingFullscreen ? "exit" : "enter"} fullscreen.`, error);
+        if (!exitingFullscreen) fullscreenToggle.hidden = true;
+        updateFullscreenControl();
+      } finally {
+        fullscreenToggle.disabled = false;
       }
     });
     document.addEventListener("fullscreenchange", updateFullscreenControl);
