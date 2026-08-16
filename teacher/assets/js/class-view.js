@@ -12,9 +12,7 @@
   const visual = document.getElementById("block-visual");
   const startLabel = document.getElementById("block-start");
   const endLabel = document.getElementById("block-end");
-  const line = document.getElementById("time-line");
   const lineTime = document.getElementById("line-time");
-  const elapsedFill = document.getElementById("elapsed-fill");
   const classView = document.querySelector(".class-view");
   const fullscreenToggle = document.getElementById("fullscreen-toggle");
   const timerToggle = document.getElementById("timer-toggle");
@@ -27,8 +25,6 @@
   const timerVisual = document.getElementById("timer-visual");
   const timerStart = document.getElementById("timer-start");
   const timerRemaining = document.getElementById("timer-remaining");
-  const timerLine = document.getElementById("timer-line");
-  const timerElapsedFill = document.getElementById("timer-elapsed-fill");
   let entries = null;
   let loadedDate = "";
   let timerState = null;
@@ -110,8 +106,8 @@
     classView.classList.remove("timer-mode");
     timerVisual.hidden = true;
     visual.hidden = false;
-    timerLine.style.top = "0%";
-    timerElapsedFill.style.height = "0%";
+    timerVisual.style.setProperty("--progress", "0%");
+    timerVisual.style.setProperty("--progress-turn", "0");
     timerRemaining.textContent = "";
     timerStart.textContent = "";
     timerForm.reset();
@@ -161,8 +157,8 @@
     const elapsed = Math.max(0, timestamp - timerState.startedAt);
     const progress = Math.min(1, elapsed / timerState.durationMs);
     const position = `${progress * 100}%`;
-    timerLine.style.top = position;
-    timerElapsedFill.style.height = position;
+    timerVisual.style.setProperty("--progress", position);
+    timerVisual.style.setProperty("--progress-turn", String(progress));
     timerRemaining.textContent = timerText((timerState.endsAt - timestamp) / 1000);
     if (progress >= 1) beginAlarm();
   }
@@ -221,8 +217,8 @@
     startLabel.textContent = displayTime(start);
     endLabel.textContent = displayTime(end);
     const position = `${progress * 100}%`;
-    line.style.top = position;
-    elapsedFill.style.height = position;
+    visual.style.setProperty("--progress", position);
+    visual.style.setProperty("--progress-turn", String(progress));
   }
 
   function noSchedule(message) {
