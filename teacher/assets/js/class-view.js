@@ -10,9 +10,7 @@
   const countdown = document.getElementById("countdown");
   const nextActivity = document.getElementById("next-activity");
   const visual = document.getElementById("block-visual");
-  const startLabel = document.getElementById("block-start");
   const endLabel = document.getElementById("block-end");
-  const lineTime = document.getElementById("line-time");
   const classView = document.querySelector(".class-view");
   const fullscreenToggle = document.getElementById("fullscreen-toggle");
   const timerToggle = document.getElementById("timer-toggle");
@@ -23,8 +21,7 @@
   const timerSeconds = document.getElementById("timer-seconds");
   const timerError = document.getElementById("timer-error");
   const timerVisual = document.getElementById("timer-visual");
-  const timerStart = document.getElementById("timer-start");
-  const timerRemaining = document.getElementById("timer-remaining");
+  const timerDuration = document.getElementById("timer-duration");
   let entries = null;
   let loadedDate = "";
   let timerState = null;
@@ -108,8 +105,7 @@
     visual.hidden = false;
     timerVisual.style.setProperty("--progress", "0%");
     timerVisual.style.setProperty("--progress-turn", "0");
-    timerRemaining.textContent = "";
-    timerStart.textContent = "";
+    timerDuration.textContent = "";
     timerForm.reset();
     timerError.hidden = true;
     timerToggle.textContent = "Timer";
@@ -141,8 +137,8 @@
       audioContext.resume();
     }
     const startedAt = Date.now();
-    timerState = { startedAt, durationMs, endsAt: startedAt + durationMs };
-    timerStart.textContent = timerText(durationMs / 1000);
+    timerState = { startedAt, durationMs };
+    timerDuration.textContent = timerText(durationMs / 1000);
     timerToggle.textContent = "Close Timer";
     timerToggle.setAttribute("aria-pressed", "true");
     classView.classList.add("timer-mode");
@@ -159,7 +155,6 @@
     const position = `${progress * 100}%`;
     timerVisual.style.setProperty("--progress", position);
     timerVisual.style.setProperty("--progress-turn", String(progress));
-    timerRemaining.textContent = timerText((timerState.endsAt - timestamp) / 1000);
     if (progress >= 1) beginAlarm();
   }
 
@@ -214,7 +209,6 @@
   function showVisual(start, end, nowMinutes) {
     const progress = Math.max(0, Math.min(1, (nowMinutes - start) / (end - start)));
     visual.hidden = false;
-    startLabel.textContent = displayTime(start);
     endLabel.textContent = displayTime(end);
     const position = `${progress * 100}%`;
     visual.style.setProperty("--progress", position);
@@ -232,7 +226,6 @@
   function update() {
     const now = new Date();
     clock.textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-    lineTime.textContent = clock.textContent;
     if (timerState) {
       updateTimer(now.getTime());
       return;
