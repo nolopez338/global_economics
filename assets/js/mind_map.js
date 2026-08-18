@@ -57,11 +57,54 @@
       progress: Array.from(root.querySelectorAll("[data-presentation-progress]")),
       status: root.querySelector("[data-presentation-status]")
     };
-    const state = { active: false, index: 0, effectGroup: 0, effectController: null, lastNavigation: 0, openTrigger: null, pointerGesture: null, transitioning: false };
+    const state = { active: false, index: 0, effectGroup: 0, effectController: null, lastNavigation: 0, openTrigger: null, pointerGesture: null, transitioning: false, preTransition: null };
     root.setAttribute("data-mind-map-initialised", "");
     root.classList.add("mind-map-presentation--enhanced");
     map.classList.add("mind-map--enhanced");
     root.querySelectorAll("[data-criterion-tooltip]").forEach((tip) => { tip.hidden = true; });
+
+    const cancelPreTransition = () => {
+      state.preTransition?.overlay.remove();
+      state.preTransition = null;
+      root.removeAttribute("data-pre-transition-active");
+    };
+
+    const typeset = async (element) => {
+      if (!window.MathJax?.typesetPromise) return;
+      await window.MathJax.typesetPromise([element]);
+    };
+
+    const showPreTransitionStage = async (preTransition, stageIndex) => {
+      const stage = preTransition.stages[stageIndex];
+      if (!stage) return false;
+      preTransition.overlay.replaceChildren(stage.content.cloneNode(true));
+      preTransition.stageIndex = stageIndex;
+      await typeset(preTransition.overlay);
+      return true;
+    };
+
+    const startPreTransition = async (slide) => {
+      const definition = slide.querySelector(":scope > template[data-mind-map-pre-transition]");
+      const stages = definition ? Array.from(definition.content.querySelectorAll(":scope > [data-mind-map-pre-transition-stage]")) : [];
+      if (!stages.length) return false;
+      const overlay = document.createElement("div");
+      overlay.className = "mind-map-pre-transition";
+      overlay.setAttribute("data-mind-map-pre-transition-active", "");
+      overlay.setAttribute("role", "status");
+      overlay.setAttribute("aria-live", "polite");
+      overlay.setAttribute("aria-atomic", "true");
+      slide.querySelector(":scope > article")?.setAttribute("aria-hidden", "true");
+      slide.append(overlay);
+      state.preTransition = { overlay, stages, stageIndex: -1, source: slide };
+      root.setAttribute("data-pre-transition-active", "");
+      await showPreTransitionStage(state.preTransition, 0);
+      return true;
+    };
+
+    const clearPreTransition = () => {
+      state.preTransition?.source.querySelector(":scope > article")?.removeAttribute("aria-hidden");
+      cancelPreTransition();
+    };
 
 
     const criterionDetailsForTrigger = (trigger) => {
@@ -177,6 +220,10 @@
     };
 
     const go = async (index, { transition = true, throttle = true } = {}) => {
+      if (state.preTransition) {
+        if (index < state.index) { clearPreTransition(); render(); return; }
+        clearPreTransition();
+      }
       const now = Date.now();
       if (!state.active || state.transitioning || index < 0 || index >= slides.length || index === state.index || (throttle && now - state.lastNavigation < 180)) return;
       state.lastNavigation = now;
@@ -216,8 +263,23 @@
 
     const forward = async () => {
       if (!state.active || state.transitioning) return;
+      if (state.preTransition) {
+        const preTransition = state.preTransition;
+        const nextStage = preTransition.stageIndex + 1;
+        if (nextStage < preTransition.stages.length) {
+          state.transitioning = true;
+          render();
+          try { await showPreTransitionStage(preTransition, nextStage); }
+          finally { state.transitioning = false; render(); }
+          return;
+        }
+        clearPreTransition();
+        go(state.index + 1, { throttle: false });
+        return;
+      }
       const groupCount = window.MindMapEffects?.getGroupCount(slides[state.index]) || 0;
       if (state.effectGroup >= groupCount) {
+        if (await startPreTransition(slides[state.index])) { render(); return; }
         go(state.index + 1);
         return;
       }
@@ -301,6 +363,7 @@
       if (!state.active) return;
       state.effectController?.abort();
       state.effectController = null;
+      clearPreTransition();
       if (document.fullscreenElement === root) {
         try { await document.exitFullscreen(); } catch (_) { /* Presentation can still exit. */ }
       }
@@ -318,6 +381,7 @@
       state.active = true;
       state.effectController?.abort();
       state.effectController = null;
+      clearPreTransition();
       state.index = 0;
       state.effectGroup = 0;
       state.transitioning = false;
