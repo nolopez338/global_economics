@@ -2229,7 +2229,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Tuesday",
     "Day": 4,
-    "Description": "-",
+    "Description": "Introduction outline",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
