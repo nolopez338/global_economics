@@ -243,7 +243,7 @@ const renderClassScheduleTable = ({ grade, section, tableEl }) => {
       const matches = data.filter(
         (entry) =>
           String(entry.Grade) === String(grade) &&
-          String(entry.Section) === String(section)
+          String(entry.Section).toUpperCase() === String(section).toUpperCase()
       );
 
       if (matches.length === 0) {
