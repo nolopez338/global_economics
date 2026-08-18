@@ -7,7 +7,17 @@
   - Exposes per-class notes collections via window.CLASS_NOTES
   - Serves as global input data for class-page rendering and related UI sections
 */
+window.CLASS_METADATA = {
+  "10SEMINAR": {
+    name: "Seminar",
+    shortLabel: "10S",
+  },
+};
+
 window.CLASS_STUDENT_LISTS = {
+  "10SEMINAR": {
+    students: [],
+  },
   "10A": {
     pdfUrl:
       "https://correosanbartoloedu-my.sharepoint.com/:b:/g/personal/nicolas_lopez_sanbartolo_edu_co/IQDe06pqnnnnSZs23p-u1ZubAXsK66kBIR5AM-Oi4lmrg9A?e=TyX9ap",
@@ -61,6 +71,7 @@ window.CLASS_STUDENT_LISTS = {
 };
 
 window.CLASS_NOTES = {
+  "10SEMINAR": [],
   "10A": [],
   "10B": [],
   "10C": [],

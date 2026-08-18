@@ -21,11 +21,14 @@
 
   document.querySelectorAll("a.class-card").forEach((link) => {
     const href = link.getAttribute("href");
-    const match = href && href.match(/^pages\/class_schedules\/(\d{2})([A-E])\.html$/i);
+    const match = href && href.match(/^pages\/class_schedules\/(\d{2})([A-E]|Seminars)\.html$/i);
     if (match) {
+      const section = match[2].toLowerCase() === "seminars"
+        ? "Seminar"
+        : match[2].toUpperCase();
       link.setAttribute(
         "href",
-        `pages/class.html?grade=${match[1]}&section=${match[2].toUpperCase()}&mode=teacher&origin=schedule-teacher`
+        `pages/class.html?grade=${match[1]}&section=${section}&mode=teacher&origin=schedule-teacher`
       );
     }
   });

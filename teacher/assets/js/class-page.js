@@ -24,12 +24,14 @@ const getClassMetadata = () => {
   const grade = container.dataset.grade || "";
   const section = container.dataset.section || "";
   const classKey = buildClassKey(grade, section);
+  const configuredMetadata = window.CLASS_METADATA?.[classKey] || {};
 
   return {
     container,
     grade,
     section: String(section).toUpperCase(),
     classKey,
+    classLabel: configuredMetadata.shortLabel || classKey,
   };
 };
 
@@ -230,7 +232,7 @@ const renderClassPage = () => {
     return;
   }
 
-  const { container, classKey, grade, section } = metadata;
+  const { container, classKey, classLabel, grade, section } = metadata;
   const mode = container.dataset.mode || "public";
   const origin = container.dataset.origin || "schedule";
 
@@ -240,14 +242,14 @@ const renderClassPage = () => {
   const studentList = studentLists[classKey];
   const notes = classNotes[classKey];
 
-  document.title = `Schedule ${classKey}`;
+  document.title = `Schedule ${classLabel}`;
   container.innerHTML = "";
 
   container.append(
     createBreadcrumbs(origin),
-    createHeader(classKey),
-    createNotesSection(classKey, studentList, notes, mode),
-    createCalendarSection(classKey, grade, section),
+    createHeader(classLabel),
+    createNotesSection(classLabel, studentList, notes, mode),
+    createCalendarSection(classLabel, grade, section),
     createBreadcrumbs(origin),
     createThemeToggleSection()
   );
