@@ -81,6 +81,14 @@
     slide.normalize();
   };
 
+  const resetElementHighlights = (slide) => {
+    slide.querySelectorAll("[data-mind-map-effect-element]").forEach((element) => {
+      element.classList.remove("mind-map-effect-element", "is-highlighted");
+      element.removeAttribute("data-mind-map-effect-element");
+      element.removeAttribute("data-highlight-color");
+    });
+  };
+
   const removeTemporaryAnimations = () => {
     temporaryAnimations.forEach((element) => element.remove());
     temporaryAnimations.clear();
@@ -104,6 +112,32 @@
       await sleep(Math.max(0, Number(effect.duration) || 0), signal);
     },
     reset: ({ slide }) => resetWordHighlights(slide)
+  });
+
+  effectTypes.set("element-highlight", {
+    run: async ({ slide, effect, signal }) => {
+      if (signal?.aborted || typeof effect.selector !== "string") return;
+      let elements;
+      try { elements = slide.querySelectorAll(effect.selector); }
+      catch (_) { console.warn("Ignoring invalid element-highlight selector."); return; }
+      elements.forEach((element) => {
+        element.classList.add("mind-map-effect-element");
+        element.dataset.mindMapEffectElement = "";
+        element.dataset.highlightColor = effect.color || "green";
+        void element.offsetWidth;
+        element.classList.add("is-highlighted");
+      });
+      await sleep(Math.max(0, Number(effect.duration) || 0), signal);
+    },
+    reset: ({ slide }) => resetElementHighlights(slide)
+  });
+
+  effectTypes.set("clear-highlights", {
+    run: async ({ slide }) => {
+      resetWordHighlights(slide);
+      resetElementHighlights(slide);
+    },
+    reset: ({ slide }) => resetElementHighlights(slide)
   });
 
   effectTypes.set("move-matching-concepts", {
@@ -177,6 +211,7 @@
     resetters.forEach((reset) => reset({ slide }));
     // Also clean up highlights created by older/changed configuration.
     resetWordHighlights(slide);
+    resetElementHighlights(slide);
   };
 
   const runTransition = async ({ slide, direction = "forward", ...context }) => {
