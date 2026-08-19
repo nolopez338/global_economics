@@ -6,6 +6,7 @@ del /s /q *.synctex.gz 2>nul
 del /s /q *.out 2>nul
 del /s /q *.toc 2>nul
 del /s /q *.synctex 2>nul
+del /s /q *.log 2>nul
 del /s /q *.fls 2>nul
 del /s /q *.fdb_latexmk 2>nul
 echo Done.
