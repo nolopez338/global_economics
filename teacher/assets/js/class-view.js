@@ -27,6 +27,19 @@
   let timerState = null;
   let alarmInterval = null;
   let audioContext = null;
+  const periodStateClasses = ["period-between-classes", "period-recess", "period-lunch"];
+
+  function setPeriodState(state) {
+    visual.classList.remove(...periodStateClasses);
+    if (state) visual.classList.add(`period-${state}`);
+  }
+
+  function scheduledPeriodState(entry) {
+    const name = (entry?.name || "").trim().toLowerCase();
+    if (name === "lunch") return "lunch";
+    if (name === "break" || name === "recess") return "recess";
+    return null;
+  }
 
   function updateFullscreenControl() {
     const isFullscreen = document.fullscreenElement === classView;
@@ -216,6 +229,7 @@
   }
 
   function noSchedule(message) {
+    setPeriodState(null);
     title.textContent = message;
     cycleLabel.textContent = "";
     countdown.textContent = "";
@@ -252,6 +266,7 @@
     const nowMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60 + now.getMilliseconds() / 60000;
     const current = entries.find((entry) => nowMinutes >= entry.start && nowMinutes < entry.end);
     if (current) {
+      setPeriodState(scheduledPeriodState(current));
       title.textContent = current.name;
       nextActivity.hidden = true;
       countdown.textContent = `${durationText((current.end - nowMinutes) * 60)} remaining`;
@@ -259,10 +274,17 @@
       return;
     }
 
-    const upcoming = entries.find((entry) => entry.start > nowMinutes);
+    const upcomingIndex = entries.findIndex((entry) => entry.start > nowMinutes);
+    const upcoming = entries[upcomingIndex];
     if (upcoming) {
-      const previous = [...entries].reverse().find((entry) => entry.end <= nowMinutes);
-      title.textContent = previous ? "Between classes" : "Before classes";
+      const previous = upcomingIndex > 0 ? entries[upcomingIndex - 1] : null;
+      const gapMinutes = previous ? upcoming.start - previous.end : null;
+      const isFiveMinuteTransition = previous
+        && nowMinutes >= previous.end
+        && gapMinutes >= 4.5
+        && gapMinutes <= 5.5;
+      setPeriodState(isFiveMinuteTransition ? "between-classes" : null);
+      title.textContent = isFiveMinuteTransition ? "Between classes" : previous ? "Between activities" : "Before classes";
       nextActivity.textContent = `Next: ${upcoming.name} at ${displayTime(upcoming.start)}`;
       nextActivity.hidden = false;
       countdown.textContent = `${durationText((upcoming.start - nowMinutes) * 60)} until start`;
