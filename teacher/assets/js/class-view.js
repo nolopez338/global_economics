@@ -74,7 +74,7 @@
 
   const returnPage = origin === "schedule-teacher" ? "schedule-teacher.html" : "schedule.html";
   returnLink.href = `./${returnPage}`;
-  returnLink.textContent = `\u2190 ${origin === "schedule-teacher" ? "Teacher schedule" : "Schedule"}`;
+  returnLink.textContent = `\u2190 ${origin === "schedule-teacher" ? "Schedule" : "Schedule"}`;
   sourceFrame.src = `./${returnPage}`;
 
   function timerText(totalSeconds) {
