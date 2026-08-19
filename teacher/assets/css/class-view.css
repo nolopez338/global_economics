@@ -5,8 +5,17 @@
   --text: #111827;
   --muted: #4b5563;
   --accent: #b91c1c;
-  --elapsed: #dbeafe;
   --border: #111827;
+  /* General schedule-clock palette (light mode). */
+  --clock-face: #eff6ff;
+  --clock-unelapsed: #3b82f6;
+  --clock-elapsed: #1e40af;
+  --clock-border: #172554;
+  --clock-outline: #93c5fd;
+  --clock-hand: #facc15;
+  --clock-hand-outline: #172554;
+  --clock-label-bg: #172554;
+  --clock-label-text: #ffffff;
 }
 
 * { box-sizing: border-box; }
@@ -96,9 +105,10 @@ h1 { margin: .15em 0; font-size: clamp(2rem, 5vw, 4.5rem); line-height: 1.05; }
   aspect-ratio: 1;
   margin: 0 auto;
   overflow: visible;
-  border: clamp(4px, .5vw, 7px) solid var(--border);
+  border: clamp(4px, .5vw, 7px) solid var(--clock-border);
   border-radius: 50%;
-  background: var(--surface);
+  background: var(--clock-face);
+  box-shadow: 0 0 0 3px var(--clock-outline);
 }
 
 .block-visual[hidden] { display: none; }
@@ -106,7 +116,9 @@ h1 { margin: .15em 0; font-size: clamp(2rem, 5vw, 4.5rem); line-height: 1.05; }
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: conic-gradient(from 0turn, var(--elapsed) 0 var(--progress, 0%), transparent var(--progress, 0%) 100%);
+  background: conic-gradient(from 0turn,
+    var(--clock-elapsed) 0 var(--progress, 0%),
+    var(--clock-unelapsed) var(--progress, 0%) 100%);
 }
 .progress-time-label {
   position: absolute;
@@ -114,7 +126,10 @@ h1 { margin: .15em 0; font-size: clamp(2rem, 5vw, 4.5rem); line-height: 1.05; }
   top: 0;
   left: 50%;
   padding: .2rem .5rem;
-  background: var(--background);
+  border: 2px solid var(--clock-border);
+  border-radius: .35rem;
+  background: var(--clock-label-bg);
+  color: var(--clock-label-text);
   font-size: clamp(1.1rem, 2.5vw, 1.6rem);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
@@ -131,71 +146,111 @@ h1 { margin: .15em 0; font-size: clamp(2rem, 5vw, 4.5rem); line-height: 1.05; }
   height: 50%;
   transform: rotate(calc(var(--progress-turn, 0) * 1turn));
   transform-origin: 50% 100%;
-  background: var(--accent);
+  background: var(--clock-hand);
+  box-shadow: 0 0 0 2px var(--clock-hand-outline);
+}
+
+.time-line-pin {
+  position: absolute;
+  z-index: 5;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  aspect-ratio: 1;
+  border: 3px solid var(--clock-hand-outline);
+  border-radius: 50%;
+  background: var(--clock-hand);
+  transform: translate(-50%, -50%);
 }
 
 /* Schedule states deliberately recolor every part of the clock. These selectors
    exclude the custom timer so its established palette remains independent. */
 .schedule-visual.period-between-classes {
-  --surface: #fff7ed;
-  --elapsed: #fdba74;
-  --border: #9a3412;
-  --accent: #7c2d12;
-  --period-text: #7c2d12;
-  --period-label-bg: #fff7ed;
+  --clock-face: #fff7ed;
+  --clock-unelapsed: #ea580c;
+  --clock-elapsed: #7c2d12;
+  --clock-border: #7c2d12;
+  --clock-outline: #fb923c;
+  --clock-hand: #67e8f9;
+  --clock-hand-outline: #431407;
+  --clock-label-bg: #7c2d12;
+  --clock-label-text: #ffffff;
 }
 
 .schedule-visual.period-recess {
-  --surface: #ecfdf5;
-  --elapsed: #6ee7b7;
-  --border: #047857;
-  --accent: #064e3b;
-  --period-text: #064e3b;
-  --period-label-bg: #ecfdf5;
+  --clock-face: #ecfdf5;
+  --clock-unelapsed: #059669;
+  --clock-elapsed: #065f46;
+  --clock-border: #064e3b;
+  --clock-outline: #34d399;
+  --clock-hand: #f0abfc;
+  --clock-hand-outline: #052e16;
+  --clock-label-bg: #065f46;
+  --clock-label-text: #ffffff;
 }
 
 .schedule-visual.period-lunch {
-  --surface: #faf5ff;
-  --elapsed: #d8b4fe;
-  --border: #7e22ce;
-  --accent: #581c87;
-  --period-text: #581c87;
-  --period-label-bg: #faf5ff;
-}
-
-.schedule-visual:is(.period-between-classes, .period-recess, .period-lunch) .progress-time-label {
-  background: var(--period-label-bg);
-  color: var(--period-text);
+  --clock-face: #faf5ff;
+  --clock-unelapsed: #9333ea;
+  --clock-elapsed: #581c87;
+  --clock-border: #581c87;
+  --clock-outline: #c084fc;
+  --clock-hand: #fde047;
+  --clock-hand-outline: #3b0764;
+  --clock-label-bg: #6b21a8;
+  --clock-label-text: #ffffff;
 }
 
 body.dark-theme .schedule-visual.period-between-classes {
-  --surface: #431407;
-  --elapsed: #9a3412;
-  --border: #fdba74;
-  --accent: #ffedd5;
-  --period-text: #ffedd5;
-  --period-label-bg: #431407;
+  --clock-face: #431407;
+  --clock-unelapsed: #c2410c;
+  --clock-elapsed: #fdba74;
+  --clock-border: #fed7aa;
+  --clock-outline: #c2410c;
+  --clock-hand: #67e8f9;
+  --clock-hand-outline: #082f49;
+  --clock-label-bg: #fed7aa;
+  --clock-label-text: #431407;
 }
 
 body.dark-theme .schedule-visual.period-recess {
-  --surface: #052e2b;
-  --elapsed: #047857;
-  --border: #6ee7b7;
-  --accent: #d1fae5;
-  --period-text: #d1fae5;
-  --period-label-bg: #052e2b;
+  --clock-face: #052e2b;
+  --clock-unelapsed: #047857;
+  --clock-elapsed: #6ee7b7;
+  --clock-border: #a7f3d0;
+  --clock-outline: #047857;
+  --clock-hand: #f0abfc;
+  --clock-hand-outline: #4a044e;
+  --clock-label-bg: #a7f3d0;
+  --clock-label-text: #052e16;
 }
 
 body.dark-theme .schedule-visual.period-lunch {
-  --surface: #3b0764;
-  --elapsed: #7e22ce;
-  --border: #d8b4fe;
-  --accent: #f3e8ff;
-  --period-text: #f3e8ff;
-  --period-label-bg: #3b0764;
+  --clock-face: #3b0764;
+  --clock-unelapsed: #9333ea;
+  --clock-elapsed: #d8b4fe;
+  --clock-border: #e9d5ff;
+  --clock-outline: #9333ea;
+  --clock-hand: #fde047;
+  --clock-hand-outline: #422006;
+  --clock-label-bg: #e9d5ff;
+  --clock-label-text: #3b0764;
 }
-.timer-visual { overflow: visible; }
-.timer-visual.timer-alarm { --surface: #dc2626; --elapsed: #dc2626; --border: #7f1d1d; --text: #fff; animation: timer-shake .18s linear infinite; }
+
+/* The custom timer owns a separate palette and never receives period-state colors. */
+.timer-visual {
+  --clock-face: var(--surface);
+  --clock-unelapsed: #dbeafe;
+  --clock-elapsed: #2563eb;
+  --clock-border: var(--border);
+  --clock-outline: #60a5fa;
+  --clock-hand: #facc15;
+  --clock-hand-outline: #111827;
+  --clock-label-bg: var(--surface);
+  --clock-label-text: var(--text);
+  overflow: visible;
+}
+.timer-visual.timer-alarm { --clock-face: #dc2626; --clock-unelapsed: #dc2626; --clock-elapsed: #dc2626; --clock-border: #7f1d1d; --clock-outline: #fca5a5; --clock-hand: #fff; --clock-hand-outline: #7f1d1d; --text: #fff; animation: timer-shake .18s linear infinite; }
 .timer-visual.timer-alarm .progress-time-label { background: #dc2626; color: #fff; }
 .timer-visual.timer-alarm .time-line { background: #fff; }
 
@@ -233,7 +288,34 @@ body.dark-theme .schedule-visual.period-lunch {
   margin: 0 auto;
 }
 
-body.dark-theme { --background: #090d16; --surface: #111827; --text: #f9fafb; --muted: #cbd5e1; --accent: #fb7185; --elapsed: #1e3a5f; --border: #f9fafb; }
+body.dark-theme {
+  --background: #090d16;
+  --surface: #111827;
+  --text: #f9fafb;
+  --muted: #cbd5e1;
+  --accent: #fb7185;
+  --border: #f9fafb;
+  /* General schedule-clock palette (dark mode). */
+  --clock-face: #0f2447;
+  --clock-unelapsed: #2563eb;
+  --clock-elapsed: #93c5fd;
+  --clock-border: #bfdbfe;
+  --clock-outline: #2563eb;
+  --clock-hand: #fde047;
+  --clock-hand-outline: #090d16;
+  --clock-label-bg: #bfdbfe;
+  --clock-label-text: #0f172a;
+}
+
+body.dark-theme .timer-visual:not(.timer-alarm) {
+  --clock-face: #111827;
+  --clock-unelapsed: #1e3a5f;
+  --clock-elapsed: #60a5fa;
+  --clock-border: #f9fafb;
+  --clock-outline: #2563eb;
+  --clock-label-bg: #111827;
+  --clock-label-text: #f9fafb;
+}
 
 @media (max-width: 650px) {
   .class-view-header { flex-wrap: wrap; }

@@ -32,6 +32,7 @@
   function setPeriodState(state) {
     visual.classList.remove(...periodStateClasses);
     if (state) visual.classList.add(`period-${state}`);
+    visual.dataset.periodState = state || "general";
   }
 
   function scheduledPeriodState(entry) {
