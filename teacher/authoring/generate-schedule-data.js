@@ -7,10 +7,10 @@
 
 const fs = require("node:fs");
 const path = require("node:path");
-const calendar = require("../assets/js/year-calendar-data.js");
+const calendar = require("../assets/js/databases/year-calendar-data.js");
 
 const sourcePath = path.join(__dirname, "schedule.csv");
-const outputPath = path.join(__dirname, "../assets/js/schedule-data.js");
+const outputPath = path.join(__dirname, "../assets/js/databases/schedule-data.js");
 const fields = [
   "Grade", "Section", "Class #", "Date", "Term", "Weekday", "Day",
   "Description", "Material", "Material teacher", "Summary"
