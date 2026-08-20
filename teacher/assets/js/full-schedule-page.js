@@ -10,7 +10,7 @@
 (() => {
   const parseClassId = (rawClassId) => {
     const classId = String(rawClassId || "").trim().toUpperCase();
-    const match = classId.match(/^(\d+)([A-Z])$/);
+    const match = classId.match(/^(\d+)([A-Z]|SEMINAR)$/);
 
     if (!match) {
       return {
@@ -23,7 +23,7 @@
     return {
       class_id: classId,
       grade: match[1],
-      group: match[2],
+      group: match[2] === "SEMINAR" ? "Sem" : match[2],
     };
   };
 
