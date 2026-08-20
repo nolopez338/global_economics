@@ -23,8 +23,6 @@ window.SCHEDULE_DATA = [
   {"Grade": 10, "Class #": "16", "Term": 1, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"},
   {"Grade": 10, "Class #": "17", "Term": 1, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"},
   {"Grade": 10, "Class #": "18", "Term": 1, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"},
-  {"Grade": 10, "Class #": "19", "Term": 1, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"},
-  {"Grade": 10, "Class #": "20", "Term": 1, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"},
 
   // Grade 10 - Term 2
   {"Grade": 10, "Class #": "1", "Term": 2, "Description": "Introduction outline and C1: Contexts for probability", "Material": "-", "Material teacher": "-", "Summary": "-"},
@@ -66,9 +64,6 @@ window.SCHEDULE_DATA = [
   {"Grade": 10, "Class #": "15", "Term": 3, "Description": "3rd Learning Evidence", "Material": "-", "Material teacher": "-", "Summary": "-"},
   {"Grade": 10, "Class #": "16", "Term": 3, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"},
   {"Grade": 10, "Class #": "17", "Term": 3, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"},
-  {"Grade": 10, "Class #": "18", "Term": 3, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"},
-  {"Grade": 10, "Class #": "19", "Term": 3, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"},
-  {"Grade": 10, "Class #": "20", "Term": 3, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"},
 
   // Grade 11 - Term 1
   {"Grade": 11, "Class #": "1", "Term": 1, "Description": "Introduction outline and C1: Contexts for probability", "Material": "-", "Material teacher": "-", "Summary": "-"},
@@ -89,8 +84,6 @@ window.SCHEDULE_DATA = [
   {"Grade": 11, "Class #": "16", "Term": 1, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"},
   {"Grade": 11, "Class #": "17", "Term": 1, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"},
   {"Grade": 11, "Class #": "18", "Term": 1, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"},
-  {"Grade": 11, "Class #": "19", "Term": 1, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"},
-  {"Grade": 11, "Class #": "20", "Term": 1, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"},
 
   // Grade 11 - Term 2
   {"Grade": 11, "Class #": "1", "Term": 2, "Description": "Introduction outline and C1: Contexts for probability", "Material": "-", "Material teacher": "-", "Summary": "-"},
@@ -132,7 +125,5 @@ window.SCHEDULE_DATA = [
   {"Grade": 11, "Class #": "15", "Term": 3, "Description": "3rd Learning Evidence", "Material": "-", "Material teacher": "-", "Summary": "-"},
   {"Grade": 11, "Class #": "16", "Term": 3, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"},
   {"Grade": 11, "Class #": "17", "Term": 3, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"},
-  {"Grade": 11, "Class #": "18", "Term": 3, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"},
-  {"Grade": 11, "Class #": "19", "Term": 3, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"},
-  {"Grade": 11, "Class #": "20", "Term": 3, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"}
+  {"Grade": 11, "Class #": "18", "Term": 3, "Description": "Extra Class", "Material": "-", "Material teacher": "-", "Summary": "-"}
 ];

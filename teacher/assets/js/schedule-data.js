@@ -32,7 +32,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "Introduction outline",
+    "Description": "Introduction outline / Survey",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "Intro"
@@ -45,7 +45,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "-",
+    "Description": "C1 Activity and C2 Introduction",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -760,7 +760,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "Introduction outline",
+    "Description": "Introduction outline and C1: Contexts for probability / Survey",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "Intro"
@@ -773,7 +773,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Tuesday",
     "Day": 4,
-    "Description": "-",
+    "Description": "C1 Activity and C2 Introduction",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -1501,7 +1501,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "-",
+    "Description": "Introduction outline / Survey",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -1514,7 +1514,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "-",
+    "Description": "C1 Activity and C2 Introduction",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -2229,7 +2229,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Tuesday",
     "Day": 4,
-    "Description": "Introduction outline",
+    "Description": "Introduction outline / Survey",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -2242,7 +2242,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "-",
+    "Description": "C1 Activity and C2 Introduction",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -2970,7 +2970,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "-",
+    "Description": "Introduction outline / Survey",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -2983,7 +2983,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "-",
+    "Description": "C1 Activity and C2 Introduction",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -3698,7 +3698,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Tuesday",
     "Day": 4,
-    "Description": "-",
+    "Description": "Seminars Presentation",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -4088,7 +4088,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "-",
+    "Description": "C1 Activity and C2 Introduction / Survey",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -4816,7 +4816,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "Excersices C1 and C2: Uniform & Triangular",
+    "Description": "Activity C1 and Introduction C2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1 & C2"
@@ -4829,10 +4829,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Monday",
     "Day": 2,
-    "Description": "-",
+    "Description": "C2 Exploration and Activity",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C2"
   },
   {
     "Grade": 11,
@@ -5544,7 +5544,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "-",
+    "Description": "Introduction outline and C1: Contexts for probability / Survey",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -5557,7 +5557,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "-",
+    "Description": "C1 Activity and C2 Introduction",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -6285,7 +6285,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "-",
+    "Description": "C1 Activity and C2 Introduction",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -7013,7 +7013,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "-",
+    "Description": "Introduction outline and C1: Contexts for probability / Survey",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -7026,7 +7026,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "-",
+    "Description": "C1 Activity and C2 Introduction",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
