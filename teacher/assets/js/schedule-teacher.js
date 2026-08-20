@@ -5,10 +5,14 @@
   const currentTimeOverlay = scheduleWrap?.querySelector(".current-time-overlay");
   const currentTimeLine = currentTimeOverlay?.querySelector(".current-time-line");
   const currentTimeLabel = currentTimeLine?.querySelector(".current-time-label");
+  const columnToggle = document.querySelector(".schedule-column-toggle");
+  const mobileScheduleQuery = window.matchMedia("(max-width: 600px)");
   const toggle = document.querySelector(".collapsible-toggle");
   const panel = document.getElementById("class-pages-panel");
   const icon = toggle?.querySelector(".collapsible-icon");
   let displayedLocalDate = null;
+  let activeCycleDay = null;
+  let mobileScheduleExpanded = false;
 
   if (toggle && panel && icon) {
     toggle.addEventListener("click", () => {
@@ -53,6 +57,7 @@
     if (!Number.isInteger(cycleDay) || cycleDay < 1 || cycleDay > 6) {
       cycleDay = null;
     }
+    activeCycleDay = cycleDay;
 
     scheduleTable?.querySelectorAll("[data-cycle-day]").forEach((cell) => {
       const isActive = Number(cell.dataset.cycleDay) === cycleDay;
@@ -64,6 +69,34 @@
         cell.removeAttribute("aria-current");
       }
     });
+    updateMobileScheduleColumns();
+  }
+
+  function updateMobileScheduleColumns() {
+    if (!scheduleTable || !columnToggle) {
+      return;
+    }
+
+    const isMobile = mobileScheduleQuery.matches;
+    const showCompleteSchedule = !isMobile || mobileScheduleExpanded;
+    const visibleCycleDays = activeCycleDay === 6
+      ? [1, 6]
+      : [activeCycleDay ?? 1, activeCycleDay ? activeCycleDay + 1 : 2];
+
+    scheduleTable.classList.toggle("is-mobile-collapsed", isMobile && !mobileScheduleExpanded);
+    scheduleTable.classList.toggle("is-mobile-expanded", isMobile && mobileScheduleExpanded);
+    scheduleTable.querySelectorAll("[data-cycle-day]").forEach((cell) => {
+      cell.classList.toggle(
+        "mobile-cycle-visible",
+        visibleCycleDays.includes(Number(cell.dataset.cycleDay))
+      );
+    });
+
+    columnToggle.setAttribute("aria-expanded", String(showCompleteSchedule));
+    columnToggle.textContent = showCompleteSchedule
+      ? "Mostrar horario reducido"
+      : "Mostrar horario completo";
+    window.requestAnimationFrame(() => updateCurrentTimeLine());
   }
 
   function assignCycleDayColumns() {
@@ -169,6 +202,11 @@
   }
 
   assignCycleDayColumns();
+  columnToggle?.addEventListener("click", () => {
+    mobileScheduleExpanded = !mobileScheduleExpanded;
+    updateMobileScheduleColumns();
+  });
+  mobileScheduleQuery.addEventListener("change", updateMobileScheduleColumns);
   updateActiveScheduleDay();
   updateCurrentTimeLine();
   window.setInterval(refreshAfterDateChange, 60000);
