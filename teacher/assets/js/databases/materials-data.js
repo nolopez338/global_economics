@@ -8,6 +8,7 @@
 window.MATERIALS_DATA = [
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "A",
     "Class #": "1-1",
     "Date": "2026-08-12",
@@ -21,6 +22,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "A",
     "Class #": "1-2",
     "Date": "2026-08-14",
@@ -34,6 +36,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "A",
     "Class #": "2-1",
     "Date": "2026-08-21",
@@ -47,6 +50,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "A",
     "Class #": "2-2",
     "Date": "2026-08-25",
@@ -60,6 +64,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "A",
     "Class #": "3-1",
     "Date": "2026-08-31",
@@ -73,6 +78,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "A",
     "Class #": "3-2",
     "Date": "2026-09-02",
@@ -86,6 +92,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "A",
     "Class #": "4-1",
     "Date": "2026-09-08",
@@ -99,6 +106,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "A",
     "Class #": "4-2",
     "Date": "2026-09-10",
@@ -112,6 +120,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "A",
     "Class #": "5-1",
     "Date": "2026-09-16",
@@ -125,6 +134,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "A",
     "Class #": "5-2",
     "Date": "2026-09-18",
@@ -138,6 +148,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "A",
     "Class #": "6-1",
     "Date": "2026-09-24",
@@ -151,6 +162,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "A",
     "Class #": "6-2",
     "Date": "2026-09-28",
@@ -164,6 +176,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "A",
     "Class #": "7-1",
     "Date": "2026-10-02",
@@ -177,6 +190,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "A",
     "Class #": "7-2",
     "Date": "2026-10-14",
@@ -190,6 +204,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "A",
     "Class #": "8-1",
     "Date": "2026-10-20",
@@ -203,6 +218,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "A",
     "Class #": "8-2",
     "Date": "2026-10-22",
@@ -216,6 +232,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "A",
     "Class #": "9-1",
     "Date": "2026-10-28",
@@ -229,6 +246,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "A",
     "Class #": "9-2",
     "Date": "2026-10-30",
@@ -242,6 +260,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "A",
     "Class #": "1-1",
     "Date": "2026-11-09",
@@ -255,6 +274,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "A",
     "Class #": "1-2",
     "Date": "2026-11-11",
@@ -268,6 +288,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "A",
     "Class #": "2-1",
     "Date": "2026-11-18",
@@ -281,6 +302,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "A",
     "Class #": "2-2",
     "Date": "2026-11-23",
@@ -294,6 +316,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "A",
     "Class #": "3-1",
     "Date": "2026-11-27",
@@ -307,6 +330,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "A",
     "Class #": "3-2",
     "Date": "2026-12-01",
@@ -320,6 +344,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "A",
     "Class #": "4-1",
     "Date": "2027-01-13",
@@ -333,6 +358,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "A",
     "Class #": "4-2",
     "Date": "2027-01-15",
@@ -346,6 +372,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "A",
     "Class #": "5-1",
     "Date": "2027-01-21",
@@ -359,6 +386,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "A",
     "Class #": "5-2",
     "Date": "2027-01-25",
@@ -372,6 +400,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "A",
     "Class #": "6-1",
     "Date": "2027-01-29",
@@ -385,6 +414,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "A",
     "Class #": "6-2",
     "Date": "2027-02-02",
@@ -398,6 +428,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "A",
     "Class #": "7-1",
     "Date": "2027-02-08",
@@ -411,6 +442,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "A",
     "Class #": "7-2",
     "Date": "2027-02-10",
@@ -424,6 +456,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "A",
     "Class #": "8-1",
     "Date": "2027-02-16",
@@ -437,6 +470,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "A",
     "Class #": "8-2",
     "Date": "2027-02-18",
@@ -450,6 +484,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "A",
     "Class #": "9-1",
     "Date": "2027-02-24",
@@ -463,6 +498,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "A",
     "Class #": "9-2",
     "Date": "2027-02-26",
@@ -476,6 +512,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "A",
     "Class #": "10-1",
     "Date": "2027-03-04",
@@ -489,6 +526,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "A",
     "Class #": "10-2",
     "Date": "2027-03-08",
@@ -502,6 +540,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "A",
     "Class #": "1-1",
     "Date": "2027-03-15",
@@ -515,6 +554,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "A",
     "Class #": "1-2",
     "Date": "2027-03-17",
@@ -528,6 +568,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "A",
     "Class #": "2-1",
     "Date": "2027-03-30",
@@ -541,6 +582,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "A",
     "Class #": "2-2",
     "Date": "2027-04-01",
@@ -554,6 +596,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "A",
     "Class #": "3-1",
     "Date": "2027-04-08",
@@ -567,6 +610,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "A",
     "Class #": "3-2",
     "Date": "2027-04-12",
@@ -580,6 +624,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "A",
     "Class #": "4-1",
     "Date": "2027-04-16",
@@ -593,6 +638,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "A",
     "Class #": "4-2",
     "Date": "2027-04-20",
@@ -606,6 +652,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "A",
     "Class #": "5-1",
     "Date": "2027-04-26",
@@ -619,6 +666,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "A",
     "Class #": "5-2",
     "Date": "2027-04-28",
@@ -632,6 +680,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "A",
     "Class #": "6-1",
     "Date": "2027-05-04",
@@ -645,6 +694,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "A",
     "Class #": "6-2",
     "Date": "2027-05-06",
@@ -658,97 +708,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
-    "Section": "A",
-    "Class #": "2-1",
-    "Date": "2027-05-13",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "A",
-    "Class #": "2-2",
-    "Date": "2027-05-18",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "A",
-    "Class #": "3-1",
-    "Date": "2027-05-24",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "A",
-    "Class #": "3-2",
-    "Date": "2027-05-26",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "A",
-    "Class #": "4-1",
-    "Date": "2027-06-02",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "A",
-    "Class #": "4-2",
-    "Date": "2027-06-04",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "A",
-    "Class #": "5-1",
-    "Date": "2027-06-11",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
+    "Term": 1,
     "Section": "B",
     "Class #": "1-1",
     "Date": "2026-08-14",
@@ -762,6 +722,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "B",
     "Class #": "1-2",
     "Date": "2026-08-18",
@@ -775,6 +736,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "B",
     "Class #": "2-1",
     "Date": "2026-08-25",
@@ -788,6 +750,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "B",
     "Class #": "2-2",
     "Date": "2026-08-26",
@@ -801,6 +764,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "B",
     "Class #": "3-1",
     "Date": "2026-09-02",
@@ -814,6 +778,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "B",
     "Class #": "3-2",
     "Date": "2026-09-03",
@@ -827,6 +792,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "B",
     "Class #": "4-1",
     "Date": "2026-09-10",
@@ -840,6 +806,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "B",
     "Class #": "4-2",
     "Date": "2026-09-11",
@@ -853,6 +820,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "B",
     "Class #": "5-1",
     "Date": "2026-09-18",
@@ -866,6 +834,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "B",
     "Class #": "5-2",
     "Date": "2026-09-21",
@@ -879,6 +848,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "B",
     "Class #": "6-1",
     "Date": "2026-09-28",
@@ -892,6 +862,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "B",
     "Class #": "6-2",
     "Date": "2026-09-29",
@@ -905,6 +876,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "B",
     "Class #": "7-1",
     "Date": "2026-10-14",
@@ -918,6 +890,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "B",
     "Class #": "7-2",
     "Date": "2026-10-15",
@@ -931,6 +904,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "B",
     "Class #": "8-1",
     "Date": "2026-10-22",
@@ -944,6 +918,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "B",
     "Class #": "8-2",
     "Date": "2026-10-23",
@@ -957,6 +932,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "B",
     "Class #": "9-1",
     "Date": "2026-10-30",
@@ -970,6 +946,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "B",
     "Class #": "9-2",
     "Date": "2026-11-03",
@@ -983,6 +960,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "B",
     "Class #": "1-1",
     "Date": "2026-11-11",
@@ -996,6 +974,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "B",
     "Class #": "1-2",
     "Date": "2026-11-12",
@@ -1009,6 +988,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "B",
     "Class #": "2-1",
     "Date": "2026-11-23",
@@ -1022,6 +1002,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "B",
     "Class #": "2-2",
     "Date": "2026-11-24",
@@ -1035,6 +1016,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "B",
     "Class #": "3-1",
     "Date": "2026-12-01",
@@ -1048,6 +1030,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "B",
     "Class #": "3-2",
     "Date": "2026-12-02",
@@ -1061,6 +1044,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "B",
     "Class #": "4-1",
     "Date": "2027-01-15",
@@ -1074,6 +1058,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "B",
     "Class #": "4-2",
     "Date": "2027-01-18",
@@ -1087,6 +1072,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "B",
     "Class #": "5-1",
     "Date": "2027-01-25",
@@ -1100,6 +1086,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "B",
     "Class #": "5-2",
     "Date": "2027-01-26",
@@ -1113,6 +1100,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "B",
     "Class #": "6-1",
     "Date": "2027-02-02",
@@ -1126,6 +1114,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "B",
     "Class #": "6-2",
     "Date": "2027-02-03",
@@ -1139,6 +1128,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "B",
     "Class #": "7-1",
     "Date": "2027-02-10",
@@ -1152,6 +1142,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "B",
     "Class #": "7-2",
     "Date": "2027-02-11",
@@ -1165,6 +1156,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "B",
     "Class #": "8-1",
     "Date": "2027-02-18",
@@ -1178,6 +1170,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "B",
     "Class #": "8-2",
     "Date": "2027-02-19",
@@ -1191,6 +1184,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "B",
     "Class #": "9-1",
     "Date": "2027-02-26",
@@ -1204,6 +1198,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "B",
     "Class #": "9-2",
     "Date": "2027-03-01",
@@ -1217,6 +1212,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "B",
     "Class #": "10-1",
     "Date": "2027-03-08",
@@ -1230,6 +1226,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "B",
     "Class #": "10-2",
     "Date": "2027-03-09",
@@ -1243,6 +1240,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "B",
     "Class #": "1-1",
     "Date": "2027-03-17",
@@ -1256,6 +1254,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "B",
     "Class #": "1-2",
     "Date": "2027-03-18",
@@ -1269,6 +1268,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "B",
     "Class #": "2-1",
     "Date": "2027-04-01",
@@ -1282,6 +1282,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "B",
     "Class #": "2-2",
     "Date": "2027-04-05",
@@ -1295,6 +1296,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "B",
     "Class #": "3-1",
     "Date": "2027-04-12",
@@ -1308,6 +1310,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "B",
     "Class #": "3-2",
     "Date": "2027-04-13",
@@ -1321,6 +1324,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "B",
     "Class #": "4-1",
     "Date": "2027-04-20",
@@ -1334,6 +1338,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "B",
     "Class #": "4-2",
     "Date": "2027-04-21",
@@ -1347,6 +1352,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "B",
     "Class #": "5-1",
     "Date": "2027-04-28",
@@ -1360,6 +1366,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "B",
     "Class #": "5-2",
     "Date": "2027-04-29",
@@ -1373,6 +1380,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "B",
     "Class #": "6-1",
     "Date": "2027-05-06",
@@ -1386,6 +1394,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "B",
     "Class #": "6-2",
     "Date": "2027-05-07",
@@ -1399,84 +1408,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
-    "Section": "B",
-    "Class #": "2-1",
-    "Date": "2027-05-18",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "B",
-    "Class #": "2-2",
-    "Date": "2027-05-19",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "B",
-    "Class #": "3-1",
-    "Date": "2027-05-26",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "B",
-    "Class #": "3-2",
-    "Date": "2027-05-27",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "B",
-    "Class #": "4-1",
-    "Date": "2027-06-04",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "B",
-    "Class #": "4-2",
-    "Date": "2027-06-08",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
+    "Term": 1,
     "Section": "C",
     "Class #": "1-1",
     "Date": "2026-08-12",
@@ -1490,6 +1422,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "C",
     "Class #": "1-2",
     "Date": "2026-08-19",
@@ -1503,6 +1436,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "C",
     "Class #": "2-1",
     "Date": "2026-08-21",
@@ -1516,6 +1450,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "C",
     "Class #": "2-2",
     "Date": "2026-08-27",
@@ -1529,6 +1464,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "C",
     "Class #": "3-1",
     "Date": "2026-08-31",
@@ -1542,6 +1478,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "C",
     "Class #": "3-2",
     "Date": "2026-09-04",
@@ -1555,6 +1492,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "C",
     "Class #": "4-1",
     "Date": "2026-09-08",
@@ -1568,6 +1506,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "C",
     "Class #": "4-2",
     "Date": "2026-09-14",
@@ -1581,6 +1520,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "C",
     "Class #": "5-1",
     "Date": "2026-09-16",
@@ -1594,6 +1534,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "C",
     "Class #": "5-2",
     "Date": "2026-09-22",
@@ -1607,6 +1548,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "C",
     "Class #": "6-1",
     "Date": "2026-09-24",
@@ -1620,6 +1562,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "C",
     "Class #": "6-2",
     "Date": "2026-09-30",
@@ -1633,6 +1576,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "C",
     "Class #": "7-1",
     "Date": "2026-10-02",
@@ -1646,6 +1590,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "C",
     "Class #": "7-2",
     "Date": "2026-10-16",
@@ -1659,6 +1604,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "C",
     "Class #": "8-1",
     "Date": "2026-10-20",
@@ -1672,6 +1618,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "C",
     "Class #": "8-2",
     "Date": "2026-10-26",
@@ -1685,6 +1632,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "C",
     "Class #": "9-1",
     "Date": "2026-10-28",
@@ -1698,6 +1646,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "C",
     "Class #": "9-2",
     "Date": "2026-11-04",
@@ -1711,6 +1660,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "C",
     "Class #": "1-1",
     "Date": "2026-11-09",
@@ -1724,6 +1674,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "C",
     "Class #": "1-2",
     "Date": "2026-11-13",
@@ -1737,6 +1688,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "C",
     "Class #": "2-1",
     "Date": "2026-11-18",
@@ -1750,6 +1702,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "C",
     "Class #": "2-2",
     "Date": "2026-11-25",
@@ -1763,6 +1716,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "C",
     "Class #": "3-1",
     "Date": "2026-11-27",
@@ -1776,6 +1730,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "C",
     "Class #": "3-2",
     "Date": "2026-12-03",
@@ -1789,6 +1744,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "C",
     "Class #": "4-1",
     "Date": "2027-01-13",
@@ -1802,6 +1758,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "C",
     "Class #": "4-2",
     "Date": "2027-01-19",
@@ -1815,6 +1772,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "C",
     "Class #": "5-1",
     "Date": "2027-01-21",
@@ -1828,6 +1786,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "C",
     "Class #": "5-2",
     "Date": "2027-01-27",
@@ -1841,6 +1800,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "C",
     "Class #": "6-1",
     "Date": "2027-01-29",
@@ -1854,6 +1814,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "C",
     "Class #": "6-2",
     "Date": "2027-02-04",
@@ -1867,6 +1828,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "C",
     "Class #": "7-1",
     "Date": "2027-02-08",
@@ -1880,6 +1842,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "C",
     "Class #": "7-2",
     "Date": "2027-02-12",
@@ -1893,6 +1856,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "C",
     "Class #": "8-1",
     "Date": "2027-02-16",
@@ -1906,6 +1870,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "C",
     "Class #": "8-2",
     "Date": "2027-02-22",
@@ -1919,6 +1884,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "C",
     "Class #": "9-1",
     "Date": "2027-02-24",
@@ -1932,6 +1898,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "C",
     "Class #": "9-2",
     "Date": "2027-03-02",
@@ -1945,6 +1912,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "C",
     "Class #": "10-1",
     "Date": "2027-03-04",
@@ -1958,6 +1926,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "C",
     "Class #": "10-2",
     "Date": "2027-03-10",
@@ -1971,6 +1940,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "C",
     "Class #": "1-1",
     "Date": "2027-03-15",
@@ -1984,6 +1954,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "C",
     "Class #": "1-2",
     "Date": "2027-03-19",
@@ -1997,6 +1968,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "C",
     "Class #": "2-1",
     "Date": "2027-03-30",
@@ -2010,6 +1982,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "C",
     "Class #": "2-2",
     "Date": "2027-04-06",
@@ -2023,6 +1996,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "C",
     "Class #": "3-1",
     "Date": "2027-04-08",
@@ -2036,6 +2010,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "C",
     "Class #": "3-2",
     "Date": "2027-04-14",
@@ -2049,6 +2024,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "C",
     "Class #": "4-1",
     "Date": "2027-04-16",
@@ -2062,6 +2038,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "C",
     "Class #": "4-2",
     "Date": "2027-04-22",
@@ -2075,6 +2052,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "C",
     "Class #": "5-1",
     "Date": "2027-04-26",
@@ -2088,6 +2066,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "C",
     "Class #": "5-2",
     "Date": "2027-04-30",
@@ -2101,6 +2080,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "C",
     "Class #": "6-1",
     "Date": "2027-05-04",
@@ -2114,6 +2094,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "C",
     "Class #": "6-2",
     "Date": "2027-05-11",
@@ -2127,97 +2108,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
-    "Section": "C",
-    "Class #": "2-1",
-    "Date": "2027-05-13",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "C",
-    "Class #": "2-2",
-    "Date": "2027-05-20",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "C",
-    "Class #": "3-1",
-    "Date": "2027-05-24",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "C",
-    "Class #": "3-2",
-    "Date": "2027-05-28",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "C",
-    "Class #": "4-1",
-    "Date": "2027-06-02",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "C",
-    "Class #": "4-2",
-    "Date": "2027-06-09",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "C",
-    "Class #": "5-1",
-    "Date": "2027-06-11",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
+    "Term": 1,
     "Section": "D",
     "Class #": "1-1",
     "Date": "2026-08-18",
@@ -2231,6 +2122,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "D",
     "Class #": "1-2",
     "Date": "2026-08-20",
@@ -2244,6 +2136,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "D",
     "Class #": "2-1",
     "Date": "2026-08-26",
@@ -2257,6 +2150,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "D",
     "Class #": "2-2",
     "Date": "2026-08-28",
@@ -2270,6 +2164,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "D",
     "Class #": "3-1",
     "Date": "2026-09-03",
@@ -2283,6 +2178,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "D",
     "Class #": "3-2",
     "Date": "2026-09-07",
@@ -2296,6 +2192,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "D",
     "Class #": "4-1",
     "Date": "2026-09-11",
@@ -2309,6 +2206,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "D",
     "Class #": "4-2",
     "Date": "2026-09-15",
@@ -2322,6 +2220,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "D",
     "Class #": "5-1",
     "Date": "2026-09-21",
@@ -2335,6 +2234,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "D",
     "Class #": "5-2",
     "Date": "2026-09-23",
@@ -2348,6 +2248,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "D",
     "Class #": "6-1",
     "Date": "2026-09-29",
@@ -2361,6 +2262,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "D",
     "Class #": "6-2",
     "Date": "2026-10-01",
@@ -2374,6 +2276,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "D",
     "Class #": "7-1",
     "Date": "2026-10-15",
@@ -2387,6 +2290,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "D",
     "Class #": "7-2",
     "Date": "2026-10-19",
@@ -2400,6 +2304,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "D",
     "Class #": "8-1",
     "Date": "2026-10-23",
@@ -2413,6 +2318,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "D",
     "Class #": "8-2",
     "Date": "2026-10-27",
@@ -2426,6 +2332,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "D",
     "Class #": "9-1",
     "Date": "2026-11-03",
@@ -2439,6 +2346,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "D",
     "Class #": "9-2",
     "Date": "2026-11-05",
@@ -2452,6 +2360,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "D",
     "Class #": "1-1",
     "Date": "2026-11-12",
@@ -2465,6 +2374,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "D",
     "Class #": "1-2",
     "Date": "2026-11-17",
@@ -2478,6 +2388,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "D",
     "Class #": "2-1",
     "Date": "2026-11-24",
@@ -2491,6 +2402,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "D",
     "Class #": "2-2",
     "Date": "2026-11-26",
@@ -2504,6 +2416,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "D",
     "Class #": "3-1",
     "Date": "2026-12-02",
@@ -2517,6 +2430,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "D",
     "Class #": "3-2",
     "Date": "2026-12-04",
@@ -2530,6 +2444,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "D",
     "Class #": "4-1",
     "Date": "2027-01-18",
@@ -2543,6 +2458,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "D",
     "Class #": "4-2",
     "Date": "2027-01-20",
@@ -2556,6 +2472,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "D",
     "Class #": "5-1",
     "Date": "2027-01-26",
@@ -2569,6 +2486,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "D",
     "Class #": "5-2",
     "Date": "2027-01-28",
@@ -2582,6 +2500,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "D",
     "Class #": "6-1",
     "Date": "2027-02-03",
@@ -2595,6 +2514,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "D",
     "Class #": "6-2",
     "Date": "2027-02-05",
@@ -2608,6 +2528,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "D",
     "Class #": "7-1",
     "Date": "2027-02-11",
@@ -2621,6 +2542,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "D",
     "Class #": "7-2",
     "Date": "2027-02-15",
@@ -2634,6 +2556,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "D",
     "Class #": "8-1",
     "Date": "2027-02-19",
@@ -2647,6 +2570,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "D",
     "Class #": "8-2",
     "Date": "2027-02-23",
@@ -2660,6 +2584,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "D",
     "Class #": "9-1",
     "Date": "2027-03-01",
@@ -2673,6 +2598,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "D",
     "Class #": "9-2",
     "Date": "2027-03-03",
@@ -2686,6 +2612,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "D",
     "Class #": "10-1",
     "Date": "2027-03-09",
@@ -2699,6 +2626,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "D",
     "Class #": "10-2",
     "Date": "2027-03-11",
@@ -2712,6 +2640,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "D",
     "Class #": "1-1",
     "Date": "2027-03-18",
@@ -2725,6 +2654,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "D",
     "Class #": "1-2",
     "Date": "2027-03-29",
@@ -2738,6 +2668,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "D",
     "Class #": "2-1",
     "Date": "2027-04-05",
@@ -2751,6 +2682,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "D",
     "Class #": "2-2",
     "Date": "2027-04-07",
@@ -2764,6 +2696,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "D",
     "Class #": "3-1",
     "Date": "2027-04-13",
@@ -2777,6 +2710,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "D",
     "Class #": "3-2",
     "Date": "2027-04-15",
@@ -2790,6 +2724,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "D",
     "Class #": "4-1",
     "Date": "2027-04-21",
@@ -2803,6 +2738,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "D",
     "Class #": "4-2",
     "Date": "2027-04-23",
@@ -2816,6 +2752,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "D",
     "Class #": "5-1",
     "Date": "2027-04-29",
@@ -2829,6 +2766,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "D",
     "Class #": "5-2",
     "Date": "2027-05-03",
@@ -2842,6 +2780,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "D",
     "Class #": "6-1",
     "Date": "2027-05-07",
@@ -2855,97 +2794,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
-    "Section": "D",
-    "Class #": "1-2",
-    "Date": "2027-05-12",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "D",
-    "Class #": "2-1",
-    "Date": "2027-05-19",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "D",
-    "Class #": "2-2",
-    "Date": "2027-05-21",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "D",
-    "Class #": "3-1",
-    "Date": "2027-05-27",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "D",
-    "Class #": "3-2",
-    "Date": "2027-06-01",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "D",
-    "Class #": "4-1",
-    "Date": "2027-06-08",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "D",
-    "Class #": "4-2",
-    "Date": "2027-06-10",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
+    "Term": 1,
     "Section": "E",
     "Class #": "1-1",
     "Date": "2026-08-12",
@@ -2959,6 +2808,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "E",
     "Class #": "1-2",
     "Date": "2026-08-19",
@@ -2972,6 +2822,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "E",
     "Class #": "2-1",
     "Date": "2026-08-21",
@@ -2985,6 +2836,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "E",
     "Class #": "2-2",
     "Date": "2026-08-27",
@@ -2998,6 +2850,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "E",
     "Class #": "3-1",
     "Date": "2026-08-31",
@@ -3011,6 +2864,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "E",
     "Class #": "3-2",
     "Date": "2026-09-04",
@@ -3024,6 +2878,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "E",
     "Class #": "4-1",
     "Date": "2026-09-08",
@@ -3037,6 +2892,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "E",
     "Class #": "4-2",
     "Date": "2026-09-14",
@@ -3050,6 +2906,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "E",
     "Class #": "5-1",
     "Date": "2026-09-16",
@@ -3063,6 +2920,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "E",
     "Class #": "5-2",
     "Date": "2026-09-22",
@@ -3076,6 +2934,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "E",
     "Class #": "6-1",
     "Date": "2026-09-24",
@@ -3089,6 +2948,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "E",
     "Class #": "6-2",
     "Date": "2026-09-30",
@@ -3102,6 +2962,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "E",
     "Class #": "7-1",
     "Date": "2026-10-02",
@@ -3115,6 +2976,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "E",
     "Class #": "7-2",
     "Date": "2026-10-16",
@@ -3128,6 +2990,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "E",
     "Class #": "8-1",
     "Date": "2026-10-20",
@@ -3141,6 +3004,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "E",
     "Class #": "8-2",
     "Date": "2026-10-26",
@@ -3154,6 +3018,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "E",
     "Class #": "9-1",
     "Date": "2026-10-28",
@@ -3167,6 +3032,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "E",
     "Class #": "9-2",
     "Date": "2026-11-04",
@@ -3180,6 +3046,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "E",
     "Class #": "1-1",
     "Date": "2026-11-09",
@@ -3193,6 +3060,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "E",
     "Class #": "1-2",
     "Date": "2026-11-13",
@@ -3206,6 +3074,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "E",
     "Class #": "2-1",
     "Date": "2026-11-18",
@@ -3219,6 +3088,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "E",
     "Class #": "2-2",
     "Date": "2026-11-25",
@@ -3232,6 +3102,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "E",
     "Class #": "3-1",
     "Date": "2026-11-27",
@@ -3245,6 +3116,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "E",
     "Class #": "3-2",
     "Date": "2026-12-03",
@@ -3258,6 +3130,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "E",
     "Class #": "4-1",
     "Date": "2027-01-13",
@@ -3271,6 +3144,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "E",
     "Class #": "4-2",
     "Date": "2027-01-19",
@@ -3284,6 +3158,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "E",
     "Class #": "5-1",
     "Date": "2027-01-21",
@@ -3297,6 +3172,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "E",
     "Class #": "5-2",
     "Date": "2027-01-27",
@@ -3310,6 +3186,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "E",
     "Class #": "6-1",
     "Date": "2027-01-29",
@@ -3323,6 +3200,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "E",
     "Class #": "6-2",
     "Date": "2027-02-04",
@@ -3336,6 +3214,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "E",
     "Class #": "7-1",
     "Date": "2027-02-08",
@@ -3349,6 +3228,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "E",
     "Class #": "7-2",
     "Date": "2027-02-12",
@@ -3362,6 +3242,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "E",
     "Class #": "8-1",
     "Date": "2027-02-16",
@@ -3375,6 +3256,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "E",
     "Class #": "8-2",
     "Date": "2027-02-22",
@@ -3388,6 +3270,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "E",
     "Class #": "9-1",
     "Date": "2027-02-24",
@@ -3401,6 +3284,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "E",
     "Class #": "9-2",
     "Date": "2027-03-02",
@@ -3414,6 +3298,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "E",
     "Class #": "10-1",
     "Date": "2027-03-04",
@@ -3427,6 +3312,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "E",
     "Class #": "10-2",
     "Date": "2027-03-10",
@@ -3440,6 +3326,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "E",
     "Class #": "1-1",
     "Date": "2027-03-15",
@@ -3453,6 +3340,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "E",
     "Class #": "1-2",
     "Date": "2027-03-19",
@@ -3466,6 +3354,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "E",
     "Class #": "2-1",
     "Date": "2027-03-30",
@@ -3479,6 +3368,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "E",
     "Class #": "2-2",
     "Date": "2027-04-06",
@@ -3492,6 +3382,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "E",
     "Class #": "3-1",
     "Date": "2027-04-08",
@@ -3505,6 +3396,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "E",
     "Class #": "3-2",
     "Date": "2027-04-14",
@@ -3518,6 +3410,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "E",
     "Class #": "4-1",
     "Date": "2027-04-16",
@@ -3531,6 +3424,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "E",
     "Class #": "4-2",
     "Date": "2027-04-22",
@@ -3544,6 +3438,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "E",
     "Class #": "5-1",
     "Date": "2027-04-26",
@@ -3557,6 +3452,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "E",
     "Class #": "5-2",
     "Date": "2027-04-30",
@@ -3570,6 +3466,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "E",
     "Class #": "6-1",
     "Date": "2027-05-04",
@@ -3583,6 +3480,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "E",
     "Class #": "6-2",
     "Date": "2027-05-11",
@@ -3596,97 +3494,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
-    "Section": "E",
-    "Class #": "2-1",
-    "Date": "2027-05-13",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "E",
-    "Class #": "2-2",
-    "Date": "2027-05-20",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "E",
-    "Class #": "3-1",
-    "Date": "2027-05-24",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "E",
-    "Class #": "3-2",
-    "Date": "2027-05-28",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "E",
-    "Class #": "4-1",
-    "Date": "2027-06-02",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "E",
-    "Class #": "4-2",
-    "Date": "2027-06-09",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "E",
-    "Class #": "5-1",
-    "Date": "2027-06-11",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
+    "Term": 1,
     "Section": "SEMINAR",
     "Class #": "1-1",
     "Date": "2026-08-18",
@@ -3700,6 +3508,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "SEMINAR",
     "Class #": "2-1",
     "Date": "2026-08-26",
@@ -3713,6 +3522,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "SEMINAR",
     "Class #": "3-1",
     "Date": "2026-09-03",
@@ -3726,6 +3536,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "SEMINAR",
     "Class #": "4-1",
     "Date": "2026-09-11",
@@ -3739,6 +3550,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "SEMINAR",
     "Class #": "5-1",
     "Date": "2026-09-21",
@@ -3752,6 +3564,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "SEMINAR",
     "Class #": "6-1",
     "Date": "2026-09-29",
@@ -3765,6 +3578,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "SEMINAR",
     "Class #": "7-1",
     "Date": "2026-10-15",
@@ -3778,6 +3592,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "SEMINAR",
     "Class #": "8-1",
     "Date": "2026-10-23",
@@ -3791,6 +3606,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 1,
     "Section": "SEMINAR",
     "Class #": "9-1",
     "Date": "2026-11-03",
@@ -3804,6 +3620,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "SEMINAR",
     "Class #": "1-1",
     "Date": "2026-11-12",
@@ -3817,6 +3634,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "SEMINAR",
     "Class #": "2-1",
     "Date": "2026-11-24",
@@ -3830,6 +3648,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "SEMINAR",
     "Class #": "3-1",
     "Date": "2026-12-02",
@@ -3843,6 +3662,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "SEMINAR",
     "Class #": "4-1",
     "Date": "2027-01-18",
@@ -3856,6 +3676,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "SEMINAR",
     "Class #": "5-1",
     "Date": "2027-01-26",
@@ -3869,6 +3690,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "SEMINAR",
     "Class #": "6-1",
     "Date": "2027-02-03",
@@ -3882,6 +3704,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "SEMINAR",
     "Class #": "7-1",
     "Date": "2027-02-11",
@@ -3895,6 +3718,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "SEMINAR",
     "Class #": "8-1",
     "Date": "2027-02-19",
@@ -3908,6 +3732,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "SEMINAR",
     "Class #": "9-1",
     "Date": "2027-03-01",
@@ -3921,6 +3746,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 2,
     "Section": "SEMINAR",
     "Class #": "10-1",
     "Date": "2027-03-09",
@@ -3934,6 +3760,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "SEMINAR",
     "Class #": "1-1",
     "Date": "2027-03-18",
@@ -3947,6 +3774,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "SEMINAR",
     "Class #": "2-1",
     "Date": "2027-04-05",
@@ -3960,6 +3788,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "SEMINAR",
     "Class #": "3-1",
     "Date": "2027-04-13",
@@ -3973,6 +3802,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "SEMINAR",
     "Class #": "4-1",
     "Date": "2027-04-21",
@@ -3986,6 +3816,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "SEMINAR",
     "Class #": "5-1",
     "Date": "2027-04-29",
@@ -3999,6 +3830,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 10,
+    "Term": 3,
     "Section": "SEMINAR",
     "Class #": "6-1",
     "Date": "2027-05-07",
@@ -4011,46 +3843,8 @@ window.MATERIALS_DATA = [
     ]
   },
   {
-    "Grade": 10,
-    "Section": "SEMINAR",
-    "Class #": "2-1",
-    "Date": "2027-05-19",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "SEMINAR",
-    "Class #": "3-1",
-    "Date": "2027-05-27",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 10,
-    "Section": "SEMINAR",
-    "Class #": "4-1",
-    "Date": "2027-06-08",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
     "Grade": 11,
+    "Term": 1,
     "Section": "A",
     "Class #": "1-1",
     "Date": "2026-08-12",
@@ -4064,6 +3858,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "A",
     "Class #": "1-2",
     "Date": "2026-08-14",
@@ -4077,6 +3872,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "A",
     "Class #": "2-1",
     "Date": "2026-08-21",
@@ -4090,6 +3886,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "A",
     "Class #": "2-2",
     "Date": "2026-08-25",
@@ -4103,6 +3900,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "A",
     "Class #": "3-1",
     "Date": "2026-08-31",
@@ -4116,6 +3914,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "A",
     "Class #": "3-2",
     "Date": "2026-09-02",
@@ -4129,6 +3928,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "A",
     "Class #": "4-1",
     "Date": "2026-09-08",
@@ -4142,6 +3942,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "A",
     "Class #": "4-2",
     "Date": "2026-09-10",
@@ -4155,6 +3956,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "A",
     "Class #": "5-1",
     "Date": "2026-09-16",
@@ -4168,6 +3970,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "A",
     "Class #": "5-2",
     "Date": "2026-09-18",
@@ -4181,6 +3984,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "A",
     "Class #": "6-1",
     "Date": "2026-09-24",
@@ -4194,6 +3998,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "A",
     "Class #": "6-2",
     "Date": "2026-09-28",
@@ -4207,6 +4012,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "A",
     "Class #": "7-1",
     "Date": "2026-10-02",
@@ -4220,6 +4026,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "A",
     "Class #": "7-2",
     "Date": "2026-10-14",
@@ -4233,6 +4040,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "A",
     "Class #": "8-1",
     "Date": "2026-10-20",
@@ -4246,6 +4054,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "A",
     "Class #": "8-2",
     "Date": "2026-10-22",
@@ -4259,6 +4068,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "A",
     "Class #": "9-1",
     "Date": "2026-10-28",
@@ -4272,6 +4082,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "A",
     "Class #": "9-2",
     "Date": "2026-10-30",
@@ -4285,6 +4096,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "A",
     "Class #": "1-1",
     "Date": "2026-11-09",
@@ -4298,6 +4110,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "A",
     "Class #": "1-2",
     "Date": "2026-11-11",
@@ -4311,6 +4124,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "A",
     "Class #": "2-1",
     "Date": "2026-11-18",
@@ -4324,6 +4138,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "A",
     "Class #": "2-2",
     "Date": "2026-11-23",
@@ -4337,6 +4152,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "A",
     "Class #": "3-1",
     "Date": "2026-11-27",
@@ -4350,6 +4166,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "A",
     "Class #": "3-2",
     "Date": "2026-12-01",
@@ -4363,6 +4180,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "A",
     "Class #": "4-1",
     "Date": "2027-01-13",
@@ -4376,6 +4194,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "A",
     "Class #": "4-2",
     "Date": "2027-01-15",
@@ -4389,6 +4208,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "A",
     "Class #": "5-1",
     "Date": "2027-01-21",
@@ -4402,6 +4222,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "A",
     "Class #": "5-2",
     "Date": "2027-01-25",
@@ -4415,6 +4236,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "A",
     "Class #": "6-1",
     "Date": "2027-01-29",
@@ -4428,6 +4250,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "A",
     "Class #": "6-2",
     "Date": "2027-02-02",
@@ -4441,6 +4264,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "A",
     "Class #": "7-1",
     "Date": "2027-02-08",
@@ -4454,6 +4278,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "A",
     "Class #": "7-2",
     "Date": "2027-02-10",
@@ -4467,6 +4292,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "A",
     "Class #": "8-1",
     "Date": "2027-02-16",
@@ -4480,6 +4306,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "A",
     "Class #": "8-2",
     "Date": "2027-02-18",
@@ -4493,6 +4320,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "A",
     "Class #": "9-1",
     "Date": "2027-02-24",
@@ -4506,6 +4334,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "A",
     "Class #": "9-2",
     "Date": "2027-02-26",
@@ -4519,6 +4348,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "A",
     "Class #": "10-1",
     "Date": "2027-03-04",
@@ -4532,6 +4362,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "A",
     "Class #": "10-2",
     "Date": "2027-03-08",
@@ -4545,6 +4376,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "A",
     "Class #": "1-1",
     "Date": "2027-03-15",
@@ -4558,6 +4390,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "A",
     "Class #": "1-2",
     "Date": "2027-03-17",
@@ -4571,6 +4404,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "A",
     "Class #": "2-1",
     "Date": "2027-03-30",
@@ -4584,6 +4418,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "A",
     "Class #": "2-2",
     "Date": "2027-04-01",
@@ -4597,6 +4432,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "A",
     "Class #": "3-1",
     "Date": "2027-04-08",
@@ -4610,6 +4446,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "A",
     "Class #": "3-2",
     "Date": "2027-04-12",
@@ -4623,6 +4460,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "A",
     "Class #": "4-1",
     "Date": "2027-04-16",
@@ -4636,6 +4474,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "A",
     "Class #": "4-2",
     "Date": "2027-04-20",
@@ -4649,6 +4488,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "A",
     "Class #": "5-1",
     "Date": "2027-04-26",
@@ -4662,6 +4502,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "A",
     "Class #": "5-2",
     "Date": "2027-04-28",
@@ -4675,6 +4516,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "A",
     "Class #": "6-1",
     "Date": "2027-05-04",
@@ -4688,6 +4530,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "A",
     "Class #": "6-2",
     "Date": "2027-05-06",
@@ -4701,97 +4544,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
-    "Section": "A",
-    "Class #": "2-1",
-    "Date": "2027-05-13",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "A",
-    "Class #": "2-2",
-    "Date": "2027-05-18",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "A",
-    "Class #": "3-1",
-    "Date": "2027-05-24",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "A",
-    "Class #": "3-2",
-    "Date": "2027-05-26",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "A",
-    "Class #": "4-1",
-    "Date": "2027-06-02",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "A",
-    "Class #": "4-2",
-    "Date": "2027-06-04",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "A",
-    "Class #": "5-1",
-    "Date": "2027-06-11",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
+    "Term": 1,
     "Section": "B",
     "Class #": "1-1",
     "Date": "2026-08-13",
@@ -4805,6 +4558,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "B",
     "Class #": "1-2",
     "Date": "2026-08-14",
@@ -4818,6 +4572,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "B",
     "Class #": "2-1",
     "Date": "2026-08-24",
@@ -4831,6 +4586,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "B",
     "Class #": "2-2",
     "Date": "2026-08-25",
@@ -4844,6 +4600,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "B",
     "Class #": "3-1",
     "Date": "2026-09-01",
@@ -4857,6 +4614,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "B",
     "Class #": "3-2",
     "Date": "2026-09-02",
@@ -4870,6 +4628,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "B",
     "Class #": "4-1",
     "Date": "2026-09-09",
@@ -4883,6 +4642,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "B",
     "Class #": "4-2",
     "Date": "2026-09-10",
@@ -4896,6 +4656,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "B",
     "Class #": "5-1",
     "Date": "2026-09-17",
@@ -4909,6 +4670,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "B",
     "Class #": "5-2",
     "Date": "2026-09-18",
@@ -4922,6 +4684,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "B",
     "Class #": "6-1",
     "Date": "2026-09-25",
@@ -4935,6 +4698,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "B",
     "Class #": "6-2",
     "Date": "2026-09-28",
@@ -4948,6 +4712,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "B",
     "Class #": "7-1",
     "Date": "2026-10-13",
@@ -4961,6 +4726,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "B",
     "Class #": "7-2",
     "Date": "2026-10-14",
@@ -4974,6 +4740,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "B",
     "Class #": "8-1",
     "Date": "2026-10-21",
@@ -4987,6 +4754,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "B",
     "Class #": "8-2",
     "Date": "2026-10-22",
@@ -5000,6 +4768,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "B",
     "Class #": "9-1",
     "Date": "2026-10-29",
@@ -5013,6 +4782,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "B",
     "Class #": "9-2",
     "Date": "2026-10-30",
@@ -5026,6 +4796,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "B",
     "Class #": "1-1",
     "Date": "2026-11-10",
@@ -5039,6 +4810,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "B",
     "Class #": "1-2",
     "Date": "2026-11-11",
@@ -5052,6 +4824,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "B",
     "Class #": "2-1",
     "Date": "2026-11-19",
@@ -5065,6 +4838,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "B",
     "Class #": "2-2",
     "Date": "2026-11-23",
@@ -5078,6 +4852,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "B",
     "Class #": "3-1",
     "Date": "2026-11-30",
@@ -5091,6 +4866,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "B",
     "Class #": "3-2",
     "Date": "2026-12-01",
@@ -5104,6 +4880,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "B",
     "Class #": "4-1",
     "Date": "2027-01-14",
@@ -5117,6 +4894,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "B",
     "Class #": "4-2",
     "Date": "2027-01-15",
@@ -5130,6 +4908,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "B",
     "Class #": "5-1",
     "Date": "2027-01-22",
@@ -5143,6 +4922,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "B",
     "Class #": "5-2",
     "Date": "2027-01-25",
@@ -5156,6 +4936,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "B",
     "Class #": "6-1",
     "Date": "2027-02-01",
@@ -5169,6 +4950,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "B",
     "Class #": "6-2",
     "Date": "2027-02-02",
@@ -5182,6 +4964,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "B",
     "Class #": "7-1",
     "Date": "2027-02-09",
@@ -5195,6 +4978,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "B",
     "Class #": "7-2",
     "Date": "2027-02-10",
@@ -5208,6 +4992,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "B",
     "Class #": "8-1",
     "Date": "2027-02-17",
@@ -5221,6 +5006,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "B",
     "Class #": "8-2",
     "Date": "2027-02-18",
@@ -5234,6 +5020,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "B",
     "Class #": "9-1",
     "Date": "2027-02-25",
@@ -5247,6 +5034,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "B",
     "Class #": "9-2",
     "Date": "2027-02-26",
@@ -5260,6 +5048,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "B",
     "Class #": "10-1",
     "Date": "2027-03-05",
@@ -5273,6 +5062,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "B",
     "Class #": "10-2",
     "Date": "2027-03-08",
@@ -5286,6 +5076,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "B",
     "Class #": "1-1",
     "Date": "2027-03-16",
@@ -5299,6 +5090,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "B",
     "Class #": "1-2",
     "Date": "2027-03-17",
@@ -5312,6 +5104,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "B",
     "Class #": "2-1",
     "Date": "2027-03-31",
@@ -5325,6 +5118,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "B",
     "Class #": "2-2",
     "Date": "2027-04-01",
@@ -5338,6 +5132,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "B",
     "Class #": "3-1",
     "Date": "2027-04-09",
@@ -5351,6 +5146,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "B",
     "Class #": "3-2",
     "Date": "2027-04-12",
@@ -5364,6 +5160,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "B",
     "Class #": "4-1",
     "Date": "2027-04-19",
@@ -5377,6 +5174,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "B",
     "Class #": "4-2",
     "Date": "2027-04-20",
@@ -5390,6 +5188,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "B",
     "Class #": "5-1",
     "Date": "2027-04-27",
@@ -5403,6 +5202,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "B",
     "Class #": "5-2",
     "Date": "2027-04-28",
@@ -5416,6 +5216,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "B",
     "Class #": "6-1",
     "Date": "2027-05-05",
@@ -5429,6 +5230,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "B",
     "Class #": "6-2",
     "Date": "2027-05-06",
@@ -5442,84 +5244,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
-    "Section": "B",
-    "Class #": "2-1",
-    "Date": "2027-05-14",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "B",
-    "Class #": "2-2",
-    "Date": "2027-05-18",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "B",
-    "Class #": "3-1",
-    "Date": "2027-05-25",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "B",
-    "Class #": "3-2",
-    "Date": "2027-05-26",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "B",
-    "Class #": "4-1",
-    "Date": "2027-06-03",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "B",
-    "Class #": "4-2",
-    "Date": "2027-06-04",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
+    "Term": 1,
     "Section": "C",
     "Class #": "1-1",
     "Date": "2026-08-12",
@@ -5533,6 +5258,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "C",
     "Class #": "1-2",
     "Date": "2026-08-20",
@@ -5546,6 +5272,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "C",
     "Class #": "2-1",
     "Date": "2026-08-21",
@@ -5559,6 +5286,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "C",
     "Class #": "2-2",
     "Date": "2026-08-28",
@@ -5572,6 +5300,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "C",
     "Class #": "3-1",
     "Date": "2026-08-31",
@@ -5585,6 +5314,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "C",
     "Class #": "3-2",
     "Date": "2026-09-07",
@@ -5598,6 +5328,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "C",
     "Class #": "4-1",
     "Date": "2026-09-08",
@@ -5611,6 +5342,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "C",
     "Class #": "4-2",
     "Date": "2026-09-15",
@@ -5624,6 +5356,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "C",
     "Class #": "5-1",
     "Date": "2026-09-16",
@@ -5637,6 +5370,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "C",
     "Class #": "5-2",
     "Date": "2026-09-23",
@@ -5650,6 +5384,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "C",
     "Class #": "6-1",
     "Date": "2026-09-24",
@@ -5663,6 +5398,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "C",
     "Class #": "6-2",
     "Date": "2026-10-01",
@@ -5676,6 +5412,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "C",
     "Class #": "7-1",
     "Date": "2026-10-02",
@@ -5689,6 +5426,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "C",
     "Class #": "7-2",
     "Date": "2026-10-19",
@@ -5702,6 +5440,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "C",
     "Class #": "8-1",
     "Date": "2026-10-20",
@@ -5715,6 +5454,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "C",
     "Class #": "8-2",
     "Date": "2026-10-27",
@@ -5728,6 +5468,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "C",
     "Class #": "9-1",
     "Date": "2026-10-28",
@@ -5741,6 +5482,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "C",
     "Class #": "9-2",
     "Date": "2026-11-05",
@@ -5754,6 +5496,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "C",
     "Class #": "1-1",
     "Date": "2026-11-09",
@@ -5767,6 +5510,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "C",
     "Class #": "1-2",
     "Date": "2026-11-17",
@@ -5780,6 +5524,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "C",
     "Class #": "2-1",
     "Date": "2026-11-18",
@@ -5793,6 +5538,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "C",
     "Class #": "2-2",
     "Date": "2026-11-26",
@@ -5806,6 +5552,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "C",
     "Class #": "3-1",
     "Date": "2026-11-27",
@@ -5819,6 +5566,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "C",
     "Class #": "3-2",
     "Date": "2026-12-04",
@@ -5832,6 +5580,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "C",
     "Class #": "4-1",
     "Date": "2027-01-13",
@@ -5845,6 +5594,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "C",
     "Class #": "4-2",
     "Date": "2027-01-20",
@@ -5858,6 +5608,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "C",
     "Class #": "5-1",
     "Date": "2027-01-21",
@@ -5871,6 +5622,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "C",
     "Class #": "5-2",
     "Date": "2027-01-28",
@@ -5884,6 +5636,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "C",
     "Class #": "6-1",
     "Date": "2027-01-29",
@@ -5897,6 +5650,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "C",
     "Class #": "6-2",
     "Date": "2027-02-05",
@@ -5910,6 +5664,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "C",
     "Class #": "7-1",
     "Date": "2027-02-08",
@@ -5923,6 +5678,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "C",
     "Class #": "7-2",
     "Date": "2027-02-15",
@@ -5936,6 +5692,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "C",
     "Class #": "8-1",
     "Date": "2027-02-16",
@@ -5949,6 +5706,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "C",
     "Class #": "8-2",
     "Date": "2027-02-23",
@@ -5962,6 +5720,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "C",
     "Class #": "9-1",
     "Date": "2027-02-24",
@@ -5975,6 +5734,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "C",
     "Class #": "9-2",
     "Date": "2027-03-03",
@@ -5988,6 +5748,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "C",
     "Class #": "10-1",
     "Date": "2027-03-04",
@@ -6001,6 +5762,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "C",
     "Class #": "10-2",
     "Date": "2027-03-11",
@@ -6014,6 +5776,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "C",
     "Class #": "1-1",
     "Date": "2027-03-15",
@@ -6027,6 +5790,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "C",
     "Class #": "1-2",
     "Date": "2027-03-29",
@@ -6040,6 +5804,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "C",
     "Class #": "2-1",
     "Date": "2027-03-30",
@@ -6053,6 +5818,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "C",
     "Class #": "2-2",
     "Date": "2027-04-07",
@@ -6066,6 +5832,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "C",
     "Class #": "3-1",
     "Date": "2027-04-08",
@@ -6079,6 +5846,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "C",
     "Class #": "3-2",
     "Date": "2027-04-15",
@@ -6092,6 +5860,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "C",
     "Class #": "4-1",
     "Date": "2027-04-16",
@@ -6105,6 +5874,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "C",
     "Class #": "4-2",
     "Date": "2027-04-23",
@@ -6118,6 +5888,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "C",
     "Class #": "5-1",
     "Date": "2027-04-26",
@@ -6131,6 +5902,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "C",
     "Class #": "5-2",
     "Date": "2027-05-03",
@@ -6144,6 +5916,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "C",
     "Class #": "6-1",
     "Date": "2027-05-04",
@@ -6157,110 +5930,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
-    "Section": "C",
-    "Class #": "1-2",
-    "Date": "2027-05-12",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "C",
-    "Class #": "2-1",
-    "Date": "2027-05-13",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "C",
-    "Class #": "2-2",
-    "Date": "2027-05-21",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "C",
-    "Class #": "3-1",
-    "Date": "2027-05-24",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "C",
-    "Class #": "3-2",
-    "Date": "2027-06-01",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "C",
-    "Class #": "4-1",
-    "Date": "2027-06-02",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "C",
-    "Class #": "4-2",
-    "Date": "2027-06-10",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "C",
-    "Class #": "5-1",
-    "Date": "2027-06-11",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
+    "Term": 1,
     "Section": "D",
     "Class #": "1-1",
     "Date": "2026-08-14",
@@ -6274,6 +5944,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "D",
     "Class #": "1-2",
     "Date": "2026-08-19",
@@ -6287,6 +5958,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "D",
     "Class #": "2-1",
     "Date": "2026-08-25",
@@ -6300,6 +5972,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "D",
     "Class #": "2-2",
     "Date": "2026-08-27",
@@ -6313,6 +5986,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "D",
     "Class #": "3-1",
     "Date": "2026-09-02",
@@ -6326,6 +6000,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "D",
     "Class #": "3-2",
     "Date": "2026-09-04",
@@ -6339,6 +6014,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "D",
     "Class #": "4-1",
     "Date": "2026-09-10",
@@ -6352,6 +6028,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "D",
     "Class #": "4-2",
     "Date": "2026-09-14",
@@ -6365,6 +6042,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "D",
     "Class #": "5-1",
     "Date": "2026-09-18",
@@ -6378,6 +6056,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "D",
     "Class #": "5-2",
     "Date": "2026-09-22",
@@ -6391,6 +6070,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "D",
     "Class #": "6-1",
     "Date": "2026-09-28",
@@ -6404,6 +6084,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "D",
     "Class #": "6-2",
     "Date": "2026-09-30",
@@ -6417,6 +6098,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "D",
     "Class #": "7-1",
     "Date": "2026-10-14",
@@ -6430,6 +6112,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "D",
     "Class #": "7-2",
     "Date": "2026-10-16",
@@ -6443,6 +6126,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "D",
     "Class #": "8-1",
     "Date": "2026-10-22",
@@ -6456,6 +6140,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "D",
     "Class #": "8-2",
     "Date": "2026-10-26",
@@ -6469,6 +6154,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "D",
     "Class #": "9-1",
     "Date": "2026-10-30",
@@ -6482,6 +6168,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "D",
     "Class #": "9-2",
     "Date": "2026-11-04",
@@ -6495,6 +6182,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "D",
     "Class #": "1-1",
     "Date": "2026-11-11",
@@ -6508,6 +6196,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "D",
     "Class #": "1-2",
     "Date": "2026-11-13",
@@ -6521,6 +6210,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "D",
     "Class #": "2-1",
     "Date": "2026-11-23",
@@ -6534,6 +6224,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "D",
     "Class #": "2-2",
     "Date": "2026-11-25",
@@ -6547,6 +6238,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "D",
     "Class #": "3-1",
     "Date": "2026-12-01",
@@ -6560,6 +6252,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "D",
     "Class #": "3-2",
     "Date": "2026-12-03",
@@ -6573,6 +6266,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "D",
     "Class #": "4-1",
     "Date": "2027-01-15",
@@ -6586,6 +6280,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "D",
     "Class #": "4-2",
     "Date": "2027-01-19",
@@ -6599,6 +6294,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "D",
     "Class #": "5-1",
     "Date": "2027-01-25",
@@ -6612,6 +6308,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "D",
     "Class #": "5-2",
     "Date": "2027-01-27",
@@ -6625,6 +6322,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "D",
     "Class #": "6-1",
     "Date": "2027-02-02",
@@ -6638,6 +6336,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "D",
     "Class #": "6-2",
     "Date": "2027-02-04",
@@ -6651,6 +6350,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "D",
     "Class #": "7-1",
     "Date": "2027-02-10",
@@ -6664,6 +6364,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "D",
     "Class #": "7-2",
     "Date": "2027-02-12",
@@ -6677,6 +6378,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "D",
     "Class #": "8-1",
     "Date": "2027-02-18",
@@ -6690,6 +6392,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "D",
     "Class #": "8-2",
     "Date": "2027-02-22",
@@ -6703,6 +6406,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "D",
     "Class #": "9-1",
     "Date": "2027-02-26",
@@ -6716,6 +6420,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "D",
     "Class #": "9-2",
     "Date": "2027-03-02",
@@ -6729,6 +6434,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "D",
     "Class #": "10-1",
     "Date": "2027-03-08",
@@ -6742,6 +6448,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "D",
     "Class #": "10-2",
     "Date": "2027-03-10",
@@ -6755,6 +6462,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "D",
     "Class #": "1-1",
     "Date": "2027-03-17",
@@ -6768,6 +6476,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "D",
     "Class #": "1-2",
     "Date": "2027-03-19",
@@ -6781,6 +6490,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "D",
     "Class #": "2-1",
     "Date": "2027-04-01",
@@ -6794,6 +6504,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "D",
     "Class #": "2-2",
     "Date": "2027-04-06",
@@ -6807,6 +6518,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "D",
     "Class #": "3-1",
     "Date": "2027-04-12",
@@ -6820,6 +6532,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "D",
     "Class #": "3-2",
     "Date": "2027-04-14",
@@ -6833,6 +6546,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "D",
     "Class #": "4-1",
     "Date": "2027-04-20",
@@ -6846,6 +6560,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "D",
     "Class #": "4-2",
     "Date": "2027-04-22",
@@ -6859,6 +6574,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "D",
     "Class #": "5-1",
     "Date": "2027-04-28",
@@ -6872,6 +6588,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "D",
     "Class #": "5-2",
     "Date": "2027-04-30",
@@ -6885,6 +6602,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "D",
     "Class #": "6-1",
     "Date": "2027-05-06",
@@ -6898,6 +6616,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "D",
     "Class #": "6-2",
     "Date": "2027-05-11",
@@ -6911,84 +6630,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
-    "Section": "D",
-    "Class #": "2-1",
-    "Date": "2027-05-18",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "D",
-    "Class #": "2-2",
-    "Date": "2027-05-20",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "D",
-    "Class #": "3-1",
-    "Date": "2027-05-26",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "D",
-    "Class #": "3-2",
-    "Date": "2027-05-28",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "D",
-    "Class #": "4-1",
-    "Date": "2027-06-04",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "D",
-    "Class #": "4-2",
-    "Date": "2027-06-09",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
+    "Term": 1,
     "Section": "E",
     "Class #": "1-1",
     "Date": "2026-08-12",
@@ -7002,6 +6644,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "E",
     "Class #": "1-2",
     "Date": "2026-08-20",
@@ -7015,6 +6658,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "E",
     "Class #": "2-1",
     "Date": "2026-08-21",
@@ -7028,6 +6672,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "E",
     "Class #": "2-2",
     "Date": "2026-08-28",
@@ -7041,6 +6686,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "E",
     "Class #": "3-1",
     "Date": "2026-08-31",
@@ -7054,6 +6700,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "E",
     "Class #": "3-2",
     "Date": "2026-09-07",
@@ -7067,6 +6714,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "E",
     "Class #": "4-1",
     "Date": "2026-09-08",
@@ -7080,6 +6728,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "E",
     "Class #": "4-2",
     "Date": "2026-09-15",
@@ -7093,6 +6742,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "E",
     "Class #": "5-1",
     "Date": "2026-09-16",
@@ -7106,6 +6756,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "E",
     "Class #": "5-2",
     "Date": "2026-09-23",
@@ -7119,6 +6770,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "E",
     "Class #": "6-1",
     "Date": "2026-09-24",
@@ -7132,6 +6784,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "E",
     "Class #": "6-2",
     "Date": "2026-10-01",
@@ -7145,6 +6798,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "E",
     "Class #": "7-1",
     "Date": "2026-10-02",
@@ -7158,6 +6812,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "E",
     "Class #": "7-2",
     "Date": "2026-10-19",
@@ -7171,6 +6826,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "E",
     "Class #": "8-1",
     "Date": "2026-10-20",
@@ -7184,6 +6840,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "E",
     "Class #": "8-2",
     "Date": "2026-10-27",
@@ -7197,6 +6854,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "E",
     "Class #": "9-1",
     "Date": "2026-10-28",
@@ -7210,6 +6868,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 1,
     "Section": "E",
     "Class #": "9-2",
     "Date": "2026-11-05",
@@ -7223,6 +6882,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "E",
     "Class #": "1-1",
     "Date": "2026-11-09",
@@ -7236,6 +6896,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "E",
     "Class #": "1-2",
     "Date": "2026-11-17",
@@ -7249,6 +6910,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "E",
     "Class #": "2-1",
     "Date": "2026-11-18",
@@ -7262,6 +6924,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "E",
     "Class #": "2-2",
     "Date": "2026-11-26",
@@ -7275,6 +6938,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "E",
     "Class #": "3-1",
     "Date": "2026-11-27",
@@ -7288,6 +6952,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "E",
     "Class #": "3-2",
     "Date": "2026-12-04",
@@ -7301,6 +6966,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "E",
     "Class #": "4-1",
     "Date": "2027-01-13",
@@ -7314,6 +6980,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "E",
     "Class #": "4-2",
     "Date": "2027-01-20",
@@ -7327,6 +6994,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "E",
     "Class #": "5-1",
     "Date": "2027-01-21",
@@ -7340,6 +7008,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "E",
     "Class #": "5-2",
     "Date": "2027-01-28",
@@ -7353,6 +7022,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "E",
     "Class #": "6-1",
     "Date": "2027-01-29",
@@ -7366,6 +7036,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "E",
     "Class #": "6-2",
     "Date": "2027-02-05",
@@ -7379,6 +7050,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "E",
     "Class #": "7-1",
     "Date": "2027-02-08",
@@ -7392,6 +7064,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "E",
     "Class #": "7-2",
     "Date": "2027-02-15",
@@ -7405,6 +7078,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "E",
     "Class #": "8-1",
     "Date": "2027-02-16",
@@ -7418,6 +7092,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "E",
     "Class #": "8-2",
     "Date": "2027-02-23",
@@ -7431,6 +7106,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "E",
     "Class #": "9-1",
     "Date": "2027-02-24",
@@ -7444,6 +7120,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "E",
     "Class #": "9-2",
     "Date": "2027-03-03",
@@ -7457,6 +7134,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "E",
     "Class #": "10-1",
     "Date": "2027-03-04",
@@ -7470,6 +7148,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 2,
     "Section": "E",
     "Class #": "10-2",
     "Date": "2027-03-11",
@@ -7483,6 +7162,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "E",
     "Class #": "1-1",
     "Date": "2027-03-15",
@@ -7496,6 +7176,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "E",
     "Class #": "1-2",
     "Date": "2027-03-29",
@@ -7509,6 +7190,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "E",
     "Class #": "2-1",
     "Date": "2027-03-30",
@@ -7522,6 +7204,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "E",
     "Class #": "2-2",
     "Date": "2027-04-07",
@@ -7535,6 +7218,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "E",
     "Class #": "3-1",
     "Date": "2027-04-08",
@@ -7548,6 +7232,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "E",
     "Class #": "3-2",
     "Date": "2027-04-15",
@@ -7561,6 +7246,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "E",
     "Class #": "4-1",
     "Date": "2027-04-16",
@@ -7574,6 +7260,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "E",
     "Class #": "4-2",
     "Date": "2027-04-23",
@@ -7587,6 +7274,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "E",
     "Class #": "5-1",
     "Date": "2027-04-26",
@@ -7600,6 +7288,7 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "E",
     "Class #": "5-2",
     "Date": "2027-05-03",
@@ -7613,113 +7302,10 @@ window.MATERIALS_DATA = [
   },
   {
     "Grade": 11,
+    "Term": 3,
     "Section": "E",
     "Class #": "6-1",
     "Date": "2027-05-04",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "E",
-    "Class #": "1-2",
-    "Date": "2027-05-12",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "E",
-    "Class #": "2-1",
-    "Date": "2027-05-13",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "E",
-    "Class #": "2-2",
-    "Date": "2027-05-21",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "E",
-    "Class #": "3-1",
-    "Date": "2027-05-24",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "E",
-    "Class #": "3-2",
-    "Date": "2027-06-01",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "E",
-    "Class #": "4-1",
-    "Date": "2027-06-02",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "E",
-    "Class #": "4-2",
-    "Date": "2027-06-10",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Section": "E",
-    "Class #": "5-1",
-    "Date": "2027-06-11",
     "Materials": [
       {
         "Acronym": "MAT",
