@@ -3,11 +3,32 @@
 
   const practiceData = {
     selectors: [
-      { key: "section", label: "Section", type: "filter", multiple: true }
+      {
+        key: "layer1",
+        label: "Number of components",
+        type: "filter",
+        multiple: true,
+        options: ["Direct", "1 component", "2 components", "3 components", "4 components"]
+      },
+      {
+        key: "layer2",
+        label: "Component structure",
+        type: "filter",
+        multiple: true,
+        options: ["AV", "SV", "AF", "SF"],
+        descriptions: {
+          AV: "Alternative-based Variable",
+          SV: "State-based Variable",
+          AF: "Alternative-based Fixed",
+          SF: "State-based Fixed"
+        }
+      }
     ],
     problems: [
       {
         id: "problem-1",
+        layer1: "Direct",
+        layer2: [],
         labels: {
           name: "Introductory General Problem (C1--C2)",
           section: "Introduction"
@@ -50,6 +71,8 @@ $$
       },
       {
         id: "problem-2",
+        layer1: "4 components",
+        layer2: ["AV","SV","AF","SF"],
         labels: {
           name: "Advanced General Problem (C1--C2)",
           section: "Introduction"
@@ -111,6 +134,8 @@ $$
       },
       {
         id: "problem-3",
+        layer1: "Direct",
+        layer2: [],
         labels: {
           name: "Local Café Investment (C1--C2)",
           section: "Direct Alternative--State Payoffs"
@@ -157,6 +182,8 @@ $$
       },
       {
         id: "problem-4",
+        layer1: "Direct",
+        layer2: [],
         labels: {
           name: "Green Energy Production Mix (C1--C2)",
           section: "Direct Alternative--State Payoffs"
@@ -210,6 +237,8 @@ $$
       },
       {
         id: "problem-5",
+        layer1: "Direct",
+        layer2: [],
         labels: {
           name: "Global Shipping Network Design (C1--C2)",
           section: "Direct Alternative--State Payoffs"
@@ -261,6 +290,8 @@ $$
       },
       {
         id: "problem-6",
+        layer1: "1 component",
+        layer2: ["AV"],
         labels: {
           name: "Community Bakery Lunch Boxes (C1--C2)",
           section: "Alternative-Based Variable Payoff: Profit per Item Times Number of Items"
@@ -320,6 +351,8 @@ $$
       },
       {
         id: "problem-7",
+        layer1: "1 component",
+        layer2: ["AV"],
         labels: {
           name: "Rural Internet Subscriptions (C1--C2)",
           section: "Alternative-Based Variable Payoff: Profit per Item Times Number of Items"
@@ -383,6 +416,8 @@ $$
       },
       {
         id: "problem-8",
+        layer1: "1 component",
+        layer2: ["SV"],
         labels: {
           name: "Coffee Export Routes (C1--C2)",
           section: "State-Based Variable Payoff: Profit per Item Times Number of Items"
@@ -447,6 +482,8 @@ $$
       },
       {
         id: "problem-9",
+        layer1: "1 component",
+        layer2: ["SV"],
         labels: {
           name: "Lake Ferry Tourism (C1--C2)",
           section: "State-Based Variable Payoff: Profit per Item Times Number of Items"
@@ -513,6 +550,8 @@ $$
       },
       {
         id: "problem-10",
+        layer1: "1 component",
+        layer2: ["AF"],
         labels: {
           name: "School Meal Service Contracts (C1--C2)",
           section: "Alternative-Based Fixed Payoff Only"
@@ -557,6 +596,8 @@ $$
       },
       {
         id: "problem-11",
+        layer1: "1 component",
+        layer2: ["AF"],
         labels: {
           name: "Mobile Clinic Service Contracts (C1--C2)",
           section: "Alternative-Based Fixed Payoff Only"
@@ -614,6 +655,8 @@ $$
       },
       {
         id: "problem-12",
+        layer1: "1 component",
+        layer2: ["SF"],
         labels: {
           name: "Neighborhood Shelter Support (C1--C2)",
           section: "State-Based Fixed Payoff Only"
@@ -658,6 +701,8 @@ $$
       },
       {
         id: "problem-13",
+        layer1: "1 component",
+        layer2: ["SF"],
         labels: {
           name: "Community Hall Emergency Rentals (C1--C2)",
           section: "State-Based Fixed Payoff Only"
@@ -713,6 +758,8 @@ $$
       },
       {
         id: "problem-14",
+        layer1: "2 components",
+        layer2: ["AV","SV"],
         labels: {
           name: "Recycling Collection Contract (C1--C2)",
           section: "Alternative-Based Variable Payoff Plus State-Based Variable Payoff"
@@ -784,6 +831,8 @@ $$
       },
       {
         id: "problem-15",
+        layer1: "2 components",
+        layer2: ["AV","SV"],
         labels: {
           name: "Museum Ticket Platform (C1--C2)",
           section: "Alternative-Based Variable Payoff Plus State-Based Variable Payoff"
@@ -860,6 +909,8 @@ $$
       },
       {
         id: "problem-16",
+        layer1: "2 components",
+        layer2: ["AV","AF"],
         labels: {
           name: "Local Printing Contracts (C1--C2)",
           section: "Alternative-Based Variable Payoff Plus Alternative-Based Fixed Payoff"
@@ -919,6 +970,8 @@ $$
       },
       {
         id: "problem-17",
+        layer1: "2 components",
+        layer2: ["AV","AF"],
         labels: {
           name: "Cold-Storage Contracts (C1--C2)",
           section: "Alternative-Based Variable Payoff Plus Alternative-Based Fixed Payoff"
@@ -982,6 +1035,8 @@ $$
       },
       {
         id: "problem-18",
+        layer1: "2 components",
+        layer2: ["AV","SF"],
         labels: {
           name: "Urban Landscaping Bids (C1--C2)",
           section: "Alternative-Based Variable Payoff Plus State-Based Fixed Payoff"
@@ -1041,6 +1096,8 @@ $$
       },
       {
         id: "problem-19",
+        layer1: "2 components",
+        layer2: ["AV","SF"],
         labels: {
           name: "Solar Installation Bids (C1--C2)",
           section: "Alternative-Based Variable Payoff Plus State-Based Fixed Payoff"
@@ -1104,6 +1161,8 @@ $$
       },
       {
         id: "problem-20",
+        layer1: "2 components",
+        layer2: ["SV","AF"],
         labels: {
           name: "Regional Bus Charters (C1--C2)",
           section: "State-Based Variable Payoff Plus Alternative-Based Fixed Payoff"
@@ -1168,6 +1227,8 @@ $$
       },
       {
         id: "problem-21",
+        layer1: "2 components",
+        layer2: ["SV","AF"],
         labels: {
           name: "Air Cargo Charters (C1--C2)",
           section: "State-Based Variable Payoff Plus Alternative-Based Fixed Payoff"
@@ -1234,6 +1295,8 @@ $$
       },
       {
         id: "problem-22",
+        layer1: "2 components",
+        layer2: ["SV","SF"],
         labels: {
           name: "Fruit Export Permits (C1--C2)",
           section: "State-Based Variable Payoff Plus State-Based Fixed Payoff"
@@ -1298,6 +1361,8 @@ $$
       },
       {
         id: "problem-23",
+        layer1: "2 components",
+        layer2: ["SV","SF"],
         labels: {
           name: "Seafood Export Licenses (C1--C2)",
           section: "State-Based Variable Payoff Plus State-Based Fixed Payoff"
@@ -1364,6 +1429,8 @@ $$
       },
       {
         id: "problem-24",
+        layer1: "2 components",
+        layer2: ["AF","SF"],
         labels: {
           name: "Warehouse Security Agreements (C1--C2)",
           section: "Alternative-Based Fixed Payoff Plus State-Based Fixed Payoff"
@@ -1418,6 +1485,8 @@ $$
       },
       {
         id: "problem-25",
+        layer1: "2 components",
+        layer2: ["AF","SF"],
         labels: {
           name: "Harbor Inspection Agreements (C1--C2)",
           section: "Alternative-Based Fixed Payoff Plus State-Based Fixed Payoff"
@@ -1473,6 +1542,8 @@ $$
       },
       {
         id: "problem-26",
+        layer1: "3 components",
+        layer2: ["AV","SV","AF"],
         labels: {
           name: "Water Treatment Modules (C1--C2)",
           section: "Alternative-Based Variable Payoff Plus State-Based Variable Payoff Plus Alternative-Based Fixed Payoff"
@@ -1549,6 +1620,8 @@ $$
       },
       {
         id: "problem-27",
+        layer1: "3 components",
+        layer2: ["AV","SV","AF"],
         labels: {
           name: "Freight Locker Network (C1--C2)",
           section: "Alternative-Based Variable Payoff Plus State-Based Variable Payoff Plus Alternative-Based Fixed Payoff"
@@ -1631,6 +1704,8 @@ $$
       },
       {
         id: "problem-28",
+        layer1: "3 components",
+        layer2: ["AV","SV","SF"],
         labels: {
           name: "District Heating Supply (C1--C2)",
           section: "Alternative-Based Variable Payoff Plus State-Based Variable Payoff Plus State-Based Fixed Payoff"
@@ -1707,6 +1782,8 @@ $$
       },
       {
         id: "problem-29",
+        layer1: "3 components",
+        layer2: ["AV","SV","SF"],
         labels: {
           name: "Port Cold-Chain Service (C1--C2)",
           section: "Alternative-Based Variable Payoff Plus State-Based Variable Payoff Plus State-Based Fixed Payoff"
@@ -1786,6 +1863,8 @@ $$
       },
       {
         id: "problem-30",
+        layer1: "3 components",
+        layer2: ["AV","AF","SF"],
         labels: {
           name: "Pharmacy Delivery Plan (C1--C2)",
           section: "Alternative-Based Variable Payoff Plus Alternative-Based Fixed Payoff Plus State-Based Fixed Payoff"
@@ -1862,6 +1941,8 @@ $$
       },
       {
         id: "problem-31",
+        layer1: "3 components",
+        layer2: ["AV","AF","SF"],
         labels: {
           name: "Timber Processing Line (C1--C2)",
           section: "Alternative-Based Variable Payoff Plus Alternative-Based Fixed Payoff Plus State-Based Fixed Payoff"
@@ -1940,6 +2021,8 @@ $$
       },
       {
         id: "problem-32",
+        layer1: "3 components",
+        layer2: ["SV","AF","SF"],
         labels: {
           name: "Public Library Outreach (C1--C2)",
           section: "State-Based Variable Payoff Plus Alternative-Based Fixed Payoff Plus State-Based Fixed Payoff"
@@ -2016,6 +2099,8 @@ $$
       },
       {
         id: "problem-33",
+        layer1: "3 components",
+        layer2: ["SV","AF","SF"],
         labels: {
           name: "Grain Terminal Schedule (C1--C2)",
           section: "State-Based Variable Payoff Plus Alternative-Based Fixed Payoff Plus State-Based Fixed Payoff"
@@ -2097,6 +2182,8 @@ $$
       },
       {
         id: "problem-34",
+        layer1: "4 components",
+        layer2: ["AV","SV","AF","SF"],
         labels: {
           name: "Urban Food Hub (C1--C2)",
           section: "Alternative-Based and State-Based Variable Payoffs Plus Alternative-Based and State-Based Fixed Payoffs"
@@ -2178,6 +2265,8 @@ $$
       },
       {
         id: "problem-35",
+        layer1: "4 components",
+        layer2: ["AV","SV","AF","SF"],
         labels: {
           name: "Regional Rail Cargo (C1--C2)",
           section: "Alternative-Based and State-Based Variable Payoffs Plus Alternative-Based and State-Based Fixed Payoffs"
