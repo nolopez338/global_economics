@@ -233,6 +233,34 @@
       color: #fef3c7;
     }
 
+    .collapsible-resource-card:not(.full-width-resource-card) .resource-content {
+      display: none;
+    }
+
+    .resource-toggle {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .resource-toggle:focus-visible {
+      border-radius: 8px;
+      outline: 3px solid var(--primary-color);
+      outline-offset: 3px;
+    }
+
+    .resource-content {
+      display: contents;
+    }
+
     @media (max-width: 480px) {
       .library-reservation-entry dl {
         grid-template-columns: 1fr;
@@ -282,10 +310,13 @@
           <span class="class-icon warm-2">Pr</span>
           <span class="class-label">Printing</span>
         </a>
-        <div class="class-card full-width-resource-card" aria-label="Library reservation information">
-          <span class="class-icon warm-2">Lib</span>
-          <span class="class-label">Library</span>
-          <h3 class="library-heading">SALAS Y ESPACIOS DE LA BIBLIOTECA GENERAL</h3>
+        <div class="class-card collapsible-resource-card" aria-label="Library reservation information">
+          <button class="resource-toggle" type="button" aria-expanded="false" aria-controls="library-resource-content">
+            <span class="class-icon warm-2">Lib</span>
+            <span class="class-label">Library</span>
+          </button>
+          <div class="resource-content" id="library-resource-content" hidden>
+            <h3 class="library-heading">SALAS Y ESPACIOS DE LA BIBLIOTECA GENERAL</h3>
           <p class="library-reservation-title">Información para reservas</p>
           <a class="class-link library-booking-link" href="https://reservas.sanbartolo.cloud/" target="_blank" rel="noopener noreferrer" aria-label="Open Library reservations">Open Library Reservations</a>
           <div class="library-reservation-grid">
@@ -342,11 +373,15 @@
             <h3 id="santander-notice-title">Nota importante sobre la Sala Santander</h3>
             <p>El equipo de la Biblioteca General no está habilitado para abrir esta sala. Por favor, no olviden reclamar siempre las llaves de ingreso a la Sala Santander y las del kit tecnológico directamente con Bienestar.</p>
           </aside>
+          </div>
         </div>
-        <div class="class-card full-width-resource-card" aria-label="YouTube links">
-          <span class="class-icon warm-2">YT</span>
-          <span class="class-label">YouTube Links</span>
-          <div class="youtube-video-grid">
+        <div class="class-card collapsible-resource-card" aria-label="YouTube links">
+          <button class="resource-toggle" type="button" aria-expanded="false" aria-controls="youtube-resource-content">
+            <span class="class-icon warm-2">YT</span>
+            <span class="class-label">YouTube Links</span>
+          </button>
+          <div class="resource-content" id="youtube-resource-content" hidden>
+            <div class="youtube-video-grid">
             <article class="youtube-video-card geometry">
               <h3 class="youtube-video-title">El problema más LOCO de la geometría | Disecciones de Dudeney</h3>
               <span class="youtube-video-url">https://www.youtube.com/watch?v=kTka84UJp2I</span>
@@ -367,6 +402,7 @@
               <span class="youtube-video-url">https://www.youtube.com/watch?v=lG_Rl9MZAYM&amp;t=10s</span>
               <a class="class-link youtube-video-button" href="https://www.youtube.com/watch?v=lG_Rl9MZAYM&amp;t=10s" target="_blank" rel="noopener noreferrer" aria-label="Open Why the political spectrum is useless on YouTube"><span class="youtube-logo" aria-hidden="true"><span class="youtube-play-icon">▶</span></span><span>Watch on YouTube</span></a>
             </article>
+            </div>
           </div>
         </div>
       </div>
@@ -400,6 +436,18 @@
       // Match the class pages' public/teacher URL mode pattern, adapted to access=teacher.
       document.querySelectorAll("[data-teacher-only]").forEach(function (item) {
         item.hidden = access !== "teacher";
+      });
+
+      document.querySelectorAll(".collapsible-resource-card").forEach(function (card) {
+        var toggle = card.querySelector(".resource-toggle");
+        var content = card.querySelector(".resource-content");
+
+        toggle.addEventListener("click", function () {
+          var expanded = toggle.getAttribute("aria-expanded") === "true";
+          toggle.setAttribute("aria-expanded", String(!expanded));
+          card.classList.toggle("full-width-resource-card", !expanded);
+          content.hidden = expanded;
+        });
       });
     })();
   </script>
