@@ -23,17 +23,48 @@
 \end{itemize}
 
 \section{Introduction}\label{sec:c3-introduction}
-A \emph{circular distribution} is a probability distribution for a variable
-measured on a circle, such as an angle, a compass direction, or a time of day.
-It is not a density whose graph happens to be a circular arc.  The defining
-feature is that the beginning and end of the scale are the same point: for
-example, $0^\circ$ and $360^\circ$ represent the same direction.
+A variable is \emph{circular} when its values describe positions in a repeating
+cycle.  Direction and orientation provide familiar examples: a weather station
+may record wind direction, while a person, vehicle, animal, antenna, or sensor
+may move or point in a particular direction.  These values can be written as
+angles, but their scale does not have two different ends.  On a compass,
+$0^\circ$ and $360^\circ$ both mean north.
+
+Repeating times can also be treated as circular variables.  Time of day returns
+to its starting point every 24 hours, so 23:59 and 00:01 are only two minutes
+apart even though their numerical representations lie on opposite sides of
+midnight.  Day of the week and season of the year have the same repeating
+feature when only position within the cycle matters.  Rotation and phase give
+further examples: after a wheel, machine component, or robot completes one
+revolution, it has returned to the same orientation, and a periodic signal
+returns to the same phase after one complete cycle.
+
+A \emph{circular distribution} is a probability distribution for such a
+variable.  It is not a density whose graph happens to be a circular arc.
+Circular probability models can answer practical questions: How likely is a
+direction to fall inside a target sector?  What is the probability of a time
+interval that crosses midnight?  What direction best represents several
+observations?  Are the observations concentrated near one part of the cycle,
+or dispersed around the whole cycle?  The appropriate method respects the fact
+that the beginning and end of the numerical scale represent the same physical
+point.
+
+Writing a circle as $[0,2\pi)$ or $[0^\circ,360^\circ)$ requires choosing a
+\emph{cut}: a numerical boundary at which one cycle is written as ending and
+the next as beginning.  The underlying direction or cycle has no physical
+break there.  For example, $1^\circ$ and $359^\circ$ are only $2^\circ$ apart
+across north, although they look far apart on a number line.  Their ordinary
+arithmetic mean is $180^\circ$, which points in the opposite direction.  This
+boundary problem motivates representing observations by unit vectors and using
+a circular mean rather than an ordinary linear average.
 
 If $\Theta$ is measured in radians, then
 \[
  \Theta\equiv\Theta+2\pi.
 \]
-Consequently a circular probability density function (pdf) is periodic:
+This equivalence says that adding a complete revolution does not change the
+physical value.  Consequently a circular probability density function (pdf)
+is periodic:
 \[
  f(\theta)=f(\theta+2\pi),
  \qquad
@@ -46,8 +77,8 @@ density:
  P(a\leq\Theta\leq b)=\int_a^b f(\theta)\,d\theta.
  \tag{2}
 \]
-If an interval crosses $0$, split it at the end of a chosen cycle.  For
-example, on $[0,2\pi)$,
+If an interval crosses the chosen cut at $0$, split it at the end of the written
+cycle.  For example, on $[0,2\pi)$,
 \[
  P\left(\frac{11\pi}{6}\leq\Theta\leq\frac{\pi}{6}\right)
  =\int_{11\pi/6}^{2\pi}f(\theta)\,d\theta
@@ -57,22 +88,32 @@ example, on $[0,2\pi)$,
 This notation means the short arc travelled through $0$, not the empty
 ordinary linear interval.
 
-The simplest example is the \emph{circular uniform distribution}:
+The simplest circular probability model is the \emph{circular uniform
+distribution}:
 \[
  f(\theta)=\frac1{2\pi},\qquad 0\leq\theta<2\pi.
  \tag{4}
 \]
-Every direction is equally likely, so an arc of angular width $L$ has
-probability $L/(2\pi)$.  Thus
+This model is suitable only when the situation gives no direction, time, or
+other part of the cycle a preference.  It is often useful as a baseline, or as
+an assumption built into a randomizing procedure; it is not the default model
+for all circular data.  Under this assumption every equal-width arc is equally
+likely, so an arc of angular width $L$ has probability $L/(2\pi)$.  Thus
 \[
  P\left(0\leq\Theta\leq\frac\pi2\right)
  =\int_0^{\pi/2}\frac1{2\pi}\,d\theta=\frac14.
 \]
 
-Ordinary averages can be misleading for circular data: the arithmetic mean of
-$1^\circ$ and $359^\circ$ is $180^\circ$, although both directions are close
-to $0^\circ$.  Instead, represent $\theta_i$ by the unit vector
-$(\cos\theta_i,\sin\theta_i)$ and calculate
+Many real circular observations do have a preferred direction or time.  A
+concentrated model such as the von Mises distribution can represent values
+clustered around one direction, while wrapped distributions provide other
+possibilities.  Model selection should depend on how the data were generated
+and on evidence about their spread.
+
+To solve the averaging problem illustrated by $1^\circ$ and $359^\circ$,
+represent each $\theta_i$ by the unit vector
+$(\cos\theta_i,\sin\theta_i)$.  Average the vector components and then find the
+direction of the average vector:
 \[
  \bar C=\frac1n\sum_{i=1}^n\cos\theta_i,
  \qquad
@@ -87,11 +128,13 @@ $R=\sqrt{\bar C^2+\bar S^2}$ indicates concentration: values near $1$ mean
 the observations point in similar directions, while values near $0$ mean
 there is little or no single representative direction.
 
-``Circular distribution'' names a category, not one particular model.  Its
-members include the circular uniform distribution, the von Mises distribution
-(often used for angles in a role analogous to the normal distribution), and
-wrapped distributions such as the wrapped normal.  This activity concentrates
-on the circular uniform model and circular means.
+Therefore, ``circular data,'' ``circular uniform distribution,'' and
+``circular mean'' are not interchangeable ideas.  Circular data describe the
+type of variable; the circular uniform and von Mises distributions are
+different probability models for that type of variable; and the circular mean
+is a method for finding a representative direction.  This activity
+concentrates on the circular uniform model and circular means while retaining
+that distinction.
 
 \section{Periodic Structure and Uniform Probabilities}\label{sec:c3-uniform}
 \SectionProblemsTableOfContents{
@@ -100,7 +143,19 @@ on the circular uniform model and circular means.
 }
 
 \subsection{A quarter-circle and periodicity}\label{sec:c3-uniform-basics}
-Suppose $\Theta$ is uniformly distributed on $[0,2\pi)$.
+A directional sensor performs a calibration cycle by selecting an initial
+antenna orientation $\Theta$, measured in radians on $[0,2\pi)$.  Orientation
+is circular because $0$ and $2\pi$ describe the same physical direction; one
+complete revolution returns the antenna to where it started.
+
+The calibration mechanism is designed to have no preferred direction, so the
+selected orientation is modelled as uniformly distributed around the circle.
+Engineers use the sector from $\pi/3$ to $5\pi/6$ to test reception across a
+specified part of the antenna's range.  They want the expected proportion of
+calibration orientations in that sector and need to confirm that describing
+the sector one full revolution later does not create a different physical
+event.
+
 \textbf{Questions/Tasks.}
 \begin{enumerate}
  \CriterionTask{subsec:c3-uniform-basics-a}{3.1}{Verify that the density in (4) has total probability $1$.}
@@ -114,6 +169,8 @@ The density is nonnegative and
  =\frac{2\pi}{2\pi}=1.
 \]
 It therefore satisfies both requirements for a pdf on one complete cycle.
+For the calibration procedure, this confirms that the model assigns total
+probability $1$ across all possible initial antenna orientations.
 \secInicio[sec:c3-uniform][sec:c3-uniform-basics]
 
 \subsubsection*{C3.2 - Find and interpret the probability.}\phantomsection\label{subsec:c3-uniform-basics-b}
@@ -124,13 +181,25 @@ The angular width is $5\pi/6-\pi/3=\pi/2$.  Therefore
 \]
 The endpoints $\pi/3+2\pi$ and $5\pi/6+2\pi$ describe the same directions
 one revolution later.  Periodicity, $f(\theta)=f(\theta+2\pi)$, makes the
-probability unchanged.
+probability unchanged.  Thus the engineers expect one quarter of calibration
+orientations to fall in the target reception sector.
 \secInicio[sec:c3-uniform][sec:c3-uniform-basics]
 
 \subsection{An interval that crosses zero}\label{sec:c3-uniform-wrap}
-A wind direction $\Theta$ is uniformly distributed around the compass.  Find
-the probability that it lies within $30^\circ$ of north, where north is
-$0^\circ$.
+A weather station records the direction $\Theta$, in degrees, from which the
+wind arrives.  Wind direction is circular: north can be written as either
+$0^\circ$ or $360^\circ$, and those labels identify the same direction.  The
+station team is evaluating how often wind enters a monitoring sector within
+$30^\circ$ of north because a north-facing installation is most exposed to
+winds from that sector.
+
+As an initial planning baseline, the team assumes that there is no preferred
+wind direction during the period, so $\Theta$ is modelled by a circular uniform
+distribution.  This is a simplifying assumption, not a claim that real wind
+directions are always uniform.  The target is one continuous $60^\circ$ sector
+centred on north, but it crosses the artificial $0^\circ/360^\circ$ cut in the
+chosen numerical scale.
+
 \textbf{Questions/Tasks.}
 \begin{enumerate}
  \CriterionTask{subsec:c3-uniform-wrap-a}{3.1}{Write the event as two intervals on $[0^\circ,360^\circ)$.}
@@ -144,7 +213,9 @@ and from $0^\circ$ to $30^\circ$.  Thus the event is
  \{330^\circ\leq\Theta<360^\circ\}\ \cup\
  \{0^\circ\leq\Theta\leq30^\circ\}.
 \]
-The two pieces are disjoint on the chosen representation of the cycle.
+The two pieces are disjoint on the chosen representation of the cycle.  Taken
+together, they describe the installation's one continuous north-facing
+monitoring sector.
 \secInicio[sec:c3-uniform][sec:c3-uniform-wrap]
 
 \subsubsection*{C3.2 - Calculate the probability.}\phantomsection\label{subsec:c3-uniform-wrap-b}
@@ -154,7 +225,9 @@ The two arcs have total width $30^\circ+30^\circ=60^\circ$.  Hence
 \]
 There is therefore a probability of about $16.67\%$.  Treating
 $330^\circ\leq\Theta\leq30^\circ$ as an ordinary linear interval would miss
-the circular meaning of the event.
+the circular meaning of the event.  Under the uniform baseline, the team would
+expect about $16.67\%$ of recorded winds to enter the sector relevant to the
+north-facing installation.
 \secInicio[sec:c3-uniform][sec:c3-uniform-wrap]
 
 \section{Circular Means}\label{sec:c3-means}
@@ -164,7 +237,18 @@ the circular meaning of the event.
 }
 
 \subsection{Directions near the cycle boundary}\label{sec:c3-means-boundary}
-Two delivery riders leave a depot in directions $10^\circ$ and $350^\circ$.
+Two delivery riders leave the same depot on routes with initial bearings
+$10^\circ$ and $350^\circ$, measured in degrees clockwise from north.  A
+bearing is circular because $0^\circ$ and $360^\circ$ are the same direction.
+Both riders therefore start close to north, but on opposite sides of the cut in
+the numerical scale.
+
+A dispatcher wants a representative initial direction in order to position a
+support vehicle on the side of the depot most useful to both routes.  The two
+riders are given equal weight.  No uniform probability distribution is assumed:
+the circular mean describes their two observed bearings, and the resultant
+length measures how closely those bearings agree.
+
 \textbf{Questions/Tasks.}
 \begin{enumerate}
  \CriterionTask{subsec:c3-means-boundary-a}{3.1}{Explain why the arithmetic mean is inappropriate.}
@@ -174,7 +258,8 @@ Two delivery riders leave a depot in directions $10^\circ$ and $350^\circ$.
 \subsubsection*{C3.1 - Compare the directions.}\phantomsection\label{subsec:c3-means-boundary-a}
 The arithmetic mean is $(10^\circ+350^\circ)/2=180^\circ$, which points
 south.  Both actual directions are only $10^\circ$ from north, so this answer
-is an artefact of cutting the circular scale at $0^\circ$.
+is an artefact of cutting the circular scale at $0^\circ$.  Positioning the
+support vehicle south of the depot on this basis would contradict both routes.
 \secInicio[sec:c3-means][sec:c3-means-boundary]
 
 \subsubsection*{C3.2 - Calculate the circular mean.}\phantomsection\label{subsec:c3-means-boundary-b}
@@ -190,12 +275,24 @@ Therefore
  \qquad R=\cos10^\circ\approx0.9848.
 \]
 The circular mean correctly points north, and $R$ close to $1$ shows strong
-agreement between the two directions.
+agreement between the two directions.  The shared northward tendency supports
+positioning the dispatch support point north of the depot, where it can serve
+both riders' initial routes.
 \secInicio[sec:c3-means][sec:c3-means-boundary]
 
 \subsection{A mean with weak concentration}\label{sec:c3-means-concentration}
-Customer arrivals are grouped by position on a 24-hour clock.  Three observed
-times correspond to angles $0^\circ$, $120^\circ$, and $240^\circ$.
+A shop records three recurring customer-activity times on a 24-hour clock:
+$0^\circ$ corresponds to midnight, $120^\circ$ to 08:00, and $240^\circ$ to
+16:00.  Time of day is circular because the clock returns to midnight after 24
+hours; the end and beginning of the numerical scale are the same time in the
+daily cycle.
+
+The manager wants to know whether one representative time could guide a daily
+staffing period.  The three observations are given equal weight and are equally
+spaced around the 24-hour cycle.  No uniform distribution is being imposed;
+the circular mean and resultant length are used to test whether these observed
+times have a meaningful common centre.
+
 \textbf{Questions/Tasks.}
 \begin{enumerate}
  \CriterionTask{subsec:c3-means-concentration-a}{3.1}{Calculate $\bar C$ and $\bar S$.}
@@ -209,14 +306,17 @@ The three unit vectors are equally spaced, and
  \qquad
  \bar S=\frac{0+\frac{\sqrt3}{2}-\frac{\sqrt3}{2}}{3}=0.
 \]
-Thus the average vector is the zero vector and $R=0$.
+Thus the average vector is the zero vector and $R=0$.  For the manager, this
+shows complete balance among midnight, 08:00, and 16:00 rather than a cluster
+near one staffing time.
 \secInicio[sec:c3-means][sec:c3-means-concentration]
 
 \subsubsection*{C3.2 - Interpret the result.}\phantomsection\label{subsec:c3-means-concentration-b}
 Because $\operatorname{atan2}(0,0)$ has no defined direction, there is no
 unique circular mean for these data.  This is informative rather than an
 error: the observations are perfectly balanced around the circle, so a single
-representative time would be misleading.
+representative time would be misleading.  The shop should therefore not use
+one ``average'' time to plan coverage for this recurring demand pattern.
 \secInicio[sec:c3-means][sec:c3-means-concentration]
 
 \section{Applied Circular Probability}\label{sec:c3-applied}
@@ -226,8 +326,19 @@ representative time would be misleading.
 }
 
 \subsection{Online orders by time of day}\label{sec:c3-applied-time}
-Under a circular uniform model for time of day, let $H$ be the time on a
-24-hour clock.  A shop manager studies orders from 22:30 through 01:30.
+A shop manager is studying an overnight service and staffing window from 22:30
+through 01:30.  Let $H$ be the order time in hours on the 24-hour scale
+$[0,24)$.  Time of day is circular because it repeats every 24 hours: 23:59 and
+00:01 are close in the actual daily cycle even though midnight is the boundary
+of this numerical representation.
+
+Before comparing the model with observed order patterns, the manager uses a
+circular uniform distribution as an initial baseline.  It assumes that no hour
+is preferred and assigns equal probability to equal-length time intervals.
+The practical objective is to find the baseline share of orders associated
+with the three-hour overnight window; the assumption need not describe the
+shop's actual demand.
+
 \textbf{Questions/Tasks.}
 \begin{enumerate}
  \CriterionTask{subsec:c3-applied-time-a}{3.1}{Represent the event without treating midnight as an endpoint of time.}
@@ -240,7 +351,8 @@ On $[0,24)$ hours the event is
  \{22.5\leq H<24\}\ \cup\ \{0\leq H\leq1.5\}.
 \]
 Equivalently, converting time $h$ to angle by $\theta=2\pi h/24$, it is the
-wrapped arc from $15\pi/8$ through $0$ to $\pi/8$.
+wrapped arc from $15\pi/8$ through $0$ to $\pi/8$.  This representation keeps
+the manager's overnight service window continuous across midnight.
 \secInicio[sec:c3-applied][sec:c3-applied-time]
 
 \subsubsection*{C3.2 - Find and interpret the probability.}\phantomsection\label{subsec:c3-applied-time-b}
@@ -250,12 +362,28 @@ The event lasts $1.5+1.5=3$ hours.  Uniformity gives
 \]
 The model assigns $12.5\%$ of orders to that time window.  This result depends
 on the uniform-model assumption; real order times may be concentrated at
-particular hours.
+meal times or other preferred hours.  The manager can therefore use $12.5\%$
+as a baseline share when comparing the window with actual order data and
+making staffing decisions.
 \secInicio[sec:c3-applied][sec:c3-applied-time]
 
 \subsection{Choosing an appropriate model}\label{sec:c3-applied-model}
-An analyst considers three variables: daily revenue in pesos, wind direction,
-and the time of day at which peak electricity demand occurs.
+An analyst is advising a business and an energy installation on three
+variables: daily revenue in pesos, wind direction measured at a weather
+station, and the time of day at which electricity demand reaches its daily
+peak.  Choosing the variable type before choosing a probability distribution
+matters because a model must preserve which values are close and whether the
+two ends of a numerical scale represent the same point.
+
+Daily revenue lies on a linear scale whose endpoints are not equivalent.  Wind
+direction is measured around a compass, where $0^\circ=360^\circ$, and peak
+time repeats on a 24-hour clock, where midnight begins a new written cycle but
+not a new type of time.  For either circular variable, the analyst must then
+use evidence to decide whether observations are spread approximately evenly
+around the cycle or concentrated near a preferred direction or time.  That
+decision affects forecasts and operational planning; uniformity is only one
+possible modelling assumption.
+
 \textbf{Questions/Tasks.}
 \begin{enumerate}
  \CriterionTask{subsec:c3-applied-model-a}{3.1}{Identify which variables are naturally circular and justify the choice.}
@@ -267,6 +395,8 @@ Wind direction and peak-demand time are circular: $0^\circ=360^\circ$, and
 midnight is both the end of one day and the beginning of the next.  Revenue is
 linear; its largest and smallest values are not identified with each other.
 The shape of a graph alone does not determine whether a variable is circular.
+This classification prevents the analyst from treating nearby directions or
+times across the chosen boundary as though they were far apart.
 \secInicio[sec:c3-applied][sec:c3-applied-model]
 
 \subsubsection*{C3.2 - Choose model families.}\phantomsection\label{subsec:c3-applied-model-b}
@@ -274,7 +404,9 @@ The circular uniform distribution is suitable if every direction is equally
 likely.  If observations cluster around a preferred direction, a von Mises
 model may be suitable; a wrapped normal is another possible model.  Data and
 context are needed to choose among them: ``circular distribution'' does not
-refer to one universal density.
+refer to one universal density.  The analyst should therefore match the model
+to actual evidence about dispersion or clustering and to the forecasting or
+planning purpose of the analysis.
 \secInicio[sec:c3-applied][sec:c3-applied-model]
 
 \end{document}
