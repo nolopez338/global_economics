@@ -156,26 +156,49 @@ const materialsBase = materialsContext.window.MATERIALS_DATA_BASE;
 if (!Array.isArray(materialsBase)) throw new Error("materials-data-base.js must expose an array");
 
 const baseByClass = new Map();
+const requiredBaseKeys = new Set();
+for (const grade of [10, 11]) {
+  for (const [term, classCount] of [[1, 18], [2, 20], [3, 18]]) {
+    for (let classNumber = 1; classNumber <= classCount; classNumber++) {
+      requiredBaseKeys.add(`${grade}|${term}|${classNumber}`);
+    }
+  }
+}
 for (const record of materialsBase) {
-  const key = `${record.Grade}|${record["Class #"]}`;
+  if (!Number.isInteger(record.Grade) || !Number.isInteger(record.Term) || typeof record["Class #"] !== "string") {
+    throw new Error("materials-data-base.js requires numeric Grade/Term and string Class # values");
+  }
+  const key = `${record.Grade}|${record.Term}|${record["Class #"]}`;
   if (baseByClass.has(key)) throw new Error(`materials-data-base.js duplicates ${key}`);
   if (!Array.isArray(record.Materials)) throw new Error(`materials-data-base.js ${key} has invalid Materials`);
   baseByClass.set(key, record.Materials);
 }
+const missingBaseKeys = [...requiredBaseKeys].filter(key => !baseByClass.has(key));
+const unexpectedBaseKeys = [...baseByClass.keys()].filter(key => !requiredBaseKeys.has(key));
+if (missingBaseKeys.length || unexpectedBaseKeys.length) {
+  throw new Error(
+    `materials-data-base.js coverage differs (missing ${missingBaseKeys.length}, unexpected ${unexpectedBaseKeys.length})`
+  );
+}
 
 const datedKeys = new Set();
-const datedMaterials = records.map((record) => {
+const datedMaterials = records.filter(record => record.Term !== null).map((record) => {
   const date = record.Date.replace(/\s*\/\s*/g, "-");
   const section = String(record.Section).toUpperCase();
   const datedKey = `${record.Grade}|${section}|${date}`;
   if (datedKeys.has(datedKey)) throw new Error(`schedule-data.js duplicates meeting ${datedKey}`);
   datedKeys.add(datedKey);
 
-  const baseClass = String(record["Class #"]).split("-")[0];
-  const materials = baseByClass.get(`${record.Grade}|${baseClass}`);
-  if (!materials) throw new Error(`missing base materials for Grade ${record.Grade}, Class ${baseClass}`);
+  const classMatch = /^(\d+)-(\d+)$/.exec(String(record["Class #"]));
+  if (!classMatch) throw new Error(`invalid schedule Class # ${record["Class #"]}`);
+  const baseClass = String((Number(classMatch[1]) - 1) * 2 + Number(classMatch[2]));
+  const materials = baseByClass.get(`${record.Grade}|${record.Term}|${baseClass}`);
+  if (!materials) {
+    throw new Error(`missing base materials for Grade ${record.Grade}, Term ${record.Term}, Class ${baseClass}`);
+  }
   return {
     Grade: record.Grade,
+    Term: record.Term,
     Section: section,
     "Class #": record["Class #"],
     Date: date,
