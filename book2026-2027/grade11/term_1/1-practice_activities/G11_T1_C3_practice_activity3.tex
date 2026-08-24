@@ -3,6 +3,47 @@
 \makeatother
 
 \input{preamble_exams.tex}
+\input{graphs/uniform_linear_probability_distributions.tex}
+
+% A probability graph for a band split by the displayed cycle cut.
+% Arguments: variable, cycle start, cycle end, pdf formula, first interval,
+% second interval, and vertical maximum.  Tick choices are supplied locally.
+\newcommand{\CThreeWrappedGraph}[9]{%
+ \begin{center}
+  \begin{tikzpicture}
+   \pgfmathsetmacro{\cycleA}{#2}
+   \pgfmathsetmacro{\cycleB}{#3}
+   \pgfmathsetmacro{\cyclePad}{0.06*(\cycleB-\cycleA)}
+   \begin{axis}[
+    width=9cm,
+    height=5cm,
+    axis lines=left,
+    xlabel={$#1$},
+    ylabel={$f(#1)$},
+    xmin={\cycleA-\cyclePad},
+    xmax={\cycleB+\cyclePad},
+    ymin=0,
+    ymax=#9,
+    grid=both,
+    samples=240
+   ]
+    \addplot[domain=#2:#3,draw=none,fill=blue!20,fill opacity=0.35]
+     {#4}\closedcycle;
+    \addplot[domain=#5:#6,draw=none,fill=blue!65,fill opacity=0.60]
+     {#4}\closedcycle;
+    \addplot[domain=#7:#8,draw=none,fill=blue!65,fill opacity=0.60]
+     {#4}\closedcycle;
+    \addplot[domain=#2:#3,very thick,blue] {#4};
+   \end{axis}
+  \end{tikzpicture}
+ \end{center}%
+}
+
+% Rotated cycle ticks keep nearby values at the cut legible on compact graphs.
+\pgfplotsset{every axis/.append style={
+ scaled y ticks=false,
+ xticklabel style={font=\scriptsize,rotate=35,anchor=north east}
+}}
 
 \title{Grade 11 -- Term 1 \\ C3 Practice Activity 3 with Solutions}
 \author{}
@@ -17,396 +58,778 @@
 
 \section*{Evaluated criterion}
 \begin{itemize}
- \item C3: Applies probability distributions for periodic variables, calculates
- interval probabilities around a circle, and uses vector methods to describe a
- representative direction.
+ \item C3: Constructs uniform and triangular probability density functions
+ for periodic variables and calculates context-specific tail and band
+ probabilities geometrically.
 \end{itemize}
 
 \section{Introduction}\label{sec:c3-introduction}
-A variable is \emph{circular} when its values describe positions in a repeating
-cycle.  Direction and orientation provide familiar examples: a weather station
-may record wind direction, while a person, vehicle, animal, antenna, or sensor
-may move or point in a particular direction.  These values can be written as
-angles, but their scale does not have two different ends.  On a compass,
-$0^\circ$ and $360^\circ$ both mean north.
-
-Repeating times can also be treated as circular variables.  Time of day returns
-to its starting point every 24 hours, so 23:59 and 00:01 are only two minutes
-apart even though their numerical representations lie on opposite sides of
-midnight.  Day of the week and season of the year have the same repeating
-feature when only position within the cycle matters.  Rotation and phase give
-further examples: after a wheel, machine component, or robot completes one
-revolution, it has returned to the same orientation, and a periodic signal
-returns to the same phase after one complete cycle.
-
-A \emph{circular distribution} is a probability distribution for such a
-variable.  It is not a density whose graph happens to be a circular arc.
-Circular probability models can answer practical questions: How likely is a
-direction to fall inside a target sector?  What is the probability of a time
-interval that crosses midnight?  What direction best represents several
-observations?  Are the observations concentrated near one part of the cycle,
-or dispersed around the whole cycle?  The appropriate method respects the fact
-that the beginning and end of the numerical scale represent the same physical
-point.
-
-Writing a circle as $[0,2\pi)$ or $[0^\circ,360^\circ)$ requires choosing a
-\emph{cut}: a numerical boundary at which one cycle is written as ending and
-the next as beginning.  The underlying direction or cycle has no physical
-break there.  For example, $1^\circ$ and $359^\circ$ are only $2^\circ$ apart
-across north, although they look far apart on a number line.  Their ordinary
-arithmetic mean is $180^\circ$, which points in the opposite direction.  This
-boundary problem motivates representing observations by unit vectors and using
-a circular mean rather than an ordinary linear average.
-
-If $\Theta$ is measured in radians, then
-\[
- \Theta\equiv\Theta+2\pi.
-\]
-This equivalence says that adding a complete revolution does not change the
-physical value.  Consequently a circular probability density function (pdf)
-is periodic:
-\[
- f(\theta)=f(\theta+2\pi),
- \qquad
- \int_0^{2\pi}f(\theta)\,d\theta=1.
- \tag{1}
-\]
-As for an ordinary continuous distribution, probability is area under the
-density:
-\[
- P(a\leq\Theta\leq b)=\int_a^b f(\theta)\,d\theta.
- \tag{2}
-\]
-If an interval crosses the chosen cut at $0$, split it at the end of the written
-cycle.  For example, on $[0,2\pi)$,
-\[
- P\left(\frac{11\pi}{6}\leq\Theta\leq\frac{\pi}{6}\right)
- =\int_{11\pi/6}^{2\pi}f(\theta)\,d\theta
-  +\int_0^{\pi/6}f(\theta)\,d\theta.
- \tag{3}
-\]
-This notation means the short arc travelled through $0$, not the empty
-ordinary linear interval.
-
-The simplest circular probability model is the \emph{circular uniform
-distribution}:
-\[
- f(\theta)=\frac1{2\pi},\qquad 0\leq\theta<2\pi.
- \tag{4}
-\]
-This model is suitable only when the situation gives no direction, time, or
-other part of the cycle a preference.  It is often useful as a baseline, or as
-an assumption built into a randomizing procedure; it is not the default model
-for all circular data.  Under this assumption every equal-width arc is equally
-likely, so an arc of angular width $L$ has probability $L/(2\pi)$.  Thus
-\[
- P\left(0\leq\Theta\leq\frac\pi2\right)
- =\int_0^{\pi/2}\frac1{2\pi}\,d\theta=\frac14.
-\]
-
-Many real circular observations do have a preferred direction or time.  A
-concentrated model such as the von Mises distribution can represent values
-clustered around one direction, while wrapped distributions provide other
-possibilities.  Model selection should depend on how the data were generated
-and on evidence about their spread.
-
-To solve the averaging problem illustrated by $1^\circ$ and $359^\circ$,
-represent each $\theta_i$ by the unit vector
-$(\cos\theta_i,\sin\theta_i)$.  Average the vector components and then find the
-direction of the average vector:
-\[
- \bar C=\frac1n\sum_{i=1}^n\cos\theta_i,
- \qquad
- \bar S=\frac1n\sum_{i=1}^n\sin\theta_i,
- \qquad
- \bar\theta=\operatorname{atan2}(\bar S,\bar C).
- \tag{5}
-\]
-If $\operatorname{atan2}$ returns a negative angle, add $2\pi$ (or
-$360^\circ$) to report it on the chosen cycle.  The mean resultant length
-$R=\sqrt{\bar C^2+\bar S^2}$ indicates concentration: values near $1$ mean
-the observations point in similar directions, while values near $0$ mean
-there is little or no single representative direction.
-
-Therefore, ``circular data,'' ``circular uniform distribution,'' and
-``circular mean'' are not interchangeable ideas.  Circular data describe the
-type of variable; the circular uniform and von Mises distributions are
-different probability models for that type of variable; and the circular mean
-is a method for finding a representative direction.  This activity
-concentrates on the circular uniform model and circular means while retaining
-that distinction.
-
-\section{Periodic Structure and Uniform Probabilities}\label{sec:c3-uniform}
 \SectionProblemsTableOfContents{
- \SectionProblemLink{sec:c3-uniform-basics}{A quarter-circle and periodicity} \\
- \SectionProblemLink{sec:c3-uniform-wrap}{An interval that crosses zero}
+ \SectionProblemLink{sec:c3-intro-periodic}{Periodic variables and the cycle cut} \\
+ \SectionProblemLink{sec:c3-intro-shapes}{Uniform and triangular pdf shapes} \\
+ \SectionProblemLink{sec:c3-intro-method}{Nine-step geometric method}
+}\vspace{4mm}
+
+Criterion C2 constructed continuous pdfs and found probabilities from areas.
+Its uniform pdfs used rectangles, while its triangular pdfs used triangles and
+trapezoids.  Criterion C3 applies exactly those geometric methods to variables
+that repeat.  No new area method is needed; the new idea is to respect the
+cycle cut when an event passes from the end of one displayed cycle to the
+beginning of the next.
+
+The word \emph{circular} describes the \textbf{variable}: its values repeat
+after one period.  The words \emph{uniform} and \emph{triangular} describe the
+\textbf{shape of its pdf}.  A circular-uniform model therefore has a periodic
+variable and a rectangular pdf on one displayed cycle.  A
+circular-triangular model has a periodic variable and straight sides that form
+one physical triangular peak around the cycle.
+
+\subsection{Periodic variables and the cycle cut}\label{sec:c3-intro-periodic}
+Compass direction repeats after one revolution, time of day repeats after one
+day, and rotation repeats when a device returns to its starting orientation.
+For example,
+\[
+ 0^\circ\equiv360^\circ,
+ \qquad 0\text{ h}\equiv24\text{ h},
+ \qquad f(x+P)=f(x),
+\]
+where $P$ is the period length.  For radians, $P=2\pi$; for degrees,
+$P=360^\circ$; and for time of day in hours, $P=24$ h.
+
+Displaying one circle as an interval requires a \emph{cut}.  For example,
+$[0^\circ,360^\circ)$ cuts the compass at north.  The interval has a written
+beginning and end, but the physical compass has no endpoint.  Thus
+$359^\circ$ and $1^\circ$ are only $2^\circ$ apart across the cut.  Likewise,
+23:59 and 00:01 are close times even though their recorded numbers lie on
+opposite sides of the midnight cut.
+
+The displayed interval is a recording convention, not a statement that the
+model stops beyond its endpoints.  Consequently, do not automatically add an
+``otherwise'' branch with zero density.  Write the pdf on one chosen cycle and
+state its periodic extension.  The equivalent endpoints describe the same
+physical value, and a wrapped event must be split only for area bookkeeping.
+\secInicio[sec:c3-introduction][sec:c3-intro-periodic]
+
+\subsection{Uniform and triangular pdf shapes}\label{sec:c3-intro-shapes}
+The only area formulas required in this activity are
+\[
+ A_{\text{rectangle}}=bh,\qquad
+ A_{\text{triangle}}=\frac12bh,\qquad
+ A_{\text{trapezoid}}=\frac12(h_1+h_2)b.
+\]
+Here $b$ is horizontal width and each $h$ is a pdf height.  A probability is
+the area of its shaded region, and the area over one complete cycle is $1$.
+
+For a uniform pdf on a period of length $P$, the whole cycle is a rectangle:
+\[
+ \text{Uniform: }1=Ph,\qquad h=\frac1P.
+\]
+Equal-width arcs or time bands therefore have equal probabilities.  This is a
+reasonable model when a controlled randomizer deliberately gives every part
+of a cycle the same chance, or when the model is explicitly introduced as a
+baseline for comparison.  Periodicity alone does not imply uniformity.
+
+For a triangular pdf on a period of length $P$, the complete physical peak has
+base $P$ and height $H$:
+\[
+ \text{Triangular: }1=\frac12PH,\qquad H=\frac2P.
+\]
+If the mode lies inside the displayed interval, the graph rises to $H$ and
+falls to zero at the cut.  Straight-side heights can be found from line
+equations, similar triangles, or proportions, exactly as in C2.
+
+If the physical peak lies at the cut, the unwrapped graph shows two triangular
+pieces: one descends from the peak at the left endpoint, and the other rises
+to the same peak at the equivalent right endpoint.  If their bases are
+$b_1$ and $b_2$, then $b_1+b_2=P$ and
+\[
+ \underbrace{\frac12b_1H}_{\text{first displayed piece}}
+ +\underbrace{\frac12b_2H}_{\text{second displayed piece}}
+ =\frac12PH=1.
+\]
+These are not two physical modes.  They are the two displayed parts of one
+peak joined across the cut.
+\secInicio[sec:c3-introduction][sec:c3-intro-shapes]
+
+\subsection{Nine-step geometric method}\label{sec:c3-intro-method}
+Use this routine for every problem.
+\begin{enumerate}
+ \item Define the variable, units, period, and chosen cut.\par
+ \item Identify the rectangular or triangular shape.\par
+ \item Use total area $1$ to find unknown heights.\par
+ \item Find intermediate heights with line equations, similar triangles, or
+ proportions.\par
+ \item Write the pdf on one cycle and state its periodic extension.\par
+ \item Shade the requested region.\par
+ \item Split at the cycle cut or pdf breakpoints.\par
+ \item Add geometric areas, or subtract simple outside regions from $1$.\par
+ \item Check $0\le P(\text{event})\le1$ and interpret the result.\par
+\end{enumerate}
+
+A circle has no intrinsic left or right tail.  The context must name the
+direction and the cut.  For example, ``the clockwise sector from $300^\circ$
+to the end of the displayed cycle'' means $[300^\circ,360^\circ)$.  A band
+within $30^\circ$ of the cut is written as the wrapped event
+\[
+ [330^\circ,360^\circ)\cup[0^\circ,30^\circ].
+\]
+The two written pieces are disjoint, so their labelled geometric areas are
+added.
+\secInicio[sec:c3-introduction][sec:c3-intro-method]
+
+\section{Circular Uniform Distributions}\label{sec:c3-uniform}
+\SectionProblemsTableOfContents{
+ \SectionProblemLink{sec:c3-uniform-sensor}{Random sensor orientation} \\
+ \SectionProblemLink{sec:c3-uniform-check}{Random daily system-check time} \\
+ \SectionProblemLink{sec:c3-uniform-device}{Randomized rotating-device direction}
 }
 
-\subsection{A quarter-circle and periodicity}\label{sec:c3-uniform-basics}
-A directional sensor performs a calibration cycle by selecting an initial
-antenna orientation $\Theta$, measured in radians on $[0,2\pi)$.  Orientation
-is circular because $0$ and $2\pi$ describe the same physical direction; one
-complete revolution returns the antenna to where it started.
+\subsection{Random sensor orientation}\label{sec:c3-uniform-sensor}
+An optical sensor can point in any orientation.  Let $\Theta$ be its clockwise
+orientation from a reference mark, measured in radians and recorded on
+$[0,2\pi)$.  Orientation is periodic because one full rotation returns the
+sensor to the same physical direction, so $0$ and $2\pi$ are equivalent.
 
-The calibration mechanism is designed to have no preferred direction, so the
-selected orientation is modelled as uniformly distributed around the circle.
-Engineers use the sector from $\pi/3$ to $5\pi/6$ to test reception across a
-specified part of the antenna's range.  They want the expected proportion of
-calibration orientations in that sector and need to confirm that describing
-the sector one full revolution later does not create a different physical
-event.
+During calibration, software generates a direction by controlled randomization
+that gives equal chances to equal-width arcs.  A circular-uniform pdf is
+therefore reasonable by design, rather than being assumed from natural data.
+Engineers use the clockwise sector from $3\pi/2$ to the cut to estimate cable
+strain, and the wrapped band within $\pi/6$ of the reference mark to plan a
+high-precision calibration test.
 
-\textbf{Questions/Tasks.}
-\begin{enumerate}
- \CriterionTask{subsec:c3-uniform-basics-a}{3.1}{Verify that the density in (4) has total probability $1$.}
- \CriterionTask{subsec:c3-uniform-basics-b}{3.2}{Find $P(\pi/3\leq\Theta\leq5\pi/6)$ and explain why adding $2\pi$ to both endpoints does not change it.}
-\end{enumerate}
-
-\subsubsection*{C3.1 - Verify normalization.}\phantomsection\label{subsec:c3-uniform-basics-a}
-The density is nonnegative and
-\[
- \int_0^{2\pi}\frac1{2\pi}\,d\theta
- =\frac{2\pi}{2\pi}=1.
-\]
-It therefore satisfies both requirements for a pdf on one complete cycle.
-For the calibration procedure, this confirms that the model assigns total
-probability $1$ across all possible initial antenna orientations.
-\secInicio[sec:c3-uniform][sec:c3-uniform-basics]
-
-\subsubsection*{C3.2 - Find and interpret the probability.}\phantomsection\label{subsec:c3-uniform-basics-b}
-The angular width is $5\pi/6-\pi/3=\pi/2$.  Therefore
-\[
- P\left(\frac\pi3\leq\Theta\leq\frac{5\pi}6\right)
- =\frac{\pi/2}{2\pi}=\frac14.
-\]
-The endpoints $\pi/3+2\pi$ and $5\pi/6+2\pi$ describe the same directions
-one revolution later.  Periodicity, $f(\theta)=f(\theta+2\pi)$, makes the
-probability unchanged.  Thus the engineers expect one quarter of calibration
-orientations to fall in the target reception sector.
-\secInicio[sec:c3-uniform][sec:c3-uniform-basics]
-
-\subsection{An interval that crosses zero}\label{sec:c3-uniform-wrap}
-A weather station records the direction $\Theta$, in degrees, from which the
-wind arrives.  Wind direction is circular: north can be written as either
-$0^\circ$ or $360^\circ$, and those labels identify the same direction.  The
-station team is evaluating how often wind enters a monitoring sector within
-$30^\circ$ of north because a north-facing installation is most exposed to
-winds from that sector.
-
-As an initial planning baseline, the team assumes that there is no preferred
-wind direction during the period, so $\Theta$ is modelled by a circular uniform
-distribution.  This is a simplifying assumption, not a claim that real wind
-directions are always uniform.  The target is one continuous $60^\circ$ sector
-centred on north, but it crosses the artificial $0^\circ/360^\circ$ cut in the
-chosen numerical scale.
+% The actual height is used to draw the shape but hidden from students.
+\begingroup
+\pgfplotsset{every axis/.append style={
+ xticklabels={$0$,${\pi}/{6}$,${3\pi}/{2}$,${11\pi}/{6}$,$2\pi\equiv0$},
+ yticklabels=\empty}}
+\CtwoProbGraph[\theta]{0}{6.283185307}{1/(2*pi)}{0}{6.283185307}
+ {0,0.523598776,4.712388980,5.759586532,6.283185307}{0.20}
+\endgroup
 
 \textbf{Questions/Tasks.}
 \begin{enumerate}
- \CriterionTask{subsec:c3-uniform-wrap-a}{3.1}{Write the event as two intervals on $[0^\circ,360^\circ)$.}
- \CriterionTask{subsec:c3-uniform-wrap-b}{3.2}{Calculate the probability and express it as a percentage.}
+ \CriterionTask{subsec:c3-uniform-sensor-a}{3.1}{Construct the complete periodic pdf of $\Theta$ from the calibration narrative, using total rectangular area $1$ to find its height and stating the period.}
+ \CriterionTask{subsec:c3-uniform-sensor-b}{3.2}{Calculate geometrically the cable-strain tail probability for the clockwise sector from $3\pi/2$ to the end of the displayed cycle.}
+ \CriterionTask{subsec:c3-uniform-sensor-c}{3.3}{Calculate geometrically the calibration-band probability within $\pi/6$ of the reference mark, crossing the cycle cut.}
 \end{enumerate}
 
-\subsubsection*{C3.1 - Split the wrapped interval.}\phantomsection\label{subsec:c3-uniform-wrap-a}
-Directions within $30^\circ$ of north run from $330^\circ$ to $360^\circ$
-and from $0^\circ$ to $30^\circ$.  Thus the event is
+\subsubsection*{C3.1 - Construct the periodic pdf.}
+\phantomsection\label{subsec:c3-uniform-sensor-a}
+The variable $\Theta$ is orientation in radians, its period is $2\pi$, and
+its one-cycle support representation is $[0,2\pi)$ with the cut at the
+reference mark.
+Controlled equal-arc randomization makes the pdf a rectangle of unknown height
+$h$.  Its complete-cycle area gives
 \[
- \{330^\circ\leq\Theta<360^\circ\}\ \cup\
- \{0^\circ\leq\Theta\leq30^\circ\}.
+ 1=A_{\text{rectangle}}=(2\pi)h,\qquad h=\frac1{2\pi}.
 \]
-The two pieces are disjoint on the chosen representation of the cycle.  Taken
-together, they describe the installation's one continuous north-facing
-monitoring sector.
-\secInicio[sec:c3-uniform][sec:c3-uniform-wrap]
-
-\subsubsection*{C3.2 - Calculate the probability.}\phantomsection\label{subsec:c3-uniform-wrap-b}
-The two arcs have total width $30^\circ+30^\circ=60^\circ$.  Hence
+Thus, on the chosen cycle,
 \[
- P=\frac{60^\circ}{360^\circ}=\frac16\approx0.1667.
+ f_{\Theta}(\theta)=\frac1{2\pi},\qquad 0\le\theta<2\pi,
 \]
-There is therefore a probability of about $16.67\%$.  Treating
-$330^\circ\leq\Theta\leq30^\circ$ as an ordinary linear interval would miss
-the circular meaning of the event.  Under the uniform baseline, the team would
-expect about $16.67\%$ of recorded winds to enter the sector relevant to the
-north-facing installation.
-\secInicio[sec:c3-uniform][sec:c3-uniform-wrap]
+and the complete periodic model is stated by
+\[
+ f_{\Theta}(\theta+2\pi)=f_{\Theta}(\theta).
+\]
+The period is $2\pi$, and the geometric check is
+$(2\pi)(1/(2\pi))=1$.
 
-\section{Circular Means}\label{sec:c3-means}
+\subsubsection*{C3.2 - Calculate the clockwise tail.}
+\phantomsection\label{subsec:c3-uniform-sensor-b}
+Relative to the cut at $0\equiv2\pi$, the cable-strain tail means the
+clockwise sector $[3\pi/2,2\pi)$.  The shaded region below is one rectangle of
+width $2\pi-3\pi/2=\pi/2$ and height $1/(2\pi)$:
+\[
+ \begin{aligned}
+ P\left(\frac{3\pi}{2}\le\Theta<2\pi\right)
+ &=\underbrace{\left(2\pi-\frac{3\pi}{2}\right)
+   \frac1{2\pi}}_{A_{\text{tail rectangle}}}\\
+ &=\frac14=25\%.
+ \end{aligned}
+\]
+The probability is valid because it lies between $0$ and $1$.  One quarter of
+randomized calibrations are expected in the cable-strain sector.
+\begingroup
+\pgfplotsset{every axis/.append style={
+ xticklabels={$0$,${\pi}/{6}$,${3\pi}/{2}$,${11\pi}/{6}$,$2\pi\equiv0$},
+ ytick={0,0.159154943},yticklabels={$0$,$1/(2\pi)$}}}
+\CtwoProbGraph[\theta]{0}{6.283185307}{1/(2*pi)}{4.712388980}{6.283185307}
+ {0,0.523598776,4.712388980,5.759586532,6.283185307}{0.20}
+\endgroup
+
+\subsubsection*{C3.3 - Calculate the wrapped calibration band.}
+\phantomsection\label{subsec:c3-uniform-sensor-c}
+The band crosses the cut, so on $[0,2\pi)$ it is
+\[
+ \left[\frac{11\pi}{6},2\pi\right)
+ \cup\left[0,\frac\pi6\right].
+\]
+The graph shades both written pieces.  Each is a rectangle of width $\pi/6$:
+\[
+ \begin{aligned}
+ P(\text{calibration band})
+ &=\underbrace{\frac\pi6\frac1{2\pi}}_{A_1=1/12}
+  +\underbrace{\frac\pi6\frac1{2\pi}}_{A_2=1/12}\\
+ &=\frac16\approx16.7\%.
+ \end{aligned}
+\]
+Thus about $16.7\%$ of randomized orientations fall within $\pi/6$ of the
+reference direction, using both sides of the artificial cut.
+\begingroup
+\pgfplotsset{every axis/.append style={
+ xtick={0,0.523598776,4.712388980,5.759586532,6.283185307},
+ xticklabels={$0$,${\pi}/{6}$,${3\pi}/{2}$,${11\pi}/{6}$,$2\pi\equiv0$},
+ ytick={0,0.159154943},yticklabels={$0$,$1/(2\pi)$}}}
+\CThreeWrappedGraph{\theta}{0}{6.283185307}{1/(2*pi)}
+ {5.759586532}{6.283185307}{0}{0.523598776}{0.20}
+\endgroup
+\secInicio[sec:c3-uniform][sec:c3-uniform-sensor]
+
+\subsection{Random daily system-check time}\label{sec:c3-uniform-check}
+A cloud platform runs one system check each day.  Let $T$ be the check's time
+of day in hours, recorded on $[0,24)$ with the cut at midnight.  Time of day is
+periodic because the 24-hour clock returns to the same time after one day:
+$0$ h and $24$ h are equivalent.
+
+To distribute network load fairly, the scheduler uses controlled
+randomization that gives equal chances to equal-length time windows.  This
+makes a circular-uniform model reasonable.  Operations managers need the
+late-cycle probability from 18:00 to midnight to plan evening on-call staff,
+and the overnight probability from 21:00 through 03:00 to decide whether a
+second overnight response team is justified.
+
+\begingroup
+\pgfplotsset{every axis/.append style={
+ xticklabels={$0$,$3$,$18$,$21$,$24\equiv0$},yticklabels=\empty}}
+\CtwoProbGraph[t]{0}{24}{1/24}{0}{24}{0,3,18,21,24}{0.052}
+\endgroup
+
+\textbf{Questions/Tasks.}
+\begin{enumerate}
+ \CriterionTask{subsec:c3-uniform-check-a}{3.1}{Construct the complete periodic pdf of $T$ from the scheduler narrative, using total rectangular area $1$ to find its height and stating the period.}
+ \CriterionTask{subsec:c3-uniform-check-b}{3.2}{Calculate geometrically the evening on-call tail probability from 18:00 to the end of the displayed day.}
+ \CriterionTask{subsec:c3-uniform-check-c}{3.3}{Calculate geometrically the overnight planning-band probability from 21:00 through 03:00, crossing midnight.}
+\end{enumerate}
+
+\subsubsection*{C3.1 - Construct the periodic pdf.}
+\phantomsection\label{subsec:c3-uniform-check-a}
+The variable $T$ is time of day in hours, its period is $24$ h, and its
+one-cycle support representation is $[0,24)$ with a midnight cut.
+Equal-window randomization gives a
+rectangular pdf of height $h$.  Total area $1$ gives
+\[
+ 1=A_{\text{rectangle}}=(24)h,\qquad h=\frac1{24}.
+\]
+On the chosen recording cycle,
+\[
+ f_T(t)=\frac1{24},\qquad 0\le t<24,
+\]
+and its periodic extension is
+\[
+ f_T(t+24)=f_T(t).
+\]
+The period is $24$ h and the rectangular area check is $24(1/24)=1$.
+
+\subsubsection*{C3.2 - Calculate the late-cycle tail.}
+\phantomsection\label{subsec:c3-uniform-check-b}
+The evening tail is defined relative to the midnight cut as
+$[18,24)$, moving forward in clock time to the end of the displayed day.  Its
+shaded shape is a width-$6$ rectangle:
+\[
+ P(18\le T<24)
+ =\underbrace{(24-18)\frac1{24}}_{A_{\text{tail rectangle}}}
+ =\frac14=25\%.
+\]
+Therefore one quarter of randomized daily checks require evening on-call
+coverage.
+\begingroup
+\pgfplotsset{every axis/.append style={
+ xticklabels={$0$,$3$,$18$,$21$,$24\equiv0$},
+ ytick={0,0.041666667},yticklabels={$0$,$1/24$}}}
+\CtwoProbGraph[t]{0}{24}{1/24}{18}{24}{0,3,18,21,24}{0.052}
+\endgroup
+
+\subsubsection*{C3.3 - Calculate the overnight band.}
+\phantomsection\label{subsec:c3-uniform-check-c}
+The time band crosses midnight, so the one-cycle representation is
+\[
+ [21,24)\cup[0,3].
+\]
+The split occurs at the cycle cut.  The shaded event consists of two
+width-$3$ rectangles:
+\[
+ \begin{aligned}
+ P(21{:}00\text{ through }03{:}00)
+ &=\underbrace{(24-21)\frac1{24}}_{A_1=1/8}
+  +\underbrace{(3-0)\frac1{24}}_{A_2=1/8}\\
+ &=\frac14=25\%.
+ \end{aligned}
+\]
+Thus the overnight team would cover $25\%$ of the platform's randomized
+system checks.
+\begingroup
+\pgfplotsset{every axis/.append style={
+ xtick={0,3,18,21,24},xticklabels={$0$,$3$,$18$,$21$,$24\equiv0$},
+ ytick={0,0.041666667},yticklabels={$0$,$1/24$}}}
+\CThreeWrappedGraph{t}{0}{24}{1/24}{21}{24}{0}{3}{0.052}
+\endgroup
+\secInicio[sec:c3-uniform][sec:c3-uniform-check]
+
+\subsection{Randomized rotating-device direction}\label{sec:c3-uniform-device}
+A rotating quality-control camera records its direction $D$ in degrees
+clockwise from its home mark on $[0^\circ,360^\circ)$.  Direction is periodic:
+after a $360^\circ$ rotation the camera has returned to its home direction, so
+the displayed endpoints are equivalent.
+
+For each inspection the controller deliberately randomizes the direction with
+no preferred sector, making a circular-uniform model appropriate by design.
+The clockwise sector from $300^\circ$ to the cut places a cable near its safe
+bend limit, while the $120^\circ$--$210^\circ$ target sector views a weld.  The
+two probabilities support cable-maintenance and target-visibility decisions.
+
+\begingroup
+\pgfplotsset{every axis/.append style={
+ xticklabels={$0^\circ$,$120^\circ$,$210^\circ$,$300^\circ$,$360^\circ\equiv0^\circ$},
+ yticklabels=\empty}}
+\CtwoProbGraph[d]{0}{360}{1/360}{0}{360}{0,120,210,300,360}{0.0035}
+\endgroup
+
+\textbf{Questions/Tasks.}
+\begin{enumerate}
+ \CriterionTask{subsec:c3-uniform-device-a}{3.1}{Construct the complete periodic pdf of $D$ from the controller narrative, using total rectangular area $1$ to find its height and stating the period.}
+ \CriterionTask{subsec:c3-uniform-device-b}{3.2}{Calculate geometrically the cable-limit tail probability for the clockwise sector from $300^\circ$ to the end of the displayed cycle.}
+ \CriterionTask{subsec:c3-uniform-device-c}{3.3}{Calculate geometrically the weld-viewing band probability for the target sector from $120^\circ$ through $210^\circ$.}
+\end{enumerate}
+
+\subsubsection*{C3.1 - Construct the periodic pdf.}
+\phantomsection\label{subsec:c3-uniform-device-a}
+The variable $D$ is direction in degrees, its period is $360^\circ$, and its
+one-cycle support representation is $[0^\circ,360^\circ)$ with a cut at the
+home mark.
+Controlled equal-sector randomization gives a rectangular pdf.  If its height
+is $h$, then
+\[
+ 1=A_{\text{rectangle}}=(360)h,
+ \qquad h=\frac1{360}.
+\]
+On one displayed cycle,
+\[
+ f_D(d)=\frac1{360},\qquad 0\le d<360,
+\]
+with density measured per degree.  The periodic extension is
+\[
+ f_D(d+360^\circ)=f_D(d).
+\]
+The period is $360^\circ$, and $360(1/360)=1$ verifies the total area.
+
+\subsubsection*{C3.2 - Calculate the directional tail.}
+\phantomsection\label{subsec:c3-uniform-device-b}
+The cable-limit tail is not an intrinsic right tail of a circle.  In this
+context it is specifically the clockwise sector $[300^\circ,360^\circ)$ from
+$300^\circ$ to the home-mark cut.  The shaded rectangle has width $60^\circ$:
+\[
+ P(300^\circ\le D<360^\circ)
+ =\underbrace{(360-300)\frac1{360}}_{A_{\text{tail rectangle}}}
+ =\frac16\approx16.7\%.
+\]
+About $16.7\%$ of inspections place the cable in the maintenance-watch sector.
+\begingroup
+\pgfplotsset{every axis/.append style={
+ xticklabels={$0^\circ$,$120^\circ$,$210^\circ$,$300^\circ$,$360^\circ\equiv0^\circ$},
+ ytick={0,0.002777778},yticklabels={$0$,$1/360$}}}
+\CtwoProbGraph[d]{0}{360}{1/360}{300}{360}{0,120,210,300,360}{0.0035}
+\endgroup
+
+\subsubsection*{C3.3 - Calculate the target sector.}
+\phantomsection\label{subsec:c3-uniform-device-c}
+The target band $[120^\circ,210^\circ]$ does not cross the cut or a pdf
+breakpoint.  Its shaded region is one width-$90^\circ$ rectangle:
+\[
+ P(120^\circ\le D\le210^\circ)
+ =\underbrace{(210-120)\frac1{360}}_{A_{\text{target rectangle}}}
+ =\frac14=25\%.
+\]
+The randomized camera views the weld sector in one quarter of inspections,
+which gives the quality-control team a baseline for expected image coverage.
+\begingroup
+\pgfplotsset{every axis/.append style={
+ xticklabels={$0^\circ$,$120^\circ$,$210^\circ$,$300^\circ$,$360^\circ\equiv0^\circ$},
+ ytick={0,0.002777778},yticklabels={$0$,$1/360$}}}
+\CtwoProbGraph[d]{0}{360}{1/360}{120}{210}{0,120,210,300,360}{0.0035}
+\endgroup
+\secInicio[sec:c3-uniform][sec:c3-uniform-device]
+
+\section{Circular Triangular Distributions}\label{sec:c3-triangular}
 \SectionProblemsTableOfContents{
- \SectionProblemLink{sec:c3-means-boundary}{Directions near the cycle boundary} \\
- \SectionProblemLink{sec:c3-means-concentration}{A mean with weak concentration}
+ \SectionProblemLink{sec:c3-triangular-scanner}{Scanner direction with an interior mode} \\
+ \SectionProblemLink{sec:c3-triangular-activity}{Daily peak-activity time} \\
+ \SectionProblemLink{sec:c3-triangular-north}{Direction with its peak at the cut}
 }
 
-\subsection{Directions near the cycle boundary}\label{sec:c3-means-boundary}
-Two delivery riders leave the same depot on routes with initial bearings
-$10^\circ$ and $350^\circ$, measured in degrees clockwise from north.  A
-bearing is circular because $0^\circ$ and $360^\circ$ are the same direction.
-Both riders therefore start close to north, but on opposite sides of the cut in
-the numerical scale.
+\subsection{Scanner direction with an interior mode}\label{sec:c3-triangular-scanner}
+An automated warehouse scanner records its clockwise direction $S$ in degrees
+on $[0^\circ,360^\circ)$, with the cut at north.  Direction is periodic because
+$0^\circ$ and $360^\circ$ are the same physical direction.
 
-A dispatcher wants a representative initial direction in order to position a
-support vehicle on the side of the depot most useful to both routes.  The two
-riders are given equal weight.  No uniform probability distribution is assumed:
-the circular mean describes their two observed bearings, and the resultant
-length measures how closely those bearings agree.
+The programmed scan profile makes north least likely, increases the direction
+density at a constant rate to its preferred loading-bay direction of
+$120^\circ$, and then decreases it at a constant rate back to zero at the cut.
+A circular-triangular pdf is reasonable because this controlled profile has
+one preferred direction and straight changes on both sides.  The sector from
+$240^\circ$ to the cut measures exposure to a reflective wall, while the
+$60^\circ$--$240^\circ$ band is the bay-coverage range used to position stock.
 
-\textbf{Questions/Tasks.}
-\begin{enumerate}
- \CriterionTask{subsec:c3-means-boundary-a}{3.1}{Explain why the arithmetic mean is inappropriate.}
- \CriterionTask{subsec:c3-means-boundary-b}{3.2}{Use unit vectors to find the circular mean and resultant length.}
-\end{enumerate}
-
-\subsubsection*{C3.1 - Compare the directions.}\phantomsection\label{subsec:c3-means-boundary-a}
-The arithmetic mean is $(10^\circ+350^\circ)/2=180^\circ$, which points
-south.  Both actual directions are only $10^\circ$ from north, so this answer
-is an artefact of cutting the circular scale at $0^\circ$.  Positioning the
-support vehicle south of the depot on this basis would contradict both routes.
-\secInicio[sec:c3-means][sec:c3-means-boundary]
-
-\subsubsection*{C3.2 - Calculate the circular mean.}\phantomsection\label{subsec:c3-means-boundary-b}
-Using $350^\circ=-10^\circ$ on the circle,
-\[
- \bar C=\frac{\cos10^\circ+\cos(-10^\circ)}2=\cos10^\circ,
- \qquad
- \bar S=\frac{\sin10^\circ+\sin(-10^\circ)}2=0.
-\]
-Therefore
-\[
- \bar\theta=\operatorname{atan2}(0,\cos10^\circ)=0^\circ,
- \qquad R=\cos10^\circ\approx0.9848.
-\]
-The circular mean correctly points north, and $R$ close to $1$ shows strong
-agreement between the two directions.  The shared northward tendency supports
-positioning the dispatch support point north of the depot, where it can serve
-both riders' initial routes.
-\secInicio[sec:c3-means][sec:c3-means-boundary]
-
-\subsection{A mean with weak concentration}\label{sec:c3-means-concentration}
-A shop records three recurring customer-activity times on a 24-hour clock:
-$0^\circ$ corresponds to midnight, $120^\circ$ to 08:00, and $240^\circ$ to
-16:00.  Time of day is circular because the clock returns to midnight after 24
-hours; the end and beginning of the numerical scale are the same time in the
-daily cycle.
-
-The manager wants to know whether one representative time could guide a daily
-staffing period.  The three observations are given equal weight and are equally
-spaced around the 24-hour cycle.  No uniform distribution is being imposed;
-the circular mean and resultant length are used to test whether these observed
-times have a meaningful common centre.
+\begingroup
+\pgfplotsset{every axis/.append style={
+ xticklabels={$0^\circ$,$60^\circ$,$120^\circ$,$240^\circ$,$360^\circ\equiv0^\circ$},
+ yticklabels=\empty}}
+\COneGraph[s]{0}{360}
+ {(x<=120)*(x/21600)+(x>120)*((360-x)/43200)}
+ {0}{360}{0,60,120,240,360}{0.0065}
+\endgroup
 
 \textbf{Questions/Tasks.}
 \begin{enumerate}
- \CriterionTask{subsec:c3-means-concentration-a}{3.1}{Calculate $\bar C$ and $\bar S$.}
- \CriterionTask{subsec:c3-means-concentration-b}{3.2}{Decide whether a single average direction is meaningful.}
+ \CriterionTask{subsec:c3-triangular-scanner-a}{3.1}{Construct the complete periodic pdf of $S$ from the scan profile, using total triangular area $1$ to find all heights and stating the period.}
+ \CriterionTask{subsec:c3-triangular-scanner-b}{3.2}{Calculate geometrically the reflective-wall tail probability for the clockwise sector from $240^\circ$ to the end of the displayed cycle.}
+ \CriterionTask{subsec:c3-triangular-scanner-c}{3.3}{Calculate geometrically the bay-coverage band probability from $60^\circ$ through $240^\circ$.}
 \end{enumerate}
 
-\subsubsection*{C3.1 - Average the vectors.}\phantomsection\label{subsec:c3-means-concentration-a}
-The three unit vectors are equally spaced, and
+\subsubsection*{C3.1 - Construct the periodic pdf.}
+\phantomsection\label{subsec:c3-triangular-scanner-a}
+The variable $S$ is direction in degrees, the period is $360^\circ$, and its
+one-cycle support representation is $[0^\circ,360^\circ)$ with its cut at
+north.  The graph is a
+triangle with mode $120^\circ$, zero height at the cut, and unknown peak $H$.
+Total area $1$ gives
 \[
- \bar C=\frac{1-\frac12-\frac12}{3}=0,
- \qquad
- \bar S=\frac{0+\frac{\sqrt3}{2}-\frac{\sqrt3}{2}}{3}=0.
+ 1=A_{\text{triangle}}=\frac12(360)H,\qquad H=\frac1{180}.
 \]
-Thus the average vector is the zero vector and $R=0$.  For the manager, this
-shows complete balance among midnight, 08:00, and 16:00 rather than a cluster
-near one staffing time.
-\secInicio[sec:c3-means][sec:c3-means-concentration]
+The rising line through $(0,0)$ and $(120,1/180)$ has slope
+\[
+ \frac{1/180-0}{120-0}=\frac1{21600},
+\]
+so its equation is $s/21600$.  The falling line through
+$(120,1/180)$ and $(360,0)$ has slope $-1/43200$; using $(360,0)$
+gives $(360-s)/43200$.  Therefore, on one cycle,
+\[
+ f_S(s)=
+ \begin{cases}
+  \dfrac{s}{21600},&0\le s\le120,\\[2mm]
+  \dfrac{360-s}{43200},&120<s<360.
+ \end{cases}
+\]
+Its periodic extension is
+\[
+ f_S(s+360^\circ)=f_S(s).
+\]
+The areas verify the model geometrically:
+\[
+ \underbrace{\frac12(120)\frac1{180}}_{1/3}
+ +\underbrace{\frac12(240)\frac1{180}}_{2/3}=1.
+\]
 
-\subsubsection*{C3.2 - Interpret the result.}\phantomsection\label{subsec:c3-means-concentration-b}
-Because $\operatorname{atan2}(0,0)$ has no defined direction, there is no
-unique circular mean for these data.  This is informative rather than an
-error: the observations are perfectly balanced around the circle, so a single
-representative time would be misleading.  The shop should therefore not use
-one ``average'' time to plan coverage for this recurring demand pattern.
-\secInicio[sec:c3-means][sec:c3-means-concentration]
+\subsubsection*{C3.2 - Calculate the reflective-wall tail.}
+\phantomsection\label{subsec:c3-triangular-scanner-b}
+Relative to the north cut, this tail is the clockwise sector
+$[240^\circ,360^\circ)$.  The line equation gives
+\[
+ f_S(240)=\frac{360-240}{43200}=\frac1{360}.
+\]
+The shaded tail is a triangle ending at zero height at the cut, with base
+$120^\circ$ and height $1/360$:
+\[
+ P(240^\circ\le S<360^\circ)
+ =\underbrace{\frac12(360-240)\frac1{360}}_{A_{\text{tail triangle}}}
+ =\frac16\approx16.7\%.
+\]
+Thus the scanner points toward the reflective-wall sector on about $16.7\%$
+of programmed scans.
+\begingroup
+\pgfplotsset{every axis/.append style={
+ xticklabels={$0^\circ$,$60^\circ$,$120^\circ$,$240^\circ$,$360^\circ\equiv0^\circ$},
+ ytick={0,0.002777778,0.005555556},
+ yticklabels={$0$,$1/360$,$1/180$}}}
+\COneGraph[s]{0}{360}
+ {(x<=120)*(x/21600)+(x>120)*((360-x)/43200)}
+ {240}{360}{0,60,120,240,360}{0.0065}
+\endgroup
 
-\section{Applied Circular Probability}\label{sec:c3-applied}
-\SectionProblemsTableOfContents{
- \SectionProblemLink{sec:c3-applied-time}{Online orders by time of day} \\
- \SectionProblemLink{sec:c3-applied-model}{Choosing an appropriate model}
-}
+\subsubsection*{C3.3 - Calculate the bay-coverage band.}
+\phantomsection\label{subsec:c3-triangular-scanner-c}
+The band $[60^\circ,240^\circ]$ crosses the pdf breakpoint at the mode, so it
+is split at $120^\circ$.  The boundary heights are
+\[
+ f_S(60)=\frac1{360},\qquad f_S(120)=\frac1{180},
+ \qquad f_S(240)=\frac1{360}.
+\]
+The two shaded pieces are trapezoids:
+\[
+ \begin{aligned}
+ P(60^\circ\le S\le240^\circ)
+ &=\underbrace{\frac12\left(\frac1{360}+\frac1{180}\right)(60)}
+     _{A_1=1/4}\\
+ &\quad+\underbrace{\frac12\left(\frac1{180}+\frac1{360}\right)(120)}
+     _{A_2=1/2}\\
+ &=\frac34=75\%.
+ \end{aligned}
+\]
+The stock-positioning band covers three quarters of the programmed scan
+directions.
+\begingroup
+\pgfplotsset{every axis/.append style={
+ xticklabels={$0^\circ$,$60^\circ$,$120^\circ$,$240^\circ$,$360^\circ\equiv0^\circ$},
+ ytick={0,0.002777778,0.005555556},
+ yticklabels={$0$,$1/360$,$1/180$}}}
+\COneGraph[s]{0}{360}
+ {(x<=120)*(x/21600)+(x>120)*((360-x)/43200)}
+ {60}{240}{0,60,120,240,360}{0.0065}
+\endgroup
+\secInicio[sec:c3-triangular][sec:c3-triangular-scanner]
 
-\subsection{Online orders by time of day}\label{sec:c3-applied-time}
-A shop manager is studying an overnight service and staffing window from 22:30
-through 01:30.  Let $H$ be the order time in hours on the 24-hour scale
-$[0,24)$.  Time of day is circular because it repeats every 24 hours: 23:59 and
-00:01 are close in the actual daily cycle even though midnight is the boundary
-of this numerical representation.
+\subsection{Daily peak-activity time}\label{sec:c3-triangular-activity}
+A service desk records $T$, the time of day at which its daily online activity
+reaches its peak, in hours on $[0,24)$.  Time of day is periodic because the
+clock repeats every 24 hours and midnight is both $0$ h and $24$ h.  The desk
+chooses its cut at midnight, the least likely peak-activity time.
 
-Before comparing the model with observed order patterns, the manager uses a
-circular uniform distribution as an initial baseline.  It assumes that no hour
-is preferred and assigns equal probability to equal-length time intervals.
-The practical objective is to find the baseline share of orders associated
-with the three-hour overnight window; the assumption need not describe the
-shop's actual demand.
+Historical planning summaries show that the density rises at a constant rate
+from zero at midnight to a mode at 08:00, then falls at a constant rate to zero
+at the next midnight.  A circular-triangular pdf is a simple reasonable model
+for that single daily preference and those straight changes.  A peak after
+18:00 requires late support, while the 04:00--16:00 band determines how often
+the regular planning window contains the day's peak.
+
+\begingroup
+\pgfplotsset{every axis/.append style={
+ xticklabels={$0$,$4$,$8$,$16$,$18$,$24\equiv0$},yticklabels=\empty}}
+\COneGraph[t]{0}{24}{(x<=8)*(x/96)+(x>8)*((24-x)/192)}
+ {0}{24}{0,4,8,16,18,24}{0.095}
+\endgroup
 
 \textbf{Questions/Tasks.}
 \begin{enumerate}
- \CriterionTask{subsec:c3-applied-time-a}{3.1}{Represent the event without treating midnight as an endpoint of time.}
- \CriterionTask{subsec:c3-applied-time-b}{3.2}{Find and interpret its probability.}
+ \CriterionTask{subsec:c3-triangular-activity-a}{3.1}{Construct the complete periodic pdf of $T$ from the activity narrative, using total triangular area $1$ to find all heights and stating the period.}
+ \CriterionTask{subsec:c3-triangular-activity-b}{3.2}{Calculate geometrically the late-support tail probability from 18:00 to the end of the displayed day.}
+ \CriterionTask{subsec:c3-triangular-activity-c}{3.3}{Calculate geometrically the regular-planning band probability from 04:00 through 16:00.}
 \end{enumerate}
 
-\subsubsection*{C3.1 - Represent the event.}\phantomsection\label{subsec:c3-applied-time-a}
-On $[0,24)$ hours the event is
+\subsubsection*{C3.1 - Construct the periodic pdf.}
+\phantomsection\label{subsec:c3-triangular-activity-a}
+The variable $T$ is daily peak-activity time in hours.  Its period is $24$ h,
+and its one-cycle support representation is $[0,24)$ with the cut at the least
+likely time, midnight.  The pdf is a triangle with mode $8$ and unknown peak
+$H$.  Its complete-cycle area
+gives
 \[
- \{22.5\leq H<24\}\ \cup\ \{0\leq H\leq1.5\}.
+ 1=A_{\text{triangle}}=\frac12(24)H,\qquad H=\frac1{12}.
 \]
-Equivalently, converting time $h$ to angle by $\theta=2\pi h/24$, it is the
-wrapped arc from $15\pi/8$ through $0$ to $\pi/8$.  This representation keeps
-the manager's overnight service window continuous across midnight.
-\secInicio[sec:c3-applied][sec:c3-applied-time]
-
-\subsubsection*{C3.2 - Find and interpret the probability.}\phantomsection\label{subsec:c3-applied-time-b}
-The event lasts $1.5+1.5=3$ hours.  Uniformity gives
+The line from $(0,0)$ to $(8,1/12)$ has slope $1/96$, so the rising equation
+is $t/96$.  The line from $(8,1/12)$ to $(24,0)$ has slope $-1/192$; through
+$(24,0)$ its equation is $(24-t)/192$.  On one cycle,
 \[
- P(22{:}30\text{ through }01{:}30)=\frac3{24}=\frac18=0.125.
+ f_T(t)=
+ \begin{cases}
+  \dfrac{t}{96},&0\le t\le8,\\[2mm]
+  \dfrac{24-t}{192},&8<t<24.
+ \end{cases}
 \]
-The model assigns $12.5\%$ of orders to that time window.  This result depends
-on the uniform-model assumption; real order times may be concentrated at
-meal times or other preferred hours.  The manager can therefore use $12.5\%$
-as a baseline share when comparing the window with actual order data and
-making staffing decisions.
-\secInicio[sec:c3-applied][sec:c3-applied-time]
+The periodic extension is
+\[
+ f_T(t+24)=f_T(t).
+\]
+The two triangular pieces have total area
+\[
+ \underbrace{\frac12(8)\frac1{12}}_{1/3}
+ +\underbrace{\frac12(16)\frac1{12}}_{2/3}=1.
+\]
 
-\subsection{Choosing an appropriate model}\label{sec:c3-applied-model}
-An analyst is advising a business and an energy installation on three
-variables: daily revenue in pesos, wind direction measured at a weather
-station, and the time of day at which electricity demand reaches its daily
-peak.  Choosing the variable type before choosing a probability distribution
-matters because a model must preserve which values are close and whether the
-two ends of a numerical scale represent the same point.
+\subsubsection*{C3.2 - Calculate the late-support tail.}
+\phantomsection\label{subsec:c3-triangular-activity-b}
+The late-cycle tail is defined as $[18,24)$, moving forward in clock time from
+18:00 to the midnight cut.  Its starting height is
+\[
+ f_T(18)=\frac{24-18}{192}=\frac1{32}.
+\]
+The shaded tail is a triangle of base $6$ h and height $1/32$:
+\[
+ P(18\le T<24)
+ =\underbrace{\frac12(24-18)\frac1{32}}_{A_{\text{tail triangle}}}
+ =\frac3{32}=9.375\%.
+\]
+Therefore about $9.4\%$ of days have a modeled peak late enough to require
+late-support coverage.
+\begingroup
+\pgfplotsset{every axis/.append style={
+ xticklabels={$0$,$4$,$8$,$16$,$18$,$24\equiv0$},
+ ytick={0,0.03125,0.083333333},yticklabels={$0$,$1/32$,$1/12$}}}
+\COneGraph[t]{0}{24}{(x<=8)*(x/96)+(x>8)*((24-x)/192)}
+ {18}{24}{0,4,8,16,18,24}{0.095}
+\endgroup
 
-Daily revenue lies on a linear scale whose endpoints are not equivalent.  Wind
-direction is measured around a compass, where $0^\circ=360^\circ$, and peak
-time repeats on a 24-hour clock, where midnight begins a new written cycle but
-not a new type of time.  For either circular variable, the analyst must then
-use evidence to decide whether observations are spread approximately evenly
-around the cycle or concentrated near a preferred direction or time.  That
-decision affects forecasts and operational planning; uniformity is only one
-possible modelling assumption.
+\subsubsection*{C3.3 - Calculate the regular-planning band.}
+\phantomsection\label{subsec:c3-triangular-activity-c}
+The band $[4,16]$ crosses the mode at $8$, which is a pdf breakpoint.  Its
+three required heights are
+\[
+ f_T(4)=\frac1{24},\qquad f_T(8)=\frac1{12},
+ \qquad f_T(16)=\frac1{24}.
+\]
+Splitting the shaded band at $8$ produces two trapezoids:
+\[
+ \begin{aligned}
+ P(4\le T\le16)
+ &=\underbrace{\frac12\left(\frac1{24}+\frac1{12}\right)(8-4)}
+     _{A_1=1/4}\\
+ &\quad+\underbrace{\frac12\left(\frac1{12}+\frac1{24}\right)(16-8)}
+     _{A_2=1/2}\\
+ &=\frac34=75\%.
+ \end{aligned}
+\]
+Thus the regular planning window contains the daily activity peak on $75\%$
+of modeled days.
+\begingroup
+\pgfplotsset{every axis/.append style={
+ xticklabels={$0$,$4$,$8$,$16$,$18$,$24\equiv0$},
+ ytick={0,0.041666667,0.083333333},yticklabels={$0$,$1/24$,$1/12$}}}
+\COneGraph[t]{0}{24}{(x<=8)*(x/96)+(x>8)*((24-x)/192)}
+ {4}{16}{0,4,8,16,18,24}{0.095}
+\endgroup
+\secInicio[sec:c3-triangular][sec:c3-triangular-activity]
+
+\subsection{Direction with its peak at the cut}\label{sec:c3-triangular-north}
+A rotating radio antenna records its direction $A$ in degrees clockwise from
+north on $[0^\circ,360^\circ)$.  Direction is periodic, so north is both
+$0^\circ$ and the equivalent endpoint $360^\circ$; the physical phenomenon
+does not stop at the recording cut.
+
+The antenna's controller most strongly favors north, reduces the direction
+density at a constant rate to zero at south ($180^\circ$), and then increases
+it at the same constant rate back toward north.  A circular-triangular pdf is
+reasonable for this symmetric programmed preference.  The upper-end sector
+from $300^\circ$ to the cut tests one cable route, while the band within
+$30^\circ$ of north measures whether a receiver can use a narrow target cone.
+
+\begingroup
+\pgfplotsset{every axis/.append style={
+ xticklabels={$0^\circ$,$30^\circ$,$180^\circ$,$300^\circ$,$330^\circ$,
+ $360^\circ\equiv0^\circ$},yticklabels=\empty}}
+\COneGraph[a]{0}{360}
+ {(x<=180)*((180-x)/32400)+(x>180)*((x-180)/32400)}
+ {0}{360}{0,30,180,300,330,360}{0.0065}
+\endgroup
 
 \textbf{Questions/Tasks.}
 \begin{enumerate}
- \CriterionTask{subsec:c3-applied-model-a}{3.1}{Identify which variables are naturally circular and justify the choice.}
- \CriterionTask{subsec:c3-applied-model-b}{3.2}{Name possible circular models when directions are uniform and when they cluster around one direction.}
+ \CriterionTask{subsec:c3-triangular-north-a}{3.1}{Construct the complete periodic pdf of $A$, showing how two displayed triangular pieces form one physical peak at the cut, using their combined area $1$ to find all heights, and stating the period.}
+ \CriterionTask{subsec:c3-triangular-north-b}{3.2}{Calculate geometrically the cable-route tail probability for the clockwise upper-end sector from $300^\circ$ to the end of the displayed cycle.}
+ \CriterionTask{subsec:c3-triangular-north-c}{3.3}{Calculate geometrically the receiver's wrapped target-band probability on $[330^\circ,360^\circ)\cup[0^\circ,30^\circ]$.}
 \end{enumerate}
 
-\subsubsection*{C3.1 - Identify circular variables.}\phantomsection\label{subsec:c3-applied-model-a}
-Wind direction and peak-demand time are circular: $0^\circ=360^\circ$, and
-midnight is both the end of one day and the beginning of the next.  Revenue is
-linear; its largest and smallest values are not identified with each other.
-The shape of a graph alone does not determine whether a variable is circular.
-This classification prevents the analyst from treating nearby directions or
-times across the chosen boundary as though they were far apart.
-\secInicio[sec:c3-applied][sec:c3-applied-model]
+\subsubsection*{C3.1 - Construct the periodic pdf.}
+\phantomsection\label{subsec:c3-triangular-north-a}
+The variable $A$ is antenna direction in degrees, its period is $360^\circ$,
+and its one-cycle support representation is $[0^\circ,360^\circ)$ with the cut
+at the physical mode, north.  The unwrapped graph shows a descending triangle on
+$[0^\circ,180^\circ]$ and an ascending triangle on
+$[180^\circ,360^\circ)$.  Their endpoint heights both represent the same
+northward peak $H$.
 
-\subsubsection*{C3.2 - Choose model families.}\phantomsection\label{subsec:c3-applied-model-b}
-The circular uniform distribution is suitable if every direction is equally
-likely.  If observations cluster around a preferred direction, a von Mises
-model may be suitable; a wrapped normal is another possible model.  Data and
-context are needed to choose among them: ``circular distribution'' does not
-refer to one universal density.  The analyst should therefore match the model
-to actual evidence about dispersion or clustering and to the forecasting or
-planning purpose of the analysis.
-\secInicio[sec:c3-applied][sec:c3-applied-model]
+The combined area is $1$:
+\[
+ 1=\underbrace{\frac12(180)H}_{\text{left displayed triangle}}
+  +\underbrace{\frac12(180)H}_{\text{right displayed triangle}}
+  =180H,
+ \qquad H=\frac1{180}.
+\]
+The first side has slope $-H/180=-1/32400$ and passes through $(180,0)$,
+giving $(180-a)/32400$.  The second has slope $1/32400$ and also passes
+through $(180,0)$, giving $(a-180)/32400$.  On one cycle,
+\[
+ f_A(a)=
+ \begin{cases}
+  \dfrac{180-a}{32400},&0\le a\le180,\\[2mm]
+  \dfrac{a-180}{32400},&180<a<360.
+ \end{cases}
+\]
+The complete model repeats according to
+\[
+ f_A(a+360^\circ)=f_A(a).
+\]
+Each displayed triangle has area $1/2$, so their areas sum to $1$.  The peak
+at $0^\circ$ and the height approached at $360^\circ$ are one physical peak,
+not two modes.
+
+\subsubsection*{C3.2 - Calculate the upper-end directional tail.}
+\phantomsection\label{subsec:c3-triangular-north-b}
+Relative to the north cut, the cable-route tail is the clockwise sector
+$[300^\circ,360^\circ)$.  Its parallel heights are
+\[
+ f_A(300)=\frac{120}{32400}=\frac1{270},
+ \qquad f_A(360^-)=\frac1{180}.
+\]
+The upper endpoint is excluded from the written cycle, but its approached
+height completes the geometric edge at the equivalent north direction.  The
+shaded tail is a trapezoid of width $60^\circ$:
+\[
+ \begin{aligned}
+ P(300^\circ\le A<360^\circ)
+ &=\underbrace{\frac12\left(\frac1{270}+\frac1{180}\right)(60)}
+   _{A_{\text{tail trapezoid}}}\\
+ &=\frac5{18}\approx27.8\%.
+ \end{aligned}
+\]
+Thus about $27.8\%$ of programmed directions use the cable route associated
+with this upper-end sector.
+\begingroup
+\pgfplotsset{every axis/.append style={
+ xticklabels={$0^\circ$,$30^\circ$,$180^\circ$,$300^\circ$,$330^\circ$,
+ $360^\circ\equiv0^\circ$},
+ ytick={0,0.003703704,0.005555556},
+ yticklabels={$0$,$1/270$,$1/180$}}}
+\COneGraph[a]{0}{360}
+ {(x<=180)*((180-x)/32400)+(x>180)*((x-180)/32400)}
+ {300}{360}{0,30,180,300,330,360}{0.0065}
+\endgroup
+
+\clearpage
+\subsubsection*{C3.3 - Calculate the wrapped target band.}
+\phantomsection\label{subsec:c3-triangular-north-c}
+The physical target cone is continuous around north, but the chosen recording
+cycle splits it at the cut:
+\[
+ [330^\circ,360^\circ)\cup[0^\circ,30^\circ].
+\]
+The outer boundary heights are equal:
+\[
+ f_A(330)=\frac{150}{32400}=\frac1{216},
+ \qquad f_A(30)=\frac{150}{32400}=\frac1{216}.
+\]
+Each shaded piece is a trapezoid of width $30^\circ$, with heights $1/216$
+and $1/180$ at its parallel sides:
+\[
+ \begin{aligned}
+ P(\text{target cone})
+ &=\underbrace{\frac12\left(\frac1{216}+\frac1{180}\right)(30)}
+     _{A_1=11/72}\\
+ &\quad+\underbrace{\frac12\left(\frac1{180}+\frac1{216}\right)(30)}
+     _{A_2=11/72}\\
+ &=\frac{11}{36}\approx30.6\%.
+ \end{aligned}
+\]
+The result lies between $0$ and $1$.  About $30.6\%$ of programmed antenna
+directions fall within $30^\circ$ of north, using both sides of the cut.
+\begingroup
+\pgfplotsset{every axis/.append style={
+ xtick={0,30,180,300,330,360},
+ xticklabels={$0^\circ$,$30^\circ$,$180^\circ$,$300^\circ$,$330^\circ$,
+ $360^\circ\equiv0^\circ$},
+ ytick={0,0.004629630,0.005555556},
+ yticklabels={$0$,$1/216$,$1/180$}}}
+\CThreeWrappedGraph{a}{0}{360}
+ {(x<=180)*((180-x)/32400)+(x>180)*((x-180)/32400)}
+ {330}{360}{0}{30}{0.0065}
+\endgroup
+\secInicio[sec:c3-triangular][sec:c3-triangular-north]
 
 \end{document}

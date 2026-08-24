@@ -6,6 +6,7 @@
   const currentTimeLine = currentTimeOverlay?.querySelector(".current-time-line");
   const currentTimeLabel = currentTimeLine?.querySelector(".current-time-label");
   const columnToggle = document.querySelector(".schedule-column-toggle");
+  const plainModeToggle = document.getElementById("plain-mode-toggle");
   const mobileScheduleQuery = window.matchMedia("(max-width: 600px)");
   const toggle = document.querySelector(".collapsible-toggle");
   const panel = document.getElementById("class-pages-panel");
@@ -13,6 +14,7 @@
   let displayedLocalDate = null;
   let activeCycleDay = null;
   let mobileScheduleExpanded = false;
+  let plainModeEnabled = false;
 
   if (toggle && panel && icon) {
     toggle.addEventListener("click", () => {
@@ -60,7 +62,7 @@
     activeCycleDay = cycleDay;
 
     scheduleTable?.querySelectorAll("[data-cycle-day]").forEach((cell) => {
-      const isActive = Number(cell.dataset.cycleDay) === cycleDay;
+      const isActive = !plainModeEnabled && Number(cell.dataset.cycleDay) === cycleDay;
       const isDayHeader = cell.classList.contains("rotation-day");
       cell.classList.toggle("is-active-cycle-day", isActive);
       if (isActive && isDayHeader) {
@@ -145,6 +147,12 @@
       return;
     }
 
+    if (plainModeEnabled) {
+      currentTimeOverlay.hidden = true;
+      currentTimeLine.classList.remove("is-unshown-gap");
+      return;
+    }
+
     const nowMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
     const rows = Array.from(scheduleTable.tBodies[0]?.rows ?? []);
     const intervals = rows.map((row) => {
@@ -194,6 +202,17 @@
     }
   }
 
+  function setPlainMode(enabled) {
+    plainModeEnabled = Boolean(enabled);
+    if (plainModeToggle) {
+      plainModeToggle.checked = plainModeEnabled;
+    }
+    scheduleWrap?.classList.toggle("plain-style", plainModeEnabled);
+
+    updateActiveScheduleDay();
+    updateCurrentTimeLine();
+  }
+
   function refreshAfterDateChange() {
     const now = new Date();
     if (formatLocalDate(now) !== displayedLocalDate) {
@@ -202,6 +221,12 @@
   }
 
   assignCycleDayColumns();
+  if (plainModeToggle) {
+    plainModeToggle.checked = false;
+    plainModeToggle.addEventListener("change", () => {
+      setPlainMode(plainModeToggle.checked);
+    });
+  }
   columnToggle?.addEventListener("click", () => {
     mobileScheduleExpanded = !mobileScheduleExpanded;
     updateMobileScheduleColumns();
@@ -213,7 +238,7 @@
   window.setInterval(updateCurrentTimeLine, 30000);
   document.addEventListener("visibilitychange", refreshAfterDateChange);
   window.addEventListener("focus", refreshAfterDateChange);
-  window.addEventListener("resize", updateCurrentTimeLine);
+  window.addEventListener("resize", () => updateCurrentTimeLine());
 
   window.updateTeacherScheduleDay = updateActiveScheduleDay;
   window.updateTeacherScheduleTime = updateCurrentTimeLine;
