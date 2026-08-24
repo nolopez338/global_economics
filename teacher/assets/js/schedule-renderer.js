@@ -3,7 +3,7 @@
   Renders schedule table rows from global schedule data into class and schedule pages.
 
   Responsibilities:
-  - Normalizes schedule fields (dates, origin mode, material values) for display
+  - Normalizes schedule fields and links dated meetings to their materials pages
   - Builds table body content including empty-state handling and per-entry row output
   - Integrates with page datasets and table markup to populate schedule views consistently
 */
@@ -23,22 +23,6 @@ const getScheduleData = () => {
   }
 
   return Promise.resolve([]);
-};
-
-const normalizeOrigin = (origin) =>
-  origin === "schedule-teacher" ? "schedule-teacher" : "schedule";
-
-const isNonEmptyValue = (value) =>
-  value !== undefined && value !== null && String(value).trim() !== "";
-
-const getMaterialValue = (entry, origin) => {
-  if (normalizeOrigin(origin) === "schedule-teacher") {
-    if (isNonEmptyValue(entry["Material teacher"])) {
-      return entry["Material teacher"];
-    }
-  }
-
-  return entry.Material || "";
 };
 
 const getColumnCount = (table) =>
@@ -68,6 +52,16 @@ const getTodayISODate = () => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
+const findMaterialsRecord = (entry, normalizedDate) => {
+  if (!Array.isArray(window.MATERIALS_DATA) || !normalizedDate) return null;
+  return window.MATERIALS_DATA.find((record) =>
+    String(record.Grade) === String(entry.Grade) &&
+    String(record.Section).toUpperCase() === String(entry.Section).toUpperCase() &&
+    String(record["Class #"]) === String(entry["Class #"]) &&
+    normalizeScheduleDate(record.Date) === normalizedDate
+  ) || null;
+};
+
 const renderEmptyRow = (table) => {
   const body = table.tBodies[0] ?? table.createTBody();
   body.innerHTML = "";
@@ -81,12 +75,6 @@ const renderEmptyRow = (table) => {
 };
 
 const renderScheduleRows = (table, entries) => {
-  const origin = normalizeOrigin(
-    table.dataset.origin ||
-      document.querySelector("#class-page")?.dataset.origin ||
-      "schedule"
-  );
-
   table.querySelectorAll("tbody").forEach((body) => body.remove());
 
   const mainBody = table.createTBody();
@@ -129,11 +117,12 @@ const renderScheduleRows = (table, entries) => {
 
   const appendEntryRow = (entry, body) => {
     const row = document.createElement("tr");
-    const material = getMaterialValue(entry, origin);
+    const normalizedDate = normalizeScheduleDate(entry.Date);
+    const materialsRecord = findMaterialsRecord(entry, normalizedDate);
     row.dataset.date = entry.Date;
     row.dataset.weekday = entry.Weekday;
     row.dataset.description = entry.Description;
-    row.dataset.material = material;
+    row.dataset.material = materialsRecord ? "Materials" : "";
     row.dataset.classId = `${entry.Grade}${entry.Section}`;
     if (entry.Summary) {
       row.dataset.summary = entry.Summary;
@@ -157,7 +146,23 @@ const renderScheduleRows = (table, entries) => {
     descriptionCell.textContent = entry.Description;
 
     const materialCell = document.createElement("td");
-    materialCell.textContent = material;
+    if (materialsRecord) {
+      const params = new URLSearchParams({
+        grade: String(entry.Grade),
+        section: String(entry.Section).toUpperCase(),
+        date: normalizedDate
+      });
+      const link = document.createElement("a");
+      link.href = `materials.html?${params.toString()}`;
+      link.textContent = "Materials";
+      link.setAttribute("aria-label", `Open materials for Grade ${entry.Grade}${String(entry.Section).toUpperCase()} on ${normalizedDate}`);
+      materialCell.append(link);
+    } else {
+      materialCell.textContent = "—";
+      console.warn("No dated materials record for schedule meeting", {
+        grade: entry.Grade, section: entry.Section, classNumber: entry["Class #"], date: normalizedDate
+      });
+    }
 
     row.append(
       classCell,

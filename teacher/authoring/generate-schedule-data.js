@@ -7,10 +7,13 @@
 
 const fs = require("node:fs");
 const path = require("node:path");
+const vm = require("node:vm");
 const calendar = require("../assets/js/databases/year-calendar-data.js");
 
 const sourcePath = path.join(__dirname, "schedule.csv");
 const outputPath = path.join(__dirname, "../assets/js/databases/schedule-data.js");
+const materialsBasePath = path.join(__dirname, "../assets/js/databases/materials-data-base.js");
+const materialsOutputPath = path.join(__dirname, "../assets/js/databases/materials-data.js");
 const fields = [
   "Grade", "Section", "Class #", "Date", "Term", "Weekday", "Day",
   "Description", "Material", "Material teacher", "Summary"
@@ -144,3 +147,56 @@ const header = `/*
 `;
 fs.writeFileSync(outputPath, `${header}window.SCHEDULE_DATA = ${JSON.stringify(records, null, 2)};\n`);
 console.log(`Generated ${records.length} records in ${path.relative(process.cwd(), outputPath)}`);
+
+const materialsContext = { window: {} };
+vm.runInNewContext(fs.readFileSync(materialsBasePath, "utf8"), materialsContext, {
+  filename: materialsBasePath
+});
+const materialsBase = materialsContext.window.MATERIALS_DATA_BASE;
+if (!Array.isArray(materialsBase)) throw new Error("materials-data-base.js must expose an array");
+
+const baseByClass = new Map();
+for (const record of materialsBase) {
+  const key = `${record.Grade}|${record["Class #"]}`;
+  if (baseByClass.has(key)) throw new Error(`materials-data-base.js duplicates ${key}`);
+  if (!Array.isArray(record.Materials)) throw new Error(`materials-data-base.js ${key} has invalid Materials`);
+  baseByClass.set(key, record.Materials);
+}
+
+const datedKeys = new Set();
+const datedMaterials = records.map((record) => {
+  const date = record.Date.replace(/\s*\/\s*/g, "-");
+  const section = String(record.Section).toUpperCase();
+  const datedKey = `${record.Grade}|${section}|${date}`;
+  if (datedKeys.has(datedKey)) throw new Error(`schedule-data.js duplicates meeting ${datedKey}`);
+  datedKeys.add(datedKey);
+
+  const baseClass = String(record["Class #"]).split("-")[0];
+  const materials = baseByClass.get(`${record.Grade}|${baseClass}`);
+  if (!materials) throw new Error(`missing base materials for Grade ${record.Grade}, Class ${baseClass}`);
+  return {
+    Grade: record.Grade,
+    Section: section,
+    "Class #": record["Class #"],
+    Date: date,
+    Materials: materials.map((material) => ({
+      Acronym: material.Acronym,
+      Name: material.Name,
+      Hyperlink: material.Hyperlink
+    }))
+  };
+});
+
+const materialsHeader = `/*
+  Purpose:
+  Stores dated class materials generated from the schedule and base materials catalog.
+*/
+// AUTO-GENERATED FILE
+// Generated from schedule.csv and materials-data-base.js by generate-schedule-data.js
+// Do not edit manually.
+`;
+fs.writeFileSync(
+  materialsOutputPath,
+  `${materialsHeader}window.MATERIALS_DATA = ${JSON.stringify(datedMaterials, null, 2)};\n`
+);
+console.log(`Generated ${datedMaterials.length} records in ${path.relative(process.cwd(), materialsOutputPath)}`);
