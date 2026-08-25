@@ -164,6 +164,13 @@
     host.setAttribute("data-mind-map-interactive", "");
     host.innerHTML = floatingMarkup();
     root.append(host);
+    // Keep the two compact fullscreen controls in one flex formatting context.
+    // Their contents can then grow (for example, from "1 / 3" to "10 / 29")
+    // without either control having to guess the other's width.
+    const fullscreenProgress = root.querySelector(
+      ":scope > .presentation-fullscreen-progress",
+    );
+    if (fullscreenProgress) host.append(fullscreenProgress);
     const launcher = host.querySelector(".countdown-launcher");
     const popup = host.querySelector(".countdown-window");
     const titlebar = host.querySelector(".countdown-titlebar");
