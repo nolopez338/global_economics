@@ -142,6 +142,16 @@
     return `${hours % 12 || 12}:${String(minutes).padStart(2, "0")} ${suffix}`;
   }
 
+  function showNextActivity(entry) {
+    if (!entry) {
+      nextActivity.textContent = "";
+      nextActivity.hidden = true;
+      return;
+    }
+    nextActivity.textContent = `Next: ${entry.name} at ${displayTime(entry.start)}`;
+    nextActivity.hidden = false;
+  }
+
   function activityForCell(cell) {
     if (!cell || cell.classList.contains("empty") || cell.textContent.trim() === "\u2014") {
       return "Free Period";
@@ -163,7 +173,7 @@
       const cell = row.querySelector(`[data-cycle-day="${cycleDay}"]`) || row.cells[cycleDay];
       const name = row.querySelector("th")?.dataset.activity || activityForCell(cell);
       return { start: parts[0], end: parts[1], name };
-    }).filter(Boolean);
+    }).filter(Boolean).sort((first, second) => first.start - second.start);
   }
 
   function durationText(seconds) {
@@ -188,7 +198,7 @@
     title.textContent = message;
     cycleLabel.textContent = "";
     countdown.textContent = "";
-    nextActivity.hidden = true;
+    showNextActivity(null);
     visual.hidden = true;
   }
 
@@ -216,11 +226,14 @@
 
     cycleLabel.textContent = `Academic cycle day ${cycleDay}`;
     const nowMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60 + now.getMilliseconds() / 60000;
-    const current = entries.find((entry) => nowMinutes >= entry.start && nowMinutes < entry.end);
+    const currentIndex = entries.findIndex((entry) => nowMinutes >= entry.start && nowMinutes < entry.end);
+    const current = entries[currentIndex];
     if (current) {
-      setPeriodState(scheduledPeriodState(current));
+      const periodState = scheduledPeriodState(current);
+      setPeriodState(periodState);
       title.textContent = current.name;
-      nextActivity.hidden = true;
+      const nextEntry = periodState ? entries[currentIndex + 1] : null;
+      showNextActivity(nextEntry);
       countdown.textContent = `${durationText((current.end - nowMinutes) * 60)} remaining`;
       showVisual(current.start, current.end, nowMinutes);
       return;
@@ -237,8 +250,7 @@
         && gapMinutes <= 5.5;
       setPeriodState(isFiveMinuteTransition ? "between-classes" : null);
       title.textContent = isFiveMinuteTransition ? "Between classes" : previous ? "Between activities" : "Before classes";
-      nextActivity.textContent = `Next: ${upcoming.name} at ${displayTime(upcoming.start)}`;
-      nextActivity.hidden = false;
+      showNextActivity(upcoming);
       countdown.textContent = `${durationText((upcoming.start - nowMinutes) * 60)} until start`;
       showVisual(previous?.end ?? 0, upcoming.start, nowMinutes);
       return;
