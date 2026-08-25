@@ -25,8 +25,13 @@
   let entries = null;
   let loadedDate = "";
   let timerState = null;
-  let alarmInterval = null;
-  let audioContext = null;
+  const timerController = new window.CountdownTimer.Controller((snapshot) => {
+    timerState = snapshot.state === "idle" ? null : snapshot;
+    const position = `${snapshot.progress * 100}%`;
+    timerVisual.style.setProperty("--progress", position);
+    timerVisual.style.setProperty("--progress-turn", String(snapshot.progress));
+    timerVisual.classList.toggle("timer-alarm", snapshot.state === "complete");
+  });
   const periodStateClasses = ["period-between-classes", "period-recess", "period-lunch"];
 
   function setPeriodState(state) {
@@ -77,42 +82,8 @@
   returnLink.textContent = `\u2190 ${origin === "schedule-teacher" ? "Schedule" : "Schedule"}`;
   sourceFrame.src = `./${returnPage}`;
 
-  function timerText(totalSeconds) {
-    const safe = Math.max(0, Math.ceil(totalSeconds));
-    const hours = Math.floor(safe / 3600);
-    const minutes = Math.floor((safe % 3600) / 60);
-    const seconds = safe % 60;
-    return `${hours ? `${hours}:` : ""}${hours ? String(minutes).padStart(2, "0") : minutes}:${String(seconds).padStart(2, "0")}`;
-  }
-
-  function soundAlarmPulse() {
-    if (!audioContext) return;
-    const oscillator = audioContext.createOscillator();
-    const gain = audioContext.createGain();
-    oscillator.type = "square";
-    oscillator.frequency.value = 880;
-    gain.gain.setValueAtTime(0.16, audioContext.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.35);
-    oscillator.connect(gain).connect(audioContext.destination);
-    oscillator.start();
-    oscillator.stop(audioContext.currentTime + 0.35);
-  }
-
-  function beginAlarm() {
-    if (alarmInterval) return;
-    timerVisual.classList.add("timer-alarm");
-    soundAlarmPulse();
-    alarmInterval = window.setInterval(soundAlarmPulse, 600);
-  }
-
-  function stopAlarm() {
-    window.clearInterval(alarmInterval);
-    alarmInterval = null;
-    timerVisual.classList.remove("timer-alarm");
-  }
-
   function closeTimer() {
-    stopAlarm();
+    timerController.reset();
     timerState = null;
     classView.classList.remove("timer-mode");
     timerVisual.hidden = true;
@@ -140,37 +111,20 @@
   timerCancel.addEventListener("click", () => timerDialog.close());
   timerForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    const durationMs = (Number(timerMinutes.value) * 60 + Number(timerSeconds.value)) * 1000;
-    if (!Number.isFinite(durationMs) || durationMs <= 0) {
+    const durationMs = window.CountdownTimer.durationFromFields(timerMinutes.value, timerSeconds.value);
+    if (!durationMs) {
       timerError.hidden = false;
       return;
     }
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (AudioContext) {
-      audioContext ||= new AudioContext();
-      audioContext.resume();
-    }
-    const startedAt = Date.now();
-    timerState = { startedAt, durationMs };
-    timerDuration.textContent = timerText(durationMs / 1000);
+    timerDuration.textContent = window.CountdownTimer.formatTime(durationMs);
     timerToggle.textContent = "Close Timer";
     timerToggle.setAttribute("aria-pressed", "true");
     classView.classList.add("timer-mode");
     visual.hidden = true;
     timerVisual.hidden = false;
     timerDialog.close();
-    updateTimer(startedAt);
+    timerController.start(durationMs);
   });
-
-  function updateTimer(timestamp = Date.now()) {
-    if (!timerState) return;
-    const elapsed = Math.max(0, timestamp - timerState.startedAt);
-    const progress = Math.min(1, elapsed / timerState.durationMs);
-    const position = `${progress * 100}%`;
-    timerVisual.style.setProperty("--progress", position);
-    timerVisual.style.setProperty("--progress-turn", String(progress));
-    if (progress >= 1) beginAlarm();
-  }
 
   function localDate(date) {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
@@ -241,10 +195,7 @@
   function update() {
     const now = new Date();
     clock.textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-    if (timerState) {
-      updateTimer(now.getTime());
-      return;
-    }
+    if (timerState) return;
     const dateKey = localDate(now);
     const info = window.academicCalendar?.getAcademicDateInfo(dateKey);
     const cycleDay = info?.cycleDay;

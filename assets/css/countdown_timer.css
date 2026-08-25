@@ -1,0 +1,44 @@
+/* Shared countdown controls. Page-specific circular clock layout remains with Class View. */
+.timer-dialog { width: min(92vw, 25rem); border: 2px solid var(--border); border-radius: .75rem; background: var(--surface); color: var(--text); }
+.timer-dialog::backdrop { background: rgb(0 0 0 / 55%); }
+.timer-dialog h2 { margin-top: 0; }
+.timer-fields, .countdown-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.timer-fields label, .countdown-fields label { display: grid; gap: .35rem; font-weight: 700; }
+.timer-fields input, .countdown-fields input { box-sizing: border-box; width: 100%; padding: .55rem; font: inherit; }
+.timer-error, .countdown-error { color: #b91c1c; font-weight: 700; }
+.timer-alarm { animation: timer-shake .18s linear infinite; }
+@keyframes timer-shake { 0%,100% { transform: translate(0); } 25% { transform:translate(-6px,3px) rotate(-.4deg); } 50% { transform:translate(5px,-3px) rotate(.4deg); } 75% { transform:translate(-4px,-2px) rotate(-.3deg); } }
+
+.countdown-timer-host { --timer-bg:#fff; --timer-text:#172033; --timer-border:#334155; --timer-accent:#155e75; position:relative; z-index:9500; }
+.countdown-launcher { position:fixed; right:max(1rem,env(safe-area-inset-right)); bottom:max(1rem,env(safe-area-inset-bottom)); z-index:9500; width:3.25rem; height:3.25rem; border:2px solid #fff; border-radius:50%; background:#155e75; color:#fff; box-shadow:0 4px 18px rgb(0 0 0 / 35%); font-size:1.55rem; cursor:pointer; }
+.countdown-window { position:fixed; z-index:9510; box-sizing:border-box; width:min(22rem,calc(100vw - 1rem)); height:25rem; min-width:280px; min-height:250px; max-width:calc(100vw - 1rem); max-height:calc(100vh - 1rem); overflow:hidden; border:2px solid var(--timer-border); border-radius:.7rem; background:var(--timer-bg); color:var(--timer-text); box-shadow:0 12px 35px rgb(0 0 0 / 45%); }
+.countdown-window[hidden] { display:none; }
+.countdown-titlebar { display:grid; grid-template-columns:1fr auto auto auto; align-items:center; gap:.35rem; min-height:2.75rem; padding:.25rem .35rem .25rem .8rem; background:#155e75; color:#fff; cursor:move; touch-action:none; user-select:none; }
+.countdown-title-time { font-variant-numeric:tabular-nums; }
+.countdown-icon { width:2.25rem; height:2.25rem; border:1px solid transparent; border-radius:.35rem; background:transparent; color:inherit; font-size:1.5rem; line-height:1; cursor:pointer; }
+.countdown-icon:hover { background:rgb(255 255 255 / 18%); }
+.countdown-content { display:flex; box-sizing:border-box; height:calc(100% - 2.75rem); padding:1rem; flex-direction:column; gap:.65rem; overflow:auto; }
+.countdown-form { display:grid; gap:.7rem; }
+.countdown-form button, .countdown-actions button { padding:.55rem .8rem; border:1px solid var(--timer-border); border-radius:.4rem; font:inherit; font-weight:700; cursor:pointer; }
+.countdown-start { background:var(--timer-accent); color:#fff; }
+.countdown-display { margin:auto 0; text-align:center; font-size:clamp(2.5rem,10vw,4.5rem); font-weight:800; font-variant-numeric:tabular-nums; }
+.countdown-status { margin:0; text-align:center; font-weight:700; }
+.countdown-actions { display:flex; justify-content:center; gap:.6rem; }
+.countdown-window[data-timer-state="complete"] { border-color:#991b1b; background:#dc2626; color:#fff; animation:timer-shake .18s linear infinite; }
+.countdown-window[data-timer-state="complete"] .countdown-titlebar { background:#7f1d1d; }
+.countdown-window[data-timer-state="stopped"] .countdown-titlebar { background:#92400e; }
+.countdown-window.is-minimized { width:min(22rem,calc(100vw - 1rem)) !important; height:2.75rem !important; min-height:0; }
+.countdown-window.is-minimized .countdown-content, .countdown-window.is-minimized .countdown-resize { display:none; }
+.countdown-window.is-minimized .countdown-minimize span { display:inline-block; transform:rotate(180deg); }
+.countdown-resize { position:absolute; z-index:2; touch-action:none; }
+.countdown-resize--n,.countdown-resize--s { left:10px; right:10px; height:10px; cursor:ns-resize; }
+.countdown-resize--n { top:-5px; } .countdown-resize--s { bottom:-5px; }
+.countdown-resize--e,.countdown-resize--w { top:10px; bottom:10px; width:10px; cursor:ew-resize; }
+.countdown-resize--e { right:-5px; } .countdown-resize--w { left:-5px; }
+.countdown-resize--ne,.countdown-resize--nw,.countdown-resize--se,.countdown-resize--sw { width:18px; height:18px; }
+.countdown-resize--ne { right:-4px;top:-4px;cursor:nesw-resize; } .countdown-resize--nw { left:-4px;top:-4px;cursor:nwse-resize; } .countdown-resize--se { right:-4px;bottom:-4px;cursor:nwse-resize; } .countdown-resize--sw { left:-4px;bottom:-4px;cursor:nesw-resize; }
+.countdown-timer-host :focus-visible { outline:3px solid #fbbf24; outline-offset:2px; }
+.countdown-pointer-active, .countdown-pointer-active * { user-select:none !important; }
+body.dark-theme .countdown-timer-host, body.theme-dark .countdown-timer-host, [data-theme="dark"] .countdown-timer-host { --timer-bg:#111827; --timer-text:#f8fafc; --timer-border:#cbd5e1; --timer-accent:#0891b2; }
+@media (max-width:420px) { .countdown-window { min-width:calc(100vw - 1rem); } .countdown-fields { gap:.5rem; } }
+@media (prefers-reduced-motion:reduce) { .timer-alarm, .countdown-window[data-timer-state="complete"] { animation:none; } }
