@@ -125,7 +125,9 @@
           state.panel.style.width = '';
           state.panel.classList.add('is-collapsed');
           state.body.hidden = true;
-          state.toggleButton.textContent = 'Show graph';
+          state.toggleSymbol.textContent = '▴';
+          state.toggleButton.setAttribute('aria-label', 'Restore graph');
+          state.toggleButton.title = 'Restore graph';
           state.toggleButton.setAttribute('aria-expanded', 'false');
           constrainPanel(state);
           return;
@@ -133,7 +135,9 @@
 
         state.panel.classList.remove('is-collapsed');
         state.body.hidden = false;
-        state.toggleButton.textContent = 'Collapse graph';
+        state.toggleSymbol.textContent = '▾';
+        state.toggleButton.setAttribute('aria-label', 'Collapse graph');
+        state.toggleButton.title = 'Collapse graph';
         state.toggleButton.setAttribute('aria-expanded', 'true');
         requestAnimationFrame(() => {
           const previous = state.expandedGeometry;
@@ -321,7 +325,9 @@
         const heading = document.createElement('h4');
         const actions = document.createElement('div');
         const toggleButton = document.createElement('button');
+        const toggleSymbol = document.createElement('span');
         const returnButton = document.createElement('button');
+        const closeSymbol = document.createElement('span');
         const body = document.createElement('div');
 
         placeholder.className = 'graph-popout-placeholder';
@@ -349,14 +355,23 @@
 
         toggleButton.type = 'button';
         toggleButton.className = 'graph-floating-control';
-        toggleButton.textContent = 'Collapse graph';
+        toggleButton.title = 'Collapse graph';
+        toggleButton.setAttribute('aria-label', 'Collapse graph');
         toggleButton.setAttribute('aria-expanded', 'true');
         toggleButton.setAttribute('aria-controls', bodyId);
+        toggleSymbol.className = 'graph-floating-control-symbol';
+        toggleSymbol.setAttribute('aria-hidden', 'true');
+        toggleSymbol.textContent = '▾';
+        toggleButton.append(toggleSymbol);
 
         returnButton.type = 'button';
         returnButton.className = 'graph-floating-control';
-        returnButton.textContent = 'Return to slide';
-        returnButton.setAttribute('aria-label', `Return ${graphTitle} to the slide`);
+        returnButton.title = 'Close graph window and return graph to slide';
+        returnButton.setAttribute('aria-label', 'Close graph window and return graph to slide');
+        closeSymbol.className = 'graph-floating-control-symbol';
+        closeSymbol.setAttribute('aria-hidden', 'true');
+        closeSymbol.textContent = '×';
+        returnButton.append(closeSymbol);
 
         body.className = 'graph-floating-body';
         body.id = bodyId;
@@ -377,6 +392,7 @@
           panel,
           titleBar,
           toggleButton,
+          toggleSymbol,
           returnButton,
           body,
           expandedGeometry: null,
