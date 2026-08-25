@@ -9,95 +9,12 @@
   <link rel="stylesheet" href="../../../../assets/css/components.css">
   <link rel="stylesheet" href="../../../../assets/css/theme.css">
   <link rel="stylesheet" href="../../../../assets/css/mind_map.css">
+  <link rel="stylesheet" href="../../../../assets/css/mind_map_probability_visuals.css">
+  <link rel="stylesheet" href="../../../../assets/css/mind_map_presentation.css">
   <script src="../../../../assets/js/math-render.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
-  <script src="../../../../assets/js/mind_map_effects.js" defer></script>
   <script src="../../../../assets/js/mind_map.js" defer></script>
-  <style>
-    .distribution-stage {
-      position: relative;
-      display: grid;
-      min-height: 24rem;
-      overflow: hidden;
-      padding: clamp(1.25rem, 4vw, 3rem);
-      place-items: center;
-      border-radius: 18px;
-      background: linear-gradient(135deg, #dbeafe 0%, #ede9fe 55%, #fef3c7 100%);
-      isolation: isolate;
-    }
-    .distribution-situation {
-      width: min(100%, 48rem);
-      padding: clamp(1rem, 3vw, 2rem);
-      border: 1px solid rgba(255, 255, 255, 0.72);
-      border-radius: 16px;
-      background: rgba(255, 255, 255, 0.38);
-      color: #172554;
-      backdrop-filter: blur(2px);
-    }
-    .distribution-situation h3 { margin: 0 0 0.8rem; color: #1e3a8a; font-size: clamp(1.35rem, 3vw, 2.25rem); }
-    .distribution-situation p { margin: 0; }
-    .situation-details { display: flex; flex-wrap: wrap; gap: 0.55rem; margin-top: 1rem; }
-    .situation-details span { padding: 0.35rem 0.65rem; border-radius: 999px; background: rgba(255, 255, 255, 0.72); font-size: 0.82em; font-weight: 700; }
-    .model-card {
-      position: absolute;
-      z-index: 2;
-      width: min(88%, 43rem);
-      max-height: calc(100% - 2rem);
-      overflow: auto;
-      padding: clamp(1.1rem, 3vw, 2rem);
-      border: 1px solid #e2e8f0;
-      border-radius: 18px;
-      background: #fff;
-      color: #1e293b;
-      box-shadow: 0 22px 55px rgba(15, 23, 42, 0.28);
-    }
-    .model-card { width: min(94%, 58rem); }
-    .model-card-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(18rem, 1.15fr); gap: clamp(0.8rem, 2vw, 1.5rem); align-items: center; }
-    .model-card h3 { margin: 0 0 0.45rem; color: #1e3a8a; font-size: clamp(1.35rem, 2.7vw, 2.15rem); }
-    .model-card p { margin: 0 0 0.45rem; }
-    .model-card ul { margin: 0.35rem 0 0; padding-left: 1.2em; }
-    .model-card li { margin-bottom: 0.18rem; }
-    .formula { margin-top: 0.55rem !important; padding: 0.45rem 0.65rem; border-radius: 9px; background: #eff6ff; color: #172554; font-family: Georgia, "Times New Roman", serif; text-align: center; }
-    .distribution-graph { margin: 0; min-width: 0; }
-    .distribution-graph svg { display: block; width: 100%; height: auto; max-height: 15rem; overflow: visible; }
-    .distribution-graph figcaption { margin-top: 0.25rem; color: #475569; font-size: 0.78rem; text-align: center; }
-    .graph-axis { stroke: #475569; stroke-width: 1.5; }
-    .graph-tick { stroke: #64748b; stroke-width: 1; }
-    .graph-bar { fill: #3b82f6; }
-    .graph-stem { stroke: #2563eb; stroke-width: 4; }
-    .graph-point { fill: #1d4ed8; }
-    .graph-curve { fill: none; stroke: #2563eb; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
-    .graph-area { fill: #bfdbfe; opacity: 0.75; }
-    .graph-label { fill: #334155; font: 12px system-ui, sans-serif; }
-    .graph-title { fill: #172554; font: 600 13px system-ui, sans-serif; }
-    .graph-dash { stroke: #94a3b8; stroke-width: 1.2; stroke-dasharray: 4 4; }
-    .concept-card { position: relative; width: min(94%, 62rem); }
-    .concept-card .model-card-layout { grid-template-columns: minmax(0, 1.25fr) minmax(17rem, 1fr); }
-    .intro-slide { text-align: center; }
-    .intro-slide h3 { max-width: 18ch; margin-inline: auto; font-size: clamp(2rem, 5vw, 4rem) !important; }
-    .intro-slide p { max-width: 42rem; margin-inline: auto; }
-    .summary-node { padding: clamp(0.8rem, 2vw, 1.5rem) !important; }
-    .summary-node h3 { margin: 0 0 0.6rem; font-size: clamp(1.55rem, 3.3vw, 2.5rem) !important; }
-    .summary-table-wrap { max-width: 100%; overflow-x: auto; }
-    .summary-table { width: 100%; border-collapse: collapse; color: #1e293b; font-size: clamp(0.7rem, 1.45vw, 1rem); line-height: 1.22; }
-    .summary-table th, .summary-table td { padding: clamp(0.3rem, 0.8vw, 0.55rem); border: 1px solid #cbd5e1; text-align: left; vertical-align: top; }
-    .summary-table th { background: #dbeafe; color: #172554; }
-    .summary-table tbody tr:nth-child(even) { background: #f8fafc; }
-    .summary-table td:first-child, .summary-table td:nth-child(2) { white-space: nowrap; font-weight: 700; }
-    .is-presenting .distribution-stage { min-height: min(100%, 38rem); }
-    @media (max-width: 700px) {
-      .distribution-stage { min-height: 29rem; padding: 0.8rem; }
-      .distribution-situation { padding: 0.9rem; }
-      .model-card { width: calc(100% - 1.2rem); max-height: calc(100% - 1.2rem); padding: 1rem; font-size: 0.9rem; }
-      .model-card-layout { grid-template-columns: 1fr; gap: 0.55rem; }
-      .concept-card { width: calc(100% - 1.2rem); }
-      .concept-card .model-card-layout { grid-template-columns: 1fr; }
-      .distribution-graph svg { max-height: 11rem; }
-      .distribution-graph figcaption { font-size: 0.72rem; }
-      .summary-table { font-size: 0.66rem; }
-      .summary-table th, .summary-table td { padding: 0.28rem; }
-    }
-  </style>
+  <script src="../../../../assets/js/mind_map_presentation.js" defer></script>
 </head>
 
 <body class="theme-main">
