@@ -102,7 +102,7 @@
     .graph-popout-layer { position: fixed; inset: 0; pointer-events: none; z-index: 9000; }
     [data-mind-map-presentation] > .presentation-toolbar,
     [data-mind-map-presentation] > .presentation-fullscreen-progress { z-index: 9100; }
-    .graph-floating-panel { position: fixed; display: flex; width: min(90vw, 34rem); max-width: calc(100vw - 1rem); max-height: calc(100dvh - 1rem); flex-direction: column; overflow: hidden; border: 1px solid var(--example-border); border-radius: 12px; background: var(--card); color: var(--text-primary); box-shadow: 0 18px 48px rgba(15, 23, 42, 0.32); pointer-events: auto; }
+    .graph-floating-panel { position: fixed; display: flex; width: min(90vw, 34rem); max-width: none; max-height: none; box-sizing: border-box; flex-direction: column; overflow: hidden; border: 1px solid var(--example-border); border-radius: 12px; background: var(--card); color: var(--text-primary); box-shadow: 0 18px 48px rgba(15, 23, 42, 0.32); pointer-events: auto; }
     .graph-floating-panel.is-collapsed { width: min(90vw, 22rem); }
     .graph-floating-titlebar { display: flex; flex: 0 0 auto; align-items: center; gap: 0.4rem; min-height: 2.65rem; padding: 0.35rem 0.45rem; border-bottom: 1px solid var(--example-border); background: var(--example-bg); cursor: move; cursor: grab; touch-action: none; user-select: none; }
     .graph-floating-titlebar.is-dragging { cursor: grabbing; }
@@ -111,13 +111,26 @@
     .graph-floating-actions { display: flex; flex: 0 0 auto; align-items: center; gap: 0.3rem; }
     .graph-floating-control { min-height: 1.8rem; padding: 0.28rem 0.45rem; border: 1px solid var(--example-border); border-radius: 7px; background: var(--card); color: var(--primary-color-dark); font: inherit; font-size: 0.67rem; font-weight: 800; line-height: 1.1; cursor: pointer; }
     .graph-floating-control:hover { background: var(--viz-surface); }
-    .graph-floating-body { min-height: 0; padding: 0.65rem; overflow: auto; overscroll-behavior: contain; }
+    .graph-floating-body { min-height: 0; flex: 1 1 auto; padding: 0.65rem; overflow: auto; overscroll-behavior: contain; }
     .graph-floating-body[hidden] { display: none; }
     .graph-floating-body > .density-graph,
     .graph-floating-body > .procedure-figure { width: 100%; max-width: none; margin: 0; }
-    .graph-floating-body > .procedure-mini-graph { width: 100%; height: auto; max-height: min(58dvh, 25rem); margin: 0; }
+    .graph-floating-body > .procedure-mini-graph { width: 100%; height: auto; max-height: none; margin: 0; }
     .graph-floating-body .density-graph svg,
-    .graph-floating-body .procedure-figure svg { width: 100%; height: auto; max-height: min(58dvh, 25rem); }
+    .graph-floating-body .procedure-figure svg { width: 100%; height: auto; max-height: none; }
+    .graph-resize-handle { position: absolute; z-index: 3; box-sizing: border-box; touch-action: none; user-select: none; }
+    .graph-resize-handle[data-resize-edge="n"], .graph-resize-handle[data-resize-edge="s"] { left: 10px; right: 10px; height: 10px; cursor: ns-resize; }
+    .graph-resize-handle[data-resize-edge="n"] { top: -1px; }
+    .graph-resize-handle[data-resize-edge="s"] { bottom: -1px; }
+    .graph-resize-handle[data-resize-edge="e"], .graph-resize-handle[data-resize-edge="w"] { top: 10px; bottom: 10px; width: 10px; cursor: ew-resize; }
+    .graph-resize-handle[data-resize-edge="e"] { right: -1px; }
+    .graph-resize-handle[data-resize-edge="w"] { left: -1px; }
+    .graph-resize-handle[data-resize-edge="nw"], .graph-resize-handle[data-resize-edge="ne"], .graph-resize-handle[data-resize-edge="sw"], .graph-resize-handle[data-resize-edge="se"] { width: 16px; height: 16px; }
+    .graph-resize-handle[data-resize-edge="nw"] { top: -1px; left: -1px; cursor: nwse-resize; }
+    .graph-resize-handle[data-resize-edge="ne"] { top: -1px; right: -1px; cursor: nesw-resize; }
+    .graph-resize-handle[data-resize-edge="sw"] { bottom: -1px; left: -1px; cursor: nesw-resize; }
+    .graph-resize-handle[data-resize-edge="se"] { right: -1px; bottom: -1px; cursor: nwse-resize; }
+    .graph-floating-panel.is-collapsed .graph-resize-handle { display: none; }
     @media (max-width: 720px) {
       .slide-grid { grid-template-columns: 1fr; }
       .density-graph svg, .solution-graph svg { max-height: 10rem; }
@@ -136,7 +149,7 @@
       .procedure-table td:nth-child(2) { text-align: left; }
       .procedure-table .procedure-mini-graph { width: min(100%, 16rem); margin-inline: auto; }
       .procedure-table .graph-popout-host--mini { width: min(100%, 16rem); margin-inline: auto; }
-      .graph-floating-panel { width: calc(100vw - 0.75rem); max-width: calc(100vw - 0.75rem); max-height: calc(100dvh - 0.75rem); }
+      .graph-floating-panel { width: calc(100vw - 0.75rem); }
       .graph-floating-panel.is-collapsed { width: min(calc(100vw - 0.75rem), 22rem); }
       .graph-floating-titlebar { flex-wrap: wrap; }
       .graph-floating-title { min-width: 8rem; }
@@ -1000,6 +1013,15 @@
       };
 
       const constrainPanel = (state) => {
+        if (!state.panel.classList.contains('is-collapsed')) {
+          const bounds = getViewportBounds();
+          const margin = 6;
+          const rect = state.panel.getBoundingClientRect();
+          const width = Math.min(rect.width, Math.max(1, bounds.width - margin * 2));
+          const height = Math.min(rect.height, Math.max(1, bounds.height - margin * 2));
+          state.panel.style.width = `${width}px`;
+          state.panel.style.height = `${height}px`;
+        }
         const rect = state.panel.getBoundingClientRect();
         const left = Number.parseFloat(state.panel.style.left);
         const top = Number.parseFloat(state.panel.style.top);
@@ -1031,9 +1053,12 @@
         return floatingLayer;
       };
 
-      const returnGraphToSlide = (state) => {
+      const returnGraphToSlide = (state, { restoreFocus = true } = {}) => {
         if (!openGraphs.has(state.graph)) return;
         state.dragCleanup?.();
+        state.resizeCleanup?.();
+        state.drag = null;
+        state.resize = null;
         state.sourceParent.insertBefore(state.graph, state.sourceNextSibling);
         state.placeholder.remove();
         state.sourceParent.classList.remove('is-graph-open');
@@ -1041,16 +1066,25 @@
         state.launchButton.setAttribute('aria-expanded', 'false');
         state.launchButton.removeAttribute('aria-controls');
         openGraphs.delete(state.graph);
-        state.launchButton.focus({ preventScroll: true });
+        if (restoreFocus && state.launchButton.isConnected) state.launchButton.focus({ preventScroll: true });
+      };
+
+      const returnAllGraphs = () => {
+        Array.from(openGraphs.values()).forEach((state) => returnGraphToSlide(state, { restoreFocus: false }));
       };
 
       const togglePanelBody = (state) => {
         const collapsing = !state.panel.classList.contains('is-collapsed');
         if (collapsing) {
-          state.expandedPosition = {
-            left: Number.parseFloat(state.panel.style.left),
-            top: Number.parseFloat(state.panel.style.top)
+          const rect = state.panel.getBoundingClientRect();
+          state.expandedGeometry = {
+            left: rect.left,
+            top: rect.top,
+            width: rect.width,
+            height: rect.height
           };
+          state.panel.style.height = 'auto';
+          state.panel.style.width = '';
           state.panel.classList.add('is-collapsed');
           state.body.hidden = true;
           state.toggleButton.textContent = 'Show graph';
@@ -1064,13 +1098,110 @@
         state.toggleButton.textContent = 'Collapse graph';
         state.toggleButton.setAttribute('aria-expanded', 'true');
         requestAnimationFrame(() => {
-          const previous = state.expandedPosition;
-          if (previous && Number.isFinite(previous.left) && Number.isFinite(previous.top)) {
+          const previous = state.expandedGeometry;
+          if (previous) {
+            state.panel.style.width = `${previous.width}px`;
+            state.panel.style.height = `${previous.height}px`;
             setPanelPosition(state.panel, previous.left, previous.top);
+            constrainPanel(state);
           } else {
             constrainPanel(state);
           }
         });
+      };
+
+      const installResizing = (state) => {
+        const { panel } = state;
+        const handles = ['n', 's', 'e', 'w', 'nw', 'ne', 'sw', 'se'].map((edge) => {
+          const handle = document.createElement('span');
+          handle.className = 'graph-resize-handle';
+          handle.dataset.resizeEdge = edge;
+          handle.setAttribute('aria-hidden', 'true');
+          panel.append(handle);
+          return handle;
+        });
+
+        const moveResize = (event) => {
+          const resize = state.resize;
+          if (!resize || resize.pointerId !== event.pointerId) return;
+          const bounds = getViewportBounds();
+          const margin = 6;
+          const minWidth = Math.min(280, bounds.width - margin * 2);
+          const minHeight = Math.min(180, bounds.height - margin * 2);
+          const rightLimit = bounds.left + bounds.width - margin;
+          const bottomLimit = bounds.top + bounds.height - margin;
+          let left = resize.left;
+          let top = resize.top;
+          let right = resize.left + resize.width;
+          let bottom = resize.top + resize.height;
+          if (resize.edge.includes('w')) left = Math.min(event.clientX, right - minWidth);
+          if (resize.edge.includes('e')) right = Math.max(event.clientX, left + minWidth);
+          if (resize.edge.includes('n')) top = Math.min(event.clientY, bottom - minHeight);
+          if (resize.edge.includes('s')) bottom = Math.max(event.clientY, top + minHeight);
+          left = Math.max(bounds.left + margin, left);
+          top = Math.max(bounds.top + margin, top);
+          right = Math.min(rightLimit, right);
+          bottom = Math.min(bottomLimit, bottom);
+          if (right - left < minWidth) {
+            if (resize.edge.includes('w')) left = right - minWidth;
+            else right = left + minWidth;
+          }
+          if (bottom - top < minHeight) {
+            if (resize.edge.includes('n')) top = bottom - minHeight;
+            else bottom = top + minHeight;
+          }
+          panel.style.left = `${left}px`;
+          panel.style.top = `${top}px`;
+          panel.style.width = `${right - left}px`;
+          panel.style.height = `${bottom - top}px`;
+          event.preventDefault();
+        };
+
+        const endResize = (event) => {
+          if (!state.resize || state.resize.pointerId !== event.pointerId) return;
+          const handle = state.resize.handle;
+          state.resize = null;
+          document.documentElement.style.removeProperty('user-select');
+          try {
+            if (handle.hasPointerCapture(event.pointerId)) handle.releasePointerCapture(event.pointerId);
+          } catch (error) {
+            // Capture can already be gone after pointer cancellation.
+          }
+        };
+
+        const lostCapture = (event) => endResize(event);
+        handles.forEach((handle) => {
+          handle.addEventListener('pointerdown', (event) => {
+            if (panel.classList.contains('is-collapsed')) return;
+            if (event.pointerType === 'mouse' && event.button !== 0) return;
+            const rect = panel.getBoundingClientRect();
+            state.resize = {
+              pointerId: event.pointerId,
+              edge: handle.dataset.resizeEdge,
+              handle,
+              left: rect.left,
+              top: rect.top,
+              width: rect.width,
+              height: rect.height
+            };
+            bringToFront(state);
+            document.documentElement.style.userSelect = 'none';
+            handle.setPointerCapture(event.pointerId);
+            event.preventDefault();
+            event.stopPropagation();
+          });
+          handle.addEventListener('lostpointercapture', lostCapture);
+        });
+        window.addEventListener('pointermove', moveResize);
+        window.addEventListener('pointerup', endResize);
+        window.addEventListener('pointercancel', endResize);
+        state.resizeCleanup = () => {
+          document.documentElement.style.removeProperty('user-select');
+          window.removeEventListener('pointermove', moveResize);
+          window.removeEventListener('pointerup', endResize);
+          window.removeEventListener('pointercancel', endResize);
+          handles.forEach((handle) => handle.removeEventListener('lostpointercapture', lostCapture));
+        };
       };
 
       const installDragging = (state) => {
@@ -1210,8 +1341,10 @@
           toggleButton,
           returnButton,
           body,
-          expandedPosition: null,
-          drag: null
+          expandedGeometry: null,
+          sourceSlide: sourceParent.closest('[data-mind-map-slide]'),
+          drag: null,
+          resize: null
         };
         openGraphs.set(graph, state);
         launchButton.setAttribute('aria-expanded', 'true');
@@ -1219,6 +1352,7 @@
         toggleButton.addEventListener('click', () => togglePanelBody(state));
         returnButton.addEventListener('click', () => returnGraphToSlide(state));
         installDragging(state);
+        installResizing(state);
         bringToFront(state);
 
         requestAnimationFrame(() => {
@@ -1280,6 +1414,23 @@
       window.addEventListener('resize', constrainAllPanels);
       window.visualViewport?.addEventListener('resize', constrainAllPanels);
       window.visualViewport?.addEventListener('scroll', constrainAllPanels);
+
+      let activeSlide = presentationRoot.querySelector('[data-mind-map-slide][aria-current="step"]');
+      let wasPresenting = presentationRoot.classList.contains('is-presenting');
+      const presentationObserver = new MutationObserver(() => {
+        const nextActiveSlide = presentationRoot.querySelector('[data-mind-map-slide][aria-current="step"]');
+        const isPresenting = presentationRoot.classList.contains('is-presenting');
+        if ((activeSlide && nextActiveSlide !== activeSlide) || (wasPresenting && !isPresenting)) {
+          returnAllGraphs();
+        }
+        activeSlide = nextActiveSlide;
+        wasPresenting = isPresenting;
+      });
+      presentationObserver.observe(presentationRoot, {
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['aria-current', 'class']
+      });
     })();
   </script>
 </body>
