@@ -168,6 +168,38 @@ const createNotesSection = (classKey, studentList, classNotes, mode) => {
     }
   }
 
+  if (classKey === "10S" && Array.isArray(window.TEACHER_SEMINAR_STUDENTS)) {
+    const rosterWrap = document.createElement("div");
+    rosterWrap.className = "table-wrap seminar-notes-table-wrap";
+
+    const roster = document.createElement("table");
+    roster.className = "seminar-notes-table";
+    const head = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+    ["First names", "Surnames", "Class"].forEach((label) => {
+      const header = document.createElement("th");
+      header.scope = "col";
+      header.textContent = label;
+      headerRow.append(header);
+    });
+    head.append(headerRow);
+
+    const body = document.createElement("tbody");
+    window.TEACHER_SEMINAR_STUDENTS.forEach((student) => {
+      const row = document.createElement("tr");
+      [student.firstNames, student.surnames, student.className].forEach((value) => {
+        const cell = document.createElement("td");
+        cell.textContent = value;
+        row.append(cell);
+      });
+      body.append(row);
+    });
+
+    roster.append(head, body);
+    rosterWrap.append(roster);
+    studentSubsection.append(rosterWrap);
+  }
+
   section.append(heading, notesContent, studentSubsection);
   return section;
 };

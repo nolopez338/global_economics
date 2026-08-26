@@ -15,6 +15,8 @@
   let activeCycleDay = null;
   let mobileScheduleExpanded = false;
   let plainModeEnabled = false;
+  const isTeacherSchedule = window.location.pathname.endsWith("/schedule-teacher.html");
+  const seminarContextKey = "grade10SeminarNavigationContext";
 
   if (toggle && panel && icon) {
     toggle.addEventListener("click", () => {
@@ -25,17 +27,33 @@
     });
   }
 
-  document.querySelectorAll("a.class-card").forEach((link) => {
+  document.querySelectorAll("a[href]").forEach((link) => {
     const href = link.getAttribute("href");
     const match = href && href.match(/^pages\/class_schedules\/(\d{2})([A-E]|Seminars)\.html$/i);
     if (match) {
       const section = match[2].toLowerCase() === "seminars"
         ? "Seminar"
         : match[2].toUpperCase();
+      const mode = isTeacherSchedule ? "teacher" : "public";
+      const origin = isTeacherSchedule ? "schedule-teacher" : "schedule";
       link.setAttribute(
         "href",
-        `pages/class.html?grade=${match[1]}&section=${section}&mode=teacher&origin=schedule-teacher`
+        `pages/class.html?grade=${match[1]}&section=${section}&mode=${mode}&origin=${origin}`
       );
+
+      if (match[1] === "10" && section === "Seminar") {
+        link.addEventListener("click", () => {
+          if (!isTeacherSchedule) {
+            sessionStorage.removeItem(seminarContextKey);
+            return;
+          }
+
+          sessionStorage.setItem(seminarContextKey, JSON.stringify({
+            destination: "10Seminar",
+            createdAt: Date.now(),
+          }));
+        });
+      }
     }
   });
 
