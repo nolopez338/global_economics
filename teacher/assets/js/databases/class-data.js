@@ -12,6 +12,16 @@ window.CLASS_METADATA = {
     name: "Seminar",
     shortLabel: "10S",
   },
+  "10A": { coordinator: "Julian Franco" },
+  "10B": { coordinator: "Carol Muñoz" },
+  "10C": { coordinator: "Johan Rincón" },
+  "10D": { coordinator: "David Amaya" },
+  "10E": { coordinator: "Iván Cárdenas" },
+  "11A": { coordinator: "Diego Bernal" },
+  "11B": { coordinator: "José Alexander Hurtado" },
+  "11C": { coordinator: "Alexandra Rodríguez" },
+  "11D": { coordinator: "Ángela González" },
+  "11E": { coordinator: "Jhon Jairo Gélvez" },
 };
 
 window.CLASS_STUDENT_LISTS = {
