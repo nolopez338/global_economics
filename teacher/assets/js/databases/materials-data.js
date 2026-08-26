@@ -14,9 +14,14 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-12",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "IS",
+        "Name": "Introductory slide",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro1.html"
+      },
+      {
+        "Acronym": "T1O",
+        "Name": "Term 1 outline",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-outline.html"
       }
     ]
   },
@@ -28,9 +33,19 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-14",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "C2S",
+        "Name": "Slide for C2",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro2.html"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "Classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C2_practice_activity1_print1_solved.pdf"
+      },
+      {
+        "Acronym": "PA",
+        "Name": "Practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-practice1.html"
       }
     ]
   },
@@ -42,9 +57,19 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-21",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "C2S",
+        "Name": "Slide for C2",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro2.html"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "Classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C2_practice_activity1_print1_solved.pdf"
+      },
+      {
+        "Acronym": "PA",
+        "Name": "Practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-practice1.html"
       }
     ]
   },
@@ -56,9 +81,19 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-25",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "C3S",
+        "Name": "Slide for C3",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c3-intro3.html"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "Classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C3_practice_activity2_print1_solved.pdf"
+      },
+      {
+        "Acronym": "PA",
+        "Name": "Practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c3-practice2.html"
       }
     ]
   },
@@ -714,9 +749,14 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-14",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "IS",
+        "Name": "Introductory slide",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro1.html"
+      },
+      {
+        "Acronym": "T1O",
+        "Name": "Term 1 outline",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-outline.html"
       }
     ]
   },
@@ -728,9 +768,19 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-18",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "C2S",
+        "Name": "Slide for C2",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro2.html"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "Classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C2_practice_activity1_print1_solved.pdf"
+      },
+      {
+        "Acronym": "PA",
+        "Name": "Practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-practice1.html"
       }
     ]
   },
@@ -742,9 +792,19 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-25",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "C2S",
+        "Name": "Slide for C2",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro2.html"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "Classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C2_practice_activity1_print1_solved.pdf"
+      },
+      {
+        "Acronym": "PA",
+        "Name": "Practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-practice1.html"
       }
     ]
   },
@@ -756,9 +816,19 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-26",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "C3S",
+        "Name": "Slide for C3",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c3-intro3.html"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "Classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C3_practice_activity2_print1_solved.pdf"
+      },
+      {
+        "Acronym": "PA",
+        "Name": "Practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c3-practice2.html"
       }
     ]
   },
@@ -1414,9 +1484,14 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-12",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "IS",
+        "Name": "Introductory slide",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro1.html"
+      },
+      {
+        "Acronym": "T1O",
+        "Name": "Term 1 outline",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-outline.html"
       }
     ]
   },
@@ -1428,9 +1503,19 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-19",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "C2S",
+        "Name": "Slide for C2",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro2.html"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "Classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C2_practice_activity1_print1_solved.pdf"
+      },
+      {
+        "Acronym": "PA",
+        "Name": "Practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-practice1.html"
       }
     ]
   },
@@ -1442,9 +1527,19 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-21",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "C2S",
+        "Name": "Slide for C2",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro2.html"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "Classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C2_practice_activity1_print1_solved.pdf"
+      },
+      {
+        "Acronym": "PA",
+        "Name": "Practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-practice1.html"
       }
     ]
   },
@@ -1456,9 +1551,19 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-27",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "C3S",
+        "Name": "Slide for C3",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c3-intro3.html"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "Classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C3_practice_activity2_print1_solved.pdf"
+      },
+      {
+        "Acronym": "PA",
+        "Name": "Practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c3-practice2.html"
       }
     ]
   },
@@ -2114,9 +2219,14 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-18",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "IS",
+        "Name": "Introductory slide",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro1.html"
+      },
+      {
+        "Acronym": "T1O",
+        "Name": "Term 1 outline",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-outline.html"
       }
     ]
   },
@@ -2128,9 +2238,19 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-20",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "C2S",
+        "Name": "Slide for C2",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro2.html"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "Classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C2_practice_activity1_print1_solved.pdf"
+      },
+      {
+        "Acronym": "PA",
+        "Name": "Practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-practice1.html"
       }
     ]
   },
@@ -2142,9 +2262,19 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-26",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "C2S",
+        "Name": "Slide for C2",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro2.html"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "Classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C2_practice_activity1_print1_solved.pdf"
+      },
+      {
+        "Acronym": "PA",
+        "Name": "Practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-practice1.html"
       }
     ]
   },
@@ -2156,9 +2286,19 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-28",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "C3S",
+        "Name": "Slide for C3",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c3-intro3.html"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "Classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C3_practice_activity2_print1_solved.pdf"
+      },
+      {
+        "Acronym": "PA",
+        "Name": "Practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c3-practice2.html"
       }
     ]
   },
@@ -2800,9 +2940,14 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-12",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "IS",
+        "Name": "Introductory slide",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro1.html"
+      },
+      {
+        "Acronym": "T1O",
+        "Name": "Term 1 outline",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-outline.html"
       }
     ]
   },
@@ -2814,9 +2959,19 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-19",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "C2S",
+        "Name": "Slide for C2",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro2.html"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "Classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C2_practice_activity1_print1_solved.pdf"
+      },
+      {
+        "Acronym": "PA",
+        "Name": "Practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-practice1.html"
       }
     ]
   },
@@ -2828,9 +2983,19 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-21",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "C2S",
+        "Name": "Slide for C2",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro2.html"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "Classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C2_practice_activity1_print1_solved.pdf"
+      },
+      {
+        "Acronym": "PA",
+        "Name": "Practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-practice1.html"
       }
     ]
   },
@@ -2842,9 +3007,19 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-27",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "C3S",
+        "Name": "Slide for C3",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c3-intro3.html"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "Classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C3_practice_activity2_print1_solved.pdf"
+      },
+      {
+        "Acronym": "PA",
+        "Name": "Practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c3-practice2.html"
       }
     ]
   },
@@ -3500,9 +3675,14 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-18",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "IS",
+        "Name": "Introductory slide",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro1.html"
+      },
+      {
+        "Acronym": "T1O",
+        "Name": "Term 1 outline",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-outline.html"
       }
     ]
   },
@@ -3514,9 +3694,19 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-26",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Acronym": "C2S",
+        "Name": "Slide for C2",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro2.html"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "Classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C2_practice_activity1_print1_solved.pdf"
+      },
+      {
+        "Acronym": "PA",
+        "Name": "Practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-practice1.html"
       }
     ]
   },
