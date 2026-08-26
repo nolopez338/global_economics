@@ -50,6 +50,24 @@
         'schedule-teacher': true,
       };
       var normalizedOrigin = validOrigins[origin] ? origin : 'schedule';
+      var hasTeacherSeminarContext = false;
+      var navigationContext = null;
+
+      try {
+        var contextKey = 'grade10SeminarNavigationContext';
+        navigationContext = JSON.parse(sessionStorage.getItem(contextKey) || 'null');
+        sessionStorage.removeItem(contextKey);
+      } catch (error) {
+        navigationContext = null;
+      }
+
+      if (grade === '10' && String(section).toUpperCase() === 'SEMINAR' &&
+          mode === 'teacher' && normalizedOrigin === 'schedule-teacher') {
+        hasTeacherSeminarContext = navigationContext?.destination === '10Seminar' &&
+          Number.isFinite(navigationContext.createdAt) &&
+          Date.now() - navigationContext.createdAt >= 0 &&
+          Date.now() - navigationContext.createdAt < 30000;
+      }
 
       if (!grade || !section) {
         var match = window.location.pathname.match(/\/(10|11)([A-E])\.html$/i);
@@ -65,9 +83,15 @@
         main.dataset.section = section;
         main.dataset.mode = mode;
         main.dataset.origin = normalizedOrigin;
+        main.dataset.teacherSeminarContext = String(hasTeacherSeminarContext);
         document.title = 'Schedule ' + grade + section;
       }
     })();
+  </script>
+  <script>
+    if (document.getElementById('class-page')?.dataset.teacherSeminarContext === 'true') {
+      document.write('<script src="../assets/js/databases/teacher-seminar-data.js"><\\/script>');
+    }
   </script>
   <script src="../assets/js/databases/class-data.js" defer></script>
   <script src="../assets/js/class-page.js" defer></script>
