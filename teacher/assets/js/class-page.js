@@ -32,6 +32,7 @@ const getClassMetadata = () => {
     section: String(section).toUpperCase(),
     classKey,
     classLabel: configuredMetadata.shortLabel || classKey,
+    coordinator: configuredMetadata.coordinator || "",
   };
 };
 
@@ -57,7 +58,7 @@ const createBreadcrumbs = (origin) => {
   return wrapper;
 };
 
-const createHeader = (classKey) => {
+const createHeader = (classKey, coordinator) => {
   const header = document.createElement("header");
   const textWrapper = document.createElement("div");
 
@@ -65,6 +66,14 @@ const createHeader = (classKey) => {
   title.textContent = `Schedule ${classKey}`;
 
   textWrapper.append(title);
+
+  if (coordinator) {
+    const coordinatorText = document.createElement("p");
+    coordinatorText.className = "sub";
+    coordinatorText.textContent = `Group coordinator: ${coordinator}`;
+    textWrapper.append(coordinatorText);
+  }
+
   header.append(textWrapper);
 
   return header;
@@ -264,7 +273,7 @@ const renderClassPage = () => {
     return;
   }
 
-  const { container, classKey, classLabel, grade, section } = metadata;
+  const { container, classKey, classLabel, coordinator, grade, section } = metadata;
   const mode = container.dataset.mode || "public";
   const origin = container.dataset.origin || "schedule";
 
@@ -279,7 +288,7 @@ const renderClassPage = () => {
 
   container.append(
     createBreadcrumbs(origin),
-    createHeader(classLabel),
+    createHeader(classLabel, coordinator),
     createNotesSection(classLabel, studentList, notes, mode),
     createCalendarSection(classLabel, grade, section),
     createBreadcrumbs(origin),
