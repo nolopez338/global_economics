@@ -13,12 +13,14 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "IS",
         "Name": "Introductory slide",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro1.html"
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro1.html",
+        "Category": "slides"
       },
       {
         "Acronym": "T1O",
         "Name": "Term 1 outline",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-outline.html"
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-outline.html",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -30,17 +32,20 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "C2S",
         "Name": "Slide for C2",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro2.html"
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro2.html",
+        "Category": "slides"
       },
       {
         "Acronym": "CA",
         "Name": "Classroom activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C2_practice_activity1_print1_solved.pdf"
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C2_practice_activity1_print1_solved.pdf",
+        "Category": "classroom-activities"
       },
       {
         "Acronym": "PA",
         "Name": "Practice activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-practice1.html"
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-practice1.html",
+        "Category": "practice-activities"
       }
     ]
   },
@@ -52,17 +57,20 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "C2S",
         "Name": "Slide for C2",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro2.html"
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro2.html",
+        "Category": "slides"
       },
       {
         "Acronym": "CA",
         "Name": "Classroom activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C2_practice_activity1_print1_solved.pdf"
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C2_practice_activity1_print1_solved.pdf",
+        "Category": "classroom-activities"
       },
       {
         "Acronym": "PA",
         "Name": "Practice activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-practice1.html"
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-practice1.html",
+        "Category": "practice-activities"
       }
     ]
   },
@@ -74,17 +82,20 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "C3S",
         "Name": "Slide for C3",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c3-intro3.html"
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c3-intro3.html",
+        "Category": "slides"
       },
       {
         "Acronym": "CA",
         "Name": "Classroom activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C3_practice_activity2_print1_solved.pdf"
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C3_practice_activity2_print1_solved.pdf",
+        "Category": "classroom-activities"
       },
       {
         "Acronym": "PA",
         "Name": "Practice activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c3-practice2.html"
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c3-practice2.html",
+        "Category": "practice-activities"
       }
     ]
   },
@@ -96,7 +107,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -108,7 +120,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -120,7 +133,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -132,7 +146,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -144,7 +159,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -156,7 +172,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -168,7 +185,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -180,7 +198,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -192,7 +211,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -204,7 +224,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -216,7 +237,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -228,7 +250,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -240,7 +263,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -252,7 +276,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -264,7 +289,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -276,7 +302,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -288,7 +315,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -300,7 +328,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -312,7 +341,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -324,7 +354,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -336,7 +367,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -348,7 +380,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -360,7 +393,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -372,7 +406,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -384,7 +419,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -396,7 +432,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -408,7 +445,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -420,7 +458,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -432,7 +471,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -444,7 +484,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -456,7 +497,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -468,7 +510,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -480,7 +523,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -492,7 +536,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -504,7 +549,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -516,7 +562,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -528,7 +575,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -540,7 +588,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -552,7 +601,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -564,7 +614,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -576,7 +627,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -588,7 +640,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -600,7 +653,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -612,7 +666,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -624,7 +679,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -636,7 +692,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -648,7 +705,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -660,7 +718,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -672,7 +731,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -684,7 +744,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -696,7 +757,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -708,7 +770,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -720,7 +783,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -732,7 +796,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -744,7 +809,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -756,7 +822,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -768,7 +835,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -780,7 +848,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -792,7 +861,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -804,7 +874,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -816,7 +887,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -828,7 +900,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -840,7 +913,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -852,7 +926,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -864,7 +939,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -876,7 +952,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -888,7 +965,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -900,7 +978,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -912,7 +991,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -924,7 +1004,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -936,7 +1017,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -948,7 +1030,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -960,7 +1043,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -972,7 +1056,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -984,7 +1069,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -996,7 +1082,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1008,7 +1095,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1020,7 +1108,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1032,7 +1121,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1044,7 +1134,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1056,7 +1147,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1068,7 +1160,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1080,7 +1173,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1092,7 +1186,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1104,7 +1199,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1116,7 +1212,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1128,7 +1225,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1140,7 +1238,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1152,7 +1251,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1164,7 +1264,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1176,7 +1277,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1188,7 +1290,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1200,7 +1303,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1212,7 +1316,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1224,7 +1329,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1236,7 +1342,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1248,7 +1355,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1260,7 +1368,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1272,7 +1381,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1284,7 +1394,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1296,7 +1407,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1308,7 +1420,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1320,7 +1433,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1332,7 +1446,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1344,7 +1459,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1356,7 +1472,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1368,7 +1485,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   },
@@ -1380,7 +1498,8 @@ window.MATERIALS_DATA_BASE = [
       {
         "Acronym": "MAT",
         "Name": "Class material",
-        "Hyperlink": "https://www.google.com"
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
       }
     ]
   }
