@@ -8,7 +8,7 @@ const { spawnSync } = require("node:child_process");
 const v = require("../../assets/js/materials-validation.js");
 const root = path.join(__dirname, "../..");
 const files = ["assets/js/databases/materials-data.js", "assets/js/databases/materials-data-base.js"];
-function material(overrides = {}) { return { Acronym: "TEST", Name: "Test material", Hyperlink: "https://example.com/a", ...overrides }; }
+function material(overrides = {}) { return { Acronym: "TEST", Name: "Test material", Hyperlink: "https://example.com/a", Category: "extra-resources", ...overrides }; }
 function dated(overrides = {}) { return { Grade: 10, Term: 1, Section: "B", "Class #": "1-2", Date: "2026-08-18", Materials: [material()], ...overrides }; }
 function base(overrides = {}) { return { Grade: 10, Term: 1, "Class #": "2", Materials: [material()], ...overrides }; }
 function load(name) { const context = { window: {} }; const file = path.join(root, `assets/js/databases/${name}.js`); vm.runInNewContext(fs.readFileSync(file, "utf8"), context); return context.window; }
@@ -43,7 +43,52 @@ test("dated page renders heading, class, safe cards, links, and accessible label
   assert.equal(page.content.children[0].textContent, "Class 1-2");
   const cards = page.content.children[1].children; assert.equal(cards.length, 3);
   assert.deepEqual(cards.map(card => card.children[0].textContent), ["C2S", "CA", "PA"]);
-  cards.forEach(card => { assert.equal(card.target, "_blank"); assert.equal(card.rel, "noopener noreferrer"); assert.match(card.href, /^https:/); assert.match(card.attributes["aria-label"], /^Open /); });
+  cards.forEach(card => { assert.equal(card.target, "_blank"); assert.equal(card.rel, "noopener noreferrer"); assert.match(card.href, /^https:/); assert.match(card.attributes["aria-label"], /^Open .* \(.+\) for Grade 10B/); assert.ok(card.className.includes(`material-card--${matchesCategory(card.children[2].textContent)}`)); });
+});
+
+function matchesCategory(label) { return v.CATEGORIES.find(category => category.label === label).value; }
+
+test("canonical categories validate and invalid categories do not", () => {
+  assert.deepEqual(Array.from(v.CATEGORY_VALUES), ["slides", "classroom-activities", "practice-activities", "extra-resources"]);
+  v.CATEGORY_VALUES.forEach(Category => assert.equal(v.validateMaterials([material({ Category })]).valid, true));
+  for (const Category of [undefined, "Slides", "slide", "unknown", 1]) {
+    const candidate = material({ Category });
+    if (Category === undefined) delete candidate.Category;
+    const result = v.validateMaterials([candidate]);
+    assert.equal(result.valid, false);
+    assert.ok(result.errors.some(error => error.includes("Category")));
+  }
+  const warned = v.validateMaterials([material({ Unrelated: true })]);
+  assert.equal(warned.valid, true);
+  assert.deepEqual(warned.warnings, ["Materials[0] has unknown property Unrelated"]);
+});
+
+test("both complete databases contain only canonical categories and pass audit", () => {
+  for (const [file, kind, globalName] of [["materials-data", "dated", "MATERIALS_DATA"], ["materials-data-base", "base", "MATERIALS_DATA_BASE"]]) {
+    const data = load(file)[globalName];
+    assert.equal(v.audit(data, kind).valid, true);
+    data.flatMap(record => record.Materials).forEach(item => assert.ok(v.CATEGORY_VALUES.includes(item.Category)));
+  }
+});
+
+test("dated and base cards use controlled classes, visible labels, and category accessible names", () => {
+  for (const [search, globals] of [
+    ["?grade=10&section=B&date=2026-08-18", { MATERIALS_DATA: [dated({ Materials: [material({ Category: "slides" })] })] }],
+    ["", { MATERIALS_DATA_BASE: [base({ Materials: [material({ Category: "classroom-activities" })] })] }]
+  ]) {
+    const page = render(search, globals);
+    const grid = search ? page.content.children[1] : page.content.children[0].children[1].children[1];
+    const card = grid.children[0], category = card.children[2];
+    assert.match(card.className, /material-card--(?:slides|classroom-activities)$/);
+    assert.ok(v.CATEGORIES.some(item => item.label === category.textContent));
+    assert.ok(card.attributes["aria-label"].includes(`(${category.textContent})`));
+  }
+});
+
+test("page legend always lists all four category labels", () => {
+  const html = fs.readFileSync(path.join(root, "pages/materials.html"), "utf8");
+  assert.match(html, /aria-label="Material categories"/);
+  v.CATEGORIES.forEach(category => assert.match(html, new RegExp(`>${category.label}<\\/li>`)));
 });
 
 test("dated page states distinguish bad requests, not found, bad requested data, and ambiguity", () => {
@@ -86,7 +131,7 @@ test("unknown record and material properties are accepted with warnings", () => 
 test("material field, length, and URL rules", () => {
   assert.equal(v.validateMaterials([material({ Acronym: "ABCD" })]).valid, true);
   for (const bad of [material({ Acronym: "" }), material({ Acronym: "ABCDE" }), material({ Name: "" }), material({ Hyperlink: "bad" }), material({ Hyperlink: "ftp://example.com/a" })]) assert.equal(v.validateMaterials([bad]).valid, false);
-  for (const missing of ["Acronym", "Name", "Hyperlink"]) { const value = material(); delete value[missing]; assert.equal(v.validateMaterials([value]).valid, false); }
+  for (const missing of ["Acronym", "Name", "Hyperlink", "Category"]) { const value = material(); delete value[missing]; assert.equal(v.validateMaterials([value]).valid, false); }
   assert.ok(v.validUrl("http://example.com")); assert.ok(v.validUrl("https://example.com"));
 });
 

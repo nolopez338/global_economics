@@ -4,6 +4,10 @@
   var pageHeading = document.querySelector("#materials-page > h1");
   var validation = window.MaterialsValidation;
 
+  function categoryDefinition(value) {
+    return validation.CATEGORIES.find(function (category) { return category.value === value; });
+  }
+
   function showStatus(message) {
     content.replaceChildren();
     var status = document.createElement("p");
@@ -17,19 +21,24 @@
     var grid = document.createElement("div");
     grid.className = "class-grid";
     materials.forEach(function (material) {
+      var category = categoryDefinition(material.Category);
+      if (!category) return;
       var card = document.createElement("a");
-      card.className = "class-card";
+      card.className = "class-card material-card material-card--" + category.value;
       card.href = validation.validUrl(material.Hyperlink);
       card.target = "_blank";
       card.rel = "noopener noreferrer";
-      card.setAttribute("aria-label", "Open " + material.Name.trim() + " for " + context);
+      card.setAttribute("aria-label", "Open " + material.Name.trim() + " (" + category.label + ") for " + context);
       var icon = document.createElement("span");
       icon.className = "class-icon";
       icon.textContent = material.Acronym.trim();
       var label = document.createElement("span");
       label.className = "class-label";
       label.textContent = material.Name.trim();
-      card.append(icon, label);
+      var badge = document.createElement("span");
+      badge.className = "material-category";
+      badge.textContent = category.label;
+      card.append(icon, label, badge);
       grid.appendChild(card);
     });
     return grid;

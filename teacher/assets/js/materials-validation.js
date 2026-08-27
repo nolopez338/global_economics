@@ -6,7 +6,14 @@
 })(typeof window !== "undefined" ? window : globalThis, function () {
   "use strict";
   var MAX_ACRONYM_LENGTH = 4;
-  var MATERIAL_FIELDS = ["Acronym", "Name", "Hyperlink"];
+  var CATEGORIES = Object.freeze([
+    Object.freeze({ value: "slides", label: "Slides" }),
+    Object.freeze({ value: "classroom-activities", label: "Classroom activities" }),
+    Object.freeze({ value: "practice-activities", label: "Practice activities" }),
+    Object.freeze({ value: "extra-resources", label: "Extra resources" })
+  ]);
+  var CATEGORY_VALUES = Object.freeze(CATEGORIES.map(function (category) { return category.value; }));
+  var MATERIAL_FIELDS = ["Acronym", "Name", "Hyperlink", "Category"];
   var DATED_REQUIRED = ["Grade", "Term", "Section", "Class #", "Date", "Materials"];
   var BASE_REQUIRED = ["Grade", "Term", "Class #", "Materials"];
 
@@ -57,6 +64,7 @@
       else if (material.Acronym.trim().length > MAX_ACRONYM_LENGTH) errors.push(label + " Acronym exceeds " + MAX_ACRONYM_LENGTH + " characters");
       if (typeof material.Name !== "string" || !material.Name.trim()) errors.push(label + " Name must be a non-empty string");
       if (!validUrl(material.Hyperlink)) errors.push(label + " Hyperlink must be an HTTP or HTTPS URL");
+      if (typeof material.Category !== "string" || !CATEGORY_VALUES.includes(material.Category)) errors.push(label + " Category must be one of: " + CATEGORY_VALUES.join(", "));
     });
     return { valid: !errors.length, errors: errors, warnings: warnings };
   }
@@ -95,5 +103,5 @@
     return { valid: records.every(function (item) { return item.valid; }) && !duplicates.length, total: records.length, validCount: records.filter(function (item) { return item.valid; }).length, invalidCount: records.filter(function (item) { return !item.valid; }).length, records: records, duplicates: duplicates };
   }
 
-  return { MAX_ACRONYM_LENGTH: MAX_ACRONYM_LENGTH, normalizeDate: normalizeDate, normalizeRequest: normalizeRequest, validUrl: validUrl, validateMaterials: validateMaterials, validateRecord: validateRecord, recordKey: recordKey, audit: audit };
+  return { MAX_ACRONYM_LENGTH: MAX_ACRONYM_LENGTH, CATEGORIES: CATEGORIES, CATEGORY_VALUES: CATEGORY_VALUES, normalizeDate: normalizeDate, normalizeRequest: normalizeRequest, validUrl: validUrl, validateMaterials: validateMaterials, validateRecord: validateRecord, recordKey: recordKey, audit: audit };
 });
