@@ -160,6 +160,11 @@ $$
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
         `,
+        narrativeDescriptionHtml: String.raw`
+<p>A small café is deciding whether to introduce a line of artisan desserts or keep its current menu. The payoff represents estimated daily profit from café sales. The projections combine recent sales records with expected ingredient, staffing, and preparation costs.</p>
+<p>The result depends on customer traffic, which may be high or low. If the café launches the dessert line, the projected profit is 42 thousand USD under high traffic and 8 thousand USD under low traffic. The large difference reflects the additional sales possible when demand is strong and the risk of unsold ingredients when demand is weak.</p>
+<p>If the café keeps its current menu, the projected profit is 28 thousand USD under high traffic and 20 thousand USD under low traffic. This alternative offers less growth potential but produces more stable outcomes because it avoids most of the new operating costs.</p>
+        `,
         solutionSections: [
           {
             title: "C1: Interpreting decision alternatives, events, consequences, and states",
@@ -213,6 +218,12 @@ $$
 <li><strong>(C1)</strong> Interpreting decision alternatives, events, consequences, and states.
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
+        `,
+        narrativeDescriptionHtml: String.raw`
+<p>A renewable-energy company must choose among building wind turbines, developing solar farms, or installing a balanced hybrid system. The payoff represents projected annual profit from electricity generation and sales. The estimates are based on expected production capacity, electricity prices, and operating and maintenance costs.</p>
+<p>Profit depends on whether conditions are windy, sunny, or cloudy. For the wind-turbine strategy, the projected profits are 90 thousand USD under windy conditions, 45 thousand USD under sunny conditions, and 30 thousand USD under cloudy conditions.</p>
+<p>For the solar-farm strategy, the projected profits are 35 thousand USD under windy conditions, 95 thousand USD under sunny conditions, and 25 thousand USD under cloudy conditions. The hybrid system is expected to produce 70 thousand USD under windy conditions, 65 thousand USD under sunny conditions, and 60 thousand USD under cloudy conditions.</p>
+<p>The specialized wind and solar systems perform best under favorable weather but decline sharply under less suitable conditions. The hybrid system does not achieve the highest possible payoff, but its outcomes are more stable because it combines two energy sources.</p>
         `,
         solutionSections: [
           {
@@ -268,6 +279,11 @@ $$
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
         `,
+        narrativeDescriptionHtml: String.raw`
+<p>A multinational logistics firm must choose between a centralized mega-hub network and a regional multi-hub network for its long-term freight contracts. The payoff represents projected profit after transportation, storage, coordination, and delay costs. Management developed the estimates from previous contracts, expected freight volumes, and simulated disruption scenarios.</p>
+<p>The firm considers four possible trade conditions: a trade boom, stable trade, moderate disruptions, and severe disruptions. Under the centralized network, projected profits are 220 thousand USD during a trade boom, 140 thousand USD during stable trade, and 40 thousand USD during moderate disruptions; severe disruptions would produce a loss of 30 thousand USD. This design benefits from economies of scale when trade is strong but becomes vulnerable when disruptions affect the main hub.</p>
+<p>Under the regional network, projected profits are 180, 160, 110, and 60 thousand USD under the same four conditions. Operating several hubs limits the highest possible profit, but the network remains more resilient because freight can be redirected when disruptions occur.</p>
+        `,
         solutionSections: [
           {
             title: "C1: Interpreting decision alternatives, events, consequences, and states",
@@ -318,6 +334,11 @@ $$
 <li><strong>(C1)</strong> Interpreting decision alternatives, events, consequences, and states.
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
+        `,
+        narrativeDescriptionHtml: String.raw`
+<p>A community bakery is bidding for office lunch-box contracts and must choose between standard and premium packaging. The payoff depends on the profit earned per lunch box and the number of boxes sold. The bakery estimates demand using recent office orders, client inquiries, and projected packaging costs.</p>
+<p>Standard packaging generates a profit of 0.04 thousand USD per lunch box. The bakery expects to sell 900 boxes under high office demand and 550 boxes under low demand. Premium packaging generates a higher profit of 0.07 thousand USD per box, but its higher price is expected to reduce sales to 650 boxes under high demand and 250 boxes under low demand.</p>
+<p>The premium option earns more per sale but is more sensitive to weak demand, while standard packaging attracts a larger number of customers in both demand states.</p>
         `,
         solutionSections: [
           {
@@ -381,6 +402,11 @@ $$
 <li><strong>(C1)</strong> Interpreting decision alternatives, events, consequences, and states.
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
+        `,
+        narrativeDescriptionHtml: String.raw`
+<p>A rural internet provider must decide whether to promote its Basic, Plus, or Pro subscription plan. The payoff depends on the profit earned per subscription and the number of customers who enroll. The estimates are based on previous enrollment patterns, local market surveys, and projected service and installation costs.</p>
+<p>The Basic plan generates a profit of 0.03 thousand USD per subscription and is expected to attract 1400 customers under high enrollment and 900 under low enrollment. The Plus plan generates 0.05 thousand USD per subscription, with projected sales of 1000 under high enrollment and 700 under low enrollment.</p>
+<p>The Pro plan produces the highest profit per subscription, at 0.08 thousand USD, but is expected to attract only 600 customers under high enrollment and 300 under low enrollment. The pattern reflects the trade-off between higher profit per customer and lower demand for more expensive plans.</p>
         `,
         solutionSections: [
           {
@@ -450,6 +476,11 @@ $$
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
         `,
+        narrativeDescriptionHtml: String.raw`
+<p>A coffee exporter must choose whether to ship its products through Port A or Port B. The payoff depends on the profit earned per shipment and the number of shipments delivered. Management developed the estimates from previous export volumes, transportation costs, port capacity, and exchange-rate scenarios.</p>
+<p>The exchange rate may be favorable or unfavorable. A favorable rate produces a profit of 6 thousand USD per shipment, while an unfavorable rate reduces the profit to 2 thousand USD per shipment.</p>
+<p>Through Port A, the exporter expects to deliver 40 shipments under a favorable exchange rate and 28 under an unfavorable rate. Through Port B, it expects to deliver 32 shipments under a favorable rate and 30 under an unfavorable rate. Port A offers greater capacity in favorable conditions, while Port B maintains more stable shipment volumes across both states.</p>
+        `,
         solutionSections: [
           {
             title: "C1: Interpreting decision alternatives, events, consequences, and states",
@@ -518,6 +549,11 @@ $$
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
         `,
+        narrativeDescriptionHtml: String.raw`
+<p>A lake tourism operator must decide whether to use small ferries or large ferries for sightseeing tours. The payoff depends on the profit earned per ticket and the number of tickets sold. The estimates are based on previous passenger demand, seasonal ticket prices, and projected operating costs.</p>
+<p>The operator considers peak season, normal season, and rainy season. Profit per ticket is 0.05 thousand USD during peak season, 0.04 thousand USD during normal season, and 0.03 thousand USD during rainy season.</p>
+<p>Small ferries are expected to sell 2200 tickets in peak season, 1600 in normal season, and 1000 in rainy season. Large ferries are expected to sell 2600, 1800, and 800 tickets under the same respective conditions. Large ferries can serve more passengers when demand is strong, but their ticket sales fall below those of small ferries during the rainy season.</p>
+        `,
         solutionSections: [
           {
             title: "C1: Interpreting decision alternatives, events, consequences, and states",
@@ -574,6 +610,10 @@ $$
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
         `,
+        narrativeDescriptionHtml: String.raw`
+<p>A school cafeteria provider must choose a basic or extended meal contract for a short academic program. After projected food, staffing, and operating costs, the agreed service fee leaves 18 thousand USD under the basic contract and 32 thousand USD under the extended contract.</p>
+<p>Participation may be regular or high, but the contracts were negotiated in advance, so their financial results do not change with participation.</p>
+        `,
         solutionSections: [
           {
             title: "C1: Interpreting decision alternatives, events, consequences, and states",
@@ -620,6 +660,10 @@ $$
 <li><strong>(C1)</strong> Interpreting decision alternatives, events, consequences, and states.
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
+        `,
+        narrativeDescriptionHtml: String.raw`
+<p>A health nonprofit must select a basic outreach, extended outreach, or full regional contract for mobile clinics. After expected staffing, transportation, equipment, and operating costs, contracted funding leaves 24 thousand USD for basic outreach, 38 thousand USD for extended outreach, and 52 thousand USD for full regional service.</p>
+<p>Community need may be regular or high, but the funding was agreed before need is observed, so the financial result for each contract remains unchanged.</p>
         `,
         solutionSections: [
           {
@@ -679,6 +723,10 @@ $$
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
         `,
+        narrativeDescriptionHtml: String.raw`
+<p>A municipal office must decide whether to open a school gym or a sports center as a temporary shelter. Its emergency budget provides 12 thousand USD during a minor emergency and 30 thousand USD during a major emergency, based on expected shelter operating requirements.</p>
+<p>The same support is available for either facility because funding depends on emergency severity, and the larger response receives more support.</p>
+        `,
         solutionSections: [
           {
             title: "C1: Interpreting decision alternatives, events, consequences, and states",
@@ -725,6 +773,10 @@ $$
 <li><strong>(C1)</strong> Interpreting decision alternatives, events, consequences, and states.
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
+        `,
+        narrativeDescriptionHtml: String.raw`
+<p>A city council must decide whether to reserve one central hall or two neighborhood halls for emergency use. Budget forecasts provide 18 thousand USD of facility-rental support during a mild emergency, 35 thousand USD during a serious emergency, and 50 thousand USD during a major emergency.</p>
+<p>These amounts apply to either reservation strategy because the support depends on the scale of emergency services required, not the halls selected.</p>
         `,
         solutionSections: [
           {
@@ -796,6 +848,10 @@ $$
 <li><strong>(C1)</strong> Interpreting decision alternatives, events, consequences, and states.
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
+        `,
+        narrativeDescriptionHtml: String.raw`
+<p>A municipal contractor must choose an electric or diesel fleet for a two-month recycling collection contract. Supplier quotes and operating budgets indicate that each item collected by the electric fleet earns 0.6 thousand USD after fleet expenses, while each item collected by the diesel fleet earns 0.4 thousand USD. Revenue from recovered material adds 0.3 thousand USD for every item when recovery is high and 0.1 thousand USD when recovery is low.</p>
+<p>The electric fleet is expected to collect 80 items under high recovery and 55 under low recovery. The diesel fleet is expected to collect 95 items under high recovery and 65 under low recovery. The diesel fleet processes more items, while the electric fleet earns more from each collection before recovery revenue is included.</p>
         `,
         solutionSections: [
           {
@@ -873,6 +929,10 @@ $$
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
         `,
+        narrativeDescriptionHtml: String.raw`
+<p>A museum consortium must select a mobile, kiosk, or hybrid ticket platform. Its contracts measure activity in batches of one thousand admissions. After platform operating costs, each batch processed on the mobile platform earns 0.5 thousand USD, while each batch processed on either the kiosk or hybrid platform earns 0.4 thousand USD. Seasonal admission pricing adds 0.2 thousand USD to the earnings from every batch in peak season and 0.1 thousand USD in regular season. These figures come from recent admission volumes, vendor quotes, and processing-revenue forecasts.</p>
+<p>The mobile platform is expected to process 70 batches during peak season and 45 during regular season. The kiosk platform is expected to process 60 and 50 batches, respectively. The hybrid platform is expected to process 65 batches during peak season and 55 during regular season. The mobile platform earns the most from each batch before seasonal admission revenue is included, while the hybrid platform is forecast to process the most batches during regular season.</p>
+        `,
         solutionSections: [
           {
             title: "C1: Interpreting decision alternatives, events, consequences, and states",
@@ -938,6 +998,11 @@ $$
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
         `,
+        narrativeDescriptionHtml: String.raw`
+<p>A local printing shop must choose a small or digital printer setup for school material packets. Contract terms provide 12 thousand USD of setup income for the small printer and 20 thousand USD for the digital printer. After ink, paper, and labor costs, the small printer earns 0.05 thousand USD per packet and the digital printer earns 0.04 thousand USD. Demand forecasts come from previous school orders.</p>
+<p>The small printer is expected to produce 500 packets under high demand and 300 under low demand. The digital printer is expected to produce 700 and 400 packets, respectively.</p>
+<p>The small setup earns more per packet, while the digital setup receives more setup income and can process more packets under both demand conditions.</p>
+        `,
         solutionSections: [
           {
             title: "C1: Interpreting decision alternatives, events, consequences, and states",
@@ -1000,6 +1065,11 @@ $$
 <li><strong>(C1)</strong> Interpreting decision alternatives, events, consequences, and states.
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
+        `,
+        narrativeDescriptionHtml: String.raw`
+<p>A logistics company must choose a small, medium, or large cold-storage facility for agricultural pallets. Existing contracts provide 40 thousand USD of facility income for the small site, 25 thousand USD for the medium site, and 10 thousand USD for the large site. After operating costs, each stored pallet earns 0.18 thousand USD at the small facility, 0.12 thousand USD at the medium facility, and 0.08 thousand USD at the large facility. Volume forecasts use previous contracts and projected demand.</p>
+<p>The small facility is expected to store 300 pallets under high demand and 220 under low demand. The medium facility is expected to store 600 and 420 pallets, respectively.</p>
+<p>The large facility is expected to store 900 pallets under high demand and 700 under low demand. Larger facilities handle more pallets, while smaller facilities receive more contract income and earn more per pallet.</p>
         `,
         solutionSections: [
           {
@@ -1064,6 +1134,11 @@ $$
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
         `,
+        narrativeDescriptionHtml: String.raw`
+<p>A landscaping company must focus its bids on residential or commercial city maintenance projects. Each completed project earns a team-specific profit, and grant funding or unreimbursed costs also affect the result. The estimates are based on previous contracts, projected labor and equipment costs, and expected project demand.</p>
+<p>The residential team earns 0.6 thousand USD per project and is expected to complete 40 projects if the grant is available and 25 if no grant is available. The commercial team earns 1.0 thousand USD per project and is expected to complete 30 and 20 projects under the same respective states.</p>
+<p>If the grant is available, it contributes 10 thousand USD toward either team’s contract profit. Without the grant, either team must absorb 5 thousand USD of unreimbursed equipment and mobilization costs. The residential focus produces more projects, while the commercial focus earns more per project.</p>
+        `,
         solutionSections: [
           {
             title: "C1: Interpreting decision alternatives, events, consequences, and states",
@@ -1126,6 +1201,11 @@ $$
 <li><strong>(C1)</strong> Interpreting decision alternatives, events, consequences, and states.
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
+        `,
+        narrativeDescriptionHtml: String.raw`
+<p>A solar company must choose a residential, commercial, or mixed portfolio. Each installation earns a portfolio-specific profit, and the government rebate either contributes funding or leaves costs unreimbursed. The estimates reflect recent bids, projected installation costs, and expected customer demand.</p>
+<p>The residential focus earns 0.9 thousand USD per installation and is expected to complete 80 installations if the rebate continues and 50 if it ends. The commercial focus earns 1.6 thousand USD per installation, with projected volumes of 55 and 40 installations under the same respective states. The mixed portfolio earns 1.2 thousand USD per installation and is expected to complete 70 installations if the rebate continues and 45 if it ends.</p>
+<p>If the rebate continues, it contributes 20 thousand USD to the profit of any portfolio. If it ends, any portfolio must absorb 10 thousand USD of administrative and equipment costs that would otherwise have been reimbursed. The residential strategy produces the largest volume, the commercial strategy earns the most per installation, and the mixed portfolio balances both features.</p>
         `,
         solutionSections: [
           {
@@ -1195,6 +1275,11 @@ $$
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
         `,
+        narrativeDescriptionHtml: String.raw`
+<p>A regional transport firm must choose a mini-bus or coach fleet for school-trip charters. Fleet contracts provide 15 thousand USD of income for mini-buses and 25 thousand USD for coaches, in addition to the profit from completed charters. The estimates are based on previous school contracts, expected bookings, and projected fuel and operating costs.</p>
+<p>The mini-bus fleet is expected to complete 25 charters under regular fuel costs and 20 under high fuel costs. The coach fleet has projected volumes of 18 and 16 charters under the same respective states.</p>
+<p>Profit per charter is 4 thousand USD when fuel costs are regular and 2 thousand USD when fuel costs are high. The mini-bus fleet completes more charters, while the coach fleet receives more contract income.</p>
+        `,
         solutionSections: [
           {
             title: "C1: Interpreting decision alternatives, events, consequences, and states",
@@ -1263,6 +1348,11 @@ $$
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
         `,
+        narrativeDescriptionHtml: String.raw`
+<p>An air cargo firm must lease narrow-body or wide-body aircraft. Lease contracts provide 30 thousand USD of income for narrow-body aircraft and 50 thousand USD for wide-body aircraft, in addition to profit from completed charters. The estimates reflect previous contracts, expected freight demand, lease costs, and projected fuel expenses.</p>
+<p>Narrow-body aircraft are expected to complete 20 charters under low fuel costs, 18 under medium fuel costs, and 15 under high fuel costs. Wide-body aircraft have projected volumes of 14, 12, and 9 charters under the same respective states.</p>
+<p>Profit per charter is 8 thousand USD under low fuel costs, 5 thousand USD under medium fuel costs, and 2 thousand USD under high fuel costs. Narrow-body aircraft complete more charters, while wide-body aircraft receive more lease-contract income.</p>
+        `,
         solutionSections: [
           {
             title: "C1: Interpreting decision alternatives, events, consequences, and states",
@@ -1328,6 +1418,11 @@ $$
 <li><strong>(C1)</strong> Interpreting decision alternatives, events, consequences, and states.
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
+        `,
+        narrativeDescriptionHtml: String.raw`
+<p>A fruit exporter must choose whether to focus its permit on citrus or berry exports. Profit comes from each crate exported, together with supply-contract income or emergency sourcing costs determined by the harvest. The estimates are based on expected export volumes, seasonal yields, transportation costs, and market demand.</p>
+<p>During a strong harvest, favorable supply contracts contribute 12 thousand USD to the exporter’s profit, and each crate earns 0.4 thousand USD. During a weak harvest, emergency sourcing costs reduce profit by 8 thousand USD, and each crate earns 0.2 thousand USD.</p>
+<p>The citrus focus is expected to export 200 crates in a strong season and 150 in a weak season. The berry focus is expected to export 180 and 120 crates under the same respective conditions. Citrus maintains the larger modeled export volume in both states.</p>
         `,
         solutionSections: [
           {
@@ -1397,6 +1492,11 @@ $$
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
         `,
+        narrativeDescriptionHtml: String.raw`
+<p>A seafood exporter must choose between a frozen-fillet focus and a fresh-export focus. Profit comes from each crate exported, together with advance-purchase income or weather-related costs determined by the season. The estimates reflect expected demand, storage and transportation costs, previous export volumes, and possible weather disruptions.</p>
+<p>During a strong tourism season, advance-purchase contracts contribute 30 thousand USD to profit, and each crate earns 0.7 thousand USD. During a normal season, those contracts contribute 10 thousand USD, and each crate earns 0.5 thousand USD. During a stormy season, weather-related storage and rescheduling costs reduce profit by 15 thousand USD, and each crate earns 0.2 thousand USD.</p>
+<p>The frozen-fillet focus is expected to export 120 crates in a strong season, 100 in a normal season, and 80 in a stormy season. The fresh-export focus is expected to export 90, 110, and 70 crates under the same respective states. Frozen products perform better in strong and stormy conditions, while fresh exports have the larger modeled volume during a normal season.</p>
+        `,
         solutionSections: [
           {
             title: "C1: Interpreting decision alternatives, events, consequences, and states",
@@ -1452,6 +1552,10 @@ $$
 <li><strong>(C1)</strong> Interpreting decision alternatives, events, consequences, and states.
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
+        `,
+        narrativeDescriptionHtml: String.raw`
+<p>A warehouse operator must choose between a standard and an enhanced security agreement for protecting seasonal inventory. Contract terms provide 20 thousand USD of net income under the standard agreement and 35 thousand USD under the enhanced agreement. Inventory forecasts show that the normal season brings a further 6 thousand USD of security funding, while the festival season brings 14 thousand USD because larger inventories require greater security support.</p>
+<p>These agreement amounts and seasonal funding are both included in the operator’s financial result, whichever agreement is selected.</p>
         `,
         solutionSections: [
           {
@@ -1509,6 +1613,10 @@ $$
 <li><strong>(C1)</strong> Interpreting decision alternatives, events, consequences, and states.
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
+        `,
+        narrativeDescriptionHtml: String.raw`
+<p>A port authority must choose between a standard inspection agreement and a rapid-response inspection agreement. Contract terms provide 28 thousand USD of net income under the standard agreement and 42 thousand USD under the rapid-response agreement. Operations forecasts indicate that a calm season adds 12 thousand USD and a busy season adds 5 thousand USD, while storm repairs reduce the result by 10 thousand USD. These amounts apply whichever agreement is chosen.</p>
+<p>The harbor estimates come from the inspection contracts, maintenance plans, and staffing requirements for each operating condition.</p>
         `,
         solutionSections: [
           {
@@ -1585,6 +1693,11 @@ $$
 <li><strong>(C1)</strong> Interpreting decision alternatives, events, consequences, and states.
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
+        `,
+        narrativeDescriptionHtml: String.raw`
+<p>A utility must choose between a membrane unit and a filtration unit for treating batches of water delivered to remote communities. Supplier terms give the membrane unit 8 thousand USD of contract income plus earnings of 0.8 thousand USD for every batch treated. The filtration unit receives 12 thousand USD of contract income plus 0.6 thousand USD for every batch. Seasonal water tariffs add 0.3 thousand USD to the earnings from each batch in the dry season and 0.1 thousand USD in the wet season. The estimates come from supplier quotes, operating budgets, and demand forecasts.</p>
+<p>Capacity studies predict that the membrane unit will treat 50 batches in the dry season and 35 in the wet season. They predict 60 and 45 batches, respectively, for the filtration unit.</p>
+<p>The membrane unit earns more for each batch before seasonal tariffs, whereas the filtration unit receives more contract income and has greater forecast capacity.</p>
         `,
         solutionSections: [
           {
@@ -1668,6 +1781,11 @@ $$
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
         `,
+        narrativeDescriptionHtml: String.raw`
+<p>A parcel operator must choose a metro-locker system, a suburban-locker system, or a mixed network. Lease proposals provide 10 thousand USD of contract income for the metro system, 14 thousand USD for the suburban system, and 12 thousand USD for the mixed network. After operating costs, metro and mixed lockers each earn 0.5 thousand USD per shipment batch, while suburban lockers earn 0.4 thousand USD. Strong demand adds 0.2 thousand USD to the earnings from every batch, and steady demand adds 0.1 thousand USD. The estimates come from lease terms, recent parcel volumes, and operating budgets.</p>
+<p>Volume forecasts show metro lockers handling 80 batches under strong demand and 55 under steady demand, while suburban lockers handle 65 and 60 batches, respectively.</p>
+<p>The mixed network is expected to handle 75 batches under strong demand and 65 under steady demand. The metro network has the highest modeled volume under strong demand, while the mixed network handles the most batches under steady demand.</p>
+        `,
         solutionSections: [
           {
             title: "C1: Interpreting decision alternatives, events, consequences, and states",
@@ -1747,6 +1865,11 @@ $$
 <li><strong>(C1)</strong> Interpreting decision alternatives, events, consequences, and states.
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
+        `,
+        narrativeDescriptionHtml: String.raw`
+<p>A district energy provider must choose between biomass heat and heat pumps. Energy-price contracts and operating budgets show earnings of 0.5 thousand USD for each biomass heating unit and 0.6 thousand USD for each heat-pump unit. Winter tariffs add 0.1 thousand USD for every unit in a mild winter and 0.3 thousand USD in a cold winter. A mild-winter service subsidy contributes another 6 thousand USD, while cold-weather emergency expenses reduce profit by 4 thousand USD. Demand forecasts supply the expected volumes.</p>
+<p>Biomass heat contributes 0.5 thousand USD per unit and is expected to supply 55 units during a mild winter and 85 during a cold winter. Heat pumps contribute 0.6 thousand USD per unit, with projected volumes of 65 and 95 units under the same respective states.</p>
+<p>Heat pumps provide the higher payoff per unit and the larger modeled supply in both winter conditions.</p>
         `,
         solutionSections: [
           {
@@ -1829,6 +1952,11 @@ $$
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
         `,
+        narrativeDescriptionHtml: String.raw`
+<p>A port authority must choose between automated and crew-operated cold-chain service. Cost studies show that automation earns 0.7 thousand USD per refrigerated container batch and crew service earns 0.5 thousand USD. Clear flow adds 0.2 thousand USD to the earnings from each batch and provides 8 thousand USD of scheduling savings. Congestion adds 0.1 thousand USD per batch but creates 3 thousand USD of extra coordination costs. An inspection surge adds 0.3 thousand USD per batch and provides 5 thousand USD of inspection-service income. Volume estimates come from earlier congestion and inspection records.</p>
+<p>The automated service contributes 0.7 thousand USD per batch and is expected to handle 80 batches under clear flow, 60 under congestion, and 45 during an inspection surge. The crew service contributes 0.5 thousand USD per batch, with projected volumes of 70, 65, and 55 batches under the same respective states.</p>
+<p>Automation handles more batches under clear flow, while the crew service maintains higher volumes under congestion and inspection surges.</p>
+        `,
         solutionSections: [
           {
             title: "C1: Interpreting decision alternatives, events, consequences, and states",
@@ -1906,6 +2034,11 @@ $$
 <li><strong>(C1)</strong> Interpreting decision alternatives, events, consequences, and states.
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
+        `,
+        narrativeDescriptionHtml: String.raw`
+<p>A pharmacy cooperative must choose cargo bikes or electric vans for prescription deliveries. The bike contract provides 9 thousand USD of route income and earns 0.6 thousand USD for each batch delivered. The van contract provides 4 thousand USD of route income and earns 0.8 thousand USD per batch. Recent traffic records also indicate 6 thousand USD of scheduling savings in light traffic, while delays in heavy traffic impose 5 thousand USD of extra costs on either plan.</p>
+<p>Capacity forecasts estimate that cargo bikes will deliver 60 batches in light traffic and 45 in heavy traffic. Electric vans are expected to deliver 75 and 55 batches, respectively.</p>
+<p>The estimates come from vehicle costs, route contracts, delivery capacity, and recent traffic patterns. Vans earn more per batch and carry more batches, whereas bikes receive more route income.</p>
         `,
         solutionSections: [
           {
@@ -1987,6 +2120,11 @@ $$
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
         `,
+        narrativeDescriptionHtml: String.raw`
+<p>A wood cooperative must choose a precision or standard lumber-processing line. The precision line’s sales agreement provides 7 thousand USD of income and earnings of 0.9 thousand USD per batch. The standard line’s agreement provides 13 thousand USD and earnings of 0.6 thousand USD per batch. Market contracts add 10 thousand USD when the market is firm and 2 thousand USD when it is normal, while weak-market storage costs reduce profit by 6 thousand USD.</p>
+<p>Production records and demand forecasts indicate that the precision line will process 70 batches in a firm market, 55 in a normal market, and 40 in a weak market. The standard line is expected to process 85, 65, and 50 batches under those respective conditions.</p>
+<p>The precision line earns more per batch, while the standard line receives more contract income and processes more batches in every market condition.</p>
+        `,
         solutionSections: [
           {
             title: "C1: Interpreting decision alternatives, events, consequences, and states",
@@ -2064,6 +2202,11 @@ $$
 <li><strong>(C1)</strong> Interpreting decision alternatives, events, consequences, and states.
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
+        `,
+        narrativeDescriptionHtml: String.raw`
+<p>A library system must choose a mobile library or pop-up branches. The program budget provides 8 thousand USD for the mobile library and 11 thousand USD for pop-up branches. When attendance is high, funding provides 0.7 thousand USD for each group served and a further 5 thousand USD for the program. When attendance is low, it provides 0.4 thousand USD per group, while unrecovered venue and publicity costs reduce the result by 2 thousand USD. The estimates come from earlier participation, operating costs, and the funding schedule.</p>
+<p>Attendance forecasts show the mobile library serving 50 groups under high attendance and 30 under low attendance. Pop-up branches are expected to serve 45 and 35 groups, respectively.</p>
+<p>The mobile library serves more groups under high attendance, while pop-up branches serve more under low attendance and receive the larger initial program allocation.</p>
         `,
         solutionSections: [
           {
@@ -2145,6 +2288,11 @@ $$
 <li><strong>(C1)</strong> Interpreting decision alternatives, events, consequences, and states.
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
+        `,
+        narrativeDescriptionHtml: String.raw`
+<p>A grain terminal must choose a day, night, or split loading schedule. Labor contracts provide 12 thousand USD of operating income for the day schedule, 8 thousand USD for the night schedule, and 10 thousand USD for the split schedule. Open export channels earn 0.6 thousand USD per cargo lot and provide 7 thousand USD of priority-access income. Restricted channels earn 0.3 thousand USD per lot and impose 3 thousand USD of rescheduling costs. The estimates come from prior volumes, labor costs, and forecasts of export restrictions.</p>
+<p>The day schedule is expected to handle 90 lots with open channels and 55 with restricted channels. The night schedule is expected to handle 75 and 60 lots, respectively, and the split schedule 85 and 65 lots, respectively.</p>
+<p>The day schedule handles the most lots when channels are open, while the split schedule handles the most under restricted conditions.</p>
         `,
         solutionSections: [
           {
@@ -2231,6 +2379,11 @@ $$
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
         `,
+        narrativeDescriptionHtml: String.raw`
+<p>A city food hub must choose electric or manual sorting for produce crates. The electric system’s service contract provides 9 thousand USD of income and earnings of 0.6 thousand USD per crate. Manual sorting receives 14 thousand USD under its contract and earns 0.4 thousand USD per crate. Strong demand adds 0.2 thousand USD to the earnings from each crate and brings 6 thousand USD of distributor incentives. Soft demand adds 0.1 thousand USD per crate, while unused-capacity costs reduce profit by 3 thousand USD. These estimates come from distribution forecasts, labor costs, equipment expenses, and recent demand.</p>
+<p>The hub expects electric sorting to process 70 crates under strong demand and 45 under soft demand. Manual sorting is expected to process 80 and 55 crates, respectively.</p>
+<p>Electric sorting earns more per crate before demand-related income, while manual sorting receives more contract income and processes more crates under both demand conditions.</p>
+        `,
         solutionSections: [
           {
             title: "C1: Interpreting decision alternatives, events, consequences, and states",
@@ -2316,6 +2469,11 @@ $$
 <li><strong>(C1)</strong> Interpreting decision alternatives, events, consequences, and states.
 </li><li><strong>(C2)</strong> Building the payoff table.
 </li></ol>
+        `,
+        narrativeDescriptionHtml: String.raw`
+<p>A rail operator must choose an express or flexible service for moving freight lots. The express contract provides 10 thousand USD of service income and earnings of 0.8 thousand USD per lot. The flexible contract provides 15 thousand USD and earnings of 0.6 thousand USD per lot. Clear conditions add 0.2 thousand USD to the earnings from each lot and produce 5 thousand USD of on-time-delivery bonuses. Busy conditions add 0.1 thousand USD per lot and bring no additional bonus or cost. Disruptions reduce earnings by 0.1 thousand USD for every lot and impose a further 7 thousand USD of rerouting costs. The estimates come from past volumes, operating costs, and network simulations.</p>
+<p>Volume forecasts show the express service moving 85 lots under clear conditions, 65 under busy conditions, and 40 under disrupted conditions. The flexible service is expected to move 75, 70, and 50 lots under those respective conditions.</p>
+<p>Express service earns more for each lot before network-related income or costs, while flexible service maintains higher forecast volumes under busy and disrupted conditions.</p>
         `,
         solutionSections: [
           {
