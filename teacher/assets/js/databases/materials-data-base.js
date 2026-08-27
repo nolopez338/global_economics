@@ -1,7 +1,8 @@
 /*
   Purpose:
-  Stores date-independent materials for every grade, term, and class combination.
+  Manually maintained date-independent materials catalog. This file is authoritative.
 */
+// Edit records directly; schedule generation must never overwrite this file.
 
 window.MATERIALS_DATA_BASE = [
   {

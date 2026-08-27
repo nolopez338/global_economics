@@ -1,10 +1,8 @@
 /*
   Purpose:
-  Stores dated class materials generated from the schedule and base materials catalog.
+  Manually maintained dated class materials. This file is authoritative.
 */
-// AUTO-GENERATED FILE
-// Generated from schedule.csv and materials-data-base.js by generate-schedule-data.js
-// Do not edit manually.
+// Edit records directly; schedule generation must never overwrite this file.
 window.MATERIALS_DATA = [
   {
     "Grade": 10,

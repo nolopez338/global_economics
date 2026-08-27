@@ -300,6 +300,65 @@ node teacher/authoring/generate-schedule-data.js
 records to `window.SCHEDULE_DATA`; do not edit it by hand. It is consumed by
 class pages, Full Schedule, and the generated prototype.
 
+The schedule generator writes **only** `assets/js/databases/schedule-data.js`.
+It neither reads nor writes either materials database.
+
+### Manually maintained materials databases
+
+The materials files are independent, authoritative, hand-authored databases:
+
+- `assets/js/databases/materials-data-base.js` is the undated catalog. Each
+  record requires integer `Grade` and `Term`, a non-empty numeric string
+  `Class #`, and a `Materials` array. Its unique key is
+  `Grade/Term/Class #`.
+- `assets/js/databases/materials-data.js` contains dated meetings. Each record
+  requires integer `Grade` and `Term`, an uppercase-letter `Section`, a
+  meeting-shaped `Class #` (for example `1-2`), an ISO `Date`, and a
+  `Materials` array. Its unique key is `Grade/Section/Date`; `Term` is required
+  metadata but is not part of navigation identity.
+
+Every material requires exactly the documented core values `Acronym`, `Name`,
+and `Hyperlink`. Acronyms must contain 1–4 non-whitespace characters, names
+must be non-empty, and hyperlinks must be absolute HTTP or HTTPS URLs. Empty
+material arrays are valid and render an empty state. Additional record or
+material properties are accepted with a console/validator warning, so an
+intentional metadata addition does not disable pages while remaining visible
+to maintainers.
+
+Edit the appropriate JavaScript array directly. To add a dated meeting, add a
+unique record to `materials-data.js`; to change the general catalog, edit
+`materials-data-base.js`. Similar content may intentionally be duplicated. If
+a change applies both generally and to existing dated meetings, update both
+files manually—there is no synchronization and neither is derived from the
+schedule CSV. Validate without modifying either file:
+
+```bash
+node teacher/authoring/validate-materials-data.js
+node --test teacher/authoring/tests/materials-workflow.test.js
+```
+
+The validator reports totals, valid/invalid records, every record error and
+warning, malformed values, empty collections, and duplicate keys. To preview
+from the repository root:
+
+```bash
+python3 -m http.server 8000
+# Open http://localhost:8000/teacher/pages/materials.html?grade=10&section=B&date=2026-08-18
+```
+
+That example renders Grade 10B, Class 1-2. With no query string the same page
+renders the base catalog. Supplying any dated parameter requires all three of
+`grade`, `section`, and `date`.
+
+To prove ordinary schedule generation preserved manual work, hash both files,
+run the generator, and compare the hashes:
+
+```bash
+sha256sum teacher/assets/js/databases/materials-data.js teacher/assets/js/databases/materials-data-base.js > /tmp/materials.before
+node teacher/authoring/generate-schedule-data.js
+sha256sum -c /tmp/materials.before
+```
+
 ### Retained schedule datasets
 
 - `assets/js/schedule-data - 2025-2026.js` is an auto-generated historical
