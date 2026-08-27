@@ -26,6 +26,7 @@
 
     const selected = new Map(selectors.map(({ key }) => [key, new Set()]));
     const summaries = new Map();
+    let preferredDescriptionMode = "structured";
     controls.classList.toggle("practice-selector__controls--problem-only", selectors.length === 0);
 
     function configuredOptions(selector) {
@@ -118,12 +119,32 @@
           ? `<li><strong>${escapeHtml(label)}:</strong> ${values.map(escapeHtml).join(", ")}</li>` : "";
       }).join("");
       const solutionId = `${problem.id}-solution`;
+      const hasNarrativeDescription = typeof problem.narrativeDescriptionHtml === "string"
+        && problem.narrativeDescriptionHtml.trim() !== "";
+      const descriptionMode = hasNarrativeDescription ? preferredDescriptionMode : "structured";
+      const descriptionHtml = descriptionMode === "narrative"
+        ? problem.narrativeDescriptionHtml : problem.descriptionHtml;
+      const descriptionControlId = `${problem.id}-description-format`;
+      const descriptionControl = hasNarrativeDescription ? `
+          <fieldset class="practice-description-mode">
+            <legend>Description format</legend>
+            <div class="practice-description-mode__choices">
+              <label for="${descriptionControlId}-structured">
+                <input id="${descriptionControlId}-structured" type="radio" name="${descriptionControlId}" value="structured"${descriptionMode === "structured" ? " checked" : ""}>
+                <span>Structured</span>
+              </label>
+              <label for="${descriptionControlId}-narrative">
+                <input id="${descriptionControlId}-narrative" type="radio" name="${descriptionControlId}" value="narrative"${descriptionMode === "narrative" ? " checked" : ""}>
+                <span>Narrative</span>
+              </label>
+            </div>
+          </fieldset>` : "";
       const sections = problem.solutionSections.map((section) =>
         `<section class="practice-solution__section"><h4>${escapeHtml(section.title)}</h4><div class="content-block">${section.contentHtml}</div></section>`
       ).join("");
       region.innerHTML = `<h2>${escapeHtml(problem.labels?.name ?? problem.name)}</h2>
         ${metadata ? `<ul class="practice-problem__metadata" aria-label="Problem properties">${metadata}</ul>` : ""}
-        <div class="example"><h3>Problem description</h3><div class="content-block">${problem.descriptionHtml}</div></div>
+        <div class="example practice-description"><div class="practice-description__header"><h3>Problem description</h3>${descriptionControl}</div><div class="content-block practice-description__content">${descriptionHtml}</div></div>
         <div class="subsection-minimize collapsed practice-solution" data-region="subsection">
           <button class="subsection-toggle" type="button" aria-expanded="false" aria-controls="${solutionId}">
             <span class="toggle-label">Solution</span><span class="toggle-icon" aria-hidden="true">+</span>
@@ -179,6 +200,19 @@
       button.setAttribute("aria-expanded", String(expanded));
       button.querySelector(".toggle-icon").textContent = expanded ? "−" : "+";
       button.closest(".subsection-minimize").classList.toggle("collapsed", !expanded);
+    });
+    region.addEventListener("change", (event) => {
+      const input = event.target.closest('.practice-description-mode input[type="radio"]');
+      if (!input || !input.checked) return;
+      const problem = matchingProblems().find(({ id }) => id === problemSelect.value);
+      if (!problem || typeof problem.narrativeDescriptionHtml !== "string"
+        || problem.narrativeDescriptionHtml.trim() === "") return;
+      preferredDescriptionMode = input.value === "narrative" ? "narrative" : "structured";
+      const description = region.querySelector(".practice-description__content");
+      if (window.MathJax?.typesetClear) window.MathJax.typesetClear([description]);
+      description.innerHTML = preferredDescriptionMode === "narrative"
+        ? problem.narrativeDescriptionHtml : problem.descriptionHtml;
+      typeset(description);
     });
     document.addEventListener("click", (event) => {
       if (!event.target.closest(".practice-multiselect")) controls.querySelectorAll(".practice-multiselect[open]").forEach((details) => { details.open = false; });
