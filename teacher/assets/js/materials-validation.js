@@ -17,6 +17,28 @@
   var DATED_REQUIRED = ["Grade", "Term", "Section", "Class #", "Date", "Materials"];
   var BASE_REQUIRED = ["Grade", "Term", "Class #", "Materials"];
 
+  // Compare what the user sees, rather than the stored category slug. Keeping
+  // these aliases narrow prevents useful descriptions containing words such as
+  // "slide" or "activity" from being rejected.
+  var REDUNDANT_CATEGORY_NAMES = Object.freeze({
+    "Slides": ["slide"],
+    "Classroom activities": ["classroom activity"],
+    "Practice activities": ["practice activity"],
+    "Extra resources": ["extra resource", "class material"]
+  });
+
+  function normalizeUserFacingLabel(value) {
+    return String(value || "").toLocaleLowerCase("en").replace(/[^a-z0-9]+/g, " ").trim().replace(/\s+/g, " ");
+  }
+
+  function isRedundantName(name, categoryValue) {
+    var category = CATEGORIES.find(function (item) { return item.value === categoryValue; });
+    if (!category) return false;
+    var normalizedName = normalizeUserFacingLabel(name);
+    var equivalents = [category.label].concat(REDUNDANT_CATEGORY_NAMES[category.label] || []);
+    return equivalents.some(function (label) { return normalizedName === normalizeUserFacingLabel(label); });
+  }
+
   function normalizeDate(value) {
     var match = String(value || "").trim().match(/^(\d{4})\s*(?:-|\/)\s*(\d{1,2})\s*(?:-|\/)\s*(\d{1,2})$/);
     if (!match) return null;
@@ -63,10 +85,16 @@
       if (typeof material.Acronym !== "string" || !material.Acronym.trim()) errors.push(label + " Acronym must be a non-empty string");
       else if (material.Acronym.trim().length > MAX_ACRONYM_LENGTH) errors.push(label + " Acronym exceeds " + MAX_ACRONYM_LENGTH + " characters");
       if (typeof material.Name !== "string" || !material.Name.trim()) errors.push(label + " Name must be a non-empty string");
+      else if (isRedundantName(material.Name, material.Category)) errors.push(label + " Name \"" + material.Name.trim() + "\" repeats category \"" + categoryDefinitionLabel(material.Category) + "\"");
       if (!validUrl(material.Hyperlink)) errors.push(label + " Hyperlink must be an HTTP or HTTPS URL");
       if (typeof material.Category !== "string" || !CATEGORY_VALUES.includes(material.Category)) errors.push(label + " Category must be one of: " + CATEGORY_VALUES.join(", "));
     });
     return { valid: !errors.length, errors: errors, warnings: warnings };
+  }
+
+  function categoryDefinitionLabel(value) {
+    var category = CATEGORIES.find(function (item) { return item.value === value; });
+    return category ? category.label : value;
   }
 
   function validateRecord(record, kind) {
@@ -103,5 +131,5 @@
     return { valid: records.every(function (item) { return item.valid; }) && !duplicates.length, total: records.length, validCount: records.filter(function (item) { return item.valid; }).length, invalidCount: records.filter(function (item) { return !item.valid; }).length, records: records, duplicates: duplicates };
   }
 
-  return { MAX_ACRONYM_LENGTH: MAX_ACRONYM_LENGTH, CATEGORIES: CATEGORIES, CATEGORY_VALUES: CATEGORY_VALUES, normalizeDate: normalizeDate, normalizeRequest: normalizeRequest, validUrl: validUrl, validateMaterials: validateMaterials, validateRecord: validateRecord, recordKey: recordKey, audit: audit };
+  return { MAX_ACRONYM_LENGTH: MAX_ACRONYM_LENGTH, CATEGORIES: CATEGORIES, CATEGORY_VALUES: CATEGORY_VALUES, normalizeUserFacingLabel: normalizeUserFacingLabel, isRedundantName: isRedundantName, normalizeDate: normalizeDate, normalizeRequest: normalizeRequest, validUrl: validUrl, validateMaterials: validateMaterials, validateRecord: validateRecord, recordKey: recordKey, audit: audit };
 });
