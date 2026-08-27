@@ -16,6 +16,7 @@
     const controls = document.getElementById("practice-selector-controls");
     const status = document.getElementById("practice-selector-status");
     const region = document.getElementById("selected-problem");
+    const commonDescriptionFooter = document.getElementById("practice-description-common-footer");
     if (!data || !controls || !status || !region) return;
 
     const selectors = data.selectors || [];
@@ -112,6 +113,24 @@
         console.error("MathJax typesetting failed:", error));
     }
 
+    function completeDescription(descriptionHtml) {
+      if (!(commonDescriptionFooter instanceof HTMLTemplateElement)) return descriptionHtml;
+      const description = document.createElement("template");
+      description.innerHTML = descriptionHtml;
+      const questionsHeading = [...description.content.querySelectorAll("h4")]
+        .find((heading) => heading.textContent.trim() === "Questions/Tasks");
+      if (questionsHeading) {
+        let element = questionsHeading;
+        do {
+          const next = element.nextElementSibling;
+          element.remove();
+          element = next;
+        } while (element);
+      }
+      description.content.append(commonDescriptionFooter.content.cloneNode(true));
+      return description.innerHTML;
+    }
+
     function renderProblem(problem) {
       const metadata = selectors.map(({ key, label }) => {
         const values = valuesFor(problem, key);
@@ -122,8 +141,8 @@
       const hasNarrativeDescription = typeof problem.narrativeDescriptionHtml === "string"
         && problem.narrativeDescriptionHtml.trim() !== "";
       const descriptionMode = hasNarrativeDescription ? preferredDescriptionMode : "structured";
-      const descriptionHtml = descriptionMode === "narrative"
-        ? problem.narrativeDescriptionHtml : problem.descriptionHtml;
+      const descriptionHtml = completeDescription(descriptionMode === "narrative"
+        ? problem.narrativeDescriptionHtml : problem.descriptionHtml);
       const descriptionControlId = `${problem.id}-description-format`;
       const descriptionControl = hasNarrativeDescription ? `
           <fieldset class="practice-description-mode">
@@ -210,8 +229,8 @@
       preferredDescriptionMode = input.value === "narrative" ? "narrative" : "structured";
       const description = region.querySelector(".practice-description__content");
       if (window.MathJax?.typesetClear) window.MathJax.typesetClear([description]);
-      description.innerHTML = preferredDescriptionMode === "narrative"
-        ? problem.narrativeDescriptionHtml : problem.descriptionHtml;
+      description.innerHTML = completeDescription(preferredDescriptionMode === "narrative"
+        ? problem.narrativeDescriptionHtml : problem.descriptionHtml);
       typeset(description);
     });
     document.addEventListener("click", (event) => {
