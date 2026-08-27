@@ -117,8 +117,8 @@
       if (!(commonDescriptionFooter instanceof HTMLTemplateElement)) return descriptionHtml;
       const description = document.createElement("template");
       description.innerHTML = descriptionHtml;
-      const questionsHeading = [...description.content.querySelectorAll("h4")]
-        .find((heading) => heading.textContent.trim() === "Questions/Tasks");
+      const questionsHeading = [...description.content.querySelectorAll("h4, strong")]
+        .find((heading) => heading.textContent.trim().replace(/\.$/, "") === "Questions/Tasks");
       if (questionsHeading) {
         let element = questionsHeading;
         do {
