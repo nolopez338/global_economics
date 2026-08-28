@@ -46,6 +46,17 @@ test("dated page renders heading, class, safe cards, links, and accessible label
   cards.forEach(card => { assert.equal(card.target, "_blank"); assert.equal(card.rel, "noopener noreferrer"); assert.match(card.href, /^https:/); assert.match(card.attributes["aria-label"], /^Open .* \(.+\) for Grade 10B/); assert.ok(card.className.includes(`material-card--${matchesCategory(card.children[2].textContent)}`)); });
 });
 
+test("Grade 10E example renders criteria name and unchanged category badge", () => {
+  const data = load("materials-data").MATERIALS_DATA;
+  const page = render("?grade=10&section=E&date=2026-08-27", { MATERIALS_DATA: data });
+  const card = page.content.children[1].children.find(item => item.href.endsWith("G10_T1_C1C3_practice_activity2_print1_solved.pdf"));
+  assert.ok(card);
+  assert.equal(card.children[1].className, "class-label");
+  assert.equal(card.children[1].textContent, "C1 & C3");
+  assert.equal(card.children[2].className, "material-category");
+  assert.equal(card.children[2].textContent, "Classroom activities");
+});
+
 function matchesCategory(label) { return v.CATEGORIES.find(category => category.label === label).value; }
 
 test("canonical categories validate and invalid categories do not", () => {
@@ -63,12 +74,59 @@ test("canonical categories validate and invalid categories do not", () => {
   assert.deepEqual(warned.warnings, ["Materials[0] has unknown property Unrelated"]);
 });
 
+test("redundant material names are normalized narrowly and rejected", () => {
+  for (const candidate of [
+    material({ Name: "Slides", Category: "slides" }),
+    material({ Name: "  sLiDeS  ", Category: "slides" }),
+    material({ Name: "Slides!!!", Category: "slides" }),
+    material({ Name: "Slide", Category: "slides" }),
+    material({ Name: " Classroom---  activities ", Category: "classroom-activities" }),
+    material({ Name: "Classroom activity", Category: "classroom-activities" }),
+    material({ Name: "Practice activity", Category: "practice-activities" }),
+    material({ Name: "Class material", Category: "extra-resources" })
+  ]) {
+    const result = v.validateMaterials([candidate]);
+    assert.equal(result.valid, false);
+    assert.match(result.errors.join("; "), /Materials\[0\].*repeats category/);
+  }
+  for (const candidate of [
+    material({ Name: "C1 & C3", Category: "classroom-activities" }),
+    material({ Name: "Term 1 outline", Category: "extra-resources" }),
+    material({ Name: "Introductory slide", Category: "slides" }),
+    material({ Name: "Probability practice", Category: "practice-activities" })
+  ]) assert.equal(v.validateMaterials([candidate]).valid, true);
+});
+
 test("both complete databases contain only canonical categories and pass audit", () => {
   for (const [file, kind, globalName] of [["materials-data", "dated", "MATERIALS_DATA"], ["materials-data-base", "base", "MATERIALS_DATA_BASE"]]) {
     const data = load(file)[globalName];
     assert.equal(v.audit(data, kind).valid, true);
-    data.flatMap(record => record.Materials).forEach(item => assert.ok(v.CATEGORY_VALUES.includes(item.Category)));
+    data.flatMap(record => record.Materials).forEach(item => {
+      assert.ok(v.CATEGORY_VALUES.includes(item.Category));
+      assert.equal(v.isRedundantName(item.Name, item.Category), false, `${file}: ${item.Name} / ${item.Category}`);
+    });
   }
+});
+
+test("shared base and dated materials have synchronized metadata", () => {
+  const baseMaterials = load("materials-data-base").MATERIALS_DATA_BASE.flatMap(record => record.Materials);
+  const datedMaterials = load("materials-data").MATERIALS_DATA.flatMap(record => record.Materials);
+  const metadataByUrl = new Map();
+  baseMaterials.forEach(item => {
+    const metadata = JSON.stringify({ Acronym: item.Acronym, Name: item.Name, Category: item.Category });
+    if (metadataByUrl.has(item.Hyperlink)) assert.equal(metadataByUrl.get(item.Hyperlink), metadata);
+    metadataByUrl.set(item.Hyperlink, metadata);
+  });
+  datedMaterials.forEach(item => {
+    if (metadataByUrl.has(item.Hyperlink)) assert.equal(
+      JSON.stringify({ Acronym: item.Acronym, Name: item.Name, Category: item.Category }),
+      metadataByUrl.get(item.Hyperlink),
+      item.Hyperlink
+    );
+  });
+  const datedOnly = material({ Name: "Dated handout", Hyperlink: "https://example.com/dated-only.pdf" });
+  assert.equal(v.audit([dated({ Materials: [datedOnly] })], "dated").valid, true);
+  assert.equal(metadataByUrl.has(datedOnly.Hyperlink), false);
 });
 
 test("dated and base cards use controlled classes, visible labels, and category accessible names", () => {

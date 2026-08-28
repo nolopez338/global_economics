@@ -318,10 +318,14 @@ The materials files are independent, authoritative, hand-authored databases:
   metadata but is not part of navigation identity.
 
 Every material requires exactly the documented core values `Acronym`, `Name`,
-and `Hyperlink`. Acronyms must contain 1–4 non-whitespace characters, names
-must be non-empty, and hyperlinks must be absolute HTTP or HTTPS URLs. Empty
-material arrays are valid and render an empty state. Additional record or
-material properties are accepted with a console/validator warning, so an
+`Hyperlink`, and `Category`. Acronyms must contain 1–4 non-whitespace
+characters, names must be non-empty, and hyperlinks must be absolute HTTP or
+HTTPS URLs. `Category` supplies the canonical broad badge; `Name` supplies the
+concise resource-specific card label (for example, criteria, topic, or
+purpose). A name that merely repeats its user-facing category label—including
+case, spacing, punctuation, and obvious singular/plural variations—is invalid.
+Empty material arrays are valid and render an empty state. Additional record
+or material properties are accepted with a console/validator warning, so an
 intentional metadata addition does not disable pages while remaining visible
 to maintainers.
 
@@ -330,7 +334,11 @@ unique record to `materials-data.js`; to change the general catalog, edit
 `materials-data-base.js`. Similar content may intentionally be duplicated. If
 a change applies both generally and to existing dated meetings, update both
 files manually—there is no synchronization and neither is derived from the
-schedule CSV. Validate without modifying either file:
+schedule CSV. The base catalog is the authoritative source for shared material
+metadata: make a shared metadata correction there first, then manually copy it
+to every corresponding dated occurrence. Identical hyperlinks shared between
+the catalogs must retain identical `Acronym`, `Name`, and `Category` values;
+dated-only materials remain supported. Validate without modifying either file:
 
 ```bash
 node teacher/authoring/validate-materials-data.js
