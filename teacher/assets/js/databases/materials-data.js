@@ -4365,9 +4365,21 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-14",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
+        "Acronym": "C1S",
+        "Name": "C1 Introduction slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade11/src/pages/term1/g11-t1-c1-intro.html",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "C1 Class activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_1/4-extra_material/G11_T1_C1_practice_activity1_print1_solved.pdf",
+        "Category": "classroom-activities"
+      },
+      {
+        "Acronym": "GIS",
+        "Name": "General introduction slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade11/src/G11_curriculum_outline.html",
         "Category": "extra-resources"
       }
     ]
@@ -4380,10 +4392,28 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-21",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C1S",
+        "Name": "C1 Introduction slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade11/src/pages/term1/g11-t1-c1-intro.html",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "C1 Class activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_1/4-extra_material/G11_T1_C1_practice_activity1_print1_solved.pdf",
+        "Category": "classroom-activities"
+      },
+      {
+        "Acronym": "PA",
+        "Name": "C1 Practice",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_1/1-practice_activities/G11_T1_C1_practice_activity1.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C2S",
+        "Name": "C2 Introduction slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade11/src/pages/term1/g11-t1-c2-intro.html",
+        "Category": "slides"
       }
     ]
   },
@@ -4395,10 +4425,22 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-25",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C2S2",
+        "Name": "C2 second, more detailed introduction",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade11/src/pages/term1/g11-t1-c2-intro2.html",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "C2 Class activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_1/4-extra_material/G11_T1_C2_practice_activity2_print1_solved.pdf",
+        "Category": "classroom-activities"
+      },
+      {
+        "Acronym": "PA",
+        "Name": "C2 Practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_1/1-practice_activities/G11_T1_C2_practice_activity2.pdf",
+        "Category": "practice-activities"
       }
     ]
   },
@@ -4410,10 +4452,16 @@ window.MATERIALS_DATA = [
     "Date": "2026-08-31",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "PA",
+        "Name": "C3 Practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_1/1-practice_activities/G11_T1_C3_practice_activity3.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C3S",
+        "Name": "C3 Introduction slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade11/src/pages/term1/g11-t1-c3-intro.html",
+        "Category": "slides"
       }
     ]
   },
