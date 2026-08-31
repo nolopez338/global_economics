@@ -1,6 +1,7 @@
 /*
   Purpose:
   Manually maintained date-independent materials catalog. This file is authoritative.
+  materials-data-base.js is the date-independent master catalog; materials-data.js is the dated, section-specific schedule that assigns those materials to actual class dates.
 */
 // Edit records directly; schedule generation must never overwrite this file.
 
