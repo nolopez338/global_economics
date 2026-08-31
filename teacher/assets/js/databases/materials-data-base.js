@@ -864,6 +864,31 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "4",
     "Materials": [
       {
+        "Acronym": "C2S2",
+        "Name": "C2 second more detailed introduction",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade11/src/pages/term1/g11-t1-c2-intro2.html",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "C2 Class activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_1/4-extra_material/G11_T1_C2_practice_activity2_print1_solved.pdf",
+        "Category": "classroom-activities"
+      },
+      {
+        "Acronym": "PA",
+        "Name": "C2 Practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_1/1-practice_activities/G11_T1_C2_practice_activity2.pdf",
+        "Category": "practice-activities"
+      }
+    ]
+  },
+  {
+    "Grade": 11,
+    "Term": 1,
+    "Class #": "5",
+    "Materials": [
+      {
         "Acronym": "PA",
         "Name": "C3 practice activity",
         "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_1/1-practice_activities/G11_T1_C3_practice_activity3.pdf",
@@ -874,19 +899,6 @@ window.MATERIALS_DATA_BASE = [
         "Name": "C3 Intro slides",
         "Hyperlink": "https://nolopez338.github.io/global_economics/grade11/src/pages/term1/g11-t1-c3-intro.html",
         "Category": "slides"
-      }
-    ]
-  },
-  {
-    "Grade": 11,
-    "Term": 1,
-    "Class #": "5",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
       }
     ]
   },
