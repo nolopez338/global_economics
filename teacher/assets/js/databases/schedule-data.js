@@ -5583,7 +5583,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "C2 Exploration and Activity 2",
+    "Description": "C2 Exploration and Activity 2 (Half Class)",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
