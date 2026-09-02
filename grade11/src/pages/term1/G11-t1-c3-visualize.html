@@ -1,0 +1,2826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Uniform Distribution: 24-Hour Cylinder</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #f4f6f8;
+        color: #1f2937;
+    }
+
+    .page {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 24px;
+    }
+
+    h1 {
+        margin: 0 0 8px;
+        font-size: 30px;
+        text-align: center;
+    }
+
+    .subtitle {
+        text-align: center;
+        margin-bottom: 24px;
+        color: #5b6470;
+        font-size: 16px;
+    }
+
+    .section {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .section h2 {
+        margin: 0 0 14px;
+        font-size: 21px;
+    }
+
+    .pdf-container {
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    #pdfCanvas {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    .formula {
+        text-align: center;
+        font-size: 21px;
+        margin: 8px 0 4px;
+        font-family: Georgia, serif;
+    }
+
+    .explanation {
+        text-align: center;
+        color: #667085;
+        margin: 0;
+    }
+
+    .status-panel {
+        border: 1px solid #d8dde4;
+        border-radius: 10px;
+        padding: 18px;
+        background: #fafbfc;
+    }
+
+    .status-title {
+        font-weight: bold;
+        margin-bottom: 12px;
+    }
+
+    .status {
+        padding: 12px;
+        border-radius: 7px;
+        background: #eef2f6;
+        margin-bottom: 18px;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .status.select-first {
+        background: #eaf3ff;
+        color: #174ea6;
+    }
+
+    .status.select-second {
+        background: #fff4df;
+        color: #8a5100;
+    }
+
+    .status.complete {
+        background: #e8f7ed;
+        color: #146c2e;
+    }
+
+    .point-display {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 18px;
+    }
+
+    .point-card {
+        border: 1px solid #d8dde4;
+        border-radius: 7px;
+        padding: 10px;
+        background: white;
+        text-align: center;
+    }
+
+    .point-label {
+        font-size: 12px;
+        color: #667085;
+        margin-bottom: 4px;
+    }
+
+    .point-value {
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .result {
+        border-top: 1px solid #d8dde4;
+        padding-top: 16px;
+    }
+
+    .result-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 7px 0;
+        gap: 12px;
+    }
+
+    .result-row span:first-child {
+        color: #667085;
+    }
+
+    .result-row span:last-child {
+        font-weight: 600;
+        text-align: right;
+    }
+
+    .probability {
+        font-size: 22px;
+        text-align: center;
+        font-family: Georgia, serif;
+        margin: 14px 0;
+        padding: 12px;
+        background: white;
+        border-radius: 7px;
+        border: 1px solid #d8dde4;
+    }
+
+    button {
+        width: 100%;
+        padding: 11px 14px;
+        border: none;
+        border-radius: 7px;
+        background: #344054;
+        color: white;
+        font-size: 15px;
+        cursor: pointer;
+        margin-top: 14px;
+    }
+
+    button:hover {
+        background: #1f2937;
+    }
+
+    .mapping-box {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 8px;
+        background: #f8fafc;
+        border: 1px solid #d8dde4;
+    }
+
+    .mapping-box h3 {
+        margin: 0 0 8px;
+        font-size: 16px;
+    }
+
+    .mapping-equation {
+        font-family: Georgia, serif;
+        text-align: center;
+        font-size: 18px;
+        margin: 10px 0;
+    }
+
+    .cyclic-note {
+        margin-top: 12px;
+        padding: 10px;
+        background: #fff8e7;
+        border-left: 4px solid #d99a00;
+        font-size: 13px;
+        line-height: 1.45;
+    }
+
+    .legend {
+        display: flex;
+        justify-content: center;
+        gap: 24px;
+        flex-wrap: wrap;
+        margin-top: 14px;
+        font-size: 14px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .legend-color {
+        width: 16px;
+        height: 16px;
+        border-radius: 3px;
+        border: 1px solid rgba(0,0,0,0.15);
+    }
+
+    .selection-layout {
+        display: grid;
+        grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr) auto;
+        gap: 14px 20px;
+        align-items: center;
+    }
+
+    .selection-layout .status {
+        margin-bottom: 0;
+    }
+
+    .selection-layout .point-display {
+        margin-bottom: 0;
+    }
+
+    .selection-layout button {
+        width: auto;
+        min-width: 160px;
+        margin-top: 0;
+    }
+
+    .visualizations-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 20px;
+        align-items: stretch;
+    }
+
+    .visualization-section {
+        min-width: 0;
+        margin-bottom: 0;
+    }
+
+    .visualization-section #threeContainer {
+        height: 600px;
+    }
+
+    /* Interval information inside the PDF section */
+    .pdf-interval-info {
+        margin-top: 18px;
+        padding: 14px 16px;
+        border: 1px solid #d8dde4;
+        border-radius: 8px;
+        background: #fafbfc;
+    }
+
+    .pdf-interval-info .result-row {
+        padding: 6px 0;
+    }
+
+    .pdf-calculation {
+        margin-top: 12px;
+        padding: 12px;
+        background: white;
+        border: 1px solid #d8dde4;
+        border-radius: 7px;
+        text-align: center;
+        font-family: Georgia, serif;
+        font-size: 19px;
+        line-height: 1.6;
+    }
+
+    .pdf-calculation .calculation-label {
+        display: block;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 13px;
+        color: #667085;
+        margin-bottom: 4px;
+    }
+
+    @media (max-width: 900px) {
+        .visualizations-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .visualization-section {
+            margin-bottom: 20px;
+        }
+
+        .visualization-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .selection-layout {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .selection-layout button {
+            grid-column: 1 / -1;
+            width: 100%;
+            margin-top: 0;
+        }
+
+        .visualization-section #threeContainer {
+            height: 500px;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .page {
+            padding: 12px;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        #threeContainer {
+            height: 420px;
+        }
+
+        .selection-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .selection-layout button {
+            grid-column: auto;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <h1>Wrapping a Uniform Distribution Around a Cylinder</h1>
+
+    <p class="subtitle">
+        Explore how intervals on a 24-hour cylinder correspond to intervals on the uniform PDF.
+    </p>
+
+    <!-- ========================================================= -->
+    <!-- 1. INTERVAL SELECTION -->
+    <!-- ========================================================= -->
+
+    <section class="section interval-selection-section">
+
+        <h2>Interval Selection</h2>
+
+        <div class="selection-layout">
+
+            <!-- Selection status -->
+            <div id="status" class="status select-first">
+                Select first point
+            </div>
+
+            <!-- Selected points -->
+            <div class="point-display">
+
+                <div class="point-card">
+                    <div class="point-label">Start</div>
+                    <div id="startValue" class="point-value">—</div>
+                </div>
+
+                <div class="point-card">
+                    <div class="point-label">End</div>
+                    <div id="endValue" class="point-value">—</div>
+                </div>
+
+            </div>
+
+            <!-- Action -->
+            <div class="selection-actions">
+                <button id="clearButton">
+                    Clear selection
+                </button>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- 2. VISUALIZATIONS -->
+    <!-- ========================================================= -->
+
+    <div class="visualizations-layout">
+
+        <!-- ========================================================= -->
+        <!-- 2A. PDF -->
+        <!-- ========================================================= -->
+
+        <section class="section visualization-section">
+
+            <h2>1. The 24-Hour Uniform Distribution</h2>
+
+            <div class="formula">
+                X ∼ Uniform(0, 24)
+            </div>
+
+            <div class="pdf-container">
+                <canvas id="pdfCanvas" width="1000" height="390"></canvas>
+            </div>
+
+            <p class="explanation">
+                Every hour has the same probability density. The total rectangular area is 1.
+            </p>
+
+            <div class="legend">
+
+                <div class="legend-item">
+                    <div class="legend-color" style="background:#d9e9ff;"></div>
+                    Uniform PDF
+                </div>
+
+                <div class="legend-item">
+                    <div class="legend-color" style="background:#8fb9ee;"></div>
+                    Selected interval
+                </div>
+
+            </div>
+
+
+            <!-- ===================================================== -->
+            <!-- SELECTED INTERVAL INFORMATION -->
+            <!-- ===================================================== -->
+
+            <div class="pdf-interval-info">
+
+                <div class="result-row">
+                    <span>Interval</span>
+                    <span id="intervalValue">—</span>
+                </div>
+
+                <div class="result-row">
+                    <span>Length</span>
+                    <span id="lengthValue">—</span>
+                </div>
+
+                <div id="probabilityFormula" class="pdf-calculation">
+
+                    <span class="calculation-label">
+                        Probability calculation
+                    </span>
+
+                    P = —
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================================================= -->
+        <!-- 2B. CYLINDER -->
+        <!-- ========================================================= -->
+
+        <section class="section visualization-section">
+
+            <h2>2. Wrap the 24 Hours Around a Cylinder</h2>
+
+            <div id="threeContainer">
+
+                <div class="interaction-hint">
+                    <strong>Rotate:</strong> left-click and drag<br>
+                    <strong>Select:</strong> right-click the cylinder
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</div>
+
+
+<!-- ============================================================= -->
+<!-- THREE.JS -->
+<!-- ============================================================= -->
+
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+}
+</script>
+
+
+<script type="module">
+
+import * as THREE from "three";
+
+
+// ================================================================
+// CONSTANTS
+// ================================================================
+
+const HOURS = 24;
+const TWO_PI = Math.PI * 2;
+
+const RADIUS = 2.5;
+const HEIGHT = 3.5;
+
+const CYLINDER_SEGMENTS = 192;
+
+
+// ================================================================
+// DOM
+// ================================================================
+
+const container = document.getElementById("threeContainer");
+
+const statusElement = document.getElementById("status");
+
+const startValue = document.getElementById("startValue");
+const endValue = document.getElementById("endValue");
+
+const intervalValue = document.getElementById("intervalValue");
+const lengthValue = document.getElementById("lengthValue");
+const probabilityFormula = document.getElementById("probabilityFormula");
+
+const clearButton = document.getElementById("clearButton");
+
+
+// ================================================================
+// THREE.JS SCENE
+// ================================================================
+
+const scene = new THREE.Scene();
+
+scene.background = new THREE.Color(0xf3f5f7);
+
+
+// Fixed camera.
+// No OrbitControls are used.
+// The camera never moves or orbits.
+
+const camera = new THREE.OrthographicCamera(
+    -6,
+    6,
+    4.5,
+    -4.5,
+    0.1,
+    100
+);
+
+camera.position.set(8, 4.5, 9);
+camera.lookAt(0, 0, 0);
+
+
+// Renderer
+
+const renderer = new THREE.WebGLRenderer({
+    antialias: true
+});
+
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(container.clientWidth, container.clientHeight);
+
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+
+container.appendChild(renderer.domElement);
+
+
+// ================================================================
+// LIGHTING
+// ================================================================
+
+const ambientLight = new THREE.AmbientLight(
+    0xffffff,
+    1.8
+);
+
+scene.add(ambientLight);
+
+
+const directionalLight = new THREE.DirectionalLight(
+    0xffffff,
+    2.5
+);
+
+directionalLight.position.set(5, 8, 7);
+
+scene.add(directionalLight);
+
+
+// ================================================================
+// CYLINDER GROUP
+// ================================================================
+
+/*
+    Everything representing the cylinder is inside this group.
+
+    The group rotates ONLY around its Y axis.
+
+    Therefore:
+        group.rotation.y
+
+    is the only allowed 3D movement.
+*/
+
+const cylinderGroup = new THREE.Group();
+
+scene.add(cylinderGroup);
+
+
+// ================================================================
+// CYLINDER BODY
+// ================================================================
+
+const cylinderGeometry = new THREE.CylinderGeometry(
+    RADIUS,
+    RADIUS,
+    HEIGHT,
+    CYLINDER_SEGMENTS,
+    1,
+    false
+);
+
+const cylinderMaterial = new THREE.MeshStandardMaterial({
+    color: 0xe8edf3,
+    roughness: 0.82,
+    metalness: 0.0,
+    side: THREE.DoubleSide
+});
+
+const cylinder = new THREE.Mesh(
+    cylinderGeometry,
+    cylinderMaterial
+);
+
+cylinder.name = "selectableCylinder";
+
+cylinderGroup.add(cylinder);
+
+
+// ================================================================
+// CYLINDER EDGE LINES
+// ================================================================
+
+const edgeGeometry = new THREE.EdgesGeometry(
+    cylinderGeometry
+);
+
+const edgeMaterial = new THREE.LineBasicMaterial({
+    color: 0x8b96a5
+});
+
+const edgeLines = new THREE.LineSegments(
+    edgeGeometry,
+    edgeMaterial
+);
+
+cylinderGroup.add(edgeLines);
+
+
+// ================================================================
+// HOUR MARKINGS
+// ================================================================
+
+const markingsGroup = new THREE.Group();
+
+cylinderGroup.add(markingsGroup);
+
+
+// Convert hour to angular position.
+// Hour 0 is positioned at angle 0.
+// The angle increases continuously around the cylinder.
+
+function hourToAngle(hour) {
+
+    return (hour / HOURS) * TWO_PI;
+
+}
+
+
+// Create tick marks and labels.
+
+for (let hour = 0; hour < 24; hour++) {
+
+    const angle = hourToAngle(hour);
+
+    const x = RADIUS * Math.cos(angle);
+    const z = RADIUS * Math.sin(angle);
+
+    const isMajor = (
+        hour % 3 === 0
+    );
+
+    const tickLength = isMajor ? 0.32 : 0.16;
+
+    const tickStart = new THREE.Vector3(
+        x,
+        0,
+        z
+    );
+
+    const tickEnd = new THREE.Vector3(
+        (RADIUS + tickLength) * Math.cos(angle),
+        0,
+        (RADIUS + tickLength) * Math.sin(angle)
+    );
+
+    const tickGeometry = new THREE.BufferGeometry()
+        .setFromPoints([
+            tickStart,
+            tickEnd
+        ]);
+
+    const tick = new THREE.Line(
+        tickGeometry,
+        new THREE.LineBasicMaterial({
+            color: isMajor ? 0x344054 : 0x98a2b3
+        })
+    );
+
+    markingsGroup.add(tick);
+
+
+    // Hour label for major markings
+
+    if (isMajor) {
+
+        createHourLabel(
+            hour,
+            angle
+        );
+
+    }
+
+}
+
+
+// ================================================================
+// TEXT LABELS
+// ================================================================
+
+function createHourLabel(hour, angle) {
+
+    const canvas = document.createElement("canvas");
+
+    canvas.width = 128;
+    canvas.height = 64;
+
+    const ctx = canvas.getContext("2d");
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+    ctx.fillStyle = "#263238";
+
+    ctx.font = "bold 30px Arial";
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.fillText(
+        hour === 0 ? "0 / 24" : String(hour),
+        64,
+        32
+    );
+
+    const texture = new THREE.CanvasTexture(canvas);
+
+    texture.colorSpace = THREE.SRGBColorSpace;
+
+    const material = new THREE.SpriteMaterial({
+        map: texture,
+        transparent: true,
+        depthTest: false
+    });
+
+    const sprite = new THREE.Sprite(material);
+
+    const labelRadius = RADIUS + 0.65;
+
+    sprite.position.set(
+        labelRadius * Math.cos(angle),
+        0,
+        labelRadius * Math.sin(angle)
+    );
+
+    sprite.scale.set(
+        0.95,
+        0.48,
+        1
+    );
+
+    markingsGroup.add(sprite);
+}
+
+
+// ================================================================
+// TOP AND BOTTOM RINGS
+// ================================================================
+
+function createRing(y, radius) {
+
+    const points = [];
+
+    for (let i = 0; i <= CYLINDER_SEGMENTS; i++) {
+
+        const angle =
+            (i / CYLINDER_SEGMENTS) * TWO_PI;
+
+        points.push(
+            new THREE.Vector3(
+                radius * Math.cos(angle),
+                y,
+                radius * Math.sin(angle)
+            )
+        );
+
+    }
+
+    const geometry = new THREE.BufferGeometry()
+        .setFromPoints(points);
+
+    const line = new THREE.Line(
+        geometry,
+        new THREE.LineBasicMaterial({
+            color: 0x667085
+        })
+    );
+
+    cylinderGroup.add(line);
+}
+
+createRing(HEIGHT / 2, RADIUS);
+createRing(-HEIGHT / 2, RADIUS);
+
+
+// ================================================================
+// SELECTED INTERVAL GROUP
+// ================================================================
+
+const selectedSurfaceGroup = new THREE.Group();
+
+cylinderGroup.add(selectedSurfaceGroup);
+
+
+// ================================================================
+// SELECTION MARKERS
+// ================================================================
+
+const markerGroup = new THREE.Group();
+
+cylinderGroup.add(markerGroup);
+
+
+// Floating labels for selected points.
+// This group is a child of cylinderGroup so labels rotate exactly with the cylinder.
+
+const selectionLabelGroup = new THREE.Group();
+
+cylinderGroup.add(selectionLabelGroup);
+
+
+// ================================================================
+// RAYCASTING
+// ================================================================
+
+const raycaster = new THREE.Raycaster();
+
+const mouse = new THREE.Vector2();
+
+
+// Convert browser coordinates into normalized device coordinates.
+
+function updateMouse(event) {
+
+    const rect =
+        renderer.domElement.getBoundingClientRect();
+
+    mouse.x =
+        ((event.clientX - rect.left) / rect.width) * 2 - 1;
+
+    mouse.y =
+        -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+}
+
+
+// ================================================================
+// 3D POINT → HOUR
+// ================================================================
+
+function pointToHour(worldPoint) {
+
+    /*
+        The cylinder rotates.
+
+        We therefore transform the world-space hit point
+        back into the cylinder's local coordinate system.
+
+        This makes the mapping independent of the cylinder's
+        current visual rotation.
+    */
+
+    const localPoint =
+        cylinderGroup.worldToLocal(
+            worldPoint.clone()
+        );
+
+
+    let angle = Math.atan2(
+        localPoint.z,
+        localPoint.x
+    );
+
+
+    if (angle < 0) {
+        angle += TWO_PI;
+    }
+
+
+    let hour =
+        (angle / TWO_PI) * HOURS;
+
+
+    /*
+        Make the 24/0 equivalence explicit.
+    */
+
+    if (hour >= 23.999999) {
+        hour = 0;
+    }
+
+
+    return hour;
+}
+
+
+// ================================================================
+// SELECTION STATE
+// ================================================================
+
+let selectedHours = [];
+
+
+// ================================================================
+// RIGHT CLICK SELECTION
+// ================================================================
+
+renderer.domElement.addEventListener(
+    "contextmenu",
+    function(event) {
+
+        event.preventDefault();
+
+        selectCylinderPoint(event);
+
+    }
+);
+
+
+function selectCylinderPoint(event) {
+
+    updateMouse(event);
+
+    raycaster.setFromCamera(
+        mouse,
+        camera
+    );
+
+
+    /*
+        Intersect only the actual cylinder body.
+
+        The ray therefore identifies an actual point on the
+        cylindrical surface.
+    */
+
+    const intersections =
+        raycaster.intersectObject(
+            cylinder,
+            false
+        );
+
+
+    if (intersections.length === 0) {
+        return;
+    }
+
+
+    const hit =
+        intersections[0];
+
+
+    const hour =
+        pointToHour(hit.point);
+
+
+    addSelection(
+        hour,
+        hit.point
+    );
+}
+
+
+// ================================================================
+// ADD SELECTION
+// ================================================================
+
+function addSelection(hour, worldPoint) {
+
+    /*
+        First right click:
+            start
+
+        Second right click:
+            end
+
+        Third right click:
+            start a new interval
+    */
+
+    if (selectedHours.length >= 2) {
+
+        clearSelection();
+
+    }
+
+
+    selectedHours.push(hour);
+
+
+    createSelectionMarker(
+        hour
+    );
+
+
+    updateInterface();
+
+
+    if (selectedHours.length === 2) {
+
+        createSelectedSurface();
+
+    }
+
+}
+
+
+// ================================================================
+// MARKER
+// ================================================================
+
+function createSelectionMarker(hour) {
+
+    const angle =
+        hourToAngle(hour);
+
+
+    const geometry =
+        new THREE.SphereGeometry(
+            0.18,
+            20,
+            20
+        );
+
+
+    const material =
+        new THREE.MeshStandardMaterial({
+            color: 0x2563eb,
+            emissive: 0x102a66,
+            emissiveIntensity: 0.25
+        });
+
+
+    const marker =
+        new THREE.Mesh(
+            geometry,
+            material
+        );
+
+
+    marker.position.set(
+        (RADIUS + 0.05) * Math.cos(angle),
+        0,
+        (RADIUS + 0.05) * Math.sin(angle)
+    );
+
+
+    markerGroup.add(marker);
+
+    createSelectionLabel(hour);
+}
+
+
+// ================================================================
+// SELECTION LABELS
+// ================================================================
+
+function createSelectionLabel(hour) {
+
+    const angle =
+        hourToAngle(hour);
+
+    const canvas = document.createElement("canvas");
+
+    canvas.width = 256;
+    canvas.height = 96;
+
+    const ctx = canvas.getContext("2d");
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const text = formatHour(hour);
+
+    ctx.font = "bold 30px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    const textWidth = ctx.measureText(text).width;
+    const paddingX = 22;
+    const boxWidth = Math.min(250, textWidth + paddingX * 2);
+    const boxHeight = 54;
+    const boxX = (canvas.width - boxWidth) / 2;
+    const boxY = 18;
+    const radius = 10;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        boxX + radius,
+        boxY
+    );
+
+    ctx.lineTo(
+        boxX + boxWidth - radius,
+        boxY
+    );
+
+    ctx.quadraticCurveTo(
+        boxX + boxWidth,
+        boxY,
+        boxX + boxWidth,
+        boxY + radius
+    );
+
+    ctx.lineTo(
+        boxX + boxWidth,
+        boxY + boxHeight - radius
+    );
+
+    ctx.quadraticCurveTo(
+        boxX + boxWidth,
+        boxY + boxHeight,
+        boxX + boxWidth - radius,
+        boxY + boxHeight
+    );
+
+    ctx.lineTo(
+        boxX + radius,
+        boxY + boxHeight
+    );
+
+    ctx.quadraticCurveTo(
+        boxX,
+        boxY + boxHeight,
+        boxX,
+        boxY + boxHeight - radius
+    );
+
+    ctx.lineTo(
+        boxX,
+        boxY + radius
+    );
+
+    ctx.quadraticCurveTo(
+        boxX,
+        boxY,
+        boxX + radius,
+        boxY
+    );
+
+    ctx.closePath();
+
+    ctx.fillStyle = "rgba(255,255,255,0.97)";
+    ctx.fill();
+
+    ctx.strokeStyle = "#2563eb";
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    ctx.fillStyle = "#1f2937";
+
+    ctx.fillText(
+        text,
+        canvas.width / 2,
+        boxY + boxHeight / 2 + 1
+    );
+
+
+    const texture =
+        new THREE.CanvasTexture(canvas);
+
+    texture.colorSpace =
+        THREE.SRGBColorSpace;
+
+    texture.needsUpdate = true;
+
+
+    const material =
+        new THREE.SpriteMaterial({
+            map: texture,
+            transparent: true,
+            depthTest: false,
+            depthWrite: false
+        });
+
+
+    const label =
+        new THREE.Sprite(material);
+
+
+    // Same angular coordinate as the selected marker.
+    // Because this sprite is inside cylinderGroup,
+    // it rotates with the cylinder around its Y axis.
+
+    const labelRadius =
+        RADIUS + 0.30;
+
+
+    label.position.set(
+        labelRadius * Math.cos(angle),
+        0.72,
+        labelRadius * Math.sin(angle)
+    );
+
+
+    label.scale.set(
+        1.45,
+        0.54,
+        1
+    );
+
+
+    label.userData.hour =
+        hour;
+
+
+    selectionLabelGroup.add(label);
+}
+
+
+function clearSelectionLabels() {
+
+    while (
+        selectionLabelGroup.children.length > 0
+    ) {
+
+        const child =
+            selectionLabelGroup.children.pop();
+
+        if (
+            child.material &&
+            child.material.map
+        ) {
+
+            child.material.map.dispose();
+
+        }
+
+        if (child.material) {
+
+            child.material.dispose();
+
+        }
+
+    }
+
+}
+
+
+// ================================================================
+// SELECTED CYLINDER REGION
+// ================================================================
+
+function createSelectedSurface() {
+
+    clearSelectedSurface();
+
+
+    const start =
+        selectedHours[0];
+
+    const end =
+        selectedHours[1];
+
+
+    const startAngle =
+        hourToAngle(start);
+
+    const endAngle =
+        hourToAngle(end);
+
+
+    /*
+        We construct the selected region as one or two angular
+        sectors.
+
+        If end >= start:
+            start → end
+
+        If end < start:
+            start → 24 → 0 → end
+    */
+
+    if (end >= start) {
+
+        createSurfaceSector(
+            startAngle,
+            endAngle
+        );
+
+    } else {
+
+        createSurfaceSector(
+            startAngle,
+            TWO_PI
+        );
+
+        createSurfaceSector(
+            0,
+            endAngle
+        );
+
+    }
+
+}
+
+
+// ================================================================
+// SURFACE SECTOR
+// ================================================================
+
+function createSurfaceSector(
+    startAngle,
+    endAngle
+) {
+
+    if (
+        endAngle - startAngle <
+        0.000001
+    ) {
+
+        return;
+
+    }
+
+
+    const geometry =
+        new THREE.BufferGeometry();
+
+
+    const positions = [];
+    const normals = [];
+    const uvs = [];
+    const indices = [];
+
+
+    const steps =
+        Math.max(
+            2,
+            Math.ceil(
+                (endAngle - startAngle) /
+                (TWO_PI / 160)
+            )
+        );
+
+
+    const innerRadius =
+        RADIUS + 0.012;
+
+    const outerRadius =
+        RADIUS + 0.04;
+
+
+    for (let i = 0; i <= steps; i++) {
+
+        const t =
+            i / steps;
+
+        const angle =
+            startAngle +
+            t * (endAngle - startAngle);
+
+
+        const cos =
+            Math.cos(angle);
+
+        const sin =
+            Math.sin(angle);
+
+
+        positions.push(
+            innerRadius * cos,
+            -HEIGHT / 2,
+            innerRadius * sin
+        );
+
+        positions.push(
+            innerRadius * cos,
+            HEIGHT / 2,
+            innerRadius * sin
+        );
+
+        positions.push(
+            outerRadius * cos,
+            -HEIGHT / 2,
+            outerRadius * sin
+        );
+
+        positions.push(
+            outerRadius * cos,
+            HEIGHT / 2,
+            outerRadius * sin
+        );
+
+
+        const nx = cos;
+        const nz = sin;
+
+
+        for (let j = 0; j < 4; j++) {
+
+            normals.push(
+                nx,
+                0,
+                nz
+            );
+
+        }
+
+
+        uvs.push(
+            t,
+            0,
+            t,
+            1,
+            t,
+            0,
+            t,
+            1
+        );
+
+    }
+
+
+    for (let i = 0; i < steps; i++) {
+
+        const base =
+            i * 4;
+
+        const next =
+            (i + 1) * 4;
+
+
+        // Main surface
+
+        indices.push(
+            base,
+            next,
+            base + 1,
+
+            base + 1,
+            next,
+            next + 1
+        );
+
+    }
+
+
+    geometry.setAttribute(
+        "position",
+        new THREE.Float32BufferAttribute(
+            positions,
+            3
+        )
+    );
+
+    geometry.setAttribute(
+        "normal",
+        new THREE.Float32BufferAttribute(
+            normals,
+            3
+        )
+    );
+
+    geometry.setAttribute(
+        "uv",
+        new THREE.Float32BufferAttribute(
+            uvs,
+            2
+        )
+    );
+
+    geometry.setIndex(indices);
+
+
+    const material =
+        new THREE.MeshBasicMaterial({
+            color: 0x5b9bea,
+            transparent: true,
+            opacity: 0.72,
+            side: THREE.DoubleSide,
+            depthWrite: false
+        });
+
+
+    const mesh =
+        new THREE.Mesh(
+            geometry,
+            material
+        );
+
+
+    selectedSurfaceGroup.add(mesh);
+
+}
+
+
+// ================================================================
+// CLEAR SELECTION SURFACE
+// ================================================================
+
+function clearSelectedSurface() {
+
+    while (
+        selectedSurfaceGroup.children.length > 0
+    ) {
+
+        const child =
+            selectedSurfaceGroup.children.pop();
+
+        child.geometry.dispose();
+
+        child.material.dispose();
+
+    }
+
+}
+
+
+// ================================================================
+// CLEAR ALL SELECTION
+// ================================================================
+
+function clearSelection() {
+
+    selectedHours = [];
+
+    clearSelectedSurface();
+    clearSelectionLabels();
+
+
+    while (
+        markerGroup.children.length > 0
+    ) {
+
+        const child =
+            markerGroup.children.pop();
+
+        child.geometry.dispose();
+
+        child.material.dispose();
+
+    }
+
+
+    updateInterface();
+
+    drawPDF();
+
+}
+
+
+clearButton.addEventListener(
+    "click",
+    clearSelection
+);
+
+
+// ================================================================
+// INTERVAL CALCULATION
+// ================================================================
+
+function getIntervalLength() {
+
+    if (selectedHours.length < 2) {
+
+        return null;
+
+    }
+
+
+    const start =
+        selectedHours[0];
+
+    const end =
+        selectedHours[1];
+
+
+    let length =
+        end - start;
+
+
+    if (length < 0) {
+
+        length += HOURS;
+
+    }
+
+
+    return length;
+}
+
+
+// ================================================================
+// INTERFACE UPDATE
+// ================================================================
+
+function updateInterface() {
+
+    const count =
+        selectedHours.length;
+
+
+    if (count === 0) {
+
+        statusElement.textContent =
+            "Select first point";
+
+        statusElement.className =
+            "status select-first";
+
+
+        startValue.textContent =
+            "—";
+
+        endValue.textContent =
+            "—";
+
+
+        intervalValue.textContent =
+            "—";
+
+        lengthValue.textContent =
+            "—";
+
+
+        probabilityFormula.innerHTML =
+            `<span class="calculation-label">Probability calculation</span>P = —`;
+
+    }
+
+
+    else if (count === 1) {
+
+        const start =
+            selectedHours[0];
+
+
+        statusElement.textContent =
+            "Select second point";
+
+        statusElement.className =
+            "status select-second";
+
+
+        startValue.textContent =
+            formatHour(start);
+
+        endValue.textContent =
+            "—";
+
+
+        intervalValue.textContent =
+            `${formatHour(start)} → ?`;
+
+
+        lengthValue.textContent =
+            "—";
+
+
+        probabilityFormula.innerHTML =
+            `<span class="calculation-label">Probability calculation</span>P = —`;
+
+    }
+
+
+    else {
+
+        const start =
+            selectedHours[0];
+
+        const end =
+            selectedHours[1];
+
+        const length =
+            getIntervalLength();
+
+        const probability =
+            length / HOURS;
+
+        const percentage =
+            probability * 100;
+
+
+        statusElement.textContent =
+            "Interval selected";
+
+        statusElement.className =
+            "status complete";
+
+
+        startValue.textContent =
+            formatHour(start);
+
+        endValue.textContent =
+            formatHour(end);
+
+
+        intervalValue.textContent =
+            `${formatHour(start)} → ${formatHour(end)}`;
+
+
+        lengthValue.textContent =
+            `${formatNumber(length)} hours`;
+
+
+        /*
+            The probability and percentage are no longer displayed
+            in the Interval Selection section.
+
+            They are displayed together in the calculation box
+            inside the Uniform Distribution section.
+        */
+
+        probabilityFormula.innerHTML =
+            `<span class="calculation-label">Probability calculation</span>
+             P = ${formatNumber(length)} / 24
+             = ${formatProbability(probability)}
+             = ${formatNumber(percentage)}%`;
+
+    }
+
+
+    drawPDF();
+
+}
+
+
+// ================================================================
+// NUMBER FORMATTING
+// ================================================================
+
+function formatHour(hour) {
+
+    if (
+        Math.abs(hour) < 0.005 ||
+        Math.abs(hour - 24) < 0.005
+    ) {
+
+        return "0 h / 24 h";
+
+    }
+
+    return `${hour.toFixed(2)} h`;
+}
+
+
+function formatNumber(value) {
+
+    if (
+        Math.abs(value - Math.round(value)) <
+        0.0001
+    ) {
+
+        return String(
+            Math.round(value)
+        );
+
+    }
+
+    return value.toFixed(2);
+
+}
+
+
+function formatProbability(value) {
+
+    return value.toFixed(3);
+
+}
+
+
+// ================================================================
+// PDF CANVAS
+// ================================================================
+
+const pdfCanvas =
+    document.getElementById("pdfCanvas");
+
+const pdfContext =
+    pdfCanvas.getContext("2d");
+
+
+// ================================================================
+// DRAW PDF
+// ================================================================
+
+function drawPDF() {
+
+    const canvas =
+        pdfCanvas;
+
+    const ctx =
+        pdfContext;
+
+
+    const width =
+        canvas.width;
+
+    const height =
+        canvas.height;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    // Plot dimensions
+
+    const left = 75;
+    const right = width - 55;
+
+    const top = 55;
+    const bottom = height - 80;
+
+
+    const plotWidth =
+        right - left;
+
+    const plotHeight =
+        bottom - top;
+
+
+    // Background
+
+    ctx.fillStyle =
+        "#ffffff";
+
+    ctx.fillRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    // Density height
+
+    const densityHeight =
+        plotHeight * 0.72;
+
+
+    const densityTop =
+        bottom - densityHeight;
+
+
+    // ------------------------------------------------------------
+    // Selected region
+    // ------------------------------------------------------------
+
+    if (selectedHours.length === 2) {
+
+        const start =
+            selectedHours[0];
+
+        const end =
+            selectedHours[1];
+
+
+        if (end >= start) {
+
+            drawPDFInterval(
+                start,
+                end,
+                left,
+                plotWidth,
+                densityTop,
+                bottom
+            );
+
+        } else {
+
+            // Wrapped interval:
+            // start → 24
+
+            drawPDFInterval(
+                start,
+                24,
+                left,
+                plotWidth,
+                densityTop,
+                bottom
+            );
+
+
+            // 0 → end
+
+            drawPDFInterval(
+                0,
+                end,
+                left,
+                plotWidth,
+                densityTop,
+                bottom
+            );
+
+        }
+
+    }
+
+
+    // ------------------------------------------------------------
+    // PDF rectangle
+    // ------------------------------------------------------------
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        left,
+        bottom
+    );
+
+    ctx.lineTo(
+        left,
+        densityTop
+    );
+
+    ctx.lineTo(
+        right,
+        densityTop
+    );
+
+    ctx.lineTo(
+        right,
+        bottom
+    );
+
+    ctx.closePath();
+
+
+    ctx.fillStyle =
+        "#d9e9ff";
+
+    ctx.fill();
+
+
+    // Redraw selected region over PDF
+
+    if (selectedHours.length === 2) {
+
+        const start =
+            selectedHours[0];
+
+        const end =
+            selectedHours[1];
+
+
+        if (end >= start) {
+
+            drawPDFInterval(
+                start,
+                end,
+                left,
+                plotWidth,
+                densityTop,
+                bottom
+            );
+
+        } else {
+
+            drawPDFInterval(
+                start,
+                24,
+                left,
+                plotWidth,
+                densityTop,
+                bottom
+            );
+
+            drawPDFInterval(
+                0,
+                end,
+                left,
+                plotWidth,
+                densityTop,
+                bottom
+            );
+
+        }
+
+    }
+
+
+    // ------------------------------------------------------------
+    // Rectangle border
+    // ------------------------------------------------------------
+
+    ctx.strokeStyle =
+        "#344054";
+
+    ctx.lineWidth = 2;
+
+    ctx.strokeRect(
+        left,
+        densityTop,
+        plotWidth,
+        densityHeight
+    );
+
+
+    // ------------------------------------------------------------
+    // Axes
+    // ------------------------------------------------------------
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        left,
+        bottom
+    );
+
+    ctx.lineTo(
+        right + 12,
+        bottom
+    );
+
+    ctx.stroke();
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        left,
+        bottom
+    );
+
+    ctx.lineTo(
+        left,
+        densityTop - 15
+    );
+
+    ctx.stroke();
+
+
+    // ------------------------------------------------------------
+    // X-axis labels
+    // ------------------------------------------------------------
+
+    ctx.fillStyle =
+        "#344054";
+
+    ctx.font =
+        "16px Arial";
+
+    ctx.textAlign =
+        "center";
+
+    const majorHours =
+        [0, 6, 12, 18, 24];
+
+
+    for (const hour of majorHours) {
+
+        const x =
+            left +
+            (hour / 24) *
+            plotWidth;
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x,
+            bottom
+        );
+
+        ctx.lineTo(
+            x,
+            bottom + 8
+        );
+
+        ctx.stroke();
+
+
+        ctx.fillText(
+            String(hour),
+            x,
+            bottom + 30
+        );
+
+    }
+
+
+    // ------------------------------------------------------------
+    // Y-axis
+    // ------------------------------------------------------------
+
+    ctx.textAlign =
+        "right";
+
+    ctx.fillText(
+        "1/24",
+        left - 12,
+        densityTop + 6
+    );
+
+
+    ctx.fillText(
+        "0",
+        left - 12,
+        bottom + 5
+    );
+
+
+    // ------------------------------------------------------------
+    // Axis titles
+    // ------------------------------------------------------------
+
+    ctx.textAlign =
+        "center";
+
+    ctx.font =
+        "17px Arial";
+
+    ctx.fillText(
+        "Time (hours)",
+        left + plotWidth / 2,
+        height - 25
+    );
+
+
+    ctx.save();
+
+    ctx.translate(
+        20,
+        top + plotHeight / 2
+    );
+
+    ctx.rotate(
+        -Math.PI / 2
+    );
+
+    ctx.fillText(
+        "Probability density",
+        0,
+        0
+    );
+
+    ctx.restore();
+
+
+    // ------------------------------------------------------------
+    // PDF label
+    // ------------------------------------------------------------
+
+    ctx.font =
+        "bold 18px Arial";
+
+    ctx.fillText(
+        "f(x) = 1/24",
+        left + plotWidth / 2,
+        densityTop - 20
+    );
+
+
+    // ------------------------------------------------------------
+    // Selected boundaries
+    // ------------------------------------------------------------
+
+    if (selectedHours.length >= 1) {
+
+        drawPDFBoundary(
+            selectedHours[0],
+            left,
+            plotWidth,
+            densityTop,
+            bottom
+        );
+
+    }
+
+
+    if (selectedHours.length === 2) {
+
+        drawPDFBoundary(
+            selectedHours[1],
+            left,
+            plotWidth,
+            densityTop,
+            bottom
+        );
+
+    }
+
+
+    // Draw selected-hour labels last so they remain clearly visible.
+
+    if (selectedHours.length >= 1) {
+
+        drawPDFSelectedLabel(
+            selectedHours[0],
+            left,
+            plotWidth,
+            densityTop
+        );
+
+    }
+
+
+    if (selectedHours.length === 2) {
+
+        drawPDFSelectedLabel(
+            selectedHours[1],
+            left,
+            plotWidth,
+            densityTop
+        );
+
+    }
+
+}
+
+
+// ================================================================
+// PDF SELECTED-POINT LABEL
+// ================================================================
+
+function drawPDFSelectedLabel(
+    hour,
+    left,
+    plotWidth,
+    densityTop
+) {
+
+    const x =
+        left +
+        (hour / 24) *
+        plotWidth;
+
+    const text =
+        formatHour(hour);
+
+    pdfContext.save();
+
+    pdfContext.font =
+        "bold 16px Arial";
+
+    pdfContext.textAlign =
+        "center";
+
+    pdfContext.textBaseline =
+        "middle";
+
+
+    const textWidth =
+        pdfContext.measureText(text).width;
+
+    const paddingX = 10;
+
+    const boxWidth =
+        textWidth + paddingX * 2;
+
+    const boxHeight = 28;
+
+    const boxX =
+        x - boxWidth / 2;
+
+    const boxY =
+        densityTop - 72;
+
+    const radius = 6;
+
+
+    // Connector from the label toward the selected PDF boundary.
+
+    pdfContext.strokeStyle =
+        "#2563eb";
+
+    pdfContext.lineWidth = 1.5;
+
+    pdfContext.setLineDash([]);
+
+
+    pdfContext.beginPath();
+
+    pdfContext.moveTo(
+        x,
+        boxY + boxHeight
+    );
+
+    pdfContext.lineTo(
+        x,
+        densityTop - 5
+    );
+
+    pdfContext.stroke();
+
+
+    // White rounded label with a blue border.
+
+    pdfContext.beginPath();
+
+    pdfContext.moveTo(
+        boxX + radius,
+        boxY
+    );
+
+    pdfContext.lineTo(
+        boxX + boxWidth - radius,
+        boxY
+    );
+
+    pdfContext.quadraticCurveTo(
+        boxX + boxWidth,
+        boxY,
+        boxX + boxWidth,
+        boxY + radius
+    );
+
+    pdfContext.lineTo(
+        boxX + boxWidth,
+        boxY + boxHeight - radius
+    );
+
+    pdfContext.quadraticCurveTo(
+        boxX + boxWidth,
+        boxY + boxHeight,
+        boxX + boxWidth - radius,
+        boxY + boxHeight
+    );
+
+    pdfContext.lineTo(
+        boxX + radius,
+        boxY + boxHeight
+    );
+
+    pdfContext.quadraticCurveTo(
+        boxX,
+        boxY + boxHeight,
+        boxX,
+        boxY + boxHeight - radius
+    );
+
+    pdfContext.lineTo(
+        boxX,
+        boxY + radius
+    );
+
+    pdfContext.quadraticCurveTo(
+        boxX,
+        boxY,
+        boxX + radius,
+        boxY
+    );
+
+    pdfContext.closePath();
+
+
+    pdfContext.fillStyle =
+        "rgba(255,255,255,0.97)";
+
+    pdfContext.fill();
+
+
+    pdfContext.strokeStyle =
+        "#2563eb";
+
+    pdfContext.lineWidth = 2;
+
+    pdfContext.stroke();
+
+
+    pdfContext.fillStyle =
+        "#1f2937";
+
+
+    pdfContext.fillText(
+        text,
+        x,
+        boxY + boxHeight / 2 + 1
+    );
+
+
+    pdfContext.restore();
+
+}
+
+
+// ================================================================
+// PDF INTERVAL
+// ================================================================
+
+function drawPDFInterval(
+    start,
+    end,
+    left,
+    plotWidth,
+    densityTop,
+    bottom
+) {
+
+    if (end <= start) {
+
+        return;
+
+    }
+
+
+    const x1 =
+        left +
+        (start / 24) *
+        plotWidth;
+
+    const x2 =
+        left +
+        (end / 24) *
+        plotWidth;
+
+
+    pdfContext.fillStyle =
+        "#8fb9ee";
+
+
+    pdfContext.fillRect(
+        x1,
+        densityTop,
+        x2 - x1,
+        bottom - densityTop
+    );
+
+
+    pdfContext.strokeStyle =
+        "#2563eb";
+
+    pdfContext.lineWidth = 1;
+
+
+    pdfContext.strokeRect(
+        x1,
+        densityTop,
+        x2 - x1,
+        bottom - densityTop
+    );
+
+}
+
+
+// ================================================================
+// PDF BOUNDARY
+// ================================================================
+
+function drawPDFBoundary(
+    hour,
+    left,
+    plotWidth,
+    densityTop,
+    bottom
+) {
+
+    const x =
+        left +
+        (hour / 24) *
+        plotWidth;
+
+
+    pdfContext.save();
+
+
+    pdfContext.strokeStyle =
+        "#2563eb";
+
+    pdfContext.lineWidth = 2;
+
+    pdfContext.setLineDash([
+        6,
+        5
+    ]);
+
+
+    pdfContext.beginPath();
+
+
+    pdfContext.moveTo(
+        x,
+        densityTop - 15
+    );
+
+
+    pdfContext.lineTo(
+        x,
+        bottom + 5
+    );
+
+
+    pdfContext.stroke();
+
+
+    pdfContext.restore();
+
+}
+
+
+// ================================================================
+// CYLINDER ROTATION
+// ================================================================
+
+let isDragging = false;
+
+let previousPointerX = 0;
+
+let rotationVelocity = 0;
+
+
+// Only horizontal pointer movement changes the cylinder.
+// No vertical movement is used.
+//
+// The object itself rotates around its longitudinal Y axis.
+// The camera remains completely fixed.
+
+renderer.domElement.addEventListener(
+    "pointerdown",
+    function(event) {
+
+        if (event.button !== 0) {
+
+            return;
+
+        }
+
+
+        isDragging = true;
+
+
+        previousPointerX =
+            event.clientX;
+
+
+        rotationVelocity = 0;
+
+
+        container.classList.add(
+            "dragging"
+        );
+
+
+        renderer.domElement.setPointerCapture(
+            event.pointerId
+        );
+
+    }
+);
+
+
+renderer.domElement.addEventListener(
+    "pointermove",
+    function(event) {
+
+        if (!isDragging) {
+
+            return;
+
+        }
+
+
+        const deltaX =
+            event.clientX -
+            previousPointerX;
+
+
+        previousPointerX =
+            event.clientX;
+
+
+        const rotationAmount =
+            deltaX * 0.012;
+
+
+        cylinderGroup.rotation.y +=
+            rotationAmount;
+
+
+        rotationVelocity =
+            rotationAmount;
+
+    }
+);
+
+
+function stopDragging(event) {
+
+    if (!isDragging) {
+
+        return;
+
+    }
+
+
+    isDragging = false;
+
+
+    container.classList.remove(
+        "dragging"
+    );
+
+
+    try {
+
+        renderer.domElement.releasePointerCapture(
+            event.pointerId
+        );
+
+    } catch (e) {}
+
+}
+
+
+renderer.domElement.addEventListener(
+    "pointerup",
+    stopDragging
+);
+
+
+renderer.domElement.addEventListener(
+    "pointercancel",
+    stopDragging
+);
+
+
+renderer.domElement.addEventListener(
+    "pointerleave",
+    function(event) {
+
+        if (
+            isDragging &&
+            event.buttons === 0
+        ) {
+
+            stopDragging(event);
+
+        }
+
+    }
+);
+
+
+// ================================================================
+// TOUCH SUPPORT
+// ================================================================
+//
+// Pointer events automatically support touch devices.
+//
+// Vertical movement is deliberately ignored.
+// This prevents orbiting/tilting.
+//
+// Only horizontal dragging rotates the cylinder.
+// ================================================================
+
+
+// ================================================================
+// RESIZE
+// ================================================================
+
+function resize() {
+
+    const width =
+        container.clientWidth;
+
+    const height =
+        container.clientHeight;
+
+
+    renderer.setSize(
+        width,
+        height
+    );
+
+
+    const aspect =
+        width / height;
+
+
+    const viewHeight =
+        9;
+
+    const viewWidth =
+        viewHeight * aspect;
+
+
+    camera.left =
+        -viewWidth / 2;
+
+    camera.right =
+        viewWidth / 2;
+
+    camera.top =
+        viewHeight / 2;
+
+    camera.bottom =
+        -viewHeight / 2;
+
+
+    camera.updateProjectionMatrix();
+
+}
+
+
+window.addEventListener(
+    "resize",
+    resize
+);
+
+resize();
+
+
+// ================================================================
+// ANIMATION
+// ================================================================
+
+function animate() {
+
+    requestAnimationFrame(
+        animate
+    );
+
+
+    /*
+        Small inertial continuation after dragging.
+
+        Still only rotation around the cylinder's
+        own longitudinal axis.
+    */
+
+    if (
+        !isDragging &&
+        Math.abs(rotationVelocity) > 0.0001
+    ) {
+
+        cylinderGroup.rotation.y +=
+            rotationVelocity;
+
+        rotationVelocity *= 0.94;
+
+    }
+
+
+    renderer.render(
+        scene,
+        camera
+    );
+
+}
+
+animate();
+
+
+// ================================================================
+// INITIAL PDF
+// ================================================================
+
+drawPDF();
+
+updateInterface();
+
+</script>
+
+</body>
+</html>
