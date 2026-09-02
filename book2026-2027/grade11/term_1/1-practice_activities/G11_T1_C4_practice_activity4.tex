@@ -20,544 +20,937 @@
  \item C4: Applies the exponential distribution to constant-rate waiting-time situations and assesses its suitability.
 \end{itemize}
 
-\section{Introduction}\label{sec:c4-introduction}
-The exponential distribution models a \emph{non-negative waiting time} $T$
-until the next event when events occur independently at a reasonably stable
-average rate.  If the average number of events per unit of time is
-$\lambda>0$, then
-\[
- T\sim\operatorname{Exp}(\lambda),\qquad T\geq0,
-\]
-and the pdf, CDF, and survival function are
-\[
- f_T(t)=
- \begin{cases}
-  \lambda e^{-\lambda t},&t\geq0,\\
-  0,&t<0,
- \end{cases}
- \qquad
- F_T(t)=P(T\leq t)=1-e^{-\lambda t},
- \qquad
- P(T>t)=e^{-\lambda t}.
-\]
-Consequently,
-\[
- P(a<T<b)=F_T(b)-F_T(a)
- =e^{-\lambda a}-e^{-\lambda b},
- \qquad
- E(T)=\frac1\lambda.
-\]
-Because $T$ is continuous, a single endpoint has probability $0$; for
-example, $P(T<5)=P(T\leq5)$.  The units must match before a formula is used.
-Thus, a rate of $12$ events per hour is $12/60=0.2$ event per minute.
+\section*{Introduction}
 
-The distribution is also \emph{memoryless}:
+The exponential distribution is commonly used to model the time $T$ until the
+next occurrence of an event. In general, we write
 \[
- P(T>s+t\mid T>s)=P(T>t).
+\boxed{T\sim\operatorname{Exponential}(\lambda)},\qquad \lambda>0,
 \]
-Under the model, waiting $s$ time units without an event does not make the
-event more nearly ``due.''  This feature is credible only while the mechanism
-and rate remain unchanged.
+where $\lambda$ is the rate at which events occur.
 
-For each context, first define the waiting-time variable and its support.
-Then identify or determine $\lambda$, convert its units, and write the model.
-Select the CDF, survival, interval, or memoryless formula; show the
-substitution and calculation; and interpret the answer in context.  Finally,
-check suitability: the event rate should be reasonably stable, events should
-be approximately independent, and the variable must genuinely be a time to
-the next event.  Fixed schedules, changing demand, queue-dependent service,
-event clustering, and aging equipment can all make an exponential model
-unsuitable.
+For an exponential random variable, the possible waiting times satisfy
+\[
+\boxed{T\geq0}.
+\]
 
-\section{Rate and Waiting-Time Interpretation}\label{sec:c4-rate}
+The general case can be summarized by the following relationships:
+
+\[
+\begin{array}{c|c}
+	\textbf{Concept} & \textbf{General expression}\\[4pt]
+	\hline
+	\text{Random variable} & T=\text{waiting time until the next event}\\[4pt]
+	\text{Possible values} & T\geq0\\[4pt]
+	\text{Rate} & \lambda>0
+\end{array}
+\]
+
+The three basic probability cases are shown below. The equation is presented
+alongside each graph, and the shaded region represents the corresponding
+probability.
+
+\begin{center}
+	\begin{tabular}{c@{\qquad\qquad}c@{\qquad\qquad}c}
+		
+		\begin{tikzpicture}[scale=0.75]
+			\draw[->] (0,0) -- (4.2,0) node[right] {$T$};
+			\draw[->] (0,0) -- (0,2.7);
+			\draw[domain=0:4,smooth,variable=\x]
+			plot ({\x},{2.2*exp(-0.75*\x)});
+			\fill[gray!30]
+			(0,0) --
+			plot[domain=0:2,smooth,variable=\x]
+			({\x},{2.2*exp(-0.75*\x)}) --
+			(2,0) -- cycle;
+			\draw[dashed] (2,0) -- (2,{2.2*exp(-0.75*2)});
+			\node[below] at (2,0) {$t$};
+		\end{tikzpicture}
+		
+		&
+		\begin{tikzpicture}[scale=0.75]
+			\draw[->] (0,0) -- (4.2,0) node[right] {$T$};
+			\draw[->] (0,0) -- (0,2.7);
+			\draw[domain=0:4,smooth,variable=\x]
+			plot ({\x},{2.2*exp(-0.75*\x)});
+			\fill[gray!30]
+			(2,0) --
+			plot[domain=2:4,smooth,variable=\x]
+			({\x},{2.2*exp(-0.75*\x)}) --
+			(4,0) -- cycle;
+			\draw[dashed] (2,0) -- (2,{2.2*exp(-0.75*2)});
+			\node[below] at (2,0) {$t$};
+		\end{tikzpicture}
+		
+		&
+		\begin{tikzpicture}[scale=0.75]
+			\draw[->] (0,0) -- (4.2,0) node[right] {$T$};
+			\draw[->] (0,0) -- (0,2.7);
+			\draw[domain=0:4,smooth,variable=\x]
+			plot ({\x},{2.2*exp(-0.75*\x)});
+			\fill[gray!30]
+			(1,0) --
+			plot[domain=1:3,smooth,variable=\x]
+			({\x},{2.2*exp(-0.75*\x)}) --
+			(3,0) -- cycle;
+			\draw[dashed] (1,0) -- (1,{2.2*exp(-0.75*1)});
+			\draw[dashed] (3,0) -- (3,{2.2*exp(-0.75*3)});
+			\node[below] at (1,0) {$a$};
+			\node[below] at (3,0) {$b$};
+		\end{tikzpicture}
+		
+		\\[10pt]
+		
+		$\displaystyle P(T<t)=1-e^{-\lambda t}$
+		
+		&
+		$\displaystyle P(T>t)=e^{-\lambda t}$
+		
+		&
+		$\displaystyle P(a<T<b)=e^{-\lambda a}-e^{-\lambda b}$
+		
+		\\
+		
+		\textbf{Less than}
+		&
+		\textbf{Greater than}
+		&
+		\textbf{Between}
+		
+	\end{tabular}
+\end{center}
+
+These relationships allow us to move from a specific context to the general
+exponential model. In the following problems, we will identify the random
+variable, determine the rate parameter when necessary, and use the appropriate
+probability expression.
+
+\section{Identifying the Random Variable}\label{sec:c4-identifying-variable}
 \SectionProblemsTableOfContents{
- \SectionProblemLink{sec:c4-rate-fintech}{Fintech verification enquiries}}
+	\SectionProblemLink{sec:c4-identify-callcenter}{Customer-service calls}\\
+	\SectionProblemLink{sec:c4-identify-delivery}{Food-delivery requests}\\
+	\SectionProblemLink{sec:c4-identify-bank}{Bank security alerts}\\
+	\SectionProblemLink{sec:c4-identify-battery}{Battery life of mobile devices}}
+	
+	\vspace{5mm}
 
-\subsection{Fintech verification enquiries}\label{sec:c4-rate-fintech}
-A Bogotá fintech records $144$ account-verification enquiries during the
-$12$ hours from 7:00 a.m. to 7:00 p.m.  For a preliminary model, an analyst
-lets $W$ be the number of minutes from a randomly chosen observation time
-until the next enquiry.  The analyst proposes that enquiries occur
-independently at a constant average rate throughout the period.
+\noindent\rule{\textwidth}{0.4pt}
 
-\textbf{Questions/Tasks.}
+\begin{multicols}{2}
+
+\subsection{Mobile-data support requests}\label{sec:c4-identify-callcenter}
+
+A mobile phone company provides technical support for customers who
+experience problems with their mobile data. Throughout the afternoon, customers call the company's support line to report problems or ask for assistance. The company wants to understand how frequently these calls arrive.
+
+To study this, an analyst randomly chooses a moment during the afternoon and starts a timer. The analyst then records how much time passes before the next mobile-data support call arrives. For example, if the analyst starts the timer at 2:15 p.m. and the next call arrives at 2:18 p.m., the recorded time is
+3 minutes.
+
+
+\textbf{Question.}
 \begin{enumerate}
- \CriterionTask{subsec:c4-rate-fintech-a}{4.1}{Identify the variable, its support, and the rate in enquiries per hour and per minute.}
- \CriterionTask{subsec:c4-rate-fintech-b}{4.2}{Write the exponential model, including its pdf and CDF.}
- \CriterionTask{subsec:c4-rate-fintech-c}{4.3}{Find and interpret the expected waiting time.}
- \CriterionTask{subsec:c4-rate-fintech-d}{4.4}{Assess whether using the whole-period average is reasonable.}
+	\CriterionTask{subsec:c4-identify-callcenter-a}{4.1}{Identify the random variable and state the possible values it can take.}
 \end{enumerate}
 
-\subsubsection*{C4.1 - Identify the variable, support, and rate}\phantomsection\label{subsec:c4-rate-fintech-a}
-The event is the arrival of the next verification enquiry.  Therefore $W$ is
-a waiting time measured in minutes, and its support is
-\[
- w\geq0.
-\]
-First calculate the hourly rate:
-\[
- \lambda=\frac{144\text{ enquiries}}{12\text{ hours}}
- =12\text{ enquiries per hour}.
-\]
-Because $W$ is measured in minutes, convert hours to minutes:
-\[
- \lambda=\frac{12}{60}=0.2\text{ enquiry per minute}.
-\]
-This is an average rate, not a claim that enquiries occur exactly five minutes
-apart.
-\secInicio[sec:c4-rate][sec:c4-rate-fintech]
+\columnbreak
 
-\subsubsection*{C4.2 - Write the model, pdf, and CDF}\phantomsection\label{subsec:c4-rate-fintech-b}
-Using the per-minute rate found in C4.1,
+\subsubsection*{C4 - Identify the random variable and its possible values}\phantomsection\label{subsec:c4-identify-callcenter-a}
+Let
 \[
- W\sim\operatorname{Exp}(0.2),\qquad W\text{ measured in minutes}.
+\boxed{
+	\begin{aligned}
+		T={}&\text{the time from a randomly selected observation time}\\
+		&\text{until the next mobile-data support call arrives.}
+\end{aligned}}
 \]
-Substitute $\lambda=0.2$ into the general formulas.  The pdf is
-\[
- f_W(w)=
- \begin{cases}
-  0.2e^{-0.2w},&w\geq0,\\
-  0,&w<0,
- \end{cases}
-\]
-and the CDF is
-\[
- F_W(w)=P(W\leq w)=
- \begin{cases}
-  1-e^{-0.2w},&w\geq0,\\
-  0,&w<0.
- \end{cases}
-\]
-The support excludes negative waits, and the CDF gives the probability that
-the next enquiry has appeared by time $w$.
-\secInicio[sec:c4-rate][sec:c4-rate-fintech]
+The random variable $T$ measures elapsed time, so it cannot take negative
+values. Therefore,
+$$
+\boxed{T\geq0}.
+$$
 
-\subsubsection*{C4.3 - Find and interpret the mean wait}\phantomsection\label{subsec:c4-rate-fintech-c}
-For an exponential waiting time,
-\[
- E(W)=\frac1\lambda.
-\]
-Substituting the per-minute rate gives
-\[
- E(W)=\frac1{0.2}=5\text{ minutes}.
-\]
-Across many comparable observation times, the mean wait to the next enquiry
-would be $5$ minutes.  Individual waits need not equal $5$ minutes.
-\secInicio[sec:c4-rate][sec:c4-rate-fintech]
+\end{multicols}
 
-\subsubsection*{C4.4 - Assess the constant-rate assumption}\phantomsection\label{subsec:c4-rate-fintech-d}
-The calculation distributes $144$ enquiries across the entire 12-hour period.
-That model is reasonable only if shorter time blocks have similar rates and
-one customer's enquiry does not trigger or suppress another.  Demand may
-instead rise at lunch, after work, or following a salary-payment message.  In
-that case the whole-period average hides a changing rate, so one exponential
-model is unsuitable.  The analyst should inspect counts by hour and use the
-model only within blocks whose rates are reasonably stable.
-\secInicio[sec:c4-rate][sec:c4-rate-fintech]
+\noindent\rule{\textwidth}{0.4pt}
 
-\section{Waiting-Time Probabilities}\label{sec:c4-probabilities}
+\newpage
+
+\begin{multicols}{2}
+	
+\subsection{Food-delivery requests}\label{sec:c4-identify-delivery}
+A food-delivery platform receives orders from customers throughout
+the day. Delivery requests can arrive at any time, and the company wants to understand how much time typically passes between consecutive requests in a
+neighbourhood.
+
+To study this, an analyst focuses on one neighbourhood and observes the  platform after a delivery request has been received. The analyst starts a timer and records how much time passes before the next delivery request from
+that neighbourhood arrives. For example, if a request is received at
+6:20 p.m. and the next request arrives at 6:24 p.m., the recorded time is
+4 minutes.
+
+
+
+\textbf{Question.}
+\begin{enumerate}
+	\CriterionTask{subsec:c4-identify-delivery-a}{4.1}{Identify the random variable and state the possible values it can take.}
+\end{enumerate}
+
+\columnbreak
+
+\subsubsection*{C4.1 - Identify the random variable and its possible values}\phantomsection\label{subsec:c4-identify-delivery-a}
+Let
+\[
+\boxed{
+	\begin{aligned}
+		T={}&\text{the time from one delivery request}\\
+		&\text{until the next request arrives}
+\end{aligned}}
+\]
+The random variable $T$ measures elapsed time between two consecutive
+requests, so it cannot take negative values. Therefore,
+\[
+\boxed{T\geq0}.
+\]
+\end{multicols}
+
+\noindent\rule{\textwidth}{0.4pt}
+
+
+\begin{multicols}{2}
+	
+\subsection{Bank security alerts}\label{sec:c4-identify-bank}
+
+A Colombian digital bank continuously monitors its customers' transactions for
+unusual activity. When a transaction meets certain risk criteria, the bank's
+monitoring system automatically generates a security alert. The bank wants to
+understand how much time typically passes between these alerts.
+
+To study this, an analyst randomly chooses a moment during a quiet overnight
+period and starts a timer. The analyst then records how much time passes before
+the next security alert is generated. For example, if monitoring begins at
+1:10 a.m. and the next alert is generated at 1:17 a.m., the recorded time is
+7 minutes.
+
+
+
+\textbf{Question.}
+\begin{enumerate}
+	\CriterionTask{subsec:c4-identify-bank-a}{4.1}{Identify the random variable and state the possible values it can take.}
+\end{enumerate}
+
+\columnbreak
+
+\subsubsection*{C4.1 - Identify the random variable and its possible values}\phantomsection\label{subsec:c4-identify-bank-a}
+Let
+\[
+\boxed{
+	\begin{aligned}
+		T={}&\text{the time from a randomly selected observation time}\\
+		&\text{until the next security alert is generated}
+\end{aligned}}
+\]
+The random variable $T$ measures elapsed time, so it cannot take negative
+values. Therefore,
+\[
+\boxed{T\geq0}.
+\]
+
+\end{multicols}
+
+\noindent\rule{\textwidth}{0.4pt}
+
+\newpage
+
+\begin{multicols}{2}
+	
+\subsection{Battery life of mobile devices}\label{sec:c4-identify-battery}
+
+A mobile phone company in Bogotá tests the batteries used in some of its
+devices. As part of quality control, the company monitors how long each
+battery continues to operate before it fails.
+
+An analyst selects a battery at random and records the total operating time
+from the beginning of the test until the battery stops working. For example,
+one battery might operate for 18.5 hours before failing, while another might
+operate for 23.2 hours.
+
+
+
+\textbf{Question.}
+\begin{enumerate}
+	\CriterionTask{subsec:c4-identify-battery-a}{4.1}{Identify the random variable and state the possible values it can take.}
+\end{enumerate}
+
+\columnbreak
+
+\subsubsection*{C4.1 - Identify the random variable and its possible values}\phantomsection\label{subsec:c4-identify-battery-a}
+Let
+\[
+T=\text{the operating time of a randomly selected battery until it fails}.
+\]
+The random variable $T$ measures elapsed operating time, so it cannot take
+negative values. Therefore,
+\[
+\boxed{T\geq0}.
+\]
+
+\end{multicols}
+
+\noindent\rule{\textwidth}{0.4pt}
+
+\newpage
+
+\section{Finding Probabilities from an Exponential Distribution}\label{sec:c4-specific-probabilities}
 \SectionProblemsTableOfContents{
- \SectionProblemLink{sec:c4-prob-dispatch}{Off-peak courier dispatches}}
+	\SectionProblemLink{sec:c4-probability-support}{Customer-support calls}\\
+	\SectionProblemLink{sec:c4-probability-delivery}{Food-delivery requests}\\
+	\SectionProblemLink{sec:c4-probability-alerts}{Bank security alerts}\\
+	\SectionProblemLink{sec:c4-probability-battery}{Battery failures}\\
+	\SectionProblemLink{sec:c4-probability-rides}{Ride-hailing requests}\\
+	\SectionProblemLink{sec:c4-probability-preparation}{Food-delivery preparation times}}
 
-\subsection{Off-peak courier dispatches}\label{sec:c4-prob-dispatch}
-During a specified off-peak hour, a bicycle courier in Chapinero receives
-independent dispatch requests at a stable average rate of $4$ per hour.  Let
-$T$ be the waiting time in minutes from the end of one job until the next
-request.  Operations staff want to understand both short waits and costly idle
-periods.
+\vspace{5mm}
 
-\textbf{Questions/Tasks.}
-\begin{enumerate}
- \CriterionTask{subsec:c4-prob-dispatch-a}{4.1}{Write the model and find the probability that a request arrives within 10 minutes.}
- \CriterionTask{subsec:c4-prob-dispatch-b}{4.2}{Use a complement to find the probability that the wait exceeds 20 minutes.}
- \CriterionTask{subsec:c4-prob-dispatch-c}{4.3}{Find the probability that the wait is between 10 and 20 minutes.}
- \CriterionTask{subsec:c4-prob-dispatch-d}{4.4}{Interpret the three probabilities for the courier operation.}
-\end{enumerate}
+\noindent\rule{\textwidth}{0.4pt}
 
-\subsubsection*{C4.1 - Model a wait of at most 10 minutes}\phantomsection\label{subsec:c4-prob-dispatch-a}
-Convert the hourly rate to the units of $T$:
-\[
- \lambda=\frac4{60}=\frac1{15}\text{ request per minute},
- \qquad T\sim\operatorname{Exp}\!\left(\frac1{15}\right).
-\]
-``Within 10 minutes'' means $T\leq10$, so use the CDF:
-\[
-\begin{aligned}
- P(T\leq10)
- &=F_T(10)\\
- &=1-e^{-(1/15)(10)}\\
- &=1-e^{-2/3}\\
- &\approx1-0.5134=0.4866.
-\end{aligned}
-\]
-Thus there is about a $48.7\%$ chance that the next request arrives within
-$10$ minutes.
-\secInicio[sec:c4-probabilities][sec:c4-prob-dispatch]
 
-\subsubsection*{C4.2 - Use a complement for a long wait}\phantomsection\label{subsec:c4-prob-dispatch-b}
-The event $T>20$ is the complement of $T\leq20$.  Therefore
-\[
-\begin{aligned}
- P(T>20)
- &=1-P(T\leq20)\\
- &=1-\left(1-e^{-(1/15)(20)}\right)\\
- &=e^{-4/3}\\
- &\approx0.2636.
-\end{aligned}
-\]
-Under the model, about $26.4\%$ of comparable off-peak waits last more than
-$20$ minutes.
-\secInicio[sec:c4-probabilities][sec:c4-prob-dispatch]
+\begin{multicols}{2}
+	
+	\subsection{Customer-support calls}\label{sec:c4-probability-support}
+	
+	A mobile phone company in Bogotá receives technical-support calls throughout
+	the afternoon. The time, in minutes, from a randomly selected observation
+	time until the next support call is modeled by an exponential distribution
+	with rate 2 calls per minute.
+	
+	\textbf{Question.}
+	\begin{enumerate}
+		\CriterionTask{subsec:c4-probability-support-b}{4}{Find the probability that the next support call takes more than 5 minutes to arrive.}
+	\end{enumerate}
+	
+	\subsubsection*{Define the random variable}\phantomsection\label{subsec:c4-probability-support-a}
+	
+	\[
+	\boxed{T=\text{waiting time until the next support call, in minutes}}
+	\]
+	
+	\subsubsection*{C4.3 - Find a probability}\phantomsection\label{subsec:c4-probability-support-b}
+	
+	The company wants to find the probability that the next support call takes
+	more than 5 minutes to arrive, i.e.
+	\[
+	P(T>5)
+	\]
+	
+	\[
+	\begin{array}{c|c}
+		\textbf{General} & P(T>t)=e^{-\lambda t} \\[6pt]
+		\textbf{Context} & P(T>5),\quad \lambda=2
+	\end{array}
+	\]
+	Therefore,
+	\[
+	P(T>5)=e^{-(2)(5)}
+	=e^{-10} \]
+	\[
+	\boxed{P(T>5)\approx0.0000454}
+	\]
+	
+\end{multicols}
 
-\subsubsection*{C4.3 - Find an interval probability}\phantomsection\label{subsec:c4-prob-dispatch-c}
-For a continuous variable, including or excluding the endpoints does not
-change the probability.  Subtract the two CDF values:
-\[
-\begin{aligned}
- P(10<T<20)
- &=F_T(20)-F_T(10)\\
- &=\left(1-e^{-4/3}\right)-\left(1-e^{-2/3}\right)\\
- &=e^{-2/3}-e^{-4/3}\\
- &\approx0.5134-0.2636=0.2498.
-\end{aligned}
-\]
-Hence about $25.0\%$ of waits are between $10$ and $20$ minutes.
-\secInicio[sec:c4-probabilities][sec:c4-prob-dispatch]
+\noindent\rule{\textwidth}{0.4pt}
 
-\subsubsection*{C4.4 - Interpret the probability breakdown}\phantomsection\label{subsec:c4-prob-dispatch-d}
-The three disjoint ranges cover all possible waits:
-\[
- P(T\leq10)+P(10<T\leq20)+P(T>20)
- \approx0.4866+0.2498+0.2636=1.0000.
-\]
-Thus approximately $48.7\%$ of requests arrive in the first 10 minutes,
-$25.0\%$ in the next 10 minutes, and $26.4\%$ after 20 minutes.  The last
-group quantifies potential idle time, but the figures apply only to the stated
-off-peak regime; they should not be transferred to a lunch rush without a new
-rate.
-\secInicio[sec:c4-probabilities][sec:c4-prob-dispatch]
+\newpage
 
-\section{Conditional Waiting Times and Memorylessness}\label{sec:c4-memory}
+\begin{multicols}{2} 
+	
+	\subsection{Food-delivery requests}\label{sec:c4-probability-delivery} 
+	
+	A food-delivery platform in Bogotá receives delivery requests throughout 
+	the evening. The time, in minutes, from a randomly selected observation 
+	time until the next delivery request is modeled by an exponential 
+	distribution with rate 0.15 requests per minute. 
+	
+	\textbf{Question.} 
+	\begin{enumerate} 
+		\CriterionTask{subsec:c4-probability-delivery-b}{4}{Find the probability that the next delivery request takes less than 10 minutes to arrive.} 
+	\end{enumerate} 
+	
+	\subsubsection*{Define the random variable}\phantomsection\label{subsec:c4-probability-delivery-a} 
+	
+	\[ 
+	\boxed{ 
+		\begin{aligned} 
+			T={}&\text{waiting time until the next delivery request,}\\ 
+			&\text{in minutes} 
+	\end{aligned}} 
+	\] 
+	
+	\subsubsection*{C4.3 - Find a probability}\phantomsection\label{subsec:c4-probability-delivery-b} 
+	
+	The platform wants to find the probability that the next delivery request 
+	takes less than 10 minutes to arrive, i.e. 
+	\[ 
+	P(T<10) 
+	\] 
+	
+	\[ 
+	\begin{array}{c|c} 
+		\textbf{General} & P(T<t)=1-e^{-\lambda t} \\[6pt] 
+		\textbf{Context} & P(T<10),\quad \lambda=0.15 
+	\end{array} 
+	\] 
+	
+	Therefore, 
+	\[ 
+	P(T<10)=1-e^{-(0.15)(10)} 
+	=1-e^{-1.5} 
+	\] 
+	\[ 
+	\boxed{P(T<10)\approx0.7769} 
+	\] 
+	
+\end{multicols}
+
+\noindent\rule{\textwidth}{0.4pt}
+
+\begin{multicols}{2}
+	
+	\subsection{Bank security alerts}\label{sec:c4-probability-alerts}
+	
+	A Colombian digital bank continuously monitors transactions for unusual
+	activity. The time, in minutes, from a randomly selected observation
+	time until the next security alert is modeled by an exponential distribution
+	with an average of 1 alert every 10 minutes.
+	
+	\textbf{Question.}
+	\begin{enumerate}
+		\CriterionTask{subsec:c4-probability-alerts-b}{4}{Find the probability that the next security alert takes more than 8 minutes to be generated.}
+	\end{enumerate}
+	
+	\subsubsection*{Define the random variable}\phantomsection\label{subsec:c4-probability-alerts-a}
+	
+	\[
+	\boxed{
+		\begin{aligned}
+			T={}&\text{waiting time until the next security alert,}\\
+			&\text{in minutes}
+	\end{aligned}}
+	\]
+	
+	\subsubsection*{C4.2 - Find the rate parameter}\phantomsection\label{subsec:c4-probability-alerts-rate}
+	
+	The average rate is 1 alert every 10 minutes, so
+	\[
+	\lambda=\frac{1}{10}=0.10\text{ alerts per minute}
+	\]
+	
+	\columnbreak
+	
+	\subsubsection*{C4.3 - Find a probability}\phantomsection\label{subsec:c4-probability-alerts-b}
+	
+	The bank wants to find the probability that the next security alert takes
+	more than 8 minutes to be generated, i.e.
+	\[
+	P(T>8)
+	\]
+	
+	\[
+	\begin{array}{c|c}
+		\textbf{General} & P(T>t)=e^{-\lambda t} \\[6pt]
+		\textbf{Context} & P(T>8),\quad \lambda=0.10
+	\end{array}
+	\]
+	
+	Therefore,
+	\[
+	P(T>8)=e^{-(0.10)(8)}
+	=e^{-0.8}
+	\]
+	\[
+	\boxed{P(T>8)\approx0.4493}
+	\]
+	
+\end{multicols}
+
+\noindent\rule{\textwidth}{0.4pt}
+
+
+\begin{multicols}{2}
+	
+	\subsection{Battery failures}\label{sec:c4-probability-battery}
+	
+	A mobile phone company tests the batteries used in its devices. The
+	operating time, in hours, of a randomly selected battery before it fails
+	is modeled by an exponential distribution with an average of 1 failure
+	every 25 hours.
+	
+	\textbf{Question.}
+	\begin{enumerate}
+		\CriterionTask{subsec:c4-probability-battery-b}{4}{Find the probability that a randomly selected battery fails within its first 15 hours of operation.}
+	\end{enumerate}
+	
+	\subsubsection*{Define the random variable}\phantomsection\label{subsec:c4-probability-battery-a}
+	
+	\[
+	\boxed{
+		\begin{aligned}
+			T={}&\text{operating time of a randomly selected battery,}\\
+			&\text{in hours}
+	\end{aligned}}
+	\]
+	
+	\subsubsection*{C4.2 - Find the rate parameter}\phantomsection\label{subsec:c4-probability-battery-rate}
+	
+	The average rate is 1 failure every 25 hours, so
+	\[
+	\lambda=\frac{1}{25}=0.04\text{ failures per hour}
+	\]
+	
+	\subsubsection*{C4.3 - Find a probability}\phantomsection\label{subsec:c4-probability-battery-b}
+	
+	The company wants to find the probability that a randomly selected
+	battery fails within its first 15 hours of operation, i.e.
+	\[
+	P(T<15)
+	\]
+	
+	\[
+	\begin{array}{c|c}
+		\textbf{General} & P(T<t)=1-e^{-\lambda t} \\[6pt]
+		\textbf{Context} & P(T<15),\quad \lambda=0.04
+	\end{array}
+	\]
+	
+	Therefore,
+	\[
+	P(T<15)=1-e^{-(0.04)(15)}
+	=1-e^{-0.6}
+	\]
+	\[
+	\boxed{P(T<15)\approx0.4512}
+	\]
+	
+\end{multicols}
+
+\noindent\rule{\textwidth}{0.4pt}\\
+
+\begin{multicols}{2}
+	
+	\subsection{Ride-hailing requests}\label{sec:c4-probability-rides}
+	
+	A ride-hailing platform in Bogotá receives ride requests throughout
+	the day. The time, in minutes, from a randomly selected observation
+	time until the next ride request is modeled by an exponential
+	distribution with rate 0.20 requests per minute.
+	
+	\textbf{Question.}
+	\begin{enumerate}
+		\CriterionTask{subsec:c4-probability-rides-b}{4}{Find the probability that the next ride request arrives between 3 and 8 minutes after the observation time.}
+	\end{enumerate}
+	
+	\subsubsection*{Define the random variable}\phantomsection\label{subsec:c4-probability-rides-a}
+	
+	\[
+	\boxed{
+		\begin{aligned}
+			T={}&\text{waiting time until the next ride request,}\\
+			&\text{in minutes}
+	\end{aligned}}
+	\]
+	
+	\subsubsection*{C4.3 - Find a probability}\phantomsection\label{subsec:c4-probability-rides-b}
+	
+	The platform wants to find the probability that the next ride request
+	arrives between 3 and 8 minutes after the observation time, i.e.
+	\[
+	P(3<T<8)
+	\]
+	
+	\[
+	\begin{array}{c|c}
+		\textbf{General} &
+		P(a<T<b)=e^{-\lambda a}-e^{-\lambda b} \\[6pt]
+		\textbf{Context} &
+		P(3<T<8),\quad \lambda=0.20
+	\end{array}
+	\]
+	
+	Therefore,
+	\[
+	P(3<T<8)
+	=
+	\left(1-e^{-(0.20)(8)}\right)
+	-
+	\left(1-e^{-(0.20)(3)}\right)
+	\]
+	
+	\[
+	=e^{-0.6}-e^{-1.6}
+	\]
+	
+	\[
+	\boxed{P(3<T<8)\approx0.3672}
+	\]
+	
+\end{multicols}
+
+\noindent\rule{\textwidth}{0.4pt}
+
+\begin{multicols}{2}
+	
+	\subsection{Food-delivery preparation times}\label{sec:c4-probability-preparation}
+	
+	A food-delivery restaurant in Bogotá prepares orders throughout the
+	evening. The preparation time, in minutes, for a randomly selected
+	order is modeled by an exponential distribution with an average
+	of 1 order every 12 minutes.
+	
+	\textbf{Question.}
+	\begin{enumerate}
+		\CriterionTask{subsec:c4-probability-preparation-b}{4}{Find the probability that a randomly selected order takes between 5 and 15 minutes to prepare.}
+	\end{enumerate}
+	
+	\subsubsection*{Define the random variable}\phantomsection\label{subsec:c4-probability-preparation-a}
+	
+	\[
+	\boxed{
+		\begin{aligned}
+			T={}&\text{preparation time of a randomly selected order,}\\
+			&\text{in minutes}
+	\end{aligned}}
+	\]
+	
+	\subsubsection*{C4.2 - Find the rate parameter}\phantomsection\label{subsec:c4-probability-preparation-rate}
+	
+	The average rate is 1 order every 12 minutes, so
+	\[
+	\lambda=\frac{1}{12}\approx0.0833\text{ orders per minute}
+	\]
+	
+	\columnbreak
+	
+	\subsubsection*{C4.3 - Find a probability}\phantomsection\label{subsec:c4-probability-preparation-b}
+	
+	The restaurant wants to find the probability that an order takes
+	between 5 and 15 minutes to prepare, i.e.
+	\[
+	P(5<T<15)
+	\]
+	
+	\[
+	\begin{array}{c|c}
+		\textbf{General} &
+		P(a<T<b)=e^{-\lambda a}-e^{-\lambda b} \\[6pt]
+		\textbf{Context} &
+		P(5<T<15),\quad \lambda=\frac{1}{12}
+	\end{array}
+	\]
+	
+	Therefore,
+	\[
+	P(5<T<15)
+	=
+	\left(1-e^{-(1/12)(15)}\right)
+	-
+	\left(1-e^{-(1/12)(5)}\right)
+	\]
+	
+	\[
+	=e^{-5/12}-e^{-15/12}
+	\]
+	
+	\[
+	\boxed{P(5<T<15)\approx0.3413}
+	\]
+	
+\end{multicols}
+
+
+\newpage
+
+\section{Finding the Rate of an Exponential Distribution}\label{sec:c4-finding-rate}
 \SectionProblemsTableOfContents{
- \SectionProblemLink{sec:c4-memory-tourism}{Tourism website enquiries}}
+	\SectionProblemLink{sec:c4-find-rate-support}{Customer-support calls}\\
+	\SectionProblemLink{sec:c4-find-rate-delivery}{Food-delivery requests}\\
+	\SectionProblemLink{sec:c4-find-rate-alerts}{Bank security alerts}\\
+	\SectionProblemLink{sec:c4-find-rate-battery}{Battery failures}\\
+	\SectionProblemLink{sec:c4-find-rate-rides}{Ride-hailing requests}\\
+	\SectionProblemLink{sec:c4-find-rate-delivery-band}{Food-delivery requests (interval)}}
+\vspace{5mm}
 
-\subsection{Tourism website enquiries}\label{sec:c4-memory-tourism}
-A Bogotá hotel receives independent website enquiries at a stable rate of
-$3$ per hour during a quiet late-evening window.  At 10:00 p.m. the employee
-starts monitoring the inbox.  By 10:20 p.m. no enquiry has arrived.  Let $T$
-be the total wait in hours from 10:00 p.m. to the next enquiry.
+\noindent\rule{\textwidth}{0.4pt}
 
-\textbf{Questions/Tasks.}
-\begin{enumerate}
- \CriterionTask{subsec:c4-memory-tourism-a}{4.1}{Use conditional probability to find the chance that the total wait exceeds 50 minutes.}
- \CriterionTask{subsec:c4-memory-tourism-b}{4.2}{Use memorylessness to obtain the same result.}
- \CriterionTask{subsec:c4-memory-tourism-c}{4.3}{Find the probability that an enquiry arrives in the next 15 minutes.}
- \CriterionTask{subsec:c4-memory-tourism-d}{4.4}{Interpret memorylessness and state when it would be implausible.}
-\end{enumerate}
+\begin{multicols}{2}
+	
+	\subsection{Customer-support calls}\label{sec:c4-find-rate-support}
+	
+	A mobile phone company in Bogotá receives technical-support calls throughout
+	the afternoon. The time $T$, in minutes, between a randomly selected
+	observation time and the next support call is modeled by an exponential
+	distribution.
+	
+	Based on previous observations, the company estimates that there is a 90\%
+	probability that the next support call arrives within 10 minutes.
+	
+	\textbf{Question.}
+	\begin{enumerate}
+		\CriterionTask{subsec:c4-find-rate-support-a}{4.2}{Find the rate parameter $\lambda$ of the exponential distribution.}
+	\end{enumerate}
+	
+	\subsubsection*{C4.2 - Find the rate parameter}\phantomsection\label{subsec:c4-find-rate-support-a}
+	
+	\[
+	\begin{array}{c|c}
+		\textbf{General} & P(T\leq t)=1-e^{-\lambda t} \\[6pt]
+		\textbf{Context} & P(T\leq10)=0.90
+	\end{array}
+	\]
+	Therefore,
+	\[
+	0.90=1-e^{-10\lambda}
+	\quad \longrightarrow \quad e^{-10\lambda}=0.10
+	\]
+	\[
+	\longrightarrow \quad \ln(e^{-10\lambda})=\ln(0.10)
+	\]
+	\[
+	\longrightarrow \quad -10\lambda=\ln(0.10)
+	\quad \longrightarrow \quad
+	\lambda=-\frac{\ln(0.10)}{10}
+	\]
+	
+	\[
+	\boxed{\lambda\approx0.2303\text{ calls/minute}}
+	\]
+	
+\end{multicols}
 
-\subsubsection*{C4.1 - Calculate from conditional probability}\phantomsection\label{subsec:c4-memory-tourism-a}
-The observed 20 minutes are $20/60=1/3$ hour, and 50 minutes are
-$50/60=5/6$ hour.  Since $\{T>5/6\}\subset\{T>1/3\}$,
-\[
-\begin{aligned}
- P\left(T>\frac56\,\middle|\,T>\frac13\right)
- &=\frac{P(T>5/6)}{P(T>1/3)}\\
- &=\frac{e^{-3(5/6)}}{e^{-3(1/3)}}\\
- &=e^{-5/2+1}=e^{-3/2}\\
- &\approx0.2231.
-\end{aligned}
-\]
-Given the first 20 alert-free minutes, the modeled probability that the total
-wait passes 50 minutes is about $22.3\%$.
-\secInicio[sec:c4-memory][sec:c4-memory-tourism]
+\noindent\rule{\textwidth}{0.4pt}
 
-\subsubsection*{C4.2 - Apply memorylessness}\phantomsection\label{subsec:c4-memory-tourism-b}
-To pass 50 total minutes after already waiting 20 minutes requires more than
-\[
- 50-20=30\text{ additional minutes}=0.5\text{ hour}.
-\]
-The memoryless property therefore gives
-\[
-\begin{aligned}
- P(T>50\text{ min}\mid T>20\text{ min})
- &=P(T>30\text{ additional min})\\
- &=e^{-3(0.5)}=e^{-1.5}\approx0.2231.
-\end{aligned}
-\]
-This agrees with the conditional-probability calculation in C4.1.
-\secInicio[sec:c4-memory][sec:c4-memory-tourism]
+\begin{multicols}{2}
+	
+	\subsection{Food-delivery requests}\label{sec:c4-find-rate-delivery}
+	
+	A food-delivery platform in Bogotá receives delivery requests throughout
+	the evening. The time $T$, in minutes, from a randomly selected observation
+	time until the next delivery request is modeled by an exponential
+	distribution.
+	
+	Based on previous observations, the platform estimates that there is a 75\%
+	probability that the next delivery request arrives within 8 minutes.
+	
+	\textbf{Question.}
+	\begin{enumerate}
+		\CriterionTask{subsec:c4-find-rate-delivery-a}{4.2}{Find the rate parameter $\lambda$ of the exponential distribution.}
+	\end{enumerate}
+	
+	\subsubsection*{C4.2 - Find the rate parameter}\phantomsection\label{subsec:c4-find-rate-delivery-a}
+	
+	\[
+	\begin{array}{c|c}
+		\textbf{General} & P(T\leq t)=1-e^{-\lambda t} \\[6pt]
+		\textbf{Context} & P(T\leq8)=0.75
+	\end{array}
+	\]
+	Therefore,
+	\[
+	0.75=1-e^{-8\lambda}
+	\quad \longrightarrow \quad e^{-8\lambda}=0.25
+	\]
+	\[
+	\longrightarrow \quad \ln(e^{-8\lambda})=\ln(0.25)
+	\]
+	\[
+	\longrightarrow \quad -8\lambda=\ln(0.25)
+	\quad \longrightarrow \quad
+	\lambda=-\frac{\ln(0.25)}{8}
+	\]
+	
+	\[
+	\boxed{\lambda\approx0.1733\text{ requests/minute}}
+	\]
+	
+\end{multicols}
 
-\subsubsection*{C4.3 - Find a next-quarter-hour probability}\phantomsection\label{subsec:c4-memory-tourism-c}
-Fifteen minutes are $15/60=0.25$ hour.  By memorylessness, the additional
-wait has the same $\operatorname{Exp}(3)$ distribution.  Use the complement
-of no enquiry in the next quarter-hour:
-\[
-\begin{aligned}
- P(\text{enquiry in next 15 min}\mid T>20\text{ min})
- &=1-P(\text{no enquiry in next 15 min})\\
- &=1-e^{-3(0.25)}\\
- &=1-e^{-0.75}\\
- &\approx1-0.4724=0.5276.
-\end{aligned}
-\]
-There is about a $52.8\%$ modeled chance of an enquiry between 10:20 p.m.
-and 10:35 p.m.
-\secInicio[sec:c4-memory][sec:c4-memory-tourism]
+\noindent\rule{\textwidth}{0.4pt}
 
-\subsubsection*{C4.4 - Interpret and qualify memorylessness}\phantomsection\label{subsec:c4-memory-tourism-d}
-The 20 elapsed minutes change the total clock time but not the modeled
-distribution of the remaining wait.  In particular, the lack of an enquiry
-does not make one ``due.''  This interpretation is reasonable only if the
-late-evening rate remains stable and enquiries are approximately independent.
-It would be implausible near a scheduled advertising launch, at closing time,
-or when a tour group generates several related enquiries, because time or a
-previous event would then change the arrival mechanism.
-\secInicio[sec:c4-memory][sec:c4-memory-tourism]
+\newpage
 
-\section{Assessing Model Suitability}\label{sec:c4-suitability}
-\SectionProblemsTableOfContents{
- \SectionProblemLink{sec:c4-suitability-operations}{Three operational waiting times}}
+\begin{multicols}{2}
+	
+	\subsection{Bank security alerts}\label{sec:c4-find-rate-alerts}
+	
+	A Colombian digital bank continuously monitors transactions for unusual
+	activity. The time $T$, in minutes, from a randomly selected observation
+	time until the next security alert is modeled by an exponential
+	distribution.
+	
+	During a quiet overnight period, the bank estimates that there is a 20\%
+	probability that the next security alert takes more than 12 minutes to be
+	generated.
+	
+	\textbf{Question.}
+	\begin{enumerate}
+		\CriterionTask{subsec:c4-find-rate-alerts-a}{4.2}{Find the rate parameter $\lambda$ of the exponential distribution.}
+	\end{enumerate}
+	
+	\subsubsection*{C4.2 - Find the rate parameter}\phantomsection\label{subsec:c4-find-rate-alerts-a}
+	
+	\[
+	\begin{array}{c|c}
+		\textbf{General} & P(T\geq t)=e^{-\lambda t} \\[6pt]
+		\textbf{Context} & P(T\geq12)=0.20
+	\end{array}
+	\]
+	Therefore,
+	\[
+	0.20=e^{-12\lambda}
+	\]
+	\[
+	\longrightarrow \quad \ln(e^{-12\lambda})=\ln(0.20)
+	\]
+	\[
+	\longrightarrow \quad -12\lambda=\ln(0.20)
+	\quad \longrightarrow \quad
+	\lambda=-\frac{\ln(0.20)}{12}
+	\]
+	
+	\[
+	\boxed{\lambda\approx0.1341\text{ alerts/minute}}
+	\]
+	
+\end{multicols}
 
-\subsection{Three operational waiting times}\label{sec:c4-suitability-operations}
-A Colombian operations manager considers using an exponential model for each
-of the following variables:
-\begin{enumerate}[label=(\roman*)]
- \item the wait for a bus advertised to depart every 10 minutes;
- \item the time until the next overnight payment confirmation, when hourly
- counts fluctuate around the same level and customers act independently;
- \item the remaining lifetime of warehouse scanners whose failure risk rises
- as components wear out.
-\end{enumerate}
+\noindent\rule{\textwidth}{0.4pt}
 
-\textbf{Questions/Tasks.}
-\begin{enumerate}
- \CriterionTask{subsec:c4-suitability-operations-a}{4.1}{Identify the waiting-time variable and relevant exponential assumption in each case.}
- \CriterionTask{subsec:c4-suitability-operations-b}{4.2}{Assess the bus and payment-confirmation models.}
- \CriterionTask{subsec:c4-suitability-operations-c}{4.3}{Assess the scanner model and relate aging to memorylessness.}
- \CriterionTask{subsec:c4-suitability-operations-d}{4.4}{State what evidence the manager should examine before using a model.}
-\end{enumerate}
+\begin{multicols}{2}
+	
+	\subsection{Battery failures}\label{sec:c4-find-rate-battery}
+	
+	A company tests rechargeable batteries used in mobile devices. The operating
+	time $T$, in hours, until a randomly selected battery fails is modeled by an
+	exponential distribution.
+	
+	Based on previous tests, the company estimates that there is a 30\%
+	probability that a battery operates for at least 15 hours before failing.
+	
+	\textbf{Question.}
+	\begin{enumerate}
+		\CriterionTask{subsec:c4-find-rate-battery-a}{4.2}{Find the rate parameter $\lambda$ of the exponential distribution.}
+	\end{enumerate}
+	
+	\subsubsection*{C4.2 - Find the rate parameter}\phantomsection\label{subsec:c4-find-rate-battery-a}
+	
+	\[
+	\begin{array}{c|c}
+		\textbf{General} & P(T\geq t)=e^{-\lambda t} \\[6pt]
+		\textbf{Context} & P(T\geq15)=0.30
+	\end{array}
+	\]
+	Therefore,
+	\[
+	0.30=e^{-15\lambda}
+	\]
+	\[
+	\longrightarrow \quad \ln(e^{-15\lambda})=\ln(0.30)
+	\]
+	\[
+	\longrightarrow \quad -15\lambda=\ln(0.30)
+	\quad \longrightarrow \quad
+	\lambda=-\frac{\ln(0.30)}{15}
+	\]
+	
+	\[
+	\boxed{\lambda\approx0.0803\text{ failures/hour}}
+	\]
+	
+\end{multicols}
 
-\subsubsection*{C4.1 - Match variables to assumptions}\phantomsection\label{subsec:c4-suitability-operations-a}
-All three variables are non-negative times: time to the next bus, time to the
-next confirmation, and time to scanner failure.  However, that fact alone is
-not enough.  The bus requires random arrivals at a stable rate; confirmations
-require approximately independent customer actions and a stable rate; and a
-scanner requires an approximately constant failure hazard, meaning its chance
-of failing in the next short interval does not depend on its present age.
-\secInicio[sec:c4-suitability][sec:c4-suitability-operations]
+\noindent\rule{\textwidth}{0.4pt}
 
-\subsubsection*{C4.2 - Assess buses and confirmations}\phantomsection\label{subsec:c4-suitability-operations-b}
-The bus model is unsuitable under the stated schedule.  Departures are
-concentrated at fixed 10-minute marks rather than occurring randomly at a
-constant rate.  A rider's remaining wait also depends on position within the
-timetable.
+\begin{multicols}{2}
+	
+	\subsection{Ride-hailing requests}\label{sec:c4-find-rate-rides}
+	
+	A ride-hailing platform in Bogotá records the time $T$, in minutes, from a
+	randomly selected observation time until the next ride request. The waiting
+	time is modeled by an exponential distribution.
+	
+	Based on previous observations, the platform estimates that there is a 40\%
+	probability that the next ride request arrives between 3 and 8 minutes after
+	the observation time.
+	
+	\textbf{Question.}
+	\begin{enumerate}
+		\CriterionTask{subsec:c4-find-rate-rides-a}{4.2}{Find the rate parameter $\lambda$ of the exponential distribution.}
+	\end{enumerate}
+	
+	\subsubsection*{C4.2 - Find the rate parameter}\phantomsection\label{subsec:c4-find-rate-rides-a}
+	
+	\[
+	\begin{array}{c|c}
+		\textbf{General} & P(a<T<b)=e^{-\lambda a}-e^{-\lambda b} \\[6pt]
+		\textbf{Context} & P(3<T<8)=0.40
+	\end{array}
+	\]
+	
+	Therefore,
+	\[
+	0.40=e^{-3\lambda}-e^{-8\lambda}
+	\]
+	
+	Since $\lambda$ appears in two exponential terms, the equation must be solved
+	numerically.
+	
+	\[
+	\boxed{\lambda\approx0.1006\text{ requests/minute}}
+	\]
+	
+\end{multicols}
 
-The payment-confirmation model is reasonable as an approximation for the
-restricted overnight period: the variable is a time to the next event, the
-description supports a stable rate, and separate customers support
-independence.  The conclusion should not automatically be extended to busy
-daytime periods or batch-processed confirmations.
-\secInicio[sec:c4-suitability][sec:c4-suitability-operations]
+\noindent\rule{\textwidth}{0.4pt}
 
-\subsubsection*{C4.3 - Assess aging scanners}\phantomsection\label{subsec:c4-suitability-operations-c}
-An exponential lifetime assumes that a scanner which has survived for $s$
-hours has the same remaining-life distribution as a new scanner:
-\[
- P(T>s+t\mid T>s)=P(T>t).
-\]
-The stated wear makes failure risk increase with age.  Survival to age $s$
-therefore changes the remaining-life distribution, contradicting
-memorylessness and a constant hazard.  The exponential model is unsuitable
-for these aging scanners, although it could be a useful approximation during
-an early period in which the hazard is observed to be nearly constant.
-\secInicio[sec:c4-suitability][sec:c4-suitability-operations]
+\begin{multicols}{2}
+	
+	\subsection{Food-delivery requests}\label{sec:c4-find-rate-delivery-band}
+	
+	A food-delivery platform in Bogotá receives requests throughout the evening.
+	The time $T$, in minutes, from a randomly selected observation time until the
+	next delivery request is modeled by an exponential distribution.
+	
+	Based on previous observations, the platform estimates that there is a 30\%
+	probability that the next delivery request arrives between 5 and 15 minutes
+	after the observation time.
+	
+	\textbf{Question.}
+	\begin{enumerate}
+		\CriterionTask{subsec:c4-find-rate-delivery-band-a}{4.2}{Find the rate parameter $\lambda$ of the exponential distribution.}
+	\end{enumerate}
+	
+	\subsubsection*{C4.2 - Find the rate parameter}\phantomsection\label{subsec:c4-find-rate-delivery-band-a}
+	
+	\[
+	\begin{array}{c|c}
+		\textbf{General} & P(a<T<b)=e^{-\lambda a}-e^{-\lambda b} \\[6pt]
+		\textbf{Context} & P(5<T<15)=0.30
+	\end{array}
+	\]
+	
+	Therefore,
+	\[
+	0.30=e^{-5\lambda}-e^{-15\lambda}
+	\]
+	
+	Since $\lambda$ appears in two exponential terms, the equation must be solved
+	numerically.
+	
+	\[
+	\boxed{\lambda\approx0.0696\text{ requests/minute}}
+	\]
+	
+\end{multicols}
 
-\subsubsection*{C4.4 - Identify evidence for a decision}\phantomsection\label{subsec:c4-suitability-operations-d}
-The manager should compare event counts across equal time blocks, plot or
-summarize observed waiting times, and look for trends, clusters, and scheduled
-peaks.  For scanners, failure rates should also be compared by equipment age.
-Roughly stable block rates and no clear dependence support an exponential
-approximation; systematic timetable peaks, customer batches, or increasing
-age-specific failure rates contradict it.  Suitability is thus an empirical
-and contextual judgment, not a consequence of the variable merely being
-positive.
-\secInicio[sec:c4-suitability][sec:c4-suitability-operations]
+\noindent\rule{\textwidth}{0.4pt}
 
-\section{Applied Economic and Financial Problems}\label{sec:c4-applied}
-\SectionProblemsTableOfContents{
- \SectionProblemLink{sec:c4-applied-logistics}{Flower-export logistics decision}\\
- \SectionProblemLink{sec:c4-applied-wallet}{Digital-wallet alert threshold}}
-
-\subsection{Flower-export logistics decision}\label{sec:c4-applied-logistics}
-A Bogotá flower exporter studies urgent pickup requests during a stable
-off-peak window.  Historical records show a mean waiting time of $24$ minutes
-between requests.  The exporter may lose a sale if the next request does not
-appear within 30 minutes, and a dispatcher wants a probability estimate for
-staffing decisions.  Let $X$ be the wait in hours to the next request.
-
-\textbf{Questions/Tasks.}
-\begin{enumerate}
- \CriterionTask{subsec:c4-applied-logistics-a}{4.1}{Determine $\lambda$ from the mean and write the model.}
- \CriterionTask{subsec:c4-applied-logistics-b}{4.2}{Find the probability that the wait exceeds 30 minutes.}
- \CriterionTask{subsec:c4-applied-logistics-c}{4.3}{Find the probability that the request arrives between 12 and 30 minutes.}
- \CriterionTask{subsec:c4-applied-logistics-d}{4.4}{Interpret the results and assess their use during Valentine's week.}
-\end{enumerate}
-
-\subsubsection*{C4.1 - Determine the rate from the mean}\phantomsection\label{subsec:c4-applied-logistics-a}
-Convert the mean to the hours used for $X$:
-\[
- 24\text{ minutes}=\frac{24}{60}=0.4\text{ hour}.
-\]
-Since $E(X)=1/\lambda$,
-\[
- \frac1\lambda=0.4
- \qquad\Longrightarrow\qquad
- \lambda=\frac1{0.4}=2.5\text{ requests per hour}.
-\]
-Therefore the proposed model is
-\[
- X\sim\operatorname{Exp}(2.5),\qquad x\geq0,
-\]
-with $X$ measured in hours.
-\secInicio[sec:c4-applied][sec:c4-applied-logistics]
-
-\subsubsection*{C4.2 - Calculate the risk of a wait over 30 minutes}\phantomsection\label{subsec:c4-applied-logistics-b}
-Thirty minutes are $30/60=0.5$ hour.  Using the survival function,
-\[
-\begin{aligned}
- P(X>0.5)
- &=e^{-\lambda(0.5)}\\
- &=e^{-2.5(0.5)}\\
- &=e^{-1.25}\\
- &\approx0.2865.
-\end{aligned}
-\]
-Thus about $28.7\%$ of modeled off-peak waits exceed 30 minutes.
-\secInicio[sec:c4-applied][sec:c4-applied-logistics]
-
-\subsubsection*{C4.3 - Calculate an operational interval}\phantomsection\label{subsec:c4-applied-logistics-c}
-Convert the lower endpoint as well:
-\[
- 12\text{ minutes}=\frac{12}{60}=0.2\text{ hour}.
-\]
-Then
-\[
-\begin{aligned}
- P(0.2<X<0.5)
- &=e^{-2.5(0.2)}-e^{-2.5(0.5)}\\
- &=e^{-0.5}-e^{-1.25}\\
- &\approx0.6065-0.2865=0.3200.
-\end{aligned}
-\]
-The model assigns about a $32.0\%$ chance to a next request arriving after
-12 minutes but before 30 minutes.
-\secInicio[sec:c4-applied][sec:c4-applied-logistics]
-
-\subsubsection*{C4.4 - Interpret and qualify the staffing evidence}\phantomsection\label{subsec:c4-applied-logistics-d}
-The $28.7\%$ long-wait probability quantifies the chance associated with the
-30-minute business threshold, while the $32.0\%$ interval probability
-describes a substantial middle group of waits.  Neither probability alone
-determines staffing: the exporter must also compare labour cost, response
-rules, and the value of a lost sale.
-
-The off-peak model should not be transferred unchanged to Valentine's week.
-Deadlines and promotions can raise the rate at different times and make
-requests arrive in clusters, violating stability and independence.  Separate
-rates for reasonably stable time blocks would be more defensible.
-\secInicio[sec:c4-applied][sec:c4-applied-logistics]
-
-\subsection{Digital-wallet alert threshold}\label{sec:c4-applied-wallet}
-During a stable overnight window, a Colombian digital wallet models the wait
-$Y$ to the next suspicious-transaction alert as exponential.  Risk managers
-report that the probability of no alert during a 30-minute period is $0.40$.
-Time $Y$ will be measured in hours.  An analyst has already monitored for
-$45$ minutes without an alert.
-
-\textbf{Questions/Tasks.}
-\begin{enumerate}
- \CriterionTask{subsec:c4-applied-wallet-a}{4.1}{Use the reported probability to determine $\lambda$ and the mean wait.}
- \CriterionTask{subsec:c4-applied-wallet-b}{4.2}{Find the probability of an alert during the next hour, given the observed 45 alert-free minutes.}
- \CriterionTask{subsec:c4-applied-wallet-c}{4.3}{Find the probability that the total wait is between 1 and 2 hours, given the observation.}
- \CriterionTask{subsec:c4-applied-wallet-d}{4.4}{Interpret the results and assess the model during a coordinated fraud wave.}
-\end{enumerate}
-
-\subsubsection*{C4.1 - Determine the parameter from a probability}\phantomsection\label{subsec:c4-applied-wallet-a}
-Thirty minutes are $0.5$ hour.  ``No alert'' means that the waiting time
-exceeds $0.5$ hour, so
-\[
- P(Y>0.5)=e^{-0.5\lambda}=0.40.
-\]
-Take natural logarithms and solve:
-\[
- -0.5\lambda=\ln(0.40)
- \qquad\Longrightarrow\qquad
- \lambda=\frac{-\ln(0.40)}{0.5}
- \approx1.8326\text{ alerts per hour}.
-\]
-Hence
-\[
- Y\sim\operatorname{Exp}(1.8326),
- \qquad
- E(Y)=\frac1\lambda
- =\frac{0.5}{-\ln(0.40)}
- \approx0.5457\text{ h}.
-\]
-Converting the mean,
-\[
- 0.5457(60)\approx32.7\text{ minutes}.
-\]
-Thus the reported half-hour survival probability corresponds to a mean wait
-of about $32.7$ minutes.
-\secInicio[sec:c4-applied][sec:c4-applied-wallet]
-
-\subsubsection*{C4.2 - Find the next-hour conditional probability}\phantomsection\label{subsec:c4-applied-wallet-b}
-The elapsed 45 minutes are $0.75$ hour.  By memorylessness, the probability of
-an alert in the next hour is the same as it was at the beginning:
-\[
-\begin{aligned}
- P(Y\leq1.75\mid Y>0.75)
- &=P(\text{additional wait}\leq1)\\
- &=1-e^{-\lambda(1)}\\
- &=1-e^{-1.8326}\\
- &\approx1-0.1600=0.8400.
-\end{aligned}
-\]
-There is about an $84.0\%$ modeled chance of an alert in the coming hour.
-\secInicio[sec:c4-applied][sec:c4-applied-wallet]
-
-\subsubsection*{C4.3 - Find a conditional interval probability}\phantomsection\label{subsec:c4-applied-wallet-c}
-Given survival to $0.75$ hour, a total wait from $1$ to $2$ hours corresponds
-to an additional wait from
-\[
- 1-0.75=0.25\text{ hour}
- \quad\text{to}\quad
- 2-0.75=1.25\text{ hours}.
-\]
-Memorylessness and the interval formula give
-\[
-\begin{aligned}
- P(1<Y<2\mid Y>0.75)
- &=e^{-\lambda(0.25)}-e^{-\lambda(1.25)}\\
- &=e^{-1.8326(0.25)}-e^{-1.8326(1.25)}\\
- &\approx0.6325-0.1012=0.5313.
-\end{aligned}
-\]
-Thus, conditional on the observed 45 alert-free minutes, about $53.1\%$ of
-modeled cases place the next alert between one and two hours after monitoring
-began.
-\secInicio[sec:c4-applied][sec:c4-applied-wallet]
-
-\subsubsection*{C4.4 - Interpret and assess the alert model}\phantomsection\label{subsec:c4-applied-wallet-d}
-The next-hour probability can inform on-call coverage, while the conditional
-interval probability describes when within the overall monitoring session an
-alert may occur.  These are probabilities under the model, not guarantees.
-
-During a coordinated fraud wave, alerts may arrive in bursts and their rate
-may rise as the attack develops.  Both independence and a stable rate would
-then fail, so the memoryless exponential model and the calculated
-probabilities would be unreliable.  Managers should update the rate over
-shorter stable windows or use a model that allows clustering and a changing
-rate.
-\secInicio[sec:c4-applied][sec:c4-applied-wallet]
 
 \end{document}
