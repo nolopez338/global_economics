@@ -1,0 +1,219 @@
+% ============================================================
+% Exponential probability graph
+% ============================================================
+
+\newcommand{\ExponentialProbabilityGraph}[3]{%
+	% #1 = lambda
+	% #2 = lower bound a
+	% #3 = upper bound b
+	
+	\begin{center}
+		\begin{tikzpicture}[x=1cm,y=10cm]
+			
+			% Graph limits
+			\pgfmathsetmacro{\GraphXMax}{#3+1.2}
+			
+			% Maximum value of the exponential density
+			\pgfmathsetmacro{\GraphYMax}{1.2*#1}
+			
+			% Function values
+			\pgfmathsetmacro{\Fa}{#1*exp(-#1*#2)}
+			\pgfmathsetmacro{\Fb}{#1*exp(-#1*#3)}
+			
+			% Axes
+			\draw[->] (-0.5,0) -- (\GraphXMax,0) node[right] {$t$};
+			\draw[->] (0,-0.02) -- (0,\GraphYMax);
+			
+			% Shaded probability region
+			\fill[blue!25, fill opacity=0.7]
+			(#2,0)
+			-- plot[
+			domain=#2:#3,
+			samples=100
+			]
+			(\x,{#1*exp(-#1*\x)})
+			-- (#3,0)
+			-- cycle;
+			
+			% Exponential density
+			\draw[
+			thick,
+			domain=0:\GraphXMax,
+			samples=100
+			]
+			plot (\x,{#1*exp(-#1*\x)});
+			
+			% Vertical guides
+			\draw[dashed]
+			(#2,0) -- (#2,\Fa);
+			
+			\draw[dashed]
+			(#3,0) -- (#3,\Fb);
+			
+			% Horizontal axis labels
+			\node[below=2pt] at (#2,0) {\scriptsize $#2$};
+			\node[below=2pt] at (#3,0) {\scriptsize $#3$};
+			
+			% Probability label
+			\pgfmathsetmacro{\MidPoint}{(#2+#3)/2}
+			\node at (\MidPoint,0.10)
+			{\scriptsize $\displaystyle P(#2<T<#3)$};
+			
+			% Density label
+			\pgfmathsetmacro{\LabelX}{max(1.5,min(#3-0.3,3.5))}
+			\pgfmathsetmacro{\LabelY}{#1*exp(-#1*\LabelX)+0.06}
+			
+			\node[above] at (\LabelX,\LabelY)
+			{\scriptsize $\displaystyle f_T(t)=#1e^{-#1t}$};
+			
+		\end{tikzpicture}
+	\end{center}
+}
+
+% ============================================================
+% Exponential probability graph: less than a
+% ============================================================
+
+\newcommand{\ExponentialLessThanGraph}[3]{%
+	% #1 = lambda
+	% #2 = upper bound a
+	% #3 = graph extension beyond a
+	
+	\begin{center}
+		\begin{tikzpicture}[x=1cm,y=10cm]
+			
+			% Graph limits
+			\pgfmathsetmacro{\GraphXMax}{#2+#3}
+			
+			% Maximum value of the exponential density
+			\pgfmathsetmacro{\GraphYMax}{1.2*#1}
+			
+			% Function value at the cutoff
+			\pgfmathsetmacro{\Fa}{#1*exp(-#1*#2)}
+			
+			% Axes
+			\draw[->] (-0.5,0) -- (\GraphXMax,0) node[right] {$t$};
+			\draw[->] (0,-0.02) -- (0,\GraphYMax);
+			
+			% Shaded probability region
+			\fill[blue!25, fill opacity=0.7]
+			(0,0)
+			-- plot[
+			domain=0:#2,
+			samples=100
+			]
+			(\x,{#1*exp(-#1*\x)})
+			-- (#2,0)
+			-- cycle;
+			
+			% Exponential density
+			\draw[
+			thick,
+			domain=0:\GraphXMax,
+			samples=100
+			]
+			plot (\x,{#1*exp(-#1*\x)});
+			
+			% Vertical guide at the cutoff
+			\draw[dashed]
+			(#2,0) -- (#2,\Fa);
+			
+			% Horizontal axis label
+			\node[below=2pt] at (#2,0)
+			{\scriptsize $#2$};
+			
+			% Probability label
+			\pgfmathsetmacro{\LabelX}{0.45*#2}
+			\pgfmathsetmacro{\LabelY}{0.10}
+			
+			\node at (\LabelX,\LabelY)
+			{\scriptsize $\displaystyle P(T<#2)$};
+			
+			% Density label
+			\pgfmathsetmacro{\DensityLabelX}{max(1.2,min(#2-0.5,3.5))}
+			\pgfmathsetmacro{\DensityLabelY}
+			{#1*exp(-#1*\DensityLabelX)+0.06}
+			
+			\node[above] at (\DensityLabelX,\DensityLabelY)
+			{\scriptsize $\displaystyle f_T(t)=#1e^{-#1t}$};
+			
+		\end{tikzpicture}
+	\end{center}
+}
+
+% ============================================================
+% Exponential probability graph: greater than a
+% ============================================================
+
+\newcommand{\ExponentialGreaterThanGraph}[3]{%
+	% #1 = lambda
+	% #2 = lower bound a
+	% #3 = graph extension beyond a
+	%
+	% Example:
+	% \ExponentialGreaterThanGraph{0.20}{7}{5}
+	%
+	% Represents P(T > 7), with the graph extending
+	% 5 units beyond the cutoff.
+	
+	\begin{center}
+		\begin{tikzpicture}[x=1cm,y=10cm]
+			
+			% Graph limits
+			\pgfmathsetmacro{\GraphXMax}{#2+#3}
+			
+			% Maximum value of the exponential density
+			\pgfmathsetmacro{\GraphYMax}{1.2*#1}
+			
+			% Function value at the cutoff
+			\pgfmathsetmacro{\Fa}{#1*exp(-#1*#2)}
+			
+			% Axes
+			\draw[->] (-0.5,0) -- (\GraphXMax,0) node[right] {$t$};
+			\draw[->] (0,-0.02) -- (0,\GraphYMax);
+			
+			% Shaded probability region
+			\fill[blue!25, fill opacity=0.7]
+			(#2,0)
+			-- plot[
+			domain=#2:\GraphXMax,
+			samples=100
+			]
+			(\x,{#1*exp(-#1*\x)})
+			-- (\GraphXMax,0)
+			-- cycle;
+			
+			% Exponential density
+			\draw[
+			thick,
+			domain=0:\GraphXMax,
+			samples=100
+			]
+			plot (\x,{#1*exp(-#1*\x)});
+			
+			% Vertical guide at the cutoff
+			\draw[dashed]
+			(#2,0) -- (#2,\Fa);
+			
+			% Horizontal axis label
+			\node[below=2pt] at (#2,0)
+			{\scriptsize $#2$};
+			
+			% Probability label
+			\pgfmathsetmacro{\LabelX}{#2+0.35*#3}
+			\pgfmathsetmacro{\LabelY}{0.10}
+			
+			\node at (\LabelX,\LabelY)
+			{\scriptsize $\displaystyle P(T>#2)$};
+			
+			% Density label
+			\pgfmathsetmacro{\DensityLabelX}{max(1.2,min(#2-0.5,3.5))}
+			\pgfmathsetmacro{\DensityLabelY}
+			{#1*exp(-#1*\DensityLabelX)+0.06}
+			
+			\node[above] at (\DensityLabelX,\DensityLabelY)
+			{\scriptsize $\displaystyle f_T(t)=#1e^{-#1t}$};
+			
+		\end{tikzpicture}
+	\end{center}
+}
