@@ -1,0 +1,1081 @@
+% ============================================================
+% Distribution density graphs
+% ============================================================
+
+% ------------------------------------------------------------
+% Global distribution graph dimensions
+% ------------------------------------------------------------
+\newlength{\DistributionGraphWidth}
+\newlength{\DistributionGraphHeight}
+
+\setlength{\DistributionGraphWidth}{0.8\textwidth}
+\setlength{\DistributionGraphHeight}{6cm}
+
+
+% ------------------------------------------------------------
+% Uniform distribution
+% X ~ U(a,b)
+% Includes vertical lines at mu-2sigma, mu-sigma, mu,
+% mu+sigma, and mu+2sigma
+% ------------------------------------------------------------
+\newcommand{\UniformGraph}[2]{%
+	\pgfmathsetmacro{\Mean}{(#1+#2)/2}%
+	\pgfmathsetmacro{\StdDev}{(#2-#1)/sqrt(12)}%
+	\pgfmathsetmacro{\MuMinusTwoSigma}{\Mean-2*\StdDev}%
+	\pgfmathsetmacro{\MuMinusSigma}{\Mean-\StdDev}%
+	\pgfmathsetmacro{\MuPlusSigma}{\Mean+\StdDev}%
+	\pgfmathsetmacro{\MuPlusTwoSigma}{\Mean+2*\StdDev}%
+	\pgfmathsetmacro{\Density}{1/(#2-#1)}%
+	%
+	\begin{center}
+		\begin{tikzpicture}
+			\begin{axis}[
+				width=\DistributionGraphWidth,
+				height=\DistributionGraphHeight,
+				axis lines=left,
+				xlabel={$x$},
+				ylabel={$f(x)$},
+				xmin=#1-0.5,
+				xmax=#2+0.5,
+				ymin=0,
+				ymax={\Density*1.35},
+				xtick={
+					{\MuMinusTwoSigma},
+					{\MuMinusSigma},
+					{\Mean},
+					{\MuPlusSigma},
+					{\MuPlusTwoSigma}
+				},
+				xticklabels={
+					{\shortstack{$\mu-2\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuMinusTwoSigma}$}},
+					{\shortstack{$\mu-\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuMinusSigma}$}},
+					{\shortstack{$\mu$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\Mean}$}},
+					{\shortstack{$\mu+\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuPlusSigma}$}},
+					{\shortstack{$\mu+2\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuPlusTwoSigma}$}}
+				},
+				ytick={0,\Density},
+				yticklabels={
+					{$0$},
+					{\shortstack{$\frac{1}{b-a}$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\Density}$}}
+				},
+				tick label style={font=\small},
+				grid=both,
+				clip=false
+				]
+				
+				% Uniform probability density function
+				\addplot[
+				very thick,
+				blue
+				] coordinates {
+					(#1,0)
+					(#1,\Density)
+					(#2,\Density)
+					(#2,0)
+				};
+				
+				% Mean
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\Mean,0)
+					(\Mean,\Density)
+				};
+				
+				% One standard deviation below the mean
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\MuMinusSigma,0)
+					(\MuMinusSigma,\Density)
+				};
+				
+				% One standard deviation above the mean
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\MuPlusSigma,0)
+					(\MuPlusSigma,\Density)
+				};
+				
+				% Two standard deviations below the mean
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\MuMinusTwoSigma,0)
+					(\MuMinusTwoSigma,\Density)
+				};
+				
+				% Two standard deviations above the mean
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\MuPlusTwoSigma,0)
+					(\MuPlusTwoSigma,\Density)
+				};
+				
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}%
+}
+
+% ------------------------------------------------------------
+% Triangular distribution
+% X ~ Tri(a,b,c)
+% a = minimum, b = mode, c = maximum
+% ------------------------------------------------------------
+\newcommand{\TriangularGraph}[3]{%
+	% Mean
+	\pgfmathsetmacro{\Mean}{(#1+#2+#3)/3}%
+	%
+	% Standard deviation
+	\pgfmathsetmacro{\StdDev}{sqrt((#1^2+#2^2+#3^2-#1*#2-#1*#3-#2*#3)/18)}%
+	%
+	% Mean +/- standard deviations
+	\pgfmathsetmacro{\MuMinusTwoSigma}{\Mean-2*\StdDev}%
+	\pgfmathsetmacro{\MuMinusSigma}{\Mean-\StdDev}%
+	\pgfmathsetmacro{\MuPlusSigma}{\Mean+\StdDev}%
+	\pgfmathsetmacro{\MuPlusTwoSigma}{\Mean+2*\StdDev}%
+	%
+	% Maximum density
+	\pgfmathsetmacro{\Density}{2/(#3-#1)}%
+	%
+	\begin{center}
+		\begin{tikzpicture}
+			\begin{axis}[
+				width=\DistributionGraphWidth,
+				height=\DistributionGraphHeight,
+				axis lines=left,
+				xlabel={$x$},
+				ylabel={$f(x)$},
+				xmin={#1-0.5},
+				xmax={#3+0.5},
+				ymin=0,
+				ymax={\Density*1.25},
+				xtick={
+					\MuMinusTwoSigma,
+					\MuMinusSigma,
+					\Mean,
+					\MuPlusSigma,
+					\MuPlusTwoSigma
+				},
+				xticklabels={
+					{\shortstack{$\mu-2\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuMinusTwoSigma}$}},
+					{\shortstack{$\mu-\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuMinusSigma}$}},
+					{\shortstack{$\mu$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\Mean}$}},
+					{\shortstack{$\mu+\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuPlusSigma}$}},
+					{\shortstack{$\mu+2\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuPlusTwoSigma}$}}
+				},
+				ytick={
+					0,
+					\Density
+				},
+				yticklabels={
+					{$0$},
+					{$\frac{2}{c-a}$}
+				},
+				tick label style={font=\small},
+				grid=both,
+				clip=false
+				]
+				
+				% Triangular density
+				\addplot[
+				very thick,
+				blue,
+				domain=#1:#2,
+				samples=100
+				]
+				{2*(x-#1)/((#3-#1)*(#2-#1))};
+				
+				\addplot[
+				very thick,
+				blue,
+				domain=#2:#3,
+				samples=100
+				]
+				{2*(#3-x)/((#3-#1)*(#3-#2))};
+				
+				% Vertical dashed lines
+				\addplot[
+				dashed,
+				gray,
+				domain=0:\Density
+				]
+				coordinates {
+					(\MuMinusTwoSigma,0)
+					(\MuMinusTwoSigma,\Density)
+				};
+				
+				\addplot[
+				dashed,
+				gray,
+				domain=0:\Density
+				]
+				coordinates {
+					(\MuMinusSigma,0)
+					(\MuMinusSigma,\Density)
+				};
+				
+				\addplot[
+				dashed,
+				gray,
+				domain=0:\Density
+				]
+				coordinates {
+					(\Mean,0)
+					(\Mean,\Density)
+				};
+				
+				\addplot[
+				dashed,
+				gray,
+				domain=0:\Density
+				]
+				coordinates {
+					(\MuPlusSigma,0)
+					(\MuPlusSigma,\Density)
+				};
+				
+				\addplot[
+				dashed,
+				gray,
+				domain=0:\Density
+				]
+				coordinates {
+					(\MuPlusTwoSigma,0)
+					(\MuPlusTwoSigma,\Density)
+				};
+				
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}%
+}
+
+% ------------------------------------------------------------
+% Linear increasing distribution
+% X ~ Lin(a,b)
+% a = minimum, b = maximum
+% Includes vertical lines at mu-2sigma, mu-sigma, mu,
+% mu+sigma, and mu+2sigma
+% ------------------------------------------------------------
+\newcommand{\LinearIncreasingGraph}[2]{%
+	\pgfmathsetmacro{\Mean}{(#1+2*#2)/3}%
+	\pgfmathsetmacro{\StdDev}{(#2-#1)/(3*sqrt(2))}%
+	\pgfmathsetmacro{\MuMinusTwoSigma}{\Mean-2*\StdDev}%
+	\pgfmathsetmacro{\MuMinusSigma}{\Mean-\StdDev}%
+	\pgfmathsetmacro{\MuPlusSigma}{\Mean+\StdDev}%
+	\pgfmathsetmacro{\MuPlusTwoSigma}{\Mean+2*\StdDev}%
+	\pgfmathsetmacro{\Density}{2/(#2-#1)}%
+	%
+	\begin{center}
+		\begin{tikzpicture}
+			\begin{axis}[
+				width=\DistributionGraphWidth,
+				height=\DistributionGraphHeight,
+				axis lines=left,
+				xlabel={$x$},
+				ylabel={$f(x)$},
+				xmin=#1-0.5,
+				xmax=#2+0.5,
+				ymin=0,
+				ymax={\Density*1.25},
+				xtick={
+					{\MuMinusTwoSigma},
+					{\MuMinusSigma},
+					{\Mean},
+					{\MuPlusSigma},
+					{\MuPlusTwoSigma}
+				},
+				xticklabels={
+					{\shortstack{$\mu-2\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuMinusTwoSigma}$}},
+					{\shortstack{$\mu-\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuMinusSigma}$}},
+					{\shortstack{$\mu$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\Mean}$}},
+					{\shortstack{$\mu+\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuPlusSigma}$}},
+					{\shortstack{$\mu+2\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuPlusTwoSigma}$}}
+				},
+				ytick={0,\Density},
+				yticklabels={
+					{$0$},
+					{\shortstack{$\frac{2}{b-a}$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\Density}$}}
+				},
+				tick label style={font=\small},
+				grid=both,
+				clip=false
+				]
+				
+				% Linear increasing probability density function
+				\addplot[
+				very thick,
+				blue
+				] coordinates {
+					(#1,0)
+					(#2,\Density)
+				};
+				
+				% Mean
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\Mean,0)
+					(\Mean,\Density)
+				};
+				
+				% One standard deviation below the mean
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\MuMinusSigma,0)
+					(\MuMinusSigma,\Density)
+				};
+				
+				% One standard deviation above the mean
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\MuPlusSigma,0)
+					(\MuPlusSigma,\Density)
+				};
+				
+				% Two standard deviations below the mean
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\MuMinusTwoSigma,0)
+					(\MuMinusTwoSigma,\Density)
+				};
+				
+				% Two standard deviations above the mean
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\MuPlusTwoSigma,0)
+					(\MuPlusTwoSigma,\Density)
+				};
+				
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}%
+}
+
+% ------------------------------------------------------------
+% Linear decreasing distribution
+% X ~ LinDec(a,b)
+% a = minimum, b = maximum
+% Includes vertical lines at mu-2sigma, mu-sigma, mu,
+% mu+sigma, and mu+2sigma
+% ------------------------------------------------------------
+\newcommand{\LinearDecreasingGraph}[2]{%
+	\pgfmathsetmacro{\Mean}{(2*#1+#2)/3}%
+	\pgfmathsetmacro{\StdDev}{(#2-#1)/(3*sqrt(2))}%
+	\pgfmathsetmacro{\MuMinusTwoSigma}{\Mean-2*\StdDev}%
+	\pgfmathsetmacro{\MuMinusSigma}{\Mean-\StdDev}%
+	\pgfmathsetmacro{\MuPlusSigma}{\Mean+\StdDev}%
+	\pgfmathsetmacro{\MuPlusTwoSigma}{\Mean+2*\StdDev}%
+	\pgfmathsetmacro{\Density}{2/(#2-#1)}%
+	%
+	\begin{center}
+		\begin{tikzpicture}
+			\begin{axis}[
+				width=\DistributionGraphWidth,
+				height=\DistributionGraphHeight,
+				axis lines=left,
+				xlabel={$x$},
+				ylabel={$f(x)$},
+				xmin=#1-0.5,
+				xmax=#2+0.5,
+				ymin=0,
+				ymax={\Density*1.25},
+				xtick={
+					{\MuMinusTwoSigma},
+					{\MuMinusSigma},
+					{\Mean},
+					{\MuPlusSigma},
+					{\MuPlusTwoSigma}
+				},
+				xticklabels={
+					{\shortstack{$\mu-2\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuMinusTwoSigma}$}},
+					{\shortstack{$\mu-\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuMinusSigma}$}},
+					{\shortstack{$\mu$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\Mean}$}},
+					{\shortstack{$\mu+\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuPlusSigma}$}},
+					{\shortstack{$\mu+2\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuPlusTwoSigma}$}}
+				},
+				ytick={0,\Density},
+				yticklabels={
+					{$0$},
+					{\shortstack{$\frac{2}{b-a}$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\Density}$}}
+				},
+				tick label style={font=\small},
+				grid=both,
+				clip=false
+				]
+				
+				% Linear decreasing probability density function
+				\addplot[
+				very thick,
+				blue
+				] coordinates {
+					(#1,\Density)
+					(#2,0)
+				};
+				
+				% Mean
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\Mean,0)
+					(\Mean,\Density)
+				};
+				
+				% One standard deviation below the mean
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\MuMinusSigma,0)
+					(\MuMinusSigma,\Density)
+				};
+				
+				% One standard deviation above the mean
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\MuPlusSigma,0)
+					(\MuPlusSigma,\Density)
+				};
+				
+				% Two standard deviations below the mean
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\MuMinusTwoSigma,0)
+					(\MuMinusTwoSigma,\Density)
+				};
+				
+				% Two standard deviations above the mean
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\MuPlusTwoSigma,0)
+					(\MuPlusTwoSigma,\Density)
+				};
+				
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}%
+}
+
+% ------------------------------------------------------------
+% Exponential distribution
+% X ~ Exp(lambda)
+% Includes vertical lines at mu-sigma, mu, mu+sigma,
+% and mu+2sigma
+% ------------------------------------------------------------
+\newcommand{\ExponentialGraph}[1]{%
+	\pgfmathsetmacro{\Mean}{1/#1}%
+	\pgfmathsetmacro{\StdDev}{1/#1}%
+	\pgfmathsetmacro{\MuMinusSigma}{\Mean-\StdDev}%
+	\pgfmathsetmacro{\MuPlusSigma}{\Mean+\StdDev}%
+	\pgfmathsetmacro{\MuPlusTwoSigma}{\Mean+2*\StdDev}%
+	%
+	\begin{center}
+		\begin{tikzpicture}
+			\begin{axis}[
+				width=\DistributionGraphWidth,
+				height=\DistributionGraphHeight,
+				axis lines=left,
+				xlabel={$x$},
+				ylabel={$f(x)$},
+				xmin=0,
+				xmax={5/#1},
+				ymin=0,
+				ymax={#1*1.15},
+				xtick={
+					{\MuMinusSigma},
+					{\Mean},
+					{\MuPlusSigma},
+					{\MuPlusTwoSigma}
+				},
+				xticklabels={
+					{\shortstack{$\mu-\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuMinusSigma}$}},
+					{\shortstack{$\mu$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\Mean}$}},
+					{\shortstack{$\mu+\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuPlusSigma}$}},
+					{\shortstack{$\mu+2\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuPlusTwoSigma}$}}
+				},
+				ytick={0,#1},
+				yticklabels={
+					{$0$},
+					{\shortstack{$\lambda$\\
+							$\pgfmathprintnumber[fixed,precision=2]{#1}$}}
+				},
+				tick label style={font=\small},
+				grid=both,
+				clip=false
+				]
+				
+				% Exponential probability density function
+				\addplot[
+				very thick,
+				blue,
+				domain=0:{5/#1},
+				samples=100
+				]
+				{#1*exp(-#1*x)};
+				
+				% mu - sigma = 0
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(0,0)
+					(0,#1)
+				};
+				
+				% mu = 1/lambda
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					({1/#1},0)
+					({1/#1},{#1*exp(-1)})
+				};
+				
+				% mu + sigma = 2/lambda
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					({2/#1},0)
+					({2/#1},{#1*exp(-2)})
+				};
+				
+				% mu + 2sigma = 3/lambda
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					({3/#1},0)
+					({3/#1},{#1*exp(-3)})
+				};
+				
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}%
+}
+
+% ------------------------------------------------------------
+% Normal distribution
+% X ~ N(mu,sigma^2)
+% Includes vertical lines at mu-3sigma, mu-2sigma,
+% mu-sigma, mu, mu+sigma, mu+2sigma, and mu+3sigma
+% ------------------------------------------------------------
+\newcommand{\NormalGraph}[2]{%
+	\pgfmathsetmacro{\MuMinusThreeSigma}{#1-3*#2}%
+	\pgfmathsetmacro{\MuMinusTwoSigma}{#1-2*#2}%
+	\pgfmathsetmacro{\MuMinusSigma}{#1-#2}%
+	\pgfmathsetmacro{\Mean}{#1}%
+	\pgfmathsetmacro{\MuPlusSigma}{#1+#2}%
+	\pgfmathsetmacro{\MuPlusTwoSigma}{#1+2*#2}%
+	\pgfmathsetmacro{\MuPlusThreeSigma}{#1+3*#2}%
+	\pgfmathsetmacro{\Density}{1/(#2*sqrt(2*pi))}%
+	%
+	\begin{center}
+		\begin{tikzpicture}
+			\begin{axis}[
+				width=\DistributionGraphWidth,
+				height=\DistributionGraphHeight,
+				axis lines=left,
+				xlabel={$x$},
+				ylabel={$f(x)$},
+				xmin={#1-4*#2},
+				xmax={#1+4*#2},
+				ymin=0,
+				ymax={\Density*1.15},
+				xtick={
+					{\MuMinusThreeSigma},
+					{\MuMinusTwoSigma},
+					{\MuMinusSigma},
+					{\Mean},
+					{\MuPlusSigma},
+					{\MuPlusTwoSigma},
+					{\MuPlusThreeSigma}
+				},
+				xticklabels={
+					{\shortstack{$\mu-3\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuMinusThreeSigma}$}},
+					{\shortstack{$\mu-2\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuMinusTwoSigma}$}},
+					{\shortstack{$\mu-\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuMinusSigma}$}},
+					{\shortstack{$\mu$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\Mean}$}},
+					{\shortstack{$\mu+\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuPlusSigma}$}},
+					{\shortstack{$\mu+2\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuPlusTwoSigma}$}},
+					{\shortstack{$\mu+3\sigma$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\MuPlusThreeSigma}$}}
+				},
+				ytick={0,\Density},
+				yticklabels={
+					{$0$},
+					{\shortstack{$\frac{1}{\sigma\sqrt{2\pi}}$\\
+							$\pgfmathprintnumber[fixed,precision=2]{\Density}$}}
+				},
+				tick label style={font=\small},
+				grid=both,
+				clip=false
+				]
+				
+				% Normal probability density function
+				\addplot[
+				very thick,
+				blue,
+				domain={#1-4*#2}:{#1+4*#2},
+				samples=150
+				]
+				{1/(#2*sqrt(2*pi))*exp(-((x-#1)^2)/(2*#2^2))};
+				
+				% mu - 3sigma
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\MuMinusThreeSigma,0)
+					(\MuMinusThreeSigma,\Density)
+				};
+				
+				% mu - 2sigma
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\MuMinusTwoSigma,0)
+					(\MuMinusTwoSigma,\Density)
+				};
+				
+				% mu - sigma
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\MuMinusSigma,0)
+					(\MuMinusSigma,\Density)
+				};
+				
+				% mu
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\Mean,0)
+					(\Mean,\Density)
+				};
+				
+				% mu + sigma
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\MuPlusSigma,0)
+					(\MuPlusSigma,\Density)
+				};
+				
+				% mu + 2sigma
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\MuPlusTwoSigma,0)
+					(\MuPlusTwoSigma,\Density)
+				};
+				
+				% mu + 3sigma
+				\addplot[
+				dashed,
+				black,
+				thick
+				] coordinates {
+					(\MuPlusThreeSigma,0)
+					(\MuPlusThreeSigma,\Density)
+				};
+				
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}%
+}
+
+
+% ============================================================
+% Compact distribution graphs for use inside tables
+% ============================================================
+
+\newlength{\DistributionGraphHeightCompact}
+\setlength{\DistributionGraphHeightCompact}{2.6cm}
+
+
+% ------------------------------------------------------------
+% Uniform distribution
+% X ~ U(a,b)
+% ------------------------------------------------------------
+\newcommand{\CompactUniformGraph}[2]{%
+	\begin{tikzpicture}
+		\begin{axis}[
+			width=0.8\linewidth,
+			height=\DistributionGraphHeightCompact,
+			axis lines=left,
+			xmin=#1-0.5,
+			xmax=#2+0.5,
+			ymin=0,
+			ymax={1/(#2-#1)*1.25},
+			xtick={#1,#2},
+			xticklabels={},
+			ytick=\empty,
+			xlabel={$x$},
+			tick label style={font=\small},
+			label style={font=\small},
+			grid=none,
+			clip=false
+			]
+			
+			\addplot[very thick, blue] coordinates {
+				(#1,0)
+				(#1,{1/(#2-#1)})
+				(#2,{1/(#2-#1)})
+				(#2,0)
+			};
+			
+			% Parameters
+			\node[font=\small] at (axis cs:#1,0) [below=2pt] {$a$};
+			\node[font=\small] at (axis cs:#2,0) [below=2pt] {$b$};
+			
+		\end{axis}
+	\end{tikzpicture}%
+}
+
+
+% ------------------------------------------------------------
+% Triangular distribution
+% X ~ Tri(a,b,c)
+% a = minimum, b = mode, c = maximum
+% ------------------------------------------------------------
+\newcommand{\CompactTriangularGraph}[3]{%
+	\begin{tikzpicture}
+		\begin{axis}[
+			width=0.8\linewidth,
+			height=\DistributionGraphHeightCompact,
+			axis lines=left,
+			xmin=#1-0.5,
+			xmax=#3+0.5,
+			ymin=0,
+			ymax={2/(#3-#1)*1.25},
+			xtick={#1,#2,#3},
+			xticklabels={},
+			ytick=\empty,
+			xlabel={$x$},
+			tick label style={font=\small},
+			label style={font=\small},
+			grid=none,
+			clip=false
+			]
+			
+			\addplot[very thick, blue] coordinates {
+				(#1,0)
+				(#2,{2/(#3-#1)})
+				(#3,0)
+			};
+			
+			% Parameters
+			\node[font=\small] at (axis cs:#1,0) [below=2pt] {$a$};
+			\node[font=\small] at (axis cs:#2,0) [below=2pt] {$b$};
+			\node[font=\small] at (axis cs:#3,0) [below=2pt] {$c$};
+			
+		\end{axis}
+	\end{tikzpicture}%
+}
+
+
+% ------------------------------------------------------------
+% Linear increasing distribution
+% X ~ Lin(a,b)
+% ------------------------------------------------------------
+\newcommand{\CompactLinearIncreasingGraph}[2]{%
+	\begin{tikzpicture}
+		\begin{axis}[
+			width=0.8\linewidth,
+			height=\DistributionGraphHeightCompact,
+			axis lines=left,
+			xmin=#1-0.5,
+			xmax=#2+0.5,
+			ymin=0,
+			ymax={2/(#2-#1)*1.25},
+			xtick={#1,#2},
+			xticklabels={},
+			ytick=\empty,
+			xlabel={$x$},
+			tick label style={font=\small},
+			label style={font=\small},
+			grid=none,
+			clip=false
+			]
+			
+			\addplot[very thick, blue] coordinates {
+				(#1,0)
+				(#2,{2/(#2-#1)})
+			};
+			
+			% Parameters
+			\node[font=\small] at (axis cs:#1,0) [below=2pt] {$a$};
+			\node[font=\small] at (axis cs:#2,0) [below=2pt] {$b$};
+			
+		\end{axis}
+	\end{tikzpicture}%
+}
+
+% ------------------------------------------------------------
+% Linear decreasing distribution
+% X ~ Lin_dec(a,b)
+% ------------------------------------------------------------
+\newcommand{\CompactLinearDecreasingGraph}[2]{%
+	\begin{tikzpicture}
+		\begin{axis}[
+			width=0.8\linewidth,
+			height=\DistributionGraphHeightCompact,
+			axis lines=left,
+			xmin=#1-0.5,
+			xmax=#2+0.5,
+			ymin=0,
+			ymax={2/(#2-#1)*1.25},
+			xtick={#1,#2},
+			xticklabels={},
+			ytick=\empty,
+			xlabel={$x$},
+			tick label style={font=\small},
+			label style={font=\small},
+			grid=none,
+			clip=false
+			]
+			
+			\addplot[very thick, blue] coordinates {
+				(#1,{2/(#2-#1)})
+				(#2,0)
+			};
+			
+			% Parameters
+			\node[font=\small] at (axis cs:#1,0) [below=2pt] {$a$};
+			\node[font=\small] at (axis cs:#2,0) [below=2pt] {$b$};
+			
+		\end{axis}
+	\end{tikzpicture}%
+}
+
+
+% ------------------------------------------------------------
+% Trapezoidal distribution
+% X ~ Trap(a,b,h1,h2)
+%
+% Area = (h1 + h2)/2 * (b-a) = 1
+% ------------------------------------------------------------
+\newcommand{\CompactTrapezoidalGraph}[4]{%
+	\begin{tikzpicture}
+		\begin{axis}[
+			width=0.8\linewidth,
+			height=\DistributionGraphHeightCompact,
+			axis lines=left,
+			xmin=#1-0.5,
+			xmax=#2+0.5,
+			ymin=0,
+			ymax={max(#3,#4)*1.25},
+			xtick={#1,#2},
+			xticklabels={},
+			ytick=\empty,
+			xlabel={$x$},
+			tick label style={font=\small},
+			label style={font=\small},
+			grid=none,
+			clip=false
+			]
+			
+			% Vertical lines at the interval edges
+			\addplot[very thick, blue] coordinates {
+				(#1,0)
+				(#1,#3)
+			};
+			
+			\addplot[very thick, blue] coordinates {
+				(#2,0)
+				(#2,#4)
+			};
+			
+			% Trapezoidal density
+			\addplot[very thick, blue] coordinates {
+				(#1,#3)
+				(#2,#4)
+			};
+			
+			% Parameters
+			\node[font=\small] at (axis cs:#1,0) [below=2pt] {$a$};
+			\node[font=\small] at (axis cs:#2,0) [below=2pt] {$b$};
+			
+			% Heights
+			\node[font=\small] at (axis cs:#1,#3) [left=3pt] {$h_1$};
+			\node[font=\small] at (axis cs:#2,#4) [right=3pt] {$h_2$};
+			
+		\end{axis}
+	\end{tikzpicture}%
+}
+
+
+% ------------------------------------------------------------
+% Exponential distribution
+% X ~ Exp(lambda)
+% ------------------------------------------------------------
+\newcommand{\CompactExponentialGraph}[1]{%
+	\begin{tikzpicture}
+		\begin{axis}[
+			width=0.8\linewidth,
+			height=\DistributionGraphHeightCompact,
+			axis lines=left,
+			xmin=0,
+			xmax={5/#1},
+			ymin=0,
+			ymax={#1*1.15},
+			xtick={0,{1/#1},{2/#1},{3/#1},{4/#1}},
+			ytick=\empty,
+			xlabel={$x$},
+			tick label style={font=\small},
+			label style={font=\small},
+			grid=none,
+			clip=false
+			]
+			
+			\addplot[
+			very thick,
+			blue,
+			domain=0:{5/#1},
+			samples=100
+			]
+			{#1*exp(-#1*x)};
+			
+			% Parameter
+			\node[
+			font=\small,
+			anchor=north east
+			] at (axis description cs:0.97,0.95) {$\lambda=#1$};
+			
+		\end{axis}
+	\end{tikzpicture}%
+}
+
+
+% ------------------------------------------------------------
+% Normal distribution
+% X ~ N(mu,sigma^2)
+% ------------------------------------------------------------
+\newcommand{\CompactNormalGraph}[2]{%
+	\begin{tikzpicture}
+		\begin{axis}[
+			width=0.8\linewidth,
+			height=\DistributionGraphHeightCompact,
+			axis lines=left,
+			xmin={#1-4*#2},
+			xmax={#1+4*#2},
+			ymin=0,
+			ymax={1/(#2*sqrt(2*pi))*1.15},
+			xtick={#1},
+			xticklabels={},
+			ytick=\empty,
+			xlabel={$x$},
+			tick label style={font=\small},
+			label style={font=\small},
+			grid=none,
+			clip=false
+			]
+			
+			\addplot[
+			very thick,
+			blue,
+			domain={#1-4*#2}:{#1+4*#2},
+			samples=150
+			]
+			{1/(#2*sqrt(2*pi))*exp(-((x-#1)^2)/(2*#2^2))};
+			
+			% Parameters
+			\node[font=\small] at (axis cs:#1,0) [below=2pt] {$\mu$};
+			\node[
+			font=\small,
+			anchor=north east
+			] at (axis description cs:0.97,0.95) {$\sigma=#2$};
+			
+		\end{axis}
+	\end{tikzpicture}%
+}
+
+
+
