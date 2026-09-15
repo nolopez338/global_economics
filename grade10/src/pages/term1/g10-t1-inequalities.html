@@ -1,0 +1,2830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linear Inequality Visualizer</title>
+
+<style>
+:root {
+    --bg: #f4f6f8;
+    --panel: #ffffff;
+    --text: #17202a;
+    --muted: #65717d;
+    --border: #d9dee3;
+    --primary: #2e4057;
+    --left: #1769aa;
+    --right: #c44e52;
+    --solution: #218c74;
+    --error: #b03a2e;
+    --grid: #e6e9ed;
+    --axis: #59636e;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.5;
+}
+
+header {
+    background: var(--primary);
+    color: white;
+    padding: 28px 20px;
+}
+
+header .header-inner {
+    max-width: 1200px;
+    margin: auto;
+}
+
+h1 {
+    margin: 0 0 6px;
+    font-size: clamp(1.7rem, 4vw, 2.5rem);
+}
+
+header p {
+    margin: 0;
+    opacity: .9;
+}
+
+main {
+    max-width: 1200px;
+    margin: 24px auto 60px;
+    padding: 0 16px;
+}
+
+section,
+.section-collapsible {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+
+section {
+    padding: 20px;
+}
+
+h2 {
+    margin: 0 0 14px;
+    font-size: 1.3rem;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+.editor {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) 90px minmax(180px, 1fr);
+    gap: 12px;
+    align-items: center;
+}
+
+.editor label {
+    font-weight: 600;
+}
+
+.editor input,
+.editor select {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #bbc3ca;
+    border-radius: 7px;
+    font-size: 1rem;
+    background: white;
+    color: var(--text);
+}
+
+.inequality-preview {
+    text-align: center;
+    font-size: 1.5rem;
+    font-family: Georgia, "Times New Roman", serif;
+    margin: 20px 0 12px;
+}
+
+/* ---------- Coefficient sliders ---------- */
+
+.coefficient-controls {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(150px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.coefficient-control {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #f8f9fa;
+}
+
+.coefficient-control-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.coefficient-label {
+    font-weight: 600;
+}
+
+.coefficient-value {
+    min-width: 44px;
+    text-align: right;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1rem;
+}
+
+.coefficient-slider {
+    width: 100%;
+    margin: 2px 0 0;
+    padding: 0;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.coefficient-range {
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: .72rem;
+    margin-top: -1px;
+}
+
+.examples {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+button {
+    border: 1px solid #aeb7bf;
+    background: white;
+    color: var(--text);
+    padding: 9px 13px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: .94rem;
+}
+
+button:hover {
+    background: #eef1f4;
+}
+
+button.primary {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+button.primary:hover {
+    opacity: .9;
+}
+
+button:focus,
+input:focus,
+select:focus {
+    outline: 3px solid rgba(46,64,87,.2);
+    outline-offset: 1px;
+}
+
+.coefficient-slider:focus {
+    outline: 3px solid rgba(46,64,87,.2);
+    outline-offset: 2px;
+}
+
+.error {
+    display: none;
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 7px;
+    color: var(--error);
+    background: #fbeeee;
+    border: 1px solid #edc3c0;
+}
+
+.graph-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+/* ---------- Graph limits toggle ---------- */
+
+.graph-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    width: 100%;
+}
+
+.graph-summary-title {
+    flex: 1;
+}
+
+.graph-limits-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    font-size: .88rem;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+}
+
+.graph-limits-toggle input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.graph-limits-switch {
+    position: relative;
+    width: 38px;
+    height: 21px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background: #c5cbd1;
+    transition: background .15s ease;
+}
+
+.graph-limits-switch::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    transition: transform .15s ease;
+}
+
+.graph-limits-toggle input:checked + .graph-limits-switch {
+    background: var(--primary);
+}
+
+.graph-limits-toggle input:checked + .graph-limits-switch::after {
+    transform: translateX(17px);
+}
+
+.graph-limits-toggle input:focus-visible + .graph-limits-switch {
+    outline: 3px solid rgba(46,64,87,.2);
+    outline-offset: 2px;
+}
+
+/* ---------- Resizable graph container ---------- */
+
+.graph-container {
+    position: relative;
+    width: 100%;
+    height: min(620px, 70vw);
+    min-height: 350px;
+    min-width: 280px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: visible;
+    background: white;
+}
+
+#graph {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: hidden;
+    border-radius: 7px;
+    touch-action: none;
+}
+
+/* ---------- Resize handles ---------- */
+
+.resize-handle {
+    position: absolute;
+    z-index: 50;
+    background: transparent;
+    user-select: none;
+    touch-action: none;
+}
+
+.resize-handle.n {
+    top: -5px;
+    left: 10px;
+    right: 10px;
+    height: 10px;
+    cursor: ns-resize;
+}
+
+.resize-handle.s {
+    bottom: -5px;
+    left: 10px;
+    right: 10px;
+    height: 10px;
+    cursor: ns-resize;
+}
+
+.resize-handle.w {
+    left: -5px;
+    top: 10px;
+    bottom: 10px;
+    width: 10px;
+    cursor: ew-resize;
+}
+
+.resize-handle.e {
+    right: -5px;
+    top: 10px;
+    bottom: 10px;
+    width: 10px;
+    cursor: ew-resize;
+}
+
+.resize-handle.nw {
+    top: -7px;
+    left: -7px;
+    width: 14px;
+    height: 14px;
+    cursor: nwse-resize;
+}
+
+.resize-handle.ne {
+    top: -7px;
+    right: -7px;
+    width: 14px;
+    height: 14px;
+    cursor: nesw-resize;
+}
+
+.resize-handle.sw {
+    bottom: -7px;
+    left: -7px;
+    width: 14px;
+    height: 14px;
+    cursor: nesw-resize;
+}
+
+.resize-handle.se {
+    bottom: -7px;
+    right: -7px;
+    width: 14px;
+    height: 14px;
+    cursor: nwse-resize;
+}
+
+.resize-handle::after {
+    content: "";
+    position: absolute;
+    background: #aeb7bf;
+    opacity: 0;
+    transition: opacity .12s ease;
+    border-radius: 3px;
+}
+
+.resize-handle:hover::after {
+    opacity: .75;
+}
+
+.resize-handle.n::after,
+.resize-handle.s::after {
+    left: 35%;
+    right: 35%;
+    top: 3px;
+    bottom: 3px;
+}
+
+.resize-handle.w::after,
+.resize-handle.e::after {
+    top: 35%;
+    bottom: 35%;
+    left: 3px;
+    right: 3px;
+}
+
+.resize-handle.nw::after,
+.resize-handle.ne::after,
+.resize-handle.sw::after,
+.resize-handle.se::after {
+    width: 7px;
+    height: 7px;
+    left: 3px;
+    top: 3px;
+}
+
+/* ---------- Graph legend ---------- */
+
+.legend {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 10;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    padding: 10px 12px;
+
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+
+    font-size: 0.9rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.legend-solution-toggle {
+    cursor: pointer;
+    user-select: none;
+    border-radius: 5px;
+    padding: 3px 4px;
+    margin: -3px -4px;
+}
+
+.legend-solution-toggle:hover {
+    background: #f0f3f5;
+}
+
+.legend-solution-toggle:focus {
+    outline: 3px solid rgba(46,64,87,.2);
+    outline-offset: 1px;
+}
+
+.legend-line {
+    width: 28px;
+    height: 4px;
+    flex-shrink: 0;
+    border-radius: 3px;
+}
+
+.legend-left {
+    background: var(--left);
+}
+
+.legend-right {
+    background: var(--right);
+}
+
+.legend-solution {
+    background: var(--solution);
+}
+
+.legend-solution-text {
+    margin-left: 36px;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.9rem;
+}
+
+.legend-solution-text + .legend-solution-text {
+    margin-top: -4px;
+}
+
+/* ---------- Test evaluation box ---------- */
+
+.test-evaluation {
+    position: absolute;
+    z-index: 20;
+    display: none;
+
+    max-width: min(520px, calc(100% - 28px));
+
+    padding: 10px 14px;
+
+    background: rgba(255, 255, 255, 0.97);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1rem;
+
+    pointer-events: none;
+}
+
+.test-evaluation .evaluation-step {
+    white-space: nowrap;
+}
+
+.test-evaluation .evaluation-step + .evaluation-step {
+    margin-top: 5px;
+}
+
+.test-evaluation .evaluation-label {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: .75rem;
+    color: var(--muted);
+    margin-right: 8px;
+}
+
+/* ---------- Selected test point ---------- */
+
+.test-point-line {
+    stroke: #59636e;
+    stroke-width: 2;
+    stroke-dasharray: 6 5;
+    opacity: .75;
+}
+
+.test-point-circle {
+    fill: white;
+    stroke: #17202a;
+    stroke-width: 3;
+}
+
+.test-point-x {
+    stroke: #17202a;
+    stroke-width: 2;
+}
+
+.steps {
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+.step {
+    display: grid;
+    grid-template-columns: 42px 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+    align-items: center;
+}
+
+.step-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: grid;
+    place-items: center;
+    font-family: Arial, sans-serif;
+    font-size: .85rem;
+}
+
+.math {
+    font-size: 1.2rem;
+}
+
+.explanation {
+    padding: 15px;
+    background: #f7f8fa;
+    border-left: 4px solid var(--solution);
+    border-radius: 5px;
+}
+
+.small {
+    font-size: .9rem;
+}
+
+/* ---------- Collapsible sections ---------- */
+
+.section-collapsible {
+    padding: 0;
+    overflow: hidden;
+}
+
+.section-collapsible > summary {
+    cursor: pointer;
+    font-size: 1.3rem;
+    font-weight: 700;
+    padding: 20px;
+    list-style-position: inside;
+}
+
+.section-collapsible > summary:hover {
+    background: #f7f8fa;
+}
+
+.section-collapsible > summary:focus {
+    outline: 3px solid rgba(46,64,87,.2);
+    outline-offset: -3px;
+}
+
+.section-collapsible[open] > summary {
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+}
+
+.section-content {
+    padding: 0 20px 20px;
+}
+
+.section-collapsible > summary::marker {
+    color: var(--primary);
+}
+
+body.graph-resizing {
+    user-select: none;
+    cursor: inherit;
+}
+
+@media (max-width: 900px) {
+    .coefficient-controls {
+        grid-template-columns: repeat(2, minmax(150px, 1fr));
+    }
+}
+
+@media (max-width: 750px) {
+    .editor {
+        grid-template-columns: 1fr;
+    }
+
+    .editor > div:nth-child(2) {
+        max-width: 100px;
+    }
+
+    .coefficient-controls {
+        grid-template-columns: 1fr;
+    }
+
+    .graph-container {
+        min-height: 300px;
+    }
+
+    .graph-summary {
+        align-items: flex-start;
+    }
+
+    .graph-limits-toggle {
+        font-size: .8rem;
+    }
+
+    .legend {
+        top: 10px;
+        left: 10px;
+        padding: 8px 10px;
+        font-size: .82rem;
+    }
+
+    .legend-line {
+        width: 24px;
+    }
+
+    .test-evaluation {
+        font-size: .85rem;
+        padding: 8px 10px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="header-inner">
+        <h1>Linear Inequality Visualizer</h1>
+        <p>Explore the algebraic, graphical, and interval representations of a one-variable linear inequality.</p>
+    </div>
+</header>
+
+<main>
+
+<!-- Inequality editor -->
+<details class="section-collapsible" open>
+    <summary>Inequality editor</summary>
+
+    <div class="section-content">
+
+        <div class="editor">
+            <div>
+                <label for="leftInput">Left side</label>
+                <input id="leftInput" value="x + 1" aria-label="Left side">
+            </div>
+
+            <div>
+                <label for="operator">Relation</label>
+                <select id="operator" aria-label="Inequality operator">
+                    <option value=">">&gt;</option>
+                    <option value=">=" selected>≥</option>
+                    <option value="<">&lt;</option>
+                    <option value="<=">≤</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="rightInput">Right side</label>
+                <input id="rightInput" value="3x + 5" aria-label="Right side">
+            </div>
+        </div>
+
+        <div class="coefficient-controls" aria-label="Coefficient controls">
+
+            <div class="coefficient-control">
+                <div class="coefficient-control-header">
+                    <label class="coefficient-label" for="aSlider">a</label>
+                    <span id="aValue"
+                          class="coefficient-value"
+                          aria-live="polite">1.0</span>
+                </div>
+
+                <input
+                    id="aSlider"
+                    class="coefficient-slider"
+                    type="range"
+                    min="-10"
+                    max="10"
+                    step="0.1"
+                    value="1"
+                    aria-label="Coefficient a"
+                    aria-valuemin="-10"
+                    aria-valuemax="10"
+                    aria-valuenow="1"
+                    aria-valuetext="1.0"
+                >
+
+                <div class="coefficient-range" aria-hidden="true">
+                    <span>-10.0</span>
+                    <span>10.0</span>
+                </div>
+            </div>
+
+            <div class="coefficient-control">
+                <div class="coefficient-control-header">
+                    <label class="coefficient-label" for="bSlider">b</label>
+                    <span id="bValue"
+                          class="coefficient-value"
+                          aria-live="polite">1.0</span>
+                </div>
+
+                <input
+                    id="bSlider"
+                    class="coefficient-slider"
+                    type="range"
+                    min="-10"
+                    max="10"
+                    step="0.1"
+                    value="1"
+                    aria-label="Coefficient b"
+                    aria-valuemin="-10"
+                    aria-valuemax="10"
+                    aria-valuenow="1"
+                    aria-valuetext="1.0"
+                >
+
+                <div class="coefficient-range" aria-hidden="true">
+                    <span>-10.0</span>
+                    <span>10.0</span>
+                </div>
+            </div>
+
+            <div class="coefficient-control">
+                <div class="coefficient-control-header">
+                    <label class="coefficient-label" for="cSlider">c</label>
+                    <span id="cValue"
+                          class="coefficient-value"
+                          aria-live="polite">3.0</span>
+                </div>
+
+                <input
+                    id="cSlider"
+                    class="coefficient-slider"
+                    type="range"
+                    min="-10"
+                    max="10"
+                    step="0.1"
+                    value="3"
+                    aria-label="Coefficient c"
+                    aria-valuemin="-10"
+                    aria-valuemax="10"
+                    aria-valuenow="3"
+                    aria-valuetext="3.0"
+                >
+
+                <div class="coefficient-range" aria-hidden="true">
+                    <span>-10.0</span>
+                    <span>10.0</span>
+                </div>
+            </div>
+
+            <div class="coefficient-control">
+                <div class="coefficient-control-header">
+                    <label class="coefficient-label" for="dSlider">d</label>
+                    <span id="dValue"
+                          class="coefficient-value"
+                          aria-live="polite">5.0</span>
+                </div>
+
+                <input
+                    id="dSlider"
+                    class="coefficient-slider"
+                    type="range"
+                    min="-10"
+                    max="10"
+                    step="0.1"
+                    value="5"
+                    aria-label="Coefficient d"
+                    aria-valuemin="-10"
+                    aria-valuemax="10"
+                    aria-valuenow="5"
+                    aria-valuetext="5.0"
+                >
+
+                <div class="coefficient-range" aria-hidden="true">
+                    <span>-10.0</span>
+                    <span>10.0</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="inequalityPreview" class="inequality-preview"></div>
+
+        <div class="examples">
+            <button data-example="x + 1|>=|3x + 5">x + 1 ≥ 3x + 5</button>
+            <button data-example="2x - 4|<|x + 3">2x - 4 &lt; x + 3</button>
+            <button data-example="5 - x|<=|2x + 8">5 - x ≤ 2x + 8</button>
+            <button data-example="3x + 2|>|7x - 6">3x + 2 &gt; 7x - 6</button>
+            <button data-example="-2x + 1|>=|4x - 11">-2x + 1 ≥ 4x - 11</button>
+            <button data-example="x + 2|>=|x - 4">All real numbers</button>
+            <button data-example="2x + 1|>|2x + 5">No solution</button>
+            <button data-example="-x + 3|<|2x - 6">x &gt; 3</button>
+            <button data-example="4x - 1|<=|x + 8">x ≤ 3</button>
+        </div>
+
+        <div id="error" class="error" role="alert"></div>
+
+    </div>
+</details>
+
+
+<!-- Graph and solution -->
+<details class="section-collapsible" open>
+    <summary>
+        <div class="graph-summary">
+            <span class="graph-summary-title">Graph and solution</span>
+
+            <label class="graph-limits-toggle"
+                   for="fixGraphLimits"
+                   title="Keep the current graph limits fixed">
+                <input
+                    id="fixGraphLimits"
+                    type="checkbox"
+                    aria-label="Fix graph limits"
+                >
+                <span class="graph-limits-switch" aria-hidden="true"></span>
+                <span>Fix graph limits</span>
+            </label>
+        </div>
+    </summary>
+
+    <div class="section-content">
+
+        <div id="graphContainer" class="graph-container">
+
+            <svg id="graph"
+                 viewBox="0 0 900 560"
+                 role="img"
+                 aria-label="Cartesian graph of the two sides of the inequality">
+            </svg>
+
+            <div class="legend">
+
+                <div class="legend-item">
+                    <span class="legend-line legend-left"></span>
+                    <span id="leftLegend">f(x)</span>
+                </div>
+
+                <div class="legend-item">
+                    <span class="legend-line legend-right"></span>
+                    <span id="rightLegend">g(x)</span>
+                </div>
+
+                <div
+                    id="solutionRegionLegend"
+                    class="legend-item legend-solution-toggle"
+                    role="button"
+                    tabindex="0"
+                    aria-pressed="true"
+                    aria-label="Toggle solution region"
+                    title="Click to show or hide the solution region"
+                >
+                    <span class="legend-line legend-solution"></span>
+                    <span>Solution region</span>
+                </div>
+
+                <div id="solutionInequalityLegend"
+                     class="legend-solution-text">
+                </div>
+
+                <div id="solutionIntervalLegend"
+                     class="legend-solution-text">
+                </div>
+
+            </div>
+
+            <div id="testEvaluation" class="test-evaluation"></div>
+
+            <div class="resize-handle n"
+                 data-resize="n"
+                 aria-hidden="true"></div>
+
+            <div class="resize-handle ne"
+                 data-resize="ne"
+                 aria-hidden="true"></div>
+
+            <div class="resize-handle e"
+                 data-resize="e"
+                 aria-hidden="true"></div>
+
+            <div class="resize-handle se"
+                 data-resize="se"
+                 aria-hidden="true"></div>
+
+            <div class="resize-handle s"
+                 data-resize="s"
+                 aria-hidden="true"></div>
+
+            <div class="resize-handle sw"
+                 data-resize="sw"
+                 aria-hidden="true"></div>
+
+            <div class="resize-handle w"
+                 data-resize="w"
+                 aria-hidden="true"></div>
+
+            <div class="resize-handle nw"
+                 data-resize="nw"
+                 aria-hidden="true"></div>
+
+        </div>
+
+        <div class="graph-toolbar">
+            <button id="resetView">Reset graph view</button>
+        </div>
+
+    </div>
+</details>
+
+
+<!-- Step-by-step solution -->
+<details id="stepsDetails" class="section-collapsible" open>
+    <summary>Solve step by step</summary>
+
+    <div class="section-content">
+        <div id="steps" class="steps"></div>
+    </div>
+</details>
+
+</main>
+
+<script>
+/*
+    LINEAR INEQUALITY VISUALIZER
+*/
+
+const state = {
+    a: 1,
+    b: 1,
+    c: 3,
+    d: 5,
+    op: ">=",
+    solution: null,
+
+    showSolutionRegion: true,
+
+    view: {
+        xmin: -10,
+        xmax: 10,
+        ymin: -10,
+        ymax: 10
+    },
+
+    graphLimitsFixed: false,
+    viewAnimationFrame: null,
+    viewAnimationToken: 0,
+    viewInitialized: false,
+
+    dragging: false,
+    lastPointer: null,
+
+    selectedTestX: null,
+
+    resizing: false,
+    resizeDirection: null,
+    resizeStart: null
+};
+
+const leftInput = document.getElementById("leftInput");
+const rightInput = document.getElementById("rightInput");
+const operator = document.getElementById("operator");
+const graph = document.getElementById("graph");
+const graphContainer = document.getElementById("graphContainer");
+const errorBox = document.getElementById("error");
+const testEvaluation = document.getElementById("testEvaluation");
+const fixGraphLimits = document.getElementById("fixGraphLimits");
+
+const solutionRegionLegend =
+    document.getElementById("solutionRegionLegend");
+
+const solutionInequalityLegend =
+    document.getElementById("solutionInequalityLegend");
+
+const solutionIntervalLegend =
+    document.getElementById("solutionIntervalLegend");
+
+const sliders = {
+    a: document.getElementById("aSlider"),
+    b: document.getElementById("bSlider"),
+    c: document.getElementById("cSlider"),
+    d: document.getElementById("dSlider")
+};
+
+const sliderValues = {
+    a: document.getElementById("aValue"),
+    b: document.getElementById("bValue"),
+    c: document.getElementById("cValue"),
+    d: document.getElementById("dValue")
+};
+
+const NS = "http://www.w3.org/2000/svg";
+
+/* ---------- Basic mathematical utilities ---------- */
+
+function cleanExpression(str) {
+    return str
+        .toLowerCase()
+        .replace(/\s+/g, "")
+        .replace(/−/g, "-")
+        .replace(/·/g, "*");
+}
+
+function parseNumber(str) {
+    if (str === "" || str === "+") return 1;
+    if (str === "-") return -1;
+
+    if (str.includes("/")) {
+        const parts = str.split("/");
+
+        if (parts.length !== 2) {
+            throw new Error("Invalid fraction.");
+        }
+
+        const numerator = Number(parts[0]);
+        const denominator = Number(parts[1]);
+
+        if (!Number.isFinite(numerator) ||
+            !Number.isFinite(denominator) ||
+            denominator === 0) {
+            throw new Error("Invalid fraction.");
+        }
+
+        return numerator / denominator;
+    }
+
+    const n = Number(str);
+
+    if (!Number.isFinite(n)) {
+        throw new Error("Invalid number.");
+    }
+
+    return n;
+}
+
+function parseLinearExpression(input) {
+    let s = cleanExpression(input);
+
+    if (!s) {
+        throw new Error("An expression cannot be empty.");
+    }
+
+    s = s.replace(/x\/(\d+(?:\.\d+)?)/g, function(_, denominator) {
+        return "x*" + (1 / Number(denominator));
+    });
+
+    s = s.replace(/(\d|\))x/g, "$1*x");
+    s = s.replace(/x(\d)/g, "x*$1");
+
+    if (!s.startsWith("+") && !s.startsWith("-")) {
+        s = "+" + s;
+    }
+
+    if (/[^0-9x+\-*/().]/.test(s)) {
+        throw new Error("Only linear expressions involving x are supported.");
+    }
+
+    if (s.includes("x*x") || s.includes("x^")) {
+        throw new Error("Only linear expressions are supported.");
+    }
+
+    const terms = [];
+    let current = "";
+    let depth = 0;
+
+    for (let i = 0; i < s.length; i++) {
+        const ch = s[i];
+
+        if (ch === "(") depth++;
+        if (ch === ")") depth--;
+
+        if ((ch === "+" || ch === "-") && depth === 0 && i > 0) {
+            terms.push(current);
+            current = ch;
+        } else {
+            current += ch;
+        }
+    }
+
+    if (current) terms.push(current);
+
+    let a = 0;
+    let b = 0;
+
+    for (let term of terms) {
+        if (!term) continue;
+
+        const sign = term[0] === "-" ? -1 : 1;
+        term = term.substring(1);
+
+        if (!term) {
+            throw new Error("Invalid expression.");
+        }
+
+        if (term.includes("x")) {
+            const xIndex = term.indexOf("x");
+
+            if (term.indexOf("x", xIndex + 1) !== -1) {
+                throw new Error("Only linear expressions are supported.");
+            }
+
+            let coefficient = term.substring(0, xIndex);
+
+            if (coefficient.endsWith("*")) {
+                coefficient = coefficient.slice(0, -1);
+            }
+
+            if (coefficient === "") {
+                coefficient = "1";
+            }
+
+            if (term.substring(xIndex + 1).length > 0) {
+                const suffix = term.substring(xIndex + 1);
+
+                if (suffix.startsWith("*")) {
+                    coefficient =
+                        coefficient + "*" + suffix.substring(1);
+                } else {
+                    throw new Error("Invalid x-term.");
+                }
+            }
+
+            if (coefficient.includes("*")) {
+                const pieces = coefficient.split("*");
+
+                if (pieces.length !== 2) {
+                    throw new Error("Invalid coefficient.");
+                }
+
+                const n1 = parseNumber(pieces[0]);
+                const n2 = parseNumber(pieces[1]);
+
+                a += sign * n1 * n2;
+            } else {
+                a += sign * parseNumber(coefficient);
+            }
+
+        } else {
+            if (term.includes("*") || term.includes("/")) {
+                try {
+                    const pieces = term.split("*");
+
+                    if (pieces.length === 1) {
+                        b += sign * parseNumber(term);
+                    } else {
+                        let value = 1;
+
+                        for (const piece of pieces) {
+                            value *= parseNumber(piece);
+                        }
+
+                        b += sign * value;
+                    }
+                } catch {
+                    throw new Error("Invalid constant term.");
+                }
+            } else {
+                b += sign * parseNumber(term);
+            }
+        }
+    }
+
+    if (!Number.isFinite(a) || !Number.isFinite(b)) {
+        throw new Error("The expression could not be interpreted.");
+    }
+
+    return { a, b };
+}
+
+/* ---------- Formatting ---------- */
+
+function nearlyEqual(a, b, eps = 1e-9) {
+    return Math.abs(a - b) < eps;
+}
+
+function formatNumber(n) {
+    if (nearlyEqual(n, 0)) n = 0;
+
+    if (Number.isInteger(n)) {
+        return String(n);
+    }
+
+    const common = [
+        [1/2, "1/2"],
+        [1/3, "1/3"],
+        [2/3, "2/3"],
+        [1/4, "1/4"],
+        [3/4, "3/4"],
+        [1/5, "1/5"],
+        [2/5, "2/5"],
+        [3/5, "3/5"],
+        [4/5, "4/5"],
+        [1/10, "1/10"]
+    ];
+
+    for (const [value, text] of common) {
+        if (nearlyEqual(n, value)) return text;
+        if (nearlyEqual(n, -value)) return "-" + text;
+    }
+
+    return Number(n.toFixed(6)).toString();
+}
+
+function formatCoefficient(a) {
+    if (nearlyEqual(Math.abs(a), 1)) return "";
+    return formatNumber(Math.abs(a));
+}
+
+function formatLinear(a, b) {
+    let result = "";
+
+    if (!nearlyEqual(a, 0)) {
+        const absA = formatCoefficient(a);
+        result += (a < 0 ? "-" : "") + absA + "x";
+    }
+
+    if (!nearlyEqual(b, 0)) {
+        const absB = formatNumber(Math.abs(b));
+
+        if (result === "") {
+            result = b < 0 ? "-" + absB : absB;
+        } else {
+            result += b < 0 ? " − " + absB : " + " + absB;
+        }
+    }
+
+    return result || "0";
+}
+
+function displayOperator(op) {
+    return {
+        ">": "&gt;",
+        ">=": "≥",
+        "<": "&lt;",
+        "<=": "≤"
+    }[op];
+}
+
+function displayPlainOperator(op) {
+    return {
+        ">": ">",
+        ">=": "≥",
+        "<": "<",
+        "<=": "≤"
+    }[op];
+}
+
+function formatSubstitution(a, b, x) {
+    const xValue = `(${formatNumber(x)})`;
+
+    let result = "";
+
+    if (!nearlyEqual(a, 0)) {
+        const coefficient = formatCoefficient(a);
+
+        if (nearlyEqual(a, 1)) {
+            result += xValue;
+        } else if (nearlyEqual(a, -1)) {
+            result += "-" + xValue;
+        } else {
+            result +=
+                (a < 0 ? "-" : "") +
+                coefficient +
+                xValue;
+        }
+    }
+
+    if (!nearlyEqual(b, 0)) {
+        const absB = formatNumber(Math.abs(b));
+
+        if (result === "") {
+            result =
+                b < 0
+                    ? "-" + absB
+                    : absB;
+        } else {
+            result +=
+                b < 0
+                    ? " − " + absB
+                    : " + " + absB;
+        }
+    }
+
+    return result || "0";
+}
+
+/* ---------- Inequality solver ---------- */
+
+function solveInequality(a, b, c, d, op) {
+    const A = a - c;
+    const B = b - d;
+
+    if (nearlyEqual(A, 0)) {
+        const truth = evaluateRelation(B, op, 0);
+
+        return {
+            type: truth ? "all" : "none",
+            boundary: null,
+            direction: null,
+            inclusive: null,
+            A,
+            B
+        };
+    }
+
+    const boundary = -B / A;
+
+    let direction;
+    let inclusive = op === ">=" || op === "<=";
+
+    if (A > 0) {
+        direction =
+            (op === ">" || op === ">=")
+                ? "right"
+                : "left";
+    } else {
+        direction =
+            (op === ">" || op === ">=")
+                ? "left"
+                : "right";
+    }
+
+    return {
+        type: "interval",
+        boundary,
+        direction,
+        inclusive,
+        A,
+        B
+    };
+}
+
+function evaluateRelation(left, op, right) {
+    switch (op) {
+        case ">": return left > right;
+        case ">=": return left >= right;
+        case "<": return left < right;
+        case "<=": return left <= right;
+    }
+}
+
+function intervalText(solution) {
+    if (solution.type === "all") return "ℝ";
+    if (solution.type === "none") return "∅";
+
+    const a = formatNumber(solution.boundary);
+
+    if (solution.direction === "left") {
+        return `(-∞, ${a}${solution.inclusive ? "]" : ")"}`;
+    }
+
+    return `${solution.inclusive ? "[" : "("}${a}, ∞)`;
+}
+
+function inequalitySolutionText(solution) {
+    if (solution.type === "all") return "x ∈ ℝ";
+    if (solution.type === "none") return "x ∈ ∅";
+
+    const x = formatNumber(solution.boundary);
+
+    if (solution.direction === "left") {
+        return `x ${solution.inclusive ? "≤" : "<"} ${x}`;
+    }
+
+    return `x ${solution.inclusive ? "≥" : ">"} ${x}`;
+}
+
+/* ---------- Slider synchronization ---------- */
+
+function formatSliderValue(value) {
+    return Number(value).toFixed(1);
+}
+
+function updateSliderDisplay(name, value) {
+    const numericValue = Number(value);
+    const displayValue = formatSliderValue(numericValue);
+
+    sliders[name].value = numericValue;
+    sliderValues[name].textContent = displayValue;
+
+    sliders[name].setAttribute(
+        "aria-valuenow",
+        numericValue.toString()
+    );
+
+    sliders[name].setAttribute(
+        "aria-valuetext",
+        displayValue
+    );
+}
+
+function syncSlidersFromState() {
+    ["a", "b", "c", "d"].forEach(name => {
+        const sliderValue = Math.max(
+            -10,
+            Math.min(
+                10,
+                Math.round(state[name] * 10) / 10
+            )
+        );
+
+        updateSliderDisplay(name, sliderValue);
+    });
+}
+
+function syncInputsFromState() {
+    leftInput.value =
+        formatLinear(state.a, state.b);
+
+    rightInput.value =
+        formatLinear(state.c, state.d);
+}
+
+function readInputs() {
+    const left = parseLinearExpression(leftInput.value);
+    const right = parseLinearExpression(rightInput.value);
+
+    state.a = left.a;
+    state.b = left.b;
+    state.c = right.a;
+    state.d = right.b;
+    state.op = operator.value;
+
+    state.solution = solveInequality(
+        state.a,
+        state.b,
+        state.c,
+        state.d,
+        state.op
+    );
+
+    syncSlidersFromState();
+}
+
+function readSlidersIntoState() {
+    state.a = Number(sliders.a.value);
+    state.b = Number(sliders.b.value);
+    state.c = Number(sliders.c.value);
+    state.d = Number(sliders.d.value);
+    state.op = operator.value;
+
+    state.solution = solveInequality(
+        state.a,
+        state.b,
+        state.c,
+        state.d,
+        state.op
+    );
+
+    ["a", "b", "c", "d"].forEach(name => {
+        updateSliderDisplay(name, state[name]);
+    });
+}
+
+/* ---------- State update ---------- */
+
+function updateSolutionLegend() {
+    const s = state.solution;
+
+    if (s.type === "all") {
+        solutionInequalityLegend.textContent = "x ∈ ℝ";
+        solutionIntervalLegend.textContent = "";
+        return;
+    }
+
+    if (s.type === "none") {
+        solutionInequalityLegend.textContent = "x ∈ ∅";
+        solutionIntervalLegend.textContent = "";
+        return;
+    }
+
+    solutionInequalityLegend.textContent =
+        inequalitySolutionText(s);
+
+    solutionIntervalLegend.textContent =
+        `x ∈ ${intervalText(s)}`;
+}
+
+function updateSolutionRegionLegendState() {
+    solutionRegionLegend.setAttribute(
+        "aria-pressed",
+        state.showSolutionRegion ? "true" : "false"
+    );
+
+    solutionRegionLegend.title =
+        state.showSolutionRegion
+            ? "Click to hide the solution region"
+            : "Click to show the solution region";
+}
+
+function update() {
+    try {
+        readInputs();
+        renderCurrentState();
+    } catch (error) {
+        errorBox.textContent = error.message;
+        errorBox.style.display = "block";
+    }
+}
+
+function updateFromSliders() {
+    try {
+        readSlidersIntoState();
+
+        syncInputsFromState();
+        renderCurrentState();
+
+    } catch (error) {
+        errorBox.textContent = error.message;
+        errorBox.style.display = "block";
+    }
+}
+
+function renderCurrentState() {
+    errorBox.style.display = "none";
+
+    document.getElementById("inequalityPreview").innerHTML =
+        `${escapeHtml(formatLinear(state.a, state.b))}
+         ${displayOperator(state.op)}
+         ${escapeHtml(formatLinear(state.c, state.d))}`;
+
+    document.getElementById("leftLegend").textContent =
+        `f(x) = ${formatLinear(state.a, state.b)}`;
+
+    document.getElementById("rightLegend").textContent =
+        `g(x) = ${formatLinear(state.c, state.d)}`;
+
+    updateSolutionLegend();
+    updateSolutionRegionLegendState();
+
+    /*
+        When graph limits are fixed, the mathematical content of the graph
+        updates normally, but the current view is left untouched.
+
+        Otherwise, calculate the automatic target using the existing
+        updateView() calculations and animate toward it.
+    */
+    if (state.graphLimitsFixed) {
+        cancelViewAnimation();
+    } else {
+        const targetView = getAutomaticView();
+
+        if (!state.viewInitialized) {
+            applyView(targetView);
+            state.viewInitialized = true;
+        } else {
+            animateToView(targetView);
+        }
+    }
+
+    renderGraph();
+    renderSteps();
+
+    if (state.selectedTestX !== null) {
+        updateTestEvaluation();
+    }
+}
+
+function escapeHtml(str) {
+    return str
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+}
+
+/* ---------- Graph view ---------- */
+
+/*
+    This function contains the existing automatic-view calculation.
+    It now calculates the target independently instead of modifying
+    state.view directly.
+*/
+function updateView(targetView = null) {
+    const s = state.solution;
+
+    const view = targetView || {
+        xmin: state.view.xmin,
+        xmax: state.view.xmax,
+        ymin: state.view.ymin,
+        ymax: state.view.ymax
+    };
+
+    if (s.type === "interval") {
+        const critical = s.boundary;
+
+        view.xmin = critical - 8;
+        view.xmax = critical + 8;
+
+    } else {
+        view.xmin = -10;
+        view.xmax = 10;
+    }
+
+    const candidates = [
+        state.a * view.xmin + state.b,
+        state.a * view.xmax + state.b,
+        state.c * view.xmin + state.d,
+        state.c * view.xmax + state.d
+    ];
+
+    let ymin = Math.min(...candidates);
+    let ymax = Math.max(...candidates);
+
+    if (nearlyEqual(ymin, ymax)) {
+        ymin -= 5;
+        ymax += 5;
+    }
+
+    const padding = Math.max(2, (ymax - ymin) * 0.15);
+
+    view.ymin = ymin - padding;
+    view.ymax = ymax + padding;
+
+    if (view.ymin > 0) view.ymin = -1;
+    if (view.ymax < 0) view.ymax = 1;
+
+    if (!targetView) {
+        applyView(view);
+    }
+
+    return view;
+}
+
+function getAutomaticView() {
+    return updateView({
+        xmin: state.view.xmin,
+        xmax: state.view.xmax,
+        ymin: state.view.ymin,
+        ymax: state.view.ymax
+    });
+}
+
+function applyView(view) {
+    state.view.xmin = view.xmin;
+    state.view.xmax = view.xmax;
+    state.view.ymin = view.ymin;
+    state.view.ymax = view.ymax;
+}
+
+function copyView(view) {
+    return {
+        xmin: view.xmin,
+        xmax: view.xmax,
+        ymin: view.ymin,
+        ymax: view.ymax
+    };
+}
+
+function cancelViewAnimation() {
+    if (state.viewAnimationFrame !== null) {
+        cancelAnimationFrame(state.viewAnimationFrame);
+        state.viewAnimationFrame = null;
+    }
+
+    state.viewAnimationToken++;
+}
+
+function easeInOutCubic(t) {
+    return t < 0.5
+        ? 4 * t * t * t
+        : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+
+function animateToView(targetView, duration = 3000) {
+    cancelViewAnimation();
+
+    const startView = copyView(state.view);
+    const finalView = copyView(targetView);
+
+    const animationToken = state.viewAnimationToken;
+    const startTime = performance.now();
+
+    function frame(currentTime) {
+        if (animationToken !== state.viewAnimationToken) {
+            return;
+        }
+
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(1, elapsed / duration);
+        const easedProgress = easeInOutCubic(progress);
+
+        state.view.xmin =
+            startView.xmin +
+            (finalView.xmin - startView.xmin) *
+            easedProgress;
+
+        state.view.xmax =
+            startView.xmax +
+            (finalView.xmax - startView.xmax) *
+            easedProgress;
+
+        state.view.ymin =
+            startView.ymin +
+            (finalView.ymin - startView.ymin) *
+            easedProgress;
+
+        state.view.ymax =
+            startView.ymax +
+            (finalView.ymax - startView.ymax) *
+            easedProgress;
+
+        renderGraph();
+
+        if (progress < 1) {
+            state.viewAnimationFrame =
+                requestAnimationFrame(frame);
+        } else {
+            /*
+                Explicitly assign the target values at the end so that
+                floating-point interpolation cannot leave a small residual.
+            */
+            applyView(finalView);
+            state.viewAnimationFrame = null;
+
+            if (state.selectedTestX !== null) {
+                updateTestEvaluation();
+            }
+
+            renderGraph();
+        }
+    }
+
+    state.viewAnimationFrame =
+        requestAnimationFrame(frame);
+}
+
+function xToSvg(x) {
+    return (
+        (x - state.view.xmin) /
+        (state.view.xmax - state.view.xmin)
+    ) * 900;
+}
+
+function yToSvg(y) {
+    return 560 -
+        (
+            (y - state.view.ymin) /
+            (state.view.ymax - state.view.ymin)
+        ) * 560;
+}
+
+function svgElement(name, attrs = {}) {
+    const el = document.createElementNS(NS, name);
+
+    for (const [key, value] of Object.entries(attrs)) {
+        el.setAttribute(key, value);
+    }
+
+    return el;
+}
+
+function addText(svg, x, y, text, attrs = {}) {
+    const el = svgElement("text", {
+        x,
+        y,
+        ...attrs
+    });
+
+    el.textContent = text;
+    svg.appendChild(el);
+
+    return el;
+}
+
+/* ---------- Graph rendering ---------- */
+
+function renderGraph() {
+    while (graph.firstChild) {
+        graph.removeChild(graph.firstChild);
+    }
+
+    const xMin = state.view.xmin;
+    const xMax = state.view.xmax;
+    const yMin = state.view.ymin;
+    const yMax = state.view.ymax;
+
+    const defs = svgElement("defs");
+
+    const clip = svgElement("clipPath", {
+        id: "graphClip"
+    });
+
+    clip.appendChild(svgElement("rect", {
+        x: 0,
+        y: 0,
+        width: 900,
+        height: 560
+    }));
+
+    defs.appendChild(clip);
+    graph.appendChild(defs);
+
+    const clipped = svgElement("g", {
+        "clip-path": "url(#graphClip)"
+    });
+
+    graph.appendChild(clipped);
+
+    const xStep = niceStep((xMax - xMin) / 10);
+    const yStep = niceStep((yMax - yMin) / 8);
+
+    for (
+        let x = Math.ceil(xMin / xStep) * xStep;
+        x <= xMax + 1e-9;
+        x += xStep
+    ) {
+        const sx = xToSvg(x);
+
+        clipped.appendChild(svgElement("line", {
+            x1: sx,
+            y1: 0,
+            x2: sx,
+            y2: 560,
+            stroke: "#e6e9ed",
+            "stroke-width": 1
+        }));
+
+        if (!nearlyEqual(x, 0)) {
+            addText(
+                graph,
+                sx + 4,
+                yToSvg(0) - 7,
+                formatNumber(x),
+                {
+                    fill: "#65717d",
+                    "font-size": 12
+                }
+            );
+        }
+    }
+
+    for (
+        let y = Math.ceil(yMin / yStep) * yStep;
+        y <= yMax + 1e-9;
+        y += yStep
+    ) {
+        const sy = yToSvg(y);
+
+        clipped.appendChild(svgElement("line", {
+            x1: 0,
+            y1: sy,
+            x2: 900,
+            y2: sy,
+            stroke: "#e6e9ed",
+            "stroke-width": 1
+        }));
+
+        if (!nearlyEqual(y, 0)) {
+            addText(
+                graph,
+                xToSvg(0) + 7,
+                sy - 5,
+                formatNumber(y),
+                {
+                    fill: "#65717d",
+                    "font-size": 12
+                }
+            );
+        }
+    }
+
+    if (state.showSolutionRegion) {
+        renderSolutionRegion(clipped);
+    }
+
+    if (xMin <= 0 && xMax >= 0) {
+        const sx = xToSvg(0);
+
+        clipped.appendChild(svgElement("line", {
+            x1: sx,
+            y1: 0,
+            x2: sx,
+            y2: 560,
+            stroke: "#59636e",
+            "stroke-width": 2
+        }));
+
+        addText(graph, sx + 8, 20, "y", {
+            fill: "#59636e",
+            "font-size": 15,
+            "font-weight": "bold"
+        });
+    }
+
+    if (yMin <= 0 && yMax >= 0) {
+        const sy = yToSvg(0);
+
+        clipped.appendChild(svgElement("line", {
+            x1: 0,
+            y1: sy,
+            x2: 900,
+            y2: sy,
+            stroke: "#59636e",
+            "stroke-width": 2
+        }));
+
+        addText(graph, 880, sy - 8, "x", {
+            fill: "#59636e",
+            "font-size": 15,
+            "font-weight": "bold"
+        });
+    }
+
+    drawFunction(
+        clipped,
+        state.a,
+        state.b,
+        "#1769aa"
+    );
+
+    drawFunction(
+        clipped,
+        state.c,
+        state.d,
+        "#c44e52"
+    );
+
+    if (state.selectedTestX !== null) {
+        renderSelectedTestPoint(clipped);
+    }
+
+    if (state.solution.type === "interval") {
+        const x = state.solution.boundary;
+        const y = state.a * x + state.b;
+
+        const sx = xToSvg(x);
+        const sy = yToSvg(y);
+
+        clipped.appendChild(svgElement("circle", {
+            cx: sx,
+            cy: sy,
+            r: 6,
+            fill: "white",
+            stroke: "#17202a",
+            "stroke-width": 3
+        }));
+
+        addText(
+            graph,
+            sx + 10,
+            sy - 10,
+            `(${formatNumber(x)}, ${formatNumber(y)})`,
+            {
+                fill: "#17202a",
+                "font-size": 13,
+                "font-weight": "bold"
+            }
+        );
+    }
+
+    addText(graph, 20, 25, "y", {
+        fill: "#59636e",
+        "font-size": 15
+    });
+
+    addText(graph, 875, 545, "x", {
+        fill: "#59636e",
+        "font-size": 15
+    });
+}
+
+function drawFunction(group, a, b, color) {
+    const x1 = state.view.xmin;
+    const x2 = state.view.xmax;
+
+    const y1 = a * x1 + b;
+    const y2 = a * x2 + b;
+
+    group.appendChild(svgElement("line", {
+        x1: xToSvg(x1),
+        y1: yToSvg(y1),
+        x2: xToSvg(x2),
+        y2: yToSvg(y2),
+        stroke: color,
+        "stroke-width": 4,
+        "stroke-linecap": "round"
+    }));
+}
+
+function renderSelectedTestPoint(group) {
+    const x = state.selectedTestX;
+
+    const f = state.a * x + state.b;
+    const g = state.c * x + state.d;
+
+    const highest = Math.max(f, g);
+
+    const sx = xToSvg(x);
+    const syF = yToSvg(f);
+    const syG = yToSvg(g);
+    const syHighest = yToSvg(highest);
+
+    group.appendChild(svgElement("line", {
+        x1: sx,
+        y1: 0,
+        x2: sx,
+        y2: 560,
+        class: "test-point-line"
+    }));
+
+    group.appendChild(svgElement("circle", {
+        cx: sx,
+        cy: syF,
+        r: 6,
+        class: "test-point-circle"
+    }));
+
+    group.appendChild(svgElement("circle", {
+        cx: sx,
+        cy: syG,
+        r: 6,
+        class: "test-point-circle"
+    }));
+
+    const xAxisY = yToSvg(0);
+
+    if (xAxisY >= 0 && xAxisY <= 560) {
+        group.appendChild(svgElement("line", {
+            x1: sx - 6,
+            y1: xAxisY - 6,
+            x2: sx + 6,
+            y2: xAxisY + 6,
+            class: "test-point-x"
+        }));
+
+        group.appendChild(svgElement("line", {
+            x1: sx - 6,
+            y1: xAxisY + 6,
+            x2: sx + 6,
+            y2: xAxisY - 6,
+            class: "test-point-x"
+        }));
+    }
+
+    positionTestEvaluation(x, syHighest);
+}
+
+function positionTestEvaluation(x, svgY) {
+    if (state.selectedTestX === null) {
+        testEvaluation.style.display = "none";
+        return;
+    }
+
+    const graphRect = graph.getBoundingClientRect();
+
+    const scaleX = graphRect.width / 900;
+    const scaleY = graphRect.height / 560;
+
+    const pixelX = xToSvg(x) * scaleX;
+    const pixelY = svgY * scaleY;
+
+    testEvaluation.style.display = "block";
+
+    const boxWidth = testEvaluation.offsetWidth;
+    const boxHeight = testEvaluation.offsetHeight;
+
+    let left = pixelX - boxWidth / 2;
+    let top = pixelY - boxHeight - 14;
+
+    const horizontalMargin = 10;
+    const verticalMargin = 10;
+
+    left = Math.max(
+        horizontalMargin,
+        Math.min(
+            left,
+            graphRect.width - boxWidth - horizontalMargin
+        )
+    );
+
+    if (top < verticalMargin) {
+        top = pixelY + 14;
+    }
+
+    top = Math.max(
+        verticalMargin,
+        Math.min(
+            top,
+            graphRect.height - boxHeight - verticalMargin
+        )
+    );
+
+    testEvaluation.style.left = `${left}px`;
+    testEvaluation.style.top = `${top}px`;
+}
+
+/* ---------- Right-click test functionality ---------- */
+
+function selectTestXFromGraph(event) {
+    const rect = graph.getBoundingClientRect();
+
+    const svgX =
+        (event.clientX - rect.left) /
+        rect.width *
+        900;
+
+    const rawX =
+        state.view.xmin +
+        (svgX / 900) *
+        (state.view.xmax - state.view.xmin);
+
+    // Round the selected x-value to one decimal place.
+    const x = Math.round(rawX * 10) / 10;
+
+    state.selectedTestX = x;
+
+    updateTestEvaluation();
+    renderGraph();
+}
+
+graph.addEventListener("contextmenu", event => {
+    event.preventDefault();
+
+    if (state.dragging || state.resizing) {
+        return;
+    }
+
+    selectTestXFromGraph(event);
+});
+
+/* ---------- Solution region ---------- */
+
+function renderSolutionRegion(group) {
+    const s = state.solution;
+
+    if (s.type !== "interval") {
+        if (s.type === "all") {
+            group.appendChild(svgElement("rect", {
+                x: 0,
+                y: 0,
+                width: 900,
+                height: 560,
+                fill: "#218c74",
+                opacity: ".08"
+            }));
+        }
+
+        return;
+    }
+
+    const boundary = s.boundary;
+
+    let startX;
+    let endX;
+
+    if (s.direction === "left") {
+        startX = state.view.xmin;
+        endX = boundary;
+    } else {
+        startX = boundary;
+        endX = state.view.xmax;
+    }
+
+    if (
+        endX < state.view.xmin ||
+        startX > state.view.xmax
+    ) {
+        return;
+    }
+
+    startX = Math.max(startX, state.view.xmin);
+    endX = Math.min(endX, state.view.xmax);
+
+    const x1 = xToSvg(startX);
+    const x2 = xToSvg(endX);
+
+    group.appendChild(svgElement("rect", {
+        x: Math.min(x1, x2),
+        y: 0,
+        width: Math.abs(x2 - x1),
+        height: 560,
+        fill: "#218c74",
+        opacity: ".10"
+    }));
+}
+
+function niceStep(raw) {
+    const power =
+        Math.pow(10, Math.floor(Math.log10(raw)));
+
+    const normalized = raw / power;
+
+    let nice;
+
+    if (normalized <= 1) nice = 1;
+    else if (normalized <= 2) nice = 2;
+    else if (normalized <= 5) nice = 5;
+    else nice = 10;
+
+    return nice * power;
+}
+
+/* ---------- Algebraic steps ---------- */
+
+function renderSteps() {
+    const container = document.getElementById("steps");
+
+    const s = state.solution;
+
+    let html = "";
+
+    const original =
+        `${formatLinear(state.a, state.b)}
+         ${displayPlainOperator(state.op)}
+         ${formatLinear(state.c, state.d)}`;
+
+    html += step(
+        1,
+        "Original inequality",
+        original
+    );
+
+    const A = state.a - state.c;
+    const B = state.b - state.d;
+
+    if (s.type === "all" || s.type === "none") {
+        const relation =
+            `${formatNumber(A)}x ${B >= 0 ? "+" : "−"}
+             ${formatNumber(Math.abs(B))}
+             ${displayPlainOperator(state.op)} 0`;
+
+        html += step(
+            2,
+            "Move all terms to one side",
+            relation
+        );
+
+        const statement =
+            s.type === "all"
+                ? `${formatNumber(B)} ${displayPlainOperator(state.op)} 0 is true.`
+                : `${formatNumber(B)} ${displayPlainOperator(state.op)} 0 is false.`;
+
+        html += step(
+            3,
+            "Evaluate the resulting statement",
+            statement
+        );
+
+        html += `
+            <p class="muted">
+                Because the x-coefficient cancels, there is no single critical
+                x-value. The result is either all real numbers or no solution.
+            </p>
+        `;
+
+        container.innerHTML = html;
+        return;
+    }
+
+    if (!nearlyEqual(state.c, 0)) {
+        const newB = state.b - state.d;
+        const newA = state.a - state.c;
+
+        html += step(
+            2,
+            "Move the x-terms and constants together",
+            `${formatNumber(newA)}x
+             ${newB >= 0 ? "+" : "−"}
+             ${formatNumber(Math.abs(newB))}
+             ${displayPlainOperator(state.op)} 0`
+        );
+    }
+
+    if (!nearlyEqual(B, 0)) {
+        const newRelation =
+            formatNumber(A) + "x " +
+            displayPlainOperator(state.op) + " " +
+            formatNumber(-B);
+
+        html += step(
+            3,
+            "Move the constant term",
+            newRelation
+        );
+    }
+
+    const finalRelation =
+        inequalitySolutionText(s);
+
+    html += step(
+        4,
+        `Divide by ${formatNumber(A)}`,
+        finalRelation
+    );
+
+    if (A < 0) {
+        html += `
+            <div class="explanation">
+                <strong>Important:</strong>
+                the coefficient of x is negative. Dividing by a negative
+                number reverses the inequality symbol.
+            </div>
+        `;
+    }
+
+    html += `
+        <p style="margin-top:16px;">
+            <strong>Interval notation:</strong>
+            ${escapeHtml(intervalText(s))}
+        </p>
+    `;
+
+    container.innerHTML = html;
+}
+
+function step(number, label, expression) {
+    return `
+        <div class="step">
+            <div class="step-number">${number}</div>
+            <div>
+                <div class="muted small">${label}</div>
+                <div class="math">${escapeHtml(expression)}</div>
+            </div>
+        </div>
+    `;
+}
+
+/* ---------- Evaluation box ---------- */
+
+function updateTestEvaluation() {
+    const x = state.selectedTestX;
+
+    if (!Number.isFinite(x)) {
+        testEvaluation.style.display = "none";
+        return;
+    }
+
+    const f = state.a * x + state.b;
+    const g = state.c * x + state.d;
+
+    const fSubstitution =
+        `f(${formatNumber(x)}) = ${formatSubstitution(state.a, state.b, x)}`;
+
+    const gSubstitution =
+        `g(${formatNumber(x)}) = ${formatSubstitution(state.c, state.d, x)}`;
+
+    const fValue = formatNumber(f);
+    const gValue = formatNumber(g);
+
+    const relation = displayPlainOperator(state.op);
+
+    testEvaluation.innerHTML = `
+        <div class="evaluation-step">
+            <span class="evaluation-label">Step 1</span>
+            ${escapeHtml(fSubstitution)}
+            ${escapeHtml(" " + relation + " ")}
+            ${escapeHtml(gSubstitution)}
+        </div>
+
+        <div class="evaluation-step">
+            <span class="evaluation-label">Step 2</span>
+            ${escapeHtml(`f(${formatNumber(x)}) = ${fValue}`)}
+            ${escapeHtml(` ${relation} `)}
+            ${escapeHtml(`${gValue} = g(${formatNumber(x)})`)}
+        </div>
+    `;
+
+    const highest = Math.max(f, g);
+
+    positionTestEvaluation(
+        x,
+        yToSvg(highest)
+    );
+}
+
+/* ---------- Input interaction ---------- */
+
+leftInput.addEventListener("input", update);
+rightInput.addEventListener("input", update);
+operator.addEventListener("change", update);
+
+Object.entries(sliders).forEach(([name, slider]) => {
+    slider.addEventListener("input", () => {
+        updateFromSliders();
+    });
+});
+
+/* ---------- Graph limits toggle ---------- */
+
+fixGraphLimits.addEventListener("click", event => {
+    /*
+        Prevent the click from also toggling the surrounding <details>
+        element because the control is located inside the summary.
+    */
+    event.stopPropagation();
+});
+
+fixGraphLimits.addEventListener("change", () => {
+    if (fixGraphLimits.checked) {
+        /*
+            Turning the toggle ON does not change the graph view.
+            Cancel any automatic transition immediately and preserve
+            whatever limits are currently visible.
+        */
+        cancelViewAnimation();
+        state.graphLimitsFixed = true;
+
+        renderGraph();
+
+        if (state.selectedTestX !== null) {
+            updateTestEvaluation();
+        }
+
+    } else {
+        /*
+            Calculate the new automatic target using the existing
+            updateView() calculation, without modifying the current view.
+            The current view therefore becomes the animation's starting
+            point with no visual jump.
+        */
+        state.graphLimitsFixed = false;
+
+        const targetView = getAutomaticView();
+
+        animateToView(targetView);
+    }
+});
+
+/* ---------- Solution region legend interaction ---------- */
+
+function toggleSolutionRegion() {
+    state.showSolutionRegion =
+        !state.showSolutionRegion;
+
+    updateSolutionRegionLegendState();
+    renderGraph();
+}
+
+solutionRegionLegend.addEventListener("click", toggleSolutionRegion);
+
+solutionRegionLegend.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        toggleSolutionRegion();
+    }
+});
+
+document.querySelectorAll("[data-example]")
+    .forEach(button => {
+        button.addEventListener("click", () => {
+            const [left, op, right] =
+                button.dataset.example.split("|");
+
+            leftInput.value = left;
+            operator.value = op;
+            rightInput.value = right;
+
+            update();
+        });
+    });
+
+/* ---------- Graph zoom and pan ---------- */
+
+graph.addEventListener("wheel", event => {
+    event.preventDefault();
+
+    if (state.resizing) return;
+
+    /*
+        Manual interaction always takes control of the graph.
+        This prevents a pending automatic animation frame from
+        overwriting the user's zoom.
+    */
+    if (!state.graphLimitsFixed) {
+        cancelViewAnimation();
+    }
+
+    const factor =
+        event.deltaY > 0 ? 1.15 : 0.87;
+
+    const rect = graph.getBoundingClientRect();
+
+    const cx =
+        state.view.xmin +
+        ((event.clientX - rect.left) / rect.width) *
+        (state.view.xmax - state.view.xmin);
+
+    const cy =
+        state.view.ymax -
+        ((event.clientY - rect.top) / rect.height) *
+        (state.view.ymax - state.view.ymin);
+
+    state.view.xmin =
+        cx +
+        (state.view.xmin - cx) * factor;
+
+    state.view.xmax =
+        cx +
+        (state.view.xmax - cx) * factor;
+
+    state.view.ymin =
+        cy +
+        (state.view.ymin - cy) * factor;
+
+    state.view.ymax =
+        cy +
+        (state.view.ymax - cy) * factor;
+
+    renderGraph();
+
+}, { passive: false });
+
+graph.addEventListener("pointerdown", event => {
+    if (state.resizing) return;
+
+    if (event.button === 2) {
+        return;
+    }
+
+    /*
+        Once the user starts manually dragging, any automatic
+        transition must stop immediately.
+    */
+    if (!state.graphLimitsFixed) {
+        cancelViewAnimation();
+    }
+
+    state.dragging = true;
+
+    state.lastPointer = {
+        x: event.clientX,
+        y: event.clientY
+    };
+
+    graph.setPointerCapture(event.pointerId);
+});
+
+graph.addEventListener("pointermove", event => {
+    if (!state.dragging || state.resizing) return;
+
+    const dx =
+        event.clientX -
+        state.lastPointer.x;
+
+    const dy =
+        event.clientY -
+        state.lastPointer.y;
+
+    const xRange =
+        state.view.xmax -
+        state.view.xmin;
+
+    const yRange =
+        state.view.ymax -
+        state.view.ymin;
+
+    const xShift =
+        dx / graph.clientWidth * xRange;
+
+    const yShift =
+        dy / graph.clientHeight * yRange;
+
+    state.view.xmin -= xShift;
+    state.view.xmax -= xShift;
+
+    state.view.ymin += yShift;
+    state.view.ymax += yShift;
+
+    state.lastPointer = {
+        x: event.clientX,
+        y: event.clientY
+    };
+
+    renderGraph();
+});
+
+graph.addEventListener("pointerup", () => {
+    state.dragging = false;
+});
+
+graph.addEventListener("pointercancel", () => {
+    state.dragging = false;
+});
+
+/* ---------- Graph container resizing ---------- */
+
+const resizeHandles =
+    graphContainer.querySelectorAll(".resize-handle");
+
+resizeHandles.forEach(handle => {
+    handle.addEventListener("pointerdown", event => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const direction =
+            handle.dataset.resize;
+
+        const rect =
+            graphContainer.getBoundingClientRect();
+
+        state.resizing = true;
+        state.resizeDirection = direction;
+
+        state.resizeStart = {
+            pointerX: event.clientX,
+            pointerY: event.clientY,
+            width: rect.width,
+            height: rect.height,
+            left: rect.left,
+            top: rect.top
+        };
+
+        handle.setPointerCapture(event.pointerId);
+
+        document.body.classList.add("graph-resizing");
+
+        document.body.style.cursor =
+            getComputedStyle(handle).cursor;
+    });
+
+    handle.addEventListener("pointermove", event => {
+        if (!state.resizing) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        resizeGraphContainer(event);
+    });
+
+    handle.addEventListener("pointerup", event => {
+        if (!state.resizing) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        finishGraphResize();
+    });
+
+    handle.addEventListener("pointercancel", event => {
+        if (!state.resizing) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        finishGraphResize();
+    });
+});
+
+function resizeGraphContainer(event) {
+    const start = state.resizeStart;
+    const direction = state.resizeDirection;
+
+    const dx = event.clientX - start.pointerX;
+    const dy = event.clientY - start.pointerY;
+
+    const computed =
+        getComputedStyle(graphContainer);
+
+    const minWidth =
+        parseFloat(computed.minWidth) || 280;
+
+    const minHeight =
+        parseFloat(computed.minHeight) || 300;
+
+    let width = start.width;
+    let height = start.height;
+
+    if (direction.includes("e")) {
+        width = start.width + dx;
+    }
+
+    if (direction.includes("w")) {
+        width = start.width - dx;
+    }
+
+    if (direction.includes("s")) {
+        height = start.height + dy;
+    }
+
+    if (direction.includes("n")) {
+        height = start.height - dy;
+    }
+
+    width = Math.max(minWidth, width);
+    height = Math.max(minHeight, height);
+
+    if (direction.includes("w") &&
+        width === minWidth &&
+        start.width - dx < minWidth) {
+        width = minWidth;
+    }
+
+    if (direction.includes("n") &&
+        height === minHeight &&
+        start.height - dy < minHeight) {
+        height = minHeight;
+    }
+
+    graphContainer.style.width = `${width}px`;
+    graphContainer.style.height = `${height}px`;
+
+    if (state.selectedTestX !== null) {
+        updateTestEvaluation();
+    }
+}
+
+function finishGraphResize() {
+    state.resizing = false;
+    state.resizeDirection = null;
+    state.resizeStart = null;
+
+    document.body.classList.remove("graph-resizing");
+    document.body.style.cursor = "";
+
+    if (state.selectedTestX !== null) {
+        updateTestEvaluation();
+    }
+
+    renderGraph();
+}
+
+/* ---------- Reset graph view ---------- */
+
+document.getElementById("resetView")
+    .addEventListener("click", () => {
+        /*
+            Always obtain the reset view through the existing automatic
+            view calculation.
+        */
+        const targetView = getAutomaticView();
+
+        if (state.graphLimitsFixed) {
+            /*
+                In fixed mode, Reset changes the fixed limits immediately
+                to the normal automatic/default limits.
+            */
+            cancelViewAnimation();
+            applyView(targetView);
+            renderGraph();
+
+            if (state.selectedTestX !== null) {
+                updateTestEvaluation();
+            }
+
+        } else {
+            /*
+                In automatic mode, preserve the current view as the
+                starting point and transition to the reset target.
+            */
+            animateToView(targetView);
+        }
+    });
+
+/*
+    Keep the evaluation box correctly positioned when
+    the browser window changes size.
+*/
+window.addEventListener("resize", () => {
+    if (state.selectedTestX !== null) {
+        updateTestEvaluation();
+    }
+});
+
+/* ---------- Initialisation ---------- */
+
+update();
+
+</script>
+
+</body>
+</html>
