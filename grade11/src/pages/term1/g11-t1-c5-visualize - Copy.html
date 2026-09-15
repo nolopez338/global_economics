@@ -1,0 +1,1116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Continuous Probability Distributions</title>
+<script>
+window.MathJax={
+  tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']]},
+  svg:{fontCache:'global'}
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<style>
+:root{
+  --navy:#2E4057;
+  --blue:#1B52A0;
+  --teal:#10867C;
+  --bg:#f5f7fa;
+  --border:#d6dde6;
+  --text:#202a36;
+  --muted:#687789;
+  --bad:#9d3838;
+  --good:#176b55;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 Arial,sans-serif}
+header{background:var(--navy);color:#fff;padding:28px max(22px,calc((100% - 1240px)/2))}
+h1{margin:0 0 5px;font-size:2rem;font-weight:600}
+header p{margin:0;color:#e6edf5}
+main{max-width:1240px;margin:auto;padding:20px}
+.toolbar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+.panel,.graph,.formulas{background:#fff;border:1px solid var(--border);border-radius:7px}
+.panel,.formulas{padding:17px}
+label{display:block;font-weight:600;font-size:.88rem;margin-bottom:6px}
+select,input[type="number"]{width:100%;padding:9px 10px;border:1px solid #b9c4d0;border-radius:5px;background:#fff;font:inherit;color:inherit}
+.layout{display:grid;grid-template-columns:300px minmax(400px,1fr) 285px;gap:16px}
+.graph{padding:8px;min-width:0}
+.graphwrap{height:460px}
+svg{width:100%;height:100%;display:block}
+.axis{stroke:#687789}
+.grid{stroke:#e7ebf0}
+.curve{fill:none;stroke:var(--blue);stroke-width:3}
+.area{fill:var(--blue);opacity:.12}
+.interval-area{fill:var(--teal);opacity:.22}
+.mean-line{stroke:var(--navy);stroke-width:2;stroke-dasharray:6 4}
+.sd-line{stroke:var(--teal);stroke-width:1.8;stroke-dasharray:4 4}
+.interval-bracket{stroke:var(--teal);stroke-width:2}
+.tick,.axislabel{fill:#526173;font-size:11px}
+.axislabel{font-size:12px}
+.marker-label{fill:var(--navy);font-size:11px;font-weight:600}
+.sd-label{fill:var(--teal);font-size:10px;font-weight:600}
+.dist{font:1.05rem Georgia,serif;color:var(--navy);margin-bottom:9px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid #edf0f3}
+.row dt{color:var(--muted)}
+.row dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+.field{margin-bottom:15px}
+.slider-row{display:grid;grid-template-columns:minmax(0,1fr) 82px;gap:9px;align-items:center}
+.slider{width:100%;padding:0;margin:4px 0 0;accent-color:var(--blue);cursor:pointer}
+.slider-value{width:100%;padding:7px 7px!important;text-align:center;font-variant-numeric:tabular-nums}
+.range-labels{display:flex;justify-content:space-between;color:var(--muted);font-size:.7rem;margin-top:2px}
+.note,.status{padding:9px 10px;margin-top:13px;font-size:.83rem}
+.note{background:#f1f4f7;border-left:3px solid #9aaabd;color:#536273}
+.status{border-radius:4px}
+.status.ok{background:#edf7f3;color:var(--good)}
+.status.error{background:#fbefef;color:var(--bad)}
+.status.info{background:#eef3f8;color:#40566f}
+.fixed{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.toggle-label{margin:0}
+.switch{position:relative;width:46px;height:24px;flex:0 0 auto}
+.switch input{opacity:0;width:0;height:0}
+.switch-track{
+  position:absolute;inset:0;background:#b9c4d0;border-radius:24px;
+  cursor:pointer;transition:background .2s;
+}
+.switch-track:before{
+  content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;
+  background:#fff;border-radius:50%;transition:transform .2s;
+}
+.switch input:checked+.switch-track{background:var(--blue)}
+.switch input:checked+.switch-track:before{transform:translateX(22px)}
+h2{font-size:1.02rem;color:var(--navy);margin:0 0 14px}
+h3{font-size:.92rem;color:var(--navy);margin:17px 0 9px}
+.formulas{margin-top:16px}
+.formula{padding:9px 0;border-bottom:1px solid #edf0f3;overflow:auto}
+.formula:last-child{border:0}
+.hidden{display:none}
+footer{text-align:center;color:var(--muted);font-size:.78rem;padding:18px}
+@media(max-width:1050px){
+  .toolbar{grid-template-columns:1fr 1fr}
+  .layout{grid-template-columns:275px 1fr}
+  .results{grid-column:1/-1}
+  .results dl{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
+}
+@media(max-width:720px){
+  main{padding:12px}
+  .toolbar,.layout{grid-template-columns:1fr}
+  .graphwrap{height:350px}
+  .fixed{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header>
+<h1>Continuous Probability Distributions</h1>
+<p>Explore how distribution parameters determine the mean, standard deviation, and probability-density shape.</p>
+</header>
+
+<main>
+<div class="toolbar">
+<div class="panel">
+<label for="dist">Distribution</label>
+<select id="dist">
+<option value="uniform">Uniform</option>
+<option value="inc">Linear increasing</option>
+<option value="dec">Linear decreasing</option>
+<option value="tri">Triangular</option>
+<option value="exp">Exponential</option>
+<option value="normal">Normal</option>
+</select>
+</div>
+
+<div class="panel">
+<label for="mode">Mode</label>
+<select id="mode">
+<option value="p">Parameters → Mean &amp; Standard Deviation</option>
+<option value="m">Mean &amp; Standard Deviation → Parameters</option>
+</select>
+</div>
+
+<div class="panel">
+<div class="toggle-row">
+<label class="toggle-label" for="fixedLimits">Fixed graph limits</label>
+<label class="switch">
+<input id="fixedLimits" type="checkbox" checked>
+<span class="switch-track"></span>
+</label>
+</div>
+<div class="note">ON keeps the current graph limits fixed. OFF automatically adjusts the limits to the displayed distribution.</div>
+</div>
+</div>
+
+<div class="layout">
+<section class="panel" id="inputs"></section>
+
+<section class="graph">
+<div class="graphwrap">
+<svg id="svg" viewBox="0 0 800 460" aria-label="Probability density graph"></svg>
+</div>
+</section>
+
+<section class="panel results">
+<h2>Results</h2>
+<div id="results"></div>
+</section>
+</div>
+
+<section class="formulas">
+<h2>Formulas</h2>
+<div id="formulas"></div>
+</section>
+</main>
+
+<footer>Calculations are performed locally in the browser.</footer>
+
+<script>
+const D={
+  uniform:{name:'Uniform',notation:'X \\sim U(a,b)',ps:['a','b'],rest:'a<b'},
+  inc:{name:'Linear increasing',notation:'X \\sim \\operatorname{Lin}_{inc}(a,b)',ps:['a','b'],rest:'a<b'},
+  dec:{name:'Linear decreasing',notation:'X \\sim \\operatorname{Lin}_{dec}(a,b)',ps:['a','b'],rest:'a<b'},
+  tri:{name:'Triangular',notation:'X \\sim \\operatorname{Tri}(a,b,c)',ps:['a','b','c'],rest:'a<c<b'},
+  exp:{name:'Exponential',notation:'X \\sim \\operatorname{Exp}(\\lambda)',ps:['l'],rest:'\\lambda>0'},
+  normal:{name:'Normal',notation:'X \\sim N(\\mu,\\sigma^2)',ps:['mu','s'],rest:'\\sigma>0'}
+};
+
+const S={
+  uniform:{a:0,b:10},
+  inc:{a:0,b:10},
+  dec:{a:0,b:10},
+  tri:{a:0,b:12,c:5},
+  exp:{l:.1},
+  normal:{mu:45,s:8}
+};
+
+const $=x=>document.getElementById(x);
+const eps=1e-9;
+
+let fixedGraphLimits=null;
+let animationFrame=null;
+
+function fmt(x){
+  return Number.isFinite(x)?(Math.abs(x)<1e-10?'0':Number(x.toPrecision(4)).toString()):'—';
+}
+
+function sliderConfig(id,v){
+  const configs={
+    xa:{min:-50,max:50,step:.1},
+    xb:{min:-50,max:50,step:.1},
+    xc:{min:-50,max:50,step:.1},
+    xl:{min:.01,max:1,step:.01},
+    xmu:{min:-50,max:100,step:.1},
+    xs:{min:.1,max:30,step:.1},
+    mu:{min:-50,max:100,step:.1},
+    sd:{min:.1,max:30,step:.1},
+    fv:{min:-50,max:50,step:.1}
+  };
+  const c=configs[id]||{min:-50,max:50,step:.1};
+  let min=c.min,max=c.max;
+  if(Number.isFinite(v)){
+    if(v<min)min=Math.floor(v)-5;
+    if(v>max)max=Math.ceil(v)+5;
+  }
+  return{min,max,step:c.step};
+}
+
+function inp(id,label,v){
+  const c=sliderConfig(id,v);
+  const value=Number.isFinite(v)?v:'';
+  return`
+<div class="field">
+<label for="${id}">${label}</label>
+<div class="slider-row">
+<input id="${id}" class="slider" type="range" min="${c.min}" max="${c.max}" step="${c.step}" value="${value}">
+<input id="${id}Value" class="slider-value" type="number" step="${c.step}" value="${value}">
+</div>
+<div class="range-labels"><span>${fmt(c.min)}</span><span>${fmt(c.max)}</span></div>
+</div>`;
+}
+
+function num(id){
+  const element=$(id);
+  if(!element)return NaN;
+  const x=Number(element.value);
+  return Number.isFinite(x)?x:NaN;
+}
+
+function bindSlider(id){
+  const slider=$(id),number=$(id+'Value');
+  if(!slider||!number)return;
+
+  slider.addEventListener('input',()=>{
+    number.value=slider.value;
+    update();
+  });
+
+  number.addEventListener('input',()=>{
+    const x=Number(number.value);
+    if(Number.isFinite(x))slider.value=x;
+    update();
+  });
+}
+
+function moments(d,p){
+  if(d==='uniform'){
+    const width=p.b-p.a,v=width**2/12;
+    return{mu:(p.a+p.b)/2,v,sd:Math.sqrt(v)};
+  }
+
+  if(d==='inc'){
+    const width=p.b-p.a,v=width**2/18;
+    return{mu:(p.a+2*p.b)/3,v,sd:Math.sqrt(v)};
+  }
+
+  if(d==='dec'){
+    const width=p.b-p.a,v=width**2/18;
+    return{mu:(2*p.a+p.b)/3,v,sd:Math.sqrt(v)};
+  }
+
+  if(d==='tri'){
+    const numerator=p.a*p.a+p.b*p.b+p.c*p.c-p.a*p.b-p.a*p.c-p.b*p.c;
+    const v=numerator/18;
+    return{mu:(p.a+p.b+p.c)/3,v,sd:Math.sqrt(Math.max(0,v))};
+  }
+
+  if(d==='exp'){
+    return{mu:1/p.l,v:1/(p.l*p.l),sd:1/p.l};
+  }
+
+  return{mu:p.mu,v:p.s*p.s,sd:p.s};
+}
+
+function valid(d,p){
+  if(!p||Object.values(p).some(x=>!Number.isFinite(x)))
+    return'All required fields must contain finite numerical values.';
+
+  if(['uniform','inc','dec'].includes(d)&&!(p.a<p.b))
+    return'The parameters must satisfy a < b.';
+
+  if(d==='tri'&&!(p.a<p.c&&p.c<p.b))
+    return'The triangular distribution requires a < c < b.';
+
+  if(d==='exp'&&!(p.l>0))
+    return'The rate must satisfy λ > 0.';
+
+  if(d==='normal'&&!(p.s>0))
+    return'The standard deviation must satisfy σ > 0.';
+
+  return null;
+}
+
+function quad(A,B,C){
+  if(Math.abs(A)<eps){
+    if(Math.abs(B)<eps)return[];
+    return[-C/B];
+  }
+
+  const disc=B*B-4*A*C;
+  if(disc<-eps)return[];
+
+  const q=Math.sqrt(Math.max(0,disc));
+  if(q<eps)return[-B/(2*A)];
+
+  const r1=(-B+q)/(2*A),r2=(-B-q)/(2*A);
+  return Math.abs(r1-r2)<eps?[r1]:[r1,r2];
+}
+
+function triSolve(mu,sd,f,k){
+  if(!Number.isFinite(mu)||!Number.isFinite(sd)||!Number.isFinite(k)||!(sd>0))
+    return{error:'The target mean and standard deviation must be finite, and the standard deviation must be positive.'};
+
+  const total=3*mu,sum=total-k;
+  const product=(sum*sum+k*k-k*sum-18*sd*sd)/3;
+  const roots=quad(1,-sum,product);
+  const candidates=[];
+
+  roots.forEach(r=>{
+    let p;
+
+    if(f==='a')p={a:k,b:r,c:sum-r};
+    else if(f==='b')p={a:r,b:k,c:sum-r};
+    else p={a:r,b:sum-r,c:k};
+
+    if(Number.isFinite(p.a)&&Number.isFinite(p.b)&&Number.isFinite(p.c)&&p.a<p.c&&p.c<p.b){
+      const m=moments('tri',p);
+      const muOK=Math.abs(m.mu-mu)<=1e-7*Math.max(1,Math.abs(mu));
+      const sdOK=Math.abs(m.sd-sd)<=1e-7*Math.max(1,Math.abs(sd));
+
+      if(muOK&&sdOK)candidates.push(p);
+    }
+  });
+
+  const unique=[];
+
+  candidates.forEach(p=>{
+    const exists=unique.some(q=>
+      Math.max(
+        Math.abs(q.a-p.a),
+        Math.abs(q.b-p.b),
+        Math.abs(q.c-p.c)
+      )<1e-7
+    );
+
+    if(!exists)unique.push(p);
+  });
+
+  if(unique.length===0)
+    return{
+      error:'No valid triangular distribution satisfies these constraints. The fixed parameter is incompatible with the requested mean and standard deviation.'
+    };
+
+  if(unique.length>1)
+    return{
+      error:'More than one valid triangular distribution satisfies these constraints. Fix an additional parameter to obtain a unique solution.',
+      multiple:true
+    };
+
+  return{
+    p:unique[0],
+    message:`Fixing ${f} allows the remaining triangular parameters to be solved from the target mean and standard deviation.`
+  };
+}
+
+function solve(d,mu,sd){
+  if(!Number.isFinite(mu)||!Number.isFinite(sd)||!(sd>0))
+    return{
+      error:'The target mean must be finite, and the target standard deviation must be positive.'
+    };
+
+  if(d==='uniform'){
+    const halfWidth=Math.sqrt(3)*sd;
+    return{
+      p:{a:mu-halfWidth,b:mu+halfWidth},
+      message:'The two target moments uniquely determine a and b.'
+    };
+  }
+
+  if(d==='inc')
+    return{
+      p:{a:mu-2*Math.sqrt(2)*sd,b:mu+Math.sqrt(2)*sd},
+      message:'The target mean and standard deviation uniquely determine a and b.'
+    };
+
+  if(d==='dec')
+    return{
+      p:{a:mu-Math.sqrt(2)*sd,b:mu+2*Math.sqrt(2)*sd},
+      message:'The target mean and standard deviation uniquely determine a and b.'
+    };
+
+  if(d==='exp'){
+    if(mu<=0)
+      return{
+        error:'No valid exponential distribution exists because its mean must be positive.'
+      };
+
+    if(Math.abs(mu-sd)>1e-7*Math.max(1,Math.abs(mu),Math.abs(sd)))
+      return{
+        error:'No valid exponential distribution satisfies these constraints: an exponential distribution requires μ = σ.'
+      };
+
+    return{
+      p:{l:1/mu},
+      message:'For an exponential distribution, μ = σ and λ = 1/μ.'
+    };
+  }
+
+  return{
+    p:{mu,s:sd},
+    message:'For a normal distribution, μ and σ are the parameters themselves.'
+  };
+}
+
+function renderInputs(){
+  const d=$('dist').value,m=$('mode').value,s=S[d];
+  let h='<h2>Inputs</h2>';
+
+  if(m==='p'){
+    if(d==='normal'){
+      h+=inp('xmu','Mean μ',s.mu);
+      h+=inp('xs','Standard deviation σ',s.s);
+    }else{
+      const labels={a:'Minimum a',b:'Maximum b',c:'Mode c',l:'Rate λ'};
+      D[d].ps.forEach(k=>{
+        h+=inp('x'+k,labels[k],s[k]);
+      });
+    }
+
+    h+=`<div class="note">Move the sliders to change the distribution parameters. The numerical boxes can also be used for precise values.</div>`;
+  }else if(d==='normal'){
+    h+=inp('mu','Target mean μ',s.mu);
+    h+=inp('sd','Target standard deviation σ',s.s);
+    h+=`<div class="note">For a normal distribution, μ and σ are the parameters themselves.</div>`;
+  }else if(d==='tri'){
+    const initialMu=moments('tri',s).mu;
+    const initialSd=moments('tri',s).sd;
+
+    h+=inp('mu','Target mean μ',initialMu);
+    h+=inp('sd','Target standard deviation σ',initialSd);
+
+    h+=`
+<h3>Fixed parameter</h3>
+<div class="fixed">
+<div class="field">
+<label for="fp">Parameter</label>
+<select id="fp">
+<option value="a">a</option>
+<option value="b">b</option>
+<option value="c" selected>c</option>
+</select>
+</div>
+${inp('fv','Fixed value',s.c)}
+</div>
+<div class="note">Mean and standard deviation provide two constraints. The triangular distribution has three unknown parameters, so one parameter must be fixed.</div>`;
+  }else{
+    const initial=moments(d,S[d]);
+
+    h+=inp('mu','Target mean μ',initial.mu);
+    h+=inp('sd','Target standard deviation σ',initial.sd);
+
+    h+=d==='exp'
+      ?`<div class="note">An exponential distribution requires μ = σ.</div>`
+      :`<div class="note">The two target moments uniquely determine the parameters for this distribution.</div>`;
+  }
+
+  $('inputs').innerHTML=h;
+
+  $('inputs').querySelectorAll('.slider').forEach(slider=>{
+    bindSlider(slider.id);
+  });
+
+  const fp=$('fp');
+  if(fp)fp.addEventListener('change',()=>update());
+}
+
+function current(){
+  const d=$('dist').value,m=$('mode').value;
+
+  if(m==='p'){
+    const p={};
+
+    D[d].ps.forEach(k=>{
+      p[k]=num('x'+k);
+    });
+
+    if(d==='normal'){
+      p.mu=num('xmu');
+      p.s=num('xs');
+    }
+
+    return{p};
+  }
+
+  const mu=num('mu'),sd=num('sd');
+
+  if(d==='tri'){
+    const fp=$('fp');
+    return triSolve(mu,sd,fp?fp.value:'c',num('fvValue'));
+  }
+
+  return solve(d,mu,sd);
+}
+
+function pdf(d,x,p){
+  if(d==='uniform')
+    return x>=p.a&&x<=p.b?1/(p.b-p.a):0;
+
+  if(d==='inc')
+    return x>=p.a&&x<=p.b?2*(x-p.a)/(p.b-p.a)**2:0;
+
+  if(d==='dec')
+    return x>=p.a&&x<=p.b?2*(p.b-x)/(p.b-p.a)**2:0;
+
+  if(d==='tri'){
+    if(x<p.a||x>p.b)return 0;
+
+    if(x<=p.c)
+      return 2*(x-p.a)/((p.b-p.a)*(p.c-p.a));
+
+    return 2*(p.b-x)/((p.b-p.a)*(p.b-p.c));
+  }
+
+  if(d==='exp')
+    return x>=0?p.l*Math.exp(-p.l*x):0;
+
+  return Math.exp(-.5*((x-p.mu)/p.s)**2)/(p.s*Math.sqrt(2*Math.PI));
+}
+
+/*
+  Calculate the automatically chosen graph limits for the current
+  distribution. These are the limits used when "Fixed graph limits"
+  is OFF.
+*/
+function automaticLimits(d,p){
+  let a0,b0;
+
+  if(d==='normal'){
+    a0=p.mu-4*p.s;
+    b0=p.mu+4*p.s;
+  }else if(d==='exp'){
+    a0=0;
+    b0=5/p.l;
+  }else{
+    a0=p.a;
+    b0=p.b;
+  }
+
+  if(!Number.isFinite(a0)||!Number.isFinite(b0)||!(b0>a0))
+    return null;
+
+  const span=Math.max(b0-a0,1e-8);
+  const xMin=a0-span*.04;
+  const xMax=b0+span*.04;
+
+  let maxY=0;
+  const samples=700;
+
+  for(let i=0;i<=samples;i++){
+    const x=xMin+(xMax-xMin)*i/samples;
+    maxY=Math.max(maxY,Math.max(0,pdf(d,x,p)));
+  }
+
+  const yMax=Math.max(maxY,1e-9)*1.12;
+
+  return{
+    xMin,
+    xMax,
+    yMin:0,
+    yMax
+  };
+}
+
+function graph(d,p,limits){
+  const svg=$('svg');
+  const W=800,H=460,L=62,R=22,T=22,B=55,n=700;
+
+  if(!limits){
+    svg.innerHTML='';
+    return;
+  }
+
+  const a=limits.xMin;
+  const b=limits.xMax;
+  const ymax=limits.yMax;
+
+  if(!Number.isFinite(a)||!Number.isFinite(b)||!(b>a)||!Number.isFinite(ymax)||!(ymax>0)){
+    svg.innerHTML='';
+    return;
+  }
+
+  const q=moments(d,p);
+  const mu=q.mu;
+  const sd=q.sd;
+
+  let supportLeft,supportRight;
+
+  if(d==='normal'){
+    supportLeft=-Infinity;
+    supportRight=Infinity;
+  }else if(d==='exp'){
+    supportLeft=0;
+    supportRight=Infinity;
+  }else{
+    supportLeft=p.a;
+    supportRight=p.b;
+  }
+
+  const intervalLeft=Math.max(mu-sd,supportLeft);
+  const intervalRight=Math.min(mu+sd,supportRight);
+
+  const X=x=>L+(x-a)/(b-a)*(W-L-R);
+  const Y=y=>H-B-y/ymax*(H-T-B);
+
+  function E(tag,o,t){
+    const e=document.createElementNS('http://www.w3.org/2000/svg',tag);
+
+    Object.entries(o).forEach(([k,v])=>{
+      e.setAttribute(k,v);
+    });
+
+    if(t!=null)e.textContent=t;
+
+    svg.appendChild(e);
+    return e;
+  }
+
+  svg.innerHTML='';
+
+  for(let i=0;i<=5;i++){
+    const y=ymax*i/5;
+
+    E('line',{
+      x1:L,
+      x2:W-R,
+      y1:Y(y),
+      y2:Y(y),
+      class:'grid'
+    });
+
+    E('text',{
+      x:L-8,
+      y:Y(y)+4,
+      'text-anchor':'end',
+      class:'tick'
+    },fmt(y));
+  }
+
+  for(let i=0;i<=5;i++){
+    const x=a+(b-a)*i/5;
+
+    E('line',{
+      x1:X(x),
+      x2:X(x),
+      y1:H-B,
+      y2:H-B+5,
+      class:'axis'
+    });
+
+    E('text',{
+      x:X(x),
+      y:H-B+20,
+      'text-anchor':'middle',
+      class:'tick'
+    },fmt(x));
+  }
+
+  E('line',{
+    x1:L,
+    x2:W-R,
+    y1:H-B,
+    y2:H-B,
+    class:'axis'
+  });
+
+  E('line',{
+    x1:L,
+    x2:L,
+    y1:T,
+    y2:H-B,
+    class:'axis'
+  });
+
+  const pts=[];
+
+  for(let i=0;i<=n;i++){
+    const x=a+(b-a)*i/n;
+    pts.push([x,Math.max(0,pdf(d,x,p))]);
+  }
+
+  let path='';
+  let area=`M ${X(pts[0][0])} ${Y(0)} `;
+
+  pts.forEach((point,i)=>{
+    path+=(i?'L':'M')+' '+X(point[0])+' '+Y(point[1])+' ';
+    area+=`L ${X(point[0])} ${Y(point[1])} `;
+  });
+
+  area+=`L ${X(pts[pts.length-1][0])} ${Y(0)} Z`;
+
+  E('path',{
+    d:area,
+    class:'area'
+  });
+
+  if(intervalRight>intervalLeft){
+    const intervalPts=[];
+    const samples=300;
+
+    for(let i=0;i<=samples;i++){
+      const x=intervalLeft+(intervalRight-intervalLeft)*i/samples;
+      intervalPts.push([x,pdf(d,x,p)]);
+    }
+
+    let intervalArea=`M ${X(intervalLeft)} ${Y(0)} `;
+
+    intervalPts.forEach(point=>{
+      intervalArea+=`L ${X(point[0])} ${Y(point[1])} `;
+    });
+
+    intervalArea+=`L ${X(intervalRight)} ${Y(0)} Z`;
+
+    E('path',{
+      d:intervalArea,
+      class:'interval-area'
+    });
+  }
+
+  E('path',{
+    d:path,
+    class:'curve'
+  });
+
+  if(intervalLeft>=a&&intervalLeft<=b){
+    E('line',{
+      x1:X(intervalLeft),
+      x2:X(intervalLeft),
+      y1:T,
+      y2:H-B,
+      class:'sd-line'
+    });
+
+    E('text',{
+      x:X(intervalLeft),
+      y:T+12,
+      'text-anchor':'middle',
+      class:'sd-label'
+    },'μ − σ');
+  }
+
+  if(mu>=a&&mu<=b){
+    E('line',{
+      x1:X(mu),
+      x2:X(mu),
+      y1:T,
+      y2:H-B,
+      class:'mean-line'
+    });
+
+    E('text',{
+      x:X(mu),
+      y:T+12,
+      'text-anchor':'middle',
+      class:'marker-label'
+    },'μ');
+  }
+
+  if(intervalRight>=a&&intervalRight<=b){
+    E('line',{
+      x1:X(intervalRight),
+      x2:X(intervalRight),
+      y1:T,
+      y2:H-B,
+      class:'sd-line'
+    });
+
+    E('text',{
+      x:X(intervalRight),
+      y:T+12,
+      'text-anchor':'middle',
+      class:'sd-label'
+    },'μ + σ');
+  }
+
+  if(intervalRight>intervalLeft){
+    const bracketY=H-B+34;
+
+    E('line',{
+      x1:X(intervalLeft),
+      x2:X(intervalRight),
+      y1:bracketY,
+      y2:bracketY,
+      class:'interval-bracket'
+    });
+
+    E('line',{
+      x1:X(intervalLeft),
+      x2:X(intervalLeft),
+      y1:bracketY-5,
+      y2:bracketY+5,
+      class:'interval-bracket'
+    });
+
+    E('line',{
+      x1:X(intervalRight),
+      x2:X(intervalRight),
+      y1:bracketY-5,
+      y2:bracketY+5,
+      class:'interval-bracket'
+    });
+
+    E('text',{
+      x:(X(intervalLeft)+X(intervalRight))/2,
+      y:bracketY+15,
+      'text-anchor':'middle',
+      class:'sd-label'
+    },`[${fmt(intervalLeft)}, ${fmt(intervalRight)}]`);
+  }
+
+  E('text',{
+    x:W/2,
+    y:H-10,
+    'text-anchor':'middle',
+    class:'axislabel'
+  },'x');
+
+  E('text',{
+    x:17,
+    y:H/2,
+    transform:`rotate(-90 17 ${H/2})`,
+    'text-anchor':'middle',
+    class:'axislabel'
+  },'f(x)');
+}
+
+function sameLimits(a,b){
+  if(!a||!b)return false;
+
+  return Math.abs(a.xMin-b.xMin)<1e-12 &&
+         Math.abs(a.xMax-b.xMax)<1e-12 &&
+         Math.abs(a.yMin-b.yMin)<1e-12 &&
+         Math.abs(a.yMax-b.yMax)<1e-12;
+}
+
+function interpolateLimits(a,b,t){
+  return{
+    xMin:a.xMin+(b.xMin-a.xMin)*t,
+    xMax:a.xMax+(b.xMax-a.xMax)*t,
+    yMin:a.yMin+(b.yMin-a.yMin)*t,
+    yMax:a.yMax+(b.yMax-a.yMax)*t
+  };
+}
+
+function animateToAuto(d,p,start,end){
+  if(animationFrame!==null){
+    cancelAnimationFrame(animationFrame);
+    animationFrame=null;
+  }
+
+  const duration=3000;
+  const startTime=performance.now();
+
+  function frame(now){
+    const t=Math.min(1,(now-startTime)/duration);
+
+    /* Smooth cubic ease-in-out interpolation. */
+    const eased=t<.5
+      ?4*t*t*t
+      :1-Math.pow(-2*t+2,3)/2;
+
+    const limits=interpolateLimits(start,end,eased);
+    graph(d,p,limits);
+
+    if(t<1){
+      animationFrame=requestAnimationFrame(frame);
+    }else{
+      animationFrame=null;
+      graph(d,p,end);
+    }
+  }
+
+  animationFrame=requestAnimationFrame(frame);
+}
+
+function update(){
+  const d=$('dist').value;
+  const m=$('mode').value;
+  const fixed=$('fixedLimits').checked;
+
+  if(m==='p'){
+    D[d].ps.forEach(k=>{
+      const x=num('x'+k);
+
+      if(Number.isFinite(x))
+        S[d][k]=x;
+    });
+  }
+
+  const r=current();
+
+  if(r.error&&!r.p){
+    $('results').innerHTML=`<div class="status error">${r.error}</div>`;
+    $('svg').innerHTML='';
+    return;
+  }
+
+  const p=r.p;
+  const e=valid(d,p);
+
+  if(e){
+    $('results').innerHTML=`<div class="status error">${e}</div>`;
+    $('svg').innerHTML='';
+    return;
+  }
+
+  const q=moments(d,p);
+  const intervalLeft=q.mu-q.sd;
+  const intervalRight=q.mu+q.sd;
+
+  let supportLeft,supportRight;
+
+  if(d==='normal'){
+    supportLeft=-Infinity;
+    supportRight=Infinity;
+  }else if(d==='exp'){
+    supportLeft=0;
+    supportRight=Infinity;
+  }else{
+    supportLeft=p.a;
+    supportRight=p.b;
+  }
+
+  const displayedLeft=Math.max(intervalLeft,supportLeft);
+  const displayedRight=Math.min(intervalRight,supportRight);
+
+  let rows=`<div class="dist">\\(${D[d].notation}\\)</div><dl>`;
+
+  D[d].ps.forEach(k=>{
+    rows+=`<div class="row"><dt>${k==='l'?'λ':k}</dt><dd>${fmt(p[k])}</dd></div>`;
+  });
+
+  rows+=`
+<div class="row"><dt>Mean</dt><dd>${fmt(q.mu)}</dd></div>
+<div class="row"><dt>Variance</dt><dd>${fmt(q.v)}</dd></div>
+<div class="row"><dt>Standard deviation</dt><dd>${fmt(q.sd)}</dd></div>
+<div class="row"><dt>μ − σ</dt><dd>${fmt(intervalLeft)}</dd></div>
+<div class="row"><dt>μ + σ</dt><dd>${fmt(intervalRight)}</dd></div>
+<div class="row"><dt>Interval within support</dt><dd>[${fmt(displayedLeft)}, ${fmt(displayedRight)}]</dd></div>
+</dl>`;
+
+  if(r.message)
+    rows+=`<div class="status ${r.multiple?'error':'ok'}">${r.message}</div>`;
+
+  rows+=`<div class="note">The graph highlights the probability-density area between μ − σ and μ + σ.</div>`;
+
+  $('results').innerHTML=rows;
+
+  const autoLimits=automaticLimits(d,p);
+
+  if(!autoLimits){
+    $('svg').innerHTML='';
+    return;
+  }
+
+  /*
+    When fixed limits are ON, the current fixed limits are preserved.
+    When OFF, the automatically calculated limits are used.
+  */
+  if(fixed){
+    if(!fixedGraphLimits)
+      fixedGraphLimits={...autoLimits};
+
+    graph(d,p,fixedGraphLimits);
+  }else{
+    graph(d,p,autoLimits);
+  }
+
+  if(window.MathJax)
+    MathJax.typesetPromise([$(`results`)].filter(Boolean));
+}
+
+function formulas(){
+  const d=$('dist').value;
+
+  const F={
+    uniform:[
+      ['Probability density','f(x)=\\frac{1}{b-a},\\quad a\\le x\\le b'],
+      ['Mean','\\mu=\\frac{a+b}{2}'],
+      ['Variance','\\sigma^2=\\frac{(b-a)^2}{12}'],
+      ['Standard deviation','\\sigma=\\frac{b-a}{\\sqrt{12}}']
+    ],
+
+    inc:[
+      ['Probability density','f(x)=\\frac{2(x-a)}{(b-a)^2},\\quad a\\le x\\le b'],
+      ['Mean','\\mu=\\frac{a+2b}{3}'],
+      ['Variance','\\sigma^2=\\frac{(b-a)^2}{18}'],
+      ['Standard deviation','\\sigma=\\frac{b-a}{3\\sqrt2}']
+    ],
+
+    dec:[
+      ['Probability density','f(x)=\\frac{2(b-x)}{(b-a)^2},\\quad a\\le x\\le b'],
+      ['Mean','\\mu=\\frac{2a+b}{3}'],
+      ['Variance','\\sigma^2=\\frac{(b-a)^2}{18}'],
+      ['Standard deviation','\\sigma=\\frac{b-a}{3\\sqrt2}']
+    ],
+
+    tri:[
+      ['Probability density','f(x)=\\begin{cases}\\frac{2(x-a)}{(b-a)(c-a)},&a\\le x\\le c\\\\\\frac{2(b-x)}{(b-a)(b-c)},&c<x\\le b\\end{cases}'],
+      ['Mean','\\mu=\\frac{a+b+c}{3}'],
+      ['Variance','\\sigma^2=\\frac{a^2+b^2+c^2-ab-ac-bc}{18}'],
+      ['Standard deviation','\\sigma=\\sqrt{\\frac{a^2+b^2+c^2-ab-ac-bc}{18}}']
+    ],
+
+    exp:[
+      ['Probability density','f(x)=\\lambda e^{-\\lambda x},\\quad x\\ge0'],
+      ['Mean','\\mu=\\frac1\\lambda'],
+      ['Variance','\\sigma^2=\\frac1{\\lambda^2}'],
+      ['Standard deviation','\\sigma=\\frac1\\lambda']
+    ],
+
+    normal:[
+      ['Probability density','f(x)=\\frac{1}{\\sigma\\sqrt{2\\pi}}e^{-\\frac{(x-\\mu)^2}{2\\sigma^2}}'],
+      ['Mean','\\mu=\\mu'],
+      ['Variance','\\sigma^2=\\sigma^2'],
+      ['Standard deviation','\\sigma=\\sigma']
+    ]
+  }[d];
+
+  $('formulas').innerHTML=
+    F.map(x=>`<div class="formula"><strong>${x[0]}:</strong> \\(${x[1]}\\)</div>`).join('')+
+    `<div class="formula"><strong>Mean ± one standard deviation:</strong> \\([\\mu-\\sigma,\\mu+\\sigma]\\)</div>
+<div class="formula"><strong>Restrictions:</strong> \\(${D[d].rest}\\)</div>`;
+
+  if(window.MathJax)
+    MathJax.typesetPromise([$(`formulas`)].filter(Boolean));
+}
+
+function render(){
+  renderInputs();
+  formulas();
+  update();
+}
+
+$('dist').addEventListener('change',()=>{
+  /*
+    A distribution change establishes a new set of fixed limits
+    corresponding to the newly displayed distribution.
+  */
+  fixedGraphLimits=null;
+  render();
+});
+
+$('mode').addEventListener('change',()=>{
+  /*
+    Changing modes changes the displayed distribution, so establish
+    new fixed limits for the new state.
+  */
+  fixedGraphLimits=null;
+  render();
+});
+
+$('fixedLimits').addEventListener('change',()=>{
+  const fixed=$('fixedLimits').checked;
+  const d=$('dist').value;
+  const r=current();
+
+  if(r.error||!r.p)return;
+
+  const p=r.p;
+
+  if(fixed){
+    /*
+      OFF → ON: immediately freeze the currently calculated automatic
+      limits. No animation is needed in this direction.
+    */
+    const autoLimits=automaticLimits(d,p);
+
+    if(autoLimits)
+      fixedGraphLimits={...autoLimits};
+
+    if(animationFrame!==null){
+      cancelAnimationFrame(animationFrame);
+      animationFrame=null;
+    }
+
+    graph(d,p,fixedGraphLimits);
+    return;
+  }
+
+  /*
+    ON → OFF: animate exactly 3 seconds from the currently visible
+    fixed limits to the newly calculated automatic limits.
+  */
+  const autoLimits=automaticLimits(d,p);
+
+  if(!autoLimits)return;
+
+  const startLimits=fixedGraphLimits
+    ? {...fixedGraphLimits}
+    : {...autoLimits};
+
+  animateToAuto(d,p,startLimits,autoLimits);
+});
+
+render();
+</script>
+</body>
+</html>
