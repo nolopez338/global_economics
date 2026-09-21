@@ -30,52 +30,53 @@ window.CLASS_STUDENT_LISTS = {
   },
   "10A": {
     pdfUrl:
-      "https://correosanbartoloedu-my.sharepoint.com/:b:/g/personal/nicolas_lopez_sanbartolo_edu_co/IQDe06pqnnnnSZs23p-u1ZubAXsK66kBIR5AM-Oi4lmrg9A?e=TyX9ap",
+      "../assets/pdf/Decimo-A.pdf",
     students: [],
   },
   "10B": {
     pdfUrl:
-      "https://correosanbartoloedu-my.sharepoint.com/:b:/g/personal/nicolas_lopez_sanbartolo_edu_co/IQAx9bJVKfMuSIp0MDpo-kZ7ASHF83XVSgRhf-Hz3LWzc3g?e=rJ1qxB",
+      "../assets/pdf/Decimo-B.pdf",
     students: [],
   },
   "10C": {
     pdfUrl:
-      "https://correosanbartoloedu-my.sharepoint.com/:b:/g/personal/nicolas_lopez_sanbartolo_edu_co/IQBlQ8VmL1LpSJXvVV_n0NeTAe5O4N0POxK7cEuWR2rjCi8?e=H4zzl4",
+      "../assets/pdf/Decimo-C.pdf",
     students: [],
   },
   "10D": {
     pdfUrl:
-      "https://correosanbartoloedu-my.sharepoint.com/:b:/g/personal/nicolas_lopez_sanbartolo_edu_co/IQAGdXuhcZKRQ6kF0TaDfI45AaD-gSxBCtc7cCt1p1u72-s?e=fkC2er",
+      "../assets/pdf/Decimo-D.pdf",
     students: [],
   },
   "10E": {
     pdfUrl:
-      "https://correosanbartoloedu-my.sharepoint.com/:b:/g/personal/nicolas_lopez_sanbartolo_edu_co/IQBHimNLEtR4T76nmWm5R4BoASlxoR_9yOKsGMqyx3gTYos?e=XdF90L",
+      "../assets/pdf/Decimo-E.pdf",
     students: [],
   },
   "11A": {
     pdfUrl:
-      "https://correosanbartoloedu-my.sharepoint.com/:b:/g/personal/nicolas_lopez_sanbartolo_edu_co/IQDzrNnkmXbQSJpTDFpxuODuAWKzdJBu0sBfgErbIT4aakA?e=Jr0TOM",
+      "../assets/pdf/Once-A.pdf",
     students: [],
   },
   "11B": {
     pdfUrl:
-      "https://correosanbartoloedu-my.sharepoint.com/:b:/g/personal/nicolas_lopez_sanbartolo_edu_co/IQACkgMVyoQoT7ua0BJqbXfbATYjinUCodtCGg6Qi7AEve0?e=KGtJMm",
+      "../assets/pdf/Once-B.pdf",
     students: [],
   },
   "11C": {
     pdfUrl:
-      "https://correosanbartoloedu-my.sharepoint.com/:b:/g/personal/nicolas_lopez_sanbartolo_edu_co/IQCPTFnw99QMTKpR0e_L78oOAWKtS7WXVetw1PED2hlPfrk?e=24RuBc",
+      "../assets/pdf/Once-C.pdf",
     students: [],
   },
   "11D": {
     pdfUrl:
-      "https://correosanbartoloedu-my.sharepoint.com/:b:/g/personal/nicolas_lopez_sanbartolo_edu_co/IQAh4xNXLXKZSLMsT11KqHThAW_pW8TOPgi-Ym3_P5Pf23k?e=6OdS0H",
+      "../assets/pdf/Once-D.pdf",
+    students: [],
     students: [],
   },
   "11E": {
     pdfUrl:
-      "https://correosanbartoloedu-my.sharepoint.com/:b:/g/personal/nicolas_lopez_sanbartolo_edu_co/IQBB5aqr_WIBTLwvfP0MiQYPAeDWo8n9EbDxE7bKUJ0zyYU?e=PpcPU5",
+      "../assets/pdf/Once-E.pdf",
     students: [],
   },
 };
