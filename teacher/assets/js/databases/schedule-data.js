@@ -3711,7 +3711,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "-",
+    "Description": "Introduction: C1 Guide",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -3724,7 +3724,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 4,
-    "Description": "-",
+    "Description": "Cesa Talk",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -3737,7 +3737,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 4,
-    "Description": "-",
+    "Description": "C2 Guide",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -3750,7 +3750,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Monday",
     "Day": 4,
-    "Description": "-",
+    "Description": "No Class: Civic Event",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -3763,7 +3763,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Tuesday",
     "Day": 4,
-    "Description": "-",
+    "Description": "C3 & C4 Guide",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -3776,7 +3776,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 4,
-    "Description": "-",
+    "Description": "C5 & C6 Guide",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -3789,7 +3789,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 4,
-    "Description": "-",
+    "Description": "C7 & C8 Guide",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -3802,7 +3802,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Tuesday",
     "Day": 4,
-    "Description": "-",
+    "Description": "C9 & C10 Guide",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
