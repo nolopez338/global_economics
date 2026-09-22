@@ -6389,7 +6389,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Tuesday",
     "Day": 5,
-    "Description": "C5 Exploration and Activity",
+    "Description": "No class: Spiritual preparation",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -6402,7 +6402,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C6 & C7 Introduction",
+    "Description": "C5 Exploration and Activity",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -6415,7 +6415,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "C5 - C7 Activities",
+    "Description": "C6 - C7 Activities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
