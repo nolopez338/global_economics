@@ -4192,7 +4192,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 1,
-    "Description": "C6 & C7 Introduction",
+    "Description": "No Class: Spiritual Event 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -4205,7 +4205,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C5 - C7 Activities",
+    "Description": "C6 & C7 Introduction",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -4218,7 +4218,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "2nd Learning Evidence",
+    "Description": "C5 - C7 Activities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -4231,7 +4231,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "C8 & C9 Introduction",
+    "Description": "2nd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -4244,7 +4244,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Tuesday",
     "Day": 1,
-    "Description": "C8 & C9 Activities",
+    "Description": "C8 - C10 Introduction",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -4257,7 +4257,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 3,
-    "Description": "C10 Exploration",
+    "Description": "C8 - C10 Activities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -4933,7 +4933,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 2,
-    "Description": "C5 - C7 Activities",
+    "Description": "No Class: Spiritual Event 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -4946,7 +4946,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "2nd Learning Evidence",
+    "Description": "C5 - C7 Activities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -4959,7 +4959,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Tuesday",
     "Day": 2,
-    "Description": "C8 & C9 Introduction",
+    "Description": "2nd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -4972,7 +4972,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "C8 & C9 Activities",
+    "Description": "C8 & C9 Introduction",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -4985,7 +4985,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 2,
-    "Description": "C10 Exploration",
+    "Description": "C8 & C9 Activities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -4998,7 +4998,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 3,
-    "Description": "3rd Learning Evidence",
+    "Description": "C10 Exploration",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -5011,7 +5011,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 2,
-    "Description": "Extra Class",
+    "Description": "3rd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -5648,7 +5648,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 6,
-    "Description": "C5 Exploration and Activity",
+    "Description": "No Class: Spiritual Event 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -5661,7 +5661,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 1,
-    "Description": "C6 & C7 Introduction",
+    "Description": "No Class: Spiritual Event 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -5674,7 +5674,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "C5 - C7 Activities",
+    "Description": "C5 Exploration and Activity",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -5687,7 +5687,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "2nd Learning Evidence",
+    "Description": "C6 & C7 Introduction",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -5700,7 +5700,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Monday",
     "Day": 6,
-    "Description": "C8 & C9 Introduction",
+    "Description": "C5 - C7 Activities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -5713,7 +5713,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Tuesday",
     "Day": 1,
-    "Description": "C8 & C9 Activities",
+    "Description": "2nd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -5726,7 +5726,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Tuesday",
     "Day": 6,
-    "Description": "C10 Exploration",
+    "Description": "C8 - C10 Introduction",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -5739,7 +5739,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "3rd Learning Evidence",
+    "Description": "C8 - C10 Activities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -5752,7 +5752,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "Extra Class",
+    "Description": "3rd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -7117,7 +7117,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 6,
-    "Description": "C5 Exploration and Activity",
+    "Description": "No class: Spiritual Event 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -7130,7 +7130,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 1,
-    "Description": "C6 & C7 Introduction",
+    "Description": "No class: Spiritual Event 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -7143,7 +7143,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "C5 - C7 Activities",
+    "Description": "C5 Exploration and Activity",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -7156,7 +7156,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "2nd Learning Evidence",
+    "Description": "C6 & C7 Introduction",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -7169,7 +7169,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Monday",
     "Day": 6,
-    "Description": "C8 & C9 Introduction",
+    "Description": "C5 - C7 Activities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -7182,7 +7182,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Tuesday",
     "Day": 1,
-    "Description": "C8 & C9 Activities",
+    "Description": "2nd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -7195,7 +7195,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Tuesday",
     "Day": 6,
-    "Description": "C10 Exploration",
+    "Description": "C8 - C10 Introduction",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -7208,7 +7208,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "3rd Learning Evidence",
+    "Description": "C8 - C10 Activities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -7221,7 +7221,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "Extra Class",
+    "Description": "3rd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
