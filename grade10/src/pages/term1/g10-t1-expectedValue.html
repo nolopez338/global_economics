@@ -30,9 +30,10 @@
     .prob-row { margin-top: 6px; }
     .prob-input { width: 70px; font-size: 12px; }
     .prob-input[readonly] { color: var(--blue); background: var(--blue-soft); font-weight: 700; }
-    .balance-button { display: block; margin: 7px auto 0; padding: 2px 7px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: white; cursor: pointer; font-size: 10px; font-weight: 700; }
-    .balance-button:hover { border-color: #93a2b8; }
-    .balance-button[aria-pressed="true"] { border-color: var(--blue); color: var(--blue); background: var(--blue-soft); }
+    .prob-slider { display: block; width: 70px; height: 8px; margin: 2px auto 0; accent-color: var(--blue); cursor: pointer; }
+    .prob-slider:disabled { cursor: default; opacity: .55; }
+    .balance-label { display: flex !important; align-items: center; justify-content: center; gap: 4px; margin-top: 7px !important; cursor: pointer; }
+    .balance-checkbox { width: 15px; height: 15px; margin: 0; accent-color: var(--blue); cursor: pointer; }
     .expected-strip { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin: 12px 0 18px; padding: 12px 15px; border-left: 3px solid var(--orange); background: #fffaf0; }
     .expected-value { font-size: 20px; font-weight: 800; color: #9a5704; white-space: nowrap; }
     .formula { color: var(--muted); font-size: 13px; }
@@ -179,7 +180,7 @@
   const faces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
   const payoffs = [1, 2, 3, 4, 5, 6];
   const probabilities = Array(6).fill(1 / 6);
-  let balancingOutcome = 5;
+  const balancingOutcomes = new Set([5]);
   const state = { n: 0, total: 0, averages: [], results: [], counts: Array(6).fill(0) };
   const $ = id => document.getElementById(id);
 
@@ -192,7 +193,8 @@
     <div class="outcome"><div class="die-mini" aria-label="Die face ${i + 1}">${face}</div>
       <label for="pay${i}">Payoff</label><input class="money-input" id="pay${i}" type="number" step="0.5" value="${payoffs[i]}" aria-label="Payoff for outcome ${i + 1}">
       <div class="prob-row"><label for="prob${i}">Probability</label><input class="prob-input" id="prob${i}" type="text" inputmode="decimal" value="1/6" aria-label="Probability of outcome ${i + 1}; enter a decimal or fraction">
-        <button class="balance-button" type="button" data-balance="${i}" aria-pressed="${i === balancingOutcome}" title="Automatically use the probability left over">${i === balancingOutcome ? 'Balancing' : 'Balance'}</button></div>
+        <input class="prob-slider" id="probSlider${i}" type="range" min="0" max="1" step="0.01" value="${1 / 6}" aria-label="Probability slider for outcome ${i + 1}">
+        <label class="balance-label" title="Share the probability left over equally among checked outcomes"><input class="balance-checkbox" type="checkbox" data-balance="${i}" ${balancingOutcomes.has(i) ? 'checked' : ''}>Balance</label></div>
     </div>`).join('');
 
   function parseProbability(value) {
@@ -210,16 +212,22 @@
   }
 
   function balanceProbabilities() {
-    probabilities[balancingOutcome] = 1 - probabilities.reduce((sum, probability, i) => i === balancingOutcome ? sum : sum + probability, 0);
-    $(`prob${balancingOutcome}`).value = formatProbability(probabilities[balancingOutcome]);
+    if (!balancingOutcomes.size) return;
+    const unbalancedTotal = probabilities.reduce((sum, probability, i) => balancingOutcomes.has(i) ? sum : sum + probability, 0);
+    const balancedProbability = (1 - unbalancedTotal) / balancingOutcomes.size;
+    balancingOutcomes.forEach(i => {
+      probabilities[i] = balancedProbability;
+      $(`prob${i}`).value = formatProbability(balancedProbability);
+      $(`probSlider${i}`).value = Math.min(1, Math.max(0, balancedProbability));
+    });
   }
 
   function updateBalancingControls() {
-    document.querySelectorAll('.balance-button').forEach((button, i) => {
-      const active = i === balancingOutcome;
-      button.setAttribute('aria-pressed', String(active));
-      button.textContent = active ? 'Balancing' : 'Balance';
+    document.querySelectorAll('.balance-checkbox').forEach((checkbox, i) => {
+      const active = balancingOutcomes.has(i);
+      checkbox.checked = active;
       $(`prob${i}`).readOnly = active;
+      $(`probSlider${i}`).disabled = active;
     });
   }
 
@@ -228,7 +236,12 @@
   function validate() {
     const sum = probabilities.reduce((a,b) => a+b, 0);
     const valid = probabilitiesValid();
-    $('probError').textContent = `Probabilities total ${Number.isFinite(sum) ? sum.toFixed(4) : '—'}, not 1.0000. Correct them to continue.`;
+    const balanceHint = balancingOutcomes.size ? '' : ' No balance outcomes are selected.';
+    const invalidValue = probabilities.some(p => !Number.isFinite(p) || p < 0 || p > 1);
+    const reason = invalidValue
+      ? 'Each probability must be a number from 0 to 1 for a valid PMF.'
+      : `Probabilities total ${sum.toFixed(4)}, not 1.0000, so this is not a valid PMF.`;
+    $('probError').textContent = `${reason}${balanceHint} Correct them to continue.`;
     $('probError').classList.toggle('show', !valid);
     document.querySelectorAll('.sim').forEach(b => b.disabled = !valid);
     updateText(); drawAll();
@@ -246,10 +259,18 @@
     const value = Number(input.value); payoffs[i] = Number.isFinite(value) ? value : 0; resetExperiment(); validate();
   }));
   document.querySelectorAll('.prob-input').forEach((input, i) => input.addEventListener('input', () => {
-    probabilities[i] = parseProbability(input.value); balanceProbabilities(); resetExperiment(); validate();
+    probabilities[i] = parseProbability(input.value);
+    if (Number.isFinite(probabilities[i])) $(`probSlider${i}`).value = Math.min(1, Math.max(0, probabilities[i]));
+    balanceProbabilities(); resetExperiment(); validate();
   }));
-  document.querySelectorAll('.balance-button').forEach(button => button.addEventListener('click', () => {
-    balancingOutcome = Number(button.dataset.balance);
+  document.querySelectorAll('.prob-slider').forEach((slider, i) => slider.addEventListener('input', () => {
+    probabilities[i] = Number(slider.value); $(`prob${i}`).value = formatProbability(probabilities[i]);
+    balanceProbabilities(); resetExperiment(); validate();
+  }));
+  document.querySelectorAll('.balance-checkbox').forEach(checkbox => checkbox.addEventListener('change', () => {
+    const outcome = Number(checkbox.dataset.balance);
+    if (checkbox.checked) balancingOutcomes.add(outcome);
+    else balancingOutcomes.delete(outcome);
     balanceProbabilities(); updateBalancingControls(); resetExperiment(); validate();
   }));
   updateBalancingControls();
