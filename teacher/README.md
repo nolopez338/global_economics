@@ -62,6 +62,10 @@ teacher/
 │       └── 11A.html  11B.html  11C.html  11D.html  11E.html
 └── tools/
     ├── schedule_authoring_tool.html
+    ├── students_visualizer.html
+    ├── students_visualizer_prompt.md
+    ├── assets/js/student-name-matcher.js
+    ├── tests/student-name-matcher.test.js
     └── 2026-02-19-results/
         ├── README.md
         ├── results.py
@@ -384,6 +388,21 @@ Schedule shell, and the generator. The schedule CSV is therefore validated
 against the same academic calendar used in the browser.
 
 ## Authoring and utility tools
+
+### Student picture visualizer
+
+`tools/students_visualizer.html` reads `tools/file_names.txt` and PNG files in
+`tools/grade10Pictures/` through the browser's read-only File System Access API.
+Its Practice Mode displays a filtered student's picture and checks typed names
+with `tools/assets/js/student-name-matcher.js`. Matching accepts complete name
+components (including a full name in any order), ignores case and diacritics,
+and rejects substrings or unknown components. The matcher is kept separate so
+its regression suite can run with Node; `tools/students_visualizer_prompt.md`
+records the implementation contract for later revisions.
+
+```bash
+node teacher/tools/tests/student-name-matcher.test.js
+```
 
 ### Browser schedule authoring prototype
 
