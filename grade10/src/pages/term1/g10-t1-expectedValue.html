@@ -20,7 +20,6 @@
     .config { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
     .config-head { display: flex; justify-content: space-between; align-items: center; gap: 15px; padding: 11px 14px; background: var(--soft); }
     .config-head strong { font-size: 13px; }
-    .prob-toggle { border: 0; padding: 3px; color: var(--blue); background: transparent; cursor: pointer; font-weight: 650; }
     .outcomes { display: grid; grid-template-columns: repeat(6, 1fr); }
     .outcome { padding: 12px; border-right: 1px solid var(--line); text-align: center; }
     .outcome.highlighted { background: var(--blue-soft); box-shadow: inset 0 0 0 2px var(--blue); }
@@ -29,8 +28,11 @@
     .outcome label { display: block; margin: 6px 0 3px; color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
     .money-input, .prob-input { width: 70px; padding: 5px 4px; border: 1px solid var(--line); border-radius: 6px; text-align: center; color: var(--ink); background: white; }
     .prob-row { margin-top: 6px; }
-    .prob-row[hidden] { display: none; }
-    .prob-input { width: 62px; font-size: 12px; }
+    .prob-input { width: 70px; font-size: 12px; }
+    .prob-input[readonly] { color: var(--blue); background: var(--blue-soft); font-weight: 700; }
+    .balance-button { display: block; margin: 7px auto 0; padding: 2px 7px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); background: white; cursor: pointer; font-size: 10px; font-weight: 700; }
+    .balance-button:hover { border-color: #93a2b8; }
+    .balance-button[aria-pressed="true"] { border-color: var(--blue); color: var(--blue); background: var(--blue-soft); }
     .expected-strip { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin: 12px 0 18px; padding: 12px 15px; border-left: 3px solid var(--orange); background: #fffaf0; }
     .expected-value { font-size: 20px; font-weight: 800; color: #9a5704; white-space: nowrap; }
     .formula { color: var(--muted); font-size: 13px; }
@@ -114,7 +116,7 @@
   </header>
 
   <section class="config" aria-labelledby="config-title">
-    <div class="config-head"><strong id="config-title">Payoff for each die outcome</strong><button class="prob-toggle" id="probToggle" aria-expanded="false">Edit probabilities</button></div>
+    <div class="config-head"><strong id="config-title">Payoff and probability for each die outcome</strong></div>
     <div class="outcomes" id="outcomes"></div>
   </section>
   <div class="expected-strip">
@@ -178,6 +180,7 @@
   const faces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
   const payoffs = [1, 2, 3, 4, 5, 6];
   const probabilities = Array(6).fill(1 / 6);
+  let balancingOutcome = 5;
   const state = { n: 0, total: 0, averages: [], results: [], counts: Array(6).fill(0) };
   const $ = id => document.getElementById(id);
 
@@ -189,8 +192,37 @@
   $('outcomes').innerHTML = faces.map((face, i) => `
     <div class="outcome"><div class="die-mini" aria-label="Die face ${i + 1}">${face}</div>
       <label for="pay${i}">Payoff</label><input class="money-input" id="pay${i}" type="number" step="0.5" value="${payoffs[i]}" aria-label="Payoff for outcome ${i + 1}">
-      <div class="prob-row" hidden><label for="prob${i}">Probability</label><input class="prob-input" id="prob${i}" type="number" min="0" max="1" step="0.01" value="0.166667" aria-label="Probability of outcome ${i + 1}"></div>
+      <div class="prob-row"><label for="prob${i}">Probability</label><input class="prob-input" id="prob${i}" type="text" inputmode="decimal" value="1/6" aria-label="Probability of outcome ${i + 1}; enter a decimal or fraction">
+        <button class="balance-button" type="button" data-balance="${i}" aria-pressed="${i === balancingOutcome}" title="Automatically use the probability left over">${i === balancingOutcome ? 'Balancing' : 'Balance'}</button></div>
     </div>`).join('');
+
+  function parseProbability(value) {
+    const text = value.trim();
+    const fraction = text.match(/^([+-]?(?:\d+(?:\.\d*)?|\.\d+))\s*\/\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))$/);
+    if (fraction) {
+      const denominator = Number(fraction[2]);
+      return denominator ? Number(fraction[1]) / denominator : NaN;
+    }
+    return Number(text);
+  }
+
+  function formatProbability(value) {
+    return Number.isFinite(value) ? String(Number(value.toFixed(6))) : '';
+  }
+
+  function balanceProbabilities() {
+    probabilities[balancingOutcome] = 1 - probabilities.reduce((sum, probability, i) => i === balancingOutcome ? sum : sum + probability, 0);
+    $(`prob${balancingOutcome}`).value = formatProbability(probabilities[balancingOutcome]);
+  }
+
+  function updateBalancingControls() {
+    document.querySelectorAll('.balance-button').forEach((button, i) => {
+      const active = i === balancingOutcome;
+      button.setAttribute('aria-pressed', String(active));
+      button.textContent = active ? 'Balancing' : 'Balance';
+      $(`prob${i}`).readOnly = active;
+    });
+  }
 
   function expected() { return probabilities.reduce((sum, p, i) => sum + p * payoffs[i], 0); }
   function probabilitiesValid() { return probabilities.every(p => Number.isFinite(p) && p >= 0 && p <= 1) && Math.abs(probabilities.reduce((a,b) => a+b, 0) - 1) < 0.0001; }
@@ -215,13 +247,13 @@
     const value = Number(input.value); payoffs[i] = Number.isFinite(value) ? value : 0; resetExperiment(); validate();
   }));
   document.querySelectorAll('.prob-input').forEach((input, i) => input.addEventListener('input', () => {
-    probabilities[i] = Number(input.value); resetExperiment(); validate();
+    probabilities[i] = parseProbability(input.value); balanceProbabilities(); resetExperiment(); validate();
   }));
-  $('probToggle').addEventListener('click', () => {
-    const open = $('probToggle').getAttribute('aria-expanded') !== 'true';
-    $('probToggle').setAttribute('aria-expanded', open); $('probToggle').textContent = open ? 'Hide probabilities' : 'Edit probabilities';
-    document.querySelectorAll('.prob-row').forEach(row => row.hidden = !open);
-  });
+  document.querySelectorAll('.balance-button').forEach(button => button.addEventListener('click', () => {
+    balancingOutcome = Number(button.dataset.balance);
+    balanceProbabilities(); updateBalancingControls(); resetExperiment(); validate();
+  }));
+  updateBalancingControls();
 
   function pickOutcome() {
     const r = Math.random(); let cumulative = 0;
