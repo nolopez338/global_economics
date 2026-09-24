@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>School Day Timer</title>
+  <link rel="stylesheet" href="./assets/css/class-view.css">
+  <style>
+    .timer-page {
+      grid-template-rows: auto auto 1fr;
+      width: min(96vw, 1200px);
+    }
+
+    .date-and-time { text-align: center; }
+    .current-date {
+      display: block;
+      margin-top: .35rem;
+      color: var(--muted);
+      font-size: clamp(1rem, 2.5vw, 1.35rem);
+      font-weight: 650;
+    }
+
+    .timer-layout {
+      display: grid;
+      grid-template-columns: minmax(18rem, 1fr) minmax(19rem, .8fr);
+      align-items: center;
+      gap: clamp(1.25rem, 4vw, 3rem);
+      min-height: 0;
+    }
+
+    .timer-display { min-width: 0; text-align: center; }
+    .period-range {
+      margin: .25rem 0;
+      color: var(--muted);
+      font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timer-page .block-visual { margin-top: clamp(2.5rem, 6vh, 4rem); }
+
+    .schedule-panel {
+      align-self: stretch;
+      padding: clamp(.8rem, 2vw, 1.25rem);
+      overflow: auto;
+      border: 2px solid var(--border);
+      border-radius: .75rem;
+      background: var(--surface);
+    }
+
+    .schedule-panel h2 { margin: 0 0 .7rem; font-size: 1.25rem; }
+    .schedule-list { display: grid; gap: .3rem; margin: 0; padding: 0; list-style: none; }
+    .schedule-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: .48rem .65rem;
+      border: 2px solid transparent;
+      border-radius: .45rem;
+    }
+    .schedule-item time { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .schedule-item.active {
+      border-color: var(--clock-border);
+      background: var(--clock-label-bg);
+      color: var(--clock-label-text);
+      font-weight: 800;
+    }
+    .schedule-item.active time { color: inherit; }
+
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+    .timer-page:fullscreen {
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      padding: clamp(.75rem, 2vw, 1.5rem);
+    }
+    .timer-page:fullscreen .class-view-header { display: flex; }
+    .timer-page:fullscreen .status { display: block; }
+    .timer-page:fullscreen .block-visual { width: min(62vw, 500px, 54vh); }
+
+    @media (max-width: 760px) {
+      .timer-layout { grid-template-columns: 1fr; }
+      .timer-page .block-visual { width: min(72vw, 420px); }
+      .schedule-panel { max-height: none; }
+    }
+
+    @media (max-width: 460px) {
+      .class-view-controls { width: 100%; justify-content: space-between; margin-left: 0; }
+      .return-link, .fullscreen-toggle { padding: .4rem .55rem; }
+      .schedule-item { font-size: .92rem; }
+    }
+  </style>
+</head>
+<body>
+  <main id="timer-page" class="class-view timer-page">
+    <header class="class-view-header">
+      <a class="return-link" href="./schedule.html">← Schedule</a>
+      <div class="date-and-time">
+        <time id="live-clock" class="live-clock" aria-label="Current local time"></time>
+        <time id="current-date" class="current-date"></time>
+      </div>
+      <div class="class-view-controls">
+        <button id="fullscreen-toggle" class="fullscreen-toggle" type="button" aria-pressed="false">Fullscreen</button>
+        <label class="theme-control">
+          <span>Dark mode</span>
+          <input type="checkbox" id="dark-mode-toggle" aria-label="Toggle dark mode">
+        </label>
+      </div>
+    </header>
+
+    <section class="status" aria-labelledby="period-title">
+      <p id="cycle-label" class="cycle-label">Checking school calendar…</p>
+      <h1 id="period-title" aria-live="polite" aria-atomic="true">School Day Timer</h1>
+      <p id="period-range" class="period-range"></p>
+      <p id="next-period" class="next-activity" hidden></p>
+      <p id="countdown" class="countdown" role="timer" aria-live="off" aria-atomic="true"></p>
+    </section>
+
+    <div class="timer-layout">
+      <section class="timer-display" aria-label="Current period progress">
+        <div id="period-visual" class="block-visual circular-progress schedule-visual" data-period-state="general">
+          <time id="period-end" class="progress-time-label"></time>
+          <div class="elapsed-fill" aria-hidden="true"></div>
+          <div class="time-line" aria-hidden="true"></div>
+          <div class="time-line-pin" aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <section class="schedule-panel" aria-labelledby="schedule-heading">
+        <h2 id="schedule-heading">Today’s schedule</h2>
+        <ol id="schedule-list" class="schedule-list"></ol>
+      </section>
+    </div>
+  </main>
+
+  <script src="./assets/js/databases/year-calendar-data.js"></script>
+  <script>
+    (function () {
+      "use strict";
+
+      const schedule = [
+        ["Contact", "06:45", "07:00"],
+        ["1st Hour", "07:05", "07:55"],
+        ["2nd Hour", "08:00", "08:50"],
+        ["3rd Hour", "08:55", "09:45"],
+        ["Break", "09:45", "10:15"],
+        ["4th Hour", "10:15", "11:05"],
+        ["5th Hour", "11:10", "12:00"],
+        ["6th Hour", "12:05", "12:55"],
+        ["Lunch", "12:55", "13:55"],
+        ["7th Hour", "13:55", "14:45"],
+        ["Pause", "14:45", "15:00"],
+        ["Final Hour", "15:00", "16:00"]
+      ].map(([name, startText, endText]) => ({
+        name, startText, endText,
+        start: toMinutes(startText),
+        end: toMinutes(endText)
+      }));
+
+      const page = document.getElementById("timer-page");
+      const clock = document.getElementById("live-clock");
+      const dateLabel = document.getElementById("current-date");
+      const cycleLabel = document.getElementById("cycle-label");
+      const title = document.getElementById("period-title");
+      const range = document.getElementById("period-range");
+      const nextPeriod = document.getElementById("next-period");
+      const countdown = document.getElementById("countdown");
+      const visual = document.getElementById("period-visual");
+      const endLabel = document.getElementById("period-end");
+      const scheduleList = document.getElementById("schedule-list");
+      const fullscreenToggle = document.getElementById("fullscreen-toggle");
+      let lastDateKey = "";
+
+      function toMinutes(value) {
+        const [hours, minutes] = value.split(":").map(Number);
+        return hours * 60 + minutes;
+      }
+
+      function localDateKey(date) {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+      }
+
+      function durationText(seconds) {
+        const safe = Math.max(0, Math.ceil(seconds));
+        const hours = Math.floor(safe / 3600);
+        const minutes = Math.floor((safe % 3600) / 60);
+        const remainder = safe % 60;
+        return `${hours ? `${hours}:` : ""}${String(minutes).padStart(hours ? 2 : 1, "0")}:${String(remainder).padStart(2, "0")}`;
+      }
+
+      function renderSchedule() {
+        schedule.forEach((period, index) => {
+          const item = document.createElement("li");
+          item.className = "schedule-item";
+          item.dataset.periodIndex = String(index);
+          const name = document.createElement("span");
+          name.textContent = period.name;
+          const time = document.createElement("time");
+          time.textContent = `${period.startText}–${period.endText}`;
+          item.append(name, time);
+          scheduleList.append(item);
+        });
+      }
+
+      function highlightPeriod(index) {
+        scheduleList.querySelectorAll(".schedule-item").forEach((item, itemIndex) => {
+          const active = itemIndex === index;
+          item.classList.toggle("active", active);
+          if (active) item.setAttribute("aria-current", "true");
+          else item.removeAttribute("aria-current");
+        });
+      }
+
+      function setPeriodState(name) {
+        visual.classList.remove("period-between-classes", "period-recess", "period-lunch");
+        let state = null;
+        if (name === "Break" || name === "Pause") state = "recess";
+        if (name === "Lunch") state = "lunch";
+        if (state) visual.classList.add(`period-${state}`);
+        visual.dataset.periodState = state || "general";
+      }
+
+      function setNext(period) {
+        nextPeriod.textContent = period ? `Next: ${period.name} at ${period.startText}` : "";
+        nextPeriod.hidden = !period;
+      }
+
+      function showProgress(start, end, nowMinutes, label) {
+        const progress = Math.max(0, Math.min(1, (nowMinutes - start) / (end - start)));
+        visual.hidden = false;
+        endLabel.textContent = label;
+        visual.style.setProperty("--progress", `${progress * 100}%`);
+        visual.style.setProperty("--progress-turn", String(progress));
+      }
+
+      function showNoSchedule(message, detail) {
+        title.textContent = message;
+        range.textContent = detail || "";
+        countdown.textContent = "";
+        setNext(null);
+        setPeriodState(null);
+        highlightPeriod(-1);
+        visual.hidden = true;
+      }
+
+      function updateCalendarLabel(info) {
+        if (Number.isInteger(info?.cycleDay)) {
+          cycleLabel.textContent = `Academic cycle day ${info.cycleDay}`;
+        } else {
+          cycleLabel.textContent = "No school day";
+        }
+      }
+
+      function update(now = new Date()) {
+        clock.dateTime = now.toISOString();
+        clock.textContent = now.toLocaleTimeString([], {
+          hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+        });
+        const dateKey = localDateKey(now);
+        if (dateKey !== lastDateKey) {
+          lastDateKey = dateKey;
+          dateLabel.dateTime = dateKey;
+          dateLabel.textContent = now.toLocaleDateString([], {
+            weekday: "long", year: "numeric", month: "long", day: "numeric"
+          });
+        }
+
+        let info = null;
+        try {
+          info = window.academicCalendar?.getAcademicDateInfo(dateKey) || null;
+        } catch (error) {
+          console.warn("School calendar data is unavailable for this date.", error);
+        }
+
+        const weekend = now.getDay() === 0 || now.getDay() === 6;
+        const validCycleDay = Number.isInteger(info?.cycleDay) && info.cycleDay >= 1 && info.cycleDay <= 6;
+        if (weekend) {
+          cycleLabel.textContent = "Weekend";
+          showNoSchedule("No active school schedule", "The school-day timer resumes on a scheduled school day.");
+          return;
+        }
+        if (info?.isHoliday) {
+          cycleLabel.textContent = info.holiday?.name || "School holiday";
+          showNoSchedule("No active school schedule", "Today is a non-school day.");
+          return;
+        }
+        if (!validCycleDay) {
+          cycleLabel.textContent = info ? "No school day" : "Calendar unavailable";
+          showNoSchedule("No active school schedule", info ? "Today is not listed as a school day." : "School calendar data is unavailable.");
+          return;
+        }
+
+        updateCalendarLabel(info);
+        const nowMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60 + now.getMilliseconds() / 60000;
+        const currentIndex = schedule.findIndex((period) => nowMinutes >= period.start && nowMinutes < period.end);
+        if (currentIndex !== -1) {
+          const current = schedule[currentIndex];
+          title.textContent = current.name;
+          range.textContent = `${current.startText}–${current.endText}`;
+          countdown.textContent = `${durationText((current.end - nowMinutes) * 60)} remaining`;
+          setNext(schedule[currentIndex + 1]);
+          setPeriodState(current.name);
+          highlightPeriod(currentIndex);
+          showProgress(current.start, current.end, nowMinutes, current.endText);
+          return;
+        }
+
+        const upcomingIndex = schedule.findIndex((period) => period.start > nowMinutes);
+        if (upcomingIndex !== -1) {
+          const upcoming = schedule[upcomingIndex];
+          const previous = schedule[upcomingIndex - 1];
+          title.textContent = previous ? "Between periods" : "School day begins soon";
+          range.textContent = previous ? "Unscheduled transition" : "Before Contact";
+          countdown.textContent = `${durationText((upcoming.start - nowMinutes) * 60)} until ${upcoming.name}`;
+          setNext(upcoming);
+          setPeriodState(null);
+          visual.classList.add("period-between-classes");
+          visual.dataset.periodState = "between-classes";
+          highlightPeriod(-1);
+          showProgress(previous?.end ?? 0, upcoming.start, nowMinutes, upcoming.startText);
+          return;
+        }
+
+        showNoSchedule("School schedule ended", "Final Hour ended at 16:00.");
+        cycleLabel.textContent = `Academic cycle day ${info.cycleDay}`;
+      }
+
+      function updateFullscreenControl() {
+        const active = document.fullscreenElement === page;
+        fullscreenToggle.textContent = active ? "Exit Fullscreen" : "Fullscreen";
+        fullscreenToggle.setAttribute("aria-pressed", String(active));
+      }
+
+      if (document.fullscreenEnabled && page.requestFullscreen && document.exitFullscreen) {
+        fullscreenToggle.addEventListener("click", async () => {
+          fullscreenToggle.disabled = true;
+          try {
+            if (document.fullscreenElement === page) await document.exitFullscreen();
+            else await page.requestFullscreen();
+          } catch (error) {
+            console.error("Unable to change fullscreen mode.", error);
+          } finally {
+            fullscreenToggle.disabled = false;
+          }
+        });
+        document.addEventListener("fullscreenchange", updateFullscreenControl);
+      } else {
+        fullscreenToggle.hidden = true;
+      }
+
+      renderSchedule();
+      update();
+      window.setInterval(update, 250);
+      document.addEventListener("visibilitychange", () => update());
+      window.addEventListener("focus", () => update());
+    })();
+  </script>
+  <script src="./assets/js/theme-toggle.js"></script>
+</body>
+</html>
