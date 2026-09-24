@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Expected Value Lab</title>
+  <style>
+    :root {
+      --ink: #172033; --muted: #697386; --line: #dfe4ec; --soft: #f6f8fb;
+      --blue: #2563eb; --blue-soft: #eff6ff; --orange: #d97706; --danger: #b42318;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: #fff; font: 15px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    button, input { font: inherit; }
+    .page { width: min(1120px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 48px; }
+    header { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 20px; }
+    h1 { margin: 0 0 3px; font-size: clamp(24px, 4vw, 34px); letter-spacing: -.035em; }
+    header p { margin: 0; color: var(--muted); }
+    .relationship { white-space: nowrap; color: var(--blue); font-size: 13px; font-weight: 700; }
+    .config { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+    .config-head { display: flex; justify-content: space-between; align-items: center; gap: 15px; padding: 11px 14px; background: var(--soft); }
+    .config-head strong { font-size: 13px; }
+    .prob-toggle { border: 0; padding: 3px; color: var(--blue); background: transparent; cursor: pointer; font-weight: 650; }
+    .outcomes { display: grid; grid-template-columns: repeat(6, 1fr); }
+    .outcome { padding: 12px; border-right: 1px solid var(--line); text-align: center; }
+    .outcome:last-child { border-right: 0; }
+    .die-mini { font-size: 25px; line-height: 1; }
+    .outcome label { display: block; margin: 6px 0 3px; color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+    .money-input, .prob-input { width: 70px; padding: 5px 4px; border: 1px solid var(--line); border-radius: 6px; text-align: center; color: var(--ink); background: white; }
+    .prob-row { margin-top: 6px; }
+    .prob-row[hidden] { display: none; }
+    .prob-input { width: 62px; font-size: 12px; }
+    .expected-strip { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin: 12px 0 18px; padding: 12px 15px; border-left: 3px solid var(--orange); background: #fffaf0; }
+    .expected-value { font-size: 20px; font-weight: 800; color: #9a5704; white-space: nowrap; }
+    .formula { color: var(--muted); font-size: 13px; }
+    .formula span { color: var(--ink); font-family: Georgia, serif; font-size: 15px; }
+    .prob-error { display: none; color: var(--danger); font-weight: 700; }
+    .prob-error.show { display: inline; }
+    .lab { display: grid; grid-template-columns: 245px minmax(0, 1fr); gap: 18px; align-items: stretch; }
+    .console { display: flex; flex-direction: column; padding: 18px; border: 1px solid var(--line); border-radius: 12px; }
+    .result-label { color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; }
+    .result { display: flex; align-items: center; gap: 14px; min-height: 84px; padding: 8px 0 12px; }
+    .die { width: 66px; height: 66px; display: grid; place-items: center; flex: 0 0 auto; border: 2px solid var(--ink); border-radius: 14px; font-size: 48px; line-height: 1; background: white; }
+    .die.pop { animation: pop .18s ease-out; }
+    @keyframes pop { 0% { transform: scale(.88) rotate(-3deg); opacity: .65; } 100% { transform: none; opacity: 1; } }
+    .roll-line { font-size: 16px; font-weight: 750; }
+    .payoff { margin-top: 3px; color: var(--blue); font-size: 22px; font-weight: 850; }
+    .current-average { padding: 12px; border-radius: 9px; background: var(--blue-soft); }
+    .current-average small { display: block; color: var(--muted); }
+    .current-average strong { color: var(--blue); font-size: 26px; }
+    .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 14px; }
+    button.action { border: 1px solid var(--line); border-radius: 8px; padding: 9px 5px; background: #fff; color: var(--ink); cursor: pointer; font-weight: 700; }
+    button.action:hover { border-color: #aab4c3; background: var(--soft); }
+    button.action:disabled { opacity: .4; cursor: not-allowed; }
+    button.primary { grid-column: 1 / -1; padding: 12px; border-color: var(--blue); color: #fff; background: var(--blue); font-size: 16px; }
+    button.primary:hover { background: #1d4ed8; }
+    button.reset { grid-column: 1 / -1; color: var(--muted); }
+    .chart-card { min-width: 0; padding: 15px 16px 10px; border: 1px solid var(--line); border-radius: 12px; }
+    .chart-heading { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+    .chart-heading h2 { margin: 0; font-size: 16px; }
+    .legend { display: flex; gap: 14px; color: var(--muted); font-size: 11px; }
+    .key::before { content: ''; display: inline-block; width: 17px; margin-right: 5px; border-top: 2px solid; vertical-align: middle; }
+    .key.average::before { border-color: var(--blue); } .key.expected::before { border-color: var(--orange); border-top-style: dashed; }
+    .canvas-wrap { position: relative; width: 100%; height: 330px; }
+    canvas { width: 100%; height: 100%; display: block; }
+    .observation { margin: 8px 2px 0; padding-top: 9px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+    .observation strong { color: var(--ink); }
+    .lower { display: grid; grid-template-columns: 1fr 1.55fr; gap: 18px; margin-top: 18px; }
+    .summary, .recent, details { padding: 15px 17px; border: 1px solid var(--line); border-radius: 12px; }
+    .summary h2, .recent h2 { margin: 0 0 12px; font-size: 14px; }
+    .stats { display: grid; grid-template-columns: 1fr auto; margin: 0; }
+    .stats dt, .stats dd { margin: 0; padding: 4px 0; border-bottom: 1px solid #eef1f5; }
+    .stats dt { color: var(--muted); } .stats dd { font-weight: 750; font-variant-numeric: tabular-nums; }
+    .stats .last { border-bottom: 0; }
+    .recent-list { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 4px; }
+    .recent-item { min-width: 65px; padding: 7px 5px; border-radius: 8px; text-align: center; background: var(--soft); }
+    .recent-item small { display: block; color: var(--muted); }
+    .recent-item span { display: block; font-size: 22px; line-height: 1.2; }
+    .recent-item b { color: var(--blue); font-size: 12px; }
+    .empty { color: var(--muted); font-size: 13px; }
+    details { margin-top: 18px; }
+    summary { cursor: pointer; font-weight: 750; }
+    details p { margin: 4px 0 8px; color: var(--muted); font-size: 12px; }
+    .freq-wrap { height: 190px; }
+    @media (max-width: 760px) {
+      .page { width: min(100% - 20px, 620px); padding-top: 18px; }
+      header { display: block; } .relationship { margin-top: 8px; white-space: normal; }
+      .outcomes { grid-template-columns: repeat(3, 1fr); }
+      .outcome:nth-child(3) { border-right: 0; } .outcome:nth-child(-n+3) { border-bottom: 1px solid var(--line); }
+      .lab, .lower { grid-template-columns: 1fr; }
+      .console { display: grid; grid-template-columns: 1fr 1fr; column-gap: 14px; }
+      .result-label, .controls { grid-column: 1 / -1; } .result { min-height: 76px; }
+      .canvas-wrap { height: 290px; }
+    }
+    @media (max-width: 430px) { .console { display: flex; } .formula { display: none; } .legend { gap: 7px; } }
+  </style>
+</head>
+<body>
+<main class="page">
+  <header>
+    <div><h1>Expected Value Lab</h1><p>Roll, watch the average, and look for a pattern.</p></div>
+    <div class="relationship">repeated experiments → running average → expected value</div>
+  </header>
+
+  <section class="config" aria-labelledby="config-title">
+    <div class="config-head"><strong id="config-title">Payoff for each die outcome</strong><button class="prob-toggle" id="probToggle" aria-expanded="false">Edit probabilities</button></div>
+    <div class="outcomes" id="outcomes"></div>
+  </section>
+  <div class="expected-strip">
+    <div><div class="formula"><span>E(X) = Σ pᵢvᵢ</span> &nbsp;—&nbsp; probability × payoff, added for all outcomes</div><div class="prob-error" id="probError" role="alert"></div></div>
+    <div class="expected-value">Expected Value: <span id="expectedValue">$0.00</span></div>
+  </div>
+
+  <section class="lab" aria-label="Die simulation">
+    <div class="console">
+      <div class="result-label">Latest experiment</div>
+      <div class="result">
+        <div class="die" id="die" aria-live="polite">—</div>
+        <div><div class="roll-line" id="rollLine">Ready to roll</div><div class="payoff" id="payoffLine">&nbsp;</div></div>
+      </div>
+      <div class="current-average"><small>Running average</small><strong id="mainAverage">—</strong></div>
+      <div class="controls">
+        <button class="action primary sim" data-rolls="1">Roll Die</button>
+        <button class="action sim" data-rolls="10">+10 Rolls</button>
+        <button class="action sim" data-rolls="100">+100 Rolls</button>
+        <button class="action sim" data-rolls="1000">+1000 Rolls</button>
+        <button class="action reset" id="reset">Reset results</button>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-heading"><h2>Running average payoff</h2><div class="legend"><span class="key average">Your average</span><span class="key expected">Expected value</span></div></div>
+      <div class="canvas-wrap"><canvas id="convergence" role="img" aria-label="Line graph of running average payoff and expected value"></canvas></div>
+      <p class="observation" id="observation"><strong>Start with one roll.</strong> Early averages can move a lot.</p>
+    </div>
+  </section>
+
+  <section class="lower">
+    <div class="summary"><h2>What the numbers say</h2><dl class="stats">
+      <dt>Experiments</dt><dd id="statN">0</dd><dt>Total payoff</dt><dd id="statTotal">$0.00</dd>
+      <dt>Average payoff</dt><dd id="statAverage">—</dd><dt>Expected value</dt><dd id="statExpected">$0.00</dd>
+      <dt class="last">Difference</dt><dd class="last" id="statDifference">—</dd>
+    </dl></div>
+    <div class="recent"><h2>Recent rolls</h2><div class="recent-list" id="recent"><span class="empty">Your latest 15 experiments will appear here.</span></div></div>
+  </section>
+
+  <details>
+    <summary>Why is the average stabilizing?</summary>
+    <p>With more rolls, the observed outcome frequencies tend to become closer to the probabilities used by the die.</p>
+    <div class="freq-wrap"><canvas id="frequency" role="img" aria-label="Bar graph comparing observed and theoretical outcome frequencies"></canvas></div>
+  </details>
+</main>
+
+<script>
+(() => {
+  'use strict';
+  const faces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+  const payoffs = [1, 2, 3, 4, 5, 6];
+  const probabilities = Array(6).fill(1 / 6);
+  const state = { n: 0, total: 0, averages: [], results: [], counts: Array(6).fill(0) };
+  const $ = id => document.getElementById(id);
+
+  function money(value, signed = false) {
+    const sign = signed && value > 0 ? '+' : '';
+    return `${sign}${value < 0 ? '−' : ''}$${Math.abs(value).toFixed(2)}`;
+  }
+
+  $('outcomes').innerHTML = faces.map((face, i) => `
+    <div class="outcome"><div class="die-mini" aria-label="Die face ${i + 1}">${face}</div>
+      <label for="pay${i}">Payoff</label><input class="money-input" id="pay${i}" type="number" step="0.5" value="${payoffs[i]}" aria-label="Payoff for outcome ${i + 1}">
+      <div class="prob-row" hidden><label for="prob${i}">Probability</label><input class="prob-input" id="prob${i}" type="number" min="0" max="1" step="0.01" value="0.166667" aria-label="Probability of outcome ${i + 1}"></div>
+    </div>`).join('');
+
+  function expected() { return probabilities.reduce((sum, p, i) => sum + p * payoffs[i], 0); }
+  function probabilitiesValid() { return probabilities.every(p => Number.isFinite(p) && p >= 0 && p <= 1) && Math.abs(probabilities.reduce((a,b) => a+b, 0) - 1) < 0.0001; }
+  function validate() {
+    const sum = probabilities.reduce((a,b) => a+b, 0);
+    const valid = probabilitiesValid();
+    $('probError').textContent = `Probabilities total ${Number.isFinite(sum) ? sum.toFixed(4) : '—'}, not 1.0000. Correct them to continue.`;
+    $('probError').classList.toggle('show', !valid);
+    document.querySelectorAll('.sim').forEach(b => b.disabled = !valid);
+    updateText(); drawAll();
+  }
+
+  function resetExperiment() {
+    Object.assign(state, { n: 0, total: 0, averages: [], results: [], counts: Array(6).fill(0) });
+    $('die').textContent = '—'; $('die').setAttribute('aria-label', 'No outcome yet');
+    $('rollLine').textContent = 'Ready to roll'; $('payoffLine').innerHTML = '&nbsp;';
+    updateText(); drawAll();
+  }
+
+  document.querySelectorAll('.money-input').forEach((input, i) => input.addEventListener('input', () => {
+    const value = Number(input.value); payoffs[i] = Number.isFinite(value) ? value : 0; resetExperiment(); validate();
+  }));
+  document.querySelectorAll('.prob-input').forEach((input, i) => input.addEventListener('input', () => {
+    probabilities[i] = Number(input.value); resetExperiment(); validate();
+  }));
+  $('probToggle').addEventListener('click', () => {
+    const open = $('probToggle').getAttribute('aria-expanded') !== 'true';
+    $('probToggle').setAttribute('aria-expanded', open); $('probToggle').textContent = open ? 'Hide probabilities' : 'Edit probabilities';
+    document.querySelectorAll('.prob-row').forEach(row => row.hidden = !open);
+  });
+
+  function pickOutcome() {
+    const r = Math.random(); let cumulative = 0;
+    for (let i = 0; i < 6; i++) { cumulative += probabilities[i]; if (r < cumulative || i === 5) return i; }
+  }
+  function simulate(amount) {
+    if (!probabilitiesValid()) return;
+    let latest;
+    for (let k = 0; k < amount; k++) {
+      const outcome = pickOutcome(), value = payoffs[outcome];
+      state.n++; state.total += value; state.counts[outcome]++;
+      state.averages.push(state.total / state.n);
+      latest = { number: state.n, outcome, value };
+      state.results.push(latest); if (state.results.length > 15) state.results.shift();
+    }
+    showLatest(latest); updateText(); drawAll();
+  }
+  function showLatest(r) {
+    $('die').textContent = faces[r.outcome]; $('die').setAttribute('aria-label', `Outcome ${r.outcome + 1}`);
+    $('die').classList.remove('pop'); void $('die').offsetWidth; $('die').classList.add('pop');
+    $('rollLine').textContent = `Roll ${r.number} → ${r.outcome + 1}`; $('payoffLine').textContent = money(r.value, true);
+  }
+  document.querySelectorAll('.sim').forEach(b => b.addEventListener('click', () => simulate(Number(b.dataset.rolls))));
+  $('reset').addEventListener('click', resetExperiment);
+
+  function updateText() {
+    const ev = expected(), avg = state.n ? state.total / state.n : null, diff = avg === null ? null : avg - ev;
+    $('expectedValue').textContent = money(ev); $('statExpected').textContent = money(ev);
+    $('mainAverage').textContent = avg === null ? '—' : money(avg); $('statN').textContent = state.n.toLocaleString();
+    $('statTotal').textContent = money(state.total); $('statAverage').textContent = avg === null ? '—' : money(avg);
+    $('statDifference').textContent = diff === null ? '—' : money(diff, true);
+    $('recent').innerHTML = state.results.length ? state.results.slice().reverse().map(r => `<div class="recent-item"><small>#${r.number}</small><span>${faces[r.outcome]}</span><b>${money(r.value, true)}</b></div>`).join('') : '<span class="empty">Your latest 15 experiments will appear here.</span>';
+    if (!state.n) $('observation').innerHTML = '<strong>Start with one roll.</strong> Early averages can move a lot.';
+    else if (state.n < 20) $('observation').innerHTML = `<strong>With only ${state.n} experiment${state.n === 1 ? '' : 's'}, the average is still highly variable.</strong> Keep rolling to see what changes.`;
+    else {
+      const distance = Math.abs(diff);
+      const phrase = state.n >= 1000 && distance < Math.max(.1, Math.abs(ev) * .03) ? 'The running average is close to the expected value' : `The average is ${money(distance)} away from the expected value`;
+      $('observation').innerHTML = `<strong>After ${state.n.toLocaleString()} experiments:</strong> ${phrase}. More rolls may move it closer or farther away.`;
+    }
+  }
+
+  function setupCanvas(canvas) {
+    const rect = canvas.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.max(1, Math.round(rect.width * dpr)); canvas.height = Math.max(1, Math.round(rect.height * dpr));
+    const ctx = canvas.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); return { ctx, w: rect.width, h: rect.height };
+  }
+  function sampleIndices(length, maxPoints = 900) {
+    if (length <= maxPoints) return Array.from({length}, (_,i) => i);
+    const indices = [0]; for (let k = 1; k < maxPoints - 1; k++) indices.push(Math.round(k * (length - 1) / (maxPoints - 1))); indices.push(length - 1); return indices;
+  }
+  function drawConvergence() {
+    const {ctx,w,h} = setupCanvas($('convergence')), pad = {l:55,r:17,t:17,b:40}, ev = expected();
+    ctx.clearRect(0,0,w,h); const values = state.averages.length ? state.averages : [ev];
+    let min = Math.min(ev, ...values), max = Math.max(ev, ...values); const spread = max - min || Math.max(Math.abs(ev) * .2, 1);
+    min -= spread * .16; max += spread * .16;
+    const x = i => pad.l + (i / Math.max(1, state.n - 1)) * (w-pad.l-pad.r);
+    const y = v => pad.t + (max-v)/(max-min)*(h-pad.t-pad.b);
+    ctx.font = '11px system-ui'; ctx.fillStyle = '#697386'; ctx.strokeStyle = '#e6e9ef'; ctx.lineWidth = 1;
+    for(let i=0;i<=4;i++){ const yy=pad.t+i*(h-pad.t-pad.b)/4, val=max-i*(max-min)/4; ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(w-pad.r,yy);ctx.stroke();ctx.textAlign='right';ctx.fillText(money(val),pad.l-7,yy+4); }
+    const ticks = state.n ? [1, Math.max(1,Math.round(state.n/2)), state.n] : [0]; ctx.textAlign='center';
+    [...new Set(ticks)].forEach(n => ctx.fillText(n.toLocaleString(), state.n ? x(n-1) : pad.l, h-17));
+    ctx.fillText('Number of experiments', pad.l+(w-pad.l-pad.r)/2,h-2);
+    ctx.save(); ctx.strokeStyle='#d97706';ctx.setLineDash([6,5]);ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(pad.l,y(ev));ctx.lineTo(w-pad.r,y(ev));ctx.stroke();ctx.restore();
+    if(state.n){ ctx.strokeStyle='#2563eb';ctx.lineWidth=2;ctx.lineJoin='round';ctx.beginPath(); sampleIndices(state.n).forEach((idx,j)=>{const xx=x(idx),yy=y(state.averages[idx]);j?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)});ctx.stroke(); const last=state.averages[state.n-1];ctx.fillStyle='#2563eb';ctx.beginPath();ctx.arc(x(state.n-1),y(last),3.5,0,Math.PI*2);ctx.fill(); }
+  }
+  function drawFrequency() {
+    const {ctx,w,h} = setupCanvas($('frequency')), pad={l:40,r:12,t:12,b:34}, max=Math.max(.25,...probabilities,...state.counts.map(c=>state.n?c/state.n:0));
+    ctx.clearRect(0,0,w,h); ctx.font='11px system-ui'; ctx.textAlign='center';
+    for(let i=0;i<6;i++){ const center=pad.l+(i+.5)*(w-pad.l-pad.r)/6, group=(w-pad.l-pad.r)/6*.68, obs=state.n?state.counts[i]/state.n:0;
+      const scale=v=>v/max*(h-pad.t-pad.b); ctx.fillStyle='#dbeafe';ctx.fillRect(center-group/2,h-pad.b-scale(obs),group/2-1,scale(obs));ctx.fillStyle='#f3c98b';ctx.fillRect(center+1,h-pad.b-scale(probabilities[i]),group/2-1,scale(probabilities[i]));ctx.fillStyle='#697386';ctx.fillText(String(i+1),center,h-14); }
+    ctx.textAlign='left';ctx.fillStyle='#2563eb';ctx.fillRect(pad.l,2,10,10);ctx.fillStyle='#697386';ctx.fillText('Observed',pad.l+15,11);ctx.fillStyle='#d97706';ctx.fillRect(pad.l+85,2,10,10);ctx.fillStyle='#697386';ctx.fillText('Theoretical',pad.l+100,11);
+  }
+  function drawAll(){ drawConvergence(); drawFrequency(); }
+  let resizeTimer; window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(drawAll,80)});
+  document.querySelector('details').addEventListener('toggle', drawFrequency);
+  validate();
+})();
+</script>
+</body>
+</html>
