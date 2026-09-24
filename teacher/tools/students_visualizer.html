@@ -745,6 +745,7 @@ const state = {
     imageUrls: [],
     selectedGroups: new Set(),
     practiceStudents: [],
+    practiceStudent: null,
     practiceIndex: 0,
     practiceActive: false
 };
@@ -1307,6 +1308,33 @@ function isPracticeAnswerCorrect(answer, filename) {
     );
 }
 
+function showPracticeFullName(fullName, matchedIndexes) {
+    const components =
+        StudentNameMatcher.getNameComponents(fullName);
+    const matched = new Set(matchedIndexes);
+    let position = 0;
+
+    practiceFullName.replaceChildren();
+
+    components.forEach((component, index) => {
+        practiceFullName.append(
+            fullName.slice(position, component.start)
+        );
+
+        if (matched.has(index)) {
+            const strong = document.createElement("strong");
+            strong.textContent = component.text;
+            practiceFullName.appendChild(strong);
+        } else {
+            practiceFullName.append(component.text);
+        }
+
+        position = component.end;
+    });
+
+    practiceFullName.append(fullName.slice(position));
+}
+
 function enterPracticeMode() {
     const filtered = getFilteredStudents();
 
@@ -1339,6 +1367,8 @@ function renderPracticeStudent() {
     const student =
         state.practiceStudents[state.practiceIndex];
 
+    state.practiceStudent = student;
+
     const fullName =
         getPracticeFullNameFromFilename(student.name);
 
@@ -1350,7 +1380,7 @@ function renderPracticeStudent() {
     const img =
         document.createElement("img");
 
-    img.alt = fullName;
+    img.alt = "Student portrait";
 
     practicePicture.appendChild(img);
 
@@ -1384,6 +1414,10 @@ async function loadPracticeImage(fileHandle, img) {
         img.src = url;
 
     } catch (error) {
+        if (!img.isConnected) {
+            return;
+        }
+
         practicePicture.innerHTML = "";
 
         const placeholder =
@@ -1407,38 +1441,43 @@ function submitPracticeAnswer() {
         return;
     }
 
-    const student =
-        state.practiceStudents[state.practiceIndex];
+    const student = state.practiceStudent;
+
+    if (!student) {
+        return;
+    }
 
     const fullName =
         getPracticeFullNameFromFilename(student.name);
 
-    const correct =
-        isPracticeAnswerCorrect(
-            practiceInput.value,
-            student.name
-        );
+    const answerMatch = StudentNameMatcher.matchAnswer(
+        practiceInput.value,
+        student.name
+    );
+    const correct = answerMatch.correct;
 
     practiceInput.disabled = true;
     practiceSubmitBtn.disabled = true;
 
     practiceResult.classList.add("visible");
 
-    practiceFullName.textContent =
-        fullName;
+    showPracticeFullName(
+        fullName,
+        answerMatch.matchedComponentIndexes
+    );
 
     if (correct) {
         practiceResult.classList.remove("error");
         practiceResult.classList.add("correct");
 
         practiceResultMessage.textContent =
-            "✓ Correct";
+            "Correct!";
     } else {
         practiceResult.classList.remove("correct");
         practiceResult.classList.add("error");
 
         practiceResultMessage.textContent =
-            "✕ Error";
+            "Incorrect!";
     }
 
     practiceNextBtn.classList.add("visible");
@@ -1466,6 +1505,7 @@ function nextPracticeStudent() {
 function finishPracticeMode() {
     state.practiceActive = false;
     state.practiceStudents = [];
+    state.practiceStudent = null;
     state.practiceIndex = 0;
 
     practiceView.classList.remove("visible");
@@ -1500,10 +1540,15 @@ practiceNextBtn.addEventListener(
 practiceInput.addEventListener(
     "keydown",
     event => {
-        if (
-            event.key === "Enter" &&
-            !practiceSubmitBtn.disabled
-        ) {
+        if (event.key !== "Enter") {
+            return;
+        }
+
+        event.preventDefault();
+
+        if (practiceSubmitBtn.disabled) {
+            nextPracticeStudent();
+        } else {
             submitPracticeAnswer();
         }
     }
