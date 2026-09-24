@@ -45,9 +45,19 @@
     @keyframes pop { 0% { transform: scale(.88) rotate(-3deg); opacity: .65; } 100% { transform: none; opacity: 1; } }
     .roll-line { font-size: 16px; font-weight: 750; }
     .payoff { margin-top: 3px; color: var(--blue); font-size: 22px; font-weight: 850; }
-    .current-average { padding: 12px; border-radius: 9px; background: var(--blue-soft); }
+    .current-average { position: absolute; z-index: 2; top: 12px; right: 12px; width: 165px; min-width: 120px; min-height: 64px; padding: 12px; border: 1px solid #bfdbfe; border-radius: 9px; background: rgba(239, 246, 255, .94); box-shadow: 0 3px 12px rgba(23, 32, 51, .12); cursor: move; user-select: none; touch-action: none; overflow: hidden; }
+    .current-average:focus { outline: 2px solid var(--blue); outline-offset: 2px; }
     .current-average small { display: block; color: var(--muted); }
     .current-average strong { color: var(--blue); font-size: 26px; }
+    .resize-handle { position: absolute; touch-action: none; }
+    .resize-handle.n, .resize-handle.s { left: 9px; right: 9px; height: 9px; cursor: ns-resize; }
+    .resize-handle.n { top: -4px; } .resize-handle.s { bottom: -4px; }
+    .resize-handle.e, .resize-handle.w { top: 9px; bottom: 9px; width: 9px; cursor: ew-resize; }
+    .resize-handle.e { right: -4px; } .resize-handle.w { left: -4px; }
+    .resize-handle.ne, .resize-handle.nw, .resize-handle.se, .resize-handle.sw { width: 13px; height: 13px; }
+    .resize-handle.ne, .resize-handle.sw { cursor: nesw-resize; } .resize-handle.nw, .resize-handle.se { cursor: nwse-resize; }
+    .resize-handle.ne { top: -4px; right: -4px; } .resize-handle.nw { top: -4px; left: -4px; }
+    .resize-handle.se { right: -4px; bottom: -4px; } .resize-handle.sw { bottom: -4px; left: -4px; }
     .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 14px; }
     button.action { border: 1px solid var(--line); border-radius: 8px; padding: 9px 5px; background: #fff; color: var(--ink); cursor: pointer; font-weight: 700; }
     button.action:hover { border-color: #aab4c3; background: var(--soft); }
@@ -118,7 +128,6 @@
         <div class="die" id="die" aria-live="polite">—</div>
         <div><div class="roll-line" id="rollLine">Ready to roll</div><div class="payoff" id="payoffLine">&nbsp;</div></div>
       </div>
-      <div class="current-average"><small>Running average</small><strong id="mainAverage">—</strong></div>
       <div class="controls">
         <button class="action primary sim" data-rolls="1">Roll Die</button>
         <button class="action sim" data-rolls="10">+10 Rolls</button>
@@ -129,7 +138,16 @@
     </div>
     <div class="chart-card">
       <div class="chart-heading"><h2>Running average payoff</h2><div class="legend"><span class="key average">Your average</span><span class="key expected">Expected value</span></div></div>
-      <div class="canvas-wrap"><canvas id="convergence" role="img" aria-label="Line graph of running average payoff and expected value"></canvas></div>
+      <div class="canvas-wrap">
+        <canvas id="convergence" role="img" aria-label="Line graph of running average payoff and expected value"></canvas>
+        <div class="current-average" id="averageLegend" role="group" aria-label="Running average legend. Drag to move; drag an edge or corner to resize." tabindex="0">
+          <small>Running average</small><strong id="mainAverage">—</strong>
+          <span class="resize-handle n" data-resize="n" aria-hidden="true"></span><span class="resize-handle ne" data-resize="ne" aria-hidden="true"></span>
+          <span class="resize-handle e" data-resize="e" aria-hidden="true"></span><span class="resize-handle se" data-resize="se" aria-hidden="true"></span>
+          <span class="resize-handle s" data-resize="s" aria-hidden="true"></span><span class="resize-handle sw" data-resize="sw" aria-hidden="true"></span>
+          <span class="resize-handle w" data-resize="w" aria-hidden="true"></span><span class="resize-handle nw" data-resize="nw" aria-hidden="true"></span>
+        </div>
+      </div>
       <p class="observation" id="observation"><strong>Start with one roll.</strong> Early averages can move a lot.</p>
     </div>
   </section>
@@ -223,6 +241,52 @@
   }
   document.querySelectorAll('.sim').forEach(b => b.addEventListener('click', () => simulate(Number(b.dataset.rolls))));
   $('reset').addEventListener('click', resetExperiment);
+
+  function makeLegendInteractive() {
+    const legend = $('averageLegend'), bounds = legend.parentElement;
+    const minWidth = 120, minHeight = 64;
+    let action = null;
+
+    const keepInBounds = () => {
+      const left = Math.min(Math.max(0, legend.offsetLeft), Math.max(0, bounds.clientWidth - legend.offsetWidth));
+      const top = Math.min(Math.max(0, legend.offsetTop), Math.max(0, bounds.clientHeight - legend.offsetHeight));
+      legend.style.left = `${left}px`; legend.style.top = `${top}px`; legend.style.right = 'auto';
+    };
+    legend.addEventListener('pointerdown', event => {
+      if (event.button !== 0) return;
+      const direction = event.target.dataset.resize || '';
+      action = { direction, x: event.clientX, y: event.clientY, left: legend.offsetLeft, top: legend.offsetTop, width: legend.offsetWidth, height: legend.offsetHeight };
+      legend.setPointerCapture(event.pointerId); legend.focus(); event.preventDefault();
+    });
+    legend.addEventListener('pointermove', event => {
+      if (!action || !legend.hasPointerCapture(event.pointerId)) return;
+      const dx = event.clientX - action.x, dy = event.clientY - action.y, direction = action.direction;
+      if (!direction) {
+        legend.style.left = `${Math.min(Math.max(0, action.left + dx), Math.max(0, bounds.clientWidth - action.width))}px`;
+        legend.style.top = `${Math.min(Math.max(0, action.top + dy), Math.max(0, bounds.clientHeight - action.height))}px`;
+        legend.style.right = 'auto'; return;
+      }
+      let left = action.left, top = action.top, width = action.width, height = action.height;
+      if (direction.includes('e')) width = Math.min(Math.max(minWidth, action.width + dx), bounds.clientWidth - left);
+      if (direction.includes('s')) height = Math.min(Math.max(minHeight, action.height + dy), bounds.clientHeight - top);
+      if (direction.includes('w')) { left = Math.min(action.left + action.width - minWidth, Math.max(0, action.left + dx)); width = action.width + action.left - left; }
+      if (direction.includes('n')) { top = Math.min(action.top + action.height - minHeight, Math.max(0, action.top + dy)); height = action.height + action.top - top; }
+      Object.assign(legend.style, { left: `${left}px`, top: `${top}px`, right: 'auto', width: `${width}px`, height: `${height}px` });
+    });
+    const endAction = () => { action = null; };
+    legend.addEventListener('pointerup', endAction); legend.addEventListener('pointercancel', endAction);
+    legend.addEventListener('keydown', event => {
+      if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)) return;
+      const step = event.shiftKey ? 10 : 2;
+      if (event.key === 'ArrowLeft') legend.style.left = `${legend.offsetLeft - step}px`;
+      if (event.key === 'ArrowRight') legend.style.left = `${legend.offsetLeft + step}px`;
+      if (event.key === 'ArrowUp') legend.style.top = `${legend.offsetTop - step}px`;
+      if (event.key === 'ArrowDown') legend.style.top = `${legend.offsetTop + step}px`;
+      keepInBounds(); event.preventDefault();
+    });
+    window.addEventListener('resize', keepInBounds);
+  }
+  makeLegendInteractive();
 
   function updateText() {
     const ev = expected(), avg = state.n ? state.total / state.n : null, diff = avg === null ? null : avg - ev;
