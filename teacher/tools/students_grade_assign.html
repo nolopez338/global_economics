@@ -1,0 +1,2359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Picture Manager</title>
+
+    <style>
+        :root {
+            --navy: #2e4057;
+            --blue: #1b52a0;
+            --teal: #10867c;
+            --green: #198754;
+            --red: #c0392b;
+            --orange: #d97706;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-500: #64748b;
+            --gray-700: #334155;
+            --gray-900: #0f172a;
+            --radius: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--gray-100);
+            color: var(--gray-900);
+        }
+
+        header {
+            background: var(--navy);
+            color: white;
+            padding: 20px 28px;
+        }
+
+        header h1 {
+            margin: 0 0 5px;
+            font-size: 24px;
+        }
+
+        header p {
+            margin: 0;
+            opacity: 0.85;
+            font-size: 14px;
+        }
+
+        main {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .toolbar,
+        .status-panel,
+        .search-panel,
+        .fallback-panel {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        button {
+            border: 0;
+            border-radius: 7px;
+            padding: 9px 14px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .primary {
+            background: var(--blue);
+            color: white;
+        }
+
+        .secondary {
+            background: var(--gray-200);
+            color: var(--gray-900);
+        }
+
+        .success {
+            background: var(--teal);
+            color: white;
+        }
+
+        .danger {
+            background: var(--red);
+            color: white;
+        }
+
+        input,
+        select {
+            border: 1px solid var(--gray-300);
+            border-radius: 7px;
+            padding: 9px 10px;
+            background: white;
+        }
+
+        /* Search bar below Project Status */
+        .search-panel {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-panel input[type="search"] {
+            width: 100%;
+            flex: 1;
+        }
+
+        .search-panel select {
+            min-width: 110px;
+        }
+
+        .status-title {
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(160px, 1fr));
+            gap: 10px;
+        }
+
+        .status-item {
+            border-radius: 8px;
+            padding: 12px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+        }
+
+        .status-item .number {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .status-item .label {
+            color: var(--gray-500);
+            font-size: 13px;
+            margin-top: 3px;
+        }
+
+        .status-item.problem {
+            border-color: #f0b27a;
+            background: #fff8ed;
+        }
+
+        .status-message {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 7px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .status-message.visible {
+            display: block;
+        }
+
+        .status-message.info {
+            background: #eef5ff;
+            color: #174a8b;
+        }
+
+        .status-message.success {
+            background: #edf9f3;
+            color: #17633f;
+        }
+
+        .status-message.error {
+            background: #fff0ef;
+            color: #8f2117;
+        }
+
+        .status-message.warning {
+            background: #fff8e8;
+            color: #8a5700;
+        }
+
+        .folder-info {
+            color: var(--gray-500);
+            font-size: 13px;
+            margin-top: 8px;
+            word-break: break-all;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card.problem {
+            border-color: #e5a55b;
+        }
+
+        .picture-container {
+            height: 250px;
+            background: var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .picture-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .picture-placeholder {
+            color: var(--gray-500);
+            font-size: 13px;
+        }
+
+        .card-content {
+            padding: 14px;
+        }
+
+        .student-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .current-filename {
+            color: var(--gray-500);
+            font-size: 12px;
+            word-break: break-all;
+            margin-bottom: 12px;
+        }
+
+        .filename-input {
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 7px;
+        }
+
+        .card-actions button {
+            flex: 1;
+        }
+
+        .problem-label {
+            display: inline-block;
+            background: #fff0d9;
+            color: #8a5700;
+            border-radius: 5px;
+            padding: 4px 7px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .empty {
+            background: white;
+            border: 1px dashed var(--gray-300);
+            border-radius: var(--radius);
+            padding: 40px;
+            text-align: center;
+            color: var(--gray-500);
+        }
+
+        .fallback-panel {
+            display: none;
+        }
+
+        .fallback-panel.visible {
+            display: block;
+        }
+
+        .fallback-files {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .fallback-note {
+            color: var(--gray-500);
+            font-size: 13px;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* =====================================================
+           Grade Assigning
+           ===================================================== */
+
+        .grade-assigning-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.97);
+            border-bottom: 1px solid var(--gray-300);
+            box-shadow: 0 3px 12px rgba(15, 23, 42, 0.12);
+        }
+
+        .grade-assigning-bar.visible {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            width: 100%;
+            gap: 12px;
+            padding: 10px 16px;
+        }
+
+        .grade-drop-zone {
+            width: 100%;
+            height: 54px;
+            border: 2px dashed var(--gray-300);
+            border-radius: 8px;
+            background: var(--gray-50);
+            color: var(--gray-700);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+            font-weight: 700;
+            transition:
+                background 0.15s ease,
+                border-color 0.15s ease,
+                transform 0.15s ease;
+        }
+
+        .grade-drop-zone.drag-over {
+            border-color: var(--blue);
+            background: #eef5ff;
+            color: var(--blue);
+            transform: scale(1.05);
+        }
+
+        .grade-drop-zone.success-state {
+            border-color: var(--green);
+            background: #edf9f3;
+            color: var(--green);
+        }
+
+        .grade-drop-zone.error-state {
+            border-color: var(--red);
+            background: #fff0ef;
+            color: var(--red);
+        }
+
+        .grade-close-btn {
+            position: absolute;
+            top: 4px;
+            right: 6px;
+            margin: 0;
+            padding: 0;
+            width: 22px;
+            height: 22px;
+            background: transparent;
+            color: var(--gray-500);
+            border-radius: 4px;
+            font-size: 20px;
+            line-height: 20px;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .grade-close-btn:hover {
+            background: var(--gray-200);
+            color: var(--gray-900);
+        }
+
+        .grade-draggable {
+            cursor: grab;
+            user-select: none;
+        }
+
+        .grade-draggable:active {
+            cursor: grabbing;
+        }
+
+        .grade-draggable.dragging {
+            opacity: 0.55;
+        }
+
+        @media (max-width: 800px) {
+            .status-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .search-panel {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-panel input[type="search"] {
+                width: 100%;
+            }
+
+            .search-panel select {
+                width: 100%;
+            }
+
+            .grade-assigning-bar.visible {
+                grid-template-columns: repeat(5, minmax(0, 1fr));
+                gap: 6px;
+                padding: 8px 32px 8px 8px;
+                overflow-x: auto;
+            }
+
+            .grade-drop-zone {
+                width: 100%;
+                height: 48px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Student Picture Manager</h1>
+    <p>Manage PNG filenames and synchronize them with file_names.txt</p>
+</header>
+
+<!-- Grade Assigning floating menu -->
+<div id="gradeAssigningBar" class="grade-assigning-bar">
+    <div class="grade-drop-zone" data-grade="A">
+        A
+    </div>
+
+    <div class="grade-drop-zone" data-grade="B">
+        B
+    </div>
+
+    <div class="grade-drop-zone" data-grade="C">
+        C
+    </div>
+
+    <div class="grade-drop-zone" data-grade="D">
+        D
+    </div>
+
+    <div class="grade-drop-zone" data-grade="E">
+        E
+    </div>
+
+    <button
+        id="closeGradeAssigningBtn"
+        class="grade-close-btn"
+        type="button"
+        aria-label="Close Grade Assigning"
+    >
+        ×
+    </button>
+</div>
+
+<main>
+
+    <section class="toolbar">
+        <button id="selectFolderBtn" class="primary">
+            Select Project Folder
+        </button>
+
+        <button id="syncBtn" class="success" disabled>
+            Synchronize
+        </button>
+
+        <button id="saveTxtBtn" class="secondary" disabled>
+            Save file_names.txt
+        </button>
+
+        <button id="gradeAssigningBtn" class="secondary" disabled>
+            Grade Assigning
+        </button>
+    </section>
+
+    <section class="status-panel">
+        <div class="status-title">Project Status</div>
+
+        <div class="status-grid">
+
+            <div class="status-item">
+                <div id="pngCount" class="number">0</div>
+                <div class="label">PNG files found</div>
+            </div>
+
+            <div class="status-item">
+                <div id="txtCount" class="number">0</div>
+                <div class="label">file_names.txt entries</div>
+            </div>
+
+            <div id="missingTxtItem" class="status-item problem">
+                <div id="missingTxtCount" class="number">0</div>
+                <div class="label">PNG files missing from TXT</div>
+            </div>
+
+            <div id="missingPngItem" class="status-item problem">
+                <div id="missingPngCount" class="number">0</div>
+                <div class="label">TXT entries without PNG</div>
+            </div>
+
+        </div>
+
+        <div id="folderInfo" class="folder-info">
+            No project folder selected.
+        </div>
+
+        <div id="statusMessage" class="status-message"></div>
+    </section>
+
+    <!-- Search bar moved below the status panel -->
+    <section class="search-panel">
+        <input
+            id="searchInput"
+            type="search"
+            placeholder="Search students or filenames..."
+            disabled
+        >
+
+        <select id="sortSelect" disabled>
+            <option value="az">A–Z</option>
+            <option value="za">Z–A</option>
+        </select>
+    </section>
+
+    <section id="fallbackPanel" class="fallback-panel">
+
+        <strong>File System Access API unavailable</strong>
+
+        <p>
+            Your browser cannot directly access and rename files in a local
+            folder. Use a Chromium-based browser such as Google Chrome or
+            Microsoft Edge for full functionality.
+        </p>
+
+        <div class="fallback-files">
+
+            <label>
+                Select PNG files:
+                <input
+                    id="fallbackPngInput"
+                    type="file"
+                    accept=".png,image/png"
+                    multiple
+                >
+            </label>
+
+            <label>
+                Select file_names.txt:
+                <input
+                    id="fallbackTxtInput"
+                    type="file"
+                    accept=".txt"
+                >
+            </label>
+
+            <button
+                id="fallbackDownloadBtn"
+                class="secondary"
+                disabled
+            >
+                Download Updated file_names.txt
+            </button>
+
+        </div>
+
+        <div class="fallback-note">
+            The fallback can read selected files and generate an updated
+            file_names.txt, but it cannot rename PNG files automatically.
+        </div>
+
+    </section>
+
+    <section id="cards" class="cards">
+        <div class="empty">
+            Select the project folder to begin.
+        </div>
+    </section>
+
+</main>
+
+<script>
+"use strict";
+
+/* =========================================================
+   State
+   ========================================================= */
+
+const state = {
+    projectHandle: null,
+    picturesHandle: null,
+    pngFiles: [],
+    txtEntries: [],
+    fallbackPngFiles: [],
+    fallbackTxtEntries: [],
+    imageUrls: [],
+
+    /* Grade Assigning state */
+    gradeAssigningMode: false,
+    assignedDuringSession: new Set(),
+    draggedFilename: null
+};
+
+/* =========================================================
+   DOM
+   ========================================================= */
+
+const selectFolderBtn = document.getElementById("selectFolderBtn");
+const syncBtn = document.getElementById("syncBtn");
+const saveTxtBtn = document.getElementById("saveTxtBtn");
+const gradeAssigningBtn = document.getElementById("gradeAssigningBtn");
+const closeGradeAssigningBtn =
+    document.getElementById("closeGradeAssigningBtn");
+
+const searchInput = document.getElementById("searchInput");
+const sortSelect = document.getElementById("sortSelect");
+
+const cardsContainer = document.getElementById("cards");
+
+const pngCount = document.getElementById("pngCount");
+const txtCount = document.getElementById("txtCount");
+const missingTxtCount = document.getElementById("missingTxtCount");
+const missingPngCount = document.getElementById("missingPngCount");
+
+const missingTxtItem = document.getElementById("missingTxtItem");
+const missingPngItem = document.getElementById("missingPngItem");
+
+const folderInfo = document.getElementById("folderInfo");
+const statusMessage = document.getElementById("statusMessage");
+
+const fallbackPanel = document.getElementById("fallbackPanel");
+const fallbackPngInput = document.getElementById("fallbackPngInput");
+const fallbackTxtInput = document.getElementById("fallbackTxtInput");
+const fallbackDownloadBtn = document.getElementById("fallbackDownloadBtn");
+
+const gradeAssigningBar =
+    document.getElementById("gradeAssigningBar");
+
+const gradeDropZones =
+    [...document.querySelectorAll(".grade-drop-zone")];
+
+/* =========================================================
+   Utility functions
+   ========================================================= */
+
+function showStatus(message, type = "info") {
+    statusMessage.textContent = message;
+    statusMessage.className = `status-message visible ${type}`;
+}
+
+function clearStatus() {
+    statusMessage.textContent = "";
+    statusMessage.className = "status-message";
+}
+
+function normalizeFilename(name) {
+    return name.trim();
+}
+
+function humanizeFilename(filename) {
+    return filename
+        .replace(/\.png$/i, "")
+        .replace(/^(A|B|C|D|E)-/i, "")
+        .replace(/_/g, " ")
+        .trim()
+        .replace(/\s+/g, " ")
+        .replace(/\b\w/g, char => char.toUpperCase());
+}
+
+function isValidPngFilename(filename) {
+    if (!filename) {
+        return false;
+    }
+
+    if (filename !== filename.trim()) {
+        return false;
+    }
+
+    if (/\s{2,}/.test(filename)) {
+        return false;
+    }
+
+    if (!/\.png$/i.test(filename)) {
+        return false;
+    }
+
+    if (/[<>:"/\\|?*]/.test(filename)) {
+        return false;
+    }
+
+    if (filename === "." || filename === "..") {
+        return false;
+    }
+
+    return true;
+}
+
+function uniqueLowercaseNames(names) {
+    const map = new Map();
+
+    for (const name of names) {
+        const key = name.toLowerCase();
+
+        if (!map.has(key)) {
+            map.set(key, []);
+        }
+
+        map.get(key).push(name);
+    }
+
+    return map;
+}
+
+function getCurrentPngNames() {
+    return state.pngFiles.map(file => file.name);
+}
+
+function arraysEqual(a, b) {
+    if (a.length !== b.length) {
+        return false;
+    }
+
+    const x = [...a].sort((a, b) => a.localeCompare(b));
+    const y = [...b].sort((a, b) => a.localeCompare(b));
+
+    return x.every((value, index) => value === y[index]);
+}
+
+function getGradePrefix(filename) {
+    const match = filename.match(/^([A-E])-/i);
+    return match ? match[1].toUpperCase() : null;
+}
+
+function removeGradePrefix(filename) {
+    return filename.replace(/^[A-E]-/i, "");
+}
+
+function createGradeFilename(filename, grade) {
+    return `${grade}-${removeGradePrefix(filename)}`;
+}
+
+function isSameFilenameCaseInsensitive(a, b) {
+    return a.toLowerCase() === b.toLowerCase();
+}
+
+/* =========================================================
+   Native filesystem rename support
+   ========================================================= */
+
+/*
+ * The File System Access API exposes FileSystemFileHandle.move()
+ * for native filesystem rename/move operations.
+ *
+ * This function intentionally does NOT fall back to:
+ *
+ *   getFile() -> createWritable() -> write() -> removeEntry()
+ *
+ * because that would copy/rewrite the PNG instead of renaming it.
+ */
+function supportsNativeRename(fileHandle) {
+    return (
+        fileHandle &&
+        typeof fileHandle.move === "function"
+    );
+}
+
+async function renameFileHandle(fileHandle, newName) {
+    if (!supportsNativeRename(fileHandle)) {
+        throw new Error(
+            "This browser does not expose FileSystemFileHandle.move() for the selected local file. A true filesystem rename cannot be performed by this browser, so the PNG was not copied, recreated, or deleted."
+        );
+    }
+
+    await fileHandle.move(newName);
+}
+
+/* =========================================================
+   File System Access API
+   ========================================================= */
+
+async function selectProjectFolder() {
+    if (!("showDirectoryPicker" in window)) {
+        fallbackPanel.classList.add("visible");
+
+        showStatus(
+            "File System Access API is not available. Use Chrome or Edge for full functionality.",
+            "warning"
+        );
+
+        return;
+    }
+
+    try {
+        const handle = await window.showDirectoryPicker({
+            mode: "readwrite"
+        });
+
+        state.projectHandle = handle;
+
+        await loadProject();
+
+    } catch (error) {
+        if (error.name === "AbortError") {
+            return;
+        }
+
+        console.error(error);
+
+        showStatus(
+            `Could not open the project folder: ${error.message}`,
+            "error"
+        );
+    }
+}
+
+async function loadProject() {
+    if (!state.projectHandle) {
+        return;
+    }
+
+    try {
+        document.body.classList.add("loading");
+
+        state.picturesHandle =
+            await state.projectHandle.getDirectoryHandle(
+                "grade10Pictures"
+            );
+
+        await refresh();
+
+        folderInfo.textContent =
+            `Project folder: ${state.projectHandle.name}/grade10Pictures`;
+
+        syncBtn.disabled = false;
+        saveTxtBtn.disabled = false;
+        gradeAssigningBtn.disabled = false;
+        searchInput.disabled = false;
+        sortSelect.disabled = false;
+
+        showStatus("Project loaded successfully.", "success");
+
+    } catch (error) {
+        console.error(error);
+
+        if (error.name === "NotFoundError") {
+            showStatus(
+                "The selected folder does not contain a grade10Pictures folder.",
+                "error"
+            );
+        } else {
+            showStatus(
+                `Could not load the project: ${error.message}`,
+                "error"
+            );
+        }
+    } finally {
+        document.body.classList.remove("loading");
+    }
+}
+
+async function loadFileNames() {
+    state.txtEntries = [];
+
+    try {
+        const fileHandle =
+            await state.projectHandle.getFileHandle("file_names.txt");
+
+        const file = await fileHandle.getFile();
+        const text = await file.text();
+
+        state.txtEntries = text
+            .split(/\r?\n/)
+            .map(line => normalizeFilename(line))
+            .filter(Boolean);
+
+    } catch (error) {
+        if (error.name === "NotFoundError") {
+            state.txtEntries = [];
+
+            showStatus(
+                "file_names.txt does not exist. It can be created with Save file_names.txt.",
+                "warning"
+            );
+        } else {
+            throw error;
+        }
+    }
+}
+
+async function scanGrade10Pictures() {
+    state.pngFiles = [];
+
+    for await (const [name, handle] of state.picturesHandle.entries()) {
+        if (
+            handle.kind === "file" &&
+            /\.png$/i.test(name)
+        ) {
+            state.pngFiles.push({
+                name,
+                handle
+            });
+        }
+    }
+
+    state.pngFiles.sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, {
+            sensitivity: "base"
+        })
+    );
+}
+
+async function saveFileNames() {
+    if (!state.projectHandle) {
+        return false;
+    }
+
+    const names = getCurrentPngNames();
+
+    const duplicateMap = uniqueLowercaseNames(names);
+
+    const duplicates = [...duplicateMap.entries()]
+        .filter(([, values]) => values.length > 1);
+
+    if (duplicates.length) {
+        showStatus(
+            "Cannot save because duplicate filenames exist.",
+            "error"
+        );
+
+        return false;
+    }
+
+    const content = names.length
+        ? names.join("\n") + "\n"
+        : "";
+
+    try {
+        const fileHandle =
+            await state.projectHandle.getFileHandle(
+                "file_names.txt",
+                { create: true }
+            );
+
+        const writable = await fileHandle.createWritable();
+
+        await writable.write(content);
+        await writable.close();
+
+        await refresh();
+
+        return true;
+
+    } catch (error) {
+        console.error(error);
+
+        showStatus(
+            `Could not save file_names.txt: ${error.message}`,
+            "error"
+        );
+
+        return false;
+    }
+}
+
+/* =========================================================
+   Comparison
+   ========================================================= */
+
+function compareFileLists() {
+    const pngNames = getCurrentPngNames();
+
+    const pngSet = new Set(
+        pngNames.map(name => name.toLowerCase())
+    );
+
+    const txtSet = new Set(
+        state.txtEntries.map(name => name.toLowerCase())
+    );
+
+    const missingFromTxt = pngNames.filter(
+        name => !txtSet.has(name.toLowerCase())
+    );
+
+    const missingPng = state.txtEntries.filter(
+        name => !pngSet.has(name.toLowerCase())
+    );
+
+    return {
+        missingFromTxt,
+        missingPng
+    };
+}
+
+/* =========================================================
+   Refresh
+   ========================================================= */
+
+async function refresh() {
+    if (!state.projectHandle || !state.picturesHandle) {
+        return;
+    }
+
+    await loadFileNames();
+    await scanGrade10Pictures();
+
+    updateStatusCounters();
+    renderStudents();
+}
+
+function updateStatusCounters() {
+    const comparison = compareFileLists();
+
+    pngCount.textContent = state.pngFiles.length;
+    txtCount.textContent = state.txtEntries.length;
+    missingTxtCount.textContent = comparison.missingFromTxt.length;
+    missingPngCount.textContent = comparison.missingPng.length;
+
+    missingTxtItem.classList.toggle(
+        "problem",
+        comparison.missingFromTxt.length > 0
+    );
+
+    missingPngItem.classList.toggle(
+        "problem",
+        comparison.missingPng.length > 0
+    );
+}
+
+/* =========================================================
+   Rendering
+   ========================================================= */
+
+function renderStudents() {
+    state.imageUrls.forEach(url => URL.revokeObjectURL(url));
+    state.imageUrls = [];
+
+    const searchTerm =
+        searchInput.value.trim().toLowerCase();
+
+    const sortDirection = sortSelect.value;
+
+    const files = [...state.pngFiles];
+
+    files.sort((a, b) => {
+        const comparison = humanizeFilename(a.name)
+            .localeCompare(
+                humanizeFilename(b.name),
+                undefined,
+                { sensitivity: "base" }
+            );
+
+        return sortDirection === "az"
+            ? comparison
+            : -comparison;
+    });
+
+    const filtered = files.filter(file => {
+        /*
+         * During Grade Assigning mode, successfully assigned
+         * students are temporarily hidden.
+         */
+        if (
+            state.gradeAssigningMode &&
+            state.assignedDuringSession.has(
+                file.name.toLowerCase()
+            )
+        ) {
+            return false;
+        }
+
+        if (!searchTerm) {
+            return true;
+        }
+
+        return (
+            file.name.toLowerCase().includes(searchTerm) ||
+            humanizeFilename(file.name)
+                .toLowerCase()
+                .includes(searchTerm)
+        );
+    });
+
+    cardsContainer.innerHTML = "";
+
+    if (!filtered.length) {
+        cardsContainer.innerHTML = `
+            <div class="empty">
+                ${
+                    state.gradeAssigningMode &&
+                    state.assignedDuringSession.size > 0
+                        ? "All currently visible students have been assigned."
+                        : "No matching PNG files found."
+                }
+            </div>
+        `;
+
+        return;
+    }
+
+    const comparison = compareFileLists();
+
+    const missingFromTxtSet = new Set(
+        comparison.missingFromTxt.map(name => name.toLowerCase())
+    );
+
+    for (const file of filtered) {
+        const card = document.createElement("article");
+
+        card.className = "card";
+
+        if (state.gradeAssigningMode) {
+            card.classList.add("grade-draggable");
+            card.draggable = true;
+
+            card.dataset.filename = file.name;
+
+            card.addEventListener(
+                "dragstart",
+                event => handleStudentDragStart(event, file)
+            );
+
+            card.addEventListener(
+                "dragend",
+                handleStudentDragEnd
+            );
+        }
+
+        const isSyncProblem =
+            missingFromTxtSet.has(file.name.toLowerCase());
+
+        if (isSyncProblem) {
+            card.classList.add("problem");
+        }
+
+        const pictureContainer =
+            document.createElement("div");
+
+        pictureContainer.className = "picture-container";
+
+        const img = document.createElement("img");
+
+        img.alt = humanizeFilename(file.name);
+        img.loading = "lazy";
+
+        const content =
+            document.createElement("div");
+
+        content.className = "card-content";
+
+        if (isSyncProblem) {
+            const problem = document.createElement("div");
+
+            problem.className = "problem-label";
+            problem.textContent = "NOT IN file_names.txt";
+
+            content.appendChild(problem);
+        }
+
+        const studentName =
+            document.createElement("div");
+
+        studentName.className = "student-name";
+        studentName.textContent =
+            humanizeFilename(file.name);
+
+        const currentFilename =
+            document.createElement("div");
+
+        currentFilename.className = "current-filename";
+        currentFilename.textContent =
+            `Current: ${file.name}`;
+
+        const input =
+            document.createElement("input");
+
+        input.className = "filename-input";
+        input.type = "text";
+        input.value = file.name;
+
+        input.setAttribute(
+            "aria-label",
+            `Filename for ${humanizeFilename(file.name)}`
+        );
+
+        const actions =
+            document.createElement("div");
+
+        actions.className = "card-actions";
+
+        const renameButton =
+            document.createElement("button");
+
+        renameButton.className = "primary";
+        renameButton.textContent = "Save / Rename";
+
+        renameButton.addEventListener(
+            "click",
+            () => renameStudentFile(file, input.value)
+        );
+
+        actions.appendChild(renameButton);
+
+        content.appendChild(studentName);
+        content.appendChild(currentFilename);
+        content.appendChild(input);
+        content.appendChild(actions);
+
+        card.appendChild(pictureContainer);
+        card.appendChild(content);
+
+        cardsContainer.appendChild(card);
+
+        createImagePreview(
+            file.handle,
+            img,
+            pictureContainer
+        );
+    }
+}
+
+async function createImagePreview(
+    fileHandle,
+    img,
+    container
+) {
+    try {
+        const file = await fileHandle.getFile();
+
+        const url =
+            URL.createObjectURL(file);
+
+        state.imageUrls.push(url);
+
+        img.src = url;
+
+        container.appendChild(img);
+
+    } catch (error) {
+        const placeholder =
+            document.createElement("div");
+
+        placeholder.className =
+            "picture-placeholder";
+
+        placeholder.textContent =
+            "Could not load image.";
+
+        container.appendChild(placeholder);
+    }
+}
+
+/* =========================================================
+   Rename
+   ========================================================= */
+
+async function renameStudentFile(file, requestedName) {
+    const newName = normalizeFilename(requestedName);
+    const oldName = file.name;
+
+    if (newName === oldName) {
+        showStatus(
+            "No filename change was requested.",
+            "info"
+        );
+
+        return;
+    }
+
+    if (!isValidPngFilename(newName)) {
+        showStatus(
+            "Invalid filename. Use a .png filename without < > : \" / \\ | ? * or unnecessary whitespace.",
+            "error"
+        );
+
+        return;
+    }
+
+    const existing = state.pngFiles.find(
+        candidate =>
+            candidate.name.toLowerCase() ===
+            newName.toLowerCase() &&
+            candidate.name !== oldName
+    );
+
+    if (existing) {
+        showStatus(
+            `Cannot rename: "${newName}" already exists.`,
+            "error"
+        );
+
+        return;
+    }
+
+    /*
+     * Recheck the actual directory immediately before renaming.
+     * This protects against filesystem changes that occurred
+     * after the last scan.
+     */
+    let existingTarget = null;
+
+    try {
+        for await (
+            const [name, handle] of state.picturesHandle.entries()
+        ) {
+            if (
+                handle.kind === "file" &&
+                isSameFilenameCaseInsensitive(name, newName) &&
+                !isSameFilenameCaseInsensitive(name, oldName)
+            ) {
+                existingTarget = name;
+                break;
+            }
+        }
+    } catch (error) {
+        showStatus(
+            `Could not verify the target filename: ${error.message}`,
+            "error"
+        );
+
+        return;
+    }
+
+    if (existingTarget) {
+        showStatus(
+            `Cannot rename: "${existingTarget}" already exists.`,
+            "error"
+        );
+
+        return;
+    }
+
+    if (!supportsNativeRename(file.handle)) {
+        showStatus(
+            "This browser does not support a true native filesystem rename for this local file. No copy, duplicate, or deletion was performed.",
+            "error"
+        );
+
+        return;
+    }
+
+    const confirmed = window.confirm(
+        `Rename "${oldName}" to "${newName}"?\n\nThis will modify the actual filename in grade10Pictures.`
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+        document.body.classList.add("loading");
+
+        /*
+         * TRUE FILESYSTEM RENAME.
+         *
+         * No getFile()
+         * No createWritable()
+         * No Blob
+         * No duplicate file
+         * No removeEntry()
+         *
+         * The existing filesystem entry is renamed directly.
+         */
+        await renameFileHandle(
+            file.handle,
+            newName
+        );
+
+        /*
+         * The filesystem is now the source of truth.
+         * Rescan the directory to obtain the new handle/name.
+         */
+        await scanGrade10Pictures();
+
+        /*
+         * Synchronize file_names.txt with the actual
+         * post-rename filesystem state.
+         */
+        const txtUpdated =
+            await writeCurrentPngNamesToTxt();
+
+        if (!txtUpdated) {
+            await refresh();
+
+            showStatus(
+                `"${oldName}" was renamed to "${newName}", but file_names.txt could not be synchronized. The actual PNG filename was not reverted because this application never copies or recreates PNG files during renaming.`,
+                "warning"
+            );
+
+            return;
+        }
+
+        await refresh();
+
+        showStatus(
+            `"${oldName}" renamed to "${newName}".`,
+            "success"
+        );
+
+    } catch (error) {
+        console.error(error);
+
+        await refresh();
+
+        showStatus(
+            `Rename failed. No copy/delete fallback was used. ${error.message}`,
+            "error"
+        );
+
+    } finally {
+        document.body.classList.remove("loading");
+    }
+}
+
+/* =========================================================
+   Grade Assigning Mode
+   ========================================================= */
+
+function enterGradeAssigningMode() {
+    if (!state.projectHandle || !state.picturesHandle) {
+        showStatus(
+            "Select a project folder before entering Grade Assigning mode.",
+            "warning"
+        );
+
+        return;
+    }
+
+    state.gradeAssigningMode = true;
+    state.assignedDuringSession.clear();
+    state.draggedFilename = null;
+
+    gradeAssigningBar.classList.add("visible");
+
+    gradeAssigningBtn.textContent = "Grade Assigning Active";
+    gradeAssigningBtn.classList.remove("secondary");
+    gradeAssigningBtn.classList.add("success");
+
+    renderStudents();
+}
+
+function exitGradeAssigningMode() {
+    state.gradeAssigningMode = false;
+    state.assignedDuringSession.clear();
+    state.draggedFilename = null;
+
+    gradeAssigningBar.classList.remove("visible");
+
+    gradeAssigningBtn.textContent = "Grade Assigning";
+    gradeAssigningBtn.classList.remove("success");
+    gradeAssigningBtn.classList.add("secondary");
+
+    renderStudents();
+
+    showStatus(
+        "Grade Assigning mode closed. Students are shown using their current filenames.",
+        "info"
+    );
+}
+
+function handleStudentDragStart(event, file) {
+    if (!state.gradeAssigningMode) {
+        event.preventDefault();
+        return;
+    }
+
+    state.draggedFilename = file.name;
+
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData(
+        "text/plain",
+        file.name
+    );
+
+    event.currentTarget.classList.add("dragging");
+}
+
+function handleStudentDragEnd(event) {
+    event.currentTarget.classList.remove("dragging");
+
+    state.draggedFilename = null;
+
+    gradeDropZones.forEach(zone => {
+        zone.classList.remove("drag-over");
+    });
+}
+
+function handleGradeDragOver(event) {
+    if (
+        !state.gradeAssigningMode ||
+        !state.draggedFilename
+    ) {
+        return;
+    }
+
+    event.preventDefault();
+
+    event.dataTransfer.dropEffect = "move";
+
+    event.currentTarget.classList.add("drag-over");
+}
+
+function handleGradeDragEnter(event) {
+    if (
+        !state.gradeAssigningMode ||
+        !state.draggedFilename
+    ) {
+        return;
+    }
+
+    event.preventDefault();
+
+    event.currentTarget.classList.add("drag-over");
+}
+
+function handleGradeDragLeave(event) {
+    if (
+        event.currentTarget.contains(event.relatedTarget)
+    ) {
+        return;
+    }
+
+    event.currentTarget.classList.remove("drag-over");
+}
+
+async function handleGradeDrop(event) {
+    event.preventDefault();
+
+    const zone = event.currentTarget;
+
+    zone.classList.remove("drag-over");
+
+    if (!state.gradeAssigningMode) {
+        return;
+    }
+
+    const draggedName =
+        event.dataTransfer.getData("text/plain") ||
+        state.draggedFilename;
+
+    const grade = zone.dataset.grade;
+
+    if (!draggedName || !grade) {
+        return;
+    }
+
+    await assignStudentGrade(
+        draggedName,
+        grade
+    );
+}
+
+async function assignStudentGrade(filename, grade) {
+    if (
+        !state.gradeAssigningMode ||
+        !state.picturesHandle
+    ) {
+        return;
+    }
+
+    const file =
+        state.pngFiles.find(
+            candidate =>
+                isSameFilenameCaseInsensitive(
+                    candidate.name,
+                    filename
+                )
+        );
+
+    if (!file) {
+        showGradeDropZoneState(
+            grade,
+            "error"
+        );
+
+        showStatus(
+            `Could not find "${filename}" in the PNG folder.`,
+            "error"
+        );
+
+        return;
+    }
+
+    const oldName = file.name;
+
+    const newName = createGradeFilename(
+        oldName,
+        grade
+    );
+
+    /*
+     * If the file already has the requested grade,
+     * no physical filesystem operation occurs.
+     */
+    const alreadyHasRequestedGrade =
+        getGradePrefix(oldName) === grade;
+
+    if (alreadyHasRequestedGrade) {
+        document.body.classList.add("loading");
+
+        try {
+            const saved =
+                await writeCurrentPngNamesToTxt();
+
+            if (!saved) {
+                showGradeDropZoneState(
+                    grade,
+                    "error"
+                );
+
+                return;
+            }
+
+            /*
+             * The filename is already the requested final
+             * filename, so it is also the session key.
+             */
+            state.assignedDuringSession.add(
+                oldName.toLowerCase()
+            );
+
+            showGradeDropZoneState(
+                grade,
+                "success"
+            );
+
+            showStatus(
+                `"${oldName}" is already assigned to grade ${grade}.`,
+                "success"
+            );
+
+            renderStudents();
+
+        } catch (error) {
+            console.error(error);
+
+            showGradeDropZoneState(
+                grade,
+                "error"
+            );
+
+            showStatus(
+                `Grade assignment failed: ${error.message}`,
+                "error"
+            );
+        } finally {
+            document.body.classList.remove("loading");
+        }
+
+        return;
+    }
+
+    if (!isValidPngFilename(newName)) {
+        showGradeDropZoneState(
+            grade,
+            "error"
+        );
+
+        showStatus(
+            `Cannot assign "${oldName}" to grade ${grade}: the resulting filename "${newName}" is invalid.`,
+            "error"
+        );
+
+        return;
+    }
+
+    /*
+     * Check the current directory immediately before modifying
+     * anything. This prevents case-insensitive collisions and
+     * accidental conflicts with another student's PNG.
+     */
+    let existingTarget = null;
+
+    try {
+        for await (
+            const [name, handle] of state.picturesHandle.entries()
+        ) {
+            if (
+                handle.kind === "file" &&
+                isSameFilenameCaseInsensitive(name, newName) &&
+                !isSameFilenameCaseInsensitive(name, oldName)
+            ) {
+                existingTarget = name;
+                break;
+            }
+        }
+    } catch (error) {
+        showGradeDropZoneState(
+            grade,
+            "error"
+        );
+
+        showStatus(
+            `Could not verify the target filename: ${error.message}`,
+            "error"
+        );
+
+        return;
+    }
+
+    if (existingTarget) {
+        showGradeDropZoneState(
+            grade,
+            "error"
+        );
+
+        showStatus(
+            `Cannot assign "${oldName}" to grade ${grade}: "${existingTarget}" already exists.`,
+            "error"
+        );
+
+        return;
+    }
+
+    /*
+     * Explicitly require the native move() operation.
+     * There is deliberately NO copy/delete fallback.
+     */
+    if (!supportsNativeRename(file.handle)) {
+        showGradeDropZoneState(
+            grade,
+            "error"
+        );
+
+        showStatus(
+            "This browser does not expose FileSystemFileHandle.move() for this local file. A true filesystem rename cannot be performed, so no PNG was copied, recreated, or deleted.",
+            "error"
+        );
+
+        return;
+    }
+
+    document.body.classList.add("loading");
+
+    try {
+        /*
+         * TRUE FILESYSTEM RENAME.
+         *
+         * The existing PNG filesystem entry is renamed directly.
+         *
+         * No:
+         *   getFile()
+         *   createWritable()
+         *   Blob
+         *   duplicate PNG
+         *   removeEntry()
+         *
+         * Therefore there is no intentional intermediate state
+         * containing both oldName and newName.
+         */
+        await renameFileHandle(
+            file.handle,
+            newName
+        );
+
+        /*
+         * Rescan the actual directory after the native rename.
+         */
+        await scanGrade10Pictures();
+
+        /*
+         * Synchronize file_names.txt from the actual filenames.
+         */
+        const txtUpdated =
+            await writeCurrentPngNamesToTxt();
+
+        if (!txtUpdated) {
+            await refresh();
+
+            showGradeDropZoneState(
+                grade,
+                "error"
+            );
+
+            showStatus(
+                `The PNG was successfully renamed from "${oldName}" to "${newName}", but file_names.txt could not be synchronized. The actual filename was not reverted because no copy/delete fallback is used.`,
+                "warning"
+            );
+
+            return;
+        }
+
+        /*
+         * The assignment is successful only after the filesystem
+         * has been renamed and file_names.txt synchronized.
+         *
+         * IMPORTANT:
+         * Use the NEW filename as the session key.
+         */
+        state.assignedDuringSession.add(
+            newName.toLowerCase()
+        );
+
+        /*
+         * Refresh the UI using the actual filesystem state.
+         * renderStudents() will hide the newly assigned student
+         * because assignedDuringSession contains newName.
+         */
+        await refresh();
+
+        showGradeDropZoneState(
+            grade,
+            "success"
+        );
+
+        showStatus(
+            `"${oldName}" assigned to grade ${grade} as "${newName}".`,
+            "success"
+        );
+
+    } catch (error) {
+        console.error(error);
+
+        /*
+         * Do NOT attempt copy/delete rollback.
+         *
+         * If move() fails, the browser's native move operation
+         * has not completed and we leave the filesystem untouched
+         * from the application's perspective.
+         */
+        await refresh();
+
+        showGradeDropZoneState(
+            grade,
+            "error"
+        );
+
+        showStatus(
+            `Grade assignment failed. No copy/delete fallback was used. ${error.message}`,
+            "error"
+        );
+
+    } finally {
+        document.body.classList.remove("loading");
+    }
+}
+
+/* =========================================================
+   File existence
+   ========================================================= */
+
+async function fileExists(
+    directoryHandle,
+    filename
+) {
+    try {
+        await directoryHandle.getFileHandle(filename);
+        return true;
+    } catch (error) {
+        if (error.name === "NotFoundError") {
+            return false;
+        }
+
+        throw error;
+    }
+}
+
+/* =========================================================
+   file_names.txt synchronization
+   ========================================================= */
+
+async function writeCurrentPngNamesToTxt() {
+    if (!state.projectHandle) {
+        return false;
+    }
+
+    /*
+     * Always scan the actual directory immediately before
+     * writing file_names.txt. The filesystem remains the
+     * source of truth.
+     */
+    await scanGrade10Pictures();
+
+    const names = getCurrentPngNames();
+
+    const duplicateMap =
+        uniqueLowercaseNames(names);
+
+    const duplicates =
+        [...duplicateMap.entries()]
+            .filter(([, values]) => values.length > 1);
+
+    if (duplicates.length) {
+        showStatus(
+            "Cannot update file_names.txt because duplicate PNG filenames exist.",
+            "error"
+        );
+
+        return false;
+    }
+
+    const content = names.length
+        ? names.join("\n") + "\n"
+        : "";
+
+    const fileHandle =
+        await state.projectHandle.getFileHandle(
+            "file_names.txt",
+            { create: true }
+        );
+
+    const writable =
+        await fileHandle.createWritable();
+
+    await writable.write(content);
+    await writable.close();
+
+    /*
+     * Verify that the file was actually written with the
+     * expected current filenames.
+     */
+    const verificationFile =
+        await fileHandle.getFile();
+
+    const verificationText =
+        await verificationFile.text();
+
+    const verificationEntries =
+        verificationText
+            .split(/\r?\n/)
+            .map(line => normalizeFilename(line))
+            .filter(Boolean);
+
+    if (!arraysEqual(
+        verificationEntries,
+        names
+    )) {
+        throw new Error(
+            "file_names.txt verification failed after writing."
+        );
+    }
+
+    state.txtEntries =
+        verificationEntries;
+
+    updateStatusCounters();
+
+    return true;
+}
+
+function showGradeDropZoneState(
+    grade,
+    type
+) {
+    const zone =
+        gradeDropZones.find(
+            candidate =>
+                candidate.dataset.grade === grade
+        );
+
+    if (!zone) {
+        return;
+    }
+
+    zone.classList.remove(
+        "success-state",
+        "error-state"
+    );
+
+    zone.classList.add(
+        type === "success"
+            ? "success-state"
+            : "error-state"
+    );
+
+    window.setTimeout(() => {
+        zone.classList.remove(
+            "success-state",
+            "error-state"
+        );
+    }, 900);
+}
+
+/* =========================================================
+   Synchronization
+   ========================================================= */
+
+async function synchronize() {
+    if (!state.projectHandle) {
+        return;
+    }
+
+    const comparison = compareFileLists();
+
+    const added = comparison.missingFromTxt;
+    const removed = comparison.missingPng;
+
+    if (!added.length && !removed.length) {
+        showStatus(
+            "The PNG folder and file_names.txt are already synchronized.",
+            "success"
+        );
+
+        return;
+    }
+
+    let details =
+        "Synchronization will replace the contents of file_names.txt with the actual PNG filenames.\n\n";
+
+    if (added.length) {
+        details +=
+            `PNG files to add: ${added.length}\n` +
+            added.map(name => `  + ${name}`).join("\n") +
+            "\n\n";
+    }
+
+    if (removed.length) {
+        details +=
+            `TXT entries to remove: ${removed.length}\n` +
+            removed.map(name => `  - ${name}`).join("\n") +
+            "\n\n";
+    }
+
+    details += "Continue?";
+
+    const confirmed =
+        window.confirm(details);
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+        document.body.classList.add("loading");
+
+        const saved =
+            await writeCurrentPngNamesToTxt();
+
+        if (saved) {
+            await refresh();
+
+            showStatus(
+                "Synchronization completed. file_names.txt now matches the actual PNG files.",
+                "success"
+            );
+        }
+
+    } catch (error) {
+        console.error(error);
+
+        showStatus(
+            `Synchronization failed: ${error.message}`,
+            "error"
+        );
+
+    } finally {
+        document.body.classList.remove("loading");
+    }
+}
+
+/* =========================================================
+   Fallback
+   ========================================================= */
+
+async function handleFallbackPngSelection(event) {
+    state.fallbackPngFiles =
+        [...event.target.files].filter(
+            file => /\.png$/i.test(file.name)
+        );
+
+    updateFallbackState();
+}
+
+async function handleFallbackTxtSelection(event) {
+    const file = event.target.files[0];
+
+    if (!file) {
+        state.fallbackTxtEntries = [];
+        updateFallbackState();
+        return;
+    }
+
+    try {
+        const text = await file.text();
+
+        state.fallbackTxtEntries = text
+            .split(/\r?\n/)
+            .map(line => line.trim())
+            .filter(Boolean);
+
+        updateFallbackState();
+
+    } catch (error) {
+        showStatus(
+            `Could not read file_names.txt: ${error.message}`,
+            "error"
+        );
+    }
+}
+
+function updateFallbackState() {
+    fallbackDownloadBtn.disabled =
+        state.fallbackPngFiles.length === 0;
+
+    if (!state.fallbackPngFiles.length) {
+        return;
+    }
+
+    const names =
+        state.fallbackPngFiles.map(
+            file => file.name
+        );
+
+    pngCount.textContent = names.length;
+
+    txtCount.textContent =
+        state.fallbackTxtEntries.length;
+
+    const pngSet =
+        new Set(
+            names.map(
+                name => name.toLowerCase()
+            )
+        );
+
+    const txtSet =
+        new Set(
+            state.fallbackTxtEntries.map(
+                name => name.toLowerCase()
+            )
+        );
+
+    const missingTxt =
+        names.filter(
+            name =>
+                !txtSet.has(
+                    name.toLowerCase()
+                )
+        );
+
+    const missingPng =
+        state.fallbackTxtEntries.filter(
+            name =>
+                !pngSet.has(
+                    name.toLowerCase()
+                )
+        );
+
+    missingTxtCount.textContent =
+        missingTxt.length;
+
+    missingPngCount.textContent =
+        missingPng.length;
+}
+
+function downloadFallbackTxt() {
+    const names =
+        state.fallbackPngFiles
+            .map(file => file.name)
+            .sort((a, b) =>
+                a.localeCompare(
+                    b,
+                    undefined,
+                    {
+                        sensitivity: "base"
+                    }
+                )
+            );
+
+    if (!names.length) {
+        return;
+    }
+
+    const blob =
+        new Blob(
+            [
+                names.join("\n") + "\n"
+            ],
+            {
+                type: "text/plain;charset=utf-8"
+            }
+        );
+
+    const url =
+        URL.createObjectURL(blob);
+
+    const link =
+        document.createElement("a");
+
+    link.href = url;
+    link.download = "file_names.txt";
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(url);
+
+    showStatus(
+        "Updated file_names.txt generated for download. The PNG files were not renamed.",
+        "success"
+    );
+}
+
+/* =========================================================
+   Event listeners
+   ========================================================= */
+
+selectFolderBtn.addEventListener(
+    "click",
+    selectProjectFolder
+);
+
+syncBtn.addEventListener(
+    "click",
+    synchronize
+);
+
+saveTxtBtn.addEventListener(
+    "click",
+    async () => {
+        const confirmed =
+            window.confirm(
+                "Save file_names.txt using the current actual PNG filenames?"
+            );
+
+        if (confirmed) {
+            await saveFileNames();
+        }
+    }
+);
+
+gradeAssigningBtn.addEventListener(
+    "click",
+    () => {
+        if (state.gradeAssigningMode) {
+            exitGradeAssigningMode();
+        } else {
+            enterGradeAssigningMode();
+        }
+    }
+);
+
+closeGradeAssigningBtn.addEventListener(
+    "click",
+    exitGradeAssigningMode
+);
+
+searchInput.addEventListener(
+    "input",
+    renderStudents
+);
+
+sortSelect.addEventListener(
+    "change",
+    renderStudents
+);
+
+fallbackPngInput.addEventListener(
+    "change",
+    handleFallbackPngSelection
+);
+
+fallbackTxtInput.addEventListener(
+    "change",
+    handleFallbackTxtSelection
+);
+
+fallbackDownloadBtn.addEventListener(
+    "click",
+    downloadFallbackTxt
+);
+
+/* =========================================================
+   Grade drop-zone event listeners
+   ========================================================= */
+
+gradeDropZones.forEach(zone => {
+    zone.addEventListener(
+        "dragover",
+        handleGradeDragOver
+    );
+
+    zone.addEventListener(
+        "dragenter",
+        handleGradeDragEnter
+    );
+
+    zone.addEventListener(
+        "dragleave",
+        handleGradeDragLeave
+    );
+
+    zone.addEventListener(
+        "drop",
+        handleGradeDrop
+    );
+});
+
+/* =========================================================
+   Startup
+   ========================================================= */
+
+if (!("showDirectoryPicker" in window)) {
+    fallbackPanel.classList.add("visible");
+
+    showStatus(
+        "Full folder access requires a Chromium-based browser such as Chrome or Edge.",
+        "warning"
+    );
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Picture Manager</title>
+
+<style>
+    :root {
+        --navy: #2e4057;
+        --blue: #1b52a0;
+        --teal: #10867c;
+        --green: #198754;
+        --red: #c0392b;
+        --orange: #d97706;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-500: #64748b;
+        --gray-700: #334155;
+        --gray-900: #0f172a;
+        --radius: 10px;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--gray-100);
+        color: var(--gray-900);
+    }
+
+    header {
+        background: var(--navy);
+        color: white;
+        padding: 20px 28px;
+    }
+
+    header h1 {
+        margin: 0 0 5px;
+        font-size: 24px;
+    }
+
+    header p {
+        margin: 0;
+        opacity: 0.85;
+        font-size: 14px;
+    }
+
+    main {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .toolbar,
+    .status-panel,
+    .group-filter-panel,
+    .fallback-panel {
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius);
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .toolbar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    button,
+    input,
+    select {
+        font: inherit;
+    }
+
+    button {
+        border: 0;
+        border-radius: 7px;
+        padding: 9px 14px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .primary {
+        background: var(--blue);
+        color: white;
+    }
+
+    .secondary {
+        background: var(--gray-200);
+        color: var(--gray-900);
+    }
+
+    .success {
+        background: var(--teal);
+        color: white;
+    }
+
+    .danger {
+        background: var(--red);
+        color: white;
+    }
+
+    .toolbar input[type="search"] {
+        min-width: 240px;
+        flex: 1;
+        max-width: 400px;
+    }
+
+    input,
+    select {
+        border: 1px solid var(--gray-300);
+        border-radius: 7px;
+        padding: 9px 10px;
+        background: white;
+    }
+
+    .status-panel {
+        position: relative;
+    }
+
+    .status-title {
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .status-toggle {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        border-radius: 5px;
+        background: transparent;
+        color: var(--gray-700);
+        font-size: 18px;
+        line-height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .status-toggle:hover {
+        background: var(--gray-100);
+    }
+
+    .status-content {
+        display: block;
+    }
+
+    .status-panel.collapsed .status-content {
+        display: none;
+    }
+
+    .status-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(160px, 1fr));
+        gap: 10px;
+    }
+
+    .status-item {
+        border-radius: 8px;
+        padding: 12px;
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+    }
+
+    .status-item .number {
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .status-item .label {
+        color: var(--gray-500);
+        font-size: 13px;
+        margin-top: 3px;
+    }
+
+    .status-item.problem {
+        border-color: #f0b27a;
+        background: #fff8ed;
+    }
+
+    .status-message {
+        margin-top: 12px;
+        padding: 10px 12px;
+        border-radius: 7px;
+        display: none;
+        font-size: 14px;
+    }
+
+    .status-message.visible {
+        display: block;
+    }
+
+    .status-message.info {
+        background: #eef5ff;
+        color: #174a8b;
+    }
+
+    .status-message.success {
+        background: #edf9f3;
+        color: #17633f;
+    }
+
+    .status-message.error {
+        background: #fff0ef;
+        color: #8f2117;
+    }
+
+    .status-message.warning {
+        background: #fff8e8;
+        color: #8a5700;
+    }
+
+    .folder-info {
+        color: var(--gray-500);
+        font-size: 13px;
+        margin-top: 8px;
+        word-break: break-all;
+    }
+
+    .group-filter-panel {
+        padding: 16px;
+    }
+
+    .group-filter-title {
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .group-filters {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .group-card {
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+        border-radius: 8px;
+        min-height: 54px;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        user-select: none;
+        transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    .group-card:hover {
+        border-color: var(--gray-300);
+        background: var(--gray-100);
+    }
+
+    .group-card.selected {
+        background: var(--blue);
+        border-color: var(--blue);
+        color: white;
+    }
+
+    .group-card input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .group-card-label {
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 16px;
+    }
+
+    .card {
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card.problem {
+        border-color: #e5a55b;
+    }
+
+    .picture-container {
+        height: 250px;
+        background: var(--gray-100);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .picture-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .picture-placeholder {
+        color: var(--gray-500);
+        font-size: 13px;
+    }
+
+    .card-content {
+        padding: 14px;
+    }
+
+    .student-name {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .current-filename {
+        color: var(--gray-500);
+        font-size: 12px;
+        word-break: break-all;
+        margin-bottom: 12px;
+    }
+
+    .filename-input {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+
+    .card-actions {
+        display: flex;
+        gap: 7px;
+    }
+
+    .card-actions button {
+        flex: 1;
+    }
+
+    .problem-label {
+        display: inline-block;
+        background: #fff0d9;
+        color: #8a5700;
+        border-radius: 5px;
+        padding: 4px 7px;
+        font-size: 11px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .empty {
+        background: white;
+        border: 1px dashed var(--gray-300);
+        border-radius: var(--radius);
+        padding: 40px;
+        text-align: center;
+        color: var(--gray-500);
+    }
+
+    .fallback-panel {
+        display: none;
+    }
+
+    .fallback-panel.visible {
+        display: block;
+    }
+
+    .fallback-files {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .fallback-note {
+        color: var(--gray-500);
+        font-size: 13px;
+        margin-top: 10px;
+        line-height: 1.5;
+    }
+
+    .loading {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    @media (max-width: 800px) {
+        .status-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .group-filters {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .toolbar input[type="search"] {
+            max-width: none;
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 500px) {
+        .status-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .group-filters {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+
+</head>
+
+<body>
+
+<header>
+    <h1>Student Picture Manager</h1>
+    <p>Manage PNG filenames and synchronize them with file_names.txt</p>
+</header>
+
+<main>
+
+<section class="toolbar">
+    <button id="selectFolderBtn" class="primary">
+        Select Project Folder
+    </button>
+
+    <button id="syncBtn" class="success" disabled>
+        Synchronize
+    </button>
+
+    <button id="saveTxtBtn" class="secondary" disabled>
+        Save file_names.txt
+    </button>
+
+    <input
+        id="searchInput"
+        type="search"
+        placeholder="Search students or filenames..."
+        disabled
+    >
+
+    <select id="sortSelect" disabled>
+        <option value="az">A–Z</option>
+        <option value="za">Z–A</option>
+    </select>
+</section>
+
+<section class="status-panel" id="statusPanel">
+    <div class="status-title">Project Status</div>
+
+    <button
+        id="statusToggle"
+        class="status-toggle"
+        type="button"
+        aria-label="Collapse Project Status"
+        aria-expanded="true"
+    >▼</button>
+
+    <div class="status-content">
+        <div class="status-grid">
+            <div class="status-item">
+                <div id="pngCount" class="number">0</div>
+                <div class="label">PNG files found</div>
+            </div>
+
+            <div class="status-item">
+                <div id="txtCount" class="number">0</div>
+                <div class="label">file_names.txt entries</div>
+            </div>
+
+            <div id="missingTxtItem" class="status-item problem">
+                <div id="missingTxtCount" class="number">0</div>
+                <div class="label">PNG files missing from TXT</div>
+            </div>
+
+            <div id="missingPngItem" class="status-item problem">
+                <div id="missingPngCount" class="number">0</div>
+                <div class="label">TXT entries without PNG</div>
+            </div>
+        </div>
+
+        <div id="folderInfo" class="folder-info">
+            No project folder selected.
+        </div>
+
+        <div id="statusMessage" class="status-message"></div>
+    </div>
+</section>
+
+<section class="group-filter-panel">
+    <div class="group-filter-title">Groups</div>
+
+    <div class="group-filters">
+        <label class="group-card" data-group="A">
+            <input type="checkbox" value="A">
+            <span class="group-card-label">A</span>
+        </label>
+
+        <label class="group-card" data-group="B">
+            <input type="checkbox" value="B">
+            <span class="group-card-label">B</span>
+        </label>
+
+        <label class="group-card" data-group="C">
+            <input type="checkbox" value="C">
+            <span class="group-card-label">C</span>
+        </label>
+
+        <label class="group-card" data-group="D">
+            <input type="checkbox" value="D">
+            <span class="group-card-label">D</span>
+        </label>
+
+        <label class="group-card" data-group="E">
+            <input type="checkbox" value="E">
+            <span class="group-card-label">E</span>
+        </label>
+    </div>
+</section>
+
+<section id="fallbackPanel" class="fallback-panel">
+    <strong>File System Access API unavailable</strong>
+
+    <p>
+        Your browser cannot directly access and rename files in a local
+        folder. Use a Chromium-based browser such as Google Chrome or
+        Microsoft Edge for full functionality.
+    </p>
+
+    <div class="fallback-files">
+        <label>
+            Select PNG files:
+            <input id="fallbackPngInput" type="file" accept=".png,image/png" multiple>
+        </label>
+
+        <label>
+            Select file_names.txt:
+            <input id="fallbackTxtInput" type="file" accept=".txt">
+        </label>
+
+        <button id="fallbackDownloadBtn" class="secondary" disabled>
+            Download Updated file_names.txt
+        </button>
+    </div>
+
+    <div class="fallback-note">
+        The fallback can read selected files and generate an updated
+        file_names.txt, but it cannot rename PNG files automatically.
+    </div>
+</section>
+
+<section id="cards" class="cards">
+    <div class="empty">
+        Select the project folder to begin.
+    </div>
+</section>
+
+</main>
+
+<script>
+"use strict";
+
+/* =========================================================
+   State
+   ========================================================= */
+
+const state = {
+    projectHandle: null,
+    picturesHandle: null,
+    pngFiles: [],
+    txtEntries: [],
+    fallbackPngFiles: [],
+    fallbackTxtEntries: [],
+    imageUrls: [],
+    selectedGroups: new Set()
+};
+
+/* =========================================================
+   DOM
+   ========================================================= */
+
+const selectFolderBtn = document.getElementById("selectFolderBtn");
+const syncBtn = document.getElementById("syncBtn");
+const saveTxtBtn = document.getElementById("saveTxtBtn");
+const searchInput = document.getElementById("searchInput");
+const sortSelect = document.getElementById("sortSelect");
+
+const statusPanel = document.getElementById("statusPanel");
+const statusToggle = document.getElementById("statusToggle");
+
+const cardsContainer = document.getElementById("cards");
+
+const pngCount = document.getElementById("pngCount");
+const txtCount = document.getElementById("txtCount");
+const missingTxtCount = document.getElementById("missingTxtCount");
+const missingPngCount = document.getElementById("missingPngCount");
+
+const missingTxtItem = document.getElementById("missingTxtItem");
+const missingPngItem = document.getElementById("missingPngItem");
+
+const folderInfo = document.getElementById("folderInfo");
+const statusMessage = document.getElementById("statusMessage");
+
+const fallbackPanel = document.getElementById("fallbackPanel");
+const fallbackPngInput = document.getElementById("fallbackPngInput");
+const fallbackTxtInput = document.getElementById("fallbackTxtInput");
+const fallbackDownloadBtn = document.getElementById("fallbackDownloadBtn");
+
+const groupCards = document.querySelectorAll(".group-card");
+
+/* =========================================================
+   Project Status collapse
+   ========================================================= */
+
+statusToggle.addEventListener("click", () => {
+    const collapsed =
+        statusPanel.classList.toggle("collapsed");
+
+    statusToggle.setAttribute(
+        "aria-expanded",
+        String(!collapsed)
+    );
+
+    statusToggle.setAttribute(
+        "aria-label",
+        collapsed
+            ? "Expand Project Status"
+            : "Collapse Project Status"
+    );
+});
+
+/* =========================================================
+   Group filtering
+   ========================================================= */
+
+function getStudentGroup(filename) {
+    const match = filename.match(/^([A-E])-/i);
+    return match ? match[1].toUpperCase() : null;
+}
+
+function updateGroupCardStates() {
+    groupCards.forEach(card => {
+        const group = card.dataset.group;
+        const checkbox = card.querySelector("input");
+
+        const selected = state.selectedGroups.has(group);
+
+        checkbox.checked = selected;
+        card.classList.toggle("selected", selected);
+    });
+}
+
+groupCards.forEach(card => {
+    card.addEventListener("click", () => {
+        const group = card.dataset.group;
+
+        if (state.selectedGroups.has(group)) {
+            state.selectedGroups.delete(group);
+        } else {
+            state.selectedGroups.add(group);
+        }
+
+        updateGroupCardStates();
+        renderStudents();
+    });
+});
+
+/* =========================================================
+   Utility functions
+   ========================================================= */
+
+function showStatus(message, type = "info") {
+    statusMessage.textContent = message;
+    statusMessage.className = `status-message visible ${type}`;
+}
+
+function clearStatus() {
+    statusMessage.textContent = "";
+    statusMessage.className = "status-message";
+}
+
+function normalizeFilename(name) {
+    return name.trim();
+}
+
+function humanizeFilename(filename) {
+    return filename
+        .replace(/\.png$/i, "")
+        .replace(/_/g, " ")
+        .trim()
+        .replace(/\s+/g, " ")
+        .replace(/\b\w/g, char => char.toUpperCase());
+}
+
+function isValidPngFilename(filename) {
+    if (!filename) {
+        return false;
+    }
+
+    if (filename !== filename.trim()) {
+        return false;
+    }
+
+    if (/\s{2,}/.test(filename)) {
+        return false;
+    }
+
+    if (!/\.png$/i.test(filename)) {
+        return false;
+    }
+
+    if (/[<>:"/\\|?*]/.test(filename)) {
+        return false;
+    }
+
+    if (filename === "." || filename === "..") {
+        return false;
+    }
+
+    return true;
+}
+
+function uniqueLowercaseNames(names) {
+    const map = new Map();
+
+    for (const name of names) {
+        const key = name.toLowerCase();
+
+        if (!map.has(key)) {
+            map.set(key, []);
+        }
+
+        map.get(key).push(name);
+    }
+
+    return map;
+}
+
+function getCurrentPngNames() {
+    return state.pngFiles.map(file => file.name);
+}
+
+function arraysEqual(a, b) {
+    if (a.length !== b.length) {
+        return false;
+    }
+
+    const x = [...a].sort((a, b) => a.localeCompare(b));
+    const y = [...b].sort((a, b) => a.localeCompare(b));
+
+    return x.every((value, index) => value === y[index]);
+}
+
+/* =========================================================
+   File System Access API
+   ========================================================= */
+
+async function selectProjectFolder() {
+    if (!("showDirectoryPicker" in window)) {
+        fallbackPanel.classList.add("visible");
+        showStatus(
+            "File System Access API is not available. Use Chrome or Edge for full functionality.",
+            "warning"
+        );
+        return;
+    }
+
+    try {
+        const handle = await window.showDirectoryPicker({
+            mode: "readwrite"
+        });
+
+        state.projectHandle = handle;
+
+        await loadProject();
+
+    } catch (error) {
+        if (error.name === "AbortError") {
+            return;
+        }
+
+        console.error(error);
+        showStatus(
+            `Could not open the project folder: ${error.message}`,
+            "error"
+        );
+    }
+}
+
+async function loadProject() {
+    if (!state.projectHandle) {
+        return;
+    }
+
+    try {
+        document.body.classList.add("loading");
+
+        state.picturesHandle =
+            await state.projectHandle.getDirectoryHandle(
+                "grade10Pictures"
+            );
+
+        await refresh();
+
+        folderInfo.textContent =
+            `Project folder: ${state.projectHandle.name}/grade10Pictures`;
+
+        syncBtn.disabled = false;
+        saveTxtBtn.disabled = false;
+        searchInput.disabled = false;
+        sortSelect.disabled = false;
+
+        showStatus("Project loaded successfully.", "success");
+
+    } catch (error) {
+        console.error(error);
+
+        if (error.name === "NotFoundError") {
+            showStatus(
+                "The selected folder does not contain a grade10Pictures folder.",
+                "error"
+            );
+        } else {
+            showStatus(
+                `Could not load the project: ${error.message}`,
+                "error"
+            );
+        }
+    } finally {
+        document.body.classList.remove("loading");
+    }
+}
+
+async function loadFileNames() {
+    state.txtEntries = [];
+
+    try {
+        const fileHandle =
+            await state.projectHandle.getFileHandle("file_names.txt");
+
+        const file = await fileHandle.getFile();
+        const text = await file.text();
+
+        state.txtEntries = text
+            .split(/\r?\n/)
+            .map(line => normalizeFilename(line))
+            .filter(Boolean);
+
+    } catch (error) {
+        if (error.name === "NotFoundError") {
+            state.txtEntries = [];
+            showStatus(
+                "file_names.txt does not exist. It can be created with Save file_names.txt.",
+                "warning"
+            );
+        } else {
+            throw error;
+        }
+    }
+}
+
+async function scanGrade10Pictures() {
+    state.pngFiles = [];
+
+    for await (const [name, handle] of state.picturesHandle.entries()) {
+        if (
+            handle.kind === "file" &&
+            /\.png$/i.test(name)
+        ) {
+            state.pngFiles.push({
+                name,
+                handle
+            });
+        }
+    }
+
+    state.pngFiles.sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, {
+            sensitivity: "base"
+        })
+    );
+}
+
+async function saveFileNames() {
+    if (!state.projectHandle) {
+        return;
+    }
+
+    const names = getCurrentPngNames();
+
+    const duplicateMap = uniqueLowercaseNames(names);
+    const duplicates = [...duplicateMap.entries()]
+        .filter(([, values]) => values.length > 1);
+
+    if (duplicates.length) {
+        showStatus(
+            "Cannot save because duplicate filenames exist.",
+            "error"
+        );
+        return;
+    }
+
+    const content = names.length
+        ? names.join("\n") + "\n"
+        : "";
+
+    try {
+        const fileHandle =
+            await state.projectHandle.getFileHandle(
+                "file_names.txt",
+                { create: true }
+            );
+
+        const writable = await fileHandle.createWritable();
+
+        await writable.write(content);
+        await writable.close();
+
+        await refresh();
+
+        showStatus(
+            "file_names.txt saved successfully.",
+            "success"
+        );
+
+    } catch (error) {
+        console.error(error);
+        showStatus(
+            `Could not save file_names.txt: ${error.message}`,
+            "error"
+        );
+    }
+}
+
+/* =========================================================
+   Comparison
+   ========================================================= */
+
+function compareFileLists() {
+    const pngNames = getCurrentPngNames();
+
+    const pngSet = new Set(
+        pngNames.map(name => name.toLowerCase())
+    );
+
+    const txtSet = new Set(
+        state.txtEntries.map(name => name.toLowerCase())
+    );
+
+    const missingFromTxt = pngNames.filter(
+        name => !txtSet.has(name.toLowerCase())
+    );
+
+    const missingPng = state.txtEntries.filter(
+        name => !pngSet.has(name.toLowerCase())
+    );
+
+    return {
+        missingFromTxt,
+        missingPng
+    };
+}
+
+/* =========================================================
+   Refresh
+   ========================================================= */
+
+async function refresh() {
+    if (!state.projectHandle || !state.picturesHandle) {
+        return;
+    }
+
+    await loadFileNames();
+    await scanGrade10Pictures();
+
+    updateStatusCounters();
+    renderStudents();
+}
+
+function updateStatusCounters() {
+    const comparison = compareFileLists();
+
+    pngCount.textContent = state.pngFiles.length;
+    txtCount.textContent = state.txtEntries.length;
+    missingTxtCount.textContent = comparison.missingFromTxt.length;
+    missingPngCount.textContent = comparison.missingPng.length;
+
+    missingTxtItem.classList.toggle(
+        "problem",
+        comparison.missingFromTxt.length > 0
+    );
+
+    missingPngItem.classList.toggle(
+        "problem",
+        comparison.missingPng.length > 0
+    );
+}
+
+/* =========================================================
+   Rendering
+   ========================================================= */
+
+function renderStudents() {
+    state.imageUrls.forEach(url => URL.revokeObjectURL(url));
+    state.imageUrls = [];
+
+    const searchTerm =
+        searchInput.value.trim().toLowerCase();
+
+    const sortDirection = sortSelect.value;
+
+    const files = [...state.pngFiles];
+
+    files.sort((a, b) => {
+        const comparison = humanizeFilename(a.name)
+            .localeCompare(
+                humanizeFilename(b.name),
+                undefined,
+                { sensitivity: "base" }
+            );
+
+        return sortDirection === "az"
+            ? comparison
+            : -comparison;
+    });
+
+    const filtered = files.filter(file => {
+        const group = getStudentGroup(file.name);
+
+        if (
+            state.selectedGroups.size > 0 &&
+            !state.selectedGroups.has(group)
+        ) {
+            return false;
+        }
+
+        if (!searchTerm) {
+            return true;
+        }
+
+        return (
+            file.name.toLowerCase().includes(searchTerm) ||
+            humanizeFilename(file.name)
+                .toLowerCase()
+                .includes(searchTerm)
+        );
+    });
+
+    cardsContainer.innerHTML = "";
+
+    if (!filtered.length) {
+        cardsContainer.innerHTML = `
+            <div class="empty">
+                No matching PNG files found.
+            </div>
+        `;
+        return;
+    }
+
+    const comparison = compareFileLists();
+
+    const missingFromTxtSet = new Set(
+        comparison.missingFromTxt.map(name => name.toLowerCase())
+    );
+
+    for (const file of filtered) {
+        const card = document.createElement("article");
+        card.className = "card";
+
+        const isSyncProblem =
+            missingFromTxtSet.has(file.name.toLowerCase());
+
+        if (isSyncProblem) {
+            card.classList.add("problem");
+        }
+
+        const pictureContainer =
+            document.createElement("div");
+
+        pictureContainer.className = "picture-container";
+
+        const img = document.createElement("img");
+        img.alt = humanizeFilename(file.name);
+        img.loading = "lazy";
+
+        const content =
+            document.createElement("div");
+
+        content.className = "card-content";
+
+        if (isSyncProblem) {
+            const problem = document.createElement("div");
+            problem.className = "problem-label";
+            problem.textContent = "NOT IN file_names.txt";
+            content.appendChild(problem);
+        }
+
+        const studentName =
+            document.createElement("div");
+
+        studentName.className = "student-name";
+        studentName.textContent =
+            humanizeFilename(file.name);
+
+        const currentFilename =
+            document.createElement("div");
+
+        currentFilename.className = "current-filename";
+        currentFilename.textContent =
+            `Current: ${file.name}`;
+
+        const input =
+            document.createElement("input");
+
+        input.className = "filename-input";
+        input.type = "text";
+        input.value = file.name;
+        input.setAttribute(
+            "aria-label",
+            `Filename for ${humanizeFilename(file.name)}`
+        );
+
+        const actions =
+            document.createElement("div");
+
+        actions.className = "card-actions";
+
+        const renameButton =
+            document.createElement("button");
+
+        renameButton.className = "primary";
+        renameButton.textContent = "Save / Rename";
+
+        renameButton.addEventListener(
+            "click",
+            () => renameStudentFile(file, input.value)
+        );
+
+        actions.appendChild(renameButton);
+
+        content.appendChild(studentName);
+        content.appendChild(currentFilename);
+        content.appendChild(input);
+        content.appendChild(actions);
+
+        card.appendChild(pictureContainer);
+        card.appendChild(content);
+
+        cardsContainer.appendChild(card);
+
+        createImagePreview(file.handle, img, pictureContainer);
+    }
+}
+
+async function createImagePreview(
+    fileHandle,
+    img,
+    container
+) {
+    try {
+        const file = await fileHandle.getFile();
+        const url = URL.createObjectURL(file);
+
+        state.imageUrls.push(url);
+
+        img.src = url;
+
+        container.appendChild(img);
+
+    } catch (error) {
+        const placeholder =
+            document.createElement("div");
+
+        placeholder.className =
+            "picture-placeholder";
+
+        placeholder.textContent =
+            "Could not load image.";
+
+        container.appendChild(placeholder);
+    }
+}
+
+/* =========================================================
+   Rename
+   ========================================================= */
+
+async function renameStudentFile(file, requestedName) {
+    const newName = normalizeFilename(requestedName);
+    const oldName = file.name;
+
+    if (newName === oldName) {
+        showStatus(
+            "No filename change was requested.",
+            "info"
+        );
+        return;
+    }
+
+    if (!isValidPngFilename(newName)) {
+        showStatus(
+            "Invalid filename. Use a .png filename without < > : \" / \\ | ? * or unnecessary whitespace.",
+            "error"
+        );
+        return;
+    }
+
+    const existing = state.pngFiles.find(
+        candidate =>
+            candidate.name.toLowerCase() ===
+            newName.toLowerCase() &&
+            candidate.name !== oldName
+    );
+
+    if (existing) {
+        showStatus(
+            `Cannot rename: "${newName}" already exists.`,
+            "error"
+        );
+        return;
+    }
+
+    const confirmed = window.confirm(
+        `Rename "${oldName}" to "${newName}"?\n\nThis will modify the actual file in grade10Pictures.`
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+        document.body.classList.add("loading");
+
+        const sourceFile =
+            await file.handle.getFile();
+
+        const newHandle =
+            await state.picturesHandle.getFileHandle(
+                newName,
+                { create: true }
+            );
+
+        const writable =
+            await newHandle.createWritable();
+
+        await writable.write(sourceFile);
+        await writable.close();
+
+        await state.picturesHandle.removeEntry(oldName);
+
+        await refresh();
+
+        showStatus(
+            `"${oldName}" renamed to "${newName}".`,
+            "success"
+        );
+
+    } catch (error) {
+        console.error(error);
+
+        showStatus(
+            `Rename failed. The original file was not intentionally removed. ${error.message}`,
+            "error"
+        );
+
+        await refresh();
+
+    } finally {
+        document.body.classList.remove("loading");
+    }
+}
+
+/* =========================================================
+   Synchronization
+   ========================================================= */
+
+async function synchronize() {
+    if (!state.projectHandle) {
+        return;
+    }
+
+    const comparison = compareFileLists();
+
+    const added = comparison.missingFromTxt;
+    const removed = comparison.missingPng;
+
+    if (!added.length && !removed.length) {
+        showStatus(
+            "The PNG folder and file_names.txt are already synchronized.",
+            "success"
+        );
+        return;
+    }
+
+    let details = "Synchronization will replace the contents of file_names.txt with the actual PNG filenames.\n\n";
+
+    if (added.length) {
+        details +=
+            `PNG files to add: ${added.length}\n` +
+            added.map(name => `  + ${name}`).join("\n") +
+            "\n\n";
+    }
+
+    if (removed.length) {
+        details +=
+            `TXT entries to remove: ${removed.length}\n` +
+            removed.map(name => `  - ${name}`).join("\n") +
+            "\n\n";
+    }
+
+    details += "Continue?";
+
+    const confirmed = window.confirm(details);
+
+    if (!confirmed) {
+        return;
+    }
+
+    try {
+        document.body.classList.add("loading");
+
+        const names = getCurrentPngNames();
+
+        const fileHandle =
+            await state.projectHandle.getFileHandle(
+                "file_names.txt",
+                { create: true }
+            );
+
+        const writable =
+            await fileHandle.createWritable();
+
+        await writable.write(
+            names.length
+                ? names.join("\n") + "\n"
+                : ""
+        );
+
+        await writable.close();
+
+        await refresh();
+
+        showStatus(
+            "Synchronization completed. file_names.txt now matches the actual PNG files.",
+            "success"
+        );
+
+    } catch (error) {
+        console.error(error);
+
+        showStatus(
+            `Synchronization failed: ${error.message}`,
+            "error"
+        );
+
+    } finally {
+        document.body.classList.remove("loading");
+    }
+}
+
+/* =========================================================
+   Fallback
+   ========================================================= */
+
+async function handleFallbackPngSelection(event) {
+    state.fallbackPngFiles =
+        [...event.target.files].filter(
+            file => /\.png$/i.test(file.name)
+        );
+
+    updateFallbackState();
+}
+
+async function handleFallbackTxtSelection(event) {
+    const file = event.target.files[0];
+
+    if (!file) {
+        state.fallbackTxtEntries = [];
+        updateFallbackState();
+        return;
+    }
+
+    try {
+        const text = await file.text();
+
+        state.fallbackTxtEntries = text
+            .split(/\r?\n/)
+            .map(line => line.trim())
+            .filter(Boolean);
+
+        updateFallbackState();
+
+    } catch (error) {
+        showStatus(
+            `Could not read file_names.txt: ${error.message}`,
+            "error"
+        );
+    }
+}
+
+function updateFallbackState() {
+    fallbackDownloadBtn.disabled =
+        state.fallbackPngFiles.length === 0;
+
+    if (!state.fallbackPngFiles.length) {
+        return;
+    }
+
+    const names =
+        state.fallbackPngFiles.map(file => file.name);
+
+    pngCount.textContent = names.length;
+    txtCount.textContent =
+        state.fallbackTxtEntries.length;
+
+    const pngSet =
+        new Set(names.map(name => name.toLowerCase()));
+
+    const txtSet =
+        new Set(
+            state.fallbackTxtEntries.map(
+                name => name.toLowerCase()
+            )
+        );
+
+    const missingTxt =
+        names.filter(
+            name => !txtSet.has(name.toLowerCase())
+        );
+
+    const missingPng =
+        state.fallbackTxtEntries.filter(
+            name => !pngSet.has(name.toLowerCase())
+        );
+
+    missingTxtCount.textContent =
+        missingTxt.length;
+
+    missingPngCount.textContent =
+        missingPng.length;
+}
+
+function downloadFallbackTxt() {
+    const names =
+        state.fallbackPngFiles
+            .map(file => file.name)
+            .sort((a, b) =>
+                a.localeCompare(b, undefined, {
+                    sensitivity: "base"
+                })
+            );
+
+    if (!names.length) {
+        return;
+    }
+
+    const blob =
+        new Blob(
+            [names.join("\n") + "\n"],
+            { type: "text/plain;charset=utf-8" }
+        );
+
+    const url =
+        URL.createObjectURL(blob);
+
+    const link =
+        document.createElement("a");
+
+    link.href = url;
+    link.download = "file_names.txt";
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(url);
+
+    showStatus(
+        "Updated file_names.txt generated for download. The PNG files were not renamed.",
+        "success"
+    );
+}
+
+/* =========================================================
+   Event listeners
+   ========================================================= */
+
+selectFolderBtn.addEventListener(
+    "click",
+    selectProjectFolder
+);
+
+syncBtn.addEventListener(
+    "click",
+    synchronize
+);
+
+saveTxtBtn.addEventListener(
+    "click",
+    async () => {
+        const confirmed = window.confirm(
+            "Save file_names.txt using the current actual PNG filenames?"
+        );
+
+        if (confirmed) {
+            await saveFileNames();
+        }
+    }
+);
+
+searchInput.addEventListener(
+    "input",
+    renderStudents
+);
+
+sortSelect.addEventListener(
+    "change",
+    renderStudents
+);
+
+fallbackPngInput.addEventListener(
+    "change",
+    handleFallbackPngSelection
+);
+
+fallbackTxtInput.addEventListener(
+    "change",
+    handleFallbackTxtSelection
+);
+
+fallbackDownloadBtn.addEventListener(
+    "click",
+    downloadFallbackTxt
+);
+
+/* =========================================================
+   Startup
+   ========================================================= */
+
+updateGroupCardStates();
+
+if (!("showDirectoryPicker" in window)) {
+    fallbackPanel.classList.add("visible");
+
+    showStatus(
+        "Full folder access requires a Chromium-based browser such as Chrome or Edge.",
+        "warning"
+    );
+}
+</script>
+
+</body>
+</html>
