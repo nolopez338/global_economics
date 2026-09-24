@@ -729,6 +729,7 @@
 
 </main>
 
+<script src="assets/js/student-name-matcher.js"></script>
 <script>
 "use strict";
 
@@ -1295,60 +1296,14 @@ async function createImagePreview(
    Practice Mode
    ========================================================= */
 
-/*
- * Practice Mode name parsing is intentionally separate from
- * humanizeFilename(). The filename format is:
- *
- * Group-name.png
- *
- * Therefore:
- *   A-Andrade Garcia Nicolas.png
- *
- * becomes:
- *   Andrade Garcia Nicolas
- *
- * Only complete whitespace-separated name components are
- * accepted as answers.
- */
-
-function normalizeNameForPractice(name) {
-    return name
-        .trim()
-        .replace(/\s+/g, " ")
-        .toLocaleLowerCase();
-}
-
 function getPracticeFullNameFromFilename(filename) {
-    return filename
-        .replace(/\.png$/i, "")
-        .replace(/^[A-E]-/i, "")
-        .replace(/_/g, " ")
-        .trim()
-        .replace(/\s+/g, " ");
-}
-
-function getPracticeNameTokens(filename) {
-    const fullName =
-        getPracticeFullNameFromFilename(filename);
-
-    return normalizeNameForPractice(fullName)
-        .split(" ")
-        .filter(Boolean);
+    return StudentNameMatcher.getFullName(filename);
 }
 
 function isPracticeAnswerCorrect(answer, filename) {
-    const normalizedAnswer =
-        normalizeNameForPractice(answer);
-
-    if (!normalizedAnswer) {
-        return false;
-    }
-
-    const nameTokens =
-        getPracticeNameTokens(filename);
-
-    return nameTokens.some(
-        nameToken => nameToken === normalizedAnswer
+    return StudentNameMatcher.isAnswerCorrect(
+        answer,
+        filename
     );
 }
 
@@ -1603,4 +1558,3 @@ if (!("showDirectoryPicker" in window)) {
 
 </body>
 </html>
-
