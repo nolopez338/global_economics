@@ -1,248 +1,431 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>5-bit Binary</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Binary</title>
   <style>
-    :root {
-      color-scheme: light;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
+    * { box-sizing: border-box; }
 
-    * {
-      box-sizing: border-box;
+    :root {
+      --cell-size: clamp(54px, 13vw, 112px);
+      --gap: clamp(8px, 2vw, 20px);
+      --ink: #111;
+      --bg: #f7f7f5;
     }
 
     body {
-      min-height: 100vh;
-      min-height: 100svh;
       margin: 0;
+      min-height: 100svh;
       display: grid;
       place-items: center;
-      color: #111;
-      background: #f7f7f5;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
     }
 
     main {
-      width: min(92vw, 720px);
+      width: min(94vw, 720px);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: clamp(1.5rem, 5vh, 3rem);
+      gap: clamp(22px, 4vh, 36px);
     }
 
-    output {
-      min-width: 2ch;
-      font-size: clamp(4rem, 13vw, 7rem);
+    #decimal {
+      width: min(5ch, 90vw);
+      padding: 0;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      outline: none;
+      background: transparent;
+      color: var(--ink);
+      text-align: center;
+      font: inherit;
+      font-size: clamp(3.5rem, 12vw, 7rem);
       font-weight: 700;
       line-height: 1;
-      text-align: center;
       font-variant-numeric: tabular-nums;
+      -moz-appearance: textfield;
+    }
+
+    #decimal::-webkit-outer-spin-button,
+    #decimal::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    #decimal:focus {
+      border-bottom-color: var(--ink);
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    #bitCount {
+      height: 32px;
+      min-width: 52px;
+      padding: 0 8px;
+      border: 2px solid var(--ink);
+      border-radius: 0;
+      background: white;
+      color: var(--ink);
+      font: inherit;
+      cursor: pointer;
+      outline: none;
     }
 
     .bits {
-      width: 100%;
-      display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: clamp(0.45rem, 2vw, 1.25rem);
+      display: flex;
+      gap: var(--gap);
+      justify-content: center;
+      max-width: 96vw;
     }
 
-    .place {
-      min-width: 0;
-      display: grid;
-      justify-items: center;
-      gap: 0.75rem;
+    .bits:has(.bit-column:nth-child(6)) {
+      --cell-size: clamp(38px, 9vw, 82px);
+      --gap: clamp(5px, 1.2vw, 12px);
+    }
+
+    .bit-column {
+      width: var(--cell-size);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
     }
 
     .bit {
-      width: 100%;
-      aspect-ratio: 1;
+      width: var(--cell-size);
+      height: var(--cell-size);
       padding: 0;
-      border: 3px solid #111;
-      border-radius: 0;
+      border: 3px solid var(--ink);
+      background: var(--ink);
+      color: white;
+      cursor: pointer;
       display: grid;
       place-items: center;
-      color: #fff;
-      background: #111;
-      cursor: pointer;
       font: inherit;
-      font-size: clamp(1rem, 3.5vw, 1.75rem);
-      font-weight: 650;
-      transition: background-color 180ms ease, color 180ms ease, transform 120ms ease;
+      transition: background-color 160ms ease, color 160ms ease, transform 120ms ease;
       -webkit-tap-highlight-color: transparent;
     }
 
+    .bit:active { transform: scale(0.96); }
+
     .bit[data-value="1"] {
-      color: #111;
-      background: #fff;
-    }
-
-    .bit:active {
-      transform: scale(0.96);
-    }
-
-    .bit:focus-visible,
-    .toggle input:focus-visible + span {
-      outline: 3px solid #3772e8;
-      outline-offset: 4px;
+      background: white;
+      color: var(--ink);
     }
 
     .power {
-      line-height: 1;
+      font-size: clamp(1rem, 3vw, 1.35rem);
+      font-weight: 600;
+      pointer-events: none;
     }
 
-    .power sup {
-      font-size: 0.6em;
-    }
+    .power sup { font-size: 0.65em; }
 
     .contribution {
       min-height: 1.25em;
-      font-size: clamp(0.9rem, 2.7vw, 1.2rem);
+      font-size: clamp(1rem, 3vw, 1.25rem);
       font-variant-numeric: tabular-nums;
     }
 
-    .sum {
-      min-height: 1.5em;
-      margin: -0.5rem 0 0;
-      font-size: clamp(1rem, 3.6vw, 1.45rem);
-      font-weight: 550;
+    .sum-row {
+      display: flex;
+      gap: var(--gap);
+      justify-content: center;
+      max-width: 96vw;
+    }
+
+    .sum-term {
+      width: var(--cell-size);
       text-align: center;
+      font-size: clamp(1rem, 3vw, 1.25rem);
       font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
 
-    .toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.65rem;
-      font-size: 0.9rem;
+    .sum-row:has(.sum-term:nth-child(6)) {
+      --cell-size: clamp(38px, 9vw, 82px);
+      --gap: clamp(5px, 1.2vw, 12px);
+    }
+
+    .explanation-hidden .power,
+    .explanation-hidden .contribution,
+    .explanation-hidden #sum {
+      visibility: hidden;
+    }
+
+    .switch {
+      position: relative;
+      width: 46px;
+      height: 26px;
+      display: inline-block;
+    }
+
+    .switch input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background-color 160ms ease;
+    }
+
+    .slider::before {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      left: 3px;
+      top: 3px;
+      border-radius: 50%;
+      background: var(--ink);
+      transition: transform 160ms ease, background-color 160ms ease;
+    }
+
+    .switch input:checked + .slider {
+      background: var(--ink);
+    }
+
+    .switch input:checked + .slider::before {
+      transform: translateX(20px);
+      background: white;
+    }
+
+
+    .binary-list {
+      width: min(94vw, 720px);
+    }
+
+    .binary-list summary {
+      width: fit-content;
+      margin: 0 auto;
       cursor: pointer;
       user-select: none;
+      list-style-position: inside;
+      font-size: 0;
     }
 
-    .toggle input {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      opacity: 0;
+    .binary-list summary::after {
+      content: "0–31";
+      font-size: 1rem;
+      margin-left: 6px;
     }
 
-    .toggle span {
-      width: 2.75rem;
-      height: 1.5rem;
-      padding: 3px;
-      border: 2px solid #111;
-      border-radius: 999px;
-      background: #fff;
-      transition: background-color 180ms ease;
+    .binary-list ol {
+      margin: 20px auto 0;
+      padding-left: 3rem;
+      width: fit-content;
+      max-height: min(48vh, 430px);
+      overflow-y: auto;
     }
 
-    .toggle span::after {
-      content: "";
-      display: block;
-      width: 0.875rem;
-      height: 0.875rem;
-      border-radius: 50%;
-      background: #111;
-      transition: transform 180ms ease, background-color 180ms ease;
+    .binary-list li {
+      padding: 5px 0 5px 8px;
     }
 
-    .toggle input:checked + span {
-      background: #111;
+    .binary-list-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .toggle input:checked + span::after {
-      background: #fff;
-      transform: translateX(1.25rem);
+    .mini-bit {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border: 2px solid var(--ink);
+      background: var(--ink);
+      color: white;
+      font-size: 0.82rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
     }
 
-    [hidden] {
-      display: none !important;
+    .mini-bit.one {
+      background: white;
+      color: var(--ink);
     }
 
-    @media (prefers-reduced-motion: reduce) {
-      *, *::after {
-        transition-duration: 0.01ms !important;
-      }
+    @media (max-width: 420px) {
+      main { width: 96vw; }
+      .bit { border-width: 2px; }
+      .bit-column { gap: 9px; }
     }
   </style>
 </head>
 <body>
-  <main>
-    <output id="decimal" aria-label="Decimal value" aria-live="polite">0</output>
+  <main id="app" class="explanation-hidden">
+    <input id="decimal" type="number" min="0" value="0" inputmode="numeric" aria-label="Decimal value">
 
-    <div class="bits" aria-label="Binary number">
-      <div class="place">
-        <button class="bit" type="button" data-value="0" data-place="16" aria-label="16s bit: 0" aria-pressed="false"><span class="power" hidden>2<sup>4</sup></span></button>
-        <span class="contribution" hidden>0</span>
-      </div>
-      <div class="place">
-        <button class="bit" type="button" data-value="0" data-place="8" aria-label="8s bit: 0" aria-pressed="false"><span class="power" hidden>2<sup>3</sup></span></button>
-        <span class="contribution" hidden>0</span>
-      </div>
-      <div class="place">
-        <button class="bit" type="button" data-value="0" data-place="4" aria-label="4s bit: 0" aria-pressed="false"><span class="power" hidden>2<sup>2</sup></span></button>
-        <span class="contribution" hidden>0</span>
-      </div>
-      <div class="place">
-        <button class="bit" type="button" data-value="0" data-place="2" aria-label="2s bit: 0" aria-pressed="false"><span class="power" hidden>2<sup>1</sup></span></button>
-        <span class="contribution" hidden>0</span>
-      </div>
-      <div class="place">
-        <button class="bit" type="button" data-value="0" data-place="1" aria-label="1s bit: 0" aria-pressed="false"><span class="power" hidden>2<sup>0</sup></span></button>
-        <span class="contribution" hidden>0</span>
-      </div>
+    <div class="bits" id="bits" aria-label="Binary number"></div>
+
+    <div id="sum" class="sum-row" aria-live="polite"></div>
+
+    <div class="controls">
+      <select id="bitCount" aria-label="Number of binary squares">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5" selected>5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+      </select>
+
+      <label class="switch" aria-label="Show place values">
+        <input id="explanationToggle" type="checkbox">
+        <span class="slider"></span>
+      </label>
     </div>
 
-    <p class="sum" id="sum" hidden>0 + 0 + 0 + 0 + 0 = 0</p>
-
-    <label class="toggle">
-      <input id="explanation-toggle" type="checkbox" aria-label="Show place values">
-      <span aria-hidden="true"></span>
-      Place values
-    </label>
+    <details class="binary-list">
+      <summary aria-label="Show first 32 binary numbers"></summary>
+      <ol id="binaryList"></ol>
+    </details>
   </main>
 
   <script>
-    const bits = [...document.querySelectorAll('.bit')];
-    const decimal = document.querySelector('#decimal');
-    const sum = document.querySelector('#sum');
-    const toggle = document.querySelector('#explanation-toggle');
-    const powers = document.querySelectorAll('.power');
-    const contributions = document.querySelectorAll('.contribution');
+    const app = document.getElementById('app');
+    const bitsContainer = document.getElementById('bits');
+    const decimal = document.getElementById('decimal');
+    const sum = document.getElementById('sum');
+    const toggle = document.getElementById('explanationToggle');
+    const bitCount = document.getElementById('bitCount');
+    const binaryList = document.getElementById('binaryList');
 
-    function update() {
-      const values = bits.map((bit, index) => {
-        const contribution = Number(bit.dataset.value) * Number(bit.dataset.place);
-        contributions[index].textContent = contribution;
-        bit.setAttribute('aria-label', `${bit.dataset.place}s bit: ${bit.dataset.value}`);
-        bit.setAttribute('aria-pressed', bit.dataset.value === '1');
+    let bits = [];
+
+    function createBinaryList() {
+      binaryList.innerHTML = '';
+
+      for (let number = 0; number < 32; number++) {
+        const item = document.createElement('li');
+        const row = document.createElement('div');
+        row.className = 'binary-list-row';
+
+        const binary = number.toString(2).padStart(5, '0');
+
+        [...binary].forEach((digit) => {
+          const square = document.createElement('span');
+          square.className = `mini-bit${digit === '1' ? ' one' : ''}`;
+          square.textContent = digit;
+          row.appendChild(square);
+        });
+
+        item.appendChild(row);
+        binaryList.appendChild(item);
+      }
+    }
+
+    function createBits(count) {
+      bitsContainer.innerHTML = '';
+
+      for (let exponent = count - 1; exponent >= 0; exponent--) {
+        const place = 2 ** exponent;
+        const column = document.createElement('div');
+        column.className = 'bit-column';
+
+        const bit = document.createElement('button');
+        bit.className = 'bit';
+        bit.type = 'button';
+        bit.dataset.value = '0';
+        bit.dataset.place = String(place);
+        bit.setAttribute('aria-label', `Bit ${exponent}: 0`);
+        bit.innerHTML = `<span class="power">2<sup>${exponent}</sup></span>`;
+
+        const contribution = document.createElement('div');
+        contribution.className = 'contribution';
+        contribution.textContent = String(place);
+
+        bit.addEventListener('click', () => {
+          bit.dataset.value = bit.dataset.value === '0' ? '1' : '0';
+          updateFromBits();
+        });
+
+        column.append(bit, contribution);
+        bitsContainer.appendChild(column);
+      }
+
+      bits = [...document.querySelectorAll('.bit')];
+      decimal.max = String((2 ** count) - 1);
+      updateFromDecimal();
+    }
+
+    function updateFromBits() {
+      const contributions = bits.map((bit) => {
+        const value = Number(bit.dataset.value);
+        const place = Number(bit.dataset.place);
+        const contribution = value * place;
+
+        bit.setAttribute('aria-label', `Bit ${Math.log2(place)}: ${value}`);
         return contribution;
       });
 
-      const total = values.reduce((result, value) => result + value, 0);
+      const total = contributions.reduce((a, b) => a + b, 0);
       decimal.value = total;
-      decimal.textContent = total;
-      sum.textContent = `${values.join(' + ')} = ${total}`;
+
+      sum.innerHTML = '';
+      contributions.forEach((contribution, index) => {
+        const term = document.createElement('div');
+        term.className = 'sum-term';
+
+        if (index < contributions.length - 1) {
+          term.textContent = `${contribution} +`;
+        } else {
+          term.textContent = `${contribution} = ${total}`;
+        }
+
+        sum.appendChild(term);
+      });
     }
 
-    bits.forEach((bit) => {
-      bit.addEventListener('click', () => {
-        bit.dataset.value = bit.dataset.value === '0' ? '1' : '0';
-        update();
+    function updateFromDecimal() {
+      const max = (2 ** Number(bitCount.value)) - 1;
+      let value = Math.trunc(Number(decimal.value));
+
+      if (!Number.isFinite(value)) value = 0;
+      value = Math.max(0, Math.min(max, value));
+      decimal.value = value;
+
+      bits.forEach((bit) => {
+        const place = Number(bit.dataset.place);
+        bit.dataset.value = (value & place) !== 0 ? '1' : '0';
       });
+
+      updateFromBits();
+    }
+
+    decimal.addEventListener('input', () => {
+      if (decimal.value === '') return;
+      updateFromDecimal();
+    });
+
+    decimal.addEventListener('change', updateFromDecimal);
+
+    bitCount.addEventListener('change', () => {
+      createBits(Number(bitCount.value));
     });
 
     toggle.addEventListener('change', () => {
-      const hidden = !toggle.checked;
-      powers.forEach((power) => { power.hidden = hidden; });
-      contributions.forEach((value) => { value.hidden = hidden; });
-      sum.hidden = hidden;
-      toggle.setAttribute('aria-label', `${hidden ? 'Show' : 'Hide'} place values`);
+      app.classList.toggle('explanation-hidden', !toggle.checked);
     });
 
-    update();
+    createBinaryList();
+    createBits(5);
   </script>
 </body>
 </html>
