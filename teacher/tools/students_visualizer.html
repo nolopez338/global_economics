@@ -860,7 +860,11 @@ function showStatus(message, type = "info") {
 }
 
 function normalizeFilename(name) {
-    return name.trim();
+    return name
+        // This sequence was decoded with the wrong legacy code page in
+        // the nine tracked filenames that contain ñ.
+        .replace(/├▒/g, "ñ")
+        .trim();
 }
 
 function humanizeFilename(filename) {
@@ -1004,7 +1008,7 @@ async function scanGrade10Pictures() {
             /\.png$/i.test(name)
         ) {
             state.pngFiles.push({
-                name,
+                name: normalizeFilename(name),
                 handle
             });
         }
