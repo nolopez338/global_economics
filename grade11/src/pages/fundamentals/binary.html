@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>5-bit Binary</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100svh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      color: #111;
+      background: #f7f7f5;
+    }
+
+    main {
+      width: min(92vw, 720px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(1.5rem, 5vh, 3rem);
+    }
+
+    output {
+      min-width: 2ch;
+      font-size: clamp(4rem, 13vw, 7rem);
+      font-weight: 700;
+      line-height: 1;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .bits {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: clamp(0.45rem, 2vw, 1.25rem);
+    }
+
+    .place {
+      min-width: 0;
+      display: grid;
+      justify-items: center;
+      gap: 0.75rem;
+    }
+
+    .bit {
+      width: 100%;
+      aspect-ratio: 1;
+      padding: 0;
+      border: 3px solid #111;
+      border-radius: 0;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: #111;
+      cursor: pointer;
+      font: inherit;
+      font-size: clamp(1rem, 3.5vw, 1.75rem);
+      font-weight: 650;
+      transition: background-color 180ms ease, color 180ms ease, transform 120ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .bit[data-value="1"] {
+      color: #111;
+      background: #fff;
+    }
+
+    .bit:active {
+      transform: scale(0.96);
+    }
+
+    .bit:focus-visible,
+    .toggle input:focus-visible + span {
+      outline: 3px solid #3772e8;
+      outline-offset: 4px;
+    }
+
+    .power {
+      line-height: 1;
+    }
+
+    .power sup {
+      font-size: 0.6em;
+    }
+
+    .contribution {
+      min-height: 1.25em;
+      font-size: clamp(0.9rem, 2.7vw, 1.2rem);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .sum {
+      min-height: 1.5em;
+      margin: -0.5rem 0 0;
+      font-size: clamp(1rem, 3.6vw, 1.45rem);
+      font-weight: 550;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .toggle input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      opacity: 0;
+    }
+
+    .toggle span {
+      width: 2.75rem;
+      height: 1.5rem;
+      padding: 3px;
+      border: 2px solid #111;
+      border-radius: 999px;
+      background: #fff;
+      transition: background-color 180ms ease;
+    }
+
+    .toggle span::after {
+      content: "";
+      display: block;
+      width: 0.875rem;
+      height: 0.875rem;
+      border-radius: 50%;
+      background: #111;
+      transition: transform 180ms ease, background-color 180ms ease;
+    }
+
+    .toggle input:checked + span {
+      background: #111;
+    }
+
+    .toggle input:checked + span::after {
+      background: #fff;
+      transform: translateX(1.25rem);
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::after {
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <output id="decimal" aria-label="Decimal value" aria-live="polite">0</output>
+
+    <div class="bits" aria-label="Binary number">
+      <div class="place">
+        <button class="bit" type="button" data-value="0" data-place="16" aria-label="16s bit: 0" aria-pressed="false"><span class="power" hidden>2<sup>4</sup></span></button>
+        <span class="contribution" hidden>0</span>
+      </div>
+      <div class="place">
+        <button class="bit" type="button" data-value="0" data-place="8" aria-label="8s bit: 0" aria-pressed="false"><span class="power" hidden>2<sup>3</sup></span></button>
+        <span class="contribution" hidden>0</span>
+      </div>
+      <div class="place">
+        <button class="bit" type="button" data-value="0" data-place="4" aria-label="4s bit: 0" aria-pressed="false"><span class="power" hidden>2<sup>2</sup></span></button>
+        <span class="contribution" hidden>0</span>
+      </div>
+      <div class="place">
+        <button class="bit" type="button" data-value="0" data-place="2" aria-label="2s bit: 0" aria-pressed="false"><span class="power" hidden>2<sup>1</sup></span></button>
+        <span class="contribution" hidden>0</span>
+      </div>
+      <div class="place">
+        <button class="bit" type="button" data-value="0" data-place="1" aria-label="1s bit: 0" aria-pressed="false"><span class="power" hidden>2<sup>0</sup></span></button>
+        <span class="contribution" hidden>0</span>
+      </div>
+    </div>
+
+    <p class="sum" id="sum" hidden>0 + 0 + 0 + 0 + 0 = 0</p>
+
+    <label class="toggle">
+      <input id="explanation-toggle" type="checkbox" aria-label="Show place values">
+      <span aria-hidden="true"></span>
+      Place values
+    </label>
+  </main>
+
+  <script>
+    const bits = [...document.querySelectorAll('.bit')];
+    const decimal = document.querySelector('#decimal');
+    const sum = document.querySelector('#sum');
+    const toggle = document.querySelector('#explanation-toggle');
+    const powers = document.querySelectorAll('.power');
+    const contributions = document.querySelectorAll('.contribution');
+
+    function update() {
+      const values = bits.map((bit, index) => {
+        const contribution = Number(bit.dataset.value) * Number(bit.dataset.place);
+        contributions[index].textContent = contribution;
+        bit.setAttribute('aria-label', `${bit.dataset.place}s bit: ${bit.dataset.value}`);
+        bit.setAttribute('aria-pressed', bit.dataset.value === '1');
+        return contribution;
+      });
+
+      const total = values.reduce((result, value) => result + value, 0);
+      decimal.value = total;
+      decimal.textContent = total;
+      sum.textContent = `${values.join(' + ')} = ${total}`;
+    }
+
+    bits.forEach((bit) => {
+      bit.addEventListener('click', () => {
+        bit.dataset.value = bit.dataset.value === '0' ? '1' : '0';
+        update();
+      });
+    });
+
+    toggle.addEventListener('change', () => {
+      const hidden = !toggle.checked;
+      powers.forEach((power) => { power.hidden = hidden; });
+      contributions.forEach((value) => { value.hidden = hidden; });
+      sum.hidden = hidden;
+      toggle.setAttribute('aria-label', `${hidden ? 'Show' : 'Hide'} place values`);
+    });
+
+    update();
+  </script>
+</body>
+</html>
