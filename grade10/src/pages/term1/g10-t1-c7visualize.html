@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Expected Value Sensitivity Explorer</title>
+  <style>
+    :root { --ink:#162033; --muted:#697386; --border:#dce2ea; --grid:#e9edf2; --soft:#f7f8fa; --a1:#2563a8; --a2:#c65d21; --a3:#288264; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:#fff; font:14px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+    button,input { font:inherit; }
+    .page { width:min(1380px, calc(100% - 36px)); margin:auto; padding:26px 0 44px; }
+    header { display:flex; align-items:end; justify-content:space-between; gap:20px; padding-bottom:17px; border-bottom:1px solid var(--border); }
+    h1 { margin:0; font-size:clamp(23px,3vw,32px); letter-spacing:-.035em; }
+    header p { margin:4px 0 0; color:var(--muted); }
+    button { padding:7px 12px; border:1px solid var(--border); border-radius:6px; color:var(--ink); background:#fff; cursor:pointer; }
+    button:hover { background:var(--soft); border-color:#aeb8c5; }
+    .flow { margin:14px 0 20px; color:#4d596b; text-align:center; font-family:Georgia,serif; font-size:15px; }
+    .layout { display:grid; grid-template-columns:360px minmax(0,1fr); gap:25px; align-items:start; }
+    h2 { margin:0 0 11px; font-size:15px; letter-spacing:.01em; }
+    h3 { margin:0 0 9px; color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.09em; }
+    .section { margin-bottom:22px; }
+    table { width:100%; border-collapse:collapse; border:1px solid var(--border); }
+    th,td { padding:8px; border-bottom:1px solid var(--border); text-align:center; }
+    thead th { background:var(--soft); font-size:12px; }
+    th:first-child { text-align:left; }
+    tbody tr:last-child th, tbody tr:last-child td { border-bottom:0; }
+    .alt-label { border-left:4px solid var(--c); padding-left:8px; }
+    .alt-label small { display:block; color:var(--muted); font-weight:400; }
+    .pay-input { width:72px; padding:5px 6px; border:1px solid #cbd3dd; border-radius:4px; text-align:right; }
+    .parameter-list { display:grid; gap:8px; }
+    .parameter { display:grid; grid-template-columns:28px 1fr 64px; align-items:center; gap:8px; }
+    .parameter label { font:italic 16px Georgia,serif; font-weight:700; color:var(--c); }
+    input[type=range] { width:100%; accent-color:var(--c, #334155); }
+    .slider-number { width:64px; padding:4px 5px; border:1px solid var(--border); border-radius:4px; text-align:right; }
+    .equations { display:grid; gap:7px; }
+    .equation { padding:8px 10px; border-left:3px solid var(--c); background:var(--soft); font-family:Georgia,serif; font-size:15px; }
+    .graph-panel { min-width:0; }
+    .graph-top { display:flex; justify-content:space-between; align-items:start; gap:12px; }
+    .legend { display:flex; flex-wrap:wrap; gap:12px; color:var(--muted); font-size:12px; }
+    .legend span::before { content:""; display:inline-block; width:18px; margin-right:5px; border-top:3px solid var(--c); vertical-align:middle; }
+    .chart-wrap { height:490px; border:1px solid var(--border); background:#fff; }
+    svg { display:block; width:100%; height:100%; }
+    .p-control { display:grid; grid-template-columns:auto minmax(160px,1fr) 84px; gap:12px; align-items:center; padding:13px 2px 12px; }
+    .p-control strong { font-size:17px; white-space:nowrap; }
+    .p-control input[type=range] { --c:#334155; }
+    .p-number { width:84px; padding:6px; border:1px solid #b8c2cf; border-radius:5px; text-align:center; }
+    .current-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; }
+    .current { padding:10px 12px; border:1px solid var(--border); border-top:3px solid var(--c); min-width:0; }
+    .current.best { background:color-mix(in srgb, var(--c) 8%, white); border-color:var(--c); }
+    .current strong { display:block; color:var(--c); font-size:17px; }
+    .current small { display:block; margin-top:3px; color:var(--muted); font-family:Georgia,serif; overflow-wrap:anywhere; }
+    .choice { margin:10px 0 20px; padding:9px 12px; border-left:3px solid #263448; background:var(--soft); font-weight:700; }
+    .strip-shell { position:relative; margin:7px 16px 25px; padding-top:19px; }
+    .strip { display:flex; height:38px; border:1px solid #aeb8c5; }
+    .segment { display:grid; place-items:center; min-width:0; color:#fff; font-weight:750; border-right:1px solid rgba(255,255,255,.8); overflow:hidden; }
+    .segment.tie { color:var(--ink); background:#e6e9ed !important; }
+    .strip-marker { position:absolute; top:12px; bottom:-8px; width:2px; background:#111827; transform:translateX(-1px); z-index:3; pointer-events:none; }
+    .strip-marker::before { content:"p"; position:absolute; top:-15px; left:50%; transform:translateX(-50%); padding:0 2px; background:#fff; font:bold italic 12px Georgia,serif; }
+    .boundary { position:absolute; top:58px; transform:translateX(-50%); color:var(--muted); font-size:11px; font-variant-numeric:tabular-nums; }
+    .end { position:absolute; top:58px; font-size:11px; } .end.left { left:0; } .end.right { right:0; }
+    .analysis { display:grid; grid-template-columns:1.25fr 1fr; gap:18px; border-top:1px solid var(--border); padding-top:17px; }
+    .sensitivity { display:flex; flex-wrap:wrap; gap:6px; }
+    .statement { padding:6px 9px; border:1px solid var(--border); border-left:3px solid var(--c,#8993a2); font-family:Georgia,serif; background:#fff; }
+    .intersection-list { display:grid; gap:5px; color:var(--muted); font-size:12px; }
+    .intersection-row { display:flex; justify-content:space-between; gap:10px; padding-bottom:4px; border-bottom:1px solid #edf0f3; }
+    .badge { white-space:nowrap; padding:1px 5px; border:1px solid var(--border); border-radius:9px; font-size:10px; text-transform:uppercase; letter-spacing:.04em; }
+    .badge.threshold { color:#fff; background:#263448; border-color:#263448; }
+    .note { color:var(--muted); font-size:12px; }
+    @media (max-width:900px) { .layout { grid-template-columns:1fr; } .left { display:grid; grid-template-columns:1fr 1fr; gap:20px; } .left .section { margin:0; } .chart-wrap { height:430px; } }
+    @media (max-width:620px) { .page { width:calc(100% - 20px); padding-top:16px; } header { align-items:start; } .flow { text-align:left; font-size:13px; } .left,.analysis { grid-template-columns:1fr; } .current-grid { grid-template-columns:1fr; } .chart-wrap { height:360px; } .p-control { grid-template-columns:auto 1fr; } .p-number { grid-column:2; } }
+  </style>
+</head>
+<body>
+<main class="page">
+  <header><div><h1>Expected Value Sensitivity Explorer</h1><p>Three alternatives · two states of nature · one uncertain probability</p></div><button id="reset" type="button">Reset</button></header>
+  <div class="flow">Payoff table → linear EV functions → intersections → decision thresholds → preferred alternative</div>
+  <div class="layout">
+    <aside class="left" aria-label="Payoff controls">
+      <section class="section"><h2>Payoff table</h2><table><thead><tr><th>Alternative</th><th>S₁<br><span class="note">P(S₁)=p</span></th><th>S₂<br><span class="note">P(S₂)=1−p</span></th></tr></thead><tbody id="payoffRows"></tbody></table></section>
+      <section class="section"><h2>Payoff parameters</h2><div class="parameter-list" id="parameters"></div><p class="note">Sliders range from −100 to 100. You may type values outside that range in the table.</p></section>
+      <section class="section"><h2>Derived EV functions</h2><div class="equations" id="equations"></div></section>
+    </aside>
+    <section class="graph-panel" aria-label="Expected value analysis">
+      <div class="graph-top"><h2>Expected Value by subjective probability</h2><div class="legend" id="legend"></div></div>
+      <div class="chart-wrap"><svg id="chart" role="img" aria-label="Expected value lines, intersections, and selected probability"></svg></div>
+      <div class="p-control"><strong id="pDisplay">p = 0.50</strong><input id="pSlider" type="range" min="0" max="1" step="0.01" value="0.5" aria-label="Subjective probability p"><input id="pNumber" class="p-number" type="number" min="0" max="1" step="0.01" value="0.50" aria-label="Numeric subjective probability p"></div>
+      <div class="current-grid" id="currentValues"></div><div class="choice" id="choice" aria-live="polite"></div>
+      <h3>Optimal regions</h3><div class="strip-shell"><div class="strip" id="strip"></div><div class="strip-marker" id="stripMarker"></div><div id="boundaryLabels"></div><span class="end left">0</span><span class="end right">1</span></div>
+      <div class="analysis"><div><h3>Sensitivity analysis</h3><div class="sensitivity" id="sensitivity"></div></div><div><h3>Pairwise intersections</h3><div class="intersection-list" id="intersections"></div></div></div>
+    </section>
+  </div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const defaults = { values:[80,-20,60,18,40,25], p:.5 };
+  const alts = [
+    {name:'A₁', desc:'Premium version', color:'#2563a8', keys:['a','b']},
+    {name:'A₂', desc:'Standard version', color:'#c65d21', keys:['c','d']},
+    {name:'A₃', desc:'Budget version', color:'#288264', keys:['e','f']}
+  ];
+  let values = [...defaults.values], p = defaults.p;
+  const $ = id => document.getElementById(id);
+  const clean = n => Math.abs(n) < 1e-10 ? 0 : n;
+  const fmt = (n,d=2) => Number.isFinite(n) ? clean(n).toFixed(d).replace(/^-/, '−') : '—';
+  const compact = n => Number.isFinite(n) ? String(Number(clean(n).toFixed(3))).replace(/^-/, '−') : '—';
+  const signedTerm = n => n < 0 ? ` − ${compact(-n)}` : ` + ${compact(n)}`;
+  const maxSetAt = (q, lines) => { const vs=lines.map(l=>l.m*q+l.b), mx=Math.max(...vs); return vs.map((v,i)=>Math.abs(v-mx)<1e-7?i:-1).filter(i=>i>=0); };
+  function makeControls() {
+    $('payoffRows').innerHTML = alts.map((a,i)=>`<tr style="--c:${a.color}"><th><span class="alt-label">${a.name}<small>${a.desc}</small></span></th>${[0,1].map(j=>`<td><input class="pay-input" data-index="${2*i+j}" type="number" step="1" value="${values[2*i+j]}" aria-label="${a.name} payoff under S${j+1}"></td>`).join('')}</tr>`).join('');
+    $('parameters').innerHTML = values.map((v,i)=>`<div class="parameter" style="--c:${alts[Math.floor(i/2)].color}"><label for="range${i}">${alts[Math.floor(i/2)].keys[i%2]}</label><input id="range${i}" data-index="${i}" type="range" min="-100" max="100" step="1" value="${Math.max(-100,Math.min(100,v))}"><input class="slider-number" data-index="${i}" type="number" step="1" value="${v}" aria-label="Payoff parameter ${alts[Math.floor(i/2)].keys[i%2]}"></div>`).join('');
+    document.querySelectorAll('[data-index]').forEach(el=>el.addEventListener('input',e=>setPayoff(+e.target.dataset.index,e.target.value)));
+  }
+  function setPayoff(i, raw) { const n=Number(raw); if(!Number.isFinite(n)) return; values[i]=n; document.querySelectorAll(`[data-index="${i}"]`).forEach(el=>{ if(el!==document.activeElement) el.value=el.type==='range'?Math.max(-100,Math.min(100,n)):n; }); update(); }
+  function lines() { return alts.map((a,i)=>({ ...a, i, x:values[i*2], y:values[i*2+1], m:values[i*2]-values[i*2+1], b:values[i*2+1] })); }
+  function intersectionData(ls) {
+    const out=[];
+    for(let i=0;i<3;i++) for(let j=i+1;j<3;j++) {
+      const dm=ls[i].m-ls[j].m, db=ls[j].b-ls[i].b;
+      if(Math.abs(dm)<1e-10) out.push({i,j,type:Math.abs(db)<1e-10?'identical':'parallel',valid:false});
+      else { const q=clean(db/dm); out.push({i,j,type:'point',p:q,y:ls[i].m*q+ls[i].b,valid:q>=-1e-9&&q<=1+1e-9}); }
+    }
+    return out;
+  }
+  function regions(ls, ints) {
+    const cuts=[0,...ints.filter(x=>x.valid).map(x=>Math.max(0,Math.min(1,x.p))),1].sort((a,b)=>a-b).filter((x,i,a)=>i===0||Math.abs(x-a[i-1])>1e-7);
+    const regions=[];
+    for(let i=0;i<cuts.length-1;i++) if(cuts[i+1]-cuts[i]>1e-9) regions.push({lo:cuts[i],hi:cuts[i+1],winners:maxSetAt((cuts[i]+cuts[i+1])/2,ls)});
+    if(!regions.length) regions.push({lo:0,hi:1,winners:maxSetAt(.5,ls)});
+    const merged=[];
+    regions.forEach(r=>{const last=merged[merged.length-1];if(last&&last.winners.join(',')===r.winners.join(','))last.hi=r.hi;else merged.push({...r,winners:[...r.winners]});});
+    const thresholds=[];
+    for(let i=1;i<merged.length;i++) thresholds.push(merged[i].lo);
+    ints.forEach(x=>x.threshold=x.valid&&thresholds.some(t=>Math.abs(t-x.p)<1e-7));
+    return {regions:merged,thresholds};
+  }
+  function winnerName(ids) { return ids.map(i=>alts[i].name).join(' = '); }
+  function renderText(ls,ints,decision) {
+    $('legend').innerHTML=alts.map(a=>`<span style="--c:${a.color}">${a.name}</span>`).join('');
+    $('equations').innerHTML=ls.map(l=>`<div class="equation" style="--c:${l.color}"><b style="color:${l.color}">EV(${l.name})</b> = ${compact(l.x)}p + (1−p)(${compact(l.y)}) = ${compact(l.m)}p${signedTerm(l.b)}</div>`).join('');
+    const evs=ls.map(l=>l.m*p+l.b), winners=maxSetAt(p,ls);
+    $('currentValues').innerHTML=ls.map((l,i)=>`<div class="current ${winners.includes(i)?'best':''}" style="--c:${l.color}"><strong>EV(${l.name}) = ${fmt(evs[i])}</strong><small>${fmt(p)}(${compact(l.x)}) + ${fmt(1-p)}(${compact(l.y)}) = ${fmt(evs[i])}</small></div>`).join('');
+    $('choice').textContent=winners.length>1?`Indifference at p = ${fmt(p)}: ${winnerName(winners)} share the maximum EV.`:`Preferred at p = ${fmt(p)}: ${winnerName(winners)} (maximum EV = ${fmt(evs[winners[0]])}).`;
+    $('intersections').innerHTML=ints.map(x=>{ const pair=`${alts[x.i].name} = ${alts[x.j].name}`; let result=x.type==='identical'?'identical for every p':x.type==='parallel'?'parallel; no intersection':x.valid?`p = ${fmt(x.p,3)}, EV = ${fmt(x.y)}`:`p = ${fmt(x.p,3)} (outside [0,1])`; return `<div class="intersection-row"><span><b>${pair}</b><br>${result}</span>${x.threshold?'<span class="badge threshold">decision threshold</span>':x.valid?'<span class="badge">intersection only</span>':''}</div>`; }).join('');
+    const parts=[];
+    decision.regions.forEach((r,i)=>{ const color=r.winners.length===1?alts[r.winners[0]].color:'#8993a2'; parts.push(`<span class="statement" style="--c:${color}">${winnerName(r.winners)}, ${i===0?'0 ≤ p':' '+fmt(r.lo,3)+' < p'} ${i===decision.regions.length-1?'≤ 1':'< '+fmt(r.hi,3)}</span>`); if(i<decision.regions.length-1){const q=r.hi,t=maxSetAt(q,ls);parts.push(`<span class="statement">${winnerName(t)}, p = ${fmt(q,3)}</span>`);} });
+    $('sensitivity').innerHTML=parts.join('');
+  }
+  function renderStrip(decision) {
+    $('strip').innerHTML=decision.regions.map(r=>{const color=r.winners.length===1?alts[r.winners[0]].color:'#8993a2';return `<div class="segment ${r.winners.length>1?'tie':''}" style="width:${(r.hi-r.lo)*100}%;background:${color}">${winnerName(r.winners)}</div>`;}).join('');
+    $('stripMarker').style.left=`${p*100}%`;
+    $('boundaryLabels').innerHTML=decision.thresholds.filter(q=>q>1e-7&&q<1-1e-7).map(q=>`<span class="boundary" style="left:${q*100}%">${fmt(q,3)}</span>`).join('');
+  }
+  function renderChart(ls,ints) {
+    const svg=$('chart'), W=900,H=490, pad={l:72,r:28,t:27,b:58};
+    const raw=ls.flatMap(l=>[l.b,l.m+l.b]); let min=Math.min(...raw),max=Math.max(...raw),span=max-min;
+    if(span<1){min-=5;max+=5;} else {min-=span*.12;max+=span*.12;}
+    const x=q=>pad.l+q*(W-pad.l-pad.r), y=v=>pad.t+(max-v)/(max-min)*(H-pad.t-pad.b);
+    let s=`<title>Expected Value lines from p equals zero to one</title><rect width="${W}" height="${H}" fill="white"/>`;
+    for(let i=0;i<=10;i++){const q=i/10;s+=`<line x1="${x(q)}" y1="${pad.t}" x2="${x(q)}" y2="${H-pad.b}" stroke="#e9edf2"/><text x="${x(q)}" y="${H-pad.b+20}" text-anchor="middle" fill="#697386" font-size="11">${q.toFixed(1)}</text>`;}
+    for(let i=0;i<=5;i++){const v=min+(max-min)*i/5,yy=y(v);s+=`<line x1="${pad.l}" y1="${yy}" x2="${W-pad.r}" y2="${yy}" stroke="#e9edf2"/><text x="${pad.l-10}" y="${yy+4}" text-anchor="end" fill="#697386" font-size="11">${compact(v)}</text>`;}
+    s+=`<line x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${H-pad.b}" stroke="#687385"/><line x1="${pad.l}" y1="${H-pad.b}" x2="${W-pad.r}" y2="${H-pad.b}" stroke="#687385"/><text x="${(pad.l+W-pad.r)/2}" y="${H-12}" text-anchor="middle" fill="#334155" font-size="13">Subjective probability p</text><text transform="translate(18 ${(pad.t+H-pad.b)/2}) rotate(-90)" text-anchor="middle" fill="#334155" font-size="13">Expected Value</text>`;
+    ls.forEach(l=>s+=`<line x1="${x(0)}" y1="${y(l.b)}" x2="${x(1)}" y2="${y(l.m+l.b)}" stroke="${l.color}" stroke-width="3"/>`);
+    ints.filter(a=>a.valid).forEach(a=>{const cx=x(Math.max(0,Math.min(1,a.p))),cy=y(a.y);s+=a.threshold?`<circle cx="${cx}" cy="${cy}" r="8" fill="white" stroke="#172033" stroke-width="3"/><circle cx="${cx}" cy="${cy}" r="2.5" fill="#172033"/>`:`<rect x="${cx-4}" y="${cy-4}" width="8" height="8" fill="white" stroke="#687385" stroke-width="2" transform="rotate(45 ${cx} ${cy})"/>`;});
+    s+=`<line x1="${x(p)}" y1="${pad.t}" x2="${x(p)}" y2="${H-pad.b}" stroke="#172033" stroke-width="1.5" stroke-dasharray="6 5"/><text x="${x(p)}" y="${pad.t-9}" text-anchor="middle" fill="#172033" font-size="12" font-weight="700">p=${fmt(p)}</text>`;
+    ls.forEach(l=>s+=`<circle cx="${x(p)}" cy="${y(l.m*p+l.b)}" r="6" fill="${l.color}" stroke="white" stroke-width="2"/>`);
+    s+=`<g transform="translate(${W-pad.r-123} ${pad.t+10})"><rect width="116" height="44" rx="4" fill="white" stroke="#dce2ea"/><circle cx="12" cy="14" r="6" fill="white" stroke="#172033" stroke-width="2"/><text x="24" y="18" fill="#526072" font-size="10">threshold</text><rect x="8" y="29" width="8" height="8" fill="white" stroke="#687385" transform="rotate(45 12 33)"/><text x="24" y="37" fill="#526072" font-size="10">intersection only</text></g>`;
+    svg.setAttribute('viewBox',`0 0 ${W} ${H}`); svg.innerHTML=s;
+  }
+  function update(){const ls=lines(),ints=intersectionData(ls),decision=regions(ls,ints);$('pDisplay').textContent=`p = ${fmt(p)}`;renderText(ls,ints,decision);renderStrip(decision);renderChart(ls,ints);}
+  $('pSlider').addEventListener('input',e=>{p=+e.target.value;$('pNumber').value=p.toFixed(2);update();});
+  $('pNumber').addEventListener('input',e=>{const n=Number(e.target.value);if(Number.isFinite(n)){p=Math.max(0,Math.min(1,n));$('pSlider').value=p;update();}});
+  $('pNumber').addEventListener('change',()=>{$('pNumber').value=p.toFixed(2);});
+  $('reset').addEventListener('click',()=>{values=[...defaults.values];p=defaults.p;$('pSlider').value=p;$('pNumber').value=p.toFixed(2);makeControls();update();});
+  makeControls(); update();
+})();
+</script>
+</body>
+</html>
