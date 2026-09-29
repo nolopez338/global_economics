@@ -616,27 +616,27 @@
 
     <div class="group-filters">
         <label class="group-card" data-group="A">
-            <input type="checkbox" value="A">
+            <input type="radio" name="student-group" value="A">
             <span class="group-card-label">A</span>
         </label>
 
         <label class="group-card" data-group="B">
-            <input type="checkbox" value="B">
+            <input type="radio" name="student-group" value="B">
             <span class="group-card-label">B</span>
         </label>
 
         <label class="group-card" data-group="C">
-            <input type="checkbox" value="C">
+            <input type="radio" name="student-group" value="C">
             <span class="group-card-label">C</span>
         </label>
 
         <label class="group-card" data-group="D">
-            <input type="checkbox" value="D">
+            <input type="radio" name="student-group" value="D">
             <span class="group-card-label">D</span>
         </label>
 
         <label class="group-card" data-group="E">
-            <input type="checkbox" value="E">
+            <input type="radio" name="student-group" value="E">
             <span class="group-card-label">E</span>
         </label>
     </div>
@@ -743,7 +743,7 @@ const state = {
     pngFiles: [],
     txtEntries: [],
     imageUrls: [],
-    selectedGroups: new Set(),
+    selectedGroup: null,
     practiceStudents: [],
     practiceStudent: null,
     practiceIndex: 0,
@@ -824,7 +824,7 @@ function updateGroupCardStates() {
         const group = card.dataset.group;
         const checkbox = card.querySelector("input");
 
-        const selected = state.selectedGroups.has(group);
+        const selected = state.selectedGroup === group;
 
         checkbox.checked = selected;
         card.classList.toggle("selected", selected);
@@ -833,13 +833,7 @@ function updateGroupCardStates() {
 
 groupCards.forEach(card => {
     card.addEventListener("click", () => {
-        const group = card.dataset.group;
-
-        if (state.selectedGroups.has(group)) {
-            state.selectedGroups.delete(group);
-        } else {
-            state.selectedGroups.add(group);
-        }
+        state.selectedGroup = card.dataset.group;
 
         updateGroupCardStates();
         renderStudents();
@@ -1130,8 +1124,8 @@ function getFilteredStudents() {
             getStudentGroup(file.name);
 
         if (
-            state.selectedGroups.size > 0 &&
-            !state.selectedGroups.has(group)
+            state.selectedGroup !== null &&
+            state.selectedGroup !== group
         ) {
             return false;
         }
