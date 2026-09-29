@@ -5,64 +5,127 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Criterion Attainment</title>
 <style>
-:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#667085;--line:#d9dee8;--bar:#365f91;--bar2:#567da9}
+:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#667085;--line:#d9dee8;--bar:#365f91;--bar2:#567da9;--accent:#244c7c}
 *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
-main{max-width:1050px;margin:0 auto;padding:32px 20px 48px} h1{font-size:28px;margin:0 0 8px} .sub{color:var(--muted);margin:0 0 26px}
-.grid{display:grid;gap:22px} .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
-h2{font-size:18px;margin:0 0 4px} .desc{font-size:13px;color:var(--muted);margin:0 0 20px}
-.chart{height:360px;display:flex;align-items:flex-end;gap:18px;border-left:1px solid #aab2c0;border-bottom:1px solid #aab2c0;padding:20px 18px 0;position:relative}
-.barwrap{height:100%;flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
-.value{font-size:13px;font-weight:700;margin-bottom:7px;text-align:center} .bar{width:min(82px,72%);background:var(--bar);border-radius:7px 7px 0 0;min-height:2px}
-.label{height:52px;font-size:12px;text-align:center;padding-top:8px;line-height:1.25;overflow-wrap:anywhere}
-.axislabel{text-align:center;color:var(--muted);font-size:12px;margin-top:8px}
-.note{font-size:12px;color:var(--muted);margin-top:12px}
+main{max-width:1050px;margin:0 auto;padding:32px 20px 48px} h1{font-size:28px;margin:0 0 8px}.sub{color:var(--muted);margin:0}
+.toolbar{display:flex;align-items:end;gap:14px;flex-wrap:wrap;margin:24px 0}.field{display:grid;gap:6px}.field label{font-size:12px;font-weight:700;color:var(--muted)}
+select,.button{min-height:42px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);padding:9px 12px;font:inherit}.button{display:inline-flex;align-items:center;cursor:pointer;color:var(--accent);font-weight:700}.button input{display:none}
+#status{font-size:13px;color:var(--muted);padding-bottom:11px}.class-title{margin:0 0 20px;font-size:20px}.grid{display:grid;gap:22px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+h2{font-size:18px;margin:0 0 4px}.desc{font-size:13px;color:var(--muted);margin:0 0 20px}.chart{height:360px;display:flex;align-items:flex-end;gap:18px;border-left:1px solid #aab2c0;border-bottom:1px solid #aab2c0;padding:20px 18px 0;position:relative}
+.barwrap{height:100%;flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}.value{font-size:13px;font-weight:700;margin-bottom:7px;text-align:center}.bar{width:min(82px,72%);background:var(--bar);border-radius:7px 7px 0 0;min-height:2px}.label{height:52px;font-size:12px;text-align:center;padding-top:8px;line-height:1.25;overflow-wrap:anywhere}.axislabel{text-align:center;color:var(--muted);font-size:12px;margin-top:8px}.note{font-size:12px;color:var(--muted);margin-top:12px}.empty{align-self:center;margin:auto;color:var(--muted)}
 @media(max-width:600px){main{padding:20px 10px}.card{padding:14px}.chart{gap:6px;padding-left:8px;padding-right:8px;height:300px}.value{font-size:11px}.label{font-size:10px}}
 </style>
 </head>
 <body><main>
 <h1>Criterion Attainment</h1>
-<p class="sub">Summary of the four currently assessed criteria.</p>
-<div class="grid">
-<section class="card">
-<h2>Criterion attainment histogram</h2>
-<p class="desc">Number and percentage of students passing each criterion.</p>
-<div class="chart" id="criterionChart"></div>
-<div class="axislabel">Criterion</div>
-</section>
-<section class="card">
-<h2>Number of criteria passed per student</h2>
-<p class="desc">How many students are passing exactly 0, 1, 2, 3, or 4 criteria.</p>
-<div class="chart" id="distributionChart"></div>
-<div class="axislabel">Number of criteria passed</div>
-</section>
+<p class="sub">The dashboard automatically loads every class CSV found beside this page.</p>
+<div class="toolbar">
+  <div class="field"><label for="classSelector">Grade and group</label><select id="classSelector" disabled><option>Finding CSV files…</option></select></div>
+  <label class="button">Choose CSV folder<input id="filePicker" type="file" accept=".csv,text/csv" multiple webkitdirectory></label>
+  <span id="status" role="status" aria-live="polite"></span>
 </div>
-<p class="note">Blank cells are treated as missing data, not as failed criteria.</p>
+<h2 class="class-title" id="classTitle"></h2>
+<div class="grid">
+<section class="card"><h2>Criterion attainment histogram</h2><p class="desc">Number and percentage of students passing each assessed criterion.</p><div class="chart" id="criterionChart"></div><div class="axislabel">Criterion</div></section>
+<section class="card"><h2>Number of criteria passed per student</h2><p class="desc" id="distributionDescription">How many students are passing each number of assessed criteria.</p><div class="chart" id="distributionChart"></div><div class="axislabel">Number of criteria passed</div></section>
+</div>
+<p class="note">“Si” means passed. “No” means not passed. Blank cells are treated as missing data, not as failed criteria.</p>
 </main>
 <script>
-const criterionData=[{"criterion": "Unnamed: 3", "passed": 15, "total": 21, "percent": 71.4}, {"criterion": "Unnamed: 4", "passed": 13, "total": 21, "percent": 61.9}, {"criterion": "Unnamed: 5", "passed": 7, "total": 21, "percent": 33.3}, {"criterion": "EVIDENCIA 2", "passed": 8, "total": 21, "percent": 38.1}];
-const distributionData=[{"x": 0, "count": 5}, {"x": 1, "count": 5}, {"x": 2, "count": 4}, {"x": 3, "count": 6}, {"x": 4, "count": 3}];
+const selector=document.getElementById('classSelector');
+const status=document.getElementById('status');
+const dashboards=new Map();
 
-function renderCriterion(){
- const root=document.getElementById('criterionChart');
- const max=Math.max(...criterionData.map(d=>d.total),1);
- criterionData.forEach(d=>{
-   const w=document.createElement('div'); w.className='barwrap';
-   const v=document.createElement('div'); v.className='value'; v.textContent=`${d.passed} / ${d.total} (${d.percent}%)`;
-   const b=document.createElement('div'); b.className='bar'; b.style.height=`${(d.passed/max)*250}px`;
-   const l=document.createElement('div'); l.className='label'; l.textContent=d.criterion;
-   w.append(v,b,l); root.append(w);
- });
+// Handles commas inside quoted fields, escaped quotes, CRLF files, and a UTF-8 BOM.
+function parseCSV(text){
+  text=text.replace(/^\uFEFF/,'');
+  const rows=[]; let row=[],field='',quoted=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(quoted){if(c==='"'&&text[i+1]==='"'){field+='"';i++;}else if(c==='"'){quoted=false;}else field+=c;}
+    else if(c==='"') quoted=true;
+    else if(c===','){row.push(field);field='';}
+    else if(c==='\n'){row.push(field.replace(/\r$/,''));rows.push(row);row=[];field='';}
+    else field+=c;
+  }
+  if(field||row.length){row.push(field.replace(/\r$/,''));rows.push(row);}
+  return rows;
 }
-function renderDistribution(){
- const root=document.getElementById('distributionChart');
- const max=Math.max(...distributionData.map(d=>d.count),1);
- distributionData.forEach(d=>{
-   const w=document.createElement('div'); w.className='barwrap';
-   const v=document.createElement('div'); v.className='value'; v.textContent=d.count;
-   const b=document.createElement('div'); b.className='bar'; b.style.background='var(--bar2)'; b.style.height=`${(d.count/max)*250}px`;
-   const l=document.createElement('div'); l.className='label'; l.textContent=d.x;
-   w.append(v,b,l); root.append(w);
- });
+
+function classFromFilename(name){
+  const base=name.split('/').pop();
+  const match=base.match(/^(\d+)([A-Za-z]+)_Evaluaciones_Academicas_Habilidades\.csv$/i);
+  return match?{grade:Number(match[1]),group:match[2].toUpperCase(),name:base}:null;
 }
-renderCriterion(); renderDistribution();
+
+function makeDashboard(name,text){
+  const klass=classFromFilename(name); if(!klass) return null;
+  const rows=parseCSV(text); if(rows.length<3) throw new Error(`${klass.name} has no student records`);
+  const headings=rows[1];
+  const columns=headings.map((heading,index)=>({heading:heading.trim(),index})).filter(c=>/^C\d+$/i.test(c.heading));
+  const criteria=columns.map(column=>{
+    const values=rows.slice(2).map(row=>(row[column.index]||'').trim().toLocaleLowerCase());
+    const assessed=values.filter(value=>value==='si'||value==='sí'||value==='no');
+    const passed=assessed.filter(value=>value==='si'||value==='sí').length;
+    return {criterion:column.heading.toUpperCase(),passed,total:assessed.length,percent:assessed.length?Math.round(passed/assessed.length*1000)/10:0,index:column.index};
+  }).filter(item=>item.total>0);
+  const counts=Array(criteria.length+1).fill(0);
+  rows.slice(2).filter(row=>row.some(cell=>cell.trim())).forEach(row=>{
+    const values=criteria.map(c=>(row[c.index]||'').trim().toLocaleLowerCase());
+    if(values.some(value=>value==='si'||value==='sí'||value==='no')) counts[values.filter(value=>value==='si'||value==='sí').length]++;
+  });
+  return {...klass,criteria,distribution:counts.map((count,x)=>({x,count}))};
+}
+
+function bar(root,value,label,height,color){
+  const wrap=document.createElement('div');wrap.className='barwrap';
+  const amount=document.createElement('div');amount.className='value';amount.textContent=value;
+  const column=document.createElement('div');column.className='bar';column.style.height=`${height}px`;if(color)column.style.background=color;
+  const caption=document.createElement('div');caption.className='label';caption.textContent=label;
+  wrap.append(amount,column,caption);root.append(wrap);
+}
+
+function render(key){
+  const data=dashboards.get(key);if(!data)return;
+  document.getElementById('classTitle').textContent=`Grade ${data.grade} · Group ${data.group}`;
+  const criterionRoot=document.getElementById('criterionChart');criterionRoot.replaceChildren();
+  const distributionRoot=document.getElementById('distributionChart');distributionRoot.replaceChildren();
+  const criterionMax=Math.max(...data.criteria.map(item=>item.total),1);
+  data.criteria.forEach(item=>bar(criterionRoot,`${item.passed} / ${item.total} (${item.percent}%)`,item.criterion,item.passed/criterionMax*250));
+  const distributionMax=Math.max(...data.distribution.map(item=>item.count),1);
+  data.distribution.forEach(item=>bar(distributionRoot,item.count,item.x,item.count/distributionMax*250,'var(--bar2)'));
+  if(!data.criteria.length){const message=document.createElement('p');message.className='empty';message.textContent='No assessed criteria found.';criterionRoot.append(message);}
+}
+
+function refreshSelector(){
+  const selected=selector.value;
+  const items=[...dashboards.entries()].sort((a,b)=>a[1].grade-b[1].grade||a[1].group.localeCompare(b[1].group));
+  selector.replaceChildren(...items.map(([key,item])=>{const option=document.createElement('option');option.value=key;option.textContent=`Grade ${item.grade} · Group ${item.group}`;return option;}));
+  selector.disabled=!items.length;if(items.length){selector.value=dashboards.has(selected)?selected:items[0][0];render(selector.value);}
+  status.textContent=`${items.length} class${items.length===1?'':'es'} loaded`;
+}
+
+async function addCSV(name,text){
+  try{const data=makeDashboard(name,text);if(data)dashboards.set(`${data.grade}${data.group}`,data);}
+  catch(error){console.error(error);status.textContent=`Could not read ${name}: ${error.message}`;}
+}
+
+async function discoverCSVs(){
+  try{
+    const response=await fetch('./');if(!response.ok)throw new Error('Directory listing unavailable');
+    const listing=await response.text();const documentListing=new DOMParser().parseFromString(listing,'text/html');
+    const names=[...new Set([...documentListing.querySelectorAll('a[href]')].map(a=>decodeURIComponent(a.getAttribute('href').split('?')[0])).filter(href=>classFromFilename(href)))];
+    if(!names.length)throw new Error('No matching CSV links in directory listing');
+    await Promise.all(names.map(async name=>{const csv=await fetch(new URL(name,location.href));if(csv.ok)await addCSV(name,await csv.text());}));
+    refreshSelector();
+  }catch(error){selector.replaceChildren(new Option('Choose the CSV folder…'));status.textContent='Automatic discovery is unavailable; choose this folder above.';console.info(error.message);}
+}
+
+selector.addEventListener('change',()=>render(selector.value));
+document.getElementById('filePicker').addEventListener('change',async event=>{
+  dashboards.clear();
+  await Promise.all([...event.target.files].filter(file=>classFromFilename(file.name)).map(async file=>addCSV(file.name,await file.text())));
+  refreshSelector();
+});
+discoverCSVs();
 </script></body></html>
