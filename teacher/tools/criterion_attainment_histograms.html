@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Criterion Attainment</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#667085;--line:#d9dee8;--bar:#365f91;--bar2:#567da9}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+main{max-width:1050px;margin:0 auto;padding:32px 20px 48px} h1{font-size:28px;margin:0 0 8px} .sub{color:var(--muted);margin:0 0 26px}
+.grid{display:grid;gap:22px} .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+h2{font-size:18px;margin:0 0 4px} .desc{font-size:13px;color:var(--muted);margin:0 0 20px}
+.chart{height:360px;display:flex;align-items:flex-end;gap:18px;border-left:1px solid #aab2c0;border-bottom:1px solid #aab2c0;padding:20px 18px 0;position:relative}
+.barwrap{height:100%;flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.value{font-size:13px;font-weight:700;margin-bottom:7px;text-align:center} .bar{width:min(82px,72%);background:var(--bar);border-radius:7px 7px 0 0;min-height:2px}
+.label{height:52px;font-size:12px;text-align:center;padding-top:8px;line-height:1.25;overflow-wrap:anywhere}
+.axislabel{text-align:center;color:var(--muted);font-size:12px;margin-top:8px}
+.note{font-size:12px;color:var(--muted);margin-top:12px}
+@media(max-width:600px){main{padding:20px 10px}.card{padding:14px}.chart{gap:6px;padding-left:8px;padding-right:8px;height:300px}.value{font-size:11px}.label{font-size:10px}}
+</style>
+</head>
+<body><main>
+<h1>Criterion Attainment</h1>
+<p class="sub">Summary of the four currently assessed criteria.</p>
+<div class="grid">
+<section class="card">
+<h2>Criterion attainment histogram</h2>
+<p class="desc">Number and percentage of students passing each criterion.</p>
+<div class="chart" id="criterionChart"></div>
+<div class="axislabel">Criterion</div>
+</section>
+<section class="card">
+<h2>Number of criteria passed per student</h2>
+<p class="desc">How many students are passing exactly 0, 1, 2, 3, or 4 criteria.</p>
+<div class="chart" id="distributionChart"></div>
+<div class="axislabel">Number of criteria passed</div>
+</section>
+</div>
+<p class="note">Blank cells are treated as missing data, not as failed criteria.</p>
+</main>
+<script>
+const criterionData=[{"criterion": "Unnamed: 3", "passed": 15, "total": 21, "percent": 71.4}, {"criterion": "Unnamed: 4", "passed": 13, "total": 21, "percent": 61.9}, {"criterion": "Unnamed: 5", "passed": 7, "total": 21, "percent": 33.3}, {"criterion": "EVIDENCIA 2", "passed": 8, "total": 21, "percent": 38.1}];
+const distributionData=[{"x": 0, "count": 5}, {"x": 1, "count": 5}, {"x": 2, "count": 4}, {"x": 3, "count": 6}, {"x": 4, "count": 3}];
+
+function renderCriterion(){
+ const root=document.getElementById('criterionChart');
+ const max=Math.max(...criterionData.map(d=>d.total),1);
+ criterionData.forEach(d=>{
+   const w=document.createElement('div'); w.className='barwrap';
+   const v=document.createElement('div'); v.className='value'; v.textContent=`${d.passed} / ${d.total} (${d.percent}%)`;
+   const b=document.createElement('div'); b.className='bar'; b.style.height=`${(d.passed/max)*250}px`;
+   const l=document.createElement('div'); l.className='label'; l.textContent=d.criterion;
+   w.append(v,b,l); root.append(w);
+ });
+}
+function renderDistribution(){
+ const root=document.getElementById('distributionChart');
+ const max=Math.max(...distributionData.map(d=>d.count),1);
+ distributionData.forEach(d=>{
+   const w=document.createElement('div'); w.className='barwrap';
+   const v=document.createElement('div'); v.className='value'; v.textContent=d.count;
+   const b=document.createElement('div'); b.className='bar'; b.style.background='var(--bar2)'; b.style.height=`${(d.count/max)*250}px`;
+   const l=document.createElement('div'); l.className='label'; l.textContent=d.x;
+   w.append(v,b,l); root.append(w);
+ });
+}
+renderCriterion(); renderDistribution();
+</script></body></html>
