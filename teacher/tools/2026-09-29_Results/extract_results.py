@@ -8,7 +8,7 @@ installed.
 
 Usage::
 
-    python extract_results.py "original/10A-Evaluaciones Académicas Habilidades.xls"
+    python extract_results.py "original"
 """
 
 from __future__ import annotations
@@ -30,6 +30,8 @@ from xml.etree import ElementTree as ET
 
 CRITERIA = [f"C{i}" for i in range(1, 11)]
 OUTPUT_COLUMNS = ["No.", "Student Name", *CRITERIA, "Total Periodo", "% Periodo"]
+UNIFIED_OUTPUT_COLUMNS = ["No.", "Student Name", "Group", *CRITERIA,
+                          "Total Periodo", "% Periodo"]
 YES_WORDS = {"si", "sí", "yes", "y", "true", "1", "x", "alcanzado", "logrado"}
 NO_WORDS = {"no", "n", "false", "0", "no alcanzado", "no logrado"}
 
@@ -283,34 +285,110 @@ def calculate_period_results(students: Iterable[dict[str, str]]) -> list[dict[st
     return results
 
 
-def export_csv(rows: Iterable[dict[str, object]], output_path: Path) -> None:
+def export_csv(
+    rows: Iterable[dict[str, object]],
+    output_path: Path,
+    columns: Sequence[str] = OUTPUT_COLUMNS,
+) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8-sig", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=OUTPUT_COLUMNS, extrasaction="ignore")
+        writer = csv.DictWriter(handle, fieldnames=columns, extrasaction="ignore")
         writer.writeheader()
         writer.writerows(rows)
 
 
-def default_output_path(input_path: Path) -> Path:
-    return input_path.with_suffix(".csv")
+def output_folder_for(input_folder: Path) -> Path:
+    """Return the sibling folder used for all generated CSV files."""
+    return input_folder.with_name(f"{input_folder.name}-Extracted")
+
+
+def find_excel_files(input_folder: Path) -> list[Path]:
+    """Find supported, non-temporary Excel files directly in a folder."""
+    return sorted(
+        (
+            path for path in input_folder.iterdir()
+            if path.is_file()
+            and path.suffix.casefold() in {".xls", ".xlsx"}
+            and not path.name.startswith("~$")
+        ),
+        key=lambda path: (path.name.casefold(), path.name),
+    )
+
+
+def individual_output_paths(
+    files: Sequence[Path], output_folder: Path
+) -> dict[Path, Path]:
+    """Create readable output names without collisions between equal stems."""
+    stem_counts: dict[str, int] = {}
+    for path in files:
+        key = path.stem.casefold()
+        stem_counts[key] = stem_counts.get(key, 0) + 1
+
+    return {
+        path: output_folder / (
+            f"{path.stem}.csv"
+            if stem_counts[path.stem.casefold()] == 1
+            and path.stem.casefold() != "unified_extracted"
+            else f"{path.stem}_{path.suffix.lstrip('.')}.csv"
+        )
+        for path in files
+    }
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("input", type=Path, help="source .xls or .xlsx file")
-    parser.add_argument("-o", "--output", type=Path,
-                        help="output CSV (default: input filename with .csv extension)")
+    parser.add_argument("input", type=Path, help="folder containing .xls or .xlsx files")
     args = parser.parse_args(argv)
-    output = args.output or default_output_path(args.input)
+
+    input_folder = args.input
+    if not input_folder.exists():
+        parser.error(f"input folder does not exist: {input_folder}")
+    if not input_folder.is_dir():
+        parser.error(f"input path is not a directory: {input_folder}")
+
     try:
-        source_rows = read_source_file(args.input)
-        students = extract_criteria(source_rows)
-        results = calculate_period_results(students)
-        export_csv(results, output)
-    except (OSError, ValueError, RuntimeError, zipfile.BadZipFile) as exc:
-        parser.exit(1, f"error: {exc}\n")
-    print(f"Extracted {len(results)} students to {output}")
-    return 0
+        files = find_excel_files(input_folder)
+    except OSError as exc:
+        parser.exit(1, f"error: could not scan input folder {input_folder}: {exc}\n")
+    if not files:
+        parser.error(f"no supported Excel files found in: {input_folder}")
+
+    output_folder = output_folder_for(input_folder)
+    output_paths = individual_output_paths(files, output_folder)
+    unified_rows: list[dict[str, object]] = []
+    failures = 0
+    try:
+        output_folder.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        parser.exit(1, f"error: could not create output folder {output_folder}: {exc}\n")
+
+    for source in files:
+        try:
+            source_rows = read_source_file(source)
+            students = extract_criteria(source_rows)
+            results = calculate_period_results(students)
+            output = output_paths[source]
+            export_csv(results, output)
+        except (OSError, ValueError, RuntimeError, zipfile.BadZipFile, ET.ParseError) as exc:
+            failures += 1
+            print(f"error: could not process {source.name}: {exc}", file=sys.stderr)
+            continue
+
+        group = source.stem.split("_", 1)[0]
+        unified_rows.extend({**result, "Group": group} for result in results)
+        print(f"Extracted {len(results)} students from {source.name} to {output}")
+
+    if unified_rows:
+        unified_output = output_folder / "Unified_Extracted.csv"
+        try:
+            export_csv(unified_rows, unified_output, UNIFIED_OUTPUT_COLUMNS)
+        except OSError as exc:
+            parser.exit(1, f"error: could not write {unified_output}: {exc}\n")
+        print(f"Combined {len(unified_rows)} students into {unified_output}")
+    else:
+        print("error: no Excel files could be processed", file=sys.stderr)
+
+    return 1 if failures else 0
 
 
 if __name__ == "__main__":
