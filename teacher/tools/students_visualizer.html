@@ -693,7 +693,8 @@ const state = {
     imageUrls: [],
     selectedGroups: new Set(),
     practiceStudents: [],
-    practiceStudent: null,
+    practiceMistakes: [],
+    practiceRound: 1,
     practiceIndex: 0,
     practiceActive: false
 };
@@ -1174,6 +1175,8 @@ function enterPracticeMode() {
     }
 
     state.practiceStudents = shuffleStudents(filtered);
+    state.practiceMistakes = [];
+    state.practiceRound = 1;
     state.practiceIndex = 0;
     state.practiceActive = true;
 
@@ -1194,10 +1197,12 @@ function renderPracticeStudent() {
     const student =
         state.practiceStudents[state.practiceIndex];
 
-    state.practiceStudent = student;
+    const roundLabel = state.practiceRound === 1
+        ? "Round 1"
+        : `Mistake Round ${state.practiceRound - 1}`;
 
     practiceProgress.textContent =
-        `Student ${state.practiceIndex + 1} of ${state.practiceStudents.length}`;
+        `${roundLabel} · Student ${state.practiceIndex + 1} of ${state.practiceStudents.length}`;
 
     practicePicture.innerHTML = "";
 
@@ -1265,7 +1270,8 @@ function submitPracticeAnswer() {
         return;
     }
 
-    const student = state.practiceStudent;
+    const student =
+        state.practiceStudents[state.practiceIndex];
 
     if (!student) {
         return;
@@ -1297,6 +1303,8 @@ function submitPracticeAnswer() {
         practiceResultMessage.textContent =
             "Correct!";
     } else {
+        state.practiceMistakes.push(student);
+
         practiceResult.classList.remove("correct");
         practiceResult.classList.add("error");
 
@@ -1318,7 +1326,17 @@ function nextPracticeStudent() {
         state.practiceIndex >=
         state.practiceStudents.length - 1
     ) {
-        finishPracticeMode();
+        if (!state.practiceMistakes.length) {
+            finishPracticeMode();
+            return;
+        }
+
+        state.practiceStudents =
+            shuffleStudents(state.practiceMistakes);
+        state.practiceMistakes = [];
+        state.practiceRound++;
+        state.practiceIndex = 0;
+        renderPracticeStudent();
         return;
     }
 
@@ -1329,7 +1347,8 @@ function nextPracticeStudent() {
 function finishPracticeMode() {
     state.practiceActive = false;
     state.practiceStudents = [];
-    state.practiceStudent = null;
+    state.practiceMistakes = [];
+    state.practiceRound = 1;
     state.practiceIndex = 0;
 
     practiceView.classList.remove("visible");
