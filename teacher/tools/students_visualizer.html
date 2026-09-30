@@ -77,7 +77,6 @@
     .toolbar,
     .status-panel,
     .group-filter-panel,
-    .fallback-panel,
     .practice-panel {
         background: white;
         border: 1px solid var(--gray-200);
@@ -433,21 +432,6 @@
         color: var(--gray-500);
     }
 
-    .fallback-panel {
-        display: none;
-    }
-
-    .fallback-panel.visible {
-        display: block;
-    }
-
-    .fallback-note {
-        color: var(--gray-500);
-        font-size: 13px;
-        margin-top: 10px;
-        line-height: 1.5;
-    }
-
     .loading {
         opacity: 0.6;
         pointer-events: none;
@@ -503,13 +487,14 @@
 <header>
     <div class="header-content">
         <h1>Student Picture Manager</h1>
-        <p>Select the folder that directly contains the student PNG files.</p>
+        <p>Select the project folder that contains the student PNG files.</p>
         <p>Start filenames with A-, B-, C-, D-, or E- to assign a group.</p>
     </div>
 
     <button id="selectFolderBtn" class="header-folder-button">
-        Select Pictures Folder
+        Select Project Folder
     </button>
+    <input id="folderInput" type="file" webkitdirectory multiple hidden>
 </header>
 
 <main>
@@ -656,21 +641,6 @@
     </div>
 </section>
 
-<section id="fallbackPanel" class="fallback-panel">
-    <strong>File System Access API unavailable</strong>
-
-    <p>
-        Your browser cannot directly access a local folder.
-        Use a Chromium-based browser such as Google Chrome or
-        Microsoft Edge to read the pictures folder.
-    </p>
-
-    <div class="fallback-note">
-        This webpage is read-only. No files will be created,
-        modified, renamed, copied, moved, deleted, or downloaded.
-    </div>
-</section>
-
 <section id="cards" class="cards">
     <div class="empty">
         Select the pictures folder to begin.
@@ -688,7 +658,6 @@
    ========================================================= */
 
 const state = {
-    picturesHandle: null,
     pngFiles: [],
     imageUrls: [],
     selectedGroups: new Set(),
@@ -704,6 +673,7 @@ const state = {
    ========================================================= */
 
 const selectFolderBtn = document.getElementById("selectFolderBtn");
+const folderInput = document.getElementById("folderInput");
 const searchInput = document.getElementById("searchInput");
 const sortSelect = document.getElementById("sortSelect");
 const practiceModeBtn = document.getElementById("practiceModeBtn");
@@ -721,8 +691,6 @@ const statusNoGroup = document.getElementById("statusNoGroup");
 
 const folderInfo = document.getElementById("folderInfo");
 const statusMessage = document.getElementById("statusMessage");
-
-const fallbackPanel = document.getElementById("fallbackPanel");
 
 const groupCards = document.querySelectorAll(".group-card");
 
@@ -797,56 +765,34 @@ function humanizeFilename(filename) {
 }
 
 /* =========================================================
-   File System Access API - Read Only
+   Local folder selection - Read Only
    ========================================================= */
 
-async function selectPicturesFolder() {
-    if (!("showDirectoryPicker" in window)) {
-        fallbackPanel.classList.add("visible");
-
-        showStatus(
-            "File System Access API is not available. Use Chrome or Edge to read the pictures folder.",
-            "warning"
-        );
-
-        return;
-    }
-
-    try {
-        const handle = await window.showDirectoryPicker({
-            mode: "read"
-        });
-
-        state.picturesHandle = handle;
-
-        await loadPicturesFolder();
-
-    } catch (error) {
-        if (error.name === "AbortError") {
-            return;
-        }
-
-        console.error(error);
-
-        showStatus(
-            `Could not open the pictures folder: ${error.message}`,
-            "error"
-        );
-    }
+function selectPicturesFolder() {
+    // Clearing the value ensures selecting the same folder fires "change".
+    folderInput.value = "";
+    folderInput.click();
 }
 
-async function loadPicturesFolder() {
-    if (!state.picturesHandle) {
+function loadPicturesFolder(fileList) {
+    if (!fileList.length) {
         return;
     }
 
     try {
         document.body.classList.add("loading");
 
-        await refresh();
+        scanPngFiles(fileList);
+        updateStatusCounters();
+        renderStudents();
+
+        const firstRelativePath = fileList[0].webkitRelativePath;
+        const folderName = firstRelativePath
+            ? firstRelativePath.split("/")[0]
+            : "Selected folder";
 
         folderInfo.textContent =
-            `Pictures folder: ${state.picturesHandle.name}`;
+            `Project folder: ${folderName}`;
 
         searchInput.disabled = false;
         sortSelect.disabled = false;
@@ -871,23 +817,14 @@ async function loadPicturesFolder() {
     }
 }
 
-async function scanPngFiles() {
-    state.pngFiles = [];
-
-    for await (
-        const [name, handle]
-        of state.picturesHandle.entries()
-    ) {
-        if (
-            handle.kind === "file" &&
-            /\.png$/i.test(name)
-        ) {
-            state.pngFiles.push({
-                name,
-                handle
-            });
-        }
-    }
+function scanPngFiles(fileList) {
+    state.pngFiles = Array.from(fileList)
+        .filter(file => /\.png$/i.test(file.name))
+        .map(file => ({
+            name: file.name,
+            relativePath: file.webkitRelativePath || file.name,
+            file
+        }));
 
     state.pngFiles.sort((a, b) =>
         a.name.localeCompare(
@@ -898,23 +835,6 @@ async function scanPngFiles() {
             }
         )
     );
-}
-
-/* =========================================================
-   Refresh
-   ========================================================= */
-
-async function refresh() {
-    if (
-        !state.picturesHandle
-    ) {
-        return;
-    }
-
-    await scanPngFiles();
-
-    updateStatusCounters();
-    renderStudents();
 }
 
 function updateStatusCounters() {
@@ -1063,7 +983,7 @@ function renderStudents() {
             "current-filename";
 
         currentFilename.textContent =
-            `Current: ${file.name}`;
+            `Current: ${file.relativePath}`;
 
         content.appendChild(studentName);
         content.appendChild(currentFilename);
@@ -1074,22 +994,19 @@ function renderStudents() {
         cardsContainer.appendChild(card);
 
         createImagePreview(
-            file.handle,
+            file.file,
             img,
             pictureContainer
         );
     }
 }
 
-async function createImagePreview(
-    fileHandle,
+function createImagePreview(
+    file,
     img,
     container
 ) {
     try {
-        const file =
-            await fileHandle.getFile();
-
         const url =
             URL.createObjectURL(file);
 
@@ -1213,7 +1130,7 @@ function renderPracticeStudent() {
 
     practicePicture.appendChild(img);
 
-    loadPracticeImage(student.handle, img);
+    loadPracticeImage(student.file, img);
 
     practiceInput.value = "";
     practiceInput.disabled = false;
@@ -1230,11 +1147,8 @@ function renderPracticeStudent() {
     practiceInput.focus();
 }
 
-async function loadPracticeImage(fileHandle, img) {
+function loadPracticeImage(file, img) {
     try {
-        const file =
-            await fileHandle.getFile();
-
         const url =
             URL.createObjectURL(file);
 
@@ -1406,6 +1320,11 @@ selectFolderBtn.addEventListener(
     selectPicturesFolder
 );
 
+folderInput.addEventListener(
+    "change",
+    () => loadPicturesFolder(folderInput.files)
+);
+
 searchInput.addEventListener(
     "input",
     () => {
@@ -1433,15 +1352,6 @@ sortSelect.addEventListener(
    ========================================================= */
 
 updateGroupCardStates();
-
-if (!("showDirectoryPicker" in window)) {
-    fallbackPanel.classList.add("visible");
-
-    showStatus(
-        "Full folder access requires a Chromium-based browser such as Chrome or Edge.",
-        "warning"
-    );
-}
 </script>
 
 </body>
