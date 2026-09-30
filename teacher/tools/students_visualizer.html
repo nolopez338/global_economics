@@ -558,25 +558,25 @@
 <header>
     <div class="header-content">
         <h1>Student Picture Manager</h1>
-        <p>Select a folder that has a subfolder called grade10Pictures</p>
-        <p>grade10Pictures is a folder with list of Group-name.png files</p>
+        <p>Select the folder containing the student PNG files</p>
+        <p>Student pictures should be named Group-name.png</p>
     </div>
 
     <button id="selectFolderBtn" class="header-folder-button">
-        Select Project Folder
+        Select Pictures Folder
     </button>
 </header>
 
 <main>
 
 <section class="status-panel" id="statusPanel">
-    <div class="status-title">Project Status</div>
+    <div class="status-title">Folder Status</div>
 
     <button
         id="statusToggle"
         class="status-toggle"
         type="button"
-        aria-label="Collapse Project Status"
+        aria-label="Collapse Folder Status"
         aria-expanded="true"
     >▼</button>
 
@@ -604,7 +604,7 @@
         </div>
 
         <div id="folderInfo" class="folder-info">
-            No project folder selected.
+            No pictures folder selected.
         </div>
 
         <div id="statusMessage" class="status-message"></div>
@@ -712,7 +712,7 @@
     <p>
         Your browser cannot directly access a local folder.
         Use a Chromium-based browser such as Google Chrome or
-        Microsoft Edge to read the project folder.
+        Microsoft Edge to read the pictures folder.
     </p>
 
     <div class="fallback-note">
@@ -723,7 +723,7 @@
 
 <section id="cards" class="cards">
     <div class="empty">
-        Select the project folder to begin.
+        Select the pictures folder to begin.
     </div>
 </section>
 
@@ -738,7 +738,6 @@
    ========================================================= */
 
 const state = {
-    projectHandle: null,
     picturesHandle: null,
     pngFiles: [],
     txtEntries: [],
@@ -790,7 +789,7 @@ const practiceFullName = document.getElementById("practiceFullName");
 const practiceNextBtn = document.getElementById("practiceNextBtn");
 
 /* =========================================================
-   Project Status collapse
+   Folder Status collapse
    ========================================================= */
 
 statusToggle.addEventListener("click", () => {
@@ -805,8 +804,8 @@ statusToggle.addEventListener("click", () => {
     statusToggle.setAttribute(
         "aria-label",
         collapsed
-            ? "Expand Project Status"
-            : "Collapse Project Status"
+            ? "Expand Folder Status"
+            : "Collapse Folder Status"
     );
 });
 
@@ -878,12 +877,12 @@ function getCurrentPngNames() {
    File System Access API - Read Only
    ========================================================= */
 
-async function selectProjectFolder() {
+async function selectPicturesFolder() {
     if (!("showDirectoryPicker" in window)) {
         fallbackPanel.classList.add("visible");
 
         showStatus(
-            "File System Access API is not available. Use Chrome or Edge to read the project folder.",
+            "File System Access API is not available. Use Chrome or Edge to read the pictures folder.",
             "warning"
         );
 
@@ -895,9 +894,9 @@ async function selectProjectFolder() {
             mode: "read"
         });
 
-        state.projectHandle = handle;
+        state.picturesHandle = handle;
 
-        await loadProject();
+        await loadPicturesFolder();
 
     } catch (error) {
         if (error.name === "AbortError") {
@@ -907,53 +906,43 @@ async function selectProjectFolder() {
         console.error(error);
 
         showStatus(
-            `Could not open the project folder: ${error.message}`,
+            `Could not open the pictures folder: ${error.message}`,
             "error"
         );
     }
 }
 
-async function loadProject() {
-    if (!state.projectHandle) {
+async function loadPicturesFolder() {
+    if (!state.picturesHandle) {
         return;
     }
 
     try {
         document.body.classList.add("loading");
 
-        state.picturesHandle =
-            await state.projectHandle.getDirectoryHandle(
-                "grade10Pictures"
-            );
-
         await refresh();
 
         folderInfo.textContent =
-            `Project folder: ${state.projectHandle.name}/grade10Pictures`;
+            `Pictures folder: ${state.picturesHandle.name}`;
 
         searchInput.disabled = false;
         sortSelect.disabled = false;
         practiceModeBtn.disabled = false;
 
         showStatus(
-            "Project loaded successfully.",
-            "success"
+            state.pngFiles.length > 0
+                ? "Pictures folder loaded successfully."
+                : "The selected folder does not contain any PNG files.",
+            state.pngFiles.length > 0 ? "success" : "warning"
         );
 
     } catch (error) {
         console.error(error);
 
-        if (error.name === "NotFoundError") {
-            showStatus(
-                "The selected folder does not contain a grade10Pictures folder.",
-                "error"
-            );
-        } else {
-            showStatus(
-                `Could not load the project: ${error.message}`,
-                "error"
-            );
-        }
+        showStatus(
+            `Could not load the pictures folder: ${error.message}`,
+            "error"
+        );
     } finally {
         document.body.classList.remove("loading");
     }
@@ -964,7 +953,7 @@ async function loadFileNames() {
 
     try {
         const fileHandle =
-            await state.projectHandle.getFileHandle(
+            await state.picturesHandle.getFileHandle(
                 "file_names.txt"
             );
 
@@ -990,7 +979,7 @@ async function loadFileNames() {
     }
 }
 
-async function scanGrade10Pictures() {
+async function scanPngFiles() {
     state.pngFiles = [];
 
     for await (
@@ -1054,14 +1043,13 @@ function compareFileLists() {
 
 async function refresh() {
     if (
-        !state.projectHandle ||
         !state.picturesHandle
     ) {
         return;
     }
 
     await loadFileNames();
-    await scanGrade10Pictures();
+    await scanPngFiles();
 
     updateStatusCounters();
     renderStudents();
@@ -1573,7 +1561,7 @@ practiceInput.addEventListener(
 
 selectFolderBtn.addEventListener(
     "click",
-    selectProjectFolder
+    selectPicturesFolder
 );
 
 searchInput.addEventListener(
