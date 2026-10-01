@@ -17,6 +17,7 @@ import argparse
 import csv
 import importlib
 import importlib.util
+import json
 import re
 import sys
 import zipfile
@@ -297,8 +298,24 @@ def export_csv(
         writer.writerows(rows)
 
 
+def write_csv_manifest(output_folder: Path) -> None:
+    """Index generated CSVs so a static browser page can discover their names."""
+    files = sorted(
+        (path.name for path in output_folder.iterdir()
+         if path.is_file() and path.suffix.casefold() == ".csv"),
+        key=lambda name: (name.casefold(), name),
+    )
+    manifest = output_folder / "csv-manifest.json"
+    manifest.write_text(
+        json.dumps({"files": files}, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
 def output_folder_for(input_folder: Path) -> Path:
     """Return the sibling folder used for all generated CSV files."""
+    if input_folder.name.casefold() == "original":
+        return input_folder.with_name("Extracted")
     return input_folder.with_name(f"{input_folder.name}-Extracted")
 
 
@@ -387,6 +404,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"Combined {len(unified_rows)} students into {unified_output}")
     else:
         print("error: no Excel files could be processed", file=sys.stderr)
+
+    try:
+        write_csv_manifest(output_folder)
+    except OSError as exc:
+        parser.exit(1, f"error: could not write CSV manifest: {exc}\n")
 
     return 1 if failures else 0
 
