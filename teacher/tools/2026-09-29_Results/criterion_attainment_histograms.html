@@ -9,7 +9,7 @@
 *{box-sizing:border-box} body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
 main{max-width:1050px;margin:0 auto;padding:32px 20px 48px} h1{font-size:28px;margin:0 0 8px}.sub{color:var(--muted);margin:0}
 .toolbar{display:flex;align-items:end;gap:14px;flex-wrap:wrap;margin:24px 0}.field{display:grid;gap:6px}.field label{font-size:12px;font-weight:700;color:var(--muted)}
-select,.button{min-height:42px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);padding:9px 12px;font:inherit}.button{display:inline-flex;align-items:center;cursor:pointer;color:var(--accent);font-weight:700}.button input{display:none}
+select{min-height:42px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);padding:9px 12px;font:inherit}
 #status{font-size:13px;color:var(--muted);padding-bottom:11px}.class-title{margin:0 0 20px;font-size:20px}.grid{display:grid;gap:22px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
 h2{font-size:18px;margin:0 0 4px}.desc{font-size:13px;color:var(--muted);margin:0 0 20px}.chart{height:360px;display:flex;align-items:flex-end;gap:18px;border-left:1px solid #aab2c0;border-bottom:1px solid #aab2c0;padding:20px 18px 0;position:relative}
 .barwrap{height:100%;flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}.value{font-size:13px;font-weight:700;margin-bottom:7px;text-align:center}.bar{width:min(82px,72%);background:var(--bar);border-radius:7px 7px 0 0;min-height:2px}.label{height:52px;font-size:12px;text-align:center;padding-top:8px;line-height:1.25;overflow-wrap:anywhere}.axislabel{text-align:center;color:var(--muted);font-size:12px;margin-top:8px}.note{font-size:12px;color:var(--muted);margin-top:12px}.empty{align-self:center;margin:auto;color:var(--muted)}
@@ -18,10 +18,9 @@ h2{font-size:18px;margin:0 0 4px}.desc{font-size:13px;color:var(--muted);margin:
 </head>
 <body><main>
 <h1>Criterion Attainment</h1>
-<p class="sub">The dashboard automatically loads every class CSV found beside this page.</p>
+<p class="sub">The dashboard automatically loads the unified criterion results.</p>
 <div class="toolbar">
-  <div class="field"><label for="classSelector">Grade and group</label><select id="classSelector" disabled><option>Finding CSV files…</option></select></div>
-  <label class="button">Choose CSV folder<input id="filePicker" type="file" accept=".csv,text/csv" multiple webkitdirectory></label>
+  <div class="field"><label for="classSelector">Grade and group</label><select id="classSelector" disabled><option>Loading groups…</option></select></div>
   <span id="status" role="status" aria-live="polite"></span>
 </div>
 <h2 class="class-title" id="classTitle"></h2>
@@ -29,12 +28,13 @@ h2{font-size:18px;margin:0 0 4px}.desc{font-size:13px;color:var(--muted);margin:
 <section class="card"><h2>Criterion attainment histogram</h2><p class="desc">Number and percentage of students passing each assessed criterion.</p><div class="chart" id="criterionChart"></div><div class="axislabel">Criterion</div></section>
 <section class="card"><h2>Number of criteria passed per student</h2><p class="desc" id="distributionDescription">How many students are passing each number of assessed criteria.</p><div class="chart" id="distributionChart"></div><div class="axislabel">Number of criteria passed</div></section>
 </div>
-<p class="note">“Si” means passed. “No” means not passed. Blank cells are treated as missing data, not as failed criteria.</p>
+<p class="note">“Si”, “Sí”, and the unified export's “Yes” mean passed. “No” means not passed. Blank cells are treated as missing data, not as failed criteria.</p>
 </main>
 <script>
 const selector=document.getElementById('classSelector');
 const status=document.getElementById('status');
 const dashboards=new Map();
+const csvPath='./Extracted/Unified_Extracted.csv';
 
 // Handles commas inside quoted fields, escaped quotes, CRLF files, and a UTF-8 BOM.
 function parseCSV(text){
@@ -52,29 +52,48 @@ function parseCSV(text){
   return rows;
 }
 
-function classFromFilename(name){
-  const base=name.split('/').pop();
-  const match=base.match(/^(\d+)([A-Za-z]+)_Evaluaciones_Academicas_Habilidades\.csv$/i);
-  return match?{grade:Number(match[1]),group:match[2].toUpperCase(),name:base}:null;
+function normalizedHeader(value){return (value||'').trim().toLocaleLowerCase();}
+function resultValue(value){
+  const normalized=(value||'').trim().toLocaleLowerCase();
+  if(normalized==='si'||normalized==='sí'||normalized==='yes')return 'passed';
+  if(normalized==='no')return 'failed';
+  return null;
 }
 
-function makeDashboard(name,text){
-  const klass=classFromFilename(name); if(!klass) return null;
-  const rows=parseCSV(text); if(rows.length<3) throw new Error(`${klass.name} has no student records`);
-  const headings=rows[1];
-  const columns=headings.map((heading,index)=>({heading:heading.trim(),index})).filter(c=>/^C\d+$/i.test(c.heading));
-  const criteria=columns.map(column=>{
-    const values=rows.slice(2).map(row=>(row[column.index]||'').trim().toLocaleLowerCase());
-    const assessed=values.filter(value=>value==='si'||value==='sí'||value==='no');
-    const passed=assessed.filter(value=>value==='si'||value==='sí').length;
-    return {criterion:column.heading.toUpperCase(),passed,total:assessed.length,percent:assessed.length?Math.round(passed/assessed.length*1000)/10:0,index:column.index};
-  }).filter(item=>item.total>0);
-  const counts=Array(criteria.length+1).fill(0);
-  rows.slice(2).filter(row=>row.some(cell=>cell.trim())).forEach(row=>{
-    const values=criteria.map(c=>(row[c.index]||'').trim().toLocaleLowerCase());
-    if(values.some(value=>value==='si'||value==='sí'||value==='no')) counts[values.filter(value=>value==='si'||value==='sí').length]++;
+function makeDashboards(text){
+  const rows=parseCSV(text);
+  if(rows.length<2)throw new Error('the file has no student records');
+  const headings=rows[0];
+  const groupIndex=headings.findIndex(heading=>normalizedHeader(heading)==='group');
+  if(groupIndex<0)throw new Error('the required “Group” column is missing');
+  const columns=headings.map((heading,index)=>{
+    const match=normalizedHeader(heading).match(/^c(10|[1-9])$/);
+    return match?{criterion:`C${Number(match[1])}`,number:Number(match[1]),index}:null;
+  }).filter(Boolean).sort((a,b)=>a.number-b.number);
+  if(!columns.length)throw new Error('no criterion columns (C1–C10) were found');
+
+  const grouped=new Map();
+  rows.slice(1).forEach(row=>{
+    const group=(row[groupIndex]||'').trim();
+    if(!group)return;
+    if(!grouped.has(group))grouped.set(group,[]);
+    grouped.get(group).push(row);
   });
-  return {...klass,criteria,distribution:counts.map((count,x)=>({x,count}))};
+  if(!grouped.size)throw new Error('no students with a group were found');
+
+  grouped.forEach((studentRows,group)=>{
+    const criteria=columns.map(column=>{
+      const values=studentRows.map(row=>resultValue(row[column.index])).filter(Boolean);
+      const passed=values.filter(value=>value==='passed').length;
+      return {criterion:column.criterion,passed,total:values.length,index:column.index};
+    }).filter(item=>item.total>0).map(item=>({...item,percent:Math.round(item.passed/item.total*1000)/10}));
+    const counts=Array(criteria.length+1).fill(0);
+    studentRows.forEach(row=>{
+      const values=criteria.map(criterion=>resultValue(row[criterion.index])).filter(Boolean);
+      if(values.length)counts[values.filter(value=>value==='passed').length]++;
+    });
+    dashboards.set(group,{group,criteria,distribution:counts.map((count,x)=>({x,count}))});
+  });
 }
 
 function bar(root,value,label,height,color){
@@ -87,7 +106,7 @@ function bar(root,value,label,height,color){
 
 function render(key){
   const data=dashboards.get(key);if(!data)return;
-  document.getElementById('classTitle').textContent=`Grade ${data.grade} · Group ${data.group}`;
+  document.getElementById('classTitle').textContent=data.group;
   const criterionRoot=document.getElementById('criterionChart');criterionRoot.replaceChildren();
   const distributionRoot=document.getElementById('distributionChart');distributionRoot.replaceChildren();
   const criterionMax=Math.max(...data.criteria.map(item=>item.total),1);
@@ -99,33 +118,32 @@ function render(key){
 
 function refreshSelector(){
   const selected=selector.value;
-  const items=[...dashboards.entries()].sort((a,b)=>a[1].grade-b[1].grade||a[1].group.localeCompare(b[1].group));
-  selector.replaceChildren(...items.map(([key,item])=>{const option=document.createElement('option');option.value=key;option.textContent=`Grade ${item.grade} · Group ${item.group}`;return option;}));
+  const items=[...dashboards.entries()].sort((a,b)=>a[0].localeCompare(b[0],undefined,{numeric:true,sensitivity:'base'}));
+  selector.replaceChildren(...items.map(([key,item])=>{const option=document.createElement('option');option.value=key;option.textContent=item.group;return option;}));
   selector.disabled=!items.length;if(items.length){selector.value=dashboards.has(selected)?selected:items[0][0];render(selector.value);}
-  status.textContent=`${items.length} class${items.length===1?'':'es'} loaded`;
+  status.textContent=`Unified_Extracted.csv loaded successfully · ${items.length} group${items.length===1?'':'s'} found`;
 }
 
-async function addCSV(name,text){
-  try{const data=makeDashboard(name,text);if(data)dashboards.set(`${data.grade}${data.group}`,data);}
-  catch(error){console.error(error);status.textContent=`Could not read ${name}: ${error.message}`;}
+function showLoadError(error){
+  selector.replaceChildren(new Option('No groups available'));selector.disabled=true;
+  status.textContent=`Could not load Unified_Extracted.csv: ${error.message}`;
+  document.getElementById('classTitle').textContent='Data unavailable';
+  for(const id of ['criterionChart','distributionChart']){
+    const message=document.createElement('p');message.className='empty';message.textContent='The unified results could not be displayed.';
+    document.getElementById(id).replaceChildren(message);
+  }
+  console.error(error);
 }
 
-async function discoverCSVs(){
+async function loadUnifiedCSV(){
   try{
-    const response=await fetch('./');if(!response.ok)throw new Error('Directory listing unavailable');
-    const listing=await response.text();const documentListing=new DOMParser().parseFromString(listing,'text/html');
-    const names=[...new Set([...documentListing.querySelectorAll('a[href]')].map(a=>decodeURIComponent(a.getAttribute('href').split('?')[0])).filter(href=>classFromFilename(href)))];
-    if(!names.length)throw new Error('No matching CSV links in directory listing');
-    await Promise.all(names.map(async name=>{const csv=await fetch(new URL(name,location.href));if(csv.ok)await addCSV(name,await csv.text());}));
+    const response=await fetch(csvPath);
+    if(!response.ok)throw new Error(`server returned ${response.status} ${response.statusText}`.trim());
+    makeDashboards(await response.text());
     refreshSelector();
-  }catch(error){selector.replaceChildren(new Option('Choose the CSV folder…'));status.textContent='Automatic discovery is unavailable; choose this folder above.';console.info(error.message);}
+  }catch(error){showLoadError(error);}
 }
 
 selector.addEventListener('change',()=>render(selector.value));
-document.getElementById('filePicker').addEventListener('change',async event=>{
-  dashboards.clear();
-  await Promise.all([...event.target.files].filter(file=>classFromFilename(file.name)).map(async file=>addCSV(file.name,await file.text())));
-  refreshSelector();
-});
-discoverCSVs();
+loadUnifiedCSV();
 </script></body></html>
