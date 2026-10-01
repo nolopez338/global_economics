@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="An interactive laboratory for exploring linear functions in slope-intercept form.">
+  <title>Line Lab — Explore f(x) = mx + b</title>
+  <style>
+    :root {
+      --ink:#17213d; --muted:#63708a; --paper:#f7f9fd; --card:#fff;
+      --navy:#122047; --slope:#6d45d8; --intercept:#e45b7a; --input:#087f83;
+      --output:#dc721b; --line:#3e58cc; --grid:#dfe5f0; --good:#087b55;
+      --bad:#b43b54; --shadow:0 14px 35px rgba(23,33,61,.09); --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    a{color:inherit}
+    .topbar{background:var(--navy);color:#fff;position:sticky;top:0;z-index:20;box-shadow:0 3px 18px #10193640}
+    .nav{max-width:1180px;margin:auto;padding:.8rem 1.2rem;display:flex;align-items:center;gap:1.2rem}
+    .brand{font-weight:850;letter-spacing:-.02em;white-space:nowrap}.brand span{color:#a9f0df}
+    .nav nav{display:flex;gap:.35rem;overflow:auto;margin-left:auto}
+    .nav a{text-decoration:none;font-size:.88rem;padding:.42rem .7rem;border-radius:999px;white-space:nowrap;color:#dce5ff}
+    .nav a:hover,.nav a:focus{background:#ffffff18;color:#fff}
+    .hero{background:linear-gradient(135deg,#122047 0%,#243d82 58%,#147b83 100%);color:white;padding:5.5rem 1.2rem 4.5rem;overflow:hidden;position:relative}
+    .hero:after{content:"y = mx + b";position:absolute;right:-1rem;bottom:-3rem;font-weight:900;font-size:clamp(4rem,12vw,10rem);opacity:.06;transform:rotate(-6deg)}
+    .hero-inner{max-width:1040px;margin:auto;position:relative;z-index:1}.eyebrow{text-transform:uppercase;letter-spacing:.16em;font-size:.76rem;font-weight:800;color:#a9f0df}
+    h1{font-size:clamp(2.7rem,6vw,5.4rem);line-height:1.02;letter-spacing:-.05em;margin:.5rem 0 1rem;max-width:850px}
+    .hero p{max-width:720px;font-size:1.16rem;color:#e3eaff}
+    .pathway{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem;margin:1.8rem 0}.pathway b{background:#ffffff13;border:1px solid #ffffff30;padding:.55rem .8rem;border-radius:10px}.pathway span{color:#a9f0df;font-weight:800}
+    .primary,.secondary,.preset,.choice{border:0;border-radius:11px;padding:.7rem 1rem;font-weight:750;transition:.15s transform,.15s background}
+    .primary{background:#a9f0df;color:#102044}.primary:hover{transform:translateY(-2px)}
+    .secondary,.preset,.choice{background:#eef1fa;color:var(--ink);border:1px solid #dbe1ef}.secondary:hover,.preset:hover,.choice:hover{background:#e2e8f7}.preset.active{background:var(--slope);color:#fff;border-color:var(--slope)}
+    main{max-width:1180px;margin:auto;padding:1rem 1.2rem 5rem}
+    section{scroll-margin-top:80px;margin:4.2rem 0}.section-head{max-width:780px;margin-bottom:1.5rem}
+    h2{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.04em;line-height:1.12;margin:.35rem 0}.section-head p{color:var(--muted);font-size:1.06rem}
+    h3{line-height:1.25;margin:.4rem 0}.tag{display:inline-block;font-size:.73rem;text-transform:uppercase;letter-spacing:.12em;font-weight:850;color:var(--line);background:#e9edff;padding:.35rem .6rem;border-radius:999px}
+    .cards{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem}.card,.panel{background:var(--card);border:1px solid #e3e7f0;border-radius:var(--radius);box-shadow:var(--shadow)}
+    .card{padding:1.25rem}.card-icon{font-size:1.6rem}.card p,.small{color:var(--muted);font-size:.92rem}.caution{margin-top:1rem;background:#fff7dd;border-left:4px solid #e0a526;padding:1rem;border-radius:4px 12px 12px 4px}
+    .notation{display:grid;grid-template-columns:1.2fr 1fr;gap:1rem;align-items:stretch}.formula-stage{padding:2rem;display:grid;place-items:center;background:var(--navy);color:white;min-height:310px}
+    .big-formula{font-family:Georgia,serif;font-size:clamp(2.8rem,7vw,5.6rem)}.token{border:0;background:transparent;color:inherit;font:inherit;padding:.08em;border-radius:.12em}.token:hover,.token.active{outline:3px solid currentColor;outline-offset:3px}.token.f{color:#a9f0df}.token.x{color:#67d9dc}.token.m{color:#c5a9ff}.token.b{color:#ff9db2}
+    .notation-info{padding:2rem;display:flex;flex-direction:column;justify-content:center}.notation-info .mini{color:var(--muted)}
+    .explorer{padding:1rem}.explorer-top{display:grid;grid-template-columns:330px minmax(0,1fr);gap:1rem}.controls{padding:1rem}
+    .live-equation{font-family:Georgia,serif;font-size:2rem;text-align:center;background:#f0f3fc;padding:.8rem;border-radius:14px;margin-bottom:1.1rem}
+    .control{margin:1rem 0}.control-head{display:flex;justify-content:space-between;align-items:center}.control label{font-weight:800}.m-text{color:var(--slope)}.b-text{color:var(--intercept)}.x-text{color:var(--input)}
+    .range-row{display:grid;grid-template-columns:1fr 76px;gap:.65rem;align-items:center}.range-row input[type=range]{width:100%;accent-color:var(--line)}.range-row input[type=number]{width:100%;padding:.45rem;border:1px solid #cdd5e5;border-radius:8px}
+    .toggle{display:flex;align-items:center;gap:.55rem;margin:.7rem 0;font-size:.9rem}.toggle input{width:18px;height:18px;accent-color:var(--line)}
+    .graph-wrap{position:relative;min-height:500px;background:#fbfcff;border-radius:17px;border:1px solid #e2e6ef;overflow:hidden}.graph-wrap svg{display:block;width:100%;height:500px;touch-action:none}
+    .graph-toolbar{position:absolute;right:.7rem;top:.7rem;display:flex;gap:.35rem}.icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid #d6ddeb;background:#fff;color:var(--ink);font-weight:900;box-shadow:0 4px 10px #17213d15}
+    .legend{position:absolute;left:.75rem;top:.75rem;background:#ffffffeb;padding:.4rem .65rem;border-radius:9px;font-size:.76rem;border:1px solid #e1e5ed}.legend i{display:inline-block;width:18px;border-top:3px solid var(--line);margin-right:.3rem}
+    .below-grid{display:grid;grid-template-columns:1.1fr .75fr 1.2fr;gap:1rem;margin-top:1rem}.subpanel{background:#f8f9fd;border:1px solid #e2e7f0;border-radius:16px;padding:1.15rem}.eval-steps{font-family:Georgia,serif;font-size:1.12rem;line-height:1.8}.mapping{font-weight:850;color:var(--input);background:#e7f6f5;padding:.6rem;text-align:center;border-radius:10px}
+    table{width:100%;border-collapse:collapse;text-align:center}th{color:var(--muted);font-size:.8rem}td,th{padding:.36rem;border-bottom:1px solid #e1e5ed}tbody tr{cursor:pointer}tbody tr:hover,tbody tr.selected{background:#e4f4f3}tbody tr.intercept{font-weight:800;box-shadow:inset 3px 0 var(--intercept)}
+    .explain-box{border-left:4px solid var(--slope);padding-left:1rem}.factline{display:flex;gap:.6rem;margin:.7rem 0}.factline strong{min-width:30px}
+    .lab-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.lab{padding:1.5rem}.presets{display:flex;gap:.45rem;flex-wrap:wrap;margin:1rem 0}.callout{background:#f0edff;color:#392675;padding:1rem;border-radius:13px;font-weight:700}.b-callout{background:#fff0f3;color:#8e2e45}.compare-lines{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;text-align:center;margin-top:1rem}.line-chip{padding:.7rem;border-radius:10px;border:2px solid #ddd;font-family:Georgia,serif}.line-chip:nth-child(1){border-color:#6d45d8}.line-chip:nth-child(2){border-color:#087f83}.line-chip:nth-child(3){border-color:#e45b7a}
+    .facts{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem}.fact{padding:1.2rem}.fact-number{font:700 1.8rem Georgia,serif;color:var(--line)}
+    .two-point{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.point-controls{padding:1.5rem}.point-controls select{padding:.55rem;border-radius:9px;border:1px solid #ccd5e5}.slope-result{font:1.2rem Georgia,serif;background:#f0edff;padding:1rem;border-radius:12px;margin-top:1rem}
+    .context-layout{display:grid;grid-template-columns:340px 1fr;gap:1rem}.scenario-list{padding:1rem}.scenario-btn{display:block;width:100%;text-align:left;margin:.5rem 0;border:1px solid #dfe4ef;background:white;padding:.8rem;border-radius:12px;font-weight:750}.scenario-btn.active{border-color:var(--input);background:#e9f7f6}.scenario-content{padding:1.7rem}.context-equation{font:2rem Georgia,serif;color:var(--navy);margin:1rem 0}.context-pills{display:flex;flex-wrap:wrap;gap:.6rem}.context-pills button{border:1px solid #bddbd9;background:#e9f7f6;padding:.55rem .8rem;border-radius:9px}.context-answer{margin-top:1rem;padding:1rem;background:#f8f9fd;border-radius:12px}
+    .representation{padding:1.5rem}.rep-tabs{display:flex;gap:.5rem;flex-wrap:wrap}.rep-tab{border:1px solid #dbe1eb;background:#f3f5fa;padding:.6rem .85rem;border-radius:10px;font-weight:750}.rep-tab.active{background:var(--navy);color:#fff}.rep-display{min-height:150px;margin-top:1rem;border:1px dashed #bac4d9;border-radius:15px;padding:1.4rem;display:grid;place-items:center;text-align:center}.rep-arrow{color:var(--input);font-weight:800}
+    .specials{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}.special{padding:1.2rem}.special button{width:100%;margin-top:.5rem}.vertical-note{margin-top:1rem;padding:1.2rem;background:#fff4e9;border-radius:14px;border:1px solid #f2d0ad}
+    .prediction{padding:1.4rem}.prediction-top{display:flex;justify-content:space-between;gap:1rem;align-items:start}.prediction-options{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-top:1rem}.prediction-feedback{min-height:2rem;margin-top:.8rem;font-weight:750}.prediction-feedback.good{color:var(--good)}.prediction-feedback.bad{color:var(--bad)}
+    .practice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}.exercise{padding:1.4rem}.answer-row{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:1rem}.answer-row input{width:105px;padding:.55rem;border:1px solid #cbd4e4;border-radius:9px}.feedback{min-height:2.5rem;margin-top:.7rem;padding:.55rem;border-radius:8px}.feedback.good{background:#e3f5ec;color:var(--good)}.feedback.bad{background:#fdecef;color:var(--bad)}
+    .glossary{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}.term{background:#fff;border:1px solid #e0e5ee;padding:1rem;border-radius:14px}.term b{color:var(--line)}
+    footer{background:var(--navy);color:#e7ecff;padding:3rem 1.2rem;text-align:center}footer .pathway{justify-content:center}
+    @media(max-width:900px){.cards,.facts{grid-template-columns:repeat(2,1fr)}.explorer-top,.notation,.context-layout{grid-template-columns:1fr}.below-grid{grid-template-columns:1fr 1fr}.below-grid .subpanel:last-child{grid-column:1/-1}.specials{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:650px){.nav nav{display:none}.hero{padding-top:4rem}.cards,.facts,.lab-grid,.two-point,.practice-grid,.glossary{grid-template-columns:1fr}.below-grid{grid-template-columns:1fr}.below-grid .subpanel:last-child{grid-column:auto}.explorer{padding:.5rem}.graph-wrap,.graph-wrap svg{min-height:390px;height:390px}.prediction-options{grid-template-columns:1fr}.compare-lines{grid-template-columns:1fr}.specials{grid-template-columns:1fr}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="nav"><div class="brand">LINE <span>LAB</span></div><nav aria-label="Page sections"><a href="#explorer">Explorer</a><a href="#slope">Slope</a><a href="#context">Context</a><a href="#practice">Practice</a><a href="#words">Words</a></nav></div>
+  </header>
+  <div class="hero">
+    <div class="hero-inner"><div class="eyebrow">An interactive mathematics laboratory</div><h1>One equation.<br>Many connected stories.</h1><p>A linear function describes a constant-rate relationship. Change a number and watch the equation, table, points, graph, and story respond together.</p><div class="pathway" aria-label="Representations"><b>Context</b><span>↔</span><b>Equation</b><span>↔</span><b>Table</b><span>↔</span><b>Points</b><span>↔</span><b>Graph</b></div><a class="primary" href="#explorer">Start experimenting ↓</a></div>
+  </div>
+  <main>
+    <section id="intro"><div class="section-head"><span class="tag">Start with a story</span><h2>Where do straight-line patterns appear?</h2><p>Whenever one quantity changes by the <strong>same amount</strong> for every equal change in another, a linear model may fit.</p></div>
+      <div class="cards">
+        <article class="card"><div class="card-icon">🚕</div><h3>Taxi fare</h3><p>A base fare plus the same price for each kilometre: <b>C(x)=mx+b</b>.</p><small>x = distance · m = price/km · b = base fare</small></article>
+        <article class="card"><div class="card-icon">💼</div><h3>Hourly earnings</h3><p>An initial amount plus a fixed amount earned each hour.</p></article>
+        <article class="card"><div class="card-icon">💧</div><h3>Water tank</h3><p>Water increases—or decreases—with a constant flow rate.</p></article>
+        <article class="card"><div class="card-icon">🌡️</div><h3>Temperature</h3><p>Celsius and Fahrenheit are connected by a linear conversion.</p></article>
+        <article class="card"><div class="card-icon">🚲</div><h3>Steady motion</h3><p>At constant speed, distance changes evenly with time.</p></article>
+      </div><div class="caution"><b>Reality check:</b> not every relationship is linear. A car that speeds up, a curved ball flight, or compound interest has a changing rate. Linear models require a constant rate (or clearly state that they are an approximation).</div>
+    </section>
+
+    <section id="notation"><div class="section-head"><span class="tag">Meet the notation</span><h2>Every symbol has a job</h2><p>Tap a highlighted part of the equation. The notation is compact, but it tells a complete input → output story.</p></div>
+      <div class="notation">
+        <div class="panel formula-stage"><div class="big-formula"><button class="token f active" data-token="f">f</button>(<button class="token x" data-token="x">x</button>) = <button class="token m" data-token="m">m</button><button class="token x" data-token="x">x</button> + <button class="token b" data-token="b">b</button></div></div>
+        <div class="panel notation-info" id="notationInfo"><span class="tag">Function name</span><h3>f names the rule</h3><p>Functions can be named <b>g</b>, <b>h</b>, or meaningful names such as <b>C</b> for cost and <b>P</b> for profit.</p><p class="mini">The name lets us discuss a particular input-output rule.</p></div>
+      </div>
+    </section>
+
+    <section id="explorer"><div class="section-head"><span class="tag">Main laboratory</span><h2>Change it here. See it everywhere.</h2><p>Manipulate <b class="m-text">m</b>, <b class="b-text">b</b>, and <b class="x-text">x</b>. Every representation below is generated from the same mathematical state.</p></div>
+      <div class="panel explorer">
+        <div class="explorer-top">
+          <div class="controls">
+            <div class="live-equation" id="liveEquation">f(x) = 2x + 3</div>
+            <div class="control"><div class="control-head"><label for="mRange" class="m-text">m · slope</label><span>rate/change</span></div><div class="range-row"><input id="mRange" type="range" min="-10" max="10" step="0.5" value="2"><input id="mNumber" type="number" min="-10" max="10" step="0.5" value="2" aria-label="Slope numerical value"></div></div>
+            <div class="control"><div class="control-head"><label for="bRange" class="b-text">b · intercept</label><span>value at x = 0</span></div><div class="range-row"><input id="bRange" type="range" min="-10" max="10" step="0.5" value="3"><input id="bNumber" type="number" min="-10" max="10" step="0.5" value="3" aria-label="Intercept numerical value"></div></div>
+            <div class="control"><div class="control-head"><label for="xRange" class="x-text">x · selected input</label><span>try a value</span></div><div class="range-row"><input id="xRange" type="range" min="-8" max="8" step="1" value="1"><input id="xNumber" type="number" min="-8" max="8" step="1" value="1" aria-label="Input numerical value"></div></div>
+            <label class="toggle"><input id="triangleToggle" type="checkbox" checked> Show slope triangle (run and rise)</label>
+            <label class="toggle"><input id="guidesToggle" type="checkbox" checked> Show input/output guide lines</label>
+            <label class="toggle"><input id="compareToggle" type="checkbox"> Compare parallel lines (b − 3, b, b + 3)</label>
+            <p class="small">Tip: drag on the graph to pan. Zoom changes the visible window, not the function.</p>
+          </div>
+          <div class="graph-wrap" id="graphWrap"><svg id="mainGraph" role="img" aria-label="Coordinate plane showing the selected linear function"></svg><div class="legend"><i></i> current function</div><div class="graph-toolbar"><button class="icon-btn" id="zoomIn" aria-label="Zoom in">+</button><button class="icon-btn" id="zoomOut" aria-label="Zoom out">−</button><button class="icon-btn" id="resetView" aria-label="Reset graph view">↺</button></div></div>
+        </div>
+        <div class="below-grid">
+          <div class="subpanel"><h3>Evaluate the function</h3><p class="small">Substitution and the selected graph point say the same thing.</p><div class="eval-steps" id="evalSteps"></div><div class="mapping" id="mapping"></div></div>
+          <div class="subpanel"><h3>Input → output table</h3><table><thead><tr><th>input x</th><th>output f(x)</th><th>point</th></tr></thead><tbody id="valueTable"></tbody></table><p class="small">Select a row to place its point on the graph. The marked x = 0 row reveals b.</p></div>
+          <div class="subpanel"><h3>What just happened?</h3><div class="explain-box" id="dynamicExplanation"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="slope"><div class="section-head"><span class="tag">Cause and effect</span><h2>What does the slope <span class="m-text">m</span> control?</h2><p>Keep b fixed and compare. Direction comes from the sign; steepness comes from the size of |m|.</p></div>
+      <div class="lab-grid">
+        <article class="panel lab"><h3>Rapid slope comparisons</h3><p>Predict first: will the line rise, fall, or stay level?</p><div class="presets" id="slopePresets"></div><div class="callout" id="slopeStatement"></div><p class="small"><b>m &gt; 0:</b> increasing · <b>m &lt; 0:</b> decreasing · <b>m = 0:</b> constant. Large |m| is steeper; small nonzero |m| is flatter.</p></article>
+        <article class="panel lab"><h3>Move the intercept, not the tilt</h3><p>Keep m fixed; change b. The whole line moves vertically, but its slope does not change.</p><div class="presets" id="bPresets"></div><div class="callout b-callout" id="bStatement"></div><div class="compare-lines"><div class="line-chip" id="cmp1">f(x)=2x−3</div><div class="line-chip" id="cmp2">g(x)=2x</div><div class="line-chip" id="cmp3">h(x)=2x+3</div></div><p class="small">Same slope + different intercepts = parallel lines. Same slope + same intercept = the identical line.</p></article>
+      </div>
+    </section>
+
+    <section id="consequences"><div class="section-head"><span class="tag">Read the equation</span><h2>What can we know before plotting?</h2></div>
+      <div class="facts">
+        <article class="panel fact"><div class="fact-number">(0, b)</div><h3>Intercept</h3><p>Put x = 0: f(0) = m·0 + b = b.</p></article>
+        <article class="panel fact"><div class="fact-number">Δf=mΔx</div><h3>Constant change</h3><p id="deltaFact">With m = 2, a run of 2 gives a rise of 4.</p></article>
+        <article class="panel fact"><div class="fact-number">m₁=m₂</div><h3>Parallel</h3><p>Equal slopes and different b-values never meet.</p></article>
+        <article class="panel fact"><div class="fact-number">m₁=m₂, b₁=b₂</div><h3>Identical</h3><p>Both equations name exactly the same set of points.</p></article>
+        <article class="panel fact"><div class="fact-number">m₁≠m₂</div><h3>One intersection</h3><p>Different slopes meet once: solve m₁x+b₁=m₂x+b₂.</p></article>
+      </div>
+    </section>
+
+    <section id="two-points"><div class="section-head"><span class="tag">Slope from points</span><h2>Any two points tell the same rate</h2><p>Select two distinct x-values. The run and rise change, but their ratio stays m.</p></div>
+      <div class="two-point">
+        <div class="panel point-controls"><h3>Choose points on the current line</h3><p><label>First x <select id="pointX1"></select></label> <label>Second x <select id="pointX2"></select></label></p><div class="slope-result" id="twoPointResult"></div><p class="small">A nonvertical function has one output for each input, so distinct x-values make Δx nonzero.</p></div>
+        <div class="panel point-controls"><h3>Why the ratio stays constant</h3><p>For y = mx+b, subtracting outputs cancels b:</p><div class="slope-result">y₂−y₁ = (mx₂+b)−(mx₁+b)<br>= m(x₂−x₁)<br>so (y₂−y₁)/(x₂−x₁) = m</div><p>The slope triangle on the main graph draws the same horizontal <b>run</b> and vertical <b>rise</b>.</p></div>
+      </div>
+    </section>
+
+    <section id="context"><div class="section-head"><span class="tag">From situation to rule</span><h2>Build an equation from a story</h2><p>Find what starts at zero, what changes each unit, and what quantities are input and output.</p></div>
+      <div class="context-layout"><div class="panel scenario-list" id="scenarioList"></div><article class="panel scenario-content"><span class="tag" id="contextType"></span><h3 id="contextTitle"></h3><p id="contextStory"></p><div class="context-equation" id="contextEquation"></div><div id="contextMeaning"></div><p><b>Test an input:</b></p><div class="context-pills" id="contextInputs"></div><div class="context-answer" id="contextAnswer">Choose an input to evaluate the model.</div><button class="secondary" id="sendToLab" style="margin-top:1rem">Open this rate and initial value in the main graph ↑</button></article></div>
+    </section>
+
+    <section id="representations"><div class="section-head"><span class="tag">Same relationship, new lens</span><h2>Equation → graph → context</h2><p>The example f(x) = −2x + 6 can be inspected in six connected forms.</p></div><div class="panel representation"><div class="rep-tabs" id="repTabs"></div><div class="rep-display" id="repDisplay"></div><p class="rep-arrow">Each view must agree: a change in one representation has consequences in all the others.</p></div></section>
+
+    <section id="special"><div class="section-head"><span class="tag">Boundary cases</span><h2>Important lines to recognize</h2><p>Send any case to the laboratory and inspect its equation, table, and graph.</p></div><div class="specials">
+      <article class="panel special"><h3>f(x) = x</h3><p>m = 1, b = 0. Rise 1 for every run 1.</p><button class="secondary special-send" data-m="1" data-b="0">Explore</button></article>
+      <article class="panel special"><h3>f(x) = −x</h3><p>m = −1, b = 0. Fall 1 for every run 1.</p><button class="secondary special-send" data-m="-1" data-b="0">Explore</button></article>
+      <article class="panel special"><h3>f(x) = b</h3><p>m = 0. A horizontal, constant function.</p><button class="secondary special-send" data-m="0" data-b="4">Explore</button></article>
+      <article class="panel special"><h3>f(x) = mx</h3><p>b = 0. Every such line passes through the origin.</p><button class="secondary special-send" data-m="3" data-b="0">Explore</button></article>
+    </div><div class="vertical-note"><b>What about x = 3?</b> It is a vertical line, but it cannot be written as f(x)=mx+b. At the single input x=3 there are many possible y-values, breaking the rule that a function maps each input to <em>exactly one</em> output. Its slope would also require division by a run of zero.</div></section>
+
+    <section id="predict"><div class="section-head"><span class="tag">Predict, then test</span><h2>Commit to an idea before revealing</h2></div><div class="panel prediction"><div class="prediction-top"><div><h3 id="predictionQuestion"></h3><p class="small">Choose your prediction. Then the laboratory will test the change.</p></div><button class="secondary" id="nextPrediction">New question</button></div><div class="prediction-options" id="predictionOptions"></div><div class="prediction-feedback" id="predictionFeedback" aria-live="polite"></div></div></section>
+
+    <section id="practice"><div class="section-head"><span class="tag">Check your understanding</span><h2>Short practice with useful feedback</h2><p>Errors are evidence. Feedback points to the next mathematical step instead of only saying “wrong.”</p></div><div class="practice-grid">
+      <article class="panel exercise"><h3>1 · Evaluate</h3><p>For f(x)=3x−4, find f(5).</p><div class="answer-row"><input id="evalAnswer" type="number" aria-label="Evaluation answer"><button class="primary check" data-ex="eval">Check</button></div><div class="feedback" id="evalFeedback"></div></article>
+      <article class="panel exercise"><h3>2 · Identify parameters</h3><p>For f(x)=−2x+7, identify m and b.</p><div class="answer-row"><label>m <input id="slopeAnswer" type="number"></label><label>b <input id="interceptAnswer" type="number"></label><button class="primary check" data-ex="parameters">Check</button></div><div class="feedback" id="parametersFeedback"></div></article>
+      <article class="panel exercise"><h3>3 · Predict the graph</h3><p>Which description matches y=−0.5x+4?</p><div class="answer-row"><select id="graphAnswer"><option value="">Choose…</option><option value="a">Steeply rises; crosses at −0.5</option><option value="b">Gently falls; crosses y-axis at 4</option><option value="c">Horizontal at y=4</option></select><button class="primary check" data-ex="graph">Check</button></div><div class="feedback" id="graphFeedback"></div></article>
+      <article class="panel exercise"><h3>4 · Construct an equation</h3><p>Slope −3 and y-intercept 2. Enter the missing values in y = mx + b.</p><div class="answer-row"><label>m <input id="buildM" type="number"></label><label>b <input id="buildB" type="number"></label><button class="primary check" data-ex="build">Check</button></div><div class="feedback" id="buildFeedback"></div></article>
+      <article class="panel exercise"><h3>5 · Interpret a context</h3><p>A phone plan starts at $12 and adds $4 for each GB. What are rate and initial value?</p><div class="answer-row"><label>rate <input id="contextM" type="number"></label><label>initial <input id="contextB" type="number"></label><button class="primary check" data-ex="context">Check</button></div><div class="feedback" id="contextFeedback"></div></article>
+      <article class="panel exercise"><h3>6 · Constant change</h3><p>If m=2.5 and x increases by 4, by how much does f(x) change?</p><div class="answer-row"><input id="changeAnswer" type="number"><button class="primary check" data-ex="change">Check</button></div><div class="feedback" id="changeFeedback"></div></article>
+    </div></section>
+
+    <section id="words"><div class="section-head"><span class="tag">Language connected to action</span><h2>Words for what you observed</h2></div><div class="glossary">
+      <div class="term"><b>Linear function</b><br>A one-output-per-input rule with a constant rate; its graph is a nonvertical straight line.</div><div class="term"><b>Input / independent variable</b><br>The x-value chosen before the function acts.</div><div class="term"><b>Output / dependent variable</b><br>f(x) or y; its value depends on x.</div><div class="term"><b>Function notation</b><br>f(3) means the output at x=3—not f multiplied by 3.</div><div class="term"><b>Slope / rate of change</b><br>m=rise/run=Δy/Δx, the output change per input unit.</div><div class="term"><b>y-intercept</b><br>b=f(0), where the graph meets the vertical axis.</div><div class="term"><b>Ordered pair</b><br>(x,f(x)), an input and its output plotted as one point.</div><div class="term"><b>Coordinate plane</b><br>The x- and y-axes, grid, and locations used to graph pairs.</div><div class="term"><b>Increasing / decreasing / constant</b><br>As x grows, output rises (m&gt;0), falls (m&lt;0), or stays fixed (m=0).</div>
+    </div></section>
+  </main>
+  <footer><h2>Keep the representations connected.</h2><div class="pathway"><b>Context</b><span>↔</span><b>Equation</b><span>↔</span><b>Table</b><span>↔</span><b>Graph</b></div><p>One constant-rate relationship, seen from many useful angles.</p></footer>
+
+  <script>
+    const state={m:2,b:3,x:1,scale:10,panX:0,panY:0,triangle:true,guides:true,compare:false};
+    const $=id=>document.getElementById(id); const clean=n=>Math.abs(n)<1e-9?0:+Number(n).toFixed(2);
+    const num=n=>clean(n).toLocaleString(undefined,{maximumFractionDigits:2});
+    function expression(m,b,name='f'){
+      let mx=m===0?'':m===1?'x':m===-1?'−x':`${num(m)}x`;
+      let tail=b===0?'':`${b>0&&mx?' + ':b<0?' − ':''}${num(Math.abs(b))}`;
+      return `${name}(x) = ${mx||num(b)}${tail}`;
+    }
+    function setState(patch,scroll=false){Object.assign(state,patch);syncControls();renderAll();if(scroll)$('explorer').scrollIntoView({behavior:'smooth'});}
+    function syncControls(){[['m',state.m],['b',state.b],['x',state.x]].forEach(([key,val])=>{const r=$(key+'Range'),n=$(key+'Number');if(r)r.value=val;if(n)n.value=val;});$('triangleToggle').checked=state.triangle;$('guidesToggle').checked=state.guides;$('compareToggle').checked=state.compare;}
+    function slopeWords(m){if(m===0)return 'The line is horizontal: every input produces the same output.';const direction=m>0?'increase':'decrease';const amount=Math.abs(m);return `Every increase of 1 unit in x produces a ${direction} of ${num(amount)} ${amount===1?'unit':'units'} in f(x).`;}
+    function renderAll(){
+      $('liveEquation').textContent=expression(state.m,state.b);const y=clean(state.m*state.x+state.b);
+      $('evalSteps').innerHTML=`<div>f(${num(state.x)}) = ${num(state.m)}(${num(state.x)}) ${state.b<0?'−':'+'} ${num(Math.abs(state.b))}</div><div>f(${num(state.x)}) = ${num(state.m*state.x)} ${state.b<0?'−':'+'} ${num(Math.abs(state.b))}</div><div><b>f(${num(state.x)}) = ${num(y)}</b></div>`;
+      $('mapping').textContent=`${num(state.x)} → f(${num(state.x)}) = ${num(y)} → (${num(state.x)}, ${num(y)})`;
+      renderTable();renderExplanation();renderGraph();renderSlopePanels();renderTwoPoints();
+    }
+    function renderTable(){const xs=[-2,-1,0,1,2];if(!xs.includes(state.x)&&Number.isInteger(state.x))xs.push(state.x);xs.sort((a,b)=>a-b);$('valueTable').innerHTML=xs.map(x=>{const y=clean(state.m*x+state.b);return `<tr data-x="${x}" class="${x===0?'intercept ':''}${x===state.x?'selected':''}"><td>${num(x)}</td><td>${num(y)}</td><td>(${num(x)}, ${num(y)})</td></tr>`}).join('');$('valueTable').querySelectorAll('tr').forEach(row=>row.onclick=()=>setState({x:+row.dataset.x}));}
+    function renderExplanation(){let type=state.m>0?'increasing':state.m<0?'decreasing':'constant';let steep=state.m===0?'no tilt':Math.abs(state.m)<1?'a gentle tilt':Math.abs(state.m)>2?'a steep tilt':'a moderate tilt';$('dynamicExplanation').innerHTML=`<div class="factline"><strong class="m-text">m</strong><span>${slopeWords(state.m)} It is <b>${type}</b>, with ${steep}.</span></div><div class="factline"><strong class="b-text">b</strong><span>At x = 0, the output is <b>${num(state.b)}</b>, so the line crosses the y-axis at <b>(0, ${num(state.b)})</b>.</span></div><div class="factline"><strong class="x-text">x</strong><span>The chosen input ${num(state.x)} maps to exactly one output, ${num(state.m*state.x+state.b)}. This makes the ordered pair on the graph.</span></div>`;$('deltaFact').textContent=`With m = ${num(state.m)}, a change in x of 2 changes the output by ${num(state.m*2)}.`;}
+    function svgEl(name,attrs={}){const e=document.createElementNS('http://www.w3.org/2000/svg',name);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));return e;}
+    function renderGraph(){const svg=$('mainGraph'),box=svg.getBoundingClientRect(),w=Math.max(400,box.width||700),h=Math.max(390,box.height||500);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML='';const half=state.scale,unit=Math.min(w,h)/(half*2),cx=w/2+state.panX,cy=h/2+state.panY;const X=x=>cx+x*unit,Y=y=>cy-y*unit,invX=p=>(p-cx)/unit;const add=(n,a)=>{const e=svgEl(n,a);svg.appendChild(e);return e};
+      for(let i=Math.ceil(invX(0));i<=Math.floor(invX(w));i++){const px=X(i);add('line',{x1:px,y1:0,x2:px,y2:h,stroke:i===0?'#8995ad':'#e1e6ef','stroke-width':i===0?2:1});if(i&&i%2===0)add('text',{x:px+3,y:Math.min(h-4,cy+16),fill:'#6e7890','font-size':11}).textContent=i;}
+      const minY=(cy-h)/unit,maxY=cy/unit;for(let i=Math.ceil(minY);i<=Math.floor(maxY);i++){const py=Y(i);add('line',{x1:0,y1:py,x2:w,y2:py,stroke:i===0?'#8995ad':'#e1e6ef','stroke-width':i===0?2:1});if(i&&i%2===0)add('text',{x:Math.max(3,cx+5),y:py-4,fill:'#6e7890','font-size':11}).textContent=i;}
+      add('text',{x:w-18,y:Math.min(h-8,cy-8),fill:'#17213d','font-weight':800}).textContent='x';add('text',{x:Math.max(8,cx+8),y:18,fill:'#17213d','font-weight':800}).textContent='y';add('text',{x:cx+5,y:cy+15,fill:'#63708a','font-size':11}).textContent='0';
+      const drawLine=(m,b,color,width=3,dash='')=>{let x1=invX(0),x2=invX(w);add('line',{x1:X(x1),y1:Y(m*x1+b),x2:X(x2),y2:Y(m*x2+b),stroke:color,'stroke-width':width,'stroke-linecap':'round','stroke-dasharray':dash,opacity:.95});};
+      if(state.compare){drawLine(state.m,state.b-3,'#6d45d8',2,'7 5');drawLine(state.m,state.b+3,'#e45b7a',2,'7 5');}drawLine(state.m,state.b,'#3e58cc',4);
+      if(state.guides){const sy=state.m*state.x+state.b;add('line',{x1:X(state.x),y1:Y(0),x2:X(state.x),y2:Y(sy),stroke:'#087f83','stroke-width':2,'stroke-dasharray':'5 5'});add('line',{x1:X(0),y1:Y(sy),x2:X(state.x),y2:Y(sy),stroke:'#dc721b','stroke-width':2,'stroke-dasharray':'5 5'});}
+      if(state.triangle){const p0=[0,state.b],p1=[1,state.b],p2=[1,state.b+state.m];add('line',{x1:X(p0[0]),y1:Y(p0[1]),x2:X(p1[0]),y2:Y(p1[1]),stroke:'#087f83','stroke-width':4});add('line',{x1:X(p1[0]),y1:Y(p1[1]),x2:X(p2[0]),y2:Y(p2[1]),stroke:'#6d45d8','stroke-width':4});add('text',{x:(X(0)+X(1))/2-10,y:Y(state.b)-7,fill:'#087f83','font-size':12,'font-weight':800}).textContent='run 1';add('text',{x:X(1)+7,y:(Y(state.b)+Y(state.b+state.m))/2,fill:'#6d45d8','font-size':12,'font-weight':800}).textContent=`rise ${num(state.m)}`;}
+      const point=(x,y,color,r,label)=>{add('circle',{cx:X(x),cy:Y(y),r,fill:color,stroke:'#fff','stroke-width':3});if(label)add('text',{x:X(x)+10,y:Y(y)-10,fill:color,'font-size':12,'font-weight':800,'paint-order':'stroke',stroke:'#fff','stroke-width':4}).textContent=label;};point(0,state.b,'#e45b7a',7,`(0, ${num(state.b)})`);const yy=clean(state.m*state.x+state.b);point(state.x,yy,'#087f83',8,`(${num(state.x)}, ${num(yy)})`);
+      svg.onpointerdown=e=>{svg.setPointerCapture(e.pointerId);svg.dataset.drag=`${e.clientX},${e.clientY},${state.panX},${state.panY}`};svg.onpointermove=e=>{if(!svg.dataset.drag)return;const [sx,sy,px,py]=svg.dataset.drag.split(',').map(Number);state.panX=px+e.clientX-sx;state.panY=py+e.clientY-sy;renderGraph()};svg.onpointerup=()=>delete svg.dataset.drag;
+    }
+    function renderSlopePanels(){$('slopeStatement').textContent=slopeWords(state.m);$('bStatement').textContent=`The y-intercept is now (0, ${num(state.b)}). Changing b slides the line ${state.b>0?'above':state.b<0?'below':'through'} the origin without changing m = ${num(state.m)}.`;['cmp1','cmp2','cmp3'].forEach((id,i)=>$(id).textContent=expression(state.m,state.b+(i-1)*3,['f','g','h'][i]));document.querySelectorAll('#slopePresets .preset').forEach(b=>b.classList.toggle('active',+b.dataset.value===state.m));document.querySelectorAll('#bPresets .preset').forEach(b=>b.classList.toggle('active',+b.dataset.value===state.b));}
+    for(const key of ['m','b','x']){const handler=e=>{let v=+e.target.value;if(Number.isFinite(v))setState({[key]:v})};$(key+'Range').addEventListener('input',handler);$(key+'Number').addEventListener('input',handler)}
+    $('triangleToggle').onchange=e=>setState({triangle:e.target.checked});$('guidesToggle').onchange=e=>setState({guides:e.target.checked});$('compareToggle').onchange=e=>setState({compare:e.target.checked});$('zoomIn').onclick=()=>setState({scale:Math.max(4,state.scale-2)});$('zoomOut').onclick=()=>setState({scale:Math.min(20,state.scale+2)});$('resetView').onclick=()=>setState({scale:10,panX:0,panY:0});
+    const tokenInfo={f:['Function name','f names the rule','Functions can be named g, h, or meaningful names such as C for cost and P for profit.','The name lets us discuss a particular input-output rule.'],x:['Input','x is the independent variable','Choose an x-value, then the function rule produces an output.','x is not fixed: many allowed inputs each map to exactly one output.'],m:['Slope · rate','m measures constant change','m = Δy/Δx = rise/run. Its sign sets direction and |m| affects steepness.','For every run of 1, the output changes by m.'],b:['Initial value','b is the y-intercept','Because f(0)=m·0+b=b, the graph always includes (0,b).','Changing b slides a line vertically without changing its slope.']};
+    document.querySelectorAll('.token').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.token').forEach(x=>x.classList.remove('active'));document.querySelectorAll(`[data-token="${btn.dataset.token}"]`).forEach(x=>x.classList.add('active'));const t=tokenInfo[btn.dataset.token];$('notationInfo').innerHTML=`<span class="tag">${t[0]}</span><h3>${t[1]}</h3><p>${t[2]}</p><p class="mini">${t[3]}</p>${btn.dataset.token==='x'?'<p><b>Important:</b> f(x) does not mean f × x. f(3) means “the value produced when x = 3.”</p>':''}`});
+    [-3,-1,-.5,0,.5,1,3].forEach(v=>{const b=document.createElement('button');b.className='preset';b.dataset.value=v;b.textContent=`m = ${v}`;b.onclick=()=>setState({m:v});$('slopePresets').appendChild(b)});[-6,-3,0,3,6].forEach(v=>{const b=document.createElement('button');b.className='preset';b.dataset.value=v;b.textContent=`b = ${v}`;b.onclick=()=>setState({b:v});$('bPresets').appendChild(b)});
+    [-4,-3,-2,-1,0,1,2,3,4].forEach(v=>{for(const id of ['pointX1','pointX2']){const o=document.createElement('option');o.value=v;o.textContent=v;$(id).appendChild(o)}});$('pointX1').value=-1;$('pointX2').value=2;$('pointX1').onchange=renderTwoPoints;$('pointX2').onchange=renderTwoPoints;
+    function renderTwoPoints(){const x1=+$('pointX1').value,x2=+$('pointX2').value,y1=clean(state.m*x1+state.b),y2=clean(state.m*x2+state.b);if(x1===x2){$('twoPointResult').innerHTML='Choose distinct x-values so the run is not zero.';return}const dx=x2-x1,dy=clean(y2-y1);$('twoPointResult').innerHTML=`P₁ = (${num(x1)}, ${num(y1)}) &nbsp; P₂ = (${num(x2)}, ${num(y2)})<br>Δx = ${num(x2)} − ${num(x1)} = <b>${num(dx)}</b><br>Δy = ${num(y2)} − ${num(y1)} = <b>${num(dy)}</b><br>m = Δy/Δx = ${num(dy)}/${num(dx)} = <b>${num(dy/dx)}</b>`;}
+    const scenarios=[
+      {icon:'🚲',title:'Bike rental',type:'Cost',story:'A bike rental company charges a fixed $5 fee plus $3 per hour.',name:'C',input:'hours h',output:'cost C(h)',m:3,b:5,unit:'$',xs:[0,2,5]},
+      {icon:'🚕',title:'Taxi',type:'Cost',story:'A taxi starts at $4 and charges $2.50 for each kilometre.',name:'C',input:'distance d (km)',output:'fare C(d)',m:2.5,b:4,unit:'$',xs:[0,3,8]},
+      {icon:'💼',title:'Wages',type:'Earnings',story:'You begin with a $20 bonus and earn $14 each hour.',name:'E',input:'hours h',output:'earnings E(h)',m:14,b:20,unit:'$',xs:[0,2,5]},
+      {icon:'📱',title:'Phone plan',type:'Cost',story:'A plan has a $12 base charge and costs $4 for each GB used.',name:'P',input:'data g (GB)',output:'cost P(g)',m:4,b:12,unit:'$',xs:[0,2,5]},
+      {icon:'💧',title:'Draining tank',type:'Volume',story:'A tank begins with 90 L and drains at 6 L per minute.',name:'V',input:'time t (min)',output:'water V(t)',m:-6,b:90,unit:' L',xs:[0,5,10]},
+      {icon:'🚶',title:'Steady walk',type:'Distance',story:'A walker is already 2 km from home and travels 5 km each hour.',name:'D',input:'time t (h)',output:'distance D(t)',m:5,b:2,unit:' km',xs:[0,1,3]}
+    ];let scenarioIndex=0;
+    scenarios.forEach((s,i)=>{const b=document.createElement('button');b.className='scenario-btn';b.innerHTML=`${s.icon} ${s.title}`;b.onclick=()=>{scenarioIndex=i;renderScenario()};$('scenarioList').appendChild(b)});
+    function renderScenario(){const s=scenarios[scenarioIndex];document.querySelectorAll('.scenario-btn').forEach((b,i)=>b.classList.toggle('active',i===scenarioIndex));$('contextType').textContent=s.type;$('contextTitle').textContent=s.title;$('contextStory').textContent=s.story;$('contextEquation').textContent=`${s.name}(${s.input.split(' ')[1]?.replace(/\W/g,'')||'x'}) = ${num(s.m)}(${s.input.split(' ')[1]?.replace(/\W/g,'')||'x'}) ${s.b>=0?'+':'−'} ${num(Math.abs(s.b))}`;$('contextMeaning').innerHTML=`<p><b>Input:</b> ${s.input}<br><b>Output:</b> ${s.output}<br><b>Rate:</b> ${num(s.m)} per input unit<br><b>Initial value:</b> ${num(s.b)} when the input is 0</p>`;$('contextInputs').innerHTML='';s.xs.forEach(x=>{const b=document.createElement('button');b.textContent=`input = ${x}`;b.onclick=()=>{$('contextAnswer').innerHTML=`At input ${x}: <b>${s.name}(${x}) = ${num(s.m)}(${x}) ${s.b>=0?'+':'−'} ${num(Math.abs(s.b))} = ${s.unit}${num(s.m*x+s.b)}</b>. This is the point (${x}, ${num(s.m*x+s.b)}) on the model’s graph.`};$('contextInputs').appendChild(b)});$('contextAnswer').textContent='Choose an input to evaluate the model.';}
+    $('sendToLab').onclick=()=>{const s=scenarios[scenarioIndex];setState({m:s.m,b:s.b,x:s.xs[1],scale:Math.max(10,Math.ceil(Math.max(Math.abs(s.b),Math.abs(s.m*s.xs[2]+s.b))/10)*10)},true)};
+    const reps=[['Equation','<div><b style="font:2rem Georgia">f(x) = −2x + 6</b><p>The compact rule: multiply the input by −2, then add 6.</p></div>'],['Slope','<div><b>m = −2</b><p>Each run of +1 produces a fall of 2. The function is decreasing.</p></div>'],['Intercept','<div><b>b = 6</b><p>f(0)=6, so (0,6) is on the y-axis.</p></div>'],['Table','<table><tr><th>x</th><th>f(x)</th></tr><tr><td>0</td><td>6</td></tr><tr><td>1</td><td>4</td></tr><tr><td>2</td><td>2</td></tr><tr><td>3</td><td>0</td></tr></table>'],['Graph','<div><b>Plot (0,6), then run 1 and fall 2.</b><p>The points (0,6), (1,4), (2,2), and (3,0) form one straight line.</p><button class="secondary" onclick="setState({m:-2,b:6,x:2},true)">See in the lab</button></div>'],['Context','<div><b>A tank begins with 6 L and drains 2 L each minute.</b><p>For the meaningful interval 0≤x≤3, f(x) is the water remaining. Context can restrict a model’s domain.</p></div>']];
+    reps.forEach(([name],i)=>{const b=document.createElement('button');b.className='rep-tab';b.textContent=name;b.onclick=()=>renderRep(i);$('repTabs').appendChild(b)});function renderRep(i){document.querySelectorAll('.rep-tab').forEach((b,j)=>b.classList.toggle('active',i===j));$('repDisplay').innerHTML=reps[i][1]};renderRep(0);
+    document.querySelectorAll('.special-send').forEach(b=>b.onclick=()=>setState({m:+b.dataset.m,b:+b.dataset.b,x:1},true));
+    const predictions=[{q:'If m changes from 2 to 5 while b stays fixed, what happens?',options:['The line becomes steeper upward','The line shifts vertically','The line becomes horizontal'],correct:0,patch:{m:5},why:'Correct: both slopes are positive, but |5|>|2|, so the line rises more steeply. The intercept stays fixed.'},{q:'If b changes from 2 to −4 while m stays fixed, what happens?',options:['The slope becomes negative','The line shifts down 6 units','The line rotates around the origin'],correct:1,patch:{b:-4},why:'Correct: the intercept moves from (0,2) to (0,−4), a shift down 6. The slope is unchanged.'},{q:'If m changes from 3 to −3, what happens to direction?',options:['It changes from rising to falling','Only the intercept changes','It stays rising but gets flatter'],correct:0,patch:{m:-3},why:'Correct: changing the sign reverses direction. The magnitude remains 3, so steepness is the same.'}];let predictionIndex=0;
+    function renderPrediction(){const p=predictions[predictionIndex];$('predictionQuestion').textContent=p.q;$('predictionOptions').innerHTML='';$('predictionFeedback').textContent='';p.options.forEach((o,i)=>{const b=document.createElement('button');b.className='choice';b.textContent=o;b.onclick=()=>{const good=i===p.correct;$('predictionFeedback').className=`prediction-feedback ${good?'good':'bad'}`;$('predictionFeedback').textContent=good?p.why:`Not quite. ${p.why.replace('Correct: ','Notice: ')}`;setState(p.patch)};$('predictionOptions').appendChild(b)})}$('nextPrediction').onclick=()=>{predictionIndex=(predictionIndex+1)%predictions.length;renderPrediction()};renderPrediction();
+    const exerciseChecks={eval:()=>[+$('evalAnswer').value===11,'Substitute first: f(5)=3(5)−4=15−4=11.'],parameters:()=>[+$('slopeAnswer').value===-2&&+$('interceptAnswer').value===7,'m is the coefficient of x (including its sign); b is the constant term. Here m=−2 and b=7.'],graph:()=>[$('graphAnswer').value==='b','The negative slope means falling, |−0.5|<1 means gentle, and b=4 gives the y-intercept.'],build:()=>[+$('buildM').value===-3&&+$('buildB').value===2,'Place the slope beside x and the intercept after it: f(x)=−3x+2.'],context:()=>[+$('contextM').value===4&&+$('contextB').value===12,'“Each GB” signals the rate m=4; “starts at” signals the initial value b=12.'],change:()=>[+$('changeAnswer').value===10,'Use Δf=mΔx: 2.5×4=10. The intercept is irrelevant to a change.']};
+    document.querySelectorAll('.check').forEach(b=>b.onclick=()=>{const [ok,hint]=exerciseChecks[b.dataset.ex](),out=$(b.dataset.ex+'Feedback');out.className=`feedback ${ok?'good':'bad'}`;out.textContent=ok?`✓ Correct. ${hint}`:`Try again. ${hint}`});
+    renderScenario();renderAll();window.addEventListener('resize',renderGraph);
+  </script>
+</body>
+</html>
