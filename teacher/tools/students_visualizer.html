@@ -295,6 +295,12 @@
     .practice-progress {
         color: var(--gray-500);
         font-size: 14px;
+        text-align: right;
+    }
+
+    .practice-score {
+        font-size: 12px;
+        margin-top: 3px;
     }
 
     .practice-content {
@@ -598,7 +604,10 @@
 <section id="practiceView" class="practice-view">
     <div class="practice-header">
         <div class="practice-title">Practice Mode</div>
-        <div id="practiceProgress" class="practice-progress"></div>
+        <div class="practice-progress">
+            <div id="practiceProgress"></div>
+            <div id="practiceScore" class="practice-score"></div>
+        </div>
     </div>
 
     <div class="practice-content">
@@ -663,6 +672,8 @@ const state = {
     selectedGroups: new Set(),
     practiceStudents: [],
     practiceMistakes: [],
+    practiceMistakeCount: 0,
+    practiceTotalStudents: 0,
     practiceRound: 1,
     practiceIndex: 0,
     practiceActive: false
@@ -696,6 +707,7 @@ const groupCards = document.querySelectorAll(".group-card");
 
 const practiceView = document.getElementById("practiceView");
 const practiceProgress = document.getElementById("practiceProgress");
+const practiceScore = document.getElementById("practiceScore");
 const practicePicture = document.getElementById("practicePicture");
 const practiceInput = document.getElementById("practiceInput");
 const practiceSubmitBtn = document.getElementById("practiceSubmitBtn");
@@ -1093,6 +1105,8 @@ function enterPracticeMode() {
 
     state.practiceStudents = shuffleStudents(filtered);
     state.practiceMistakes = [];
+    state.practiceMistakeCount = 0;
+    state.practiceTotalStudents = filtered.length;
     state.practiceRound = 1;
     state.practiceIndex = 0;
     state.practiceActive = true;
@@ -1120,6 +1134,7 @@ function renderPracticeStudent() {
 
     practiceProgress.textContent =
         `${roundLabel} · Student ${state.practiceIndex + 1} of ${state.practiceStudents.length}`;
+    updatePracticeScore();
 
     practicePicture.innerHTML = "";
 
@@ -1176,6 +1191,11 @@ function loadPracticeImage(file, img) {
     }
 }
 
+function updatePracticeScore() {
+    practiceScore.textContent =
+        `Mistakes ${state.practiceMistakeCount} / Total Students ${state.practiceTotalStudents}`;
+}
+
 function submitPracticeAnswer() {
     if (
         !state.practiceActive ||
@@ -1218,6 +1238,8 @@ function submitPracticeAnswer() {
             "Correct!";
     } else {
         state.practiceMistakes.push(student);
+        state.practiceMistakeCount++;
+        updatePracticeScore();
 
         practiceResult.classList.remove("correct");
         practiceResult.classList.add("error");
@@ -1262,6 +1284,8 @@ function finishPracticeMode() {
     state.practiceActive = false;
     state.practiceStudents = [];
     state.practiceMistakes = [];
+    state.practiceMistakeCount = 0;
+    state.practiceTotalStudents = 0;
     state.practiceRound = 1;
     state.practiceIndex = 0;
 
