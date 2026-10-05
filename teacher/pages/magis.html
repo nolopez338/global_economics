@@ -233,6 +233,107 @@
       color: #fef3c7;
     }
 
+    .class-card.tasks-card {
+      border-color: #7f1d1d;
+      background: #7f1d1d;
+      color: #ffffff;
+    }
+
+    .class-card.tasks-card:not(.full-width-resource-card):hover,
+    .class-card.tasks-card:not(.full-width-resource-card):focus-within {
+      border-color: #991b1b;
+      background: #991b1b;
+    }
+
+    .class-icon.tasks-icon {
+      background: #fee2e2;
+      color: #7f1d1d;
+    }
+
+    .tasks-card.full-width-resource-card {
+      background: var(--card-bg, #ffffff);
+      color: inherit;
+    }
+
+    .tasks-card.full-width-resource-card .resource-toggle {
+      color: #7f1d1d;
+    }
+
+    .tasks-table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border-color, rgba(15, 23, 42, 0.12));
+      border-radius: 10px;
+    }
+
+    .tasks-table {
+      width: 100%;
+      min-width: 620px;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .tasks-table th,
+    .tasks-table td {
+      padding: 0.8rem 0.9rem;
+      border-bottom: 1px solid var(--border-color, rgba(15, 23, 42, 0.12));
+      vertical-align: middle;
+    }
+
+    .tasks-table th {
+      background: #7f1d1d;
+      color: #ffffff;
+      font-size: 0.85rem;
+      letter-spacing: 0.02em;
+    }
+
+    .tasks-table tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .tasks-table tbody tr:nth-child(even) {
+      background: var(--card-muted-bg, rgba(15, 23, 42, 0.04));
+    }
+
+    .task-position {
+      width: 3rem;
+      font-weight: 800;
+    }
+
+    .task-countdown {
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+    }
+
+    .task-countdown.overdue {
+      color: #b91c1c;
+    }
+
+    .tasks-empty {
+      margin: 0;
+      padding: 1rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    body.dark-theme .class-card.tasks-card:not(.full-width-resource-card) {
+      border-color: #b91c1c;
+      background: #7f1d1d;
+      color: #ffffff;
+    }
+
+    body.dark-theme .tasks-card.full-width-resource-card .resource-toggle,
+    body.dark-theme .task-countdown.overdue {
+      color: #fca5a5;
+    }
+
+    body.dark-theme .tasks-table-wrapper,
+    body.dark-theme .tasks-table th,
+    body.dark-theme .tasks-table td {
+      border-color: #475569;
+    }
+
     .collapsible-resource-card:not(.full-width-resource-card) .resource-content {
       display: none;
     }
@@ -405,6 +506,28 @@
             </div>
           </div>
         </div>
+        <div class="class-card collapsible-resource-card tasks-card" aria-label="Tasks">
+          <button class="resource-toggle" type="button" aria-expanded="false" aria-controls="tasks-resource-content">
+            <span class="class-icon tasks-icon">T</span>
+            <span class="class-label">Tasks</span>
+          </button>
+          <div class="resource-content" id="tasks-resource-content" hidden>
+            <div class="tasks-table-wrapper">
+              <table class="tasks-table">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Due Date</th>
+                    <th scope="col">Time Remaining</th>
+                  </tr>
+                </thead>
+                <tbody id="tasks-table-body"></tbody>
+              </table>
+              <p class="tasks-empty" id="tasks-empty" hidden>No tasks are currently listed.</p>
+            </div>
+          </div>
+        </div>
         <a class="class-card" href="https://correosanbartoloedu.sharepoint.com/:w:/s/EquipodecicloIV-Comitcicloao24-25/IQCSQs6QuKUzSZQaH6-F5_BQASKNEMcPo19_6pllOdDthDs?e=R2NJE7&CID=79b0e5d6-fdf0-eeab-c797-57f5d17a2028" target="_blank" rel="noopener noreferrer" aria-label="Open P">
           <span class="class-icon purple">P</span>
           <span class="class-label">Teacher Pauses</span>
@@ -425,6 +548,7 @@
       </label>
     </section>
   </main>
+  <script src="../assets/js/databases/magis-tasks.js"></script>
   <script>
     (function () {
       var params = new URLSearchParams(window.location.search);
@@ -457,6 +581,69 @@
           content.hidden = expanded;
         });
       });
+
+      var tasksTableBody = document.getElementById("tasks-table-body");
+      var tasksEmpty = document.getElementById("tasks-empty");
+      var tasks = Array.isArray(window.magisTasks) ? window.magisTasks.slice() : [];
+      var dateFormatter = new Intl.DateTimeFormat(undefined, {
+        dateStyle: "medium",
+        timeStyle: "short"
+      });
+
+      tasks.sort(function (firstTask, secondTask) {
+        return new Date(firstTask.dueDate).getTime() - new Date(secondTask.dueDate).getTime();
+      });
+
+      function formatTimeRemaining(milliseconds) {
+        if (milliseconds <= 0) {
+          return "Overdue";
+        }
+
+        var totalSeconds = Math.floor(milliseconds / 1000);
+        var days = Math.floor(totalSeconds / 86400);
+        var hours = Math.floor((totalSeconds % 86400) / 3600);
+        var minutes = Math.floor((totalSeconds % 3600) / 60);
+        var seconds = totalSeconds % 60;
+
+        return days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+      }
+
+      function updateTaskCountdowns() {
+        var now = Date.now();
+
+        document.querySelectorAll("[data-task-deadline]").forEach(function (countdown) {
+          var remaining = Number(countdown.dataset.taskDeadline) - now;
+          countdown.textContent = formatTimeRemaining(remaining);
+          countdown.classList.toggle("overdue", remaining <= 0);
+        });
+      }
+
+      tasks.forEach(function (task, index) {
+        var dueDate = new Date(task.dueDate);
+        var row = document.createElement("tr");
+        var positionCell = document.createElement("td");
+        var descriptionCell = document.createElement("td");
+        var dueDateCell = document.createElement("td");
+        var countdownCell = document.createElement("td");
+
+        positionCell.className = "task-position";
+        positionCell.textContent = String(index + 1);
+        descriptionCell.textContent = task.description;
+        dueDateCell.textContent = Number.isNaN(dueDate.getTime()) ? "Invalid date" : dateFormatter.format(dueDate);
+        countdownCell.className = "task-countdown";
+        countdownCell.dataset.taskDeadline = String(dueDate.getTime());
+
+        row.append(positionCell, descriptionCell, dueDateCell, countdownCell);
+        tasksTableBody.appendChild(row);
+      });
+
+      if (tasks.length === 0) {
+        tasksEmpty.hidden = false;
+        tasksTableBody.closest("table").hidden = true;
+      } else {
+        updateTaskCountdowns();
+        window.setInterval(updateTaskCountdowns, 1000);
+      }
     })();
   </script>
   <script src="../assets/js/theme-toggle.js" defer></script>
