@@ -1,0 +1,217 @@
+% Archival definitions unused by the three Grade 11 reference documents.
+% Not loaded by the active preambles. Requires the packages/configuration
+% from preamble.tex; definitions below are preserved verbatim.
+
+% Boolean switch for optional explanations.
+% Use \mostrarExplicaciones{true} to show explanations.
+% Use \mostrarExplicaciones{false} to hide explanations.
+\newboolean{explicaciones}
+
+% \explicacion{shown text}{hidden-mode text}
+% Displays the first argument when explanations are enabled;
+% otherwise displays the second argument.
+% Usage example: \explicacion{Detailed explanation.}{}
+\newcommand{\explicacion}[2]{%
+	\ifthenelse{\boolean{explicaciones}}{#1}{#2}%
+}
+
+% Sets the explanation switch.
+% Usage example: \mostrarExplicaciones{true}
+\newcommand{\mostrarExplicaciones}[1]{%
+	\setboolean{explicaciones}{#1}%
+}
+
+\definecolor{popUp}{HTML}{666666}
+\definecolor{popUpIn}{HTML}{CED9E0}
+\definecolor{backgroundC}{HTML}{D0E8F2}
+\definecolor{backgroundCC}{HTML}{FFFFFF}
+\definecolor{borders}{HTML}{8c120d}
+\definecolor{padding}{HTML}{77D0D7}
+% General mdframed style for highlighted content blocks.
+\mdfdefinestyle{estiloGeneral}{
+	linecolor=black,
+	linewidth=1.5pt,
+	roundcorner=10pt,
+	backgroundcolor=backgroundC,
+	innerbottommargin=0pt
+}
+
+% mdframed style for code-like blocks.
+\mdfdefinestyle{code}{
+	linecolor=black,
+	linewidth=1.5pt,
+	roundcorner=10pt,
+	backgroundcolor=darkgray!10,
+	innerbottommargin=0pt
+}
+
+% Inline tcolorbox used for framed links and linked images.
+\newtcbox{\fboxC}{
+	colback=backgroundC,
+	colframe=popUp,
+	arc=10pt,
+	boxrule=3pt,
+	boxsep=0pt,
+	nobeforeafter
+}
+
+% \cuadro{content}
+% Wraps content in the standard general frame.
+% Usage example: \cuadro{Important information.}
+\newcommand{\cuadro}[1]{%
+	\begin{mdframed}[style=estiloGeneral]
+		#1
+	\end{mdframed}%
+}
+
+% Python listings style.
+\lstdefinestyle{python}{
+	language=Python,
+	basicstyle=\ttfamily\small,
+	commentstyle=\color{green!50!black},
+	keywordstyle=\color{blue},
+	numberstyle=\tiny\color{gray},
+	numbers=left,
+	morekeywords={>, <},
+	breakatwhitespace=false,
+	showstringspaces=false,
+	showtabs=false,
+	showspaces=false
+}
+
+% \bigLink{url}{text}
+% Creates a large centered framed hyperlink.
+% Usage example: \bigLink{https://example.com}{Open resource}
+\newcommand{\bigLink}[2]{%
+	\begin{center}
+		\fboxC{\LARGE{\href{#1}{#2}}}
+	\end{center}%
+}
+
+% \smallLink{url}{text}
+% Creates a small centered framed hyperlink.
+% Usage example: \smallLink{https://example.com}{Open}
+\newcommand{\smallLink}[2]{%
+	\begin{center}
+		\fboxC{\href{#1}{#2}}
+	\end{center}%
+}
+
+% \bfLink{url}{text}
+% Creates a bold inline hyperlink.
+% Usage example: \bfLink{https://example.com}{Important link}
+\newcommand{\bfLink}[2]{%
+	\href{#1}{\textbf{#2}}%
+}
+
+% \smallUrl{url}
+% Displays a centered framed URL.
+% Usage example: \smallUrl{https://example.com}
+\newcommand{\smallUrl}[1]{%
+	\begin{center}
+		\fboxC{\url{#1}}
+	\end{center}%
+}
+
+% \subSecLink{url}{title}
+% Creates an unnumbered subsubsection title as a hyperlink.
+% Usage example: \subSecLink{https://example.com}{Additional practice}
+\newcommand{\subSecLink}[2]{%
+	\subsubsection*{\href{#1}{\textbf{#2}}}%
+}
+
+% ==========================================================
+% CUSTOM LAYOUT AND PAGE COMMANDS
+% ==========================================================
+% \background
+% Draws a large colored background rectangle behind the page content.
+% Usage example: \background
+\newcommand{\background}[0]{%
+	\begin{tikzpicture}[remember picture,overlay]
+		\fill[backgroundC] (-2,2) rectangle (25cm,-550);
+	\end{tikzpicture}%
+}
+
+% \backgroundC
+% Draws a large white background rectangle behind the page content.
+% Kept with its original name for compatibility.
+% Usage example: \backgroundC
+\newcommand{\backgroundC}[0]{%
+	\begin{tikzpicture}[remember picture,overlay]
+		\fill[backgroundCC] (-2,2) rectangle (25cm,-550);
+	\end{tikzpicture}%
+}
+
+% \anchoPag
+% Stores the intended page/content width used by custom layouts.
+% Usage example: \parbox{\anchoPag}{Content}
+\newcommand{\anchoPag}[0]{20cm}
+
+% General vertical spacing helper.
+% Usage example: Text before.\esp Text after.
+\newcommand{\esp}[0]{%
+	\vspace{4mm}%
+}
+
+% ==========================================================
+% CUSTOM FIGURE COMMANDS
+% ==========================================================
+% Horizontal offset used by image commands.
+% Usage example: \hspace*{\espacioImagenes}
+\newcommand{\espacioImagenes}[0]{-1.2cm}
+
+% \fig[horizontal offset]{width fraction}{image path}
+% Inserts an image without a frame.
+% Usage example: \fig{0.8}{example-image}
+% Usage example: \fig[-1cm]{0.8}{example-image}
+\newcommand{\fig}[3][\espacioImagenes]{%
+	\hspace*{#1}
+	\centering
+	\includegraphics[width=#2\textwidth]{#3}%
+}
+
+% \ffig{width fraction}{image path}
+% Inserts a framed image inside a figure environment.
+% Usage example: \ffig{0.8}{example-image}
+\newcommand{\ffig}[2]{%
+	\begin{figure}[h]
+		\hspace*{\espacioImagenes}
+		\centering
+		\fbox{\includegraphics[width=#1\textwidth]{#2}}
+	\end{figure}%
+}
+
+% \hfig{url}{width fraction}{image path}
+% Inserts a framed linked image inside a figure environment.
+% Usage example: \hfig{https://example.com}{0.8}{example-image}
+\newcommand{\hfig}[3]{%
+	\begin{figure}[h]
+		\hspace*{-1.4cm}
+		\centering
+		\color{popUp}
+		\fboxC{\href{#1}{\includegraphics[width=#2\textwidth]{#3}}}
+	\end{figure}%
+}
+
+% \hffig{url}{width fraction}{image path}
+% Inserts a linked image without a frame inside a figure environment.
+% Usage example: \hffig{https://example.com}{0.8}{example-image}
+\newcommand{\hffig}[3]{%
+	\begin{figure}[h]
+		\hspace*{-1.1cm}
+		\centering
+		\color{popUp}
+		\href{#1}{\includegraphics[width=#2\textwidth]{#3}}
+	\end{figure}%
+}
+
+% \linkExplicacion{url}
+% Inserts the standard explanation-video image as a clickable figure.
+% Usage example: \linkExplicacion{https://example.com/video}
+\newcommand{\linkExplicacion}[1]{%
+	\hffig{#1}{0.5}{principal/videoExplicacion}
+	\vspace{-0.5cm}%
+}
+
+
+

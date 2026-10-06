@@ -1,41 +1,43 @@
+% Exam layer: load before document content instead of loading preamble.tex again.
+% Inherits the general preamble through preamble_G10_T1_C2C3.tex, then adds
+% compact spacing, table columns, and reusable assessment-header commands.
+% Unused exam definitions are archived in preamble_exams-unused.tex, not loaded.
+% No custom environments are defined here; lists and tables use inherited packages.
+% ----------------------------------------------------------
+% Inheritance and relative input-file lookup
+% ----------------------------------------------------------
 \makeatletter
 \def\input@path{{./}{../}{../../}{../../../}{preamble/}{../preamble/}{../../preamble/}{../../../preamble/}}
 \makeatother	
 \input{preamble_G10_T1_C2C3.tex}
 
+% ----------------------------------------------------------
+% Exam table and list spacing (overrides general defaults)
+% ----------------------------------------------------------
 \setlength{\parindent}{0pt}
 \setlength{\tabcolsep}{6pt}
 \renewcommand{\arraystretch}{1.15}
 
-% ===================================================================
+% Compact bullet and numbered lists.
 \setlist[itemize]{topsep=2pt,itemsep=1pt,parsep=0pt,partopsep=0pt}
 \setlist[enumerate]{topsep=2pt,itemsep=0.8pt,parsep=0pt,partopsep=0pt}
 
-% Alphabetical enumeration: a), b), c), ...
-\newlist{alphenum}{enumerate}{1}
-\setlist[alphenum]{
-	label=\textbf{\alph*)},
-	topsep=2pt,
-	itemsep=0.8pt,
-	parsep=0pt,
-	partopsep=0pt
-}
-
-
-% ===================================================================
-% Column types
+% ----------------------------------------------------------
+% Adjustable objective/criteria columns and centered header cells
+% ----------------------------------------------------------
+% Shared width used by the Y/Z pair; change via \setYColumnWidth.
 \newlength{\YColumnWidth}
 
-% Set Y as a fraction of \textwidth.
-% Z automatically uses the remaining fraction.
+% \setYColumnWidth{fraction}: allocate a fraction of \textwidth to Y.
+% Z uses the remainder; column formulas subtract cell padding and rule widths.
 \newcommand{\setYColumnWidth}[1]{%
 	\setlength{\YColumnWidth}{#1\textwidth}%
 }
 
-% Default: Y = 30%, Z = 70%
+% Default allocation: 30% objective, 70% criteria, before padding/rule deductions.
 \setYColumnWidth{0.30}
 
-% Column types
+% Y and Z: vertically centered, ragged-right columns for \begin{tabular}{|Y|Z|}.
 \newcolumntype{Y}{%
 	>{\raggedright\arraybackslash}%
 	m{\dimexpr\YColumnWidth-2\tabcolsep-2\arrayrulewidth\relax}%
@@ -46,12 +48,17 @@
 	m{\dimexpr\textwidth-\YColumnWidth-2\tabcolsep-2\arrayrulewidth\relax}%
 }
 
+% C{width}: vertically and horizontally centered column, e.g. C{2.8cm}.
 \newcolumntype{C}[1]{%
 	>{\centering\arraybackslash}m{#1}%
 }
 
 
-% Gray subsection header box
+% ----------------------------------------------------------
+% Heading and cell helpers
+% ----------------------------------------------------------
+% \SubsectionBox{text}: bold gray heading spanning the current \linewidth.
+% Works within columns; adds spacing but no section numbering or TOC entry.
 \newcommand{\SubsectionBox}[1]{%
 	\vspace{0.25cm}
 	\noindent\colorbox{gray!30}{%
@@ -59,17 +66,20 @@
 	}\par\vspace{0.0cm}%
 }
 
-% Centered multi-line cell helper
+% \CellCenter{content}: centered multi-line table cell at the current \linewidth.
+% Separate lines with \par; used by \ExamHeader.
 \newcommand{\CellCenter}[1]{%
 	\parbox{\linewidth}{\centering #1}%
 }
 
-% Centered multi-line cell helper
-\newcommand{\score}[1]{%
-	\hfill \textbf{[#1]}
-}
 
-% Exam header arguments: grade, learning evidence number, title, term.
+
+% ----------------------------------------------------------
+% Assessment header, student details, and learning objective
+% ----------------------------------------------------------
+% \ExamHeader{grade}{evidence number}{title}{term}: full-width three-cell header.
+% Example: \ExamHeader{11th}{1}{Financial modeling}{1st}.
+% Requires logo.png on the graphics search path; teacher/year are fixed below.
 \newcommand{\ExamHeader}[4]{%
 	\noindent
 	\begin{tabularx}{\textwidth}{|C{2.8cm}|C{\dimexpr\textwidth-6cm-4\tabcolsep-4\arrayrulewidth\relax}|C{2.8cm}|}
@@ -96,6 +106,8 @@
 }
 
 
+% \StudentInfo: full-width name, grade, and date blanks; no arguments.
+% Place below \ExamHeader, before entering a multicolumn layout.
 \newcommand{\StudentInfo}{%
 	\noindent
 	\textbf{Name:} \rule{9.5cm}{0.4pt}\hfill
@@ -103,6 +115,10 @@
 	\textbf{Date:} \rule{3cm}{0.4pt}%
 }
 
+% \LearningObjective[objective-width fraction]{objective text}{criteria text}.
+% Full-width two-column table; optional fraction defaults to 0.30.
+% Use \par between criteria; place before entering a multicolumn layout.
+% Sets the shared Y/Z allocation for subsequent tables in the current scope.
 \newcommand{\LearningObjective}[3][0.30]{%
 	\setYColumnWidth{#1}%
 	\noindent
