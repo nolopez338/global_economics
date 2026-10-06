@@ -317,6 +317,62 @@
       text-align: center;
     }
 
+    .task-editor-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.65rem;
+      width: 100%;
+      margin-bottom: 0.85rem;
+    }
+
+    .task-editor-button {
+      padding: 0.55rem 0.85rem;
+      border: 1px solid currentColor;
+      border-radius: 999px;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .task-editor-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .task-save-status {
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .task-save-status.error {
+      color: #fecaca;
+    }
+
+    .task-editor-input {
+      box-sizing: border-box;
+      width: 100%;
+      min-width: 10rem;
+      padding: 0.45rem 0.55rem;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      color: inherit;
+      font: inherit;
+    }
+
+    .task-editor-input::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .task-remove-button {
+      padding: 0.35rem 0.55rem;
+      border-color: rgba(255, 255, 255, 0.65);
+    }
+
     body.dark-theme .class-card.tasks-card:not(.full-width-resource-card) {
       border-color: #b91c1c;
       background: #7f1d1d;
@@ -512,6 +568,12 @@
             <span class="class-label">Tasks</span>
           </button>
           <div class="resource-content" id="tasks-resource-content" hidden>
+            <div class="task-editor-toolbar" aria-label="Local task editor controls">
+              <button class="task-editor-button" id="connect-repository" type="button">Connect Local Repository</button>
+              <button class="task-editor-button" id="add-task" type="button">Add Task</button>
+              <button class="task-editor-button" id="save-tasks" type="button" disabled>Save Changes</button>
+              <span class="task-save-status" id="task-save-status" role="status" aria-live="polite">No unsaved changes</span>
+            </div>
             <div class="tasks-table-wrapper">
               <table class="tasks-table">
                 <thead>
@@ -520,6 +582,7 @@
                     <th scope="col">Description</th>
                     <th scope="col">Due Date</th>
                     <th scope="col">Time Remaining</th>
+                    <th scope="col">Action</th>
                   </tr>
                 </thead>
                 <tbody id="tasks-table-body"></tbody>
@@ -584,17 +647,22 @@
 
       var tasksTableBody = document.getElementById("tasks-table-body");
       var tasksEmpty = document.getElementById("tasks-empty");
-      var tasks = Array.isArray(window.magisTasks) ? window.magisTasks.slice() : [];
-      var dateFormatter = new Intl.DateTimeFormat(undefined, {
-        dateStyle: "medium",
-        timeStyle: "short"
-      });
-
-      tasks.sort(function (firstTask, secondTask) {
-        return new Date(firstTask.dueDate).getTime() - new Date(secondTask.dueDate).getTime();
-      });
+      var tasksTable = tasksTableBody.closest("table");
+      var connectButton = document.getElementById("connect-repository");
+      var addTaskButton = document.getElementById("add-task");
+      var saveButton = document.getElementById("save-tasks");
+      var saveStatus = document.getElementById("task-save-status");
+      var tasks = Array.isArray(window.magisTasks) ? window.magisTasks.map(function (task) {
+        return Object.assign({}, task);
+      }) : [];
+      var tasksFileHandle = null;
+      var hasUnsavedChanges = false;
 
       function formatTimeRemaining(milliseconds) {
+        if (!Number.isFinite(milliseconds)) {
+          return "Invalid date";
+        }
+
         if (milliseconds <= 0) {
           return "Overdue";
         }
@@ -618,32 +686,152 @@
         });
       }
 
-      tasks.forEach(function (task, index) {
-        var dueDate = new Date(task.dueDate);
-        var row = document.createElement("tr");
-        var positionCell = document.createElement("td");
-        var descriptionCell = document.createElement("td");
-        var dueDateCell = document.createElement("td");
-        var countdownCell = document.createElement("td");
+      function setSaveStatus(message, isError) {
+        saveStatus.textContent = message;
+        saveStatus.classList.toggle("error", Boolean(isError));
+      }
 
-        positionCell.className = "task-position";
-        positionCell.textContent = String(index + 1);
-        descriptionCell.textContent = task.description;
-        dueDateCell.textContent = Number.isNaN(dueDate.getTime()) ? "Invalid date" : dateFormatter.format(dueDate);
-        countdownCell.className = "task-countdown";
-        countdownCell.dataset.taskDeadline = String(dueDate.getTime());
+      function markUnsaved() {
+        hasUnsavedChanges = true;
+        saveButton.disabled = !tasksFileHandle;
+        setSaveStatus("Unsaved changes");
+      }
 
-        row.append(positionCell, descriptionCell, dueDateCell, countdownCell);
-        tasksTableBody.appendChild(row);
+      function renderTasks() {
+        tasksTableBody.replaceChildren();
+        tasksEmpty.hidden = tasks.length !== 0;
+        tasksTable.hidden = tasks.length === 0;
+
+        tasks.forEach(function (task, index) {
+          var dueDate = new Date(task.dueDate);
+          var row = document.createElement("tr");
+          var positionCell = document.createElement("td");
+          var descriptionCell = document.createElement("td");
+          var dueDateCell = document.createElement("td");
+          var countdownCell = document.createElement("td");
+          var actionCell = document.createElement("td");
+          var descriptionInput = document.createElement("input");
+          var dueDateInput = document.createElement("input");
+          var removeButton = document.createElement("button");
+
+          positionCell.className = "task-position";
+          positionCell.textContent = String(index + 1);
+          descriptionInput.className = "task-editor-input";
+          descriptionInput.type = "text";
+          descriptionInput.value = task.description || "";
+          descriptionInput.setAttribute("aria-label", "Task " + (index + 1) + " description");
+          dueDateInput.className = "task-editor-input";
+          dueDateInput.type = "text";
+          dueDateInput.value = task.dueDate || "";
+          dueDateInput.placeholder = "YYYY-MM-DDTHH:mm:ss-05:00";
+          dueDateInput.setAttribute("aria-label", "Task " + (index + 1) + " due date");
+          countdownCell.className = "task-countdown";
+          countdownCell.dataset.taskDeadline = String(dueDate.getTime());
+          removeButton.className = "task-editor-button task-remove-button";
+          removeButton.type = "button";
+          removeButton.textContent = "Remove";
+          removeButton.setAttribute("aria-label", "Remove task " + (index + 1));
+
+          descriptionInput.addEventListener("input", function () {
+            task.description = descriptionInput.value;
+            markUnsaved();
+          });
+          dueDateInput.addEventListener("input", function () {
+            task.dueDate = dueDateInput.value;
+            countdownCell.dataset.taskDeadline = String(new Date(task.dueDate).getTime());
+            updateTaskCountdowns();
+            markUnsaved();
+          });
+          removeButton.addEventListener("click", function () {
+            tasks.splice(index, 1);
+            renderTasks();
+            markUnsaved();
+          });
+
+          descriptionCell.appendChild(descriptionInput);
+          dueDateCell.appendChild(dueDateInput);
+          actionCell.appendChild(removeButton);
+          row.append(positionCell, descriptionCell, dueDateCell, countdownCell, actionCell);
+          tasksTableBody.appendChild(row);
+        });
+
+        updateTaskCountdowns();
+      }
+
+      async function locateTasksFile(repositoryHandle) {
+        var teacherDirectory = await repositoryHandle.getDirectoryHandle("teacher");
+        var assetsDirectory = await teacherDirectory.getDirectoryHandle("assets");
+        var javascriptDirectory = await assetsDirectory.getDirectoryHandle("js");
+        var databasesDirectory = await javascriptDirectory.getDirectoryHandle("databases");
+        return databasesDirectory.getFileHandle("teacher-tasks.js");
+      }
+
+      function serializeTasks() {
+        return "window.magisTasks = " + JSON.stringify(tasks, null, 2) + ";\n";
+      }
+
+      connectButton.addEventListener("click", async function () {
+        if (typeof window.showDirectoryPicker !== "function") {
+          setSaveStatus("Local editing requires Chrome or Edge with File System Access API support.", true);
+          return;
+        }
+
+        try {
+          var repositoryHandle = await window.showDirectoryPicker({ mode: "readwrite" });
+          tasksFileHandle = await locateTasksFile(repositoryHandle);
+          connectButton.textContent = "Repository Connected";
+          saveButton.disabled = !hasUnsavedChanges;
+          setSaveStatus(hasUnsavedChanges ? "Unsaved changes" : "No unsaved changes");
+        } catch (error) {
+          if (error.name !== "AbortError") {
+            setSaveStatus("Could not connect: select the repository root folder.", true);
+          }
+        }
       });
 
-      if (tasks.length === 0) {
-        tasksEmpty.hidden = false;
-        tasksTableBody.closest("table").hidden = true;
-      } else {
-        updateTaskCountdowns();
-        window.setInterval(updateTaskCountdowns, 1000);
+      addTaskButton.addEventListener("click", function () {
+        tasks.push({ description: "", dueDate: "" });
+        renderTasks();
+        markUnsaved();
+      });
+
+      saveButton.addEventListener("click", async function () {
+        if (!tasksFileHandle || !hasUnsavedChanges) {
+          return;
+        }
+
+        saveButton.disabled = true;
+        var writable;
+        try {
+          writable = await tasksFileHandle.createWritable();
+          await writable.write(serializeTasks());
+          await writable.close();
+          window.magisTasks = tasks.map(function (task) { return Object.assign({}, task); });
+          hasUnsavedChanges = false;
+          setSaveStatus("Changes saved locally");
+        } catch (error) {
+          if (writable) {
+            await writable.abort().catch(function () {});
+          }
+          saveButton.disabled = false;
+          setSaveStatus("Save failed: " + error.message, true);
+        }
+      });
+
+      window.addEventListener("beforeunload", function (event) {
+        if (hasUnsavedChanges) {
+          event.preventDefault();
+          event.returnValue = "";
+        }
+      });
+
+      if (typeof window.showDirectoryPicker !== "function") {
+        connectButton.disabled = true;
+        setSaveStatus("Local editing requires Chrome or Edge with File System Access API support.", true);
       }
+
+      renderTasks();
+      window.setInterval(updateTaskCountdowns, 1000);
     })();
   </script>
   <script src="../assets/js/theme-toggle.js" defer></script>
