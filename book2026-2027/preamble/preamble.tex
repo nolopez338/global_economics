@@ -136,6 +136,8 @@ top=0.4in
 \definecolor{links2}{HTML}{0000B3} % Dark blue
 \definecolor{links3}{HTML}{B0005A} % Dark red
 \definecolor{tocLinkDark}{HTML}{8C3F33}
+\definecolor{darkgold}{HTML}{FFAB00}
+\definecolor{darkred}{HTML}{8B0000}
 \definecolor{taskLinkDarkBlue}{HTML}{0B3D91}
 
 % ==========================================================
@@ -234,6 +236,18 @@ top=0.4in
 
 % Improved PDF bookmarks; loaded after hyperref.
 \usepackage{bookmark}
+
+% Install after tocloft replaces \tableofcontents at begin-document time.
+% Scope the contents-link color without changing other internal links.
+\AddToHook{begindocument/end}{%
+	\let\OriginalTableOfContents\tableofcontents
+	\renewcommand{\tableofcontents}{%
+		\begingroup
+		\hypersetup{linkcolor=darkgold}%
+		\OriginalTableOfContents
+		\endgroup
+	}%
+}
 
 % \bigLink{url}{text}
 % Creates a large centered framed hyperlink.
@@ -346,14 +360,15 @@ top=0.4in
 }
 
 % \secInicio
-% \secInicio[current-section-label]
-% \secInicio[current-section-label][next-section-label]
-% Without arguments, shows one upward links-color arrow that links to the table of contents label "toc".
-% With one argument, shows two upward arrows: toc in links color and current-section in blue!70!black.
-% With two arguments, also shows a downward blue!70!black arrow for the next-section link.
-% Usage example: \secInicio
-% Usage example: \secInicio[sec:inicio]
+% \secInicio[blue-label]
+% \secInicio[blue-label][red-label]
+% \secInicio[][red-label]
+% Always shows the upward TOC arrow linking to "toc", using links.
+% Each non-empty optional label independently adds an upward arrow:
+% first label uses links2 (blue); second label uses links3 (red).
+% Empty inputs suppress only their own arrow and its preceding spacing.
 % Usage example: \secInicio[sec:inicio][subsec:inicio]
+% Usage example: \secInicio[][sec:inicio]
 \NewDocumentCommand{\secInicio}{O{} O{}}{%
 	\vspace{-3mm}
 	\par\noindent
@@ -369,21 +384,14 @@ top=0.4in
 		%
 		\ifstrempty{#1}{}{%
 			\hspace{0.8em}%
-			\ifstrempty{#2}{%
-				% One input: blue arrow
-				\hyperref[#1]{%
-					\secInicioIcon{links2}{up}%
-				}%
-			}{%
-				% Two inputs: dark-red arrow to the first
-				\hyperref[#1]{%
-					\secInicioIcon{links3}{up}%
-				}%
-				\hspace{0.8em}%
-				% Blue arrow to the second
-				\hyperref[#2]{%
-					\secInicioIcon{links2}{up}%
-				}%
+			\hyperref[#1]{%
+				\secInicioIcon{links2}{up}%
+			}%
+		}%
+		\ifstrempty{#2}{}{%
+			\hspace{0.8em}%
+			\hyperref[#2]{%
+				\secInicioIcon{links3}{up}%
 			}%
 		}%
 	}%
@@ -488,6 +496,8 @@ top=0.4in
 
 
 \newcommand{\SectionProblemsTableOfContents}[1]{%
+	\begingroup
+	\hypersetup{linkcolor=darkred}%
 	\vspace{-2mm}
 	\begin{center}
 		\begin{tabular}{@{}l@{}}
@@ -499,6 +509,7 @@ top=0.4in
 		\end{tabular}
 	\end{center}
 	\vspace{-8mm}
+	\endgroup
 }
 
 \newcommand{\SectionProblemLink}[2]{%
@@ -554,25 +565,46 @@ top=0.4in
 }
 
 
+% Syntax: \QuestionsTasks{entries}, \QuestionsTasks[section-label]{entries},
+% or \QuestionsTasks[before|after][section-label]{entries}.
 % Entries: {criterion number}/{label}/{description}.
+% before/after are reserved heading-placement options (default: after).
+% Omitted, blank, or NaN (case-insensitive) labels call \secInicio without
+% arguments; other labels call \secInicio[][section-label] (TOC + red arrow).
+% Example: \QuestionsTasks[sec:examples]{entries} uses no blue arrow.
 % [before] preserves blocks whose heading precedes the spacing commands.
 \ExplSyntaxOn
 \seq_new:N \l_questions_tasks_entry_seq
 \tl_new:N \l_questions_tasks_criterion_tl
 \tl_new:N \l_questions_tasks_label_tl
 \tl_new:N \l_questions_tasks_description_tl
+\tl_new:N \l_questions_tasks_navigation_tl
 \cs_new_protected:Npn \questions_tasks_emit:nnn #1 #2 #3 {
 	\CriterionTask{#1}{#2}{#3}
 }
 \cs_generate_variant:Nn \questions_tasks_emit:nnn {VVV}
-\newcommand{\QuestionsTasks}[2][after]{
+\cs_new_protected:Npn \questions_tasks_navigation:n #1 {\secInicio[][#1]}
+\NewDocumentCommand{\QuestionsTasks}{O{after} o m}{
+	\tl_clear:N \l_questions_tasks_navigation_tl
+	\IfNoValueTF{#2}{
+		\str_case:nnF {#1} {{before}{} {after}{}} {
+			\tl_set:Nn \l_questions_tasks_navigation_tl {#1}
+		}
+	}{
+		\tl_set:Nn \l_questions_tasks_navigation_tl {#2}
+	}
+	\tl_trim_spaces:N \l_questions_tasks_navigation_tl
 	\str_if_eq:nnT {#1} {before} {\textbf{Questions/Tasks}}
 	\vspace{2mm}
-	\secInicio
+	\tl_if_blank:VTF \l_questions_tasks_navigation_tl {\secInicio}{
+		\str_if_eq:eeTF {\str_lowercase:f {\l_questions_tasks_navigation_tl}} {nan}
+		{\secInicio}
+		{\exp_args:NV \questions_tasks_navigation:n \l_questions_tasks_navigation_tl}
+	}
 	\vspace{-8mm}
 	\str_if_eq:nnF {#1} {before} {\textbf{Questions/Tasks}}
 	\begin{enumerate}
-		\clist_map_inline:nn {#2} {
+		\clist_map_inline:nn {#3} {
 			\seq_set_split:Nnn \l_questions_tasks_entry_seq {/} {##1}
 			\seq_pop_left:NN \l_questions_tasks_entry_seq \l_questions_tasks_criterion_tl
 			\seq_pop_left:NN \l_questions_tasks_entry_seq \l_questions_tasks_label_tl
