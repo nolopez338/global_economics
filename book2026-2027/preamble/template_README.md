@@ -31,6 +31,8 @@ Treat all matching files, and any similar generated LaTeX compilation artifacts,
 
 Use concise English and consistent domain terminology. Keep the README descriptive; add no extra sections, tutorials, or unsupported claims. Use actual filenames throughout, even when they differ from `README.md`.
 
+Order files first by type (alphabetically by the type labels used in the Files table), then alphabetically by filename within each type, ignoring case. Use this same file order in the Files table, Directory Structure tree, and Public Commands table. Sort subfolders alphabetically by name in the Folders table and place them before the grouped files in the tree.
+
 Write links relative to the generated README's folder using forward slashes: [`example.tex`](example.tex), [`module/`](module/), [`README-module.md`](module/README-module.md), or [`README-parent.md`](../README-parent.md). Use linked filenames in tables and link relevant related documents within descriptions when helpful. Only link to existing targets, apart from the README being generated; never use absolute paths. If a subfolder has no README, link to the folder itself and write `None.` in its README column.
 
 ## Output Template
@@ -58,8 +60,8 @@ Write links relative to the generated README's folder using forward slashes: [`e
 
 ```text
 folder_name/
-├── example.tex
 ├── module/
+├── example.tex
 └── README-folder.md
 ```
 

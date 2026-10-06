@@ -9,6 +9,7 @@ Shared LaTeX preambles, document templates, and visual assets for the project's 
 | File | Type | Purpose |
 |---|---|---|
 | [`logo.png`](logo.png) | PNG | Displays the San Bartolomé La Merced crest used in document headers. |
+| [`urraca.png`](urraca.png) | PNG | School mascot bird illustration. |
 | [`main.tex`](main.tex) | LaTeX | Explains preamble settings, formatting commands, links, and figures with usage examples. |
 | [`preamble_exams.tex`](preamble_exams.tex) | LaTeX | Configures compact assessment layouts, adjustable table columns, subsection boxes, and score labels. |
 | [`preamble_G10_T1_C2C3.tex`](preamble_G10_T1_C2C3.tex) | LaTeX | Extends the base preamble with a decision-elements table for Grade 10 Term 1 practice activities. |
@@ -20,7 +21,6 @@ Shared LaTeX preambles, document templates, and visual assets for the project's 
 | [`template_practice.tex`](template_practice.tex) | LaTeX | Demonstrates criterion-linked practice tasks, worked probability solutions, and graph command examples. |
 | [`template_print.tex`](template_print.tex) | LaTeX | Provides a printable problem sheet followed by a solution characterization table. |
 | [`template_README.md`](template_README.md) | Markdown | Defines the structure, descriptions, relative links, and command inventory required for folder READMEs. |
-| [`urraca.png`](urraca.png) | PNG | Displays a colorful bird illustration. |
 
 ## Folders
 
@@ -36,6 +36,7 @@ preamble/
 ├── graphs/
 ├── imgs/
 ├── logo.png
+├── urraca.png
 ├── main.tex
 ├── preamble_exams.tex
 ├── preamble_G10_T1_C2C3.tex
@@ -46,8 +47,7 @@ preamble/
 ├── template_exam.tex
 ├── template_practice.tex
 ├── template_print.tex
-├── template_README.md
-└── urraca.png
+└── template_README.md
 ```
 
 ## Public Commands
@@ -55,6 +55,7 @@ preamble/
 | File | Commands |
 |---|---|
 | [`logo.png`](logo.png) | None. |
+| [`urraca.png`](urraca.png) | None. |
 | [`main.tex`](main.tex) | None. |
 | [`preamble_exams.tex`](preamble_exams.tex) | `\setYColumnWidth`, `\SubsectionBox`, `\CellCenter`, `\score` |
 | [`preamble_G10_T1_C2C3.tex`](preamble_G10_T1_C2C3.tex) | `\DecisionElementsTable` |
@@ -66,4 +67,3 @@ preamble/
 | [`template_practice.tex`](template_practice.tex) | None. |
 | [`template_print.tex`](template_print.tex) | None. |
 | [`template_README.md`](template_README.md) | None. |
-| [`urraca.png`](urraca.png) | None. |
