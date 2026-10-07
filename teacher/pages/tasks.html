@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tasks</title>
+  <link rel="stylesheet" href="../../assets/css/schedule.css" />
+  <style>
+    .tasks-table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--border-color, rgba(15, 23, 42, 0.12));
+      border-radius: 10px;
+    }
+
+    .tasks-table {
+      width: 100%;
+      min-width: 620px;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .tasks-table th,
+    .tasks-table td {
+      padding: 0.8rem 0.9rem;
+      border-bottom: 1px solid var(--border-color, rgba(15, 23, 42, 0.12));
+      vertical-align: middle;
+    }
+
+    .tasks-table th {
+      background: #7f1d1d;
+      color: #ffffff;
+      font-size: 0.85rem;
+      letter-spacing: 0.02em;
+    }
+
+    .tasks-table tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .tasks-table tbody tr:nth-child(even) {
+      background: var(--card-muted-bg, rgba(15, 23, 42, 0.04));
+    }
+
+    .task-position {
+      width: 3rem;
+      font-weight: 800;
+    }
+
+    .task-countdown {
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+    }
+
+    .task-countdown.overdue {
+      color: #b91c1c;
+    }
+
+    .tasks-empty {
+      margin: 0;
+      padding: 1rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .task-editor-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.65rem;
+      width: 100%;
+      margin-bottom: 0.85rem;
+    }
+
+    .task-editor-button {
+      padding: 0.55rem 0.85rem;
+      border: 1px solid currentColor;
+      border-radius: 999px;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .task-editor-button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .task-editor-input {
+      box-sizing: border-box;
+      width: 100%;
+      min-width: 10rem;
+      padding: 0.45rem 0.55rem;
+      border: 1px solid var(--grid);
+      border-radius: 6px;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+    }
+
+    .task-editor-input::placeholder {
+      color: var(--muted);
+    }
+
+    .task-remove-button {
+      padding: 0.35rem 0.55rem;
+      border-color: currentColor;
+    }
+
+    body.dark-theme .task-countdown.overdue { color: #fca5a5; }
+
+    body.dark-theme .tasks-table-wrapper,
+    body.dark-theme .tasks-table th,
+    body.dark-theme .tasks-table td {
+      border-color: #475569;
+    }
+
+    .task-alert { margin: 0 0 1rem; padding: 0.85rem 1rem; border: 1px solid; border-left-width: 5px; border-radius: 10px; }
+    .task-alert[data-state="info"] { background: #eff6ff; color: #1e40af; }
+    .task-alert[data-state="success"] { background: #f0fdf4; color: #166534; }
+    .task-alert[data-state="warning"] { background: #fffbeb; color: #92400e; }
+    .task-alert[data-state="error"] { background: #fef2f2; color: #991b1b; }
+    body.dark-theme .task-alert[data-state="info"] { background: #172554; color: #bfdbfe; }
+    body.dark-theme .task-alert[data-state="success"] { background: #052e16; color: #bbf7d0; }
+    body.dark-theme .task-alert[data-state="warning"] { background: #422006; color: #fde68a; }
+    body.dark-theme .task-alert[data-state="error"] { background: #450a0a; color: #fecaca; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="breadcrumbs"><a class="back-link" href="magis.html">← Back to Magis</a></div>
+    <h1>Tasks</h1>
+    <section class="page-card" aria-label="Tasks editor">
+      <p>Connect your local repository root to save edits. Local saving requires Chrome or Edge with File System Access API support.</p>
+      <p class="task-alert" id="task-save-status" role="status" aria-live="polite" aria-atomic="true" data-state="info">No unsaved changes. Connect a repository to enable saving.</p>
+      <p class="task-alert" id="task-dirty-status" data-state="warning" hidden>Unsaved changes — save before leaving.</p>
+      <div class="task-editor-toolbar" aria-label="Local task editor controls">
+        <button class="task-editor-button" id="connect-repository" type="button">Connect Local Repository</button>
+        <button class="task-editor-button" id="add-task" type="button">Add Task</button>
+        <button class="task-editor-button" id="save-tasks" type="button" disabled>Save Changes</button>
+
+      </div>
+      <div class="tasks-table-wrapper">
+        <table class="tasks-table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Description</th>
+              <th scope="col">Due Date</th>
+              <th scope="col">Time Remaining</th>
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+          <tbody id="tasks-table-body"></tbody>
+        </table>
+        <p class="tasks-empty" id="tasks-empty" hidden>No tasks are currently listed.</p>
+      </div>
+    </section>
+    <section class="theme-toggle-section" aria-label="Theme controls">
+      <label class="theme-toggle" for="dark-mode-toggle">
+        <span class="theme-toggle-label">Dark mode</span>
+        <span class="theme-toggle-control">
+          <input type="checkbox" id="dark-mode-toggle" aria-label="Toggle dark mode">
+          <span class="theme-toggle-slider" aria-hidden="true"></span>
+        </span>
+      </label>
+    </section>
+  </main>
+  <script src="../assets/js/databases/teacher-tasks.js"></script>
+  <script src="../assets/js/tasks.js"></script>
+  <script src="../assets/js/theme-toggle.js" defer></script>
+</body>
+</html>
