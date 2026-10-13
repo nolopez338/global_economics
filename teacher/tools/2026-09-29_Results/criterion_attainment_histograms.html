@@ -15,7 +15,12 @@ fieldset{margin:0;padding:10px 14px;border:1px solid var(--line);border-radius:8
 h2{font-size:18px;margin:0 0 4px}.desc{font-size:13px;color:var(--muted);margin:0 0 20px}.chart{overflow-x:auto;height:360px;display:flex;align-items:flex-end;gap:18px;border-left:1px solid #aab2c0;border-bottom:1px solid #aab2c0;padding:20px 18px 0;position:relative}
 .barwrap{height:100%;flex:1;min-width:42px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}.value{font-size:13px;font-weight:700;margin-bottom:7px;text-align:center}.bar{width:min(82px,72%);background:var(--bar);border-radius:7px 7px 0 0;min-height:2px}.label{height:52px;font-size:12px;text-align:center;padding-top:8px;line-height:1.25;overflow-wrap:anywhere}.axislabel{text-align:center;color:var(--muted);font-size:12px;margin-top:8px}.note{font-size:12px;color:var(--muted);margin-top:12px}.empty{align-self:center;margin:auto;color:var(--muted)}
 @media(max-width:600px){main{padding:20px 10px}.card{padding:14px}.chart{gap:6px;padding-left:8px;padding-right:8px;height:300px}.value{font-size:11px}.label{font-size:10px}}
-.stack{width:min(82px,90%);display:flex;flex-direction:column;justify-content:flex-end}.segment{display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0}.passed{background:#24733d}.failed{background:#b73535}.segment.small{color:var(--text);position:relative;z-index:1}.segment.small span{background:rgba(255,255,255,.94);border-radius:3px;padding:0 2px}.legend{display:flex;gap:18px;font-size:12px;margin:0 0 16px}.swatch{display:inline-block;width:12px;height:12px;margin-right:5px;border-radius:2px}.bar{flex-shrink:0}.card{min-width:0}.chart:focus-visible{outline:2px solid var(--accent)}
+.stack{width:min(82px,90%);display:flex;flex-direction:column;justify-content:flex-end}.segment{display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0}.passed{background:#24733d}.failed{background:#b73535}.missing{background:#7952a3}.segment.small{color:var(--text);position:relative;z-index:1}.segment.small span{background:rgba(255,255,255,.94);border-radius:3px;padding:0 2px}.legend{display:flex;flex-wrap:wrap;gap:18px;font-size:12px;margin:0 0 16px}.swatch{display:inline-block;width:12px;height:12px;margin-right:5px;border-radius:2px}.bar{flex-shrink:0}.card{min-width:0}.chart:focus-visible{outline:2px solid var(--accent)}
+.section-heading{margin:0}.section-toggle{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;min-height:0;padding:0;border:0;border-radius:0;background:transparent;color:var(--text);font:inherit;text-align:left}.chevron{width:10px;height:10px;margin:0 4px 4px;flex-shrink:0;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform 180ms ease}.section-toggle[aria-expanded="false"] .chevron{transform:rotate(-45deg)}
+.section-content{display:grid;grid-template-rows:1fr;opacity:1;visibility:visible;transition:grid-template-rows 180ms ease,opacity 180ms ease,visibility 180ms}.section-content.is-collapsed{grid-template-rows:0fr;opacity:0;visibility:hidden}.section-inner{min-height:0;overflow:hidden}.section-inner>.desc{padding-top:4px}
+@media(prefers-reduced-motion:reduce){.section-content,.chevron{transition:none}}
+.barwrap[type="button"]{padding:0;border:0;border-radius:5px;background:transparent;color:var(--text);font:inherit;cursor:pointer}.barwrap.is-selected{background:#244c7c12;box-shadow:inset 0 0 0 2px var(--accent)}.barwrap:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}.barwrap .label{flex-shrink:0}
+.student-panel{margin-top:20px;border-top:1px solid var(--line);padding-top:16px}.student-panel[hidden]{display:none}.student-panel summary{display:flex;align-items:center;justify-content:space-between;gap:16px;font-size:14px;font-weight:700;cursor:pointer;list-style:none}.student-panel summary::-webkit-details-marker{display:none}.student-panel summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.student-panel:not([open]) .chevron{transform:rotate(-45deg)}.table-scroll{overflow-x:auto;margin-top:12px}.table-scroll:focus-visible{outline:2px solid var(--accent)}.student-panel table{width:100%;border-collapse:collapse;font-size:13px;text-align:left}.student-panel caption{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}.student-panel th,.student-panel td{padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}.student-panel th{color:var(--muted);font-weight:600}.result-badge{display:inline-block;border-radius:4px;padding:3px 8px;color:#fff}.table-empty{color:var(--muted)}
 </style>
 </head>
 <body><main>
@@ -29,12 +34,24 @@ h2{font-size:18px;margin:0 0 4px}.desc{font-size:13px;color:var(--muted);margin:
 </div>
 <h2 class="class-title" id="classTitle"></h2>
 <div class="grid">
-<section class="card"><h2>Criterion attainment histogram</h2><p class="desc">Students passing and failing each assessed criterion.</p><div class="legend"><span><i class="swatch passed"></i>Passed (green)</span><span><i class="swatch failed"></i>Failed (red)</span></div><div class="chart" id="criterionChart" tabindex="0" role="img" aria-label="Criterion attainment"></div><div class="axislabel">Criterion</div></section>
-<section class="card"><h2>Number of criteria passed per student</h2><p class="desc" id="distributionDescription">How many students are passing each number of assessed criteria.</p><div class="chart" id="distributionChart" tabindex="0" role="img" aria-label="Criteria passed per student"></div><div class="axislabel">Number of criteria passed</div></section>
+<section class="card"><h2 class="section-heading"><button class="section-toggle" type="button" aria-expanded="true" aria-controls="criterionContent"><span>Criterion attainment histogram</span><span class="chevron" aria-hidden="true"></span></button></h2><div class="section-content" id="criterionContent"><div class="section-inner"><p class="desc">All selected students per criterion: passed, failed, and missing (NaN).</p><div class="legend"><span><i class="swatch passed"></i>Passed (green)</span><span><i class="swatch failed"></i>Failed (red)</span><span><i class="swatch missing"></i>NaN (purple)</span></div><div class="chart" id="criterionChart" tabindex="0" role="group" aria-label="Criterion attainment"></div><div class="axislabel">Criterion</div><details class="student-panel" id="criterionStudents" hidden><summary><span id="criterionStudentsTitle"></span><span class="chevron" aria-hidden="true"></span></summary><div class="table-scroll" tabindex="0" role="region" aria-labelledby="criterionStudentsTitle"><table><caption id="criterionStudentsCaption"></caption><thead><tr><th scope="col">Student Name</th><th scope="col">Group</th><th scope="col">Result</th></tr></thead><tbody id="criterionStudentsBody"></tbody></table></div></details></div></div></section>
+<section class="card"><h2 class="section-heading"><button class="section-toggle" type="button" aria-expanded="true" aria-controls="distributionContent"><span>Number of criteria passed per student</span><span class="chevron" aria-hidden="true"></span></button></h2><div class="section-content" id="distributionContent"><div class="section-inner"><p class="desc" id="distributionDescription">NaN means all criteria are missing. Other categories count passed criteria among students with at least one recorded result.</p><div class="chart" id="distributionChart" tabindex="0" role="group" aria-label="Criteria passed per student"></div><div class="axislabel">Number of criteria passed</div><details class="student-panel" id="distributionStudents" hidden><summary><span id="distributionStudentsTitle"></span><span class="chevron" aria-hidden="true"></span></summary><div class="table-scroll" tabindex="0" role="region" aria-labelledby="distributionStudentsTitle"><table><caption id="distributionStudentsCaption"></caption><thead><tr><th scope="col">Student Name</th><th scope="col">Group</th><th scope="col">Number of Criteria Passed</th></tr></thead><tbody id="distributionStudentsBody"></tbody></table></div></details></div></div></section>
 </div>
-<p class="note">“Si”, “Sí”, and the unified export's “Yes” mean passed. “No” means not passed. Blank cells are treated as missing data, not as failed criteria.</p>
+<p class="note">“Si”, “Sí”, and the unified export's “Yes” mean passed. “No” means not passed. Blank, whitespace-only, and NaN cells (case-insensitive) are missing data. Students with all results missing appear only in NaN; 0 means recorded results but no passed criteria.</p>
 </main>
 <script>
+// Keep chart nodes and their layout dimensions intact while hiding each panel.
+document.querySelectorAll('.section-toggle').forEach(button=>{
+  const content=document.getElementById(button.getAttribute('aria-controls'));
+  button.addEventListener('click',()=>{
+    const expanded=button.getAttribute('aria-expanded')==='true';
+    button.setAttribute('aria-expanded',String(!expanded));
+    content.inert=expanded;
+    content.setAttribute('aria-hidden',String(expanded));
+    content.classList.toggle('is-collapsed',expanded);
+  });
+});
+
 const status=document.getElementById('status');
 const controls=document.getElementById('groupControls');
 const groupChoices=document.getElementById('groupChoices');
@@ -45,6 +62,60 @@ const checkboxes=new Map();
 let students=[],columns=[];
 let allCheckbox;
 let loadedFileName='';
+const barSelections={criterion:null,distribution:null};
+const resultOrder={missing:0,failed:1,passed:2};
+function selectedGroups(){return new Set([...checkboxes].filter(([,input])=>input.checked&&!input.disabled).map(([group])=>group));}
+function distributionIndex(student){
+  return student.results.some(value=>value==='passed'||value==='failed')?student.results.filter(value=>value==='passed').length+1:0;
+}
+function syncBarSelection(kind){
+  const panel=document.getElementById(kind+'Students');
+  document.querySelectorAll('#'+kind+'Chart .barwrap').forEach(button=>{
+    const selected=button.dataset.selection===String(barSelections[kind]);
+    button.classList.toggle('is-selected',selected);
+    button.setAttribute('aria-expanded',String(selected&&panel.open));
+  });
+}
+for(const kind of ['criterion','distribution']){
+  document.getElementById(kind+'Students').addEventListener('toggle',()=>syncBarSelection(kind));
+}
+function updateStudentTable(kind){
+  const selection=barSelections[kind];
+  const panel=document.getElementById(kind+'Students');
+  panel.hidden=selection===null;
+  if(selection===null)return;
+  const index=kind==='criterion'?columns.findIndex(column=>column.criterion===selection):selection;
+  const groups=selectedGroups();
+  const matching=students.filter(student=>groups.has(student.group)&&(kind==='criterion'?index>=0:distributionIndex(student)===index));
+  matching.sort((a,b)=>(kind==='criterion'?resultOrder[a.results[index]]-resultOrder[b.results[index]]:0)||a.name.localeCompare(b.name,undefined,{sensitivity:'base'})||a.sourceGroup.localeCompare(b.sourceGroup));
+  const category=kind==='criterion'?selection:index===0?'NaN':String(index-1)+' criteria passed';
+  const title=category+' · '+matching.length+' student'+(matching.length===1?'':'s');
+  document.getElementById(kind+'StudentsTitle').textContent=title;
+  document.getElementById(kind+'StudentsCaption').textContent=title;
+  const body=document.getElementById(kind+'StudentsBody');body.replaceChildren();
+  matching.forEach(student=>{
+    const row=document.createElement('tr');
+    for(const value of [student.name,student.sourceGroup]){const cell=document.createElement('td');cell.textContent=value;row.append(cell);}
+    const cell=document.createElement('td');
+    if(kind==='criterion'){
+      const result=student.results[index];const badge=document.createElement('span');badge.className='result-badge '+result;
+      badge.textContent={missing:'NaN',failed:'Failed (No)',passed:'Passed (Yes)'}[result];cell.append(badge);
+    }else cell.textContent=index===0?'NaN':String(index-1);
+    row.append(cell);body.append(row);
+  });
+  if(!matching.length){const row=document.createElement('tr');const cell=document.createElement('td');cell.colSpan=3;cell.className='table-empty';cell.textContent='No students match this selection in the selected groups.';row.append(cell);body.append(row);}
+}
+function selectBar(kind,selection){
+  const panel=document.getElementById(kind+'Students');
+  const same=barSelections[kind]===selection;
+  barSelections[kind]=selection;
+  updateStudentTable(kind);
+  panel.open=same?!panel.open:true;
+  syncBarSelection(kind);
+}
+function resetStudentTables(){
+  for(const kind of ['criterion','distribution']){barSelections[kind]=null;const panel=document.getElementById(kind+'Students');panel.hidden=true;panel.open=false;document.getElementById(kind+'StudentsBody').replaceChildren();}
+}
 
 // Handles commas inside quoted fields, escaped quotes, CRLF files, and a UTF-8 BOM.
 function parseCSV(text){
@@ -68,6 +139,7 @@ function resultValue(value){
   const normalized=(value||'').trim().toLocaleLowerCase();
   if(normalized==='si'||normalized==='sí'||normalized==='yes')return 'passed';
   if(normalized==='no')return 'failed';
+  if(normalized===''||normalized==='nan')return 'missing';
   return null;
 }
 
@@ -88,7 +160,7 @@ function readStudents(text){
   const unique=new Map();
   rows.forEach((row,index)=>{
     if(row.length!==headings.length)throw new Error('incorrect number of fields in student record '+(index+1));
-    const group=row[groupIndex].trim();
+    const group=row[groupIndex].split('-',1)[0].trim();
     const match=group.match(/^(?:\d+\s*)?([A-E])(?=$|[\s_-])/i);
     if(!match)throw new Error('missing or unsupported Group in student record '+(index+1));
     const results=detected.map(column=>{
@@ -97,14 +169,14 @@ function readStudents(text){
       if(value.trim()&&!result)throw new Error('invalid '+column.criterion+' result in student record '+(index+1)+': '+value);
       return result;
     });
-    // Names are scoped to their full source group; local row numbers repeat across groups.
+    // Names are scoped to their normalized group; local row numbers repeat across groups.
     const name=nameIndex>=0?normalizedHeader(row[nameIndex]):'';
     const identity=name?JSON.stringify([normalizedHeader(group),name]):'row:'+index;
     if(unique.has(identity)){
       if(JSON.stringify(unique.get(identity).results)!==JSON.stringify(results))throw new Error('conflicting duplicate student record: '+row[nameIndex]);
       return;
     }
-    unique.set(identity,{group:match[1].toUpperCase(),sourceGroup:group,results});
+    unique.set(identity,{group:match[1].toUpperCase(),sourceGroup:group,name:nameIndex>=0?(row[nameIndex].trim()||'Unnamed student'):'Unnamed student',results});
   });
   return {students:[...unique.values()],columns:detected};
 }
@@ -112,15 +184,16 @@ function readStudents(text){
 function aggregate(selected){
   const included=students.filter(student=>selected.has(student.group));
   const criteria=columns.map((column,index)=>{
-    let passed=0,failed=0;
-    included.forEach(student=>{if(student.results[index]==='passed')passed++;else if(student.results[index]==='failed')failed++;});
-    return {criterion:column.criterion,passed,failed,total:passed+failed};
-  }).filter(item=>item.total>0);
-  const distribution=Array(criteria.length+1).fill(0);
+    let passed=0,failed=0,missing=0;
+    included.forEach(student=>{if(student.results[index]==='passed')passed++;else if(student.results[index]==='failed')failed++;else missing++;});
+    return {criterion:column.criterion,passed,failed,missing,total:passed+failed+missing};
+  });
+  // Index 0 is NaN; index 1 is zero passed with at least one recorded result.
+  const distribution=Array(columns.length+2).fill(0);
   let eligible=0;
   included.forEach(student=>{
-    if(!student.results.some(Boolean))return;
-    distribution[student.results.filter(value=>value==='passed').length]++;
+    if(!student.results.some(value=>value==='passed'||value==='failed')){distribution[0]++;return;}
+    distribution[student.results.filter(value=>value==='passed').length+1]++;
     eligible++;
   });
   return {criteria,distribution,eligible,total:included.length};
@@ -131,42 +204,45 @@ function emptyChart(root,message){
   root.setAttribute('aria-label',message);
 }
 
-function makeBar(root,label,description){
-  const wrap=document.createElement('div');wrap.className='barwrap';wrap.title=description;
-  const caption=document.createElement('div');caption.className='label';caption.textContent=label;
+function makeBar(root,label,description,kind,selection){
+  const wrap=document.createElement('button');wrap.type='button';wrap.className='barwrap';wrap.title=description;
+  wrap.dataset.selection=String(selection);wrap.setAttribute('aria-label',description+'; show students');wrap.setAttribute('aria-controls',kind+'Students');
+  wrap.addEventListener('click',()=>selectBar(kind,selection));
+  const caption=document.createElement('span');caption.className='label';caption.textContent=label;
   root.append(wrap);
   return {wrap,caption};
 }
 
 function render(){
-  const selected=new Set([...checkboxes].filter(([,input])=>input.checked&&!input.disabled).map(([group])=>group));
+  const selected=selectedGroups();
   const available=[...checkboxes.values()].filter(input=>!input.disabled);
   allCheckbox.checked=available.length>0&&available.every(input=>input.checked);
   allCheckbox.indeterminate=available.some(input=>input.checked)&&!allCheckbox.checked;
   const data=aggregate(selected);
   document.getElementById('classTitle').textContent=selected.size?'Groups '+[...selected].join(', '):'No groups selected';
-  status.textContent=loadedFileName+' loaded · '+data.total+' selected students · '+data.eligible+' with assessed results';
+  status.textContent=loadedFileName+' loaded · '+data.total+' selected students · '+data.eligible+' with assessed results · '+data.distribution[0]+' with no assessment data (NaN)';
   const criterionRoot=document.getElementById('criterionChart');criterionRoot.replaceChildren();
   const distributionRoot=document.getElementById('distributionChart');distributionRoot.replaceChildren();
-  const message=selected.size?'No assessed criteria found.':'Select one or more groups.';
-  if(!data.criteria.length){emptyChart(criterionRoot,message);emptyChart(distributionRoot,message);return;}
+  const message=selected.size?'No students found.':'Select one or more groups.';
+  for(const kind of ['criterion','distribution'])updateStudentTable(kind);
+  if(!data.total){emptyChart(criterionRoot,message);emptyChart(distributionRoot,message);return;}
   // Scale to the current chart viewport so the labels also fit on small screens.
   const plotHeight=Math.max(100,Math.min(250,criterionRoot.clientHeight-110));
   const maximum=Math.max(...data.criteria.map(item=>item.total),1);
   const summaries=[];
   data.criteria.forEach(item=>{
-    const description=item.criterion+': '+item.passed+' passed, '+item.failed+' failed, '+item.total+' valid results';
+    const description=item.criterion+': '+item.passed+' passed, '+item.failed+' failed, '+item.missing+' missing (NaN), '+item.total+' total students';
     summaries.push(description);
-    const {wrap,caption}=makeBar(criterionRoot,item.criterion,description);
-    const amount=document.createElement('div');amount.className='value';amount.textContent=item.total+' total';
-    const stack=document.createElement('div');stack.className='stack';
-    // Red appears above green. Zero counts remain visible above the bar.
-    for(const type of ['failed','passed']){
+    const {wrap,caption}=makeBar(criterionRoot,item.criterion,description,'criterion',item.criterion);
+    const amount=document.createElement('span');amount.className='value';amount.textContent=item.total+' total';
+    const stack=document.createElement('span');stack.className='stack';
+    // Purple appears above red and green. Zero counts remain visible above the bar.
+    for(const type of ['missing','failed','passed']){
       const count=item[type];const height=count/maximum*plotHeight;
-      const segment=document.createElement('div');segment.className='segment '+type+(height<18?' small':'');
+      const segment=document.createElement('span');segment.className='segment '+type+(height<18?' small':'');
       segment.style.height=height+'px';
       const number=document.createElement('span');number.textContent=count;
-      if(count)segment.append(number);else amount.textContent+=' · 0 '+type;
+      if(count)segment.append(number);else amount.textContent+=' · 0 '+(type==='missing'?'NaN':type);
       stack.append(segment);
     }
     wrap.append(amount,stack,caption);
@@ -174,12 +250,15 @@ function render(){
   criterionRoot.setAttribute('aria-label',summaries.join('; '));
   const distributionMax=Math.max(...data.distribution,1);
   data.distribution.forEach((count,index)=>{
-    const {wrap,caption}=makeBar(distributionRoot,index,count+' students passed '+index+' criteria');
-    const amount=document.createElement('div');amount.className='value';amount.textContent=count;
-    const bar=document.createElement('div');bar.className='bar';bar.style.background='var(--bar2)';bar.style.height=count/distributionMax*plotHeight+'px';
+    const label=index===0?'NaN':index-1;
+    const description=index===0?count+' students have no assessment data (all criteria missing)':count+' students passed '+label+' criteria and have at least one recorded result';
+    const {wrap,caption}=makeBar(distributionRoot,label,description,'distribution',index);
+    const amount=document.createElement('span');amount.className='value';amount.textContent=count;
+    const bar=document.createElement('span');bar.className='bar';bar.style.background=index===0?'#7952a3':'var(--bar2)';bar.style.height=count/distributionMax*plotHeight+'px';
     wrap.append(amount,bar,caption);
   });
-  distributionRoot.setAttribute('aria-label',data.distribution.map((count,index)=>index+' criteria passed: '+count+' students').join('; '));
+  distributionRoot.setAttribute('aria-label',data.distribution.map((count,index)=>index===0?'NaN (no assessment data): '+count+' students':(index-1)+' criteria passed (at least one recorded result): '+count+' students').join('; '));
+  for(const kind of ['criterion','distribution'])syncBarSelection(kind);
 }
 
 function buildGroupControls(){
@@ -200,6 +279,7 @@ function buildGroupControls(){
 }
 
 function showLoadError(error){
+  resetStudentTables();
   controls.disabled=true;
   students=[];columns=[];loadedFileName='';
   checkboxes.clear();groupChoices.replaceChildren();
@@ -218,6 +298,7 @@ async function loadCSVFile(file){
   try{
     const data=readStudents(await file.text());
     students=data.students;columns=data.columns;loadedFileName=file.name;
+    resetStudentTables();
     buildGroupControls();
   }catch(error){showLoadError(error);}
   finally{loadButton.disabled=false;}
