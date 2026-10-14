@@ -3,6 +3,16 @@
 \makeatother
 \input{preamble_exams.tex}
 
+% Filtering trees reuse the classroom activity's survivor/elimination layout.
+\tikzset{
+  cNine survivor/.style={draw,align=center,font=\small,text width=31mm},
+  cNine eliminated/.style={align=center,font=\small,text width=34mm},
+  cNine rule/.style={align=center,font=\scriptsize,text width=36mm},
+  cNine selected/.style={cNine survivor,very thick,fill=black!8},
+  cNine keep/.style={->},
+  cNine discard/.style={->,dashed}
+}
+
 \title{Grade 10 -- Term 1\\Decision Trees with Staged Filtering: C9 Practice}
 \author{}
 \date{}
@@ -95,6 +105,23 @@ Filtering rules (all values in thousand USD; retain ties at every cutoff):
 \end{tabularx}
 \end{center}
 
+\begin{center}\vspace{-6pt}
+\begin{tikzpicture}[>=Stealth]
+\node[cNine survivor] (s0) at (0.00,0) {All six $B_i$};
+\node[cNine survivor] (s1) at (4.05,0) {$B_4,B_5,B_2,B_3$};
+\node[cNine eliminated] (e1) at (4.05,-1.05) {Eliminate\\$B_1,B_6$};
+\node[cNine rule] at (4.05,0.85) {1: EMV\\Keep 4 highest EMVs};
+\draw[cNine keep] (s0) -- (s1); \draw[cNine discard] (s1) -- (e1);
+\node[cNine survivor] (s2) at (8.10,0) {$B_4,B_2$};
+\node[cNine eliminated] (e2) at (8.10,-1.05) {Eliminate\\$B_5,B_3$};
+\node[cNine rule] at (8.10,0.85) {2: Maximin\\Keep 2 highest minima};
+\draw[cNine keep] (s1) -- (s2); \draw[cNine discard] (s2) -- (e2);
+\node[cNine selected] (s3) at (12.15,0) {\textbf{Selected}\\$B_2$};
+\node[cNine eliminated] (e3) at (12.15,-1.05) {Eliminate\\$B_4$};
+\node[cNine rule] at (12.15,0.85) {3: Minimax Regret\\Select lowest max regret};
+\draw[cNine keep] (s2) -- (s3); \draw[cNine discard] (s3) -- (e3);
+\end{tikzpicture}\vspace{-6pt}\vspace{-6pt}\end{center}
+
 \secInicio[sec:c9-logistics][sec:c9-filtering]
 
 \subsection{Regional Distributor Expansion}\label{sec:c9-distributor}
@@ -106,7 +133,7 @@ Payoffs (thousand USD) and probabilities are:
 		\toprule
 		State & Probability & $X_1$ & $X_2$ & $X_3$ & $X_4$ & $X_5$ & $X_6$ \\
 		\midrule
-		$U_1$ & 0.30 & 130 & 120 & 140 & 110 & 125 & 118 \\
+		$U_1$ & 0.30 & 130 & 120 & 140 & 135 & 125 & 118 \\
 		$U_2$ & 0.25 & 90 & 95 & 80 & 100 & 88 & 92 \\
 		$U_3$ & 0.25 & 60 & 70 & 55 & 85 & 65 & 75 \\
 		$U_4$ & 0.20 & 20 & 40 & 10 & 60 & 45 & 35 \\
@@ -122,7 +149,7 @@ Alternative & EMV & Max Payoff & Min Payoff & Max Regret \\
 $X_1$ & 80.50 & 130.00 & 20.00 & 40.00 \\
 $X_2$ & 85.25 & 120.00 & 40.00 & 20.00 \\
 $X_3$ & 77.75 & 140.00 & 10.00 & 50.00 \\
-$X_4$ & 91.25 & 110.00 & 60.00 & 30.00 \\
+$X_4$ & 98.75 & 135.00 & 60.00 & 5.00 \\
 $X_5$ & 84.75 & 125.00 & 45.00 & 20.00 \\
 $X_6$ & 84.15 & 118.00 & 35.00 & 25.00 \\
 \bottomrule
@@ -145,11 +172,24 @@ Filtering rules (all values in thousand USD; retain ties at every cutoff):
 \# Step & Description & Left Alternatives & Eliminated Alternatives \\
 \midrule
 0 & Initial alternatives & $\{X_1,X_2,X_3,X_4,X_5,X_6\}$ & --- \\
-1 & Maximax: keep the 3 highest Max Payoff values. & $X_3(140.00)$, $X_1(130.00)$, $X_5(125.00)$ & $X_2(120.00)$, $X_6(118.00)$, $X_4(110.00)$ \\
-2 & EMV: select the highest EMV value. & \textbf{Selected:} $X_5(84.75)$ & $X_1(80.50)$, $X_3(77.75)$ \\
+1 & Maximax: keep the 3 highest Max Payoff values. & $X_3(140.00)$, $X_4(135.00)$, $X_1(130.00)$ & $X_5(125.00)$, $X_2(120.00)$, $X_6(118.00)$ \\
+2 & EMV: select the highest EMV value. & \textbf{Selected:} $X_4(98.75)$ & $X_1(80.50)$, $X_3(77.75)$ \\
 \bottomrule
 \end{tabularx}
 \end{center}
+
+\begin{center}\vspace{-6pt}
+\begin{tikzpicture}[>=Stealth]
+\node[cNine survivor] (s0) at (0.00,0) {All six $X_i$};
+\node[cNine survivor] (s1) at (4.05,0) {$X_3,X_4,X_1$};
+\node[cNine eliminated] (e1) at (4.05,-1.05) {Eliminate\\$X_5,X_2,X_6$};
+\node[cNine rule] at (4.05,0.85) {1: Maximax\\Keep 3 highest maxima};
+\draw[cNine keep] (s0) -- (s1); \draw[cNine discard] (s1) -- (e1);
+\node[cNine selected] (s2) at (8.10,0) {\textbf{Selected}\\$X_4$};
+\node[cNine eliminated] (e2) at (8.10,-1.05) {Eliminate\\$X_1,X_3$};
+\node[cNine rule] at (8.10,0.85) {2: EMV\\Select highest EMV};
+\draw[cNine keep] (s1) -- (s2); \draw[cNine discard] (s2) -- (e2);
+\end{tikzpicture}\vspace{-6pt}\vspace{-6pt}\end{center}
 
 \secInicio[sec:c9-distributor][sec:c9-filtering]
 
@@ -163,8 +203,8 @@ Payoffs are in thousand USD. Policies $G_4$ and $G_5$ balance upside and downsid
 		State & Probability & $G_1$ & $G_2$ & $G_3$ & $G_4$ & $G_5$ & $G_6$ \\
 		\midrule
 		$M_1$ & 0.45 & 100 & 94 & 114 & 90 & 104 & 96 \\
-		$M_2$ & 0.35 & 72 & 78 & 64 & 84 & 70 & 80 \\
-		$M_3$ & 0.20 & 32 & 44 & 12 & 56 & 38 & 26 \\
+		$M_2$ & 0.35 & 72 & 78 & 82 & 84 & 70 & 80 \\
+		$M_3$ & 0.20 & 32 & 44 & 46 & 56 & 38 & 26 \\
 		\bottomrule
 	\end{tabular}
 \end{center}
@@ -176,7 +216,7 @@ Alternative & EMV & Max Payoff & Min Payoff & Max Regret \\
 \midrule
 $G_1$ & 76.60 & 100.00 & 32.00 & 24.00 \\
 $G_2$ & 78.40 & 94.00 & 44.00 & 20.00 \\
-$G_3$ & 76.10 & 114.00 & 12.00 & 44.00 \\
+$G_3$ & 89.20 & 114.00 & 46.00 & 10.00 \\
 $G_4$ & 81.10 & 90.00 & 56.00 & 24.00 \\
 $G_5$ & 78.90 & 104.00 & 38.00 & 18.00 \\
 $G_6$ & 76.40 & 96.00 & 26.00 & 30.00 \\
@@ -202,13 +242,36 @@ Filtering rules (all values in thousand USD; retain ties at every cutoff):
 \# Step & Description & Left Alternatives & Eliminated Alternatives \\
 \midrule
 0 & Initial alternatives & $\{G_1,G_2,G_3,G_4,G_5,G_6\}$ & --- \\
-1 & EMV: keep the 5 highest EMV values. & $G_4(81.10)$, $G_5(78.90)$, $G_2(78.40)$, $G_1(76.60)$, $G_6(76.40)$ & $G_3(76.10)$ \\
-2 & Maximax: keep the 4 highest Max Payoff values. & $G_5(104.00)$, $G_1(100.00)$, $G_6(96.00)$, $G_2(94.00)$ & $G_4(90.00)$ \\
-3 & Maximin: keep the 2 highest Min Payoff values. & $G_2(44.00)$, $G_5(38.00)$ & $G_1(32.00)$, $G_6(26.00)$ \\
-4 & Minimax Regret: select the lowest Max Regret value. & \textbf{Selected:} $G_5(18.00)$ & $G_2(20.00)$ \\
+1 & EMV: keep the 5 highest EMV values. & $G_3(89.20)$, $G_4(81.10)$, $G_5(78.90)$, $G_2(78.40)$, $G_1(76.60)$ & $G_6(76.40)$ \\
+2 & Maximax: keep the 4 highest Max Payoff values. & $G_3(114.00)$, $G_5(104.00)$, $G_1(100.00)$, $G_2(94.00)$ & $G_4(90.00)$ \\
+3 & Maximin: keep the 2 highest Min Payoff values. & $G_3(46.00)$, $G_2(44.00)$ & $G_5(38.00)$, $G_1(32.00)$ \\
+4 & Minimax Regret: select the lowest Max Regret value. & \textbf{Selected:} $G_3(10.00)$ & $G_2(20.00)$ \\
 \bottomrule
 \end{tabularx}
 \end{center}
+
+\begin{center}\vspace{-6pt}
+\resizebox{0.98\linewidth}{!}{%
+\begin{tikzpicture}[>=Stealth]
+\node[cNine survivor] (s0) at (0.00,0) {All six $G_i$};
+\node[cNine survivor] (s1) at (4.05,0) {$G_3,G_4,G_5$\\$G_2,G_1$};
+\node[cNine eliminated] (e1) at (4.05,-1.05) {Eliminate\\$G_6$};
+\node[cNine rule] at (4.05,0.85) {1: EMV\\Keep 5 highest EMVs};
+\draw[cNine keep] (s0) -- (s1); \draw[cNine discard] (s1) -- (e1);
+\node[cNine survivor] (s2) at (8.10,0) {$G_3,G_5,G_1,G_2$};
+\node[cNine eliminated] (e2) at (8.10,-1.05) {Eliminate\\$G_4$};
+\node[cNine rule] at (8.10,0.85) {2: Maximax\\Keep 4 highest maxima};
+\draw[cNine keep] (s1) -- (s2); \draw[cNine discard] (s2) -- (e2);
+\node[cNine survivor] (s3) at (12.15,0) {$G_3,G_2$};
+\node[cNine eliminated] (e3) at (12.15,-1.05) {Eliminate\\$G_5,G_1$};
+\node[cNine rule] at (12.15,0.85) {3: Maximin\\Keep 2 highest minima};
+\draw[cNine keep] (s2) -- (s3); \draw[cNine discard] (s3) -- (e3);
+\node[cNine selected] (s4) at (16.20,0) {\textbf{Selected}\\$G_3$};
+\node[cNine eliminated] (e4) at (16.20,-1.05) {Eliminate\\$G_2$};
+\node[cNine rule] at (16.20,0.85) {4: Minimax Regret\\Select lowest max regret};
+\draw[cNine keep] (s3) -- (s4); \draw[cNine discard] (s4) -- (e4);
+\end{tikzpicture}%
+}\vspace{-6pt}\end{center}
 
 \secInicio[sec:c9-finance][sec:c9-filtering]
 
@@ -267,6 +330,23 @@ Filtering rules (all values in thousand USD; retain ties at every cutoff):
 \bottomrule
 \end{tabularx}
 \end{center}
+
+\begin{center}\vspace{-6pt}
+\begin{tikzpicture}[>=Stealth]
+\node[cNine survivor] (s0) at (0.00,0) {All six $Y_i$};
+\node[cNine survivor] (s1) at (4.05,0) {$Y_4,Y_2,Y_5$};
+\node[cNine eliminated] (e1) at (4.05,-1.05) {Eliminate\\$Y_6,Y_1,Y_3$};
+\node[cNine rule] at (4.05,0.85) {1: EMV\\Keep 3 highest EMVs};
+\draw[cNine keep] (s0) -- (s1); \draw[cNine discard] (s1) -- (e1);
+\node[cNine survivor] (s2) at (8.10,0) {$Y_5,Y_2$};
+\node[cNine eliminated] (e2) at (8.10,-1.05) {Eliminate\\$Y_4$};
+\node[cNine rule] at (8.10,0.85) {2: Minimax Regret\\Keep 2 lowest max regrets};
+\draw[cNine keep] (s1) -- (s2); \draw[cNine discard] (s2) -- (e2);
+\node[cNine selected] (s3) at (12.15,0) {\textbf{Selected}\\$Y_5$};
+\node[cNine eliminated] (e3) at (12.15,-1.05) {Eliminate\\$Y_2$};
+\node[cNine rule] at (12.15,0.85) {3: Maximin\\Select highest minimum};
+\draw[cNine keep] (s2) -- (s3); \draw[cNine discard] (s3) -- (e3);
+\end{tikzpicture}\vspace{-6pt}\vspace{-6pt}\end{center}
 
 \secInicio[sec:c9-insurance][sec:c9-filtering]
 
