@@ -4,40 +4,29 @@ This directory is the working collection for Grade 11 Term 1 probability. Its cu
 
 All paths below are relative to `book2026-2027/grade11/term_1/`. Every instructional document is LaTeX source (`.tex`); no generated PDFs are stored here.
 
-## Complete directory tree
+## Directory structure
 
 ```text
 .
 ├── README.md
-├── 1-practice_activities
-│   ├── G11_T1_C1_practice_activity1.tex
-│   ├── G11_T1_C2_practice_activity2.tex
-│   ├── G11_T1_C3_practice_activity3.tex
-│   ├── G11_T1_C4_practice_activity4.tex
-│   ├── old_G11_T3_C1C2C3_practice_activity_context.tex
-│   ├── old_G11_T3_C4_practice_activity.tex
-│   ├── old_G11_T3_C5_practice_activity.tex
-│   ├── old_G11_T3_C6_practice_activity.tex
-│   └── old_G11_T3_C7_practice_activity.tex
-├── 2-learning_evidences
-│   ├── G11_T1_C1C2C3C4_exam0_solution.tex
-│   ├── old_G11_T3_C1C7_midterm.tex
-│   ├── old_G11_T3_C1C7_midterm_solution.tex
-│   └── old_G11_T3_L4_C8C9C10_activity.tex
-└── 4-extra_material
-    ├── G11_T1_C1_practice_activity1_print1_solved.tex
-    └── normal-table.tex
+├── 1-practice_activities/
+├── 2-class_activities/
+├── 3-learning_evidences/
+├── 4-catch_ups/
+│   └── README-G11T1CU.md
+└── 5-extra_material/
+    └── README-G11T1EM.md
 ```
 
-The numbering deliberately has no `3-*` folder in the present tree. `old_` means legacy material physically retained here; it should not be mistaken for the current C1–C4 sequence merely because it remains buildable.
+The folders follow the standardized Grade 10 numbering. The catch-up and extra-material folders contain empty README placeholders. `old_` means legacy material physically retained here; it should not be mistaken for the current C1–C4 sequence merely because it remains buildable.
 
 ## Folder roles and instructional sequence
 
 | Folder | Role and contents | Relationship to the rest of Term 1 |
 |---|---|---|
-| `1-practice_activities/` | **Practice/source materials.** Four current, self-contained activities with explanations, contextual problems, and worked solutions; five legacy activities covering the former C1–C7 progression. | The current C1–C4 files prepare learners for `2-learning_evidences/G11_T1_C1C2C3C4_exam0_solution.tex`. Several documents load graph macros maintained outside this directory. |
-| `2-learning_evidences/` | **Assessments and solutions.** One current cumulative C1–C4 solved exercise set, a legacy C1–C7 midterm and its solution, and a legacy C8–C10 web-project brief. | Assesses or extends the skills practiced in `1-practice_activities/`. The legacy midterm pair is a direct question/solution workflow. The project brief is independent of the current assessment and refers to external web resources and datasets. |
-| `4-extra_material/` | **Supplementary/reference materials.** A compact solved C1 classification handout and a standalone standard-normal table. | The handout reinforces the current C1 activity. The normal table supports normal-probability work in the legacy C5–C7 materials, but is not imported by them. |
+| `1-practice_activities/` | **Practice/source materials.** Four current, self-contained activities with explanations, contextual problems, and worked solutions; five legacy activities covering the former C1–C7 progression. | The current C1–C4 files prepare learners for `3-learning_evidences/G11_T1_C1C2C3C4_exam0_solution.tex`. Several documents load graph macros maintained outside this directory. |
+| `3-learning_evidences/` | **Assessments and solutions.** One current cumulative C1–C4 solved exercise set, a legacy C1–C7 midterm and its solution, and a legacy C8–C10 web-project brief. | Assesses or extends the skills practiced in `1-practice_activities/`. The legacy midterm pair is a direct question/solution workflow. The project brief is independent of the current assessment and refers to external web resources and datasets. |
+| `2-class_activities/` | **Supplementary/reference materials.** A compact solved C1 classification handout and a standalone standard-normal table. | The handout reinforces the current C1 activity. The normal table supports normal-probability work in the legacy C5–C7 materials, but is not imported by them. |
 
 Recommended current teaching order:
 
@@ -63,7 +52,7 @@ flowchart LR
 - **Purpose/content:** Introduces random variables, support, PMFs, PDFs, CDFs, and the distinction between discrete and continuous variables. It gives recognition rules and formulas for Bernoulli, binomial, geometric, Poisson, uniform, triangular, linear, and normal distributions, followed by Colombian economic/business classification cases in discrete and continuous groups.
 - **Criterion:** C1—characterise continuous variables, distinguish them from discrete variables, and interpret PDF, CDF, and support in economic contexts.
 - **Dependencies:** Loads shared `preamble_exams.tex` and the reusable macro libraries `graphs/uniform_linear_probability_distributions.tex`, `graphs/probability_distribution_graphs.tex`, and `graphs/normal_distribution_graphs.tex`. These are external Term 1 dependencies found through the document's multi-level `\input@path`, under `book2026-2027/preamble/`.
-- **Relationships:** Establishes vocabulary needed by C2–C4, is assessed in the cumulative solution file, and has a shorter classification-only companion in `4-extra_material/`.
+- **Relationships:** Establishes vocabulary needed by C2–C4, is assessed in the cumulative solution file, and has a shorter classification-only companion in `2-class_activities/`.
 
 #### `1-practice_activities/G11_T1_C2_practice_activity2.tex`
 
@@ -91,7 +80,7 @@ flowchart LR
 
 ### Current solved assessment/resource
 
-#### `2-learning_evidences/G11_T1_C1C2C3C4_exam0_solution.tex`
+#### `3-learning_evidences/G11_T1_C1C2C3C4_exam0_solution.tex`
 
 - **Type/status:** LaTeX **assessment-style practice exercise and complete solution set** (despite the internal title saying “Term 3,” its filename and criteria align with the current Term 1 C1–C4 collection).
 - **Purpose/content:** A cumulative scored set. C1 classifies Bernoulli, geometric, Poisson, uniform, triangular, linear, normal, and piecewise continuous cases; C2 normalizes uniform/triangular PDFs and finds geometric probabilities; C3 normalizes circular-arc densities and finds areas using semicircles/circular segments; C4 obtains exponential rates, waiting probabilities/expectations, and judges model suitability.
@@ -99,7 +88,7 @@ flowchart LR
 - **Dependencies:** Loads external `preamble_exams.tex`, `graphs/uniform_linear_probability_distributions.tex`, and `graphs/probability_distribution_graphs.tex`; it does **not** load the normal graph library.
 - **Relationships:** Culminating worked evidence for all four current activities. Solutions are embedded in this one file; there is no separate unsolved current exam file in this directory.
 
-#### `4-extra_material/G11_T1_C1_practice_activity1_print1_solved.tex`
+#### `2-class_activities/G11_T1_C1_practice_activity1_print1_solved.tex`
 
 - **Type/status:** LaTeX **compact print handout with solutions**; page style is empty and it has no table of contents.
 - **Purpose/content:** Ten economic contexts followed by a solution table classifying each variable as discrete/continuous and Bernoulli, uniform, binomial, Poisson, triangular, geometric, linear, or normal. It focuses on distribution recognition rather than calculations.
@@ -107,7 +96,7 @@ flowchart LR
 - **Dependencies:** Loads `preamble_exams.tex` and all three external graph libraries, although this short source does not call graph macros directly; the imports make the preamble environment consistent with the full activity.
 - **Relationships:** Printable reinforcement/answer key for `G11_T1_C1_practice_activity1.tex`, not a separate assessment.
 
-#### `4-extra_material/normal-table.tex`
+#### `2-class_activities/normal-table.tex`
 
 - **Type/status:** Standalone LaTeX **reference sheet/supporting asset** with its own `article` document class and package configuration; it does not use a shared preamble.
 - **Purpose/content:** Defines `Z ~ N(0,1)`, explains how to read `Phi(z)=P(Z<z)`, demonstrates `Phi(1.23)=0.8907`, lists complement/symmetry/interval/two-tail identities, draws a shaded standard-normal curve in local TikZ/PGFPlots, and tabulates cumulative values for positive `z` from 0.00 through 2.99.
@@ -136,7 +125,7 @@ These sources are explicitly prefixed `old_` and identify themselves as Term 3 r
 - **Type/status:** LaTeX legacy **standard-normal practice with solutions**.
 - **Purpose/content:** Explains reading a positive-z cumulative table and using symmetry/complements, then covers left tails, right tails, central bands, and unions of tails for positive and negative bounds. A standard-normal table is embedded in the file.
 - **Criterion:** Former C5—use the standard normal distribution/table for contextual probabilities.
-- **Dependencies:** External `preamble_exams.tex` and `graphs/normal_distribution_graphs.tex` for shaded curve macros. `4-extra_material/normal-table.tex` is a related reference, not an `\input` dependency.
+- **Dependencies:** External `preamble_exams.tex` and `graphs/normal_distribution_graphs.tex` for shaded curve macros. `2-class_activities/normal-table.tex` is a related reference, not an `\input` dependency.
 
 #### `1-practice_activities/old_G11_T3_C6_practice_activity.tex`
 
@@ -154,25 +143,25 @@ These sources are explicitly prefixed `old_` and identify themselves as Term 3 r
 
 ## Legacy learning evidences retained in this folder
 
-#### `2-learning_evidences/old_G11_T3_C1C7_midterm.tex`
+#### `3-learning_evidences/old_G11_T3_C1C7_midterm.tex`
 
 - **Type/status:** LaTeX legacy **unsolved midterm assessment/task sheet**, internally labeled Grade 10, Term 3, 2025–2026.
 - **Purpose/content:** Two-column scored assessment of former C1–C7: increasing density for coffee investment; a mixture of three uniform inventory scenarios; asymmetric triangular investment; drawing/comparing distributions; standard-normal table calculations; contextual normal standardisation; and inverse-normal cutoffs.
 - **Dependencies:** External `preamble_exams.tex`; `logo.png` via `\includegraphics` and a multi-level `\graphicspath` (resolved from the shared preamble area); PGFPlots 1.18 and `enumitem` configured locally.
 - **Relationships:** Question paper paired directly with `old_G11_T3_C1C7_midterm_solution.tex`.
 
-#### `2-learning_evidences/old_G11_T3_C1C7_midterm_solution.tex`
+#### `3-learning_evidences/old_G11_T3_C1C7_midterm_solution.tex`
 
 - **Type/status:** LaTeX legacy **midterm solution/answer key**, internally labeled Grade 10 Term 3.
 - **Purpose/content:** Fully worked solutions to the preceding assessment: normalized PDFs, geometric and normal probabilities, graph interpretation/comparison, standardisation, and inverse-normal cutoff computations.
 - **Dependencies:** External `preamble.tex` plus all three shared graph libraries: `uniform_linear_probability_distributions.tex`, `probability_distribution_graphs.tex`, and `normal_distribution_graphs.tex`.
 - **Relationships:** Mirrors the C1–C7 order and contexts in `old_G11_T3_C1C7_midterm.tex`.
 
-#### `2-learning_evidences/old_G11_T3_L4_C8C9C10_activity.tex`
+#### `3-learning_evidences/old_G11_T3_L4_C8C9C10_activity.tex`
 
 - **Type/status:** Standalone LaTeX legacy **project/assessment brief**, internally labeled Grade 10 Term 3 Learning Evidence 4; it defines its own preamble and formatting.
 - **Purpose/content:** Specifies a web implementation and APA-style report for continuous probability modeling. C8 requires interactive PDFs and shaded below/above/between probabilities for uniform, triangular, linear, piecewise, and normal distributions. C9 requires AI-assisted fitting from uploaded data, parameter estimates, histograms, fitted curves, interpretation, deployment, and visible AI-conversation links. C10 requires a sourced comparative report, screenshots, model probabilities, and conclusions.
-- **Dependencies/assets:** Optionally includes `../../../preamble/logo.png` and falls back to a text “Logo” box. It links to Git/GitHub Pages tutorials, three SharePoint datasets, GitHub Pages, and three relative CSV names (`G10_T3_L4_C8C9C10_dataset_1.csv` through `_3.csv`). Those CSVs do **not** exist in `term_1`; repository copies are under `book2026-2027/grade10/term_3/2-learning_evidences/`, so the relative download links are unresolved when compiled here.
+- **Dependencies/assets:** Optionally includes `../../../preamble/logo.png` and falls back to a text “Logo” box. It links to Git/GitHub Pages tutorials, three SharePoint datasets, GitHub Pages, and three relative CSV names (`G10_T3_L4_C8C9C10_dataset_1.csv` through `_3.csv`). Those CSVs do **not** exist in `term_1`; repository copies are under `book2026-2027/grade10/term_3/3-learning_evidences/`, so the relative download links are unresolved when compiled here.
 - **Relationships:** Independent legacy C8–C10 extension rather than part of the present C1–C4 evidence workflow.
 
 Legacy workflow:

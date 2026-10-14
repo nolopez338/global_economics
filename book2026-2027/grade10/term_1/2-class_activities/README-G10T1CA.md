@@ -28,7 +28,7 @@ Provides Grade 10, Term 1 LaTeX classroom activities and worked solutions for de
 ## Directory Structure
 
 ```text
-4-class_activities/
+2-class_activities/
 ├── old/
 ├── G10_T1_C1C2C3C4_motivation-content.tex
 ├── G10_T1_C1C2C3C4_motivation.tex

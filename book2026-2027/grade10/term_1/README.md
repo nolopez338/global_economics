@@ -4,7 +4,7 @@
 
 This directory contains the Grade 10 Term 1 decision-analysis materials. The instructional sequence moves from describing decisions under uncertainty and constructing payoff tables (C1–C3), through optimistic/conservative, regret, expected-value, and sensitivity methods (C4–C7), to archived extension work on Bayes comparisons and decision trees (C8–C10). It includes student practice, one formal assessment and its key, criterion-specific catch-up worksheets and keys, supplementary/archived material, and documentation sources.
 
-The numbered folders reflect intended use rather than a build pipeline: `1-practice_activities/` develops skills, `2-learning_evidences/` checks them, `3-catch_ups/` remediates individual criteria, and `4-extra_material/` provides a survey plus older supplementary resources. Most documents are standalone LaTeX entry points but rely on shared preambles or a logo stored **outside** this directory under `book2026-2027/preamble/`.
+The numbered folders reflect intended use rather than a build pipeline: `1-practice_activities/` develops skills, `3-learning_evidences/` checks them, `4-catch_ups/` remediates individual criteria, and `4-extra_material/` provides a survey plus older supplementary resources. Most documents are standalone LaTeX entry points but rely on shared preambles or a logo stored **outside** this directory under `book2026-2027/preamble/`.
 
 ## Directory tree
 
@@ -24,10 +24,10 @@ Paths below are relative to `book2026-2027/grade10/term_1/`.
 │   ├── G10_T1_L2_C4C5_practice_activity3.tex
 │   ├── G10_T1_L2_C6C7_practice_activity4.tex
 │   └── G10_T1_practice_activities_summary.tex
-├── 2-learning_evidences/
+├── 3-learning_evidences/
 │   ├── G10_T1_L1_C1C2C3C4_exam.tex
 │   └── G10_T1_L1_C1C2C3C4_exam_solution.tex
-├── 3-catch_ups/
+├── 4-catch_ups/
 │   ├── G10_T1_C1_catchUp.tex
 │   ├── G10_T1_C1_catchUp_soution.tex
 │   ├── G10_T1_C2_catchUp.tex
@@ -89,7 +89,7 @@ The wording varies slightly among documents, but the files collectively use the 
 | `G10_T1_L2_C6C7_practice_activity4.tex` | LaTeX; practice/source with worked analysis | C6 expected-value choices for theater ticketing, holiday inventory, and routing, followed by C7 sensitivity analysis for marketing, production, and zoning decisions. Imports the external general `preamble.tex`. It continues the decision-rule sequence after Activity 3. |
 | `G10_T1_practice_activities_summary.tex` | LaTeX; supporting teacher/contributor summary | Describes the coverage and progression of all four current practice activities, including their scenario/model groupings. Imports external `preamble.tex`; it documents the activities but is not loaded by them. |
 
-### `2-learning_evidences/`
+### `3-learning_evidences/`
 
 **Purpose.** Formal evidence of learning for C1–C4. The folder contains exactly one student exam and its teacher solution; it does not currently contain the broader Lesson 1–3 assessment collection described by the older `STRUCTURE.*` files.
 
@@ -100,7 +100,7 @@ The wording varies slightly among documents, but the files collectively use the 
 | `G10_T1_L1_C1C2C3C4_exam.tex` | LaTeX; student assessment | Six-problem exam. Weekend market and urban delivery assess decision characterisation/table construction (C1–C2); school lunch and cold-chain distribution assess profit/payoff construction (C1–C3); mobile produce and warehouse technology assess Maximax/Maximin (C4). It imports the exam preamble and embeds the external logo. Despite its header saying “3 TERM” and `2025–2026`, its stored location/name is Term 1 for 2026–2027; this README reports the file as stored rather than correcting its content. |
 | `G10_T1_L1_C1C2C3C4_exam_solution.tex` | LaTeX; teacher solution | Complete companion key for the six exam contexts, with decision elements, tables/calculations, and Maximax/Maximin workings and point allocations. Imports the external exam preamble; it does not include the exam source directly. |
 
-### `3-catch_ups/`
+### `4-catch_ups/`
 
 **Purpose.** Criterion-by-criterion recovery/remediation for C1–C7. Each student worksheet has a corresponding teacher key. Each pair contains ten problems; solution documents generally provide full workings plus a “Minimal Solutions” section.
 
@@ -175,11 +175,11 @@ This is a logical teaching relationship; the LaTeX files do not include one anot
 ### Student/teacher pairs
 
 ```text
-2-learning_evidences/
+3-learning_evidences/
 └── G10_T1_L1_C1C2C3C4_exam.tex
     └── teacher key: G10_T1_L1_C1C2C3C4_exam_solution.tex
 
-3-catch_ups/
+4-catch_ups/
 ├── G10_T1_C1_catchUp.tex ── key: G10_T1_C1_catchUp_soution.tex
 ├── G10_T1_C2_catchUp.tex ── key: G10_T1_C2_catchUp_soution.tex
 ├── G10_T1_C3_catchUp.tex ── key: G10_T1_C3_catchUp_soution.tex
@@ -237,7 +237,7 @@ Important build details:
 * **Source/instructional material:** the four main practice activities, their alternate-description variants, archived `MATERIAL`/reference sources, and all LaTeX entry points.
 * **Practice activities:** everything in `1-practice_activities/` except its summary; the supplementary student sheets in `4-extra_material/old/` provide optional additional practice/assessment.
 * **Solutions/teacher material:** the exam solution, all catch-up `solution`/`soution` files, archived solution/reference/material files, and the practice summary.
-* **Assessments:** the exam in `2-learning_evidences/`, the criterion catch-ups, and archived supplementary assessments. The survey is support material, not an assessment of Term 1 economics criteria.
+* **Assessments:** the exam in `3-learning_evidences/`, the criterion catch-ups, and archived supplementary assessments. The survey is support material, not an assessment of Term 1 economics criteria.
 * **Reusable assets:** none local. Shared preambles and `logo.png` are external dependencies under `book2026-2027/preamble/`.
 * **Supporting/generated files:** this README, the older `STRUCTURE.md`/`STRUCTURE.tex` inventory pair, and its compiled `STRUCTURE.pdf`.
 

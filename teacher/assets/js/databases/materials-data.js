@@ -4373,7 +4373,7 @@ window.MATERIALS_DATA = [
       {
         "Acronym": "CA",
         "Name": "C1 Class activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_1/4-extra_material/G11_T1_C1_practice_activity1_print1_solved.pdf",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_1/2-class_activities/G11_T1_C1_practice_activity1_print1_solved.pdf",
         "Category": "classroom-activities"
       },
       {
@@ -4400,7 +4400,7 @@ window.MATERIALS_DATA = [
       {
         "Acronym": "CA",
         "Name": "C1 Class activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_1/4-extra_material/G11_T1_C1_practice_activity1_print1_solved.pdf",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_1/2-class_activities/G11_T1_C1_practice_activity1_print1_solved.pdf",
         "Category": "classroom-activities"
       },
       {
@@ -4433,7 +4433,7 @@ window.MATERIALS_DATA = [
       {
         "Acronym": "CA",
         "Name": "C2 Class activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_1/4-extra_material/G11_T1_C2_practice_activity2_print1_solved.pdf",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_1/2-class_activities/G11_T1_C2_classroom_activity_solved.pdf",
         "Category": "classroom-activities"
       },
       {
@@ -4460,7 +4460,7 @@ window.MATERIALS_DATA = [
       {
         "Acronym": "CA",
         "Name": "C2 Class activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_1/4-extra_material/G11_T1_C2_practice_activity2_print1_solved.pdf",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_1/2-class_activities/G11_T1_C2_classroom_activity_solved.pdf",
         "Category": "classroom-activities"
       },
       {
