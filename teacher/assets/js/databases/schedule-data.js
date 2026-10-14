@@ -162,7 +162,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "Practice: 2nd Learning Evidence",
+    "Description": "No Class: Spiritual exercises",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -175,7 +175,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "2nd Learning Evidence",
+    "Description": "Practice: 2nd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -188,7 +188,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "C8 & C9 Introduction",
+    "Description": "2nd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
