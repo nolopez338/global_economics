@@ -48,7 +48,7 @@
     closePicker();
     var today = dateParts(new Date().toISOString());
     // UTC is used only for calendar arithmetic; confirmed wall times get Bogotá's explicit offset.
-    var month = new Date(Date.UTC(Number(today.year), Number(today.month), 1));
+    var month = new Date(Date.UTC(Number(today.year), Number(today.month) - 1, 1));
     var existing = dateParts(task.dueDate);
     var selected = null;
     var dialog = document.createElement("dialog");
@@ -199,18 +199,12 @@
       return "Invalid date";
     }
 
-    if (milliseconds <= 0) {
-      var elapsedHours = Math.floor(-milliseconds / 3600000);
-      return "Overdue by " + Math.floor(elapsedHours / 24) + "days-" + (elapsedHours % 24) + "hours";
-    }
+    var totalHours = Math.floor(Math.abs(milliseconds) / 3600000);
+    var days = Math.floor(totalHours / 24);
+    var hours = totalHours % 24;
+    var duration = (days ? days + "d " : "") + hours + "h";
 
-    var totalSeconds = Math.floor(milliseconds / 1000);
-    var days = Math.floor(totalSeconds / 86400);
-    var hours = Math.floor((totalSeconds % 86400) / 3600);
-    var minutes = Math.floor((totalSeconds % 3600) / 60);
-    var seconds = totalSeconds % 60;
-
-    return days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+    return (milliseconds <= 0 ? "Overdue by " : "") + duration;
   }
 
   function updateTaskCountdowns() {

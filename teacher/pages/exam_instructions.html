@@ -36,11 +36,12 @@
 
     .class-timer {
       position: fixed;
-      top: calc(16px + env(safe-area-inset-top, 0px));
+      top: var(--class-timer-center, calc(16px + env(safe-area-inset-top, 0px)));
       right: calc(16px + env(safe-area-inset-right, 0px));
       width: var(--class-timer-size);
       height: var(--class-timer-size);
-      z-index: 1;
+      transform: translateY(-50%);
+      z-index: 1000;
       border: 2px solid #292f36;
       border-radius: 50%;
       background: conic-gradient(from 0turn,
@@ -225,7 +226,22 @@
     (function () {
       "use strict";
       const visual = document.getElementById("class-timer");
+      const heading = document.querySelector("h1");
       const { periods, progress } = window.SchoolDayTimer;
+
+      function alignClock() {
+        const bounds = heading.getBoundingClientRect();
+        visual.style.setProperty("--class-timer-center", (bounds.top + bounds.height / 2) + "px");
+      }
+
+      // Keep the fixed clock aligned as the heading moves or wraps.
+      const layoutObserver = new ResizeObserver(alignClock);
+      layoutObserver.observe(document.body);
+      layoutObserver.observe(heading);
+      window.addEventListener("resize", alignClock);
+      window.addEventListener("scroll", alignClock, { passive: true });
+      document.fonts.ready.then(alignClock);
+      alignClock();
 
       function update(now = new Date()) {
         const dateKey = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
