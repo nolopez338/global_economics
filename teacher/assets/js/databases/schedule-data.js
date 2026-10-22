@@ -942,7 +942,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 3,
-    "Description": "C10 Exploration",
+    "Description": "C10 Introduction",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -955,7 +955,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 4,
-    "Description": "3rd Learning Evidence",
+    "Description": "C10 and 3rd Learning Evidence Mock",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -968,7 +968,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "Extra Class",
+    "Description": "3rd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -4998,7 +4998,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 3,
-    "Description": "C10 Exploration",
+    "Description": "Alcaldias",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -5011,7 +5011,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 2,
-    "Description": "3rd Learning Evidence",
+    "Description": "C10 Exploration",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -5024,7 +5024,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "Extra Class",
+    "Description": "3rd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
