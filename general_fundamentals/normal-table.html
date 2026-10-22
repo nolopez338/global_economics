@@ -11,6 +11,7 @@ main{max-width:1500px;padding:26px 32px}header{align-items:flex-start}header p{m
 @media(max-width:600px){main{padding:18px 12px}header>.muted{display:none}.tabs{width:100%;margin-top:18px}.tabs button{font-size:12px;padding:10px 8px}.section-heading{align-items:flex-start}.section-heading h2{font-size:17px}.view-actions{max-width:125px}.card{padding:16px}.controls{grid-template-columns:1fr;gap:12px}.selection-group{display:flex;gap:12px;flex-wrap:wrap}.selection-group label{flex:1 1 120px}.controls .selection-group label+label{margin-top:0}.identities{grid-template-columns:1fr}.solve-group{grid-template-columns:1fr}.result{font-size:40px}.equation{font-size:18px}}
 
 /* Supporting identities complement the dark selected-region state; focus keeps its gold outline. */
+.identities .case-formula{display:block;line-height:1.5;margin-top:4px;overflow-wrap:anywhere}
 .identities button.identity-used{background:var(--probability-soft);color:var(--probability);border-color:var(--probability);box-shadow:inset 3px 0 var(--probability)}
 .identities button.identity-used:hover{background:#e2d6ef}
 .identity-status{display:block;font:600 10px/1.4 system-ui;margin-top:3px;color:inherit}
@@ -288,20 +289,24 @@ renderControls=function(){if(comparison())return legacyControls();let q=s(),keys
  if($('tail'))$('tail').onchange=e=>{q.region=e.target.value;render()};if($('endpoint'))$('endpoint').onchange=e=>{q.active=e.target.value;render()};if(isT()){$('df').onchange=e=>changeDf(Number(e.target.value));$('sample').onchange=e=>changeDf(Number(e.target.value)-1)}$('solve').onclick=()=>solve(Number($('target').value));$('target').onkeydown=e=>{if(e.key==='Enter')solve(Number(e.target.value))};$('reset').onclick=()=>{states[mode]=defaults[mode]();render()};
 };
 function criticalAlpha(x){let row=TDATA.find(r=>Number(r[0])===s().df);let c=row?row.slice(1).findIndex(v=>Math.abs(Number(v)-Math.abs(x))<.0000001):-1;return c<0?null:ALPHAS[c]}
+// Shared symbolic formulas keep the case buttons and worked equation in sync.
+function caseFormula(n,t,a,b){
+ if(!t)return ['Φ(z)','1 − Φ(−z)','1 − Φ(z)','Φ(−z)','Φ(b) − Φ(a)','Φ(a) + 1 − Φ(b)'][n-1];
+ if(n<=4)return ['1 − Qν(t)','Qν(−t)','Qν(t)','1 − Qν(−t)'][n-1];
+ return a>=0?(n===5?'Qν(a) − Qν(b)':'1 − Qν(a) + Qν(b)'):b<=0?(n===5?'Qν(−b) − Qν(−a)':'Qν(−a) + 1 − Qν(−b)'):(n===5?'1 − Qν(−a) − Qν(b)':'Qν(−a) + Qν(b)');
+}
 function equationState(){let q=s(),n=caseNumber(),t=isT(),D=t?'Tν':'Z',f=t?'Qν':'Φ',a=q.a,b=q.b,show=controlText;
  const lookup=x=>`${f}(${show(Math.abs(x))})`,F=x=>x<0?`[1 − ${lookup(x)}]`:lookup(x),Q=lookup;
  let event=n<=4?`P(${D} ${q.region==='left'?'<':'>'} ${show(a)})`:n===5?`P(${show(a)} < ${D} < ${show(b)})`:`P(${D} < ${show(a)}) + P(${D} > ${show(b)})`;
  let symbolic=n<=4?`P(${D} ${q.region==='left'?'<':'>'} ${t?'t':'z'})`:n===5?`P(a < ${D} < b)`:`P(${D} < a) + P(${D} > b)`;
  let expression;if(t){expression=n===1?`1 − ${Q(a)}`:n===2?Q(a):n===3?Q(a):n===4?`1 − ${Q(a)}`:a>=0?(n===5?`${Q(a)} − ${Q(b)}`:`1 − ${Q(a)} + ${Q(b)}`):b<=0?(n===5?`${Q(b)} − ${Q(a)}`:`${Q(a)} + 1 − ${Q(b)}`):(n===5?`1 − ${Q(a)} − ${Q(b)}`:`${Q(a)} + ${Q(b)}`)}else expression=n===1?F(a):n===2?F(a):n===3?`1 − ${F(a)}`:n===4?lookup(a):n===5?`${F(b)} − ${F(a)}`:`${F(a)} + 1 − ${F(b)}`;
  let symmetry=twoBounds()&&Math.round(a*precision)===-Math.round(b*precision),special='';if(symmetry){let c=show(b);special=t?(n===5?`P(−c < Tν < c) = 1 − 2Qν(c)`:`P(Tν < −c) + P(Tν > c) = 2Qν(c)`):(n===5?`P(−c < Z < c) = Φ(c) − Φ(−c) = 2Φ(c) − 1`:`P(Z < −c) + P(Z > c) = 2[1 − Φ(c)]`);expression=t?(n===5?`1 − 2 × Qν(${c})`:`2 × Qν(${c})`):(n===5?`2 × Φ(${c}) − 1`:`2 × [1 − Φ(${c})]`)}
-  let generic;
- if(t){generic=n===1?'1 − Qν(t), t ≥ 0':n===2?'Qν(−t), t < 0':n===3?'Qν(t), t ≥ 0':n===4?'1 − Qν(−t), t < 0':a>=0?(n===5?'Qν(a) − Qν(b)':'1 − Qν(a) + Qν(b)'):b<=0?(n===5?'Qν(−b) − Qν(−a)':'Qν(−a) + 1 − Qν(−b)'):(n===5?'1 − Qν(−a) − Qν(b)':'Qν(−a) + Qν(b)')}
- else generic=n===1?'Φ(z), z ≥ 0':n===2?'1 − Φ(−z), z < 0':n===3?'1 − Φ(z), z ≥ 0':n===4?'Φ(−z), z < 0':n===5?'Φ(b) − Φ(a)':'Φ(a) + 1 − Φ(b)';
+ let generic=caseFormula(n,t,a,b)+(n<=4?`, ${t?'t':'z'} ${n%2===0?'<':'≥'} 0`:'');
  let substitution=expression.replace(/(Φ|Qν)\(([^)]+)\)/g,(_,f,x)=>fmt(f==='Φ'?cdf(Number(x)):tail(Number(x),df()),8));return{n,event,symbolic,generic,expression,substitution,special,symmetry};
 }
 equations=function(){if(comparison())return legacyEquations();let q=s(),e=equationState(),D=isT()?'Tν':'Z',x=isT()?'t':'z',labels=[`P(${D} < ${x}), ${x} ≥ 0`,`P(${D} < ${x}), ${x} < 0`,`P(${D} > ${x}), ${x} ≥ 0`,`P(${D} > ${x}), ${x} < 0`,`P(a < ${D} < b)`,`P(${D} < a) + P(${D} > b)`];let nominal=isT()&&e.symmetry?criticalAlpha(q.b):null;
  $('equations').innerHTML=`<div class="result">${fmt(probability(),8)}</div><small>Computed probability · continuous distribution</small><div class="equation"><p>${e.symbolic} = ${e.generic}<br>${e.event}<br>= ${e.expression}<br>= ${e.substitution}</p>${e.special?`<div class="symmetry-step">${e.special}<small>c = b = −a = ${controlText(q.b)}</small></div>`:''}${nominal===null?'':`<p>Nominal table identity: ${e.n===5?'1 − 2α':'2α'} = ${fmt(e.n===5?1-2*nominal:2*nominal)}; α = ${nominal}.</p>`}</div><p class="note">${isT()?'Qν(x) = P(Tν > x), x ≥ 0; Qν(0) = 0.5. Table α is nominal; the computed result evaluates the rounded threshold continuously.':'Φ(x) = P(Z < x). Negative arguments use Φ(x) = 1 − Φ(−x). Displayed substitutions are rounded; the result uses stable continuous tails.'}</p>`;
- $('identities').innerHTML=labels.map((label,i)=>`<button data-case="${i+1}" class="${e.n===i+1?'active':''}" aria-pressed="${e.n===i+1}">${i+1}. ${label}</button>`).join('');$('identities').querySelectorAll('button').forEach(b=>b.onclick=()=>chooseCase(Number(b.dataset.case)));
+ $('identities').innerHTML=labels.map((label,i)=>`<button data-case="${i+1}" class="${e.n===i+1?'active':''}" aria-pressed="${e.n===i+1}">${i+1}. ${label}<span class="case-formula">= ${caseFormula(i+1,isT(),q.a,q.b)}${isT()&&i>=4&&Math.round(q.a*precision)===-Math.round(q.b*precision)?` = ${i===4?'1 − 2Qν(b)':'2Qν(b)'} (a = −b)`: ''}</span></button>`).join('');$('identities').querySelectorAll('button').forEach(b=>b.onclick=()=>chooseCase(Number(b.dataset.case)));
 };
 // Reuse literal tables and their focus/hover previews, then apply signed endpoint lookups.
 table=function(){if(comparison())return legacyTable();let q=s();legacyTable();$('reference').querySelectorAll('.lookupA,.lookupB,.lookupAB,.neighbor').forEach(el=>{el.classList.remove('lookupA','lookupB','lookupAB','neighbor');if(el.tagName==='BUTTON')el.setAttribute('aria-pressed','false')});let notes=[];
