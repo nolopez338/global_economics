@@ -32,6 +32,8 @@
     #payoffs th,#payoffs td { text-align:left; } .remove { display:block; font-size:12px; padding:3px 7px; margin-top:6px; }
     .payoff-heading { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
     .payoff-heading h2 { margin:0; }
+    .probability-toggle { padding:1px 4px; margin-left:4px; font-size:11px; font-weight:400; vertical-align:middle; color:var(--muted); }
+    .probability-input { display:inline-flex; align-items:center; gap:4px; white-space:nowrap; }
     #transposePayoffs[aria-pressed="true"],.setup button[aria-pressed="true"] { background:var(--pale); border-color:var(--blue); }
     .error { color:var(--danger); font-size:13px; } .field-error { display:block; max-width:150px; min-height:0; }
     [aria-invalid="true"] { border:2px solid var(--danger); }
@@ -68,7 +70,7 @@
 </head>
 <body>
 <main class="page">
-  <header><div><h1>Decision-making dashboard</h1><p>Grade 10 · Explore payoffs, compare criteria, then filter in stages.</p></div><button id="print" type="button">Print dashboard</button></header>
+  <header><div><h1>Decision-making dashboard</h1></div><button id="print" type="button">Print dashboard</button></header>
   <div class="flow">Payoff Table → Summary → Criterion Decisions → Staged Filtering</div>
   <div class="toolbar setup" role="group" aria-label="Load a decision-making example">
     <button type="button" data-preset="city" aria-pressed="false">City logistics</button>
@@ -77,12 +79,10 @@
     <button type="button" data-preset="insurance" aria-pressed="false">Insurance portfolios</button>
     <button type="button" data-preset="energy" aria-pressed="false">Energy investment</button>
     <button type="button" data-preset="custom" aria-pressed="true">Blank / Custom</button>
-    <span class="note">Loading replaces the whole dashboard. Blank / Custom clears entries and rules to a 2 × 2 blank table.</span>
   </div>
   <section aria-labelledby="payoff-title">
     <div class="payoff-heading"><h2 id="payoff-title">1. Payoff Table</h2><button id="transposePayoffs" type="button" aria-controls="payoffs" aria-pressed="false">Transpose table</button></div>
     <div class="toolbar"><label for="unit">Payoff unit <input id="unit" value="thousand USD"></label><button id="addAlt" type="button">Add alternative</button><button id="addState" type="button">Add state</button></div>
-    <p class="note">Enter a payoff in every cell (including any zeros). Losses and decimals are welcome. Probabilities must each be between 0 and 1, and their total must be within 0.000000001 (10⁻⁹) of 1. Probabilities are never normalized.</p>
     <div class="scroll" tabindex="0" role="region" aria-label="Editable payoff table, scroll horizontally"><table id="payoffs"></table></div>
     <div id="validation" class="status" aria-live="polite"></div>
   </section>
@@ -110,11 +110,20 @@
     // Two guaranteed investments tie, including at the second-stage cutoff.
     energy:{alts:['Expansion','Deposit','Solar','Efficiency','Bonds'],states:['Growth','Stable','Slump'],unit:'million USD',p:[.2,.3,.5],matrix:[[200,30,100,90,30],[-100,30,60,55,30],[-100,30,-20,0,30]],rules:[['min',3],['regret',2],['emv',null],['regret',null]]}
   };
-  let serial=0,model,transposed=false;
+  let serial=0,model,transposed=false,percentage=false;
   const id=()=>`id${++serial}`, $=s=>document.getElementById(s);
   const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const fmt=n=>Number.isFinite(n)?(Object.is(Number(n.toFixed(2)),-0)?'0.00':n.toFixed(2)):'Unavailable';
   const number=raw=>String(raw).trim()===''?NaN:Number(raw);
+  // Shift the decimal point as text, so display conversions never round stored values.
+  function scaleProbability(raw,places) {
+    if(raw==='')return '';
+    const match=String(raw).match(/^([+-]?)(\d*)(?:\.(\d*))?(?:e([+-]?\d+))?$/i);
+    if(!match||!Number.isFinite(number(raw)))return raw;
+    const digits=match[2]+(match[3]||''),point=match[2].length+Number(match[4]||0)+places;
+    const shifted=point<=0?'0.'+'0'.repeat(-point)+digits:point>=digits.length?digits+'0'.repeat(point-digits.length):digits.slice(0,point)+'.'+digits.slice(point);
+    return match[1]+shifted.replace(/^0+(?=\d)/,'').replace(/(\.\d*?)0+$/,'$1').replace(/\.$/,'');
+  }
   function setup(key) {
     const p=presets[key];
     model={alts:Array.from({length:p?p.matrix[0].length:2},(_,i)=>({id:id(),name:p?(p.alts?.[i]??`${p.prefix}${i+1}`):`A${i+1}`})),states:[],rules:[],unit:p?.unit??'thousand USD'};
@@ -125,7 +134,7 @@
   }
   function input(raw,label,attrs='') { return `<input value="${esc(raw)}" aria-label="${esc(label)}" ${attrs}>`; }
   function renderInputs() {
-    $('payoffs').innerHTML=`<caption>States are rows; alternatives are columns. Payoffs in <span class="unit">${esc(model.unit)}</span>.</caption><thead><tr><th scope="col">State</th><th scope="col">Probability</th>${model.alts.map(a=>`<th scope="col">${input(a.name,`Alternative name ${a.name}`,`class="name" data-alt="${a.id}"`)}<button class="remove" data-remove-alt="${a.id}" ${model.alts.length===1?'disabled':''} type="button" aria-label="Remove alternative ${esc(a.name)}">Remove alternative</button></th>`).join('')}</tr></thead><tbody>${model.states.map(s=>`<tr><th scope="row">${input(s.name,`State name ${s.name}`,`class="name" data-state-name="${s.id}"`)}<button class="remove" data-remove-state="${s.id}" ${model.states.length===1?'disabled':''} type="button" aria-label="Remove state ${esc(s.name)}">Remove state</button></th><td>${input(s.p,`Probability for ${s.name}`,`type="number" min="0" max="1" step="any" data-prob="${s.id}" aria-describedby="error-${s.id}-p"`)}<span class="error field-error" id="error-${s.id}-p"></span></td>${model.alts.map(a=>`<td>${input(s.pay[a.id],`${a.name} payoff in ${s.name}`,`type="number" step="any" data-pay="${a.id}" data-state="${s.id}" aria-describedby="error-${s.id}-${a.id}"`)}<span class="error field-error" id="error-${s.id}-${a.id}"></span></td>`).join('')}</tr>`).join('')}</tbody>`;
+    $('payoffs').innerHTML=`<thead><tr><th scope="col">State</th><th scope="col">Probability<button id="probabilityMode" class="probability-toggle" type="button" aria-label="Display probabilities as percentages" aria-pressed="${percentage}">${percentage?'% → 0.01':'0.01 → %'}</button></th>${model.alts.map(a=>`<th scope="col">${input(a.name,`Alternative name ${a.name}`,`class="name" data-alt="${a.id}"`)}<button class="remove" data-remove-alt="${a.id}" ${model.alts.length===1?'disabled':''} type="button" aria-label="Remove alternative ${esc(a.name)}">Remove alternative</button></th>`).join('')}</tr></thead><tbody>${model.states.map(s=>`<tr><th scope="row">${input(s.name,`State name ${s.name}`,`class="name" data-state-name="${s.id}"`)}<button class="remove" data-remove-state="${s.id}" ${model.states.length===1?'disabled':''} type="button" aria-label="Remove state ${esc(s.name)}">Remove state</button></th><td><span class="probability-input">${input(percentage?scaleProbability(s.p,2):s.p,`Probability for ${s.name}${percentage?' (percent)':''}`,`type="number" min="0" max="${percentage?100:1}" step="${percentage?1:0.01}" data-prob="${s.id}" aria-describedby="error-${s.id}-p"`)}${percentage?'<span aria-hidden="true">%</span>':''}</span><span class="error field-error" id="error-${s.id}-p"></span></td>${model.alts.map(a=>`<td>${input(s.pay[a.id],`${a.name} payoff in ${s.name}`,`type="number" step="any" data-pay="${a.id}" data-state="${s.id}" aria-describedby="error-${s.id}-${a.id}"`)}<span class="error field-error" id="error-${s.id}-${a.id}"></span></td>`).join('')}</tr>`).join('')}</tbody>`;
     if(transposed)transposeInputs();
   }
   // Move the existing cells so input values, IDs, and validation associations stay intact.
@@ -145,7 +154,6 @@
     table.tBodies[0].remove();
     table.append(head,body);
     table.rows[0].cells[0].textContent=transposed?'Alternative':'State';
-    table.caption.innerHTML=`${transposed?'Alternatives are rows; states are columns.':'States are rows; alternatives are columns.'} Payoffs in <span class="unit">${esc(model.unit)}</span>.`;
   }
   $('transposePayoffs').addEventListener('click',()=>{
     transposed=!transposed;
@@ -203,9 +211,9 @@
     document.querySelectorAll('.unit').forEach(el=>el.textContent=model.unit.trim()||'(unit not specified)');
     const data=calculate(model);
     document.querySelectorAll('[data-pay],[data-prob]').forEach(el=>{
-      const raw=el.value,n=number(raw),prob=!!el.dataset.prob,invalid=!Number.isFinite(n)||(prob&&(n<0||n>1));
+      const raw=el.value,n=number(raw),prob=!!el.dataset.prob,invalid=!Number.isFinite(n)||(prob&&(n<0||n>(percentage?100:1)));
       el.setAttribute('aria-invalid',String(invalid));
-      $(el.getAttribute('aria-describedby')).textContent=invalid?(prob?'Enter a probability from 0 to 1.':'Enter a finite payoff; blank is not zero.'):'';
+      $(el.getAttribute('aria-describedby')).textContent=invalid?(prob?`Enter a probability from 0 to ${percentage?'100%.':'1.'}`:'Enter a finite payoff; blank is not zero.'):'';
     });
     $('validation').innerHTML=`<b>Probability total: ${Number.isFinite(data.total)?esc(String(data.total)):'incomplete'}</b>. ${data.probs?'Valid probabilities.':'<span class="error">Fix each probability and make the total 1 (tolerance 10⁻⁹). EMV is unavailable.</span>'} ${data.payoffs?'All payoff cells are valid.':'<span class="error">Complete or correct the marked payoff cells to calculate results.</span>'}`;
     model.rules.forEach(r=>{const invalid=r.action==='keep'&&(!Number.isSafeInteger(number(r.k))||number(r.k)<1);$(`rule-error-${r.id}`).textContent=invalid?'Enter a positive whole number for k.':'';const el=document.querySelector(`[data-rule="${r.id}"][data-field="k"]`);el.setAttribute('aria-invalid',String(invalid));});
@@ -230,7 +238,7 @@
     const el=e.target,d=el.dataset;
     if(d.alt)model.alts.find(a=>a.id===d.alt).name=el.value;
     if(d.stateName)model.states.find(s=>s.id===d.stateName).name=el.value;
-    if(d.prob)model.states.find(s=>s.id===d.prob).p=el.value;
+    if(d.prob)model.states.find(s=>s.id===d.prob).p=percentage?scaleProbability(el.value,-2):el.value;
     if(d.pay)model.states.find(s=>s.id===d.state).pay[d.pay]=el.value;
     update();
   });
@@ -238,6 +246,7 @@
   $('payoffs').addEventListener('change',e=>{if(e.target.dataset.alt||e.target.dataset.stateName){const el=e.target;const a=el.dataset.alt,s=el.dataset.stateName;renderInputs();update();document.querySelector(a?`[data-alt="${a}"]`:`[data-state-name="${s}"]`).focus();}});
   function focusThenUpdate(selector){renderInputs();update();document.querySelector(selector)?.focus();}
   $('payoffs').addEventListener('click',e=>{
+    if(e.target.id==='probabilityMode'){percentage=!percentage;renderInputs();update();$('probabilityMode').focus();return;}
     const d=e.target.dataset;
     if(d.removeAlt&&model.alts.length>1){model.alts=model.alts.filter(a=>a.id!==d.removeAlt);model.states.forEach(s=>delete s.pay[d.removeAlt]);focusThenUpdate('[data-alt]');}
     if(d.removeState&&model.states.length>1){model.states=model.states.filter(s=>s.id!==d.removeState);focusThenUpdate('[data-state-name]');}
