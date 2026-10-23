@@ -32,7 +32,7 @@
     #payoffs th,#payoffs td { text-align:left; } .remove { display:block; font-size:12px; padding:3px 7px; margin-top:6px; }
     .payoff-heading { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
     .payoff-heading h2 { margin:0; }
-    #transposePayoffs[aria-pressed="true"] { background:var(--pale); border-color:var(--blue); }
+    #transposePayoffs[aria-pressed="true"],.setup button[aria-pressed="true"] { background:var(--pale); border-color:var(--blue); }
     .error { color:var(--danger); font-size:13px; } .field-error { display:block; max-width:150px; min-height:0; }
     [aria-invalid="true"] { border:2px solid var(--danger); }
     .status { background:var(--soft); border-left:3px solid var(--blue); padding:10px 12px; }
@@ -70,7 +70,15 @@
 <main class="page">
   <header><div><h1>Decision-making dashboard</h1><p>Grade 10 · Explore payoffs, compare criteria, then filter in stages.</p></div><button id="print" type="button">Print dashboard</button></header>
   <div class="flow">Payoff Table → Summary → Criterion Decisions → Staged Filtering</div>
-  <div class="toolbar setup"><label for="preset">Setup <select id="preset"><option value="custom">Blank / custom</option><option value="city">City logistics</option><option value="distributor">Regional distributor</option><option value="finance">Trade finance</option><option value="insurance">Insurance portfolios</option></select></label><button id="load" type="button">Load setup</button><button id="reset" type="button">Reset to blank / custom</button><span class="note">Loading replaces the whole dashboard. Reset clears entries and rules to a 2 × 2 blank table.</span></div>
+  <div class="toolbar setup" role="group" aria-label="Load a decision-making example">
+    <button type="button" data-preset="city" aria-pressed="false">City logistics</button>
+    <button type="button" data-preset="distributor" aria-pressed="false">Regional distributor</button>
+    <button type="button" data-preset="finance" aria-pressed="false">Trade finance</button>
+    <button type="button" data-preset="insurance" aria-pressed="false">Insurance portfolios</button>
+    <button type="button" data-preset="energy" aria-pressed="false">Energy investment</button>
+    <button type="button" data-preset="custom" aria-pressed="true">Blank / Custom</button>
+    <span class="note">Loading replaces the whole dashboard. Blank / Custom clears entries and rules to a 2 × 2 blank table.</span>
+  </div>
   <section aria-labelledby="payoff-title">
     <div class="payoff-heading"><h2 id="payoff-title">1. Payoff Table</h2><button id="transposePayoffs" type="button" aria-controls="payoffs" aria-pressed="false">Transpose table</button></div>
     <div class="toolbar"><label for="unit">Payoff unit <input id="unit" value="thousand USD"></label><button id="addAlt" type="button">Add alternative</button><button id="addState" type="button">Add state</button></div>
@@ -97,7 +105,10 @@
     city:{prefix:'B',state:'T',p:[.5,.3,.2],matrix:[[95,90,110,85,100,92],[70,75,60,80,65,78],[30,40,10,55,35,20]],rules:[['emv',4],['min',2],['regret',null]]},
     distributor:{prefix:'X',state:'U',p:[.3,.25,.25,.2],matrix:[[130,120,140,135,125,118],[90,95,80,100,88,92],[60,70,55,85,65,75],[20,40,10,60,45,35]],rules:[['max',3],['emv',null]]},
     finance:{prefix:'G',state:'M',p:[.45,.35,.2],matrix:[[100,94,114,90,104,96],[72,78,82,84,70,80],[32,44,46,56,38,26]],rules:[['emv',5],['max',4],['min',2],['regret',null]]},
-    insurance:{prefix:'Y',state:'W',p:[.3,.25,.25,.2],matrix:[[136,126,146,116,130,121],[94,98,84,103,90,95],[66,74,58,88,69,77],[28,46,14,64,48,38]],rules:[['emv',3],['regret',2],['min',null]]}
+    insurance:{prefix:'Y',state:'W',p:[.3,.25,.25,.2],matrix:[[136,126,146,116,130,121],[94,98,84,103,90,95],[66,74,58,88,69,77],[28,46,14,64,48,38]],rules:[['emv',3],['regret',2],['min',null]]},
+    // Net project returns: growth rewards expansion; a slump exposes its losses.
+    // Two guaranteed investments tie, including at the second-stage cutoff.
+    energy:{alts:['Expansion','Deposit','Solar','Efficiency','Bonds'],states:['Growth','Stable','Slump'],unit:'million USD',p:[.2,.3,.5],matrix:[[200,30,100,90,30],[-100,30,60,55,30],[-100,30,-20,0,30]],rules:[['min',3],['regret',2],['emv',null],['regret',null]]}
   };
   let serial=0,model,transposed=false;
   const id=()=>`id${++serial}`, $=s=>document.getElementById(s);
@@ -106,9 +117,10 @@
   const number=raw=>String(raw).trim()===''?NaN:Number(raw);
   function setup(key) {
     const p=presets[key];
-    model={alts:Array.from({length:p?6:2},(_,i)=>({id:id(),name:p?`${p.prefix}${i+1}`:`A${i+1}`})),states:[],rules:[],unit:'thousand USD'};
-    model.states=Array.from({length:p?p.p.length:2},(_,j)=>({id:id(),name:p?`${p.state}${j+1}`:`S${j+1}`,p:p?String(p.p[j]):'',pay:Object.fromEntries(model.alts.map((a,i)=>[a.id,p?String(p.matrix[j][i]):'']))}));
+    model={alts:Array.from({length:p?p.matrix[0].length:2},(_,i)=>({id:id(),name:p?(p.alts?.[i]??`${p.prefix}${i+1}`):`A${i+1}`})),states:[],rules:[],unit:p?.unit??'thousand USD'};
+    model.states=Array.from({length:p?p.p.length:2},(_,j)=>({id:id(),name:p?(p.states?.[j]??`${p.state}${j+1}`):`S${j+1}`,p:p?String(p.p[j]):'',pay:Object.fromEntries(model.alts.map((a,i)=>[a.id,p?String(p.matrix[j][i]):'']))}));
     model.rules=p?p.rules.map(([criterion,k])=>({id:id(),criterion,action:k===null?'best':'keep',k:k===null?'1':String(k)})):[];
+    document.querySelectorAll('[data-preset]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.preset===key)));
     $('unit').value=model.unit; renderInputs(); renderRules(); update();
   }
   function input(raw,label,attrs='') { return `<input value="${esc(raw)}" aria-label="${esc(label)}" ${attrs}>`; }
@@ -236,8 +248,7 @@
   $('rules').addEventListener('input',e=>{const d=e.target.dataset;if(!d.rule)return;model.rules.find(r=>r.id===d.rule)[d.field]=e.target.value;if(d.field==='action'){const k=document.querySelector(`[data-rule="${d.rule}"][data-field="k"]`);k.closest('label').hidden=e.target.value==='best';}update();});
   $('rules').addEventListener('click',e=>{const d=e.target.dataset;if(d.removeRule)model.rules=model.rules.filter(r=>r.id!==d.removeRule);else if(d.move){const i=model.rules.findIndex(r=>r.id===d.move),j=i+Number(d.offset);if(j<0||j>=model.rules.length)return;[model.rules[i],model.rules[j]]=[model.rules[j],model.rules[i]];}else return;renderRules();update();$('addRule').focus();});
   $('addRule').addEventListener('click',()=>{model.rules.push({id:id(),criterion:'emv',action:'keep',k:'2'});renderRules();update();document.querySelector(`[data-rule="${model.rules.at(-1).id}"]`).focus();});
-  $('load').addEventListener('click',()=>setup($('preset').value));
-  $('reset').addEventListener('click',()=>{$('preset').value='custom';setup('custom');});
+  document.querySelectorAll('[data-preset]').forEach(button=>button.addEventListener('click',()=>setup(button.dataset.preset)));
   $('print').addEventListener('click',()=>window.print());
   let printClosedDetails=null;
   window.addEventListener('beforeprint',()=>{
