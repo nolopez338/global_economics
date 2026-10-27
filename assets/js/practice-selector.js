@@ -27,7 +27,7 @@
 
     const selected = new Map(selectors.map(({ key }) => [key, new Set()]));
     const summaries = new Map();
-    let preferredDescriptionMode = "structured";
+    let preferredDescriptionMode = controls.dataset.defaultDescriptionMode === "narrative" ? "narrative" : "structured";
     controls.classList.toggle("practice-selector__controls--problem-only", selectors.length === 0);
 
     function configuredOptions(selector) {
