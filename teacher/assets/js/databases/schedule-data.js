@@ -4273,7 +4273,7 @@ window.SCHEDULE_DATA = [
     "Description": "3rd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "3rd Learning Evidence"
   },
   {
     "Grade": 11,
@@ -4283,10 +4283,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "Extra Class",
+    "Description": "Catch Up Session",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Catch Up Session"
   },
   {
     "Grade": 11,
@@ -5011,10 +5011,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 2,
-    "Description": "C10 Exploration",
+    "Description": "3rd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "3rd Learning Evidence"
   },
   {
     "Grade": 11,
@@ -5024,10 +5024,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "3rd Learning Evidence",
+    "Description": "Catch Up Session",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Catch Up Session"
   },
   {
     "Grade": 11,
@@ -5739,10 +5739,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C8 - C10 Activities",
+    "Description": "3rd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "3rd Learning Evidence"
   },
   {
     "Grade": 11,
@@ -5752,10 +5752,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "3rd Learning Evidence",
+    "Description": "Catch Up Session",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Catch Up Session"
   },
   {
     "Grade": 11,
@@ -6483,7 +6483,7 @@ window.SCHEDULE_DATA = [
     "Description": "3rd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "3rd Learning Evidence"
   },
   {
     "Grade": 11,
@@ -6493,10 +6493,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "Extra Class",
+    "Description": "Catch Up Session",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Catch Up Session"
   },
   {
     "Grade": 11,
@@ -7208,10 +7208,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C8 - C10 Activities",
+    "Description": "3rd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "3rd Learning Evidence"
   },
   {
     "Grade": 11,
@@ -7221,10 +7221,10 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "3rd Learning Evidence",
+    "Description": "Catch Up Session",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Catch Up Session"
   },
   {
     "Grade": 11,
