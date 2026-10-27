@@ -240,7 +240,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "Extra Class",
+    "Description": "Catch Up Session",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -981,7 +981,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Tuesday",
     "Day": 4,
-    "Description": "Extra Class",
+    "Description": "Catch Up Session",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -1709,7 +1709,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "Extra Class",
+    "Description": "Catch Up Session",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -2424,7 +2424,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Tuesday",
     "Day": 6,
-    "Description": "3rd Learning Evidence",
+    "Description": "Recap Class",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -2437,7 +2437,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Tuesday",
     "Day": 4,
-    "Description": "Extra Class",
+    "Description": "3rd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -2450,7 +2450,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "Extra Class",
+    "Description": "Catch Up Session",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -3178,7 +3178,7 @@ window.SCHEDULE_DATA = [
     "Term": 1,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "Extra Class",
+    "Description": "Catch Up Session",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
