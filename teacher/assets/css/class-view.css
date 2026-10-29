@@ -30,32 +30,38 @@ body {
 
 .class-view {
   display: grid;
-  grid-template-rows: auto auto minmax(24rem, 1fr);
-  gap: clamp(.75rem, 2vh, 1.5rem);
-  width: min(96vw, 1100px);
-  min-height: 100vh;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: clamp(.5rem, 1.5vh, 1rem);
+  width: 100%;
+  max-width: 100rem;
+  height: 100vh;
+  height: 100dvh;
   margin: auto;
-  padding: clamp(.75rem, 2vw, 1.5rem);
+  padding: clamp(.75rem, 2vmin, 1.5rem);
 }
 
-.class-view.timer-mode { grid-template-rows: auto minmax(24rem, 1fr); }
+.class-view.timer-mode { grid-template-rows: auto minmax(0, 1fr); }
 .class-view.timer-mode .status { display: none; }
 
 .class-view-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  gap: clamp(.5rem, 1vw, 1rem);
 }
 
 .class-view-controls {
   display: flex;
   align-items: center;
-  gap: .75rem;
+  justify-self: end;
+  gap: clamp(.35rem, .8vw, .75rem);
+  font-size: clamp(.8rem, 1.2vw, 1rem);
+  white-space: nowrap;
 }
 
 .return-link {
-  padding: .55rem .85rem;
+  justify-self: start;
+  padding: .4rem .65rem;
   border: 2px solid currentColor;
   border-radius: .5rem;
   color: inherit;
@@ -84,24 +90,37 @@ body {
 }
 
 .live-clock {
-  font-size: clamp(2.2rem, 7vw, 5.5rem);
+  font-size: clamp(2rem, min(4.5vw, 7vh), 4.5rem);
   font-variant-numeric: tabular-nums;
   font-weight: 800;
   line-height: 1;
+  white-space: nowrap;
 }
 
 .theme-control { display: flex; align-items: center; gap: .4rem; color: var(--muted); }
 .theme-control input { width: 1.25rem; height: 1.25rem; }
-.status { text-align: center; }
-.cycle-label { margin: 0; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
-h1 { margin: .15em 0; font-size: clamp(2rem, 5vw, 4.5rem); line-height: 1.05; }
-.next-activity { margin: .25rem 0; font-size: clamp(1.25rem, 3vw, 2rem); font-weight: 650; }
-.countdown { margin: .15rem 0; font-size: clamp(1.5rem, 4vw, 3rem); font-variant-numeric: tabular-nums; font-weight: 800; }
+.status { min-width: 0; text-align: center; overflow-wrap: anywhere; }
+.cycle-label { margin: 0; color: var(--muted); font-size: clamp(.8rem, 1.8vh, 1rem); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+h1 { margin: .12em 0; font-size: clamp(1.5rem, min(3.8vw, 5.5vh), 3.5rem); line-height: 1.1; }
+.next-activity { margin: .2rem 0; font-size: clamp(1rem, min(2vw, 3vh), 1.6rem); line-height: 1.2; font-weight: 650; }
+.countdown { margin: .15rem 0 0; font-size: clamp(1.25rem, min(3vw, 4.5vh), 2.75rem); line-height: 1.15; font-variant-numeric: tabular-nums; font-weight: 800; }
+
+/* The final grid row gets only the space left by the live header and status.
+   Size containment lets both clocks use that row's actual width AND height.
+   Padding reserves the outside label and the outline/alarm movement. */
+.visual-stage {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: clamp(2.5rem, 5vh, 3.25rem) .75rem .75rem;
+  container-type: size;
+}
 
 .block-visual.circular-progress {
   position: relative;
   align-self: center;
-  width: min(78vw, 560px, 58vh);
+  width: min(100cqw, 100cqh);
   aspect-ratio: 1;
   margin: 0 auto;
   overflow: visible;
@@ -130,7 +149,7 @@ h1 { margin: .15em 0; font-size: clamp(2rem, 5vw, 4.5rem); line-height: 1.05; }
   border-radius: .35rem;
   background: var(--clock-label-bg);
   color: var(--clock-label-text);
-  font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+  font-size: clamp(1rem, min(2vw, 3vh), 1.6rem);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   line-height: 1;
@@ -258,11 +277,8 @@ body.dark-theme .schedule-visual.period-lunch {
 
 
 .class-view:fullscreen {
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  width: 100vw;
-  min-height: 100vh;
+  grid-template-rows: minmax(0, 1fr);
+  width: 100%;
   max-width: none;
   margin: 0;
   background: var(--background);
@@ -270,10 +286,6 @@ body.dark-theme .schedule-visual.period-lunch {
 
 .class-view:fullscreen .class-view-header,
 .class-view:fullscreen .status { display: none; }
-.class-view:fullscreen .block-visual {
-  width: min(90vw, 90vh, 900px);
-  margin: 0 auto;
-}
 
 body.dark-theme {
   --background: #090d16;
@@ -304,9 +316,11 @@ body.dark-theme .timer-visual:not(.timer-alarm) {
   --clock-label-text: #f9fafb;
 }
 
-@media (max-width: 650px) {
-  .class-view-header { flex-wrap: wrap; }
-  .live-clock { order: -1; width: 100%; text-align: center; }
-  .class-view-controls { margin-left: auto; }
-  .block-visual { width: min(72vw, 560px); }
+@media (max-width: 850px) {
+  .class-view-header { grid-template-columns: auto 1fr; }
+  .live-clock { grid-column: 1 / -1; grid-row: 1; text-align: center; }
+}
+
+@media (max-width: 420px) {
+  .class-view-controls { flex-wrap: wrap; justify-content: flex-end; white-space: normal; }
 }

@@ -63,12 +63,20 @@ top=0.4in
 % ----------------------------------------------------------
 % Heading and cell helpers
 % ----------------------------------------------------------
-% \SubsectionBox{text}: bold gray heading spanning the current \linewidth.
-% Works within columns; adds spacing but no section numbering or TOC entry.
-\newcommand{\SubsectionBox}[1]{%
+% \SubsectionBox{text}: numbered bold gray problem heading (1., 2., ...).
+% \SubsectionBox*{text}: identical heading without displaying or advancing a number.
+% The dedicated counter has no section parent; numbering continues across columns
+% and pages. Standard \stepcounter updates are global, even in formatting groups.
+% Both forms span the current \linewidth and add spacing, with no TOC entry.
+% Pass titles without manual numbers; existing \score{...} formatting is retained.
+\newcounter{subsectionboxproblem}
+% A stable dispatcher also supports existing \let-based local wrappers.
+\newcommand{\SubsectionBox}{\SubsectionBoxHeading}
+\NewDocumentCommand{\SubsectionBoxHeading}{s m}{%
+	\IfBooleanF{#1}{\stepcounter{subsectionboxproblem}}%
 	\vspace{0.25cm}
 	\noindent\colorbox{gray!30}{%
-		\parbox{\linewidth}{\textbf{#1}}%
+		\parbox{\linewidth}{\textbf{\IfBooleanF{#1}{\arabic{subsectionboxproblem}. }#2}}%
 	}\par\vspace{0.0cm}%
 }
 
