@@ -67,3 +67,18 @@ preamble/
 | [`template_practice.tex`](template_practice.tex) | None. |
 | [`template_print.tex`](template_print.tex) | None. |
 | [`template_README.md`](template_README.md) | None. |
+
+
+## Unified Grade 10 C1--C3 solutions
+
+`preamble_G10_T1_C1C2C3.tex` is the authoritative presentation preamble.
+See [C1--C3 migration and validation](C1C2C3-migration.md) for the complete
+migration list, interfaces, dependency structure, and verification results.
+
+Use `\input{preamble_G10_T1_C1C2C3}` in practice and solution documents.
+Exams and classroom sheets additionally input `preamble_exam_layout` for
+compact lists, margins, assessment columns, and headers. This layer does not
+load another preamble or declare a document class.
+
+`preamble_G10_T1_C2C3.tex` remains a compatibility wrapper. Existing general
+exam consumers still use `preamble_exams.tex`; they need no migration.
