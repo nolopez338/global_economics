@@ -4,6 +4,28 @@
 
 \input{preamble_G10_T1_C2C3.tex}
 
+% Local presentation helpers: readable two-line numerical cells and rotated pages.
+\usepackage{pdflscape}
+\usepackage{needspace}
+\newcommand{\PayoffStrut}{\vphantom{\begin{gathered}1\\1\\1\end{gathered}}}
+\newcommand{\PayoffNumber}[2]{\ensuremath{\PayoffStrut\begin{gathered}#1\\= #2\end{gathered}}}
+% Keep the existing decision-elements layout, allowing its labels to fit.
+\ExplSyntaxOn
+\RenewDocumentCommand{\DecisionElementsTable}{mmmm}
+{
+  \decision_prepare_lists:nn {#1} {#2}
+  \begin{center}
+  \begin{tabularx}{\linewidth}{@{}p{2.6cm}>{\raggedright\arraybackslash}X@{}}
+  \toprule Element & Description \\ \midrule
+  Alternatives & \decision_print_slots:Nn \l_decision_alternatives_seq {A} \\
+  States~of~nature & \decision_print_slots:Nn \l_decision_states_seq {S} \\
+  Events & #3 \\
+  Consequences & #4 \\ \bottomrule
+  \end{tabularx}
+  \end{center}
+}
+\ExplSyntaxOff
+
 \title{Grade 10 Term 1 Lesson 1 Practice Activity 1\\Decision Alternatives, Events, Consequences, States, and Payoff Tables}
 \author{}
 \date{}
@@ -22,8 +44,587 @@
 		\item Characterises decision-making problems under uncertainty by identifying decision alternatives, states of nature, consequences, and the economic or financial context of the decision.
 		\item Organises decision problems using payoff tables, placing alternatives, states of nature, and payoffs in a clear structure for comparison.
 	\end{enumerate}
+	
+	\section{Introduction} 
+	\label{sec:introduction} 
+	
+	\SectionProblemsTableOfContents{ 
+		\SectionProblemLink{sec:main-ideas-and-concepts}{Main Ideas and Concepts} \\
+		\SectionProblemLink{sec:problem1-introductory-general-problem-c1-c2}{Introductory General Problem (C1--C2)} \\ 
+		\SectionProblemLink{sec:from-supplied-to-calculated}{From Supplied Payoffs to Calculated Models} \\
+		\SectionProblemLink{sec:problem2-advanced-general-problem-c1-c2}{Advanced General Problem (C1--C2)} \\
+		\SectionProblemLink{sec:notation-and-procedure}{Notation Reference and Practice Procedure} 
+	}\vspace{5mm} 
+	
+	\subsection{Main Ideas and Concepts}
+\label{sec:main-ideas-and-concepts}
 
-	\section{Direct Payoff Models}
+\subsubsection*{1. Start with the choice and its timing}
+A school enterprise offers a printing service for a school fair. Its student team must decide whether to offer a standard packet service or a colour packet service. The team must advertise one service before it knows how much demand there will be. First it chooses a service; later it learns whether demand is high or low.
+
+The team is the \emph{decision-maker}, and the two services are its \emph{alternatives}. The uncertain process is how demand develops after advertising. High demand and low demand are the two possible \emph{states of nature}: the possible outcomes of that process. In this simplified model, exactly one of those states occurs. The team controls its service choice, but it does not control the demand state.
+
+A \emph{consequence} tells us what a choice and a demand state mean for the enterprise. For example, offering standard packets under high demand could leave the team with money to buy supplies for its next project. A \emph{payoff} measures the financial result in money. A consequence therefore explains what happens and why it matters; a payoff gives its numerical financial value.
+
+\textbf{Check.} Is ``high demand'' the team's choice or an outcome of the uncertain process? \emph{Suggested answer:} It is a possible outcome, or state. The team chooses the service before knowing the state.
+
+\subsubsection*{2. Give the choices short names}
+Short names help us label tables without repeatedly writing long service descriptions. Call the standard packet service $A_1$, read ``alternative one'', and the colour packet service $A_2$, read ``alternative two''.
+\begin{center}
+\begin{tabular}{ll}
+\toprule Symbol & Choice in the school enterprise \\ \midrule
+$A_1$ & Offer the standard packet service \\
+$A_2$ & Offer the colour packet service \\
+\bottomrule
+\end{tabular}
+\end{center}
+The small number below the letter is a \emph{subscript}. It identifies a choice; it does not give a score or rank. For example, writing $A_2$ on a row means that the row is about the colour service.
+
+\textbf{Check.} Does the 2 in $A_2$ mean that this service earns twice as much? \emph{Suggested answer:} No. It is only the service's identifying number.
+
+\Needspace{18\baselineskip}
+\subsubsection*{3. Give the possible demand outcomes short names}
+We also need short column labels for the possible demand outcomes. Call high demand $S_1$, read ``state one'', and low demand $S_2$, read ``state two''.
+\begin{center}
+\begin{tabular}{ll}
+\toprule Symbol & Demand outcome \\ \midrule
+$S_1$ & High demand \\
+$S_2$ & Low demand \\
+\bottomrule
+\end{tabular}
+\end{center}
+Thus, if demand turns out to be low, we record $S_2$, whichever service the team chose.
+
+\textbf{Check.} Can choosing $A_1$ guarantee $S_1$? \emph{Suggested answer:} No. Choosing the standard service does not choose the demand state.
+
+\subsubsection*{4. Match one choice with one state}
+To describe a possible consequence, we must say both which service is offered and which demand state occurs. We write $(A_1,S_1)$ and read it as ``standard packet service with high demand''. This ordered pair names one possible combination; the alternative comes first and the state second.
+
+There are four combinations to record:
+\begin{center}
+\begin{tabular}{ll}
+\toprule Combination & Contextual reading \\ \midrule
+$(A_1,S_1)$ & Standard service with high demand \\
+$(A_1,S_2)$ & Standard service with low demand \\
+$(A_2,S_1)$ & Colour service with high demand \\
+$(A_2,S_2)$ & Colour service with low demand \\
+\bottomrule
+\end{tabular}
+\end{center}
+Before the choice and the demand outcome are known, our description must cover all four possibilities. After one service is chosen and one state occurs, only its particular combination is realised.
+
+\textbf{Check.} If the team chooses colour service, should we erase the standard-service combinations from the original problem table? \emph{Suggested answer:} No. The complete table records the consequences of both available choices under both states.
+
+\subsubsection*{5. Attach a supplied monetary payoff}
+Suppose the enterprise is given a projected financial surplus of 20 USD for standard service with high demand. This means 20 USD remains available for its next project. We need a way to attach that number to the right combination. Write
+\[P_{ay}(A_1,S_1)=20\text{ USD}.\]
+Read the full statement as ``the payoff from choosing standard service when high demand occurs is 20 US dollars''. The name $P_{ay}$ stands for payoff. Its two \emph{arguments}, $A_1$ and $S_1$, identify the service and demand state. These parentheses identify inputs; they do not mean multiplication.
+
+For this surplus measure, a positive payoff means money remains, zero means no surplus or loss, and a negative payoff means a loss that must be covered. For example, $+20$ USD can fund supplies, 0 USD leaves no money for the next project, and $-5$ USD means the team must find 5 USD to cover a shortfall. These are examples of possible financial results, not extra components of the supplied 20 USD.
+
+\textbf{Check.} Does $P_{ay}(A_1,S_1)=20$ tell us how many packets were printed? \emph{Suggested answer:} No. It supplies a monetary payoff, not an item count or a breakdown of that payoff.
+
+\Needspace{23\baselineskip}
+\subsubsection*{6. Put each payoff in its place}
+Begin a payoff table with service names as rows and demand outcomes as columns. The supplied 20 USD belongs where the standard-service row meets the high-demand column. If the other supplied payoffs are 8 USD for standard service with low demand, 15 USD for colour service with high demand, and 6 USD for colour service with low demand, the completed table is:
+\begin{center}
+\textbf{Supplied payoffs (USD).}\par\medskip
+\begin{tabular}{lcc}
+\toprule Service & High demand ($S_1$) & Low demand ($S_2$) \\ \midrule
+Standard ($A_1$) & 20 & 8 \\
+Colour ($A_2$) & 15 & 6 \\
+\bottomrule
+\end{tabular}
+\end{center}
+For example, the 6 in the second row and second column says $P_{ay}(A_2,S_2)=6$ USD. Every cell links a consequence to a choice and a state. No calculation is needed when the payoff is supplied directly.
+
+\textbf{Check.} Where would you look for the colour-service payoff under high demand? \emph{Suggested answer:} Row $A_2$, column $S_1$: 15 USD.
+
+The next general problem consolidates this same placement skill with generic choices and a different monetary scale. Its values are supplied independently; they are not the school enterprise's figures.
+
+\subsection{Introductory General Problem (C1--C2)} 
+	\label{sec:problem1-introductory-general-problem-c1-c2} 
+	
+	A decision-maker chooses between generic alternatives $A_1$ and $A_2$. After the choice, one uncertain event produces either state $S_1$ or state $S_2$. The payoffs, in thousand USD, are supplied directly:
+	\[
+	P_{ay}(A_1,S_1)=10,\quad
+	P_{ay}(A_1,S_2)=4,\quad
+	P_{ay}(A_2,S_1)=7,\quad
+	P_{ay}(A_2,S_2)=8.
+	\]
+	
+	Use the first argument to locate the alternative row and the second to locate the state column. The four combinations are
+	\[
+	(A_1,S_1),\quad(A_1,S_2),\quad(A_2,S_1),\quad(A_2,S_2).
+	\]
+	
+	\textbf{Questions/Tasks.}
+	\begin{enumerate}
+		\CriterionTask
+		{subsec:problem1-introductory-general-problem-c1}{1}
+		{Interpreting decision alternatives, events, consequences, and states.}
+		
+		\CriterionTask
+		{subsec:problem1-introductory-general-problem-c2}{2}
+		{Building the payoff table.}
+	\end{enumerate}
+	
+	\Needspace{12\baselineskip}
+\subsubsection*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\phantomsection
+	\label{subsec:problem1-introductory-general-problem-c1}
+	
+	\DecisionElementsTable
+	{$A_1$; $A_2$}
+	{$S_1$; $S_2$}
+	{The uncertain event that produces either $S_1$ or $S_2$}
+	{The consequence and its payoff in thousand USD for each of the four listed combinations}
+	
+	\secInicio[sec:problem1-introductory-general-problem-c1-c2][sec:introduction]
+
+\Needspace{8\baselineskip}
+\subsubsection*{C2 - Building the payoff table.}
+	\phantomsection
+	\label{subsec:problem1-introductory-general-problem-c2}
+	
+	\begin{center}
+		\begin{tabular}{lcc}
+			\toprule
+			Alternative & $S_1$ & $S_2$ \\
+			\midrule
+			$A_1$ & 10 & 4 \\
+			$A_2$ & 7 & 8 \\
+			\bottomrule
+		\end{tabular}
+	\end{center}
+	
+	Because $P_{ay}(A_1,S_1)$ belongs to row $A_1$ and column $S_1$, 10 goes in the first payoff cell. Similarly, $P_{ay}(A_1,S_2)=4$ goes in row $A_1$, column $S_2$; $P_{ay}(A_2,S_1)=7$ goes in row $A_2$, column $S_1$; and $P_{ay}(A_2,S_2)=8$ goes in row $A_2$, column $S_2$.
+	
+	\textbf{Check.} What does the 7 in the completed table tell us? \emph{Suggested answer:} Choosing $A_2$ when $S_1$ occurs gives a payoff of 7 thousand USD; it does not count items.
+
+\secInicio[sec:problem1-introductory-general-problem-c1-c2][sec:introduction]
+
+\subsection{From Supplied Payoffs to Calculated Models}
+\label{sec:from-supplied-to-calculated}
+
+\subsubsection*{7. Extend the familiar table}
+The introductory problem has two alternatives and two states. To discuss any selected alternative without naming a specific row, write $A_i$, read ``alternative with index $i$''. To discuss any particular state, write $S_j$, read ``state with index $j$''. The letters $i$ and $j$ are identifying indices. For example, setting $i=2$ gives $A_i=A_2$, and setting $j=1$ gives $S_j=S_1$. In the introductory table, these substitutions locate $P_{ay}(A_2,S_1)=7$ thousand USD.
+
+We also need to say how many choices and states a larger problem contains. Let $m$ be the \emph{number of alternatives} and $n$ the \emph{number of states}. In the familiar two-by-two table, $m=2$ and $n=2$. A problem with three services and two demand outcomes would have $m=3$ and $n=2$:
+\[A_1,A_2,A_3\qquad\text{and}\qquad S_1,S_2.\]
+In general, the lists are $A_1,\ldots,A_m$ and $S_1,\ldots,S_n$. The dots mean ``continue the list''. The index $i$ runs from 1 to $m$, and $j$ runs from 1 to $n$. An index identifies a row or column; a count tells us how many there are; a payoff is a financial value with units. These are different jobs.
+
+\textbf{Check.} In the introductory problem, are $i=2$, $m=2$, and a payoff of 7 interchangeable? \emph{Suggested answer:} No. They mean the selected row number, the total number of alternatives, and a payoff of 7 thousand USD.
+
+Now we can write a general template. Each $P_{ay}(A_i,S_j)$, read ``the payoff for alternative $i$ under state $j$'', still belongs at the intersection of that row and column.
+\begin{center}
+\begin{tabular}{lcccc}
+\toprule Alternative & $S_1$ & $S_2$ & $\cdots$ & $S_n$ \\ \midrule
+$A_1$ & $P_{ay}(A_1,S_1)$ & $P_{ay}(A_1,S_2)$ & $\cdots$ & $P_{ay}(A_1,S_n)$ \\
+$A_2$ & $P_{ay}(A_2,S_1)$ & $P_{ay}(A_2,S_2)$ & $\cdots$ & $P_{ay}(A_2,S_n)$ \\
+$\vdots$ & $\vdots$ & $\vdots$ & $\ddots$ & $\vdots$ \\
+$A_m$ & $P_{ay}(A_m,S_1)$ & $P_{ay}(A_m,S_2)$ & $\cdots$ & $P_{ay}(A_m,S_n)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\textbf{Check.} If there are three alternatives and two states, how many payoff cells are needed? \emph{Suggested answer:} Six: one for each of the $3\times2$ combinations.
+
+\subsubsection*{8. Keep the table; change how its entries are obtained}
+Sometimes a problem supplies a financial result directly, as in the first general problem. Sometimes it supplies item counts, amounts earned per item, or fixed amounts instead. For example, ``three packets, earning 2 USD each'' requires a calculation before we can enter a monetary payoff. The rows and columns stay the same; the method for obtaining each entry changes.
+
+We return to the school enterprise for the following \emph{calculated-payoff variations}. Each variation states its financial arrangement explicitly. Its calculated payoffs replace, rather than reproduce, the earlier supplied figures. Unless stated otherwise, money is in USD and an item is one printed packet.
+
+\textbf{Check.} May we put ``3 packets'' in a payoff table labelled USD? \emph{Suggested answer:} No. We must first use the stated financial arrangement to find a monetary amount.
+
+\subsubsection*{9. Record the quantity for each combination}
+A service may sell different numbers of packets under high and low demand. Colour packets may also attract different numbers of buyers from standard packets under the same demand conditions. We therefore record a quantity for each combination.
+
+Suppose standard service sells 6 packets under high demand and 3 under low demand; colour service sells 4 and 2 packets, respectively. Write $q(A_1,S_2)=3$ packets, read ``the quantity for standard service under low demand is three packets''. More generally, $q(A_i,S_j)$ means the quantity for the selected alternative and particular state.
+\begin{center}
+\textbf{Quantities (packets), not monetary payoffs.}\par\medskip
+\begin{tabular}{lcc}
+\toprule Service & High demand ($S_1$) & Low demand ($S_2$) \\ \midrule
+Standard ($A_1$) & 6 & 3 \\
+Colour ($A_2$) & 4 & 2 \\
+\bottomrule
+\end{tabular}
+\end{center}
+For example, $q(A_2,S_1)=4$ packets. The quantity can differ both across a row and down a column because it depends on the service and demand together. Use this quantity table throughout the school variations below.
+
+\textbf{Check.} Does $q(A_1,S_2)=3$ mean a payoff of 3 USD? \emph{Suggested answer:} No. It means three packets; we still need the monetary terms.
+
+\Needspace{30\baselineskip}
+\subsubsection*{10. Variation A: earnings per packet set by the service}
+Suppose each standard packet contributes 2 USD to the enterprise, and each colour packet contributes 3 USD. These are the stated earnings per packet after the relevant operating expenses; this variation includes no other payments. We need a rate determined by the service. Write $v(A_1)=2$ USD per packet and $v(A_2)=3$ USD per packet. Read $v(A_1)$ as ``the variable payoff per item for standard service''. In general, $v(A_i)$ is the alternative-based per-item payoff.
+
+For a given service, this rate is the same in both demand states. Multiply its rate by the number of packets to obtain the monetary payoff:
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)v(A_i).\]
+Read this as ``payoff equals quantity times the rate for the chosen alternative''. For standard service under low demand, the compact worked example follows the input--calculation--final payoff sequence.
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}l l >{\raggedright\arraybackslash}X@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$q(A_1,S_2)$ & 3 packets & Standard-service sales under low demand \\
+$v(A_1)$ & 2 USD per packet & Standard-service earnings per packet \\
+\bottomrule
+\end{tabularx}\par\medskip
+\begin{tabular}{cc}
+\toprule Symbolic calculation & Numerical calculation (USD) \\ \midrule
+$P_{ay}(A_1,S_2)=q(A_1,S_2)v(A_1)$ & \PayoffNumber{3\times2}{6} \\
+\bottomrule
+\end{tabular}
+\par\medskip\textbf{Final payoff: 6 USD for standard service under low demand.}
+\end{center}
+The units explain the multiplication: 3 packets times 2 USD per packet gives 6 USD. Under high demand the same service earns $6\times2=12$ USD. A constant rate across a row does not make the total payoff constant when quantities differ.
+
+\textbf{Check.} Why is the standard-service rate 2 in both cells, while the payoffs are 12 and 6? \emph{Suggested answer:} The rate is per packet; the quantities are six and three packets.
+
+\Needspace{27\baselineskip}
+\subsubsection*{11. Variation B: earnings per packet set by demand}
+Consider a \emph{separate one-component arrangement}: a sponsor pays for each packet, and these payments are the only payoff. The sponsor pays 1 USD per packet under high demand and 0.5 USD per packet under low demand, whichever service is chosen. These rates replace the service-based earnings in Variation A.
+
+Write $v(S_1)=1$ and $v(S_2)=0.5$, both in USD per packet. Read $v(S_2)$ as ``the variable payoff per item under low demand''. In general, $v(S_j)$ is the state-based per-item payoff. Here the model is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)v(S_j).\]
+\Needspace{23\baselineskip}
+For standard service under low demand, collect the inputs and calculate this one cell:
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}l l >{\raggedright\arraybackslash}X@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$q(A_1,S_2)$ & 3 packets & Standard-service sales under low demand \\
+$v(S_2)$ & 0.5 USD per packet & Low-demand sponsor payment per packet \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\begin{center}
+\textbf{Standard service under low demand: one cell.}\par\medskip
+\begin{tabular}{cc}
+\toprule Symbolic calculation & Numerical calculation (USD) \\ \midrule
+$q(A_1,S_2)v(S_2)$ & \PayoffNumber{3\times0.5}{1.5} \\
+\bottomrule
+\end{tabular}\par\medskip
+\textbf{Final payoff table (USD).}\par\medskip
+\begin{tabular}{lc}
+\toprule Alternative & $S_2$ \\ \midrule
+$A_1$ & 1.5 \\
+\bottomrule
+\end{tabular}
+\end{center}
+Within a state column, the rate is the same for both services. The total need not be: colour service under low demand earns $2\times0.5=1$ USD because it sells only two packets.
+
+\textbf{Check.} Does a shared column rate guarantee equal column payoffs? \emph{Suggested answer:} No. Different services can sell different quantities in that state.
+
+\Needspace{10\baselineskip}
+\textbf{Extension AB: both per-packet earnings apply.}
+Now suppose the enterprise receives both its service earnings from Variation A and the sponsor payments from Variation B for every packet. This is a new, two-component arrangement. Each packet generates two monetary contributions, so
+\[
+\begin{aligned}
+P_{ay}(A_i,S_j)&=q(A_i,S_j)v(A_i)+q(A_i,S_j)v(S_j)\\
+&=q(A_i,S_j)\bigl[v(A_i)+v(S_j)\bigr].
+\end{aligned}
+\]
+The first line counts the earnings from each source separately. The second adds the two rates first, then multiplies by their common quantity. Read the bracket as ``service earnings per packet plus demand-based earnings per packet''.
+
+\Needspace{23\baselineskip}
+For standard service under low demand, both rates apply to the same three packets:
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}l l >{\raggedright\arraybackslash}X@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$q(A_1,S_2)$ & 3 packets & Standard-service sales under low demand \\
+$v(A_1)$ & 2 USD per packet & Service earnings for each packet \\
+$v(S_2)$ & 0.5 USD per packet & Low-demand sponsor payment per packet \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\begin{center}
+\textbf{Standard service under low demand: one cell.}\par\medskip
+\begin{tabular}{cc}
+\toprule Symbolic calculation & Numerical calculation (USD) \\ \midrule
+$q(A_1,S_2)[v(A_1)+v(S_2)]$ & \PayoffNumber{3(2+0.5)}{7.5} \\
+\bottomrule
+\end{tabular}\par\medskip
+\textbf{Final payoff table (USD).}\par\medskip
+\begin{tabular}{lc}
+\toprule Alternative & $S_2$ \\ \midrule
+$A_1$ & 7.5 \\
+\bottomrule
+\end{tabular}
+\end{center}
+This is also $3\times2+3\times0.5=7.5$ USD. Only compatible rates can be added: both here are USD per packet and apply to the same packets. A rate in USD per packet cannot be added directly to an amount in USD.
+
+\textbf{Check.} Is $3(2+0.5)$ the same as $3\times2+0.5$? \emph{Suggested answer:} No. Both rates apply to all three packets, so both are multiplied by 3.
+
+\Needspace{22\baselineskip}
+\subsubsection*{12. Variation C: a fixed amount set by the service}
+Not every payment is earned once per packet. Suppose a school agreement provides a single payment of 5 USD for offering standard service or 4 USD for offering colour service at the fair, independent of how many packets are printed. These payments are \emph{fixed}: within this model, they do not depend on quantity.
+
+Write $f(A_1)=5$ USD and $f(A_2)=4$ USD. Read $f(A_1)$ as ``the fixed payoff for standard service''. In general, $f(A_i)$ is the alternative-based fixed payoff. In a \emph{fixed-payment-only variation}, with no per-packet earnings, the model is
+\[P_{ay}(A_i,S_j)=f(A_i).\]
+For $A_1$ under either state, substituting $f(A_1)=5$ USD gives a final payoff of 5 USD. The entire standard-service row is 5; the entire colour-service row is 4. No quantity multiplication is needed.
+
+\textbf{Extension AC: add the fixed agreement payment to Variation A.}
+If the agreement payment is received in addition to the service's per-packet earnings, the model becomes
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)v(A_i)+f(A_i).\]
+\Needspace{23\baselineskip}
+For standard service under low demand, use the packet count, service rate, and single agreement payment:
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}l l >{\raggedright\arraybackslash}X@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$q(A_1,S_2)$ & 3 packets & Standard-service sales under low demand \\
+$v(A_1)$ & 2 USD per packet & Service earnings for each packet \\
+$f(A_1)$ & 5 USD & Single standard-service agreement payment \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\begin{center}
+\textbf{Standard service under low demand: one cell.}\par\medskip
+\begin{tabular}{cc}
+\toprule Symbolic calculation & Numerical calculation (USD) \\ \midrule
+$q(A_1,S_2)v(A_1)+f(A_1)$ & \PayoffNumber{3\times2+5}{11} \\
+\bottomrule
+\end{tabular}\par\medskip
+\textbf{Final payoff table (USD).}\par\medskip
+\begin{tabular}{lc}
+\toprule Alternative & $S_2$ \\ \midrule
+$A_1$ & 11 \\
+\bottomrule
+\end{tabular}
+\end{center}
+Multiplying the fixed 5 USD by three would wrongly count a single agreement payment three times.
+
+\textbf{Check.} If the number of packets doubles, does the agreement payment double? \emph{Suggested answer:} No. The per-packet contribution doubles, but the fixed payment stays 5 USD for standard service.
+
+\Needspace{25\baselineskip}
+\subsubsection*{13. Variation D: a fixed amount set by the state}
+A state can also trigger a single payment or cost. Suppose high demand brings a one-off school grant of 2 USD for the fair, while low demand brings a one-off unused-space charge of 1 USD. These amounts apply to either service and do not depend on the packet count.
+
+Write $f(S_1)=2$ USD and $f(S_2)=-1$ USD. Read $f(S_2)$ as ``the fixed payoff under low demand''. The negative sign records a cost that reduces the financial result. In general, $f(S_j)$ is the state-based fixed payoff. In a \emph{state-payment-only variation}, with no other financial components,
+\[P_{ay}(A_i,S_j)=f(S_j).\]
+For either service under low demand, the input $f(S_2)=-1$ USD gives a final payoff of $-1$ USD. Under high demand the final payoff is 2 USD. Thus each column is constant in this one-component case. ``Fixed'' means independent of quantity, not identical across states.
+
+Compare the two low-demand terms: $v(S_2)=0.5$ USD \emph{per packet} in Variation B, but $f(S_2)=-1$ USD \emph{once for the fair} in Variation D. Three packets would generate $3\times0.5=1.5$ USD from the first term, while the second term would still be $-1$ USD.
+
+\textbf{Check.} Should three packets make the unused-space charge $-3$ USD? \emph{Suggested answer:} No. It is a single 1 USD charge, so its contribution is $-1$ USD.
+
+\Needspace{25\baselineskip}
+\subsubsection*{14. Assemble the complete model}
+\textbf{Complete extension ABCD.} Suppose all four arrangements now apply together: service earnings and sponsor payments for each packet, plus the service agreement payment and the state-dependent grant or charge. These are the same four sources already explained, now combined in one financial result:
+\[
+P_{ay}(A_i,S_j)
+=q(A_i,S_j)\bigl[v(A_i)+v(S_j)\bigr]+f(A_i)+f(S_j).
+\]
+Read this as ``quantity times the sum of the two per-item rates, plus the alternative's fixed amount, plus the state's fixed amount''.
+
+\Needspace{23\baselineskip}
+For standard service under low demand, collect the familiar inputs first:
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}l l >{\raggedright\arraybackslash}X@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$q(A_1,S_2)$ & 3 packets & Standard-service sales under low demand \\
+$v(A_1)$ & 2 USD per packet & Service earnings for each packet \\
+$v(S_2)$ & 0.5 USD per packet & Sponsor payment for each packet \\
+$f(A_1)$ & 5 USD & Single standard-service agreement payment \\
+$f(S_2)$ & $-1$ USD & Single low-demand unused-space charge \\
+\bottomrule
+\end{tabularx}
+\end{center}
+\begin{center}
+\textbf{Standard service under low demand: one cell.}\par\medskip
+\begin{tabular}{cc}
+\toprule Symbolic calculation & Numerical calculation (USD) \\ \midrule
+$\begin{gathered}q(A_1,S_2)[v(A_1)+v(S_2)]\\{}+f(A_1)+f(S_2)\end{gathered}$ & \PayoffNumber{3(2+0.5)+5-1}{11.5} \\
+\bottomrule
+\end{tabular}\par\medskip
+\textbf{Final payoff table (USD).}\par\medskip
+\begin{tabular}{lc}
+\toprule Alternative & $S_2$ \\ \midrule
+$A_1$ & 11.5 \\
+\bottomrule
+\end{tabular}
+\end{center}
+The final payoff is 11.5 USD: money available for the next project after these contributions and the charge are included. This differs from Variation A's 6 USD because the financial arrangement now includes three additional components.
+
+The four additive payoff components are $q(A_i,S_j)v(A_i)$, $q(A_i,S_j)v(S_j)$, $f(A_i)$, and $f(S_j)$. The quantity $q(A_i,S_j)$ multiplies the two variable components; it is not a fifth additive payoff component. Each of the four components has monetary units after any multiplication.
+
+An absent component is set to zero. For example, setting $v(S_j)=0$, $f(A_i)=0$, and $f(S_j)=0$ leaves the one-component formula $P_{ay}(A_i,S_j)=q(A_i,S_j)v(A_i)$. This does not assume that every real arrangement includes four payments; it is a way to describe simpler models using the same structure.
+
+\textbf{Check.} Why do five input types produce only four payoff components? \emph{Suggested answer:} Quantity is a multiplier used in two components, not a separate amount of money to add.
+
+The practice sections follow this progression. A direct-payoff model supplies each cell. One-component models use just one of the four monetary components. Two-component models add two, for example $q(A_i,S_j)v(A_i)+f(A_i)$. Three-component models add three, for example $q(A_i,S_j)[v(A_i)+v(S_j)]+f(A_i)$. Complete four-component models include all four. The number of components counts monetary contributions, not symbols or table cells.
+
+An argument also tells us which input determines a component. A rate or fixed amount with argument $A_i$ is determined by the alternative and is reused across its row. One with argument $S_j$ is determined by the state and is reused down its column. A quantity with both arguments is specified for each combination. Values need not actually differ: two services may happen to have equal rates, even though each rate is specified by service.
+
+\textbf{Check.} If both services earn 2 USD per packet, can the rates still be alternative-based? \emph{Suggested answer:} Yes. The arrangement specifies the rate for each service; the two values happen to match.
+
+\subsubsection*{15. Bring the familiar steps together}
+The Advanced General Problem below is an independent example in thousand USD. It uses the same quantities, per-item rates, and fixed-amount notation, with new supplied values. Start with its \emph{Symbol | Value | Meaning in this problem} table. Then match each symbolic cell to the numerical cell beside it: alternatives and states remain in the same order. Finally, copy the evaluated results into a clean payoff table. In every numerical calculation cell, the arithmetic expression is on one line and the result is directly below it.
+
+Each number has a familiar job. Use the full worked tables to trace all four cells in the same way.
+
+\par\medskip
+\subsection{Advanced General Problem (C1--C2)}
+	\label{sec:problem2-advanced-general-problem-c1-c2}
+	
+	A decision-maker chooses $A_1$ or $A_2$ before an uncertain event produces $S_1$ or $S_2$. All monetary values below are in thousand USD, with variable values stated per item:
+	\[
+	v(A_1)=2,\quad v(A_2)=3,\qquad
+	f(A_1)=5,\quad f(A_2)=6,
+	\]
+	\[
+	v(S_1)=1,\quad v(S_2)=2,\qquad
+	f(S_1)=1,\quad f(S_2)=2.
+	\]
+	
+	The alternative--state quantities are:
+	\begin{center}
+		\begin{tabular}{lcc}
+			\toprule
+			Alternative & $S_1$ & $S_2$ \\
+			\midrule
+			$A_1$ & $q(A_1,S_1)=2$ & $q(A_1,S_2)=3$ \\
+			$A_2$ & $q(A_2,S_1)=4$ & $q(A_2,S_2)=5$ \\
+			\bottomrule
+		\end{tabular}
+	\end{center}
+	
+	\textbf{Questions/Tasks.}
+	\begin{enumerate}
+		\CriterionTask
+		{subsec:problem2-advanced-general-problem-c1}{1}
+		{Interpreting decision alternatives, events, consequences, and states.}
+		
+		\CriterionTask
+		{subsec:problem2-advanced-general-problem-c2}{2}
+		{Building the payoff table.}
+	\end{enumerate}
+	
+	\Needspace{12\baselineskip}
+\subsubsection*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\phantomsection
+	\label{subsec:problem2-advanced-general-problem-c1}
+	
+	\DecisionElementsTable
+	{$A_1$; $A_2$}
+	{$S_1$; $S_2$}
+	{The uncertain event that produces either $S_1$ or $S_2$}
+	{The total payoff in thousand USD for each pair $(A_i,S_j)$}
+	
+	\secInicio[sec:problem2-advanced-general-problem-c1-c2][sec:introduction]
+	
+	\par\noindent\begin{minipage}{\linewidth}
+\subsubsection*{C2 - Building the payoff table.}
+	\phantomsection
+	\label{subsec:problem2-advanced-general-problem-c2}
+\leavevmode\par
+
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Generic alternative 1. \\
+$A_2$ & --- & Alternative: Generic alternative 2. \\
+$S_1$ & --- & State: Generic state 1. \\
+$S_2$ & --- & State: Generic state 2. \\
+$q(A_1,S_1)$ & 2 items & Quantity for Generic alternative 1 under Generic state 1. \\
+$q(A_1,S_2)$ & 3 items & Quantity for Generic alternative 1 under Generic state 2. \\
+$q(A_2,S_1)$ & 4 items & Quantity for Generic alternative 2 under Generic state 1. \\
+$q(A_2,S_2)$ & 5 items & Quantity for Generic alternative 2 under Generic state 2. \\
+$v(A_1)$ & 2 thousand USD per item & Alternative-based earnings for Generic alternative 1. \\
+$v(A_2)$ & 3 thousand USD per item & Alternative-based earnings for Generic alternative 2. \\
+$v(S_1)$ & 1 thousand USD per item & State-based earnings for Generic state 1. \\
+$v(S_2)$ & 2 thousand USD per item & State-based earnings for Generic state 2. \\
+$f(A_1)$ & 5 thousand USD & Alternative-based fixed income for Generic alternative 1. \\
+$f(A_2)$ & 6 thousand USD & Alternative-based fixed income for Generic alternative 2. \\
+$f(S_1)$ & 1 thousand USD & State-based fixed income for Generic state 1. \\
+$f(S_2)$ & 2 thousand USD & State-based fixed income for Generic state 2. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+For example, $q(A_1,S_1)=2$ counts items; $v(A_1)=2$ and $v(S_1)=1$ are thousand USD per item; $f(A_1)=5$ and $f(S_1)=1$ are thousand USD counted once. Thus the first cell is $2(2+1)+5+1=12$ thousand USD.
+
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)\bigl[v(A_i)+v(S_j)\bigr]+f(A_i)+f(S_j).\]
+\end{minipage}\par\medskip
+\begin{landscape}
+\begin{minipage}{\linewidth}
+\textbf{Advanced General Problem: payoff calculations.}
+
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.64\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\bigl[v(A_1)+v(S_1)\bigr] \\ {}+f(A_1)+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\bigl[v(A_1)+v(S_2)\bigr] \\ {}+f(A_1)+f(S_2)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\bigl[v(A_2)+v(S_1)\bigr] \\ {}+f(A_2)+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\bigl[v(A_2)+v(S_2)\bigr] \\ {}+f(A_2)+f(S_2)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.34\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & \PayoffNumber{2(2+1)+5+1}{12} & \PayoffNumber{3(2+2)+5+2}{19} \\[5pt]
+$A_2$ & \PayoffNumber{4(3+1)+6+1}{23} & \PayoffNumber{5(3+2)+6+2}{33} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & 12 & 19 \\[5pt]
+$A_2$ & 23 & 33 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem2-advanced-general-problem-c1-c2][sec:introduction]
+\end{minipage}
+\end{landscape}
+
+	
+	
+
+	\subsection{Notation Reference and Practice Procedure}
+\label{sec:notation-and-procedure}
+
+The reference below collects notation already used. Always attach the units stated in the particular problem; the school examples used USD, while the general problems used thousand USD.
+\begin{center}
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\toprule Symbol & Meaning and units \\ \midrule
+$A_i$, $S_j$ & The selected alternative and particular state; labels, not money \\
+$i$, $j$ & Indices identifying a row and a column \\
+$m$, $n$ & Counts of alternatives and states \\
+$(A_i,S_j)$ & One alternative--state combination \\
+$q(A_i,S_j)$ & Quantity for that combination, in items \\
+$v(A_i)$, $v(S_j)$ & Alternative-based and state-based rates, in money per item \\
+$f(A_i)$, $f(S_j)$ & Alternative-based and state-based fixed amounts, in money \\
+$P_{ay}(A_i,S_j)$ & Total payoff for that combination, in money \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\textbf{Procedure for the practice problems.}
+\begin{enumerate}[label=\arabic*.]
+\item Identify who decides, the available choices, and the uncertain process. State what is chosen first and which state is learned later. Describe what the consequences mean economically (C1).
+\item Name the alternatives and states, and set up rows and columns for every combination (C2).
+\item If payoffs are supplied, place them directly in their cells. If calculation is needed, first build a \emph{Symbol | Value | Meaning in this problem} input table with units and signs. Identify which financial components actually apply.
+\item For calculated models, build matching symbolic and numerical tables side by side. Substitute the inputs for each combination. Keep the arithmetic expression on one line and its result below it.
+\item Collect only the evaluated monetary values in a final payoff table. Check row and column placement, signs, units, and completeness. The task ends with an organised description of the possible financial results.
+\end{enumerate}
+
+\textbf{Final checks for understanding.}
+\begin{enumerate}
+\item A cell lists a quantity of 4 items. Is 4 ready to enter in a payoff table measured in thousand USD? \emph{Suggested answer:} No. Quantity counts items; use the applicable monetary rates and fixed amounts to calculate the payoff.
+\item A payment is 3 USD per item and a grant is 5 USD once. For two items, should both be multiplied by two? \emph{Suggested answer:} No. The total is $2\times3+5=11$ USD; the grant is counted once.
+\item Which input is reused across a row: $v(A_i)$ or $v(S_j)$? Does that make every payoff in the row equal? \emph{Suggested answer:} $v(A_i)$ is reused across the row. Payoffs can still differ because quantity or state-based components can differ. The state-based rate $v(S_j)$ is reused down a column.
+\end{enumerate}
+\secInicio[sec:notation-and-procedure][sec:introduction]
+
+\section{Direct Payoff Models}
 	\label{sec:direct-payoff-models}
 
 	\SectionProblemsTableOfContents{
@@ -61,7 +662,8 @@
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem3-local-cafe-investment-c1}
 
@@ -73,7 +675,8 @@
 
 	\secInicio[sec:problem3-local-cafe-investment-c1-c2][sec:direct-alternative-state-payoffs]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\Needspace{8\baselineskip}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem3-local-cafe-investment-c2}
 	\begin{center}
@@ -111,7 +714,8 @@
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem4-green-energy-production-mix-c1}
 	\DecisionElementsTable
@@ -122,7 +726,8 @@
 
 	\secInicio[sec:problem4-green-energy-production-mix-c1-c2][sec:direct-alternative-state-payoffs]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\Needspace{8\baselineskip}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem4-green-energy-production-mix-c2}
 	\begin{center}
@@ -159,7 +764,8 @@
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem5-global-shipping-network-design-c1}
 	\DecisionElementsTable
@@ -170,7 +776,8 @@
 
 	\secInicio[sec:problem5-global-shipping-network-design-c1-c2][sec:direct-alternative-state-payoffs]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\Needspace{8\baselineskip}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem5-global-shipping-network-design-c2}
 	\begin{center}
@@ -230,7 +837,8 @@
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem6-community-bakery-lunch-boxes-c1}
 	\DecisionElementsTable
@@ -241,36 +849,73 @@
 
 	\secInicio[sec:problem6-community-bakery-lunch-boxes-c1-c2][sec:alternative-based-variable-payoff-profit-per-item-times-number-of-items]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem6-community-bakery-lunch-boxes-c2}
-	Calculation table in thousand USD:
-	\[
-	\text{Payoff}=\text{number of lunch boxes}\times\text{profit per lunch box}
-	\]
-	\begin{center}
-		\begin{tabular}{lll}
-			\toprule
-			Alternative & High demand & Low demand \\
-			\midrule
-			Standard packaging & $900 \times 0.04 = 36$ & $550 \times 0.04 = 22$ \\
-			Premium packaging & $650 \times 0.07 = 45.5$ & $250 \times 0.07 = 17.5$ \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\leavevmode\par
 
-	\begin{center}
-		\begin{tabular}{lll}
-			\toprule
-			Alternative & High demand & Low demand \\
-			\midrule
-			Standard packaging & 36 & 22 \\
-			Premium packaging & 45.5 & 17.5 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Standard packaging. \\
+$A_2$ & --- & Alternative: Premium packaging. \\
+$S_1$ & --- & State: High demand. \\
+$S_2$ & --- & State: Low demand. \\
+$q(A_1,S_1)$ & 900 lunch boxes & Quantity for Standard packaging under High demand. \\
+$q(A_1,S_2)$ & 550 lunch boxes & Quantity for Standard packaging under Low demand. \\
+$q(A_2,S_1)$ & 650 lunch boxes & Quantity for Premium packaging under High demand. \\
+$q(A_2,S_2)$ & 250 lunch boxes & Quantity for Premium packaging under Low demand. \\
+$v(A_1)$ & 0.04 thousand USD per lunch box & Packaging profit for Standard packaging. \\
+$v(A_2)$ & 0.07 thousand USD per lunch box & Packaging profit for Premium packaging. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)v(A_i).\]
+\end{minipage}\par\medskip
+\begin{minipage}{\linewidth}
+\textbf{Community Bakery Lunch Boxes: payoff calculations.}
 
-	\secInicio[sec:problem6-community-bakery-lunch-boxes-c1-c2][sec:alternative-based-variable-payoff-profit-per-item-times-number-of-items]
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times v(A_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times v(A_1)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times v(A_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times v(A_2)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & \PayoffNumber{900 \times 0.04}{36} & \PayoffNumber{550 \times 0.04}{22} \\[5pt]
+$A_2$ & \PayoffNumber{650 \times 0.07}{45.5} & \PayoffNumber{250 \times 0.07}{17.5} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & 36 & 22 \\[5pt]
+$A_2$ & 45.5 & 17.5 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem6-community-bakery-lunch-boxes-c1-c2][sec:alternative-based-variable-payoff-profit-per-item-times-number-of-items]
+\end{minipage}
+
+
 	
 	\subsubsection{Rural Internet Subscriptions (C1--C2)}
 	\label{sec:problem7-rural-internet-subscriptions-c1-c2}
@@ -292,7 +937,8 @@
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem7-rural-internet-subscriptions-c1}
 	\DecisionElementsTable
@@ -303,38 +949,80 @@
 
 	\secInicio[sec:problem7-rural-internet-subscriptions-c1-c2][sec:alternative-based-variable-payoff-profit-per-item-times-number-of-items]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem7-rural-internet-subscriptions-c2}
-	Calculation table in thousand USD:
-	\[
-	\text{Payoff}=\text{subscriptions sold}\times\text{profit per subscription}
-	\]
-	\begin{center}
-		\begin{tabular}{lll}
-			\toprule
-			Alternative & High enrollment & Low enrollment \\
-			\midrule
-			Basic plan & $1400 \times 0.03 = 42$ & $900 \times 0.03 = 27$ \\
-			Plus plan & $1000 \times 0.05 = 50$ & $700 \times 0.05 = 35$ \\
-			Pro plan & $600 \times 0.08 = 48$ & $300 \times 0.08 = 24$ \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\leavevmode\par
 
-	\begin{center}
-		\begin{tabular}{lll}
-			\toprule
-			Alternative & High enrollment & Low enrollment \\
-			\midrule
-			Basic plan & 42 & 27 \\
-			Plus plan & 50 & 35 \\
-			Pro plan & 48 & 24 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Basic plan. \\
+$A_2$ & --- & Alternative: Plus plan. \\
+$A_3$ & --- & Alternative: Pro plan. \\
+$S_1$ & --- & State: High enrollment. \\
+$S_2$ & --- & State: Low enrollment. \\
+$q(A_1,S_1)$ & 1400 subscriptions & Quantity for Basic plan under High enrollment. \\
+$q(A_1,S_2)$ & 900 subscriptions & Quantity for Basic plan under Low enrollment. \\
+$q(A_2,S_1)$ & 1000 subscriptions & Quantity for Plus plan under High enrollment. \\
+$q(A_2,S_2)$ & 700 subscriptions & Quantity for Plus plan under Low enrollment. \\
+$q(A_3,S_1)$ & 600 subscriptions & Quantity for Pro plan under High enrollment. \\
+$q(A_3,S_2)$ & 300 subscriptions & Quantity for Pro plan under Low enrollment. \\
+$v(A_1)$ & 0.03 thousand USD per subscription & Plan profit for Basic plan. \\
+$v(A_2)$ & 0.05 thousand USD per subscription & Plan profit for Plus plan. \\
+$v(A_3)$ & 0.08 thousand USD per subscription & Plan profit for Pro plan. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)v(A_i).\]
+\end{minipage}\par\medskip
+\begin{minipage}{\linewidth}
+\textbf{Rural Internet Subscriptions: payoff calculations.}
 
-	\secInicio[sec:problem7-rural-internet-subscriptions-c1-c2][sec:alternative-based-variable-payoff-profit-per-item-times-number-of-items]
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times v(A_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times v(A_1)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times v(A_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times v(A_2)\end{gathered}$ \\[5pt]
+$A_3$ & $\PayoffStrut\begin{gathered}q(A_3,S_1)\times v(A_3)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_3,S_2)\times v(A_3)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & \PayoffNumber{1400 \times 0.03}{42} & \PayoffNumber{900 \times 0.03}{27} \\[5pt]
+$A_2$ & \PayoffNumber{1000 \times 0.05}{50} & \PayoffNumber{700 \times 0.05}{35} \\[5pt]
+$A_3$ & \PayoffNumber{600 \times 0.08}{48} & \PayoffNumber{300 \times 0.08}{24} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & 42 & 27 \\[5pt]
+$A_2$ & 50 & 35 \\[5pt]
+$A_3$ & 48 & 24 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem7-rural-internet-subscriptions-c1-c2][sec:alternative-based-variable-payoff-profit-per-item-times-number-of-items]
+\end{minipage}
+
+
 
 	
 	\subsection{State-Based Variable}
@@ -365,7 +1053,8 @@
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem8-coffee-export-routes-c1}
 	\DecisionElementsTable
@@ -376,36 +1065,73 @@
 
 	\secInicio[sec:problem8-coffee-export-routes-c1-c2][sec:state-based-variable-payoff-profit-per-item-times-number-of-items]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem8-coffee-export-routes-c2}
-	Calculation table in thousand USD:
-	\[
-	\text{Payoff}=\text{shipments}\times\text{profit per shipment}
-	\]
-	\begin{center}
-		\begin{tabular}{lll}
-			\toprule
-			Route & Favorable rate & Unfavorable rate \\
-			\midrule
-			Port A & $40 \times 6 = 240$ & $28 \times 2 = 56$ \\
-			Port B & $32 \times 6 = 192$ & $30 \times 2 = 60$ \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\leavevmode\par
 
-	\begin{center}
-		\begin{tabular}{lll}
-			\toprule
-			Route & Favorable rate & Unfavorable rate \\
-			\midrule
-			Port A & 240 & 56 \\
-			Port B & 192 & 60 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Port A route. \\
+$A_2$ & --- & Alternative: Port B route. \\
+$S_1$ & --- & State: Favorable rate. \\
+$S_2$ & --- & State: Unfavorable rate. \\
+$q(A_1,S_1)$ & 40 shipments & Quantity for Port A route under Favorable rate. \\
+$q(A_1,S_2)$ & 28 shipments & Quantity for Port A route under Unfavorable rate. \\
+$q(A_2,S_1)$ & 32 shipments & Quantity for Port B route under Favorable rate. \\
+$q(A_2,S_2)$ & 30 shipments & Quantity for Port B route under Unfavorable rate. \\
+$v(S_1)$ & 6 thousand USD per shipment & Exchange-rate profit for Favorable rate. \\
+$v(S_2)$ & 2 thousand USD per shipment & Exchange-rate profit for Unfavorable rate. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)v(S_j).\]
+\end{minipage}\par\medskip
+\begin{minipage}{\linewidth}
+\textbf{Coffee Export Routes: payoff calculations.}
 
-	\secInicio[sec:problem8-coffee-export-routes-c1-c2][sec:state-based-variable-payoff-profit-per-item-times-number-of-items]
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times v(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times v(S_2)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times v(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times v(S_2)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & \PayoffNumber{40 \times 6}{240} & \PayoffNumber{28 \times 2}{56} \\[5pt]
+$A_2$ & \PayoffNumber{32 \times 6}{192} & \PayoffNumber{30 \times 2}{60} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & 240 & 56 \\[5pt]
+$A_2$ & 192 & 60 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem8-coffee-export-routes-c1-c2][sec:state-based-variable-payoff-profit-per-item-times-number-of-items]
+\end{minipage}
+
+
 	
 	\subsubsection{Lake Ferry Tourism (C1--C2)}
 	\label{sec:problem9-lake-ferry-tourism-c1-c2}
@@ -427,7 +1153,8 @@
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem9-lake-ferry-tourism-c1}
 	\DecisionElementsTable
@@ -438,36 +1165,78 @@
 
 	\secInicio[sec:problem9-lake-ferry-tourism-c1-c2][sec:state-based-variable-payoff-profit-per-item-times-number-of-items]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem9-lake-ferry-tourism-c2}
-	Calculation table in thousand USD:
-	\[
-	\text{Payoff}=\text{tickets sold}\times\text{profit per ticket}
-	\]
-	\begin{center}
-		\begin{tabular}{llll}
-			\toprule
-			Alternative & Peak & Normal & Rainy \\
-			\midrule
-			Small ferries & $2200 \times 0.05 = 110$ & $1600 \times 0.04 = 64$ & $1000 \times 0.03 = 30$ \\
-			Large ferries & $2600 \times 0.05 = 130$ & $1800 \times 0.04 = 72$ & $800 \times 0.03 = 24$ \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\leavevmode\par
 
-	\begin{center}
-		\begin{tabular}{llll}
-			\toprule
-			Alternative & Peak & Normal & Rainy \\
-			\midrule
-			Small ferries & 110 & 64 & 30 \\
-			Large ferries & 130 & 72 & 24 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Small ferries. \\
+$A_2$ & --- & Alternative: Large ferries. \\
+$S_1$ & --- & State: Peak. \\
+$S_2$ & --- & State: Normal. \\
+$S_3$ & --- & State: Rainy. \\
+$q(A_1,S_1)$ & 2200 tickets & Quantity for Small ferries under Peak. \\
+$q(A_1,S_2)$ & 1600 tickets & Quantity for Small ferries under Normal. \\
+$q(A_1,S_3)$ & 1000 tickets & Quantity for Small ferries under Rainy. \\
+$q(A_2,S_1)$ & 2600 tickets & Quantity for Large ferries under Peak. \\
+$q(A_2,S_2)$ & 1800 tickets & Quantity for Large ferries under Normal. \\
+$q(A_2,S_3)$ & 800 tickets & Quantity for Large ferries under Rainy. \\
+$v(S_1)$ & 0.05 thousand USD per ticket & Seasonal ticket profit for Peak. \\
+$v(S_2)$ & 0.04 thousand USD per ticket & Seasonal ticket profit for Normal. \\
+$v(S_3)$ & 0.03 thousand USD per ticket & Seasonal ticket profit for Rainy. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)v(S_j).\]
+\end{minipage}\par\medskip
+\begin{landscape}
+\begin{minipage}{\linewidth}
+\textbf{Lake Ferry Tourism: payoff calculations.}
 
-	\secInicio[sec:problem9-lake-ferry-tourism-c1-c2][sec:state-based-variable-payoff-profit-per-item-times-number-of-items]
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times v(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times v(S_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_3)\times v(S_3)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times v(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times v(S_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_3)\times v(S_3)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & \PayoffNumber{2200 \times 0.05}{110} & \PayoffNumber{1600 \times 0.04}{64} & \PayoffNumber{1000 \times 0.03}{30} \\[5pt]
+$A_2$ & \PayoffNumber{2600 \times 0.05}{130} & \PayoffNumber{1800 \times 0.04}{72} & \PayoffNumber{800 \times 0.03}{24} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & 110 & 64 & 30 \\[5pt]
+$A_2$ & 130 & 72 & 24 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem9-lake-ferry-tourism-c1-c2][sec:state-based-variable-payoff-profit-per-item-times-number-of-items]
+\end{minipage}
+\end{landscape}
+
 
 
 	\subsection{Alternative-Based Fixed}
@@ -497,7 +1266,8 @@
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem10-school-meal-service-contracts-c1}
 	\DecisionElementsTable
@@ -508,7 +1278,8 @@
 
 	\secInicio[sec:problem10-school-meal-service-contracts-c1-c2][sec:alternative-based-fixed-payoff-only]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\Needspace{8\baselineskip}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem10-school-meal-service-contracts-c2}
 	\begin{center}
@@ -542,7 +1313,8 @@
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem11-mobile-clinic-service-contracts-c1}
 	\DecisionElementsTable
@@ -553,7 +1325,8 @@
 
 	\secInicio[sec:problem11-mobile-clinic-service-contracts-c1-c2][sec:alternative-based-fixed-payoff-only]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\Needspace{8\baselineskip}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem11-mobile-clinic-service-contracts-c2}
 	Calculation table in thousand USD:
@@ -614,7 +1387,8 @@
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem12-neighborhood-shelter-support-c1}
 	\DecisionElementsTable
@@ -625,7 +1399,8 @@
 
 	\secInicio[sec:problem12-neighborhood-shelter-support-c1-c2][sec:state-based-fixed-payoff-only]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\Needspace{8\baselineskip}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem12-neighborhood-shelter-support-c2}
 	\begin{center}
@@ -659,7 +1434,8 @@
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem13-community-hall-emergency-rentals-c1}
 	\DecisionElementsTable
@@ -670,7 +1446,8 @@
 
 	\secInicio[sec:problem13-community-hall-emergency-rentals-c1-c2][sec:state-based-fixed-payoff-only]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\Needspace{8\baselineskip}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem13-community-hall-emergency-rentals-c2}
 	Calculation table in thousand USD:
@@ -747,7 +1524,8 @@
 	{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem14-recycling-collection-contract-c1}
 	\DecisionElementsTable
@@ -757,34 +1535,75 @@
 	{Payoff in thousand USD for each alternative--state pair}
 	\secInicio[sec:problem14-recycling-collection-contract-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-variable-payoff]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem14-recycling-collection-contract-c2}
-	The applicable payoff formula is
-	\[ P_{ay}(A_i,S_j)=q(A_i,S_j)\left(v(A_i)+v(S_j)\right). \]
-	Detailed calculations (thousand USD):
-	\begin{center}\small
-	\begin{tabular}{lcc}
-	\toprule
-	Alternative & High recovery & Low recovery \\
-	\midrule
-	Electric fleet & $80\times(0.6+0.3)=72$ & $55\times(0.6+0.1)=38.5$ \\
-Diesel fleet & $95\times(0.4+0.3)=66.5$ & $65\times(0.4+0.1)=32.5$ \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	The simplified payoff table is
-	\begin{center}
-	\begin{tabular}{lcc}
-	\toprule
-	Alternative & High recovery & Low recovery \\
-	\midrule
-	Electric fleet & 72 & 38.5 \\
-Diesel fleet & 66.5 & 32.5 \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	\secInicio[sec:problem14-recycling-collection-contract-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-variable-payoff]
+\leavevmode\par
+
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Electric fleet. \\
+$A_2$ & --- & Alternative: Diesel fleet. \\
+$S_1$ & --- & State: High recovery. \\
+$S_2$ & --- & State: Low recovery. \\
+$q(A_1,S_1)$ & 80 items & Quantity for Electric fleet under High recovery. \\
+$q(A_1,S_2)$ & 55 items & Quantity for Electric fleet under Low recovery. \\
+$q(A_2,S_1)$ & 95 items & Quantity for Diesel fleet under High recovery. \\
+$q(A_2,S_2)$ & 65 items & Quantity for Diesel fleet under Low recovery. \\
+$v(A_1)$ & 0.6 thousand USD per item & Fleet earnings after expenses for Electric fleet. \\
+$v(A_2)$ & 0.4 thousand USD per item & Fleet earnings after expenses for Diesel fleet. \\
+$v(S_1)$ & 0.3 thousand USD per item & Recovered-material revenue for High recovery. \\
+$v(S_2)$ & 0.1 thousand USD per item & Recovered-material revenue for Low recovery. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)\bigl[v(A_i)+v(S_j)\bigr].\]
+\end{minipage}\par\medskip
+\begin{minipage}{\linewidth}
+\textbf{Recycling Collection Contract: payoff calculations.}
+
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times \\ \bigl[v(A_1)+v(S_1)\bigr]\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times \\ \bigl[v(A_1)+v(S_2)\bigr]\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times \\ \bigl[v(A_2)+v(S_1)\bigr]\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times \\ \bigl[v(A_2)+v(S_2)\bigr]\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & \PayoffNumber{80\times\bigl[0.6+0.3\bigr]}{72} & \PayoffNumber{55\times\bigl[0.6+0.1\bigr]}{38.5} \\[5pt]
+$A_2$ & \PayoffNumber{95\times\bigl[0.4+0.3\bigr]}{66.5} & \PayoffNumber{65\times\bigl[0.4+0.1\bigr]}{32.5} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & 72 & 38.5 \\[5pt]
+$A_2$ & 66.5 & 32.5 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem14-recycling-collection-contract-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-variable-payoff]
+\end{minipage}
+
+
 	
 	\subsubsection{Museum Ticket Platform (C1--C2)}
 	\label{sec:problem15-museum-ticket-platform-c1-c2}
@@ -804,7 +1623,8 @@ Diesel fleet & 66.5 & 32.5 \\
 	{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem15-museum-ticket-platform-c1}
 	\DecisionElementsTable
@@ -814,36 +1634,82 @@ Diesel fleet & 66.5 & 32.5 \\
 	{Payoff in thousand USD for each alternative--state pair}
 	\secInicio[sec:problem15-museum-ticket-platform-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-variable-payoff]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem15-museum-ticket-platform-c2}
-	The applicable payoff formula is
-	\[ P_{ay}(A_i,S_j)=q(A_i,S_j)\left(v(A_i)+v(S_j)\right). \]
-	Detailed calculations (thousand USD):
-	\begin{center}\small
-	\begin{tabular}{lcc}
-	\toprule
-	Alternative & Peak season & Regular season \\
-	\midrule
-	Mobile platform & $70\times(0.5+0.2)=49$ & $45\times(0.5+0.1)=27$ \\
-Kiosk platform & $60\times(0.4+0.2)=36$ & $50\times(0.4+0.1)=25$ \\
-Hybrid platform & $65\times(0.4+0.2)=39$ & $55\times(0.4+0.1)=27.5$ \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	The simplified payoff table is
-	\begin{center}
-	\begin{tabular}{lcc}
-	\toprule
-	Alternative & Peak season & Regular season \\
-	\midrule
-	Mobile platform & 49 & 27 \\
-Kiosk platform & 36 & 25 \\
-Hybrid platform & 39 & 27.5 \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	\secInicio[sec:problem15-museum-ticket-platform-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-variable-payoff]
+\leavevmode\par
+
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Mobile platform. \\
+$A_2$ & --- & Alternative: Kiosk platform. \\
+$A_3$ & --- & Alternative: Hybrid platform. \\
+$S_1$ & --- & State: Peak season. \\
+$S_2$ & --- & State: Regular season. \\
+$q(A_1,S_1)$ & 70 batches & Quantity for Mobile platform under Peak season. \\
+$q(A_1,S_2)$ & 45 batches & Quantity for Mobile platform under Regular season. \\
+$q(A_2,S_1)$ & 60 batches & Quantity for Kiosk platform under Peak season. \\
+$q(A_2,S_2)$ & 50 batches & Quantity for Kiosk platform under Regular season. \\
+$q(A_3,S_1)$ & 65 batches & Quantity for Hybrid platform under Peak season. \\
+$q(A_3,S_2)$ & 55 batches & Quantity for Hybrid platform under Regular season. \\
+$v(A_1)$ & 0.5 thousand USD per batch of 1,000 admissions & Platform earnings after costs for Mobile platform. \\
+$v(A_2)$ & 0.4 thousand USD per batch of 1,000 admissions & Platform earnings after costs for Kiosk platform. \\
+$v(A_3)$ & 0.4 thousand USD per batch of 1,000 admissions & Platform earnings after costs for Hybrid platform. \\
+$v(S_1)$ & 0.2 thousand USD per batch of 1,000 admissions & Seasonal admission earnings for Peak season. \\
+$v(S_2)$ & 0.1 thousand USD per batch of 1,000 admissions & Seasonal admission earnings for Regular season. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)\bigl[v(A_i)+v(S_j)\bigr].\]
+\end{minipage}\par\medskip
+\begin{minipage}{\linewidth}
+\textbf{Museum Ticket Platform: payoff calculations.}
+
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times \\ \bigl[v(A_1)+v(S_1)\bigr]\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times \\ \bigl[v(A_1)+v(S_2)\bigr]\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times \\ \bigl[v(A_2)+v(S_1)\bigr]\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times \\ \bigl[v(A_2)+v(S_2)\bigr]\end{gathered}$ \\[5pt]
+$A_3$ & $\PayoffStrut\begin{gathered}q(A_3,S_1)\times \\ \bigl[v(A_3)+v(S_1)\bigr]\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_3,S_2)\times \\ \bigl[v(A_3)+v(S_2)\bigr]\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & \PayoffNumber{70\times\bigl[0.5+0.2\bigr]}{49} & \PayoffNumber{45\times\bigl[0.5+0.1\bigr]}{27} \\[5pt]
+$A_2$ & \PayoffNumber{60\times\bigl[0.4+0.2\bigr]}{36} & \PayoffNumber{50\times\bigl[0.4+0.1\bigr]}{25} \\[5pt]
+$A_3$ & \PayoffNumber{65\times\bigl[0.4+0.2\bigr]}{39} & \PayoffNumber{55\times\bigl[0.4+0.1\bigr]}{27.5} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & 49 & 27 \\[5pt]
+$A_2$ & 36 & 25 \\[5pt]
+$A_3$ & 39 & 27.5 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem15-museum-ticket-platform-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-variable-payoff]
+\end{minipage}
+
+
 
 	
 	\subsection{Alternative-Based Variable Plus Alternative-Based Fixed}
@@ -874,7 +1740,8 @@ Hybrid platform & 39 & 27.5 \\
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem16-local-printing-contracts-c1}
 	\DecisionElementsTable
@@ -885,36 +1752,75 @@ Hybrid platform & 39 & 27.5 \\
 
 	\secInicio[sec:problem16-local-printing-contracts-c1-c2][sec:alternative-based-variable-payoff-plus-alternative-based-fixed-payoff]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem16-local-printing-contracts-c2}
-	Calculation table in thousand USD:
-	\[
-	\text{Payoff}=\text{packets printed}\times\text{profit per packet}+\text{setup fixed profit}
-	\]
-	\begin{center}
-		\begin{tabular}{lll}
-			\toprule
-			Alternative & High demand & Low demand \\
-			\midrule
-			Small printer & $500 \times 0.05 + 12 = 37$ & $300 \times 0.05 + 12 = 27$ \\
-			Digital printer & $700 \times 0.04 + 20 = 48$ & $400 \times 0.04 + 20 = 36$ \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\leavevmode\par
 
-	\begin{center}
-		\begin{tabular}{lll}
-			\toprule
-			Alternative & High demand & Low demand \\
-			\midrule
-			Small printer & 37 & 27 \\
-			Digital printer & 48 & 36 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Small printer. \\
+$A_2$ & --- & Alternative: Digital printer. \\
+$S_1$ & --- & State: High demand. \\
+$S_2$ & --- & State: Low demand. \\
+$q(A_1,S_1)$ & 500 packets & Quantity for Small printer under High demand. \\
+$q(A_1,S_2)$ & 300 packets & Quantity for Small printer under Low demand. \\
+$q(A_2,S_1)$ & 700 packets & Quantity for Digital printer under High demand. \\
+$q(A_2,S_2)$ & 400 packets & Quantity for Digital printer under Low demand. \\
+$v(A_1)$ & 0.05 thousand USD per packet & Printer earnings after costs for Small printer. \\
+$v(A_2)$ & 0.04 thousand USD per packet & Printer earnings after costs for Digital printer. \\
+$f(A_1)$ & 12 thousand USD & Setup income for Small printer. \\
+$f(A_2)$ & 20 thousand USD & Setup income for Digital printer. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)v(A_i)+f(A_i).\]
+\end{minipage}\par\medskip
+\begin{minipage}{\linewidth}
+\textbf{Local Printing Contracts: payoff calculations.}
 
-	\secInicio[sec:problem16-local-printing-contracts-c1-c2][sec:alternative-based-variable-payoff-plus-alternative-based-fixed-payoff]
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times v(A_1) \\ {}+f(A_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times v(A_1) \\ {}+f(A_1)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times v(A_2) \\ {}+f(A_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times v(A_2) \\ {}+f(A_2)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & \PayoffNumber{500 \times 0.05 + 12}{37} & \PayoffNumber{300 \times 0.05 + 12}{27} \\[5pt]
+$A_2$ & \PayoffNumber{700 \times 0.04 + 20}{48} & \PayoffNumber{400 \times 0.04 + 20}{36} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & 37 & 27 \\[5pt]
+$A_2$ & 48 & 36 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem16-local-printing-contracts-c1-c2][sec:alternative-based-variable-payoff-plus-alternative-based-fixed-payoff]
+\end{minipage}
+
+
 	
 	\subsubsection{Cold-Storage Contracts (C1--C2)}
 	\label{sec:problem17-cold-storage-contracts-c1-c2}
@@ -936,7 +1842,8 @@ Hybrid platform & 39 & 27.5 \\
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem17-cold-storage-contracts-c1}
 	\DecisionElementsTable
@@ -947,38 +1854,83 @@ Hybrid platform & 39 & 27.5 \\
 
 	\secInicio[sec:problem17-cold-storage-contracts-c1-c2][sec:alternative-based-variable-payoff-plus-alternative-based-fixed-payoff]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem17-cold-storage-contracts-c2}
-	Calculation table in thousand USD:
-	\[
-	\text{Payoff}=\text{pallets stored}\times\text{profit per pallet}+\text{facility fixed profit}
-	\]
-	\begin{center}
-		\begin{tabular}{lll}
-			\toprule
-			Alternative & High demand & Low demand \\
-			\midrule
-			Small facility & $300 \times 0.18 + 40 = 94$ & $220 \times 0.18 + 40 = 79.6$ \\
-			Medium facility & $600 \times 0.12 + 25 = 97$ & $420 \times 0.12 + 25 = 75.4$ \\
-			Large facility & $900 \times 0.08 + 10 = 82$ & $700 \times 0.08 + 10 = 66$ \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\leavevmode\par
 
-	\begin{center}
-		\begin{tabular}{lll}
-			\toprule
-			Alternative & High demand & Low demand \\
-			\midrule
-			Small facility & 94 & 79.6 \\
-			Medium facility & 97 & 75.4 \\
-			Large facility & 82 & 66 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Small facility. \\
+$A_2$ & --- & Alternative: Medium facility. \\
+$A_3$ & --- & Alternative: Large facility. \\
+$S_1$ & --- & State: High demand. \\
+$S_2$ & --- & State: Low demand. \\
+$q(A_1,S_1)$ & 300 pallets & Quantity for Small facility under High demand. \\
+$q(A_1,S_2)$ & 220 pallets & Quantity for Small facility under Low demand. \\
+$q(A_2,S_1)$ & 600 pallets & Quantity for Medium facility under High demand. \\
+$q(A_2,S_2)$ & 420 pallets & Quantity for Medium facility under Low demand. \\
+$q(A_3,S_1)$ & 900 pallets & Quantity for Large facility under High demand. \\
+$q(A_3,S_2)$ & 700 pallets & Quantity for Large facility under Low demand. \\
+$v(A_1)$ & 0.18 thousand USD per pallet & Storage earnings after costs for Small facility. \\
+$v(A_2)$ & 0.12 thousand USD per pallet & Storage earnings after costs for Medium facility. \\
+$v(A_3)$ & 0.08 thousand USD per pallet & Storage earnings after costs for Large facility. \\
+$f(A_1)$ & 40 thousand USD & Facility-contract income for Small facility. \\
+$f(A_2)$ & 25 thousand USD & Facility-contract income for Medium facility. \\
+$f(A_3)$ & 10 thousand USD & Facility-contract income for Large facility. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)v(A_i)+f(A_i).\]
+\end{minipage}\par\medskip
+\begin{minipage}{\linewidth}
+\textbf{Cold-Storage Contracts: payoff calculations.}
 
-	\secInicio[sec:problem17-cold-storage-contracts-c1-c2][sec:alternative-based-variable-payoff-plus-alternative-based-fixed-payoff]
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times v(A_1) \\ {}+f(A_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times v(A_1) \\ {}+f(A_1)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times v(A_2) \\ {}+f(A_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times v(A_2) \\ {}+f(A_2)\end{gathered}$ \\[5pt]
+$A_3$ & $\PayoffStrut\begin{gathered}q(A_3,S_1)\times v(A_3) \\ {}+f(A_3)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_3,S_2)\times v(A_3) \\ {}+f(A_3)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & \PayoffNumber{300 \times 0.18 + 40}{94} & \PayoffNumber{220 \times 0.18 + 40}{79.6} \\[5pt]
+$A_2$ & \PayoffNumber{600 \times 0.12 + 25}{97} & \PayoffNumber{420 \times 0.12 + 25}{75.4} \\[5pt]
+$A_3$ & \PayoffNumber{900 \times 0.08 + 10}{82} & \PayoffNumber{700 \times 0.08 + 10}{66} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & 94 & 79.6 \\[5pt]
+$A_2$ & 97 & 75.4 \\[5pt]
+$A_3$ & 82 & 66 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem17-cold-storage-contracts-c1-c2][sec:alternative-based-variable-payoff-plus-alternative-based-fixed-payoff]
+\end{minipage}
+
+
 	
 	\subsection{Alternative-Based Variable Plus State-Based Fixed}
 	\label{sec:alternative-based-variable-payoff-plus-state-based-fixed-payoff}
@@ -1009,7 +1961,8 @@ Hybrid platform & 39 & 27.5 \\
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem18-urban-landscaping-bids-c1}
 	\DecisionElementsTable
@@ -1020,36 +1973,75 @@ Hybrid platform & 39 & 27.5 \\
 
 	\secInicio[sec:problem18-urban-landscaping-bids-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-fixed-payoff]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem18-urban-landscaping-bids-c2}
-	Calculation table in thousand USD:
-	\[
-	\text{Payoff}=\text{projects completed}\times\text{profit per project}+\text{grant fixed profit}
-	\]
-	\begin{center}
-		\begin{tabular}{lll}
-			\toprule
-			Alternative & Grant available & No grant \\
-			\midrule
-			Residential focus & $40 \times 0.6 + 10 = 34$ & $25 \times 0.6 - 5 = 10$ \\
-			Commercial focus & $30 \times 1.0 + 10 = 40$ & $20 \times 1.0 - 5 = 15$ \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\leavevmode\par
 
-	\begin{center}
-		\begin{tabular}{lll}
-			\toprule
-			Alternative & Grant available & No grant \\
-			\midrule
-			Residential focus & 34 & 10 \\
-			Commercial focus & 40 & 15 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Residential. \\
+$A_2$ & --- & Alternative: Commercial. \\
+$S_1$ & --- & State: Grant available. \\
+$S_2$ & --- & State: No grant. \\
+$q(A_1,S_1)$ & 40 projects & Quantity for Residential under Grant available. \\
+$q(A_1,S_2)$ & 25 projects & Quantity for Residential under No grant. \\
+$q(A_2,S_1)$ & 30 projects & Quantity for Commercial under Grant available. \\
+$q(A_2,S_2)$ & 20 projects & Quantity for Commercial under No grant. \\
+$v(A_1)$ & 0.6 thousand USD per project & Team profit for Residential. \\
+$v(A_2)$ & 1.0 thousand USD per project & Team profit for Commercial. \\
+$f(S_1)$ & 10 thousand USD & Grant funding or unreimbursed equipment and mobilization costs for Grant available. \\
+$f(S_2)$ & -5 thousand USD & Grant funding or unreimbursed equipment and mobilization costs for No grant. Negative: reduces the payoff. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)v(A_i)+f(S_j).\]
+\end{minipage}\par\medskip
+\begin{minipage}{\linewidth}
+\textbf{Urban Landscaping Bids: payoff calculations.}
 
-	\secInicio[sec:problem18-urban-landscaping-bids-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-fixed-payoff]
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times v(A_1) \\ {}+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times v(A_1) \\ {}+f(S_2)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times v(A_2) \\ {}+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times v(A_2) \\ {}+f(S_2)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & \PayoffNumber{40 \times 0.6 + 10}{34} & \PayoffNumber{25 \times 0.6 - 5}{10} \\[5pt]
+$A_2$ & \PayoffNumber{30 \times 1.0 + 10}{40} & \PayoffNumber{20 \times 1.0 - 5}{15} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & 34 & 10 \\[5pt]
+$A_2$ & 40 & 15 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem18-urban-landscaping-bids-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-fixed-payoff]
+\end{minipage}
+
+
 	
 	\subsubsection{Solar Installation Bids (C1--C2)}
 	\label{sec:problem19-solar-installation-bids-c1-c2}
@@ -1071,7 +2063,8 @@ Hybrid platform & 39 & 27.5 \\
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem19-solar-installation-bids-c1}
 	\DecisionElementsTable
@@ -1082,38 +2075,82 @@ Hybrid platform & 39 & 27.5 \\
 
 	\secInicio[sec:problem19-solar-installation-bids-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-fixed-payoff]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem19-solar-installation-bids-c2}
-	Calculation table in thousand USD:
-	\[
-	\text{Payoff}=\text{installations}\times\text{profit per installation}+\text{policy fixed profit}
-	\]
-	\begin{center}
-		\begin{tabular}{lll}
-			\toprule
-			Alternative & Rebate continues & Rebate ends \\
-			\midrule
-			Residential focus & $80 \times 0.9 + 20 = 92$ & $50 \times 0.9 - 10 = 35$ \\
-			Commercial focus & $55 \times 1.6 + 20 = 108$ & $40 \times 1.6 - 10 = 54$ \\
-			Mixed portfolio & $70 \times 1.2 + 20 = 104$ & $45 \times 1.2 - 10 = 44$ \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\leavevmode\par
 
-	\begin{center}
-		\begin{tabular}{lll}
-			\toprule
-			Alternative & Rebate continues & Rebate ends \\
-			\midrule
-			Residential focus & 92 & 35 \\
-			Commercial focus & 108 & 54 \\
-			Mixed portfolio & 104 & 44 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Residential. \\
+$A_2$ & --- & Alternative: Commercial. \\
+$A_3$ & --- & Alternative: Mixed portfolio. \\
+$S_1$ & --- & State: Rebate continues. \\
+$S_2$ & --- & State: Rebate ends. \\
+$q(A_1,S_1)$ & 80 installations & Quantity for Residential under Rebate continues. \\
+$q(A_1,S_2)$ & 50 installations & Quantity for Residential under Rebate ends. \\
+$q(A_2,S_1)$ & 55 installations & Quantity for Commercial under Rebate continues. \\
+$q(A_2,S_2)$ & 40 installations & Quantity for Commercial under Rebate ends. \\
+$q(A_3,S_1)$ & 70 installations & Quantity for Mixed portfolio under Rebate continues. \\
+$q(A_3,S_2)$ & 45 installations & Quantity for Mixed portfolio under Rebate ends. \\
+$v(A_1)$ & 0.9 thousand USD per installation & Portfolio profit for Residential. \\
+$v(A_2)$ & 1.6 thousand USD per installation & Portfolio profit for Commercial. \\
+$v(A_3)$ & 1.2 thousand USD per installation & Portfolio profit for Mixed portfolio. \\
+$f(S_1)$ & 20 thousand USD & Rebate funding or unreimbursed administrative and equipment costs for Rebate continues. \\
+$f(S_2)$ & -10 thousand USD & Rebate funding or unreimbursed administrative and equipment costs for Rebate ends. Negative: reduces the payoff. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)v(A_i)+f(S_j).\]
+\end{minipage}\par\medskip
+\begin{minipage}{\linewidth}
+\textbf{Solar Installation Bids: payoff calculations.}
 
-	\secInicio[sec:problem19-solar-installation-bids-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-fixed-payoff]
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times v(A_1) \\ {}+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times v(A_1) \\ {}+f(S_2)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times v(A_2) \\ {}+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times v(A_2) \\ {}+f(S_2)\end{gathered}$ \\[5pt]
+$A_3$ & $\PayoffStrut\begin{gathered}q(A_3,S_1)\times v(A_3) \\ {}+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_3,S_2)\times v(A_3) \\ {}+f(S_2)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & \PayoffNumber{80 \times 0.9 + 20}{92} & \PayoffNumber{50 \times 0.9 - 10}{35} \\[5pt]
+$A_2$ & \PayoffNumber{55 \times 1.6 + 20}{108} & \PayoffNumber{40 \times 1.6 - 10}{54} \\[5pt]
+$A_3$ & \PayoffNumber{70 \times 1.2 + 20}{104} & \PayoffNumber{45 \times 1.2 - 10}{44} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & 92 & 35 \\[5pt]
+$A_2$ & 108 & 54 \\[5pt]
+$A_3$ & 104 & 44 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem19-solar-installation-bids-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-fixed-payoff]
+\end{minipage}
+
+
 
 	
 	\subsection{State-Based Variable Plus Alternative-Based Fixed}
@@ -1145,7 +2182,8 @@ Hybrid platform & 39 & 27.5 \\
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem20-regional-bus-charters-c1}
 	\DecisionElementsTable
@@ -1156,36 +2194,75 @@ Hybrid platform & 39 & 27.5 \\
 
 	\secInicio[sec:problem20-regional-bus-charters-c1-c2][sec:state-based-variable-payoff-plus-alternative-based-fixed-payoff]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem20-regional-bus-charters-c2}
-	Calculation table in thousand USD:
-	\[
-	\text{Payoff}=\text{charters}\times\text{profit per charter}+\text{fleet fixed profit}
-	\]
-	\begin{center}
-		\begin{tabular}{lll}
-			\toprule
-			Alternative & Regular fuel & High fuel \\
-			\midrule
-			Mini-bus fleet & $25 \times 4 + 15 = 115$ & $20 \times 2 + 15 = 55$ \\
-			Coach fleet & $18 \times 4 + 25 = 97$ & $16 \times 2 + 25 = 57$ \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\leavevmode\par
 
-	\begin{center}
-		\begin{tabular}{lll}
-			\toprule
-			Alternative & Regular fuel & High fuel \\
-			\midrule
-			Mini-bus fleet & 115 & 55 \\
-			Coach fleet & 97 & 57 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Mini-bus fleet. \\
+$A_2$ & --- & Alternative: Coach fleet. \\
+$S_1$ & --- & State: Regular fuel. \\
+$S_2$ & --- & State: High fuel. \\
+$q(A_1,S_1)$ & 25 charters & Quantity for Mini-bus fleet under Regular fuel. \\
+$q(A_1,S_2)$ & 20 charters & Quantity for Mini-bus fleet under High fuel. \\
+$q(A_2,S_1)$ & 18 charters & Quantity for Coach fleet under Regular fuel. \\
+$q(A_2,S_2)$ & 16 charters & Quantity for Coach fleet under High fuel. \\
+$v(S_1)$ & 4 thousand USD per charter & Fuel-dependent charter profit for Regular fuel. \\
+$v(S_2)$ & 2 thousand USD per charter & Fuel-dependent charter profit for High fuel. \\
+$f(A_1)$ & 15 thousand USD & Fleet-contract income for Mini-bus fleet. \\
+$f(A_2)$ & 25 thousand USD & Fleet-contract income for Coach fleet. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)v(S_j)+f(A_i).\]
+\end{minipage}\par\medskip
+\begin{minipage}{\linewidth}
+\textbf{Regional Bus Charters: payoff calculations.}
 
-	\secInicio[sec:problem20-regional-bus-charters-c1-c2][sec:state-based-variable-payoff-plus-alternative-based-fixed-payoff]
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times v(S_1) \\ {}+f(A_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times v(S_2) \\ {}+f(A_1)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times v(S_1) \\ {}+f(A_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times v(S_2) \\ {}+f(A_2)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & \PayoffNumber{25 \times 4 + 15}{115} & \PayoffNumber{20 \times 2 + 15}{55} \\[5pt]
+$A_2$ & \PayoffNumber{18 \times 4 + 25}{97} & \PayoffNumber{16 \times 2 + 25}{57} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & 115 & 55 \\[5pt]
+$A_2$ & 97 & 57 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem20-regional-bus-charters-c1-c2][sec:state-based-variable-payoff-plus-alternative-based-fixed-payoff]
+\end{minipage}
+
+
 	
 	\subsubsection{Air Cargo Charters (C1--C2)}
 	\label{sec:problem21-air-cargo-charters-c1-c2}
@@ -1207,7 +2284,8 @@ Hybrid platform & 39 & 27.5 \\
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem21-air-cargo-charters-c1}
 	\DecisionElementsTable
@@ -1218,36 +2296,80 @@ Hybrid platform & 39 & 27.5 \\
 
 	\secInicio[sec:problem21-air-cargo-charters-c1-c2][sec:state-based-variable-payoff-plus-alternative-based-fixed-payoff]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem21-air-cargo-charters-c2}
-	Calculation table in thousand USD:
-	\[
-	\text{Payoff}=\text{charters}\times\text{profit per charter}+\text{aircraft fixed profit}
-	\]
-	\begin{center}
-		\begin{tabular}{llll}
-			\toprule
-			Alternative & Low fuel & Medium fuel & High fuel \\
-			\midrule
-			Narrow-body lease & $20 \times 8 + 30 = 190$ & $18 \times 5 + 30 = 120$ & $15 \times 2 + 30 = 60$ \\
-			Wide-body lease & $14 \times 8 + 50 = 162$ & $12 \times 5 + 50 = 110$ & $9 \times 2 + 50 = 68$ \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\leavevmode\par
 
-	\begin{center}
-		\begin{tabular}{llll}
-			\toprule
-			Alternative & Low fuel & Medium fuel & High fuel \\
-			\midrule
-			Narrow-body lease & 190 & 120 & 60 \\
-			Wide-body lease & 162 & 110 & 68 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Narrow-body lease. \\
+$A_2$ & --- & Alternative: Wide-body lease. \\
+$S_1$ & --- & State: Low fuel. \\
+$S_2$ & --- & State: Medium fuel. \\
+$S_3$ & --- & State: High fuel. \\
+$q(A_1,S_1)$ & 20 charters & Quantity for Narrow-body lease under Low fuel. \\
+$q(A_1,S_2)$ & 18 charters & Quantity for Narrow-body lease under Medium fuel. \\
+$q(A_1,S_3)$ & 15 charters & Quantity for Narrow-body lease under High fuel. \\
+$q(A_2,S_1)$ & 14 charters & Quantity for Wide-body lease under Low fuel. \\
+$q(A_2,S_2)$ & 12 charters & Quantity for Wide-body lease under Medium fuel. \\
+$q(A_2,S_3)$ & 9 charters & Quantity for Wide-body lease under High fuel. \\
+$v(S_1)$ & 8 thousand USD per charter & Fuel-dependent charter profit for Low fuel. \\
+$v(S_2)$ & 5 thousand USD per charter & Fuel-dependent charter profit for Medium fuel. \\
+$v(S_3)$ & 2 thousand USD per charter & Fuel-dependent charter profit for High fuel. \\
+$f(A_1)$ & 30 thousand USD & Lease-contract income for Narrow-body lease. \\
+$f(A_2)$ & 50 thousand USD & Lease-contract income for Wide-body lease. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)v(S_j)+f(A_i).\]
+\end{minipage}\par\medskip
+\begin{landscape}
+\begin{minipage}{\linewidth}
+\textbf{Air Cargo Charters: payoff calculations.}
 
-	\secInicio[sec:problem21-air-cargo-charters-c1-c2][sec:state-based-variable-payoff-plus-alternative-based-fixed-payoff]
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times v(S_1) \\ {}+f(A_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times v(S_2) \\ {}+f(A_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_3)\times v(S_3) \\ {}+f(A_1)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times v(S_1) \\ {}+f(A_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times v(S_2) \\ {}+f(A_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_3)\times v(S_3) \\ {}+f(A_2)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & \PayoffNumber{20 \times 8 + 30}{190} & \PayoffNumber{18 \times 5 + 30}{120} & \PayoffNumber{15 \times 2 + 30}{60} \\[5pt]
+$A_2$ & \PayoffNumber{14 \times 8 + 50}{162} & \PayoffNumber{12 \times 5 + 50}{110} & \PayoffNumber{9 \times 2 + 50}{68} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & 190 & 120 & 60 \\[5pt]
+$A_2$ & 162 & 110 & 68 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem21-air-cargo-charters-c1-c2][sec:state-based-variable-payoff-plus-alternative-based-fixed-payoff]
+\end{minipage}
+\end{landscape}
+
 
 	
 	\subsection{State-Based Variable Plus State-Based Fixed}
@@ -1279,7 +2401,8 @@ Hybrid platform & 39 & 27.5 \\
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem22-fruit-export-permits-c1}
 	\DecisionElementsTable
@@ -1290,36 +2413,75 @@ Hybrid platform & 39 & 27.5 \\
 
 	\secInicio[sec:problem22-fruit-export-permits-c1-c2][sec:state-based-variable-payoff-plus-state-based-fixed-payoff]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem22-fruit-export-permits-c2}
-	Calculation table in thousand USD:
-	\[
-	\text{Payoff}=\text{crates exported}\times\text{profit per crate}+\text{season fixed profit}
-	\]
-	\begin{center}
-		\begin{tabular}{lll}
-			\toprule
-			Alternative & Strong & Weak \\
-			\midrule
-			Citrus focus & $200 \times 0.4 + 12 = 92$ & $150 \times 0.2 - 8 = 22$ \\
-			Berry focus & $180 \times 0.4 + 12 = 84$ & $120 \times 0.2 - 8 = 16$ \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\leavevmode\par
 
-	\begin{center}
-		\begin{tabular}{lll}
-			\toprule
-			Alternative & Strong & Weak \\
-			\midrule
-			Citrus focus & 92 & 22 \\
-			Berry focus & 84 & 16 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Citrus focus. \\
+$A_2$ & --- & Alternative: Berry focus. \\
+$S_1$ & --- & State: Strong. \\
+$S_2$ & --- & State: Weak. \\
+$q(A_1,S_1)$ & 200 crates & Quantity for Citrus focus under Strong. \\
+$q(A_1,S_2)$ & 150 crates & Quantity for Citrus focus under Weak. \\
+$q(A_2,S_1)$ & 180 crates & Quantity for Berry focus under Strong. \\
+$q(A_2,S_2)$ & 120 crates & Quantity for Berry focus under Weak. \\
+$v(S_1)$ & 0.4 thousand USD per crate & Harvest-dependent export profit for Strong. \\
+$v(S_2)$ & 0.2 thousand USD per crate & Harvest-dependent export profit for Weak. \\
+$f(S_1)$ & 12 thousand USD & Supply-contract income or emergency sourcing costs for Strong. \\
+$f(S_2)$ & -8 thousand USD & Supply-contract income or emergency sourcing costs for Weak. Negative: reduces the payoff. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)v(S_j)+f(S_j).\]
+\end{minipage}\par\medskip
+\begin{minipage}{\linewidth}
+\textbf{Fruit Export Permits: payoff calculations.}
 
-	\secInicio[sec:problem22-fruit-export-permits-c1-c2][sec:state-based-variable-payoff-plus-state-based-fixed-payoff]
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times v(S_1) \\ {}+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times v(S_2) \\ {}+f(S_2)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times v(S_1) \\ {}+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times v(S_2) \\ {}+f(S_2)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & \PayoffNumber{200 \times 0.4 + 12}{92} & \PayoffNumber{150 \times 0.2 - 8}{22} \\[5pt]
+$A_2$ & \PayoffNumber{180 \times 0.4 + 12}{84} & \PayoffNumber{120 \times 0.2 - 8}{16} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & 92 & 22 \\[5pt]
+$A_2$ & 84 & 16 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem22-fruit-export-permits-c1-c2][sec:state-based-variable-payoff-plus-state-based-fixed-payoff]
+\end{minipage}
+
+
 	
 	\subsubsection{Seafood Export Licenses (C1--C2)}
 	\label{sec:problem23-seafood-export-licenses-c1-c2}
@@ -1341,7 +2503,8 @@ Hybrid platform & 39 & 27.5 \\
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem23-seafood-export-licenses-c1}
 	\DecisionElementsTable
@@ -1352,36 +2515,81 @@ Hybrid platform & 39 & 27.5 \\
 
 	\secInicio[sec:problem23-seafood-export-licenses-c1-c2][sec:state-based-variable-payoff-plus-state-based-fixed-payoff]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem23-seafood-export-licenses-c2}
-	Calculation table in thousand USD:
-	\[
-	\text{Payoff}=\text{crates exported}\times\text{profit per crate}+\text{season fixed profit}
-	\]
-	\begin{center}
-		\begin{tabular}{llll}
-			\toprule
-			Alternative & Strong & Normal & Stormy \\
-			\midrule
-			Frozen fillet focus & $120 \times 0.7 + 30 = 114$ & $100 \times 0.5 + 10 = 60$ & $80 \times 0.2 - 15 = 1$ \\
-			Fresh export focus & $90 \times 0.7 + 30 = 93$ & $110 \times 0.5 + 10 = 65$ & $70 \times 0.2 - 15 = -1$ \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\leavevmode\par
 
-	\begin{center}
-		\begin{tabular}{llll}
-			\toprule
-			Alternative & Strong & Normal & Stormy \\
-			\midrule
-			Frozen fillet focus & 114 & 60 & 1 \\
-			Fresh export focus & 93 & 65 & -1 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Frozen fillet focus. \\
+$A_2$ & --- & Alternative: Fresh export focus. \\
+$S_1$ & --- & State: Strong. \\
+$S_2$ & --- & State: Normal. \\
+$S_3$ & --- & State: Stormy. \\
+$q(A_1,S_1)$ & 120 crates & Quantity for Frozen fillet focus under Strong. \\
+$q(A_1,S_2)$ & 100 crates & Quantity for Frozen fillet focus under Normal. \\
+$q(A_1,S_3)$ & 80 crates & Quantity for Frozen fillet focus under Stormy. \\
+$q(A_2,S_1)$ & 90 crates & Quantity for Fresh export focus under Strong. \\
+$q(A_2,S_2)$ & 110 crates & Quantity for Fresh export focus under Normal. \\
+$q(A_2,S_3)$ & 70 crates & Quantity for Fresh export focus under Stormy. \\
+$v(S_1)$ & 0.7 thousand USD per crate & Seasonal export profit for Strong. \\
+$v(S_2)$ & 0.5 thousand USD per crate & Seasonal export profit for Normal. \\
+$v(S_3)$ & 0.2 thousand USD per crate & Seasonal export profit for Stormy. \\
+$f(S_1)$ & 30 thousand USD & Advance-purchase income or weather-related storage and rescheduling costs for Strong. \\
+$f(S_2)$ & 10 thousand USD & Advance-purchase income or weather-related storage and rescheduling costs for Normal. \\
+$f(S_3)$ & -15 thousand USD & Advance-purchase income or weather-related storage and rescheduling costs for Stormy. Negative: reduces the payoff. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)v(S_j)+f(S_j).\]
+\end{minipage}\par\medskip
+\begin{landscape}
+\begin{minipage}{\linewidth}
+\textbf{Seafood Export Licenses: payoff calculations.}
 
-	\secInicio[sec:problem23-seafood-export-licenses-c1-c2][sec:state-based-variable-payoff-plus-state-based-fixed-payoff]
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times v(S_1) \\ {}+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times v(S_2) \\ {}+f(S_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_3)\times v(S_3) \\ {}+f(S_3)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times v(S_1) \\ {}+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times v(S_2) \\ {}+f(S_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_3)\times v(S_3) \\ {}+f(S_3)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & \PayoffNumber{120 \times 0.7 + 30}{114} & \PayoffNumber{100 \times 0.5 + 10}{60} & \PayoffNumber{80 \times 0.2 - 15}{1} \\[5pt]
+$A_2$ & \PayoffNumber{90 \times 0.7 + 30}{93} & \PayoffNumber{110 \times 0.5 + 10}{65} & \PayoffNumber{70 \times 0.2 - 15}{-1} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & 114 & 60 & 1 \\[5pt]
+$A_2$ & 93 & 65 & -1 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem23-seafood-export-licenses-c1-c2][sec:state-based-variable-payoff-plus-state-based-fixed-payoff]
+\end{minipage}
+\end{landscape}
+
 
 	
 	\subsection{Alternative-Based Fixed Plus State-Based Fixed}
@@ -1411,7 +2619,8 @@ Hybrid platform & 39 & 27.5 \\
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem24-warehouse-security-agreements-c1}
 	\DecisionElementsTable
@@ -1422,36 +2631,71 @@ Hybrid platform & 39 & 27.5 \\
 
 	\secInicio[sec:problem24-warehouse-security-agreements-c1-c2][sec:alternative-based-fixed-payoff-plus-state-based-fixed-payoff]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem24-warehouse-security-agreements-c2}
-	Calculation table in thousand USD:
-	\[
-	\text{Payoff}=\text{agreement fixed payoff}+\text{state fixed payoff}
-	\]
-	\begin{center}
-		\begin{tabular}{lll}
-			\toprule
-			Alternative & Normal season & Festival season \\
-			\midrule
-			Standard security & $20 + 6 = 26$ & $20 + 14 = 34$ \\
-			Enhanced security & $35 + 6 = 41$ & $35 + 14 = 49$ \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\leavevmode\par
 
-	\begin{center}
-		\begin{tabular}{lll}
-			\toprule
-			Alternative & Normal season & Festival season \\
-			\midrule
-			Standard security & 26 & 34 \\
-			Enhanced security & 41 & 49 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Standard security. \\
+$A_2$ & --- & Alternative: Enhanced security. \\
+$S_1$ & --- & State: Normal season. \\
+$S_2$ & --- & State: Festival season. \\
+$f(A_1)$ & 20 thousand USD & Security-agreement net income for Standard security. \\
+$f(A_2)$ & 35 thousand USD & Security-agreement net income for Enhanced security. \\
+$f(S_1)$ & 6 thousand USD & Seasonal security funding for Normal season. \\
+$f(S_2)$ & 14 thousand USD & Seasonal security funding for Festival season. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=f(A_i)+f(S_j).\]
+\end{minipage}\par\medskip
+\begin{minipage}{\linewidth}
+\textbf{Warehouse Security Agreements: payoff calculations.}
 
-	\secInicio[sec:problem24-warehouse-security-agreements-c1-c2][sec:alternative-based-fixed-payoff-plus-state-based-fixed-payoff]
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}f(A_1)+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}f(A_1)+f(S_2)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}f(A_2)+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}f(A_2)+f(S_2)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & \PayoffNumber{20 + 6}{26} & \PayoffNumber{20 + 14}{34} \\[5pt]
+$A_2$ & \PayoffNumber{35 + 6}{41} & \PayoffNumber{35 + 14}{49} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & 26 & 34 \\[5pt]
+$A_2$ & 41 & 49 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem24-warehouse-security-agreements-c1-c2][sec:alternative-based-fixed-payoff-plus-state-based-fixed-payoff]
+\end{minipage}
+
+
 	
 	\subsubsection{Harbor Inspection Agreements (C1--C2)}
 	\label{sec:problem25-harbor-inspection-agreements-c1-c2}
@@ -1471,7 +2715,8 @@ Hybrid platform & 39 & 27.5 \\
 		{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem25-harbor-inspection-agreements-c1}
 	\DecisionElementsTable
@@ -1482,36 +2727,74 @@ Hybrid platform & 39 & 27.5 \\
 
 	\secInicio[sec:problem25-harbor-inspection-agreements-c1-c2][sec:alternative-based-fixed-payoff-plus-state-based-fixed-payoff]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem25-harbor-inspection-agreements-c2}
-	Calculation table in thousand USD:
-	\[
-	\text{Payoff}=\text{agreement fixed payoff}+\text{state fixed payoff}
-	\]
-	\begin{center}
-		\begin{tabular}{llll}
-			\toprule
-			Alternative & Calm season & Busy season & Storm-repair season \\
-			\midrule
-			Standard inspection & $28 + 12 = 40$ & $28 + 5 = 33$ & $28 - 10 = 18$ \\
-			Rapid-response inspection & $42 + 12 = 54$ & $42 + 5 = 47$ & $42 - 10 = 32$ \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\leavevmode\par
 
-	\begin{center}
-		\begin{tabular}{llll}
-			\toprule
-			Alternative & Calm season & Busy season & Storm-repair season \\
-			\midrule
-			Standard inspection & 40 & 33 & 18 \\
-			Rapid-response inspection & 54 & 47 & 32 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Standard inspection. \\
+$A_2$ & --- & Alternative: Rapid-response inspection. \\
+$S_1$ & --- & State: Calm season. \\
+$S_2$ & --- & State: Busy season. \\
+$S_3$ & --- & State: Storm-repair season. \\
+$f(A_1)$ & 28 thousand USD & Inspection-agreement net income for Standard inspection. \\
+$f(A_2)$ & 42 thousand USD & Inspection-agreement net income for Rapid-response inspection. \\
+$f(S_1)$ & 12 thousand USD & Seasonal income or storm-repair costs for Calm season. \\
+$f(S_2)$ & 5 thousand USD & Seasonal income or storm-repair costs for Busy season. \\
+$f(S_3)$ & -10 thousand USD & Seasonal income or storm-repair costs for Storm-repair season. Negative: reduces the payoff. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=f(A_i)+f(S_j).\]
+\end{minipage}\par\medskip
+\begin{landscape}
+\begin{minipage}{\linewidth}
+\textbf{Harbor Inspection Agreements: payoff calculations.}
 
-	\secInicio[sec:problem25-harbor-inspection-agreements-c1-c2][sec:alternative-based-fixed-payoff-plus-state-based-fixed-payoff]
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}f(A_1)+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}f(A_1)+f(S_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}f(A_1)+f(S_3)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}f(A_2)+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}f(A_2)+f(S_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}f(A_2)+f(S_3)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & \PayoffNumber{28 + 12}{40} & \PayoffNumber{28 + 5}{33} & \PayoffNumber{28 - 10}{18} \\[5pt]
+$A_2$ & \PayoffNumber{42 + 12}{54} & \PayoffNumber{42 + 5}{47} & \PayoffNumber{42 - 10}{32} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & 40 & 33 & 18 \\[5pt]
+$A_2$ & 54 & 47 & 32 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem25-harbor-inspection-agreements-c1-c2][sec:alternative-based-fixed-payoff-plus-state-based-fixed-payoff]
+\end{minipage}
+\end{landscape}
+
 
 	
 	\section{Three-Component Models}
@@ -1557,7 +2840,8 @@ Hybrid platform & 39 & 27.5 \\
 	{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem26-water-treatment-modules-c1}
 	\DecisionElementsTable
@@ -1567,34 +2851,77 @@ Hybrid platform & 39 & 27.5 \\
 	{Payoff in thousand USD for each alternative--state pair}
 	\secInicio[sec:problem26-water-treatment-modules-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-variable-payoff-plus-alternative-based-fixed-payoff]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem26-water-treatment-modules-c2}
-	The applicable payoff formula is
-	\[ P_{ay}(A_i,S_j)=q(A_i,S_j)\left(v(A_i)+v(S_j)\right)+f(A_i). \]
-	Detailed calculations (thousand USD):
-	\begin{center}\small
-	\begin{tabular}{lcc}
-	\toprule
-	Alternative & Dry season & Wet season \\
-	\midrule
-	Membrane unit & $50\times(0.8+0.3)+8=63$ & $35\times(0.8+0.1)+8=39.5$ \\
-Filtration unit & $60\times(0.6+0.3)+12=66$ & $45\times(0.6+0.1)+12=43.5$ \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	The simplified payoff table is
-	\begin{center}
-	\begin{tabular}{lcc}
-	\toprule
-	Alternative & Dry season & Wet season \\
-	\midrule
-	Membrane unit & 63 & 39.5 \\
-Filtration unit & 66 & 43.5 \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	\secInicio[sec:problem26-water-treatment-modules-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-variable-payoff-plus-alternative-based-fixed-payoff]
+\leavevmode\par
+
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Membrane unit. \\
+$A_2$ & --- & Alternative: Filtration unit. \\
+$S_1$ & --- & State: Dry season. \\
+$S_2$ & --- & State: Wet season. \\
+$q(A_1,S_1)$ & 50 water batches & Quantity for Membrane unit under Dry season. \\
+$q(A_1,S_2)$ & 35 water batches & Quantity for Membrane unit under Wet season. \\
+$q(A_2,S_1)$ & 60 water batches & Quantity for Filtration unit under Dry season. \\
+$q(A_2,S_2)$ & 45 water batches & Quantity for Filtration unit under Wet season. \\
+$v(A_1)$ & 0.8 thousand USD per water batch & Treatment earnings for Membrane unit. \\
+$v(A_2)$ & 0.6 thousand USD per water batch & Treatment earnings for Filtration unit. \\
+$v(S_1)$ & 0.3 thousand USD per water batch & Seasonal water-tariff earnings for Dry season. \\
+$v(S_2)$ & 0.1 thousand USD per water batch & Seasonal water-tariff earnings for Wet season. \\
+$f(A_1)$ & 8 thousand USD & Supplier-contract income for Membrane unit. \\
+$f(A_2)$ & 12 thousand USD & Supplier-contract income for Filtration unit. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)\bigl[v(A_i)+v(S_j)\bigr]+f(A_i).\]
+\end{minipage}\par\medskip
+\begin{minipage}{\linewidth}
+\textbf{Water Treatment Modules: payoff calculations.}
+
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times \\ \bigl[v(A_1)+v(S_1)\bigr] \\ {}+f(A_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times \\ \bigl[v(A_1)+v(S_2)\bigr] \\ {}+f(A_1)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times \\ \bigl[v(A_2)+v(S_1)\bigr] \\ {}+f(A_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times \\ \bigl[v(A_2)+v(S_2)\bigr] \\ {}+f(A_2)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & \PayoffNumber{50\times\bigl[0.8+0.3\bigr]+8}{63} & \PayoffNumber{35\times\bigl[0.8+0.1\bigr]+8}{39.5} \\[5pt]
+$A_2$ & \PayoffNumber{60\times\bigl[0.6+0.3\bigr]+12}{66} & \PayoffNumber{45\times\bigl[0.6+0.1\bigr]+12}{43.5} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & 63 & 39.5 \\[5pt]
+$A_2$ & 66 & 43.5 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem26-water-treatment-modules-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-variable-payoff-plus-alternative-based-fixed-payoff]
+\end{minipage}
+
+
 	
 	\subsubsection{Freight Locker Network (C1--C2)}
 	\label{sec:problem27-freight-locker-network-c1-c2}
@@ -1616,7 +2943,8 @@ Filtration unit & 66 & 43.5 \\
 	{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem27-freight-locker-network-c1}
 	\DecisionElementsTable
@@ -1626,36 +2954,85 @@ Filtration unit & 66 & 43.5 \\
 	{Payoff in thousand USD for each alternative--state pair}
 	\secInicio[sec:problem27-freight-locker-network-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-variable-payoff-plus-alternative-based-fixed-payoff]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem27-freight-locker-network-c2}
-	The applicable payoff formula is
-	\[ P_{ay}(A_i,S_j)=q(A_i,S_j)\left(v(A_i)+v(S_j)\right)+f(A_i). \]
-	Detailed calculations (thousand USD):
-	\begin{center}\small
-	\begin{tabular}{lcc}
-	\toprule
-	Alternative & Strong demand & Steady demand \\
-	\midrule
-	Metro lockers & $80\times(0.5+0.2)+10=66$ & $55\times(0.5+0.1)+10=43$ \\
-Suburban lockers & $65\times(0.4+0.2)+14=53$ & $60\times(0.4+0.1)+14=44$ \\
-Mixed network & $75\times(0.5+0.2)+12=64.5$ & $65\times(0.5+0.1)+12=51$ \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	The simplified payoff table is
-	\begin{center}
-	\begin{tabular}{lcc}
-	\toprule
-	Alternative & Strong demand & Steady demand \\
-	\midrule
-	Metro lockers & 66 & 43 \\
-Suburban lockers & 53 & 44 \\
-Mixed network & 64.5 & 51 \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	\secInicio[sec:problem27-freight-locker-network-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-variable-payoff-plus-alternative-based-fixed-payoff]
+\leavevmode\par
+
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Metro lockers. \\
+$A_2$ & --- & Alternative: Suburban lockers. \\
+$A_3$ & --- & Alternative: Mixed network. \\
+$S_1$ & --- & State: Strong demand. \\
+$S_2$ & --- & State: Steady demand. \\
+$q(A_1,S_1)$ & 80 shipment batches & Quantity for Metro lockers under Strong demand. \\
+$q(A_1,S_2)$ & 55 shipment batches & Quantity for Metro lockers under Steady demand. \\
+$q(A_2,S_1)$ & 65 shipment batches & Quantity for Suburban lockers under Strong demand. \\
+$q(A_2,S_2)$ & 60 shipment batches & Quantity for Suburban lockers under Steady demand. \\
+$q(A_3,S_1)$ & 75 shipment batches & Quantity for Mixed network under Strong demand. \\
+$q(A_3,S_2)$ & 65 shipment batches & Quantity for Mixed network under Steady demand. \\
+$v(A_1)$ & 0.5 thousand USD per shipment batch & Locker earnings after costs for Metro lockers. \\
+$v(A_2)$ & 0.4 thousand USD per shipment batch & Locker earnings after costs for Suburban lockers. \\
+$v(A_3)$ & 0.5 thousand USD per shipment batch & Locker earnings after costs for Mixed network. \\
+$v(S_1)$ & 0.2 thousand USD per shipment batch & Demand-related earnings for Strong demand. \\
+$v(S_2)$ & 0.1 thousand USD per shipment batch & Demand-related earnings for Steady demand. \\
+$f(A_1)$ & 10 thousand USD & Lease-contract income for Metro lockers. \\
+$f(A_2)$ & 14 thousand USD & Lease-contract income for Suburban lockers. \\
+$f(A_3)$ & 12 thousand USD & Lease-contract income for Mixed network. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)\bigl[v(A_i)+v(S_j)\bigr]+f(A_i).\]
+\end{minipage}\par\medskip
+\begin{minipage}{\linewidth}
+\textbf{Freight Locker Network: payoff calculations.}
+
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times \\ \bigl[v(A_1)+v(S_1)\bigr] \\ {}+f(A_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times \\ \bigl[v(A_1)+v(S_2)\bigr] \\ {}+f(A_1)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times \\ \bigl[v(A_2)+v(S_1)\bigr] \\ {}+f(A_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times \\ \bigl[v(A_2)+v(S_2)\bigr] \\ {}+f(A_2)\end{gathered}$ \\[5pt]
+$A_3$ & $\PayoffStrut\begin{gathered}q(A_3,S_1)\times \\ \bigl[v(A_3)+v(S_1)\bigr] \\ {}+f(A_3)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_3,S_2)\times \\ \bigl[v(A_3)+v(S_2)\bigr] \\ {}+f(A_3)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & \PayoffNumber{80\times\bigl[0.5+0.2\bigr]+10}{66} & \PayoffNumber{55\times\bigl[0.5+0.1\bigr]+10}{43} \\[5pt]
+$A_2$ & \PayoffNumber{65\times\bigl[0.4+0.2\bigr]+14}{53} & \PayoffNumber{60\times\bigl[0.4+0.1\bigr]+14}{44} \\[5pt]
+$A_3$ & \PayoffNumber{75\times\bigl[0.5+0.2\bigr]+12}{64.5} & \PayoffNumber{65\times\bigl[0.5+0.1\bigr]+12}{51} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & 66 & 43 \\[5pt]
+$A_2$ & 53 & 44 \\[5pt]
+$A_3$ & 64.5 & 51 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem27-freight-locker-network-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-variable-payoff-plus-alternative-based-fixed-payoff]
+\end{minipage}
+
+
 	
 	\subsection{Alternative-Based Variable Plus State-Based Variable Plus State-Based Fixed}
 	\label{sec:alternative-based-variable-payoff-plus-state-based-variable-payoff-plus-state-based-fixed-payoff}
@@ -1686,7 +3063,8 @@ Mixed network & 64.5 & 51 \\
 	{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem28-district-heating-supply-c1}
 	\DecisionElementsTable
@@ -1696,34 +3074,77 @@ Mixed network & 64.5 & 51 \\
 	{Payoff in thousand USD for each alternative--state pair}
 	\secInicio[sec:problem28-district-heating-supply-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-variable-payoff-plus-state-based-fixed-payoff]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem28-district-heating-supply-c2}
-	The applicable payoff formula is
-	\[ P_{ay}(A_i,S_j)=q(A_i,S_j)\left(v(A_i)+v(S_j)\right)+f(S_j). \]
-	Detailed calculations (thousand USD):
-	\begin{center}\small
-	\begin{tabular}{lcc}
-	\toprule
-	Alternative & Mild winter & Cold winter \\
-	\midrule
-	Biomass heat & $55\times(0.5+0.1)+6=39$ & $85\times(0.5+0.3)-4=64$ \\
-Heat pumps & $65\times(0.6+0.1)+6=51.5$ & $95\times(0.6+0.3)-4=81.5$ \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	The simplified payoff table is
-	\begin{center}
-	\begin{tabular}{lcc}
-	\toprule
-	Alternative & Mild winter & Cold winter \\
-	\midrule
-	Biomass heat & 39 & 64 \\
-Heat pumps & 51.5 & 81.5 \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	\secInicio[sec:problem28-district-heating-supply-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-variable-payoff-plus-state-based-fixed-payoff]
+\leavevmode\par
+
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Biomass heat. \\
+$A_2$ & --- & Alternative: Heat pumps. \\
+$S_1$ & --- & State: Mild winter. \\
+$S_2$ & --- & State: Cold winter. \\
+$q(A_1,S_1)$ & 55 heating units & Quantity for Biomass heat under Mild winter. \\
+$q(A_1,S_2)$ & 85 heating units & Quantity for Biomass heat under Cold winter. \\
+$q(A_2,S_1)$ & 65 heating units & Quantity for Heat pumps under Mild winter. \\
+$q(A_2,S_2)$ & 95 heating units & Quantity for Heat pumps under Cold winter. \\
+$v(A_1)$ & 0.5 thousand USD per heating unit & Heating earnings for Biomass heat. \\
+$v(A_2)$ & 0.6 thousand USD per heating unit & Heating earnings for Heat pumps. \\
+$v(S_1)$ & 0.1 thousand USD per heating unit & Winter-tariff earnings for Mild winter. \\
+$v(S_2)$ & 0.3 thousand USD per heating unit & Winter-tariff earnings for Cold winter. \\
+$f(S_1)$ & 6 thousand USD & Service subsidy or emergency expenses for Mild winter. \\
+$f(S_2)$ & -4 thousand USD & Service subsidy or emergency expenses for Cold winter. Negative: reduces the payoff. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)\bigl[v(A_i)+v(S_j)\bigr]+f(S_j).\]
+\end{minipage}\par\medskip
+\begin{minipage}{\linewidth}
+\textbf{District Heating Supply: payoff calculations.}
+
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times \\ \bigl[v(A_1)+v(S_1)\bigr] \\ {}+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times \\ \bigl[v(A_1)+v(S_2)\bigr] \\ {}+f(S_2)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times \\ \bigl[v(A_2)+v(S_1)\bigr] \\ {}+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times \\ \bigl[v(A_2)+v(S_2)\bigr] \\ {}+f(S_2)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & \PayoffNumber{55\times\bigl[0.5+0.1\bigr]+6}{39} & \PayoffNumber{85\times\bigl[0.5+0.3\bigr]-4}{64} \\[5pt]
+$A_2$ & \PayoffNumber{65\times\bigl[0.6+0.1\bigr]+6}{51.5} & \PayoffNumber{95\times\bigl[0.6+0.3\bigr]-4}{81.5} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & 39 & 64 \\[5pt]
+$A_2$ & 51.5 & 81.5 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem28-district-heating-supply-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-variable-payoff-plus-state-based-fixed-payoff]
+\end{minipage}
+
+
 	
 	\subsubsection{Port Cold-Chain Service (C1--C2)}
 	\label{sec:problem29-port-cold-chain-service-c1-c2}
@@ -1745,7 +3166,8 @@ Heat pumps & 51.5 & 81.5 \\
 	{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem29-port-cold-chain-service-c1}
 	\DecisionElementsTable
@@ -1755,34 +3177,83 @@ Heat pumps & 51.5 & 81.5 \\
 	{Payoff in thousand USD for each alternative--state pair}
 	\secInicio[sec:problem29-port-cold-chain-service-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-variable-payoff-plus-state-based-fixed-payoff]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem29-port-cold-chain-service-c2}
-	The applicable payoff formula is
-	\[ P_{ay}(A_i,S_j)=q(A_i,S_j)\left(v(A_i)+v(S_j)\right)+f(S_j). \]
-	Detailed calculations (thousand USD):
-	\begin{center}\small
-	\begin{tabular}{lccc}
-	\toprule
-	Alternative & Clear flow & Congestion & Inspection surge \\
-	\midrule
-	Automated service & $80\times(0.7+0.2)+8=80$ & $60\times(0.7+0.1)-3=45$ & $45\times(0.7+0.3)+5=50$ \\
-Crew service & $70\times(0.5+0.2)+8=57$ & $65\times(0.5+0.1)-3=36$ & $55\times(0.5+0.3)+5=49$ \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	The simplified payoff table is
-	\begin{center}
-	\begin{tabular}{lccc}
-	\toprule
-	Alternative & Clear flow & Congestion & Inspection surge \\
-	\midrule
-	Automated service & 80 & 45 & 50 \\
-Crew service & 57 & 36 & 49 \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	\secInicio[sec:problem29-port-cold-chain-service-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-variable-payoff-plus-state-based-fixed-payoff]
+\leavevmode\par
+
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Automated service. \\
+$A_2$ & --- & Alternative: Crew service. \\
+$S_1$ & --- & State: Clear flow. \\
+$S_2$ & --- & State: Congestion. \\
+$S_3$ & --- & State: Inspection surge. \\
+$q(A_1,S_1)$ & 80 container batches & Quantity for Automated service under Clear flow. \\
+$q(A_1,S_2)$ & 60 container batches & Quantity for Automated service under Congestion. \\
+$q(A_1,S_3)$ & 45 container batches & Quantity for Automated service under Inspection surge. \\
+$q(A_2,S_1)$ & 70 container batches & Quantity for Crew service under Clear flow. \\
+$q(A_2,S_2)$ & 65 container batches & Quantity for Crew service under Congestion. \\
+$q(A_2,S_3)$ & 55 container batches & Quantity for Crew service under Inspection surge. \\
+$v(A_1)$ & 0.7 thousand USD per container batch & Service earnings for Automated service. \\
+$v(A_2)$ & 0.5 thousand USD per container batch & Service earnings for Crew service. \\
+$v(S_1)$ & 0.2 thousand USD per container batch & Flow-related earnings for Clear flow. \\
+$v(S_2)$ & 0.1 thousand USD per container batch & Flow-related earnings for Congestion. \\
+$v(S_3)$ & 0.3 thousand USD per container batch & Flow-related earnings for Inspection surge. \\
+$f(S_1)$ & 8 thousand USD & Scheduling savings, coordination costs, or inspection-service income for Clear flow. \\
+$f(S_2)$ & -3 thousand USD & Scheduling savings, coordination costs, or inspection-service income for Congestion. Negative: reduces the payoff. \\
+$f(S_3)$ & 5 thousand USD & Scheduling savings, coordination costs, or inspection-service income for Inspection surge. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)\bigl[v(A_i)+v(S_j)\bigr]+f(S_j).\]
+\end{minipage}\par\medskip
+\begin{landscape}
+\begin{minipage}{\linewidth}
+\textbf{Port Cold-Chain Service: payoff calculations.}
+
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times \\ \bigl[v(A_1)+v(S_1)\bigr] \\ {}+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times \\ \bigl[v(A_1)+v(S_2)\bigr] \\ {}+f(S_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_3)\times \\ \bigl[v(A_1)+v(S_3)\bigr] \\ {}+f(S_3)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times \\ \bigl[v(A_2)+v(S_1)\bigr] \\ {}+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times \\ \bigl[v(A_2)+v(S_2)\bigr] \\ {}+f(S_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_3)\times \\ \bigl[v(A_2)+v(S_3)\bigr] \\ {}+f(S_3)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & \PayoffNumber{80\times\bigl[0.7+0.2\bigr]+8}{80} & \PayoffNumber{60\times\bigl[0.7+0.1\bigr]-3}{45} & \PayoffNumber{45\times\bigl[0.7+0.3\bigr]+5}{50} \\[5pt]
+$A_2$ & \PayoffNumber{70\times\bigl[0.5+0.2\bigr]+8}{57} & \PayoffNumber{65\times\bigl[0.5+0.1\bigr]-3}{36} & \PayoffNumber{55\times\bigl[0.5+0.3\bigr]+5}{49} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & 80 & 45 & 50 \\[5pt]
+$A_2$ & 57 & 36 & 49 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem29-port-cold-chain-service-c1-c2][sec:alternative-based-variable-payoff-plus-state-based-variable-payoff-plus-state-based-fixed-payoff]
+\end{minipage}
+\end{landscape}
+
 
 	
 	\subsection{Alternative-Based Variable Plus Alternative-Based Fixed Plus State-Based Fixed}
@@ -1814,7 +3285,8 @@ Crew service & 57 & 36 & 49 \\
 	{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem30-pharmacy-delivery-plan-c1}
 	\DecisionElementsTable
@@ -1824,34 +3296,77 @@ Crew service & 57 & 36 & 49 \\
 	{Payoff in thousand USD for each alternative--state pair}
 	\secInicio[sec:problem30-pharmacy-delivery-plan-c1-c2][sec:alternative-based-variable-payoff-plus-alternative-based-fixed-payoff-plus-state-based-fixed-payoff]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem30-pharmacy-delivery-plan-c2}
-	The applicable payoff formula is
-	\[ P_{ay}(A_i,S_j)=q(A_i,S_j)v(A_i)+f(A_i)+f(S_j). \]
-	Detailed calculations (thousand USD):
-	\begin{center}\small
-	\begin{tabular}{lcc}
-	\toprule
-	Alternative & Light traffic & Heavy traffic \\
-	\midrule
-	Cargo bikes & $60\times 0.6+9+6=51$ & $45\times 0.6+9-5=31$ \\
-Electric vans & $75\times 0.8+4+6=70$ & $55\times 0.8+4-5=43$ \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	The simplified payoff table is
-	\begin{center}
-	\begin{tabular}{lcc}
-	\toprule
-	Alternative & Light traffic & Heavy traffic \\
-	\midrule
-	Cargo bikes & 51 & 31 \\
-Electric vans & 70 & 43 \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	\secInicio[sec:problem30-pharmacy-delivery-plan-c1-c2][sec:alternative-based-variable-payoff-plus-alternative-based-fixed-payoff-plus-state-based-fixed-payoff]
+\leavevmode\par
+
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Cargo bikes. \\
+$A_2$ & --- & Alternative: Electric vans. \\
+$S_1$ & --- & State: Light traffic. \\
+$S_2$ & --- & State: Heavy traffic. \\
+$q(A_1,S_1)$ & 60 delivery batches & Quantity for Cargo bikes under Light traffic. \\
+$q(A_1,S_2)$ & 45 delivery batches & Quantity for Cargo bikes under Heavy traffic. \\
+$q(A_2,S_1)$ & 75 delivery batches & Quantity for Electric vans under Light traffic. \\
+$q(A_2,S_2)$ & 55 delivery batches & Quantity for Electric vans under Heavy traffic. \\
+$v(A_1)$ & 0.6 thousand USD per delivery batch & Delivery earnings for Cargo bikes. \\
+$v(A_2)$ & 0.8 thousand USD per delivery batch & Delivery earnings for Electric vans. \\
+$f(A_1)$ & 9 thousand USD & Route-contract income for Cargo bikes. \\
+$f(A_2)$ & 4 thousand USD & Route-contract income for Electric vans. \\
+$f(S_1)$ & 6 thousand USD & Scheduling savings or delay costs for Light traffic. \\
+$f(S_2)$ & -5 thousand USD & Scheduling savings or delay costs for Heavy traffic. Negative: reduces the payoff. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)v(A_i)+f(A_i)+f(S_j).\]
+\end{minipage}\par\medskip
+\begin{minipage}{\linewidth}
+\textbf{Pharmacy Delivery Plan: payoff calculations.}
+
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times v(A_1) \\ {}+f(A_1)+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times v(A_1) \\ {}+f(A_1)+f(S_2)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times v(A_2) \\ {}+f(A_2)+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times v(A_2) \\ {}+f(A_2)+f(S_2)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & \PayoffNumber{60\times 0.6+9+6}{51} & \PayoffNumber{45\times 0.6+9-5}{31} \\[5pt]
+$A_2$ & \PayoffNumber{75\times 0.8+4+6}{70} & \PayoffNumber{55\times 0.8+4-5}{43} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & 51 & 31 \\[5pt]
+$A_2$ & 70 & 43 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem30-pharmacy-delivery-plan-c1-c2][sec:alternative-based-variable-payoff-plus-alternative-based-fixed-payoff-plus-state-based-fixed-payoff]
+\end{minipage}
+
+
 	
 	\subsubsection{Timber Processing Line (C1--C2)}
 	\label{sec:problem31-timber-processing-line-c1-c2}
@@ -1873,7 +3388,8 @@ Electric vans & 70 & 43 \\
 	{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem31-timber-processing-line-c1}
 	\DecisionElementsTable
@@ -1883,34 +3399,82 @@ Electric vans & 70 & 43 \\
 	{Payoff in thousand USD for each alternative--state pair}
 	\secInicio[sec:problem31-timber-processing-line-c1-c2][sec:alternative-based-variable-payoff-plus-alternative-based-fixed-payoff-plus-state-based-fixed-payoff]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem31-timber-processing-line-c2}
-	The applicable payoff formula is
-	\[ P_{ay}(A_i,S_j)=q(A_i,S_j)v(A_i)+f(A_i)+f(S_j). \]
-	Detailed calculations (thousand USD):
-	\begin{center}\small
-	\begin{tabular}{lccc}
-	\toprule
-	Alternative & Firm market & Normal market & Weak market \\
-	\midrule
-	Precision line & $70\times 0.9+7+10=80$ & $55\times 0.9+7+2=58.5$ & $40\times 0.9+7-6=37$ \\
-Standard line & $85\times 0.6+13+10=74$ & $65\times 0.6+13+2=54$ & $50\times 0.6+13-6=37$ \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	The simplified payoff table is
-	\begin{center}
-	\begin{tabular}{lccc}
-	\toprule
-	Alternative & Firm market & Normal market & Weak market \\
-	\midrule
-	Precision line & 80 & 58.5 & 37 \\
-Standard line & 74 & 54 & 37 \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	\secInicio[sec:problem31-timber-processing-line-c1-c2][sec:alternative-based-variable-payoff-plus-alternative-based-fixed-payoff-plus-state-based-fixed-payoff]
+\leavevmode\par
+
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Precision line. \\
+$A_2$ & --- & Alternative: Standard line. \\
+$S_1$ & --- & State: Firm market. \\
+$S_2$ & --- & State: Normal market. \\
+$S_3$ & --- & State: Weak market. \\
+$q(A_1,S_1)$ & 70 lumber batches & Quantity for Precision line under Firm market. \\
+$q(A_1,S_2)$ & 55 lumber batches & Quantity for Precision line under Normal market. \\
+$q(A_1,S_3)$ & 40 lumber batches & Quantity for Precision line under Weak market. \\
+$q(A_2,S_1)$ & 85 lumber batches & Quantity for Standard line under Firm market. \\
+$q(A_2,S_2)$ & 65 lumber batches & Quantity for Standard line under Normal market. \\
+$q(A_2,S_3)$ & 50 lumber batches & Quantity for Standard line under Weak market. \\
+$v(A_1)$ & 0.9 thousand USD per lumber batch & Processing earnings for Precision line. \\
+$v(A_2)$ & 0.6 thousand USD per lumber batch & Processing earnings for Standard line. \\
+$f(A_1)$ & 7 thousand USD & Sales-agreement income for Precision line. \\
+$f(A_2)$ & 13 thousand USD & Sales-agreement income for Standard line. \\
+$f(S_1)$ & 10 thousand USD & Market-contract income or storage costs for Firm market. \\
+$f(S_2)$ & 2 thousand USD & Market-contract income or storage costs for Normal market. \\
+$f(S_3)$ & -6 thousand USD & Market-contract income or storage costs for Weak market. Negative: reduces the payoff. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)v(A_i)+f(A_i)+f(S_j).\]
+\end{minipage}\par\medskip
+\begin{landscape}
+\begin{minipage}{\linewidth}
+\textbf{Timber Processing Line: payoff calculations.}
+
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times v(A_1) \\ {}+f(A_1)+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times v(A_1) \\ {}+f(A_1)+f(S_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_3)\times v(A_1) \\ {}+f(A_1)+f(S_3)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times v(A_2) \\ {}+f(A_2)+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times v(A_2) \\ {}+f(A_2)+f(S_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_3)\times v(A_2) \\ {}+f(A_2)+f(S_3)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & \PayoffNumber{70\times 0.9+7+10}{80} & \PayoffNumber{55\times 0.9+7+2}{58.5} & \PayoffNumber{40\times 0.9+7-6}{37} \\[5pt]
+$A_2$ & \PayoffNumber{85\times 0.6+13+10}{74} & \PayoffNumber{65\times 0.6+13+2}{54} & \PayoffNumber{50\times 0.6+13-6}{37} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & 80 & 58.5 & 37 \\[5pt]
+$A_2$ & 74 & 54 & 37 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem31-timber-processing-line-c1-c2][sec:alternative-based-variable-payoff-plus-alternative-based-fixed-payoff-plus-state-based-fixed-payoff]
+\end{minipage}
+\end{landscape}
+
 
 	
 	\subsection{State-Based Variable Plus Alternative-Based Fixed Plus State-Based Fixed}
@@ -1942,7 +3506,8 @@ Standard line & 74 & 54 & 37 \\
 	{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem32-public-library-outreach-c1}
 	\DecisionElementsTable
@@ -1952,34 +3517,77 @@ Standard line & 74 & 54 & 37 \\
 	{Payoff in thousand USD for each alternative--state pair}
 	\secInicio[sec:problem32-public-library-outreach-c1-c2][sec:state-based-variable-payoff-plus-alternative-based-fixed-payoff-plus-state-based-fixed-payoff]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem32-public-library-outreach-c2}
-	The applicable payoff formula is
-	\[ P_{ay}(A_i,S_j)=q(A_i,S_j)v(S_j)+f(A_i)+f(S_j). \]
-	Detailed calculations (thousand USD):
-	\begin{center}\small
-	\begin{tabular}{lcc}
-	\toprule
-	Alternative & High attendance & Low attendance \\
-	\midrule
-	Mobile library & $50\times 0.7+8+5=48$ & $30\times 0.4+8-2=18$ \\
-Pop-up branches & $45\times 0.7+11+5=47.5$ & $35\times 0.4+11-2=23$ \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	The simplified payoff table is
-	\begin{center}
-	\begin{tabular}{lcc}
-	\toprule
-	Alternative & High attendance & Low attendance \\
-	\midrule
-	Mobile library & 48 & 18 \\
-Pop-up branches & 47.5 & 23 \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	\secInicio[sec:problem32-public-library-outreach-c1-c2][sec:state-based-variable-payoff-plus-alternative-based-fixed-payoff-plus-state-based-fixed-payoff]
+\leavevmode\par
+
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Mobile library. \\
+$A_2$ & --- & Alternative: Pop-up branches. \\
+$S_1$ & --- & State: High attendance. \\
+$S_2$ & --- & State: Low attendance. \\
+$q(A_1,S_1)$ & 50 groups & Quantity for Mobile library under High attendance. \\
+$q(A_1,S_2)$ & 30 groups & Quantity for Mobile library under Low attendance. \\
+$q(A_2,S_1)$ & 45 groups & Quantity for Pop-up branches under High attendance. \\
+$q(A_2,S_2)$ & 35 groups & Quantity for Pop-up branches under Low attendance. \\
+$v(S_1)$ & 0.7 thousand USD per group & Attendance-based funding for High attendance. \\
+$v(S_2)$ & 0.4 thousand USD per group & Attendance-based funding for Low attendance. \\
+$f(A_1)$ & 8 thousand USD & Program-budget allocation for Mobile library. \\
+$f(A_2)$ & 11 thousand USD & Program-budget allocation for Pop-up branches. \\
+$f(S_1)$ & 5 thousand USD & Additional program funding or unrecovered venue and publicity costs for High attendance. \\
+$f(S_2)$ & -2 thousand USD & Additional program funding or unrecovered venue and publicity costs for Low attendance. Negative: reduces the payoff. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)v(S_j)+f(A_i)+f(S_j).\]
+\end{minipage}\par\medskip
+\begin{minipage}{\linewidth}
+\textbf{Public Library Outreach: payoff calculations.}
+
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times v(S_1) \\ {}+f(A_1)+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times v(S_2) \\ {}+f(A_1)+f(S_2)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times v(S_1) \\ {}+f(A_2)+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times v(S_2) \\ {}+f(A_2)+f(S_2)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & \PayoffNumber{50\times 0.7+8+5}{48} & \PayoffNumber{30\times 0.4+8-2}{18} \\[5pt]
+$A_2$ & \PayoffNumber{45\times 0.7+11+5}{47.5} & \PayoffNumber{35\times 0.4+11-2}{23} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & 48 & 18 \\[5pt]
+$A_2$ & 47.5 & 23 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem32-public-library-outreach-c1-c2][sec:state-based-variable-payoff-plus-alternative-based-fixed-payoff-plus-state-based-fixed-payoff]
+\end{minipage}
+
+
 	
 	\subsubsection{Grain Terminal Schedule (C1--C2)}
 	\label{sec:problem33-grain-terminal-schedule-c1-c2}
@@ -2001,7 +3609,8 @@ Pop-up branches & 47.5 & 23 \\
 	{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem33-grain-terminal-schedule-c1}
 	\DecisionElementsTable
@@ -2011,36 +3620,84 @@ Pop-up branches & 47.5 & 23 \\
 	{Payoff in thousand USD for each alternative--state pair}
 	\secInicio[sec:problem33-grain-terminal-schedule-c1-c2][sec:state-based-variable-payoff-plus-alternative-based-fixed-payoff-plus-state-based-fixed-payoff]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem33-grain-terminal-schedule-c2}
-	The applicable payoff formula is
-	\[ P_{ay}(A_i,S_j)=q(A_i,S_j)v(S_j)+f(A_i)+f(S_j). \]
-	Detailed calculations (thousand USD):
-	\begin{center}\small
-	\begin{tabular}{lcc}
-	\toprule
-	Alternative & Open channels & Restricted channels \\
-	\midrule
-	Day schedule & $90\times 0.6+12+7=73$ & $55\times 0.3+12-3=25.5$ \\
-Night schedule & $75\times 0.6+8+7=60$ & $60\times 0.3+8-3=23$ \\
-Split schedule & $85\times 0.6+10+7=68$ & $65\times 0.3+10-3=26.5$ \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	The simplified payoff table is
-	\begin{center}
-	\begin{tabular}{lcc}
-	\toprule
-	Alternative & Open channels & Restricted channels \\
-	\midrule
-	Day schedule & 73 & 25.5 \\
-Night schedule & 60 & 23 \\
-Split schedule & 68 & 26.5 \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	\secInicio[sec:problem33-grain-terminal-schedule-c1-c2][sec:state-based-variable-payoff-plus-alternative-based-fixed-payoff-plus-state-based-fixed-payoff]
+\leavevmode\par
+
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Day schedule. \\
+$A_2$ & --- & Alternative: Night schedule. \\
+$A_3$ & --- & Alternative: Split schedule. \\
+$S_1$ & --- & State: Open channels. \\
+$S_2$ & --- & State: Restricted channels. \\
+$q(A_1,S_1)$ & 90 cargo lots & Quantity for Day schedule under Open channels. \\
+$q(A_1,S_2)$ & 55 cargo lots & Quantity for Day schedule under Restricted channels. \\
+$q(A_2,S_1)$ & 75 cargo lots & Quantity for Night schedule under Open channels. \\
+$q(A_2,S_2)$ & 60 cargo lots & Quantity for Night schedule under Restricted channels. \\
+$q(A_3,S_1)$ & 85 cargo lots & Quantity for Split schedule under Open channels. \\
+$q(A_3,S_2)$ & 65 cargo lots & Quantity for Split schedule under Restricted channels. \\
+$v(S_1)$ & 0.6 thousand USD per cargo lot & Channel-dependent loading earnings for Open channels. \\
+$v(S_2)$ & 0.3 thousand USD per cargo lot & Channel-dependent loading earnings for Restricted channels. \\
+$f(A_1)$ & 12 thousand USD & Labor-contract operating income for Day schedule. \\
+$f(A_2)$ & 8 thousand USD & Labor-contract operating income for Night schedule. \\
+$f(A_3)$ & 10 thousand USD & Labor-contract operating income for Split schedule. \\
+$f(S_1)$ & 7 thousand USD & Priority-access income or rescheduling costs for Open channels. \\
+$f(S_2)$ & -3 thousand USD & Priority-access income or rescheduling costs for Restricted channels. Negative: reduces the payoff. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)v(S_j)+f(A_i)+f(S_j).\]
+\end{minipage}\par\medskip
+\begin{minipage}{\linewidth}
+\textbf{Grain Terminal Schedule: payoff calculations.}
+
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times v(S_1) \\ {}+f(A_1)+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times v(S_2) \\ {}+f(A_1)+f(S_2)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times v(S_1) \\ {}+f(A_2)+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times v(S_2) \\ {}+f(A_2)+f(S_2)\end{gathered}$ \\[5pt]
+$A_3$ & $\PayoffStrut\begin{gathered}q(A_3,S_1)\times v(S_1) \\ {}+f(A_3)+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_3,S_2)\times v(S_2) \\ {}+f(A_3)+f(S_2)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & \PayoffNumber{90\times 0.6+12+7}{73} & \PayoffNumber{55\times 0.3+12-3}{25.5} \\[5pt]
+$A_2$ & \PayoffNumber{75\times 0.6+8+7}{60} & \PayoffNumber{60\times 0.3+8-3}{23} \\[5pt]
+$A_3$ & \PayoffNumber{85\times 0.6+10+7}{68} & \PayoffNumber{65\times 0.3+10-3}{26.5} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & 73 & 25.5 \\[5pt]
+$A_2$ & 60 & 23 \\[5pt]
+$A_3$ & 68 & 26.5 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem33-grain-terminal-schedule-c1-c2][sec:state-based-variable-payoff-plus-alternative-based-fixed-payoff-plus-state-based-fixed-payoff]
+\end{minipage}
+
+
 
 	
 	\section{Complete Four-Component Models}
@@ -2080,7 +3737,8 @@ Split schedule & 68 & 26.5 \\
 	{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem34-urban-food-hub-c1}
 	\DecisionElementsTable
@@ -2090,34 +3748,79 @@ Split schedule & 68 & 26.5 \\
 	{Payoff in thousand USD for each alternative--state pair}
 	\secInicio[sec:problem34-urban-food-hub-c1-c2][sec:alternative-based-and-state-based-variable-payoffs-plus-alternative-based-and-state-based-fixed-payoffs]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem34-urban-food-hub-c2}
-	The applicable payoff formula is
-	\[ P_{ay}(A_i,S_j)=q(A_i,S_j)\left(v(A_i)+v(S_j)\right)+f(A_i)+f(S_j). \]
-	Detailed calculations (thousand USD):
-	\begin{center}\small
-	\begin{tabular}{lcc}
-	\toprule
-	Alternative & Strong demand & Soft demand \\
-	\midrule
-	Electric sorting & $70\times(0.6+0.2)+9+6=71$ & $45\times(0.6+0.1)+9-3=37.5$ \\
-Manual sorting & $80\times(0.4+0.2)+14+6=68$ & $55\times(0.4+0.1)+14-3=38.5$ \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	The simplified payoff table is
-	\begin{center}
-	\begin{tabular}{lcc}
-	\toprule
-	Alternative & Strong demand & Soft demand \\
-	\midrule
-	Electric sorting & 71 & 37.5 \\
-Manual sorting & 68 & 38.5 \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	\secInicio[sec:problem34-urban-food-hub-c1-c2][sec:alternative-based-and-state-based-variable-payoffs-plus-alternative-based-and-state-based-fixed-payoffs]
+\leavevmode\par
+
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Electric sorting. \\
+$A_2$ & --- & Alternative: Manual sorting. \\
+$S_1$ & --- & State: Strong demand. \\
+$S_2$ & --- & State: Soft demand. \\
+$q(A_1,S_1)$ & 70 produce crates & Quantity for Electric sorting under Strong demand. \\
+$q(A_1,S_2)$ & 45 produce crates & Quantity for Electric sorting under Soft demand. \\
+$q(A_2,S_1)$ & 80 produce crates & Quantity for Manual sorting under Strong demand. \\
+$q(A_2,S_2)$ & 55 produce crates & Quantity for Manual sorting under Soft demand. \\
+$v(A_1)$ & 0.6 thousand USD per produce crate & Sorting earnings for Electric sorting. \\
+$v(A_2)$ & 0.4 thousand USD per produce crate & Sorting earnings for Manual sorting. \\
+$v(S_1)$ & 0.2 thousand USD per produce crate & Demand-related earnings for Strong demand. \\
+$v(S_2)$ & 0.1 thousand USD per produce crate & Demand-related earnings for Soft demand. \\
+$f(A_1)$ & 9 thousand USD & Service-contract income for Electric sorting. \\
+$f(A_2)$ & 14 thousand USD & Service-contract income for Manual sorting. \\
+$f(S_1)$ & 6 thousand USD & Distributor incentives or unused-capacity costs for Strong demand. \\
+$f(S_2)$ & -3 thousand USD & Distributor incentives or unused-capacity costs for Soft demand. Negative: reduces the payoff. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)\bigl[v(A_i)+v(S_j)\bigr]+f(A_i)+f(S_j).\]
+\end{minipage}\par\medskip
+\begin{minipage}{\linewidth}
+\textbf{Urban Food Hub: payoff calculations.}
+
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times \\ \bigl[v(A_1)+v(S_1)\bigr] \\ {}+f(A_1)+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times \\ \bigl[v(A_1)+v(S_2)\bigr] \\ {}+f(A_1)+f(S_2)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times \\ \bigl[v(A_2)+v(S_1)\bigr] \\ {}+f(A_2)+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times \\ \bigl[v(A_2)+v(S_2)\bigr] \\ {}+f(A_2)+f(S_2)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & \PayoffNumber{70\times\bigl[0.6+0.2\bigr]+9+6}{71} & \PayoffNumber{45\times\bigl[0.6+0.1\bigr]+9-3}{37.5} \\[5pt]
+$A_2$ & \PayoffNumber{80\times\bigl[0.4+0.2\bigr]+14+6}{68} & \PayoffNumber{55\times\bigl[0.4+0.1\bigr]+14-3}{38.5} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lcc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ \\
+\midrule
+$A_1$ & 71 & 37.5 \\[5pt]
+$A_2$ & 68 & 38.5 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem34-urban-food-hub-c1-c2][sec:alternative-based-and-state-based-variable-payoffs-plus-alternative-based-and-state-based-fixed-payoffs]
+\end{minipage}
+
+
 	
 	\subsubsection{Regional Rail Cargo (C1--C2)}
 	\label{sec:problem35-regional-rail-cargo-c1-c2}
@@ -2139,7 +3842,8 @@ Manual sorting & 68 & 38.5 \\
 	{Building the payoff table.}
 	\end{enumerate}
 
-	\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
+	\Needspace{12\baselineskip}
+\paragraph*{C1 - Interpreting decision alternatives, events, consequences, and states.}
 	\phantomsection
 	\label{subsec:problem35-regional-rail-cargo-c1}
 	\DecisionElementsTable
@@ -2149,34 +3853,85 @@ Manual sorting & 68 & 38.5 \\
 	{Payoff in thousand USD for each alternative--state pair}
 	\secInicio[sec:problem35-regional-rail-cargo-c1-c2][sec:alternative-based-and-state-based-variable-payoffs-plus-alternative-based-and-state-based-fixed-payoffs]
 
-	\paragraph*{C2 - Building the payoff table.}
+	\par\noindent\begin{minipage}{\linewidth}
+\paragraph*{C2 - Building the payoff table.}
 	\phantomsection
 	\label{subsec:problem35-regional-rail-cargo-c2}
-	The applicable payoff formula is
-	\[ P_{ay}(A_i,S_j)=q(A_i,S_j)\left(v(A_i)+v(S_j)\right)+f(A_i)+f(S_j). \]
-	Detailed calculations (thousand USD):
-	\begin{center}\small
-	\begin{tabular}{lccc}
-	\toprule
-	Alternative & Clear network & Busy network & Disrupted network \\
-	\midrule
-	Express service & $85\times(0.8+0.2)+10+5=100$ & $65\times(0.8+0.1)+10+0=68.5$ & $40\times(0.8-0.1)+10-7=31$ \\
-Flexible service & $75\times(0.6+0.2)+15+5=80$ & $70\times(0.6+0.1)+15+0=64$ & $50\times(0.6-0.1)+15-7=33$ \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	The simplified payoff table is
-	\begin{center}
-	\begin{tabular}{lccc}
-	\toprule
-	Alternative & Clear network & Busy network & Disrupted network \\
-	\midrule
-	Express service & 100 & 68.5 & 31 \\
-Flexible service & 80 & 64 & 33 \\
-	\bottomrule
-	\end{tabular}
-	\end{center}
-	\secInicio[sec:problem35-regional-rail-cargo-c1-c2][sec:alternative-based-and-state-based-variable-payoffs-plus-alternative-based-and-state-based-fixed-payoffs]
+\leavevmode\par
+
+\textbf{Symbols, values, and meanings.}
+\begin{center}\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr0.55\linewidth-4\tabcolsep\relax}@{}}
+\toprule Symbol & Value & Meaning in this problem \\ \midrule
+$A_1$ & --- & Alternative: Express service. \\
+$A_2$ & --- & Alternative: Flexible service. \\
+$S_1$ & --- & State: Clear network. \\
+$S_2$ & --- & State: Busy network. \\
+$S_3$ & --- & State: Disrupted network. \\
+$q(A_1,S_1)$ & 85 freight lots & Quantity for Express service under Clear network. \\
+$q(A_1,S_2)$ & 65 freight lots & Quantity for Express service under Busy network. \\
+$q(A_1,S_3)$ & 40 freight lots & Quantity for Express service under Disrupted network. \\
+$q(A_2,S_1)$ & 75 freight lots & Quantity for Flexible service under Clear network. \\
+$q(A_2,S_2)$ & 70 freight lots & Quantity for Flexible service under Busy network. \\
+$q(A_2,S_3)$ & 50 freight lots & Quantity for Flexible service under Disrupted network. \\
+$v(A_1)$ & 0.8 thousand USD per freight lot & Service earnings for Express service. \\
+$v(A_2)$ & 0.6 thousand USD per freight lot & Service earnings for Flexible service. \\
+$v(S_1)$ & 0.2 thousand USD per freight lot & Network-related earnings or reductions for Clear network. \\
+$v(S_2)$ & 0.1 thousand USD per freight lot & Network-related earnings or reductions for Busy network. \\
+$v(S_3)$ & -0.1 thousand USD per freight lot & Network-related earnings or reductions for Disrupted network. Negative: reduces the payoff. \\
+$f(A_1)$ & 10 thousand USD & Service-contract income for Express service. \\
+$f(A_2)$ & 15 thousand USD & Service-contract income for Flexible service. \\
+$f(S_1)$ & 5 thousand USD & Delivery bonuses or rerouting costs for Clear network. \\
+$f(S_2)$ & 0 thousand USD & Delivery bonuses or rerouting costs for Busy network. \\
+$f(S_3)$ & -7 thousand USD & Delivery bonuses or rerouting costs for Disrupted network. Negative: reduces the payoff. \\
+\bottomrule\end{tabular}\end{center}\par\medskip
+The applicable payoff formula is
+\[P_{ay}(A_i,S_j)=q(A_i,S_j)\bigl[v(A_i)+v(S_j)\bigr]+f(A_i)+f(S_j).\]
+\end{minipage}\par\medskip
+\begin{landscape}
+\begin{minipage}{\linewidth}
+\textbf{Regional Rail Cargo: payoff calculations.}
+
+All calculation cells and final payoffs are in thousand USD. The indices refer to the symbols table above.
+\begingroup\small\setlength{\tabcolsep}{3pt}
+\begin{center}
+\begin{minipage}[t]{0.44\linewidth}\centering
+\textbf{Symbolic calculations.}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & $\PayoffStrut\begin{gathered}q(A_1,S_1)\times \\ \bigl[v(A_1)+v(S_1)\bigr] \\ {}+f(A_1)+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_2)\times \\ \bigl[v(A_1)+v(S_2)\bigr] \\ {}+f(A_1)+f(S_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_1,S_3)\times \\ \bigl[v(A_1)+v(S_3)\bigr] \\ {}+f(A_1)+f(S_3)\end{gathered}$ \\[5pt]
+$A_2$ & $\PayoffStrut\begin{gathered}q(A_2,S_1)\times \\ \bigl[v(A_2)+v(S_1)\bigr] \\ {}+f(A_2)+f(S_1)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_2)\times \\ \bigl[v(A_2)+v(S_2)\bigr] \\ {}+f(A_2)+f(S_2)\end{gathered}$ & $\PayoffStrut\begin{gathered}q(A_2,S_3)\times \\ \bigl[v(A_2)+v(S_3)\bigr] \\ {}+f(A_2)+f(S_3)\end{gathered}$ \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}\hfill%
+\begin{minipage}[t]{0.54\linewidth}\centering
+\textbf{Numerical calculations.}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & \PayoffNumber{85\times\bigl[0.8+0.2\bigr]+10+5}{100} & \PayoffNumber{65\times\bigl[0.8+0.1\bigr]+10+0}{68.5} & \PayoffNumber{40\times\bigl[0.8-0.1\bigr]+10-7}{31} \\[5pt]
+$A_2$ & \PayoffNumber{75\times\bigl[0.6+0.2\bigr]+15+5}{80} & \PayoffNumber{70\times\bigl[0.6+0.1\bigr]+15+0}{64} & \PayoffNumber{50\times\bigl[0.6-0.1\bigr]+15-7}{33} \\[5pt]
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+\endgroup
+\begin{center}\textbf{Final payoff table (thousand USD).}\par\medskip
+\begin{tabular}[t]{@{}lccc@{}}
+\toprule
+Alternative & $S_1$ & $S_2$ & $S_3$ \\
+\midrule
+$A_1$ & 100 & 68.5 & 31 \\[5pt]
+$A_2$ & 80 & 64 & 33 \\[5pt]
+\bottomrule
+\end{tabular}
+\end{center}
+\secInicio[sec:problem35-regional-rail-cargo-c1-c2][sec:alternative-based-and-state-based-variable-payoffs-plus-alternative-based-and-state-based-fixed-payoffs]
+\end{minipage}
+\end{landscape}
+
 
 	
 \end{document}

@@ -4,6 +4,65 @@
 
 \input{preamble_G10_T1_C2C3.tex}
 
+
+% Keep calculation cells unbroken and align the two table headings.
+\newcommand{\CalcResult}[2]{\(\begin{gathered}\strut#1\\[2pt]\strut=#2\end{gathered}\)}
+\newcommand{\SymbolicCell}[1]{\(\begin{gathered}\strut#1\\[2pt]\strut\phantom{=0}\end{gathered}\)}
+\newsavebox{\SymbolicTableBox}
+\newsavebox{\NumericalTableBox}
+\newlength{\SymbolicTableWidth}
+\newlength{\NumericalTableWidth}
+\newcommand{\CalculationPair}[3]{%
+  \par\medskip\noindent
+  \begin{minipage}{\linewidth}
+    \linespread{1}\selectfont\setlength{\parskip}{0pt}%
+    \textbf{#1}\par\smallskip
+    \setlength{\tabcolsep}{4pt}%
+    \medmuskip=2mu\thickmuskip=3mu\relax
+    \sbox{\SymbolicTableBox}{#2}\sbox{\NumericalTableBox}{#3}%
+    \setlength{\SymbolicTableWidth}{\wd\SymbolicTableBox}%
+    \setlength{\NumericalTableWidth}{\wd\NumericalTableBox}%
+    \ifdim\NumericalTableWidth<145pt \setlength{\NumericalTableWidth}{145pt}\fi
+    \noindent\hbox to\linewidth{\hfil\begin{minipage}[t]{\SymbolicTableWidth}
+      \centering\textbf{Symbolic calculations.}\par\medskip #2
+    \end{minipage}\hspace{20pt}%
+    \begin{minipage}[t]{\NumericalTableWidth}
+      \centering\textbf{Numerical calculations.}\par\medskip #3
+    \end{minipage}\hfil}%
+  \end{minipage}\par\medskip
+}
+% Local landscape sheets retain normal-size type for long indexed models.
+\newenvironment{CalculationLandscape}[2]{%
+  \clearpage
+  \newgeometry{left=0.4in,right=0.4in,top=0.4in,textheight=\dimexpr#2-0.95in\relax}%
+  \paperwidth=#1\relax\paperheight=#2\relax
+  \pdfpagewidth=\paperwidth\pdfpageheight=\paperheight
+  \textwidth=\dimexpr#1-0.8in\relax
+  \hsize=\textwidth\linewidth=\textwidth\columnwidth=\textwidth
+}{%
+  \clearpage
+  \paperwidth=8.5in\paperheight=11in
+  \pdfpagewidth=\paperwidth\pdfpageheight=\paperheight
+  \restoregeometry
+}
+% Local repair of the shared decision table's narrow, unspaced labels.
+\ExplSyntaxOn
+\RenewDocumentCommand{\DecisionElementsTable}{mmmm}
+{
+  \decision_prepare_lists:nn {#1} {#2}
+  \begin{center}
+  \begin{tabularx}{\textwidth}{@{}p{2.65cm}>{\raggedright\arraybackslash}X@{}}
+  \toprule Element & Description \\ \midrule
+  Alternatives & \decision_print_slots:Nn \l_decision_alternatives_seq {A} \\
+  States~of~nature & \decision_print_slots:Nn \l_decision_states_seq {S} \\
+  Events & #3 \\
+  Consequences & #4 \\
+  \bottomrule
+  \end{tabularx}
+  \end{center}
+}
+\ExplSyntaxOff
+
 \title{Grade 10 Term 1 Lesson 1 Practice Activity 2\\Revenue, Costs, Profit, and Payoff Tables}
 \author{}
 \date{}
@@ -25,16 +84,139 @@
 
 	\section{Introduction}
 	\label{sec:introduction}
+	% Keep classroom explanations together within the Introduction.
+	\interlinepenalty=10000
 
 	\SectionProblemsTableOfContents{
+		\SectionProblemLink{subsec:intro-first-steps}{From a decision situation to a profit table} \\
 		\SectionProblemLink{sec:problem1-introductory-general-c1-c3}{Introductory General Problem (C1--C3)} \\
-		\SectionProblemLink{sec:problem2-advanced-general-c1-c3}{Advanced General Problem (C1--C3)}
+		\SectionProblemLink{subsec:intro-components}{Build totals from quantities, rates, and fixed amounts} \\
+		\SectionProblemLink{sec:problem2-advanced-general-c1-c3}{Advanced General Problem (C1--C3)} \\
+		\SectionProblemLink{subsec:intro-reference}{Reference and classroom solving routine}
 	}
 
-	\subsection{Introductory General Problem (C1--C3)}
+
+\clearpage
+\subsection{From a decision situation to a profit table}
+\label{subsec:intro-first-steps}
+
+\subsubsection*{Start with the situation}
+A school enterprise organises services for community events. Before bookings
+are confirmed, its students must choose either a basic service plan or an
+expanded service plan with more equipment and capacity. Demand may turn out
+to be high or low. The enterprise chooses its plan first; demand is revealed
+later. This timing makes the decision uncertain.
+
+The uncertain process is customers making bookings. High demand and low
+demand are the two possible \textbf{states} of that process in this model.
+The students control the service plan, but they cannot choose the demand state.
+A consequence can first be described in words: ``the basic plan operates under
+high demand, earns sales income, and uses staff and supplies.'' We then assign
+a monetary payoff to that consequence. Here the payoff will be the profit
+remaining after costs. Describing what happens and measuring its financial
+result are related, but different, tasks.
+
+\subsubsection*{Name the choices, then the states}
+The basic and expanded plans are the \textbf{alternatives}: the available
+choices. We now shorten their names to \(A_1\), read ``alternative one,''
+and \(A_2\), read ``alternative two.''
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule Symbol & Choice made by the enterprise \\ \midrule
+\(A_1\) & Choose the basic service plan. \\
+\(A_2\) & Choose the expanded service plan. \\
+\bottomrule
+\end{tabular}
+\end{center}
+High and low demand are possible outcomes outside the enterprise's control.
+We label them \(S_1\), read ``state one,'' and \(S_2\), read ``state two.''
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule Symbol & Demand outcome revealed after the choice \\ \midrule
+\(S_1\) & High demand. \\
+\(S_2\) & Low demand. \\
+\bottomrule
+\end{tabular}
+\end{center}
+The small numbers below the letters are \textbf{subscripts}. They identify
+choices and states; they do not rank them or give their monetary values.
+
+\textbf{Check.} Can the enterprise choose \(S_1\)?
+\textit{Suggested answer:} No. It chooses a plan; customers' bookings determine
+which demand state occurs.
+
+\clearpage
+\subsubsection*{Match one choice with one state}
+To describe a possible result, name both the chosen plan and the demand
+outcome. The pair \((A_1,S_1)\), read ``alternative one with state one,''
+means the basic plan under high demand. There are four combinations:
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule Pair & Contextual meaning \\ \midrule
+\((A_1,S_1)\) & Basic plan, high demand. \\
+\((A_1,S_2)\) & Basic plan, low demand. \\
+\((A_2,S_1)\) & Expanded plan, high demand. \\
+\((A_2,S_2)\) & Expanded plan, low demand. \\
+\bottomrule
+\end{tabular}
+\end{center}
+Only one pair will be realised for this particular decision. We analyse all
+four beforehand so that the financial consequence of each possible
+choice--state combination is recorded.
+
+\subsubsection*{Give the consequence a monetary value}
+\textbf{Revenue} is money earned from the activity. \textbf{Cost} is money
+spent or resources charged to the activity. \textbf{Profit} is revenue minus
+cost. Suppose the basic plan under high demand earns 20 thousand USD and
+costs 9 thousand USD. Its profit is \(20-9=11\) thousand USD.
+One thousand USD means 1,000 US dollars. Throughout these introductory
+examples, monetary totals are in thousand USD. Revenue alone is not the
+payoff in this activity: profit is.
+
+We introduce a separate symbol for each total. First,
+\[
+R(A_1,S_1)=20.
+\]
+Read this as ``total revenue for alternative one in state one is 20 thousand
+USD.'' The capital \(R\) names total revenue; \(A_1\) identifies the basic
+plan and \(S_1\) identifies high demand. The parentheses identify the inputs
+to this quantity; they do not mean multiplication.
+
+Next, write the corresponding total cost as
+\[
+C(A_1,S_1)=9.
+\]
+Read this as ``total cost for alternative one in state one is 9 thousand
+USD.'' Capital \(C\) names total cost, with the same two inputs.
+
+Finally, capital \(P\) names profit, which is our payoff:
+\[
+P(A_1,S_1)=R(A_1,S_1)-C(A_1,S_1)=11.
+\]
+Read this as ``profit for alternative one in state one equals its revenue
+minus its cost: 11 thousand USD.'' All three quantities refer to the
+\emph{same} plan and demand state. The result is positive because revenue
+exceeds cost. In separate small illustrations, revenue 9 and cost 9 give
+zero profit (\(9-9=0\)); revenue 8 and cost 9 give a loss
+(\(8-9=-1\) thousand USD).
+
+\subsubsection*{Organise the four profits}
+A profit payoff table puts alternatives in rows and states in columns.
+For example, take the basic plan's high-demand revenue of 20 and matching
+cost of 9, subtract to obtain 11, then put 11 in row \(A_1\), column
+\(S_1\). Repeat that process for the other three pairs. The next problem
+consolidates this process using directly supplied totals. Its input table
+records the data; the paired calculation tables match each symbolic
+subtraction to its arithmetic; the clean final table contains profits only.
+
+\textbf{Check.} Could we subtract the cost for \((A_2,S_1)\) from the revenue
+for \((A_1,S_1)\)? \textit{Suggested answer:} No. That would mix two plans.
+Both amounts in a subtraction must belong to the same alternative--state pair.
+
+\subsection{Introductory General Problem (C1--C3)}
 	\label{sec:problem1-introductory-general-c1-c3}
 
-	A school enterprise must commit to either alternative \(A_1\) or alternative \(A_2\) before learning whether demand will be \(S_1\) or \(S_2\). Its accounting team used sales forecasts for each choice under each demand outcome to estimate total revenue, and used purchasing and operating budgets to estimate the corresponding total cost. All amounts and the resulting profit are measured in thousand USD.
+	Use the school service enterprise just described. It must commit to either alternative \(A_1\) or alternative \(A_2\) before learning whether demand will be high (\(S_1\)) or low (\(S_2\)). Its accounting team used sales forecasts for each choice under each demand outcome to estimate total revenue, and used purchasing and operating budgets to estimate the corresponding total cost. All amounts and the resulting profit are measured in thousand USD.
 
 	If the enterprise selects \(A_1\), forecast sales produce total revenue of \(20\) under demand state \(S_1\) and \(13\) under \(S_2\); fulfilling those sales is budgeted to cost \(9\) and \(8\), respectively. If it selects \(A_2\), its different sales plan is expected to bring in \(18\) under \(S_1\) and \(15\) under \(S_2\), while the resources required by that plan cost \(10\) and \(9\), respectively. The enterprise must calculate the profit for every possible alternative--state pair before constructing its payoff table.
 
@@ -54,56 +236,356 @@
 	\label{subsec:problem1-introductory-general-c1}
 
 	\DecisionElementsTable
-	{\(A_1\); \(A_2\)}
-	{\(S_1\); \(S_2\)}
-	{Demand revealed after the enterprise choice}
-	{Profit in thousand USD for each alternative--state pair}
+	{Basic service plan; Expanded service plan}
+	{High demand; Low demand}
+	{Customer bookings reveal demand after the enterprise chooses its plan}
+	{Services are delivered with sales income and resource use; profit measures the monetary consequence in thousand USD}
 
 	\secInicio[sec:problem1-introductory-general-c1-c3][sec:introduction]
 
+	\clearpage
 	\subsubsection*{C3 - Calculating revenue, cost, and payoff.}
 	\phantomsection
 	\label{subsec:problem1-introductory-general-c3}
 
-	\begin{center}
-		\small
-		\begin{tabular}{lrrr}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\) & 20 & 9  & \(20-9=11\) \\
-			\((A_1,S_2)\) & 13 & 8  & \(13-8=5\) \\
-			\((A_2,S_1)\) & 18 & 10 & \(18-10=8\) \\
-			\((A_2,S_2)\) & 15 & 9  & \(15-9=6\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\textbf{1. Input table.}
 
-	\begin{center}
-		\begin{tabular}{lrr}
-			\toprule
-			Alternative & \(S_1\) & \(S_2\) \\
-			\midrule
-			\(A_1\) & 11 & 5 \\
-			\(A_2\) & 8  & 6 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Operating alternative 1. \\
+\(A_2\) & --- & Operating alternative 2. \\
+\(S_1\) & --- & Demand outcome 1. \\
+\(S_2\) & --- & Demand outcome 2. \\
+\(R(A_1,S_1)\) & 20 thousand USD & Forecast total revenue for \(A_1\) under \(S_1\). \\
+\(C(A_1,S_1)\) & 9 thousand USD & Budgeted total cost for \(A_1\) under \(S_1\). \\
+\(R(A_1,S_2)\) & 13 thousand USD & Forecast total revenue for \(A_1\) under \(S_2\). \\
+\(C(A_1,S_2)\) & 8 thousand USD & Budgeted total cost for \(A_1\) under \(S_2\). \\
+\(R(A_2,S_1)\) & 18 thousand USD & Forecast total revenue for \(A_2\) under \(S_1\). \\
+\(C(A_2,S_1)\) & 10 thousand USD & Budgeted total cost for \(A_2\) under \(S_1\). \\
+\(R(A_2,S_2)\) & 15 thousand USD & Forecast total revenue for \(A_2\) under \(S_2\). \\
+\(C(A_2,S_2)\) & 9 thousand USD & Budgeted total cost for \(A_2\) under \(S_2\). \\
+\bottomrule
+\end{longtable}
+
+\textbf{2. Symbolic and numerical calculations.}
+
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{20-9}{11} & \CalcResult{13-8}{5} \\
+\(A_2\) & \CalcResult{18-10}{8} & \CalcResult{15-9}{6} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \(11\) & \(5\) \\
+\(A_2\) & \(8\) & \(6\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
+
 
 	\secInicio[sec:problem1-introductory-general-c1-c3][sec:introduction]
+
+\clearpage
+\subsection{Build totals from quantities, rates, and fixed amounts}
+\label{subsec:intro-components}
+
+\subsubsection*{Generalise a familiar calculation}
+The first problem has two choices and two states. To refer to any one of
+them without writing a separate rule for every cell, use \(A_i\), read
+``alternative i,'' and \(S_j\), read ``state j.'' The letters \(i\) and
+\(j\) are \textbf{indices}: they tell us which alternative and which state
+to use. For example, substituting \(i=2\) and \(j=1\) gives \(A_2\),
+\(S_1\), and the expanded-plan, high-demand pair \((A_2,S_1)\).
+In the first problem, \(R(A_2,S_1)=18\), \(C(A_2,S_1)=10\), and
+\(P(A_2,S_1)=18-10=8\) thousand USD. The indices 2 and 1 are identifiers;
+the number 8 is a monetary value. The number of alternatives is a count,
+not an index or a profit. Later problems may have more choices or states.
+
+The relationship already used in every cell can now be written generally:
+\[
+P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j).
+\]
+This says ``profit for a chosen alternative and a particular state is the
+revenue for that pair minus the cost for that same pair.''
+
+\subsubsection*{Why build revenue and cost?}
+A \textbf{direct model}, such as the first problem, supplies total revenue
+and total cost. Use those totals as given; we cannot infer a unique set of
+prices, quantities, or fixed payments from them. A \textbf{component model}
+instead supplies ingredients: quantities, rates per unit, and fixed amounts.
+We must use those ingredients to build total revenue and total cost
+\emph{independently}, then subtract.
+
+We now study a new version of the same school service enterprise. Its plans
+and demand labels keep their meanings, but its financial arrangements will
+be stated component by component. These are new assumptions, not a
+breakdown of the first problem's directly supplied totals. Each extension
+below explicitly adds an arrangement to this new version.
+
+\subsubsection*{Quantity: how much service is completed?}
+Suppose the basic plan completes two service batches under high demand and
+one under low demand. A \textbf{service batch} is one package of work for an
+event; it is the quantity unit throughout this running example. The expanded
+plan can complete three batches under high demand and two under low demand.
+Write \(q(A_1,S_1)=2\) batches, read ``quantity for alternative one in state
+one is two batches.'' More generally, \(q(A_i,S_j)\) means the quantity for
+the named pair.
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule Quantity (service batches) & \(S_1\): high demand & \(S_2\): low demand \\ \midrule
+\(A_1\): basic plan & 2 & 1 \\
+\(A_2\): expanded plan & 3 & 2 \\
+\bottomrule
+\end{tabular}
+\end{center}
+Demand affects bookings, while the chosen plan affects capacity, so quantity
+can depend on both inputs. A quantity of 2 batches is not 2 thousand USD.
+
+\subsubsection*{A revenue rate determined by the plan}
+Assume initially that the only revenue is payment for each completed batch.
+The basic plan earns 10 thousand USD per batch; the expanded plan earns 11
+thousand USD per batch for its larger service package. These are earning
+\textbf{rates}, rather than total amounts. Write \(r(A_1)=10\) and
+\(r(A_2)=11\) thousand USD per batch. Read \(r(A_1)\) as ``revenue rate
+for alternative one.'' More generally, \(r(A_i)\) is the rate set by the plan.
+
+Multiply the number of batches by the payment for each batch:
+\[
+R(A_i,S_j)=q(A_i,S_j)r(A_i).
+\]
+For the basic plan under high demand, substitute the quantity and rate:
+\[
+R(A_1,S_1)=\begin{gathered}2\times10\\[2pt]=20\end{gathered}\quad\text{(thousand USD).}
+\]
+The units are batches times thousand USD per batch, giving thousand USD.
+The basic plan's rate stays at 10 across its row; under low demand its
+revenue is \(1\times10=10\) thousand USD because quantity changes.
+Dependence tells us which input determines a component. It does not require
+different inputs to have different values: two plans could happen to have
+equal rates.
+
+\subsubsection*{A cost rate determined by the plan}
+Now add a cost assumption: each basic-plan batch uses 3 thousand USD of
+resources, while each expanded-plan batch uses 4 thousand USD. These are
+costs \emph{per batch}. Write \(c(A_1)=3\), read ``cost rate for alternative
+one,'' and \(c(A_2)=4\), in thousand USD per batch. The general plan-based
+cost rate is \(c(A_i)\). If these are the only costs,
+\[
+C(A_i,S_j)=q(A_i,S_j)c(A_i).
+\]
+Keep the revenue and cost calculations separate before finding profit:
+\[
+\begin{aligned}
+R(A_1,S_1)&=\begin{gathered}2\times10\\[2pt]=20\end{gathered},&
+C(A_1,S_1)&=\begin{gathered}2\times3\\[2pt]=6\end{gathered},&
+P(A_1,S_1)&=\begin{gathered}20-6\\[2pt]=14\end{gathered}.
+\end{aligned}
+\]
+All three results are in thousand USD. Lowercase \(r\) and \(c\) name
+rates per batch; uppercase \(R\) and \(C\) name monetary totals.
+
+\textbf{Check.} Why is \(20-3\) not the profit for two basic-plan batches?
+\textit{Suggested answer:} 20 is total revenue, but 3 is cost per batch.
+First find total cost, \(2\times3=6\), then subtract \(20-6=14\).
+
+\subsubsection*{A revenue rate determined by demand}
+Consider a separate pricing variation first: suppose payment comes only
+from a demand-based rate, with no plan-based payment. A community booking
+scheme pays 5 thousand USD per batch under high demand and 3 under low
+demand. Write \(r(S_1)=5\) and \(r(S_2)=3\) thousand USD per batch;
+read \(r(S_1)\) as ``revenue rate for state one.'' The rate \(r(S_j)\)
+is determined by the demand state. For this state-only pricing variation,
+\[
+R(A_i,S_j)=q(A_i,S_j)r(S_j),\qquad
+R(A_1,S_1)=\begin{gathered}2\times5\\[2pt]=10\end{gathered}.
+\]
+The result is in thousand USD. The rate is the same down a state column,
+but total revenue need not be: three batches under \(A_2\) earn
+\(3\times5=15\) thousand USD in that same state.
+
+Return now to the plan-based pricing version and \emph{extend} it: assume
+the booking scheme's payment is an addition to the plan payment, so both
+rates apply to each batch. Then
+\[
+\begin{aligned}
+R(A_i,S_j)&=q(A_i,S_j)r(A_i)+q(A_i,S_j)r(S_j)\\
+          &=q(A_i,S_j)[r(A_i)+r(S_j)].
+\end{aligned}
+\]
+For the basic plan under high demand, \(2\times10+2\times5=2(10+5)=30\)
+thousand USD. Factoring out quantity works because the same two batches
+earn both rates. We add 10 and 5 because both use thousand USD per batch;
+multiplying the combined rate by two batches gives money.
+
+\subsubsection*{A cost rate determined by demand}
+High-demand bookings may use shared deliveries, while low-demand bookings
+need separate handling. Suppose handling costs 1 thousand USD per batch in
+high demand and 2 in low demand. Write \(c(S_1)=1\) and \(c(S_2)=2\)
+thousand USD per batch; read \(c(S_1)\) as ``cost rate for state one.''
+The general state-based rate is \(c(S_j)\). In a simple variation where
+handling is the only charged cost,
+\[
+C(A_i,S_j)=q(A_i,S_j)c(S_j),\qquad
+C(A_1,S_1)=\begin{gathered}2\times1\\[2pt]=2\end{gathered}.
+\]
+The result is in thousand USD. Now extend the plan-cost version instead:
+assume handling is charged \emph{in addition} to the plan's resource cost.
+Then
+\[
+C(A_i,S_j)=q(A_i,S_j)[c(A_i)+c(S_j)],\qquad
+C(A_1,S_1)=\begin{gathered}2(3+1)\\[2pt]=8\end{gathered}.
+\]
+The handling rate stays at 1 down the high-demand column, but its total
+charge changes from \(2\times1=2\) to \(3\times1=3\) thousand USD as
+quantity changes. A state-based component does not make the entire total
+state-only when quantity also depends on the alternative.
+
+\textbf{Check.} Under the version with both revenue rates and both cost
+rates, what is the basic plan's high-demand profit?
+\textit{Suggested answer:} Revenue is 30, cost is 8, and profit is
+\(30-8=22\) thousand USD. Equal state rates across plans do not imply equal totals.
+
+\subsubsection*{Fixed revenue: first a plan payment, then a state payment}
+Extend the version with both revenue rates: a sponsor now pays 7 thousand
+USD for choosing the basic plan, or 9 for choosing the expanded plan,
+regardless of how many batches are completed. We write \(f_r(A_1)=7\) and
+\(f_r(A_2)=9\) thousand USD. Read \(f_r(A_1)\) as ``fixed revenue for
+alternative one.'' The letter \(f\) indicates a fixed amount; the subscript
+\(r\) identifies it as revenue. The plan determines \(f_r(A_i)\).
+For the basic plan under high demand, revenue becomes
+\[
+R(A_1,S_1)=\begin{gathered}2(10+5)+7\\[2pt]=37\end{gathered}\quad\text{(thousand USD).}
+\]
+The 7 is added once; it is not a payment for each batch.
+
+Add one more assumption: a community grant pays 6 thousand USD if demand
+is high and 7 if it is low, independently of the number of batches served.
+Write \(f_r(S_1)=6\) and \(f_r(S_2)=7\) thousand USD. Read \(f_r(S_1)\)
+as ``fixed revenue for state one.'' The state determines \(f_r(S_j)\).
+The high-demand grant alone contributes 6 thousand USD, whether the plan
+serves two or three batches. With both fixed payments now included,
+\[
+R(A_1,S_1)=\begin{gathered}2(10+5)+7+6\\[2pt]=43\end{gathered}\quad\text{(thousand USD).}
+\]
+``Fixed'' means independent of quantity within the model. A fixed amount
+can still differ between plans or states. For a compact \emph{fixed-only}
+variation, suppose there are no per-batch earnings, only the sponsor and
+grant. Then \(R(A_i,S_j)=f_r(A_i)+f_r(S_j)\), and
+\(R(A_1,S_1)=7+6=13\) thousand USD; no quantity is needed.
+
+\subsubsection*{Fixed cost: first setup, then administration}
+Return to the version with both per-batch cost rates. Extend it by charging
+setup once: 8 thousand USD for the basic plan and 10 for the expanded plan.
+Write \(f_c(A_1)=8\) and \(f_c(A_2)=10\) thousand USD. Read \(f_c(A_1)\)
+as ``fixed cost for alternative one.'' The subscript \(c\) identifies cost;
+the plan determines \(f_c(A_i)\). For the basic plan under high demand,
+\[
+C(A_1,S_1)=\begin{gathered}2(3+1)+8\\[2pt]=16\end{gathered}\quad\text{(thousand USD).}
+\]
+Now add a state-specific administration bill: 5 thousand USD under high
+demand or 3 under low demand, charged once whichever plan is chosen.
+Write \(f_c(S_1)=5\) and \(f_c(S_2)=3\) thousand USD. Read \(f_c(S_1)\)
+as ``fixed cost for state one.'' The state determines \(f_c(S_j)\).
+The high-demand bill contributes 5 thousand USD, not \(2\times5\).
+With setup and administration included,
+\[
+C(A_1,S_1)=\begin{gathered}2(3+1)+8+5\\[2pt]=21\end{gathered}\quad\text{(thousand USD).}
+\]
+Ordinary positive costs are added \emph{inside total cost}. Total cost is
+then subtracted once from revenue: \(43-21=22\) thousand USD. Making every
+cost negative and then subtracting it would reverse its effect.
+
+\textbf{Check.} If the basic plan completes one batch instead of two, does
+its setup charge become 4? \textit{Suggested answer:} No. Setup remains
+8 thousand USD; only the per-batch charges change with quantity.
+
+\subsubsection*{Assemble the complete models}
+We have now taught every ingredient. When \emph{all} the arrangements just
+introduced apply together, their complete models are
+\[
+\begin{aligned}
+R(A_i,S_j)&=q(A_i,S_j)[r(A_i)+r(S_j)]+f_r(A_i)+f_r(S_j),\\
+C(A_i,S_j)&=q(A_i,S_j)[c(A_i)+c(S_j)]+f_c(A_i)+f_c(S_j),\\
+P(A_i,S_j)&=R(A_i,S_j)-C(A_i,S_j).
+\end{aligned}
+\]
+The four additive revenue components are \(q(A_i,S_j)r(A_i)\),
+\(q(A_i,S_j)r(S_j)\), \(f_r(A_i)\), and \(f_r(S_j)\).
+The four additive cost components are \(q(A_i,S_j)c(A_i)\),
+\(q(A_i,S_j)c(S_j)\), \(f_c(A_i)\), and \(f_c(S_j)\).
+Each is a monetary amount. Quantity \(q(A_i,S_j)\) is a multiplier,
+not an extra monetary component.
+
+The later sections count components \emph{within} the revenue and cost
+models. A one-component example can have one revenue component and one
+cost component. The two models need not use matching types. For example,
+if the stated arrangements provide only plan-based per-batch revenue and
+state-based handling cost, then
+\[
+R(A_i,S_j)=q(A_i,S_j)r(A_i),\qquad
+C(A_i,S_j)=q(A_i,S_j)c(S_j).
+\]
+If instead there is only a plan sponsorship payment and a state
+administration bill, the fixed-only models are
+\[
+R(A_i,S_j)=f_r(A_i),\qquad C(A_i,S_j)=f_c(S_j).
+\]
+A two-component version might add a fixed plan payment to per-batch plan
+revenue; a three-component version could add a fixed state grant as well.
+Use only components included by the stated arrangements. An excluded
+component can be treated as zero. A necessary input that is merely missing
+is unknown, not automatically zero.
+
+\subsubsection*{Keep the meaning of a signed adjustment}
+Some financial descriptions may explicitly give a reduction. For example,
+a 2 thousand USD rebate on a 9 thousand USD bill gives total cost
+\(9+(-2)=7\), whereas an additional charge of 2 gives \(9+2=11\).
+A reduction and a further cost have opposite effects. If a stated model
+actually gives a negative total cost, subtract it with parentheses:
+revenue 5 and total cost \(-2\) give profit \(5-(-2)=7\) thousand USD.
+These signed cases do not change the basic rule: build the stated totals,
+then subtract cost once.
+
+The Advanced General Problem now brings the familiar steps together. Its
+community business is a variation of our service enterprise: it uses the
+same component values, with one completed service batch counted as one
+``unit.'' Its input table connects every quantity, rate, and fixed amount
+to the notation above. Rates are in thousand USD per unit, while fixed
+amounts and totals are in thousand USD.
 
 	\subsection{Advanced General Problem (C1--C3)}
 	\label{sec:problem2-advanced-general-c1-c3}
 
-	A community business must choose operating plan \(A_1\) or \(A_2\) before demand is revealed as \(S_1\) or \(S_2\). Its demand study indicates that plan \(A_1\) will complete \(2\) units in state \(S_1\) and \(1\) in state \(S_2\), whereas plan \(A_2\) will complete \(3\) and \(2\) units, respectively. All revenue rates, cost rates, fixed amounts, and profits are measured in thousand USD, with each variable rate applying to every unit completed.
+	A community business must choose the basic operating plan \(A_1\) or expanded operating plan \(A_2\) before demand is revealed as high (\(S_1\)) or low (\(S_2\)). Its demand study indicates that plan \(A_1\) will complete \(2\) units in state \(S_1\) and \(1\) in state \(S_2\), whereas plan \(A_2\) will complete \(3\) and \(2\) units, respectively. Each completed service batch counts as one unit. Revenue and cost rates are in thousand USD per unit; fixed amounts and profits are in thousand USD. Each variable rate applies to every unit completed.
 
 	The plans command different base selling rates because they offer different services: each unit under \(A_1\) earns an alternative-based revenue rate of \(10\), while each unit under \(A_2\) earns \(11\). Demand conditions add a market-based revenue rate of \(5\) per unit in \(S_1\) or \(3\) per unit in \(S_2\). The signed agreements also provide plan-based fixed revenue of \(7\) for \(A_1\) and \(9\) for \(A_2\), while community funding adds state-based fixed revenue of \(6\) in \(S_1\) and \(7\) in \(S_2\).
 
 	The business's operating budget assigns an alternative-based cost of \(3\) per unit to \(A_1\) and \(4\) per unit to \(A_2\), reflecting the resources used by each plan. Demand-related handling adds a further state-based cost of \(1\) per unit in \(S_1\) and \(2\) per unit in \(S_2\). Preparing the plans also creates fixed costs of \(8\) for \(A_1\) and \(10\) for \(A_2\), and state-specific administration creates fixed costs of \(5\) in \(S_1\) and \(3\) in \(S_2\). The business must combine all four revenue components and all four cost components for each pair, then subtract total cost from total revenue.
 
+	\begin{samepage}
 	\textbf{Questions/Tasks.}
 	\begin{enumerate}
 		\CriterionTask
@@ -114,97 +596,206 @@
 		{subsec:problem2-advanced-general-c3}{3}
 		{Build the payoff table.}
 	\end{enumerate}
+	\end{samepage}
 
 	\subsubsection*{C1 - Interpreting the decision.}
 	\phantomsection
 	\label{subsec:problem2-advanced-general-c1}
 
 	\DecisionElementsTable
-	{\(A_1\); \(A_2\)}
-	{\(S_1\); \(S_2\)}
-	{Demand revealed after the business choice}
-	{Profit in thousand USD from the complete revenue and cost models}
+	{Basic operating plan; Expanded operating plan}
+	{High demand; Low demand}
+	{Customer bookings reveal demand after the business chooses its plan}
+	{Service delivery earns income and uses resources; profit measures the result in thousand USD}
 
-	For every alternative--state pair, revenue and cost are calculated independently:
-	\[
-	\begin{aligned}
-		R(A_i,S_j)
-		={}&
-		q(A_i,S_j)
-		\left[
-		r(A_i)+r(S_j)
-		\right]
-		+
-		f_r(A_i)
-		+
-		f_r(S_j),
-		\\
-		C(A_i,S_j)
-		={}&
-		q(A_i,S_j)
-		\left[
-		c(A_i)+c(S_j)
-		\right]
-		+
-		f_c(A_i)
-		+
-		f_c(S_j),
-		\\
-		P(A_i,S_j)
-		={}&
-		R(A_i,S_j)-C(A_i,S_j).
-	\end{aligned}
-	\]
+Use the complete models developed above: calculate revenue and cost independently,
+then subtract cost from revenue.
+
+\textbf{Trace one cell before completing the tables.} For \((A_1,S_1)\),
+use quantity 2, revenue rates 10 and 5, and fixed revenue 7 and 6:
+\[
+R(A_1,S_1)=\begin{gathered}2(10+5)+7+6\\[2pt]=43\end{gathered}.
+\]
+Independently, use cost rates 3 and 1 and fixed costs 8 and 5:
+\[
+C(A_1,S_1)=\begin{gathered}2(3+1)+8+5\\[2pt]=21\end{gathered}.
+\]
+Finally, \(P(A_1,S_1)=43-21=22\) thousand USD. This is the entry in row
+\(A_1\), column \(S_1\) of the final profit table. Apply these same three
+steps to each remaining pair; do not mix a rate or payment from another
+plan or state. The following paired tables show revenue first, cost second,
+and profit third.
 
 	\secInicio[sec:problem2-advanced-general-c1-c3][sec:introduction]
 
-	\subsubsection*{C3 - Calculating revenue, cost, and payoff.}
+	\begin{CalculationLandscape}{14in}{11in}
+\subsubsection*{C3 - Calculating revenue, cost, and payoff.}
 	\phantomsection
 	\label{subsec:problem2-advanced-general-c3}
 
-	\begin{center}
-		\begin{tabular}{llll}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\)
-			& \(2(10+5)+7+6=43\)
-			& \(2(3+1)+8+5=21\)
-			& \(43-21=22\) \\
-			
-			\((A_1,S_2)\)
-			& \(1(10+3)+7+7=27\)
-			& \(1(3+2)+8+3=16\)
-			& \(27-16=11\) \\
-			
-			\((A_2,S_1)\)
-			& \(3(11+5)+9+6=63\)
-			& \(3(4+1)+10+5=30\)
-			& \(63-30=33\) \\
-			
-			\((A_2,S_2)\)
-			& \(2(11+3)+9+7=44\)
-			& \(2(4+2)+10+3=25\)
-			& \(44-25=19\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\textbf{1. Input table.}
 
-	\begin{center}
-		\begin{tabular}{lrr}
-			\toprule
-			Alternative & \(S_1\) & \(S_2\) \\
-			\midrule
-			\(A_1\) & 22 & 11 \\
-			\(A_2\) & 33 & 19 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Operating plan 1. \\
+\(A_2\) & --- & Operating plan 2. \\
+\(S_1\) & --- & Demand outcome 1. \\
+\(S_2\) & --- & Demand outcome 2. \\
+\(q(A_1,S_1)\) & 2 units & Forecast quantity for \(A_1\) under \(S_1\). \\
+\(r(A_1)\) & 10 thousand USD per unit & Base service selling rate for \(A_1\) (rate per unit). \\
+\(r(S_1)\) & 5 thousand USD per unit & Demand-related revenue rate for \(S_1\) (rate per unit). \\
+\(f_r(A_1)\) & 7 thousand USD & Plan agreement payment for \(A_1\) (fixed amount). \\
+\(f_r(S_1)\) & 6 thousand USD & Community funding for \(S_1\) (fixed amount). \\
+\(c(A_1)\) & 3 thousand USD per unit & Plan operating rate for \(A_1\) (rate per unit). \\
+\(c(S_1)\) & 1 thousand USD per unit & Demand handling rate for \(S_1\) (rate per unit). \\
+\(f_c(A_1)\) & 8 thousand USD & Plan preparation cost for \(A_1\) (fixed amount). \\
+\(f_c(S_1)\) & 5 thousand USD & State administration cost for \(S_1\) (fixed amount). \\
+\(q(A_1,S_2)\) & 1 unit & Forecast quantity for \(A_1\) under \(S_2\). \\
+\(r(S_2)\) & 3 thousand USD per unit & Demand-related revenue rate for \(S_2\) (rate per unit). \\
+\(f_r(S_2)\) & 7 thousand USD & Community funding for \(S_2\) (fixed amount). \\
+\(c(S_2)\) & 2 thousand USD per unit & Demand handling rate for \(S_2\) (rate per unit). \\
+\(f_c(S_2)\) & 3 thousand USD & State administration cost for \(S_2\) (fixed amount). \\
+\(q(A_2,S_1)\) & 3 units & Forecast quantity for \(A_2\) under \(S_1\). \\
+\(r(A_2)\) & 11 thousand USD per unit & Base service selling rate for \(A_2\) (rate per unit). \\
+\(f_r(A_2)\) & 9 thousand USD & Plan agreement payment for \(A_2\) (fixed amount). \\
+\(c(A_2)\) & 4 thousand USD per unit & Plan operating rate for \(A_2\) (rate per unit). \\
+\(f_c(A_2)\) & 10 thousand USD & Plan preparation cost for \(A_2\) (fixed amount). \\
+\(q(A_2,S_2)\) & 2 units & Forecast quantity for \(A_2\) under \(S_2\). \\
+\bottomrule
+\end{longtable}
+
+\clearpage
+\textbf{2. Symbolic and numerical calculations.}
+
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Revenue}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)[r(A_1)+r(S_1)]+f_r(A_1)+f_r(S_1)} & \SymbolicCell{q(A_1,S_2)[r(A_1)+r(S_2)]+f_r(A_1)+f_r(S_2)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)[r(A_2)+r(S_1)]+f_r(A_2)+f_r(S_1)} & \SymbolicCell{q(A_2,S_2)[r(A_2)+r(S_2)]+f_r(A_2)+f_r(S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{2(10+5)+7+6}{43} & \CalcResult{1(10+3)+7+7}{27} \\
+\(A_2\) & \CalcResult{3(11+5)+9+6}{63} & \CalcResult{2(11+3)+9+7}{44} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Cost}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)[c(A_1)+c(S_1)]+f_c(A_1)+f_c(S_1)} & \SymbolicCell{q(A_1,S_2)[c(A_1)+c(S_2)]+f_c(A_1)+f_c(S_2)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)[c(A_2)+c(S_1)]+f_c(A_2)+f_c(S_1)} & \SymbolicCell{q(A_2,S_2)[c(A_2)+c(S_2)]+f_c(A_2)+f_c(S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{2(3+1)+8+5}{21} & \CalcResult{1(3+2)+8+3}{16} \\
+\(A_2\) & \CalcResult{3(4+1)+10+5}{30} & \CalcResult{2(4+2)+10+3}{25} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{43-21}{22} & \CalcResult{27-16}{11} \\
+\(A_2\) & \CalcResult{63-30}{33} & \CalcResult{44-25}{19} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \(22\) & \(11\) \\
+\(A_2\) & \(33\) & \(19\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
+
 
 	\secInicio[sec:problem2-advanced-general-c1-c3][sec:introduction]
+\end{CalculationLandscape}
+
+
+\subsection{Reference and classroom solving routine}
+\label{subsec:intro-reference}
+
+\textbf{Notation already used.} Monetary units below are thousand USD;
+``per unit'' refers to the quantity unit stated in the problem.
+\begin{longtable}{@{}p{0.30\linewidth}p{0.64\linewidth}@{}}
+\toprule Symbol & Meaning and units \\ \midrule
+\endhead
+\(A_i\), \(S_j\) & Alternative and state labels; \(i\) and \(j\) are indices, not money or ranks. \\
+\(q(A_i,S_j)\) & Quantity for that pair, in batches or another stated quantity unit. \\
+\(r(A_i)\), \(r(S_j)\) & Revenue rates determined by the plan or the state, in thousand USD per unit. \\
+\(c(A_i)\), \(c(S_j)\) & Cost rates determined by the plan or the state, in thousand USD per unit. \\
+\(f_r(A_i)\), \(f_r(S_j)\) & Fixed revenue determined by the plan or the state, in thousand USD; add once. \\
+\(f_c(A_i)\), \(f_c(S_j)\) & Fixed cost determined by the plan or the state, in thousand USD; add once inside cost. \\
+\(R(A_i,S_j)\) & Total revenue for the pair, in thousand USD. \\
+\(C(A_i,S_j)\) & Total cost for the pair, in thousand USD. \\
+\(P(A_i,S_j)\) & Profit/payoff for the pair: revenue minus cost, in thousand USD. \\
+\bottomrule
+\end{longtable}
+
+\textbf{Practical solving procedure.}
+\begin{enumerate}[itemsep=2pt,parsep=0pt]
+\item Identify who chooses, the alternatives, the uncertain process, its
+states, the timing, and the consequences in their economic context (C1).
+\item Map choices and states to symbols. List all alternative--state pairs.
+\item Record inputs in a \emph{Symbol | Value | Meaning in this problem}
+table, with units. Distinguish direct totals, quantities, rates, and fixed amounts;
+check that necessary inputs are supplied.
+\item Calculate revenue for each pair from its stated components, or record
+the directly supplied total. Match quantity units to rate units.
+\item Calculate cost independently for the same pair, or record the supplied
+total. Add each applicable fixed amount once.
+\item Subtract total cost from total revenue (C3). Match the symbolic
+calculation to the full numerical substitution and its result.
+\item Construct the profit payoff table (C3): alternatives in rows, states
+in columns, profits only in cells, and monetary units stated. Keep the same
+row and column order throughout.
+\end{enumerate}
+
+\textbf{Final checks with suggested answers.}
+\begin{itemize}[itemsep=2pt,parsep=0pt]
+\item Is 10 thousand USD per batch a total revenue? \textit{No: it is a
+rate. Two batches earn 20 thousand USD at that rate.}
+\item Does a fixed payment of 7 thousand USD become 14 for two batches?
+\textit{No: add it once. Only per-batch amounts are multiplied by quantity.}
+\item With revenue 43 and cost 21 thousand USD, what enters the payoff table?
+\textit{Profit: \(43-21=22\) thousand USD.}
+\end{itemize}
+
+\secInicio[sec:introduction][toc]
+\clearpage
+\interlinepenalty=0
 
 	\section{Direct Revenue and Cost Models}
 	\label{sec:direct-revenue-cost-models}
@@ -248,40 +839,63 @@
 	\phantomsection
 	\label{subsec:problem3-local-cafe-investment-c3}
 
-	For every alternative--state pair, calculate
-	\[
-	P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j).
-	\]
+\textbf{1. Input table.}
 
-	\begin{center}
-		\small
-		\begin{tabular}{lrrr}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\) & 58 & 16 & \(58-16=42\) \\
-			\((A_1,S_2)\) & 27 & 19 & \(27-19=8\) \\
-			\((A_2,S_1)\) & 49 & 21 & \(49-21=28\) \\
-			\((A_2,S_2)\) & 41 & 21 & \(41-21=20\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Launch dessert line. \\
+\(A_2\) & --- & Keep current menu. \\
+\(S_1\) & --- & High traffic. \\
+\(S_2\) & --- & Low traffic. \\
+\(R(A_1,S_1)\) & 58 thousand USD & Forecast total revenue for \(A_1\) under \(S_1\). \\
+\(C(A_1,S_1)\) & 16 thousand USD & Budgeted total cost for \(A_1\) under \(S_1\). \\
+\(R(A_1,S_2)\) & 27 thousand USD & Forecast total revenue for \(A_1\) under \(S_2\). \\
+\(C(A_1,S_2)\) & 19 thousand USD & Budgeted total cost for \(A_1\) under \(S_2\). \\
+\(R(A_2,S_1)\) & 49 thousand USD & Forecast total revenue for \(A_2\) under \(S_1\). \\
+\(C(A_2,S_1)\) & 21 thousand USD & Budgeted total cost for \(A_2\) under \(S_1\). \\
+\(R(A_2,S_2)\) & 41 thousand USD & Forecast total revenue for \(A_2\) under \(S_2\). \\
+\(C(A_2,S_2)\) & 21 thousand USD & Budgeted total cost for \(A_2\) under \(S_2\). \\
+\bottomrule
+\end{longtable}
 
-	The resulting payoff table is:
+\textbf{2. Symbolic and numerical calculations.}
 
-	\begin{center}
-		\begin{tabular}{lrr}
-			\toprule
-			Alternative & High traffic & Low traffic \\
-			\midrule
-			Launch dessert line & 42 & 8 \\
-			Keep current menu & 28 & 20 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{58-16}{42} & \CalcResult{27-19}{8} \\
+\(A_2\) & \CalcResult{49-21}{28} & \CalcResult{41-21}{20} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \(42\) & \(8\) \\
+\(A_2\) & \(28\) & \(20\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
+
 
 	\secInicio[sec:problem3-local-cafe-investment-c1-c3][sec:direct-revenue-cost-models]
 
@@ -317,52 +931,88 @@
 
 	\secInicio[sec:problem4-green-energy-production-mix-c1-c3][sec:direct-revenue-cost-models]
 
-	\subsubsection*{C3 - Calculating profit and building the payoff table.}
+	\begin{CalculationLandscape}{11in}{8.5in}
+\subsubsection*{C3 - Calculating profit and building the payoff table.}
 	\phantomsection
 	\label{subsec:problem4-green-energy-production-mix-c3}
 
-	For every alternative--state pair, calculate
-	\[
-	P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j).
-	\]
+\textbf{1. Input table.}
 
-	\begin{center}
-		\small
-		\begin{tabular}{lrrr}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\) & 132 & 42 & \(132-42=90\) \\
-			\((A_1,S_2)\) & 78  & 33 & \(78-33=45\) \\
-			\((A_1,S_3)\) & 62  & 32 & \(62-32=30\) \\
-			\((A_2,S_1)\) & 77  & 42 & \(77-42=35\) \\
-			\((A_2,S_2)\) & 143 & 48 & \(143-48=95\) \\
-			\((A_2,S_3)\) & 63  & 38 & \(63-38=25\) \\
-			\((A_3,S_1)\) & 112 & 42 & \(112-42=70\) \\
-			\((A_3,S_2)\) & 107 & 42 & \(107-42=65\) \\
-			\((A_3,S_3)\) & 96  & 36 & \(96-36=60\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Wind turbines. \\
+\(A_2\) & --- & Solar farms. \\
+\(A_3\) & --- & Hybrid system. \\
+\(S_1\) & --- & Windy. \\
+\(S_2\) & --- & Sunny. \\
+\(S_3\) & --- & Cloudy. \\
+\(R(A_1,S_1)\) & 132 thousand USD & Forecast total revenue for \(A_1\) under \(S_1\). \\
+\(C(A_1,S_1)\) & 42 thousand USD & Budgeted total cost for \(A_1\) under \(S_1\). \\
+\(R(A_1,S_2)\) & 78 thousand USD & Forecast total revenue for \(A_1\) under \(S_2\). \\
+\(C(A_1,S_2)\) & 33 thousand USD & Budgeted total cost for \(A_1\) under \(S_2\). \\
+\(R(A_1,S_3)\) & 62 thousand USD & Forecast total revenue for \(A_1\) under \(S_3\). \\
+\(C(A_1,S_3)\) & 32 thousand USD & Budgeted total cost for \(A_1\) under \(S_3\). \\
+\(R(A_2,S_1)\) & 77 thousand USD & Forecast total revenue for \(A_2\) under \(S_1\). \\
+\(C(A_2,S_1)\) & 42 thousand USD & Budgeted total cost for \(A_2\) under \(S_1\). \\
+\(R(A_2,S_2)\) & 143 thousand USD & Forecast total revenue for \(A_2\) under \(S_2\). \\
+\(C(A_2,S_2)\) & 48 thousand USD & Budgeted total cost for \(A_2\) under \(S_2\). \\
+\(R(A_2,S_3)\) & 63 thousand USD & Forecast total revenue for \(A_2\) under \(S_3\). \\
+\(C(A_2,S_3)\) & 38 thousand USD & Budgeted total cost for \(A_2\) under \(S_3\). \\
+\(R(A_3,S_1)\) & 112 thousand USD & Forecast total revenue for \(A_3\) under \(S_1\). \\
+\(C(A_3,S_1)\) & 42 thousand USD & Budgeted total cost for \(A_3\) under \(S_1\). \\
+\(R(A_3,S_2)\) & 107 thousand USD & Forecast total revenue for \(A_3\) under \(S_2\). \\
+\(C(A_3,S_2)\) & 42 thousand USD & Budgeted total cost for \(A_3\) under \(S_2\). \\
+\(R(A_3,S_3)\) & 96 thousand USD & Forecast total revenue for \(A_3\) under \(S_3\). \\
+\(C(A_3,S_3)\) & 36 thousand USD & Budgeted total cost for \(A_3\) under \(S_3\). \\
+\bottomrule
+\end{longtable}
 
-	The resulting payoff table is:
+\clearpage
+\textbf{2. Symbolic and numerical calculations.}
 
-	\begin{center}
-		\begin{tabular}{lrrr}
-			\toprule
-			Strategy & Windy & Sunny & Cloudy \\
-			\midrule
-			Wind turbines & 90 & 45 & 30 \\
-			Solar farms & 35 & 95 & 25 \\
-			Hybrid system & 70 & 65 & 60 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) & \(S_3\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} & \SymbolicCell{R(A_1,S_3)-C(A_1,S_3)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} & \SymbolicCell{R(A_2,S_3)-C(A_2,S_3)} \\
+\(A_3\) & \SymbolicCell{R(A_3,S_1)-C(A_3,S_1)} & \SymbolicCell{R(A_3,S_2)-C(A_3,S_2)} & \SymbolicCell{R(A_3,S_3)-C(A_3,S_3)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) & \(S_3\) \\
+\midrule
+\(A_1\) & \CalcResult{132-42}{90} & \CalcResult{78-33}{45} & \CalcResult{62-32}{30} \\
+\(A_2\) & \CalcResult{77-42}{35} & \CalcResult{143-48}{95} & \CalcResult{63-38}{25} \\
+\(A_3\) & \CalcResult{112-42}{70} & \CalcResult{107-42}{65} & \CalcResult{96-36}{60} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) & \(S_3\) \\
+\midrule
+\(A_1\) & \(90\) & \(45\) & \(30\) \\
+\(A_2\) & \(35\) & \(95\) & \(25\) \\
+\(A_3\) & \(70\) & \(65\) & \(60\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
+
 
 	\secInicio[sec:problem4-green-energy-production-mix-c1-c3][sec:direct-revenue-cost-models]
+\end{CalculationLandscape}
+
 
 	\section{One-Component Models}
 	\label{sec:one-component-models}
@@ -425,63 +1075,99 @@
 	\phantomsection
 	\label{subsec:problem5-custom-printing-product-line-c3}
 
-	For every alternative--state pair, calculate revenue and cost independently:
-	\[
-	\begin{aligned}
-		R(A_i,S_j)&=q(A_i,S_j)r(A_i),
-		\\
-		C(A_i,S_j)&=q(A_i,S_j)c(S_j),
-		\\
-		P(A_i,S_j)&=R(A_i,S_j)-C(A_i,S_j).
-	\end{aligned}
-	\]
+\textbf{1. Input table.}
 
-	\begin{center}
-		\small
-		\begin{tabular}{llll}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\)
-			& \(6(12)=72\)
-			& \(6(5)=30\)
-			& \(72-30=42\) \\
-			
-			\((A_1,S_2)\)
-			& \(4(12)=48\)
-			& \(4(8)=32\)
-			& \(48-32=16\) \\
-			
-			\((A_2,S_1)\)
-			& \(5(15)=75\)
-			& \(5(5)=25\)
-			& \(75-25=50\) \\
-			
-			\((A_2,S_2)\)
-			& \(3(15)=45\)
-			& \(3(8)=24\)
-			& \(45-24=21\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Produce premium notebooks. \\
+\(A_2\) & --- & Produce canvas bags. \\
+\(S_1\) & --- & Strong demand and stable material prices. \\
+\(S_2\) & --- & Weak demand and higher material prices. \\
+\(q(A_1,S_1)\) & 6 production lots & Forecast quantity for \(A_1\) under \(S_1\). \\
+\(r(A_1)\) & 12 thousand USD per production lot & Product selling rate for \(A_1\) (rate per unit). \\
+\(c(S_1)\) & 5 thousand USD per production lot & Material price per lot for \(S_1\) (rate per unit). \\
+\(q(A_1,S_2)\) & 4 production lots & Forecast quantity for \(A_1\) under \(S_2\). \\
+\(c(S_2)\) & 8 thousand USD per production lot & Material price per lot for \(S_2\) (rate per unit). \\
+\(q(A_2,S_1)\) & 5 production lots & Forecast quantity for \(A_2\) under \(S_1\). \\
+\(r(A_2)\) & 15 thousand USD per production lot & Product selling rate for \(A_2\) (rate per unit). \\
+\(q(A_2,S_2)\) & 3 production lots & Forecast quantity for \(A_2\) under \(S_2\). \\
+\bottomrule
+\end{longtable}
 
-	The resulting payoff table is:
+\textbf{2. Symbolic and numerical calculations.}
 
-	\begin{center}
-		\begin{tabular}{lrr}
-			\toprule
-			Alternative
-			& Strong demand and stable prices
-			& Weak demand and higher prices \\
-			\midrule
-			Premium notebooks & 42 & 16 \\
-			Canvas bags & 50 & 21 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Revenue}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)r(A_1)} & \SymbolicCell{q(A_1,S_2)r(A_1)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)r(A_2)} & \SymbolicCell{q(A_2,S_2)r(A_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{6(12)}{72} & \CalcResult{4(12)}{48} \\
+\(A_2\) & \CalcResult{5(15)}{75} & \CalcResult{3(15)}{45} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Cost}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)c(S_1)} & \SymbolicCell{q(A_1,S_2)c(S_2)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)c(S_1)} & \SymbolicCell{q(A_2,S_2)c(S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{6(5)}{30} & \CalcResult{4(8)}{32} \\
+\(A_2\) & \CalcResult{5(5)}{25} & \CalcResult{3(8)}{24} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{72-30}{42} & \CalcResult{48-32}{16} \\
+\(A_2\) & \CalcResult{75-25}{50} & \CalcResult{45-24}{21} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \(42\) & \(16\) \\
+\(A_2\) & \(50\) & \(21\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
+
 
 	\secInicio[sec:problem5-custom-printing-product-line-c1-c3][sec:one-component-models]
 
@@ -536,64 +1222,84 @@
 	\phantomsection
 	\label{subsec:problem6-event-equipment-fleet-c3}
 
-	For every alternative--state pair, calculate
-	\[
-	\begin{aligned}
-		R(A_i,S_j)&=q(A_i,S_j)r(S_j),
-		\\
-		C(A_i,S_j)&=f_c(A_i),
-		\\
-		P(A_i,S_j)&=R(A_i,S_j)-C(A_i,S_j).
-	\end{aligned}
-	\]
+\textbf{1. Input table.}
 
-	\begin{center}
-		\small
-		\begin{tabular}{llll}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\)
-			& \(6(9)=54\)
-			& \(22\)
-			& \(54-22=32\) \\
-			
-			\((A_1,S_2)\)
-			& \(3(6)=18\)
-			& \(22\)
-			& \(18-22=-4\) \\
-			
-			\((A_2,S_1)\)
-			& \(8(9)=72\)
-			& \(34\)
-			& \(72-34=38\) \\
-			
-			\((A_2,S_2)\)
-			& \(4(6)=24\)
-			& \(34\)
-			& \(24-34=-10\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Prepare a compact fleet. \\
+\(A_2\) & --- & Prepare an expanded fleet. \\
+\(S_1\) & --- & High rental demand. \\
+\(S_2\) & --- & Low rental demand. \\
+\(q(A_1,S_1)\) & 6 rental contracts & Forecast quantity for \(A_1\) under \(S_1\). \\
+\(r(S_1)\) & 9 thousand USD per rental contract & Market rental rate for \(S_1\) (rate per unit). \\
+\(f_c(A_1)\) & 22 thousand USD & Fleet preparation cost for \(A_1\) (fixed amount). \\
+\(q(A_1,S_2)\) & 3 rental contracts & Forecast quantity for \(A_1\) under \(S_2\). \\
+\(r(S_2)\) & 6 thousand USD per rental contract & Market rental rate for \(S_2\) (rate per unit). \\
+\(q(A_2,S_1)\) & 8 rental contracts & Forecast quantity for \(A_2\) under \(S_1\). \\
+\(f_c(A_2)\) & 34 thousand USD & Fleet preparation cost for \(A_2\) (fixed amount). \\
+\(q(A_2,S_2)\) & 4 rental contracts & Forecast quantity for \(A_2\) under \(S_2\). \\
+\bottomrule
+\end{longtable}
 
-	The resulting payoff table is:
+\textbf{2. Symbolic and numerical calculations.}
 
-	\begin{center}
-		\begin{tabular}{lrr}
-			\toprule
-			Alternative & High rental demand & Low rental demand \\
-			\midrule
-			Compact fleet & 32 & \(-4\) \\
-			Expanded fleet & 38 & \(-10\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Revenue}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)r(S_1)} & \SymbolicCell{q(A_1,S_2)r(S_2)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)r(S_1)} & \SymbolicCell{q(A_2,S_2)r(S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{6(9)}{54} & \CalcResult{3(6)}{18} \\
+\(A_2\) & \CalcResult{8(9)}{72} & \CalcResult{4(6)}{24} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{54-22}{32} & \CalcResult{18-22}{-4} \\
+\(A_2\) & \CalcResult{72-34}{38} & \CalcResult{24-34}{-10} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \(32\) & \(-4\) \\
+\(A_2\) & \(38\) & \(-10\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
 
 	The negative payoffs in the low-demand state represent losses because the
 	fixed preparation cost is greater than the revenue earned.
+
 
 	\secInicio[sec:problem6-event-equipment-fleet-c1-c3][sec:one-component-models]
 
@@ -648,48 +1354,59 @@
 	\phantomsection
 	\label{subsec:problem7-community-arts-sponsorship-c3}
 
-	For every alternative--state pair, calculate
-	\[
-	\begin{aligned}
-		R(A_i,S_j)&=f_r(A_i),
-		\\
-		C(A_i,S_j)&=f_c(S_j),
-		\\
-		P(A_i,S_j)&=R(A_i,S_j)-C(A_i,S_j).
-	\end{aligned}
-	\]
+\textbf{1. Input table.}
 
-	\begin{center}
-		\small
-		\begin{tabular}{lrrr}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\) & 52 & 18 & \(52-18=34\) \\
-			\((A_1,S_2)\) & 52 & 31 & \(52-31=21\) \\
-			\((A_2,S_1)\) & 68 & 18 & \(68-18=50\) \\
-			\((A_2,S_2)\) & 68 & 31 & \(68-31=37\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Accept the standard sponsorship agreement. \\
+\(A_2\) & --- & Accept the premium sponsorship agreement. \\
+\(S_1\) & --- & Routine permit requirements. \\
+\(S_2\) & --- & Enhanced safety requirements. \\
+\(f_r(A_1)\) & 52 thousand USD & Sponsorship payment for \(A_1\) (fixed amount). \\
+\(f_c(S_1)\) & 18 thousand USD & Regulatory and safety bill for \(S_1\) (fixed amount). \\
+\(f_c(S_2)\) & 31 thousand USD & Regulatory and safety bill for \(S_2\) (fixed amount). \\
+\(f_r(A_2)\) & 68 thousand USD & Sponsorship payment for \(A_2\) (fixed amount). \\
+\bottomrule
+\end{longtable}
 
-	The resulting payoff table is:
+\textbf{2. Symbolic and numerical calculations.}
 
-	\begin{center}
-		\begin{tabular}{lrr}
-			\toprule
-			Alternative
-			& Routine requirements
-			& Enhanced requirements \\
-			\midrule
-			Standard sponsorship & 34 & 21 \\
-			Premium sponsorship & 50 & 37 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{52-18}{34} & \CalcResult{52-31}{21} \\
+\(A_2\) & \CalcResult{68-18}{50} & \CalcResult{68-31}{37} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \(34\) & \(21\) \\
+\(A_2\) & \(50\) & \(37\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
+
 
 	\secInicio[sec:problem7-community-arts-sponsorship-c1-c3][sec:one-component-models]
 
@@ -744,63 +1461,81 @@
 	\phantomsection
 	\label{subsec:problem8-distribution-contract-fulfilment-c3}
 
-	For every alternative--state pair, calculate
-	\[
-	\begin{aligned}
-		R(A_i,S_j)&=f_r(S_j),
-		\\
-		C(A_i,S_j)&=q(A_i,S_j)c(A_i),
-		\\
-		P(A_i,S_j)&=R(A_i,S_j)-C(A_i,S_j).
-	\end{aligned}
-	\]
+\textbf{1. Input table.}
 
-	\begin{center}
-		\small
-		\begin{tabular}{llll}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\)
-			& \(70\)
-			& \(4(7)=28\)
-			& \(70-28=42\) \\
-			
-			\((A_1,S_2)\)
-			& \(104\)
-			& \(7(7)=49\)
-			& \(104-49=55\) \\
-			
-			\((A_2,S_1)\)
-			& \(70\)
-			& \(5(5)=25\)
-			& \(70-25=45\) \\
-			
-			\((A_2,S_2)\)
-			& \(104\)
-			& \(8(5)=40\)
-			& \(104-40=64\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Use manual packing. \\
+\(A_2\) & --- & Use automated packing. \\
+\(S_1\) & --- & Standard-volume contract. \\
+\(S_2\) & --- & High-volume contract. \\
+\(f_r(S_1)\) & 70 thousand USD & Contract payment for \(S_1\) (fixed amount). \\
+\(q(A_1,S_1)\) & 4 hundreds of orders & Forecast quantity for \(A_1\) under \(S_1\). \\
+\(c(A_1)\) & 7 thousand USD per hundred orders & Packing labour rate for \(A_1\) (rate per unit). \\
+\(f_r(S_2)\) & 104 thousand USD & Contract payment for \(S_2\) (fixed amount). \\
+\(q(A_1,S_2)\) & 7 hundreds of orders & Forecast quantity for \(A_1\) under \(S_2\). \\
+\(q(A_2,S_1)\) & 5 hundreds of orders & Forecast quantity for \(A_2\) under \(S_1\). \\
+\(c(A_2)\) & 5 thousand USD per hundred orders & Packing labour rate for \(A_2\) (rate per unit). \\
+\(q(A_2,S_2)\) & 8 hundreds of orders & Forecast quantity for \(A_2\) under \(S_2\). \\
+\bottomrule
+\end{longtable}
 
-	The resulting payoff table is:
+\textbf{2. Symbolic and numerical calculations.}
 
-	\begin{center}
-		\begin{tabular}{lrr}
-			\toprule
-			Alternative
-			& Standard-volume contract
-			& High-volume contract \\
-			\midrule
-			Manual packing & 42 & 55 \\
-			Automated packing & 45 & 64 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Cost}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)c(A_1)} & \SymbolicCell{q(A_1,S_2)c(A_1)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)c(A_2)} & \SymbolicCell{q(A_2,S_2)c(A_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{4(7)}{28} & \CalcResult{7(7)}{49} \\
+\(A_2\) & \CalcResult{5(5)}{25} & \CalcResult{8(5)}{40} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{70-28}{42} & \CalcResult{104-49}{55} \\
+\(A_2\) & \CalcResult{70-25}{45} & \CalcResult{104-40}{64} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \(42\) & \(55\) \\
+\(A_2\) & \(45\) & \(64\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
+
 
 	\secInicio[sec:problem8-distribution-contract-fulfilment-c1-c3][sec:one-component-models]
 
@@ -878,76 +1613,113 @@
 
 	\secInicio[sec:problem9-farm-produce-subscription-c1-c3][sec:two-component-models]
 
-	\subsubsection*{C3 - Calculating profit and building the payoff table.}
+	\begin{CalculationLandscape}{14in}{11in}
+\subsubsection*{C3 - Calculating profit and building the payoff table.}
 	\phantomsection
 	\label{subsec:problem9-farm-produce-subscription-c3}
 
-	For every alternative--state pair, calculate
-	\[
-	\begin{aligned}
-		R(A_i,S_j)
-		&=
-		q(A_i,S_j)
-		\left[
-		r(A_i)+r(S_j)
-		\right],
-		\\
-		C(A_i,S_j)
-		&=
-		q(A_i,S_j)c(A_i)+f_c(S_j),
-		\\
-		P(A_i,S_j)
-		&=
-		R(A_i,S_j)-C(A_i,S_j).
-	\end{aligned}
-	\]
+\textbf{1. Input table.}
 
-	\begin{center}
-		\small
-		\begin{tabular}{llll}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\)
-			& \(7(8+3)=77\)
-			& \(7(4)+9=37\)
-			& \(77-37=40\) \\
-			
-			\((A_1,S_2)\)
-			& \(4(8+1)=36\)
-			& \(4(4)+13=29\)
-			& \(36-29=7\) \\
-			
-			\((A_2,S_1)\)
-			& \(6(11+3)=84\)
-			& \(6(6)+9=45\)
-			& \(84-45=39\) \\
-			
-			\((A_2,S_2)\)
-			& \(3(11+1)=36\)
-			& \(3(6)+13=31\)
-			& \(36-31=5\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Offer a standard produce box. \\
+\(A_2\) & --- & Offer a premium produce box. \\
+\(S_1\) & --- & Strong seasonal demand. \\
+\(S_2\) & --- & Weak seasonal demand. \\
+\(q(A_1,S_1)\) & 7 hundreds of subscriptions & Forecast quantity for \(A_1\) under \(S_1\). \\
+\(r(A_1)\) & 8 thousand USD per hundred subscriptions & Produce-box selling rate for \(A_1\) (rate per unit). \\
+\(r(S_1)\) & 3 thousand USD per hundred subscriptions & Seasonal market supplement for \(S_1\) (rate per unit). \\
+\(c(A_1)\) & 4 thousand USD per hundred subscriptions & Packing input rate for \(A_1\) (rate per unit). \\
+\(f_c(S_1)\) & 9 thousand USD & Seasonal distribution cost for \(S_1\) (fixed amount). \\
+\(q(A_1,S_2)\) & 4 hundreds of subscriptions & Forecast quantity for \(A_1\) under \(S_2\). \\
+\(r(S_2)\) & 1 thousand USD per hundred subscriptions & Seasonal market supplement for \(S_2\) (rate per unit). \\
+\(f_c(S_2)\) & 13 thousand USD & Seasonal distribution cost for \(S_2\) (fixed amount). \\
+\(q(A_2,S_1)\) & 6 hundreds of subscriptions & Forecast quantity for \(A_2\) under \(S_1\). \\
+\(r(A_2)\) & 11 thousand USD per hundred subscriptions & Produce-box selling rate for \(A_2\) (rate per unit). \\
+\(c(A_2)\) & 6 thousand USD per hundred subscriptions & Packing input rate for \(A_2\) (rate per unit). \\
+\(q(A_2,S_2)\) & 3 hundreds of subscriptions & Forecast quantity for \(A_2\) under \(S_2\). \\
+\bottomrule
+\end{longtable}
 
-	The resulting payoff table is:
+\clearpage
+\textbf{2. Symbolic and numerical calculations.}
 
-	\begin{center}
-		\begin{tabular}{lrr}
-			\toprule
-			Alternative & Strong seasonal demand & Weak seasonal demand \\
-			\midrule
-			Standard produce box & 40 & 7 \\
-			Premium produce box & 39 & 5 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Revenue}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)[r(A_1)+r(S_1)]} & \SymbolicCell{q(A_1,S_2)[r(A_1)+r(S_2)]} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)[r(A_2)+r(S_1)]} & \SymbolicCell{q(A_2,S_2)[r(A_2)+r(S_2)]} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{7(8+3)}{77} & \CalcResult{4(8+1)}{36} \\
+\(A_2\) & \CalcResult{6(11+3)}{84} & \CalcResult{3(11+1)}{36} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Cost}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)c(A_1)+f_c(S_1)} & \SymbolicCell{q(A_1,S_2)c(A_1)+f_c(S_2)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)c(A_2)+f_c(S_1)} & \SymbolicCell{q(A_2,S_2)c(A_2)+f_c(S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{7(4)+9}{37} & \CalcResult{4(4)+13}{29} \\
+\(A_2\) & \CalcResult{6(6)+9}{45} & \CalcResult{3(6)+13}{31} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{77-37}{40} & \CalcResult{36-29}{7} \\
+\(A_2\) & \CalcResult{84-45}{39} & \CalcResult{36-31}{5} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \(40\) & \(7\) \\
+\(A_2\) & \(39\) & \(5\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
+
 
 	\secInicio[sec:problem9-farm-produce-subscription-c1-c3][sec:two-component-models]
+\end{CalculationLandscape}
+
 
 	\subsection{Mobile Catering Configuration (C1--C3)}
 	\label{sec:problem10-mobile-catering-configuration-c1-c3}
@@ -1007,73 +1779,113 @@
 
 	\secInicio[sec:problem10-mobile-catering-configuration-c1-c3][sec:two-component-models]
 
-	\subsubsection*{C3 - Calculating profit and building the payoff table.}
+	\begin{CalculationLandscape}{14in}{11in}
+\subsubsection*{C3 - Calculating profit and building the payoff table.}
 	\phantomsection
 	\label{subsec:problem10-mobile-catering-configuration-c3}
 
-	For every alternative--state pair, calculate
-	\[
-	\begin{aligned}
-		R(A_i,S_j)
-		&=
-		q(A_i,S_j)r(A_i)+f_r(A_i),
-		\\
-		C(A_i,S_j)
-		&=
-		q(A_i,S_j)c(S_j)+f_c(A_i),
-		\\
-		P(A_i,S_j)
-		&=
-		R(A_i,S_j)-C(A_i,S_j).
-	\end{aligned}
-	\]
+\textbf{1. Input table.}
 
-	\begin{center}
-		\small
-		\begin{tabular}{llll}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\)
-			& \(8(7)+18=74\)
-			& \(8(3)+20=44\)
-			& \(74-44=30\) \\
-			
-			\((A_1,S_2)\)
-			& \(4(7)+18=46\)
-			& \(4(5)+20=40\)
-			& \(46-40=6\) \\
-			
-			\((A_2,S_1)\)
-			& \(10(9)+25=115\)
-			& \(10(3)+32=62\)
-			& \(115-62=53\) \\
-			
-			\((A_2,S_2)\)
-			& \(5(9)+25=70\)
-			& \(5(5)+32=57\)
-			& \(70-57=13\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Prepare a compact catering station. \\
+\(A_2\) & --- & Prepare a full mobile kitchen. \\
+\(S_1\) & --- & Busy event with stable ingredient prices. \\
+\(S_2\) & --- & Quiet event with higher ingredient prices. \\
+\(q(A_1,S_1)\) & 8 hundreds of service orders & Forecast quantity for \(A_1\) under \(S_1\). \\
+\(r(A_1)\) & 7 thousand USD per hundred service orders & Menu sales rate for \(A_1\) (rate per unit). \\
+\(f_r(A_1)\) & 18 thousand USD & Booking agreement payment for \(A_1\) (fixed amount). \\
+\(c(S_1)\) & 3 thousand USD per hundred service orders & Ingredient rate for \(S_1\) (rate per unit). \\
+\(f_c(A_1)\) & 20 thousand USD & Configuration setup cost for \(A_1\) (fixed amount). \\
+\(q(A_1,S_2)\) & 4 hundreds of service orders & Forecast quantity for \(A_1\) under \(S_2\). \\
+\(c(S_2)\) & 5 thousand USD per hundred service orders & Ingredient rate for \(S_2\) (rate per unit). \\
+\(q(A_2,S_1)\) & 10 hundreds of service orders & Forecast quantity for \(A_2\) under \(S_1\). \\
+\(r(A_2)\) & 9 thousand USD per hundred service orders & Menu sales rate for \(A_2\) (rate per unit). \\
+\(f_r(A_2)\) & 25 thousand USD & Booking agreement payment for \(A_2\) (fixed amount). \\
+\(f_c(A_2)\) & 32 thousand USD & Configuration setup cost for \(A_2\) (fixed amount). \\
+\(q(A_2,S_2)\) & 5 hundreds of service orders & Forecast quantity for \(A_2\) under \(S_2\). \\
+\bottomrule
+\end{longtable}
 
-	The resulting payoff table is:
+\clearpage
+\textbf{2. Symbolic and numerical calculations.}
 
-	\begin{center}
-		\begin{tabular}{lrr}
-			\toprule
-			Alternative & Busy event & Quiet event \\
-			\midrule
-			Compact catering station & 30 & 6 \\
-			Full mobile kitchen & 53 & 13 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Revenue}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)r(A_1)+f_r(A_1)} & \SymbolicCell{q(A_1,S_2)r(A_1)+f_r(A_1)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)r(A_2)+f_r(A_2)} & \SymbolicCell{q(A_2,S_2)r(A_2)+f_r(A_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{8(7)+18}{74} & \CalcResult{4(7)+18}{46} \\
+\(A_2\) & \CalcResult{10(9)+25}{115} & \CalcResult{5(9)+25}{70} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Cost}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)c(S_1)+f_c(A_1)} & \SymbolicCell{q(A_1,S_2)c(S_2)+f_c(A_1)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)c(S_1)+f_c(A_2)} & \SymbolicCell{q(A_2,S_2)c(S_2)+f_c(A_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{8(3)+20}{44} & \CalcResult{4(5)+20}{40} \\
+\(A_2\) & \CalcResult{10(3)+32}{62} & \CalcResult{5(5)+32}{57} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{74-44}{30} & \CalcResult{46-40}{6} \\
+\(A_2\) & \CalcResult{115-62}{53} & \CalcResult{70-57}{13} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \(30\) & \(6\) \\
+\(A_2\) & \(53\) & \(13\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
+
 
 	\secInicio[sec:problem10-mobile-catering-configuration-c1-c3][sec:two-component-models]
+\end{CalculationLandscape}
+
 
 	\subsection{Online Training Programme (C1--C3)}
 	\label{sec:problem11-online-training-programme-c1-c3}
@@ -1133,73 +1945,113 @@
 
 	\secInicio[sec:problem11-online-training-programme-c1-c3][sec:two-component-models]
 
-	\subsubsection*{C3 - Calculating profit and building the payoff table.}
+	\begin{CalculationLandscape}{14in}{11in}
+\subsubsection*{C3 - Calculating profit and building the payoff table.}
 	\phantomsection
 	\label{subsec:problem11-online-training-programme-c3}
 
-	For every alternative--state pair, calculate
-	\[
-	\begin{aligned}
-		R(A_i,S_j)
-		&=
-		q(A_i,S_j)r(A_i)+f_r(S_j),
-		\\
-		C(A_i,S_j)
-		&=
-		q(A_i,S_j)c(S_j)+f_c(S_j),
-		\\
-		P(A_i,S_j)
-		&=
-		R(A_i,S_j)-C(A_i,S_j).
-	\end{aligned}
-	\]
+\textbf{1. Input table.}
 
-	\begin{center}
-		\small
-		\begin{tabular}{llll}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\)
-			& \(5(14)+12=82\)
-			& \(5(6)+10=40\)
-			& \(82-40=42\) \\
-			
-			\((A_1,S_2)\)
-			& \(3(14)+7=49\)
-			& \(3(8)+14=38\)
-			& \(49-38=11\) \\
-			
-			\((A_2,S_1)\)
-			& \(4(20)+12=92\)
-			& \(4(6)+10=34\)
-			& \(92-34=58\) \\
-			
-			\((A_2,S_2)\)
-			& \(2(20)+7=47\)
-			& \(2(8)+14=30\)
-			& \(47-30=17\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Offer the foundation programme. \\
+\(A_2\) & --- & Offer the advanced programme. \\
+\(S_1\) & --- & Corporate enrolment. \\
+\(S_2\) & --- & Individual enrolment. \\
+\(q(A_1,S_1)\) & 5 enrolment groups & Forecast quantity for \(A_1\) under \(S_1\). \\
+\(r(A_1)\) & 14 thousand USD per enrolment group & Tuition rate for \(A_1\) (rate per unit). \\
+\(f_r(S_1)\) & 12 thousand USD & Enrolment-channel payment for \(S_1\) (fixed amount). \\
+\(c(S_1)\) & 6 thousand USD per enrolment group & Group delivery rate for \(S_1\) (rate per unit). \\
+\(f_c(S_1)\) & 10 thousand USD & Platform arrangement cost for \(S_1\) (fixed amount). \\
+\(q(A_1,S_2)\) & 3 enrolment groups & Forecast quantity for \(A_1\) under \(S_2\). \\
+\(f_r(S_2)\) & 7 thousand USD & Enrolment-channel payment for \(S_2\) (fixed amount). \\
+\(c(S_2)\) & 8 thousand USD per enrolment group & Group delivery rate for \(S_2\) (rate per unit). \\
+\(f_c(S_2)\) & 14 thousand USD & Platform arrangement cost for \(S_2\) (fixed amount). \\
+\(q(A_2,S_1)\) & 4 enrolment groups & Forecast quantity for \(A_2\) under \(S_1\). \\
+\(r(A_2)\) & 20 thousand USD per enrolment group & Tuition rate for \(A_2\) (rate per unit). \\
+\(q(A_2,S_2)\) & 2 enrolment groups & Forecast quantity for \(A_2\) under \(S_2\). \\
+\bottomrule
+\end{longtable}
 
-	The resulting payoff table is:
+\clearpage
+\textbf{2. Symbolic and numerical calculations.}
 
-	\begin{center}
-		\begin{tabular}{lrr}
-			\toprule
-			Alternative & Corporate enrolment & Individual enrolment \\
-			\midrule
-			Foundation programme & 42 & 11 \\
-			Advanced programme & 58 & 17 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Revenue}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)r(A_1)+f_r(S_1)} & \SymbolicCell{q(A_1,S_2)r(A_1)+f_r(S_2)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)r(A_2)+f_r(S_1)} & \SymbolicCell{q(A_2,S_2)r(A_2)+f_r(S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{5(14)+12}{82} & \CalcResult{3(14)+7}{49} \\
+\(A_2\) & \CalcResult{4(20)+12}{92} & \CalcResult{2(20)+7}{47} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Cost}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)c(S_1)+f_c(S_1)} & \SymbolicCell{q(A_1,S_2)c(S_2)+f_c(S_2)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)c(S_1)+f_c(S_1)} & \SymbolicCell{q(A_2,S_2)c(S_2)+f_c(S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{5(6)+10}{40} & \CalcResult{3(8)+14}{38} \\
+\(A_2\) & \CalcResult{4(6)+10}{34} & \CalcResult{2(8)+14}{30} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{82-40}{42} & \CalcResult{49-38}{11} \\
+\(A_2\) & \CalcResult{92-34}{58} & \CalcResult{47-30}{17} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \(42\) & \(11\) \\
+\(A_2\) & \(58\) & \(17\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
+
 
 	\secInicio[sec:problem11-online-training-programme-c1-c3][sec:two-component-models]
+\end{CalculationLandscape}
+
 
 	\subsection{Community Venue Membership (C1--C3)}
 	\label{sec:problem12-community-venue-membership-c1-c3}
@@ -1259,76 +2111,116 @@
 
 	\secInicio[sec:problem12-community-venue-membership-c1-c3][sec:two-component-models]
 
-	\subsubsection*{C3 - Calculating profit and building the payoff table.}
+	\begin{CalculationLandscape}{14in}{11in}
+\subsubsection*{C3 - Calculating profit and building the payoff table.}
 	\phantomsection
 	\label{subsec:problem12-community-venue-membership-c3}
 
-	For every alternative--state pair, calculate
-	\[
-	\begin{aligned}
-		R(A_i,S_j)
-		&=
-		q(A_i,S_j)r(S_j)+f_r(A_i),
-		\\
-		C(A_i,S_j)
-		&=
-		f_c(A_i)+f_c(S_j),
-		\\
-		P(A_i,S_j)
-		&=
-		R(A_i,S_j)-C(A_i,S_j).
-	\end{aligned}
-	\]
+\textbf{1. Input table.}
 
-	\begin{center}
-		\small
-		\begin{tabular}{llll}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\)
-			& \(6(10)+15=75\)
-			& \(28+8=36\)
-			& \(75-36=39\) \\
-			
-			\((A_1,S_2)\)
-			& \(3(7)+15=36\)
-			& \(28+13=41\)
-			& \(36-41=-5\) \\
-			
-			\((A_2,S_1)\)
-			& \(8(10)+22=102\)
-			& \(40+8=48\)
-			& \(102-48=54\) \\
-			
-			\((A_2,S_2)\)
-			& \(4(7)+22=50\)
-			& \(40+13=53\)
-			& \(50-53=-3\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Select the standard venue membership. \\
+\(A_2\) & --- & Select the expanded venue membership. \\
+\(S_1\) & --- & High booking demand. \\
+\(S_2\) & --- & Low booking demand. \\
+\(q(A_1,S_1)\) & 6 bookings & Forecast quantity for \(A_1\) under \(S_1\). \\
+\(r(S_1)\) & 10 thousand USD per booking & Booking revenue rate for \(S_1\) (rate per unit). \\
+\(f_r(A_1)\) & 15 thousand USD & Sponsor contribution for \(A_1\) (fixed amount). \\
+\(f_c(A_1)\) & 28 thousand USD & Annual membership cost for \(A_1\) (fixed amount). \\
+\(f_c(S_1)\) & 8 thousand USD & Permit cost for \(S_1\) (fixed amount). \\
+\(q(A_1,S_2)\) & 3 bookings & Forecast quantity for \(A_1\) under \(S_2\). \\
+\(r(S_2)\) & 7 thousand USD per booking & Booking revenue rate for \(S_2\) (rate per unit). \\
+\(f_c(S_2)\) & 13 thousand USD & Permit cost for \(S_2\) (fixed amount). \\
+\(q(A_2,S_1)\) & 8 bookings & Forecast quantity for \(A_2\) under \(S_1\). \\
+\(f_r(A_2)\) & 22 thousand USD & Sponsor contribution for \(A_2\) (fixed amount). \\
+\(f_c(A_2)\) & 40 thousand USD & Annual membership cost for \(A_2\) (fixed amount). \\
+\(q(A_2,S_2)\) & 4 bookings & Forecast quantity for \(A_2\) under \(S_2\). \\
+\bottomrule
+\end{longtable}
 
-	The resulting payoff table is:
+\clearpage
+\textbf{2. Symbolic and numerical calculations.}
 
-	\begin{center}
-		\begin{tabular}{lrr}
-			\toprule
-			Alternative & High booking demand & Low booking demand \\
-			\midrule
-			Standard venue membership & 39 & \(-5\) \\
-			Expanded venue membership & 54 & \(-3\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Revenue}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)r(S_1)+f_r(A_1)} & \SymbolicCell{q(A_1,S_2)r(S_2)+f_r(A_1)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)r(S_1)+f_r(A_2)} & \SymbolicCell{q(A_2,S_2)r(S_2)+f_r(A_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{6(10)+15}{75} & \CalcResult{3(7)+15}{36} \\
+\(A_2\) & \CalcResult{8(10)+22}{102} & \CalcResult{4(7)+22}{50} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Cost}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{f_c(A_1)+f_c(S_1)} & \SymbolicCell{f_c(A_1)+f_c(S_2)} \\
+\(A_2\) & \SymbolicCell{f_c(A_2)+f_c(S_1)} & \SymbolicCell{f_c(A_2)+f_c(S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{28+8}{36} & \CalcResult{28+13}{41} \\
+\(A_2\) & \CalcResult{40+8}{48} & \CalcResult{40+13}{53} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{75-36}{39} & \CalcResult{36-41}{-5} \\
+\(A_2\) & \CalcResult{102-48}{54} & \CalcResult{50-53}{-3} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \(39\) & \(-5\) \\
+\(A_2\) & \(54\) & \(-3\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
 
 	The negative payoffs under low booking demand represent losses because the
 	combined fixed costs exceed the revenue earned.
 
+
 	\secInicio[sec:problem12-community-venue-membership-c1-c3][sec:two-component-models]
+\end{CalculationLandscape}
+
 
 	\subsection{Urban Delivery Fleet (C1--C3)}
 	\label{sec:problem13-urban-delivery-fleet-c1-c3}
@@ -1391,76 +2283,113 @@
 
 	\secInicio[sec:problem13-urban-delivery-fleet-c1-c3][sec:two-component-models]
 
-	\subsubsection*{C3 - Calculating profit and building the payoff table.}
+	\begin{CalculationLandscape}{14in}{11in}
+\subsubsection*{C3 - Calculating profit and building the payoff table.}
 	\phantomsection
 	\label{subsec:problem13-urban-delivery-fleet-c3}
 
-	For every alternative--state pair, calculate
-	\[
-	\begin{aligned}
-		R(A_i,S_j)
-		&=
-		q(A_i,S_j)r(S_j)+f_r(S_j),
-		\\
-		C(A_i,S_j)
-		&=
-		q(A_i,S_j)
-		\left[
-		c(A_i)+c(S_j)
-		\right],
-		\\
-		P(A_i,S_j)
-		&=
-		R(A_i,S_j)-C(A_i,S_j).
-	\end{aligned}
-	\]
+\textbf{1. Input table.}
 
-	\begin{center}
-		\small
-		\begin{tabular}{llll}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\)
-			& \(9(8)+14=86\)
-			& \(9(3+1)=36\)
-			& \(86-36=50\) \\
-			
-			\((A_1,S_2)\)
-			& \(5(6)+8=38\)
-			& \(5(3+3)=30\)
-			& \(38-30=8\) \\
-			
-			\((A_2,S_1)\)
-			& \(12(8)+14=110\)
-			& \(12(2+1)=36\)
-			& \(110-36=74\) \\
-			
-			\((A_2,S_2)\)
-			& \(6(6)+8=44\)
-			& \(6(2+3)=30\)
-			& \(44-30=14\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Use a conventional van fleet. \\
+\(A_2\) & --- & Use an electric cargo-bike fleet. \\
+\(S_1\) & --- & High demand with light traffic. \\
+\(S_2\) & --- & Low demand with heavy traffic. \\
+\(q(A_1,S_1)\) & 9 delivery batches & Forecast quantity for \(A_1\) under \(S_1\). \\
+\(r(S_1)\) & 8 thousand USD per delivery batch & Customer contract rate for \(S_1\) (rate per unit). \\
+\(f_r(S_1)\) & 14 thousand USD & Performance payment for \(S_1\) (fixed amount). \\
+\(c(A_1)\) & 3 thousand USD per delivery batch & Fleet operating rate for \(A_1\) (rate per unit). \\
+\(c(S_1)\) & 1 thousand USD per delivery batch & Traffic-related rate for \(S_1\) (rate per unit). \\
+\(q(A_1,S_2)\) & 5 delivery batches & Forecast quantity for \(A_1\) under \(S_2\). \\
+\(r(S_2)\) & 6 thousand USD per delivery batch & Customer contract rate for \(S_2\) (rate per unit). \\
+\(f_r(S_2)\) & 8 thousand USD & Performance payment for \(S_2\) (fixed amount). \\
+\(c(S_2)\) & 3 thousand USD per delivery batch & Traffic-related rate for \(S_2\) (rate per unit). \\
+\(q(A_2,S_1)\) & 12 delivery batches & Forecast quantity for \(A_2\) under \(S_1\). \\
+\(c(A_2)\) & 2 thousand USD per delivery batch & Fleet operating rate for \(A_2\) (rate per unit). \\
+\(q(A_2,S_2)\) & 6 delivery batches & Forecast quantity for \(A_2\) under \(S_2\). \\
+\bottomrule
+\end{longtable}
 
-	The resulting payoff table is:
+\clearpage
+\textbf{2. Symbolic and numerical calculations.}
 
-	\begin{center}
-		\begin{tabular}{lrr}
-			\toprule
-			Alternative & High demand, light traffic & Low demand, heavy traffic \\
-			\midrule
-			Conventional van fleet & 50 & 8 \\
-			Electric cargo-bike fleet & 74 & 14 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Revenue}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)r(S_1)+f_r(S_1)} & \SymbolicCell{q(A_1,S_2)r(S_2)+f_r(S_2)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)r(S_1)+f_r(S_1)} & \SymbolicCell{q(A_2,S_2)r(S_2)+f_r(S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{9(8)+14}{86} & \CalcResult{5(6)+8}{38} \\
+\(A_2\) & \CalcResult{12(8)+14}{110} & \CalcResult{6(6)+8}{44} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Cost}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)[c(A_1)+c(S_1)]} & \SymbolicCell{q(A_1,S_2)[c(A_1)+c(S_2)]} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)[c(A_2)+c(S_1)]} & \SymbolicCell{q(A_2,S_2)[c(A_2)+c(S_2)]} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{9(3+1)}{36} & \CalcResult{5(3+3)}{30} \\
+\(A_2\) & \CalcResult{12(2+1)}{36} & \CalcResult{6(2+3)}{30} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{86-36}{50} & \CalcResult{38-30}{8} \\
+\(A_2\) & \CalcResult{110-36}{74} & \CalcResult{44-30}{14} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \(50\) & \(8\) \\
+\(A_2\) & \(74\) & \(14\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
+
 
 	\secInicio[sec:problem13-urban-delivery-fleet-c1-c3][sec:two-component-models]
+\end{CalculationLandscape}
+
 
 	\subsection{Data-Service Contract (C1--C3)}
 	\label{sec:problem14-data-service-contract-c1-c3}
@@ -1519,73 +2448,113 @@
 
 	\secInicio[sec:problem14-data-service-contract-c1-c3][sec:two-component-models]
 
-	\subsubsection*{C3 - Calculating profit and building the payoff table.}
+	\begin{CalculationLandscape}{14in}{11in}
+\subsubsection*{C3 - Calculating profit and building the payoff table.}
 	\phantomsection
 	\label{subsec:problem14-data-service-contract-c3}
 
-	For every alternative--state pair, calculate
-	\[
-	\begin{aligned}
-		R(A_i,S_j)
-		&=
-		f_r(A_i)+f_r(S_j),
-		\\
-		C(A_i,S_j)
-		&=
-		q(A_i,S_j)c(A_i)+f_c(A_i),
-		\\
-		P(A_i,S_j)
-		&=
-		R(A_i,S_j)-C(A_i,S_j).
-	\end{aligned}
-	\]
+\textbf{1. Input table.}
 
-	\begin{center}
-		\small
-		\begin{tabular}{llll}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\)
-			& \(55+16=71\)
-			& \(4(6)+18=42\)
-			& \(71-42=29\) \\
-			
-			\((A_1,S_2)\)
-			& \(55+9=64\)
-			& \(7(6)+18=60\)
-			& \(64-60=4\) \\
-			
-			\((A_2,S_1)\)
-			& \(72+16=88\)
-			& \(5(4)+31=51\)
-			& \(88-51=37\) \\
-			
-			\((A_2,S_2)\)
-			& \(72+9=81\)
-			& \(9(4)+31=67\)
-			& \(81-67=14\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Use standard data processing. \\
+\(A_2\) & --- & Use automated data processing. \\
+\(S_1\) & --- & Standard-volume contract. \\
+\(S_2\) & --- & High-volume contract. \\
+\(f_r(A_1)\) & 55 thousand USD & Method agreement payment for \(A_1\) (fixed amount). \\
+\(f_r(S_1)\) & 16 thousand USD & Service-level payment for \(S_1\) (fixed amount). \\
+\(q(A_1,S_1)\) & 4 processing batches & Forecast quantity for \(A_1\) under \(S_1\). \\
+\(c(A_1)\) & 6 thousand USD per processing batch & Processing rate for \(A_1\) (rate per unit). \\
+\(f_c(A_1)\) & 18 thousand USD & Implementation cost for \(A_1\) (fixed amount). \\
+\(f_r(S_2)\) & 9 thousand USD & Service-level payment for \(S_2\) (fixed amount). \\
+\(q(A_1,S_2)\) & 7 processing batches & Forecast quantity for \(A_1\) under \(S_2\). \\
+\(f_r(A_2)\) & 72 thousand USD & Method agreement payment for \(A_2\) (fixed amount). \\
+\(q(A_2,S_1)\) & 5 processing batches & Forecast quantity for \(A_2\) under \(S_1\). \\
+\(c(A_2)\) & 4 thousand USD per processing batch & Processing rate for \(A_2\) (rate per unit). \\
+\(f_c(A_2)\) & 31 thousand USD & Implementation cost for \(A_2\) (fixed amount). \\
+\(q(A_2,S_2)\) & 9 processing batches & Forecast quantity for \(A_2\) under \(S_2\). \\
+\bottomrule
+\end{longtable}
 
-	The resulting payoff table is:
+\clearpage
+\textbf{2. Symbolic and numerical calculations.}
 
-	\begin{center}
-		\begin{tabular}{lrr}
-			\toprule
-			Alternative & Standard-volume contract & High-volume contract \\
-			\midrule
-			Standard data processing & 29 & 4 \\
-			Automated data processing & 37 & 14 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Revenue}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{f_r(A_1)+f_r(S_1)} & \SymbolicCell{f_r(A_1)+f_r(S_2)} \\
+\(A_2\) & \SymbolicCell{f_r(A_2)+f_r(S_1)} & \SymbolicCell{f_r(A_2)+f_r(S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{55+16}{71} & \CalcResult{55+9}{64} \\
+\(A_2\) & \CalcResult{72+16}{88} & \CalcResult{72+9}{81} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Cost}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)c(A_1)+f_c(A_1)} & \SymbolicCell{q(A_1,S_2)c(A_1)+f_c(A_1)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)c(A_2)+f_c(A_2)} & \SymbolicCell{q(A_2,S_2)c(A_2)+f_c(A_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{4(6)+18}{42} & \CalcResult{7(6)+18}{60} \\
+\(A_2\) & \CalcResult{5(4)+31}{51} & \CalcResult{9(4)+31}{67} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{71-42}{29} & \CalcResult{64-60}{4} \\
+\(A_2\) & \CalcResult{88-51}{37} & \CalcResult{81-67}{14} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \(29\) & \(4\) \\
+\(A_2\) & \(37\) & \(14\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
+
 
 	\secInicio[sec:problem14-data-service-contract-c1-c3][sec:two-component-models]
+\end{CalculationLandscape}
+
 
 	\section{Three-Component Models}
 	\label{sec:three-component-models}
@@ -1679,85 +2648,117 @@
 
 	\secInicio[sec:problem15-regional-parcel-delivery-c1-c3][sec:three-component-models]
 
-	\subsubsection*{C3 - Calculating profit and building the payoff table.}
+	\begin{CalculationLandscape}{14in}{11in}
+\subsubsection*{C3 - Calculating profit and building the payoff table.}
 	\phantomsection
 	\label{subsec:problem15-regional-parcel-delivery-c3}
 
-	For every alternative--state pair, calculate
-	\[
-	\begin{aligned}
-		R(A_i,S_j)
-		&=
-		q(A_i,S_j)
-		\left[
-		r(A_i)+r(S_j)
-		\right]
-		+
-		f_r(A_i),
-		\\
-		C(A_i,S_j)
-		&=
-		q(A_i,S_j)
-		\left[
-		c(A_i)+c(S_j)
-		\right]
-		+
-		f_c(S_j),
-		\\
-		P(A_i,S_j)
-		&=
-		R(A_i,S_j)-C(A_i,S_j).
-	\end{aligned}
-	\]
+\textbf{1. Input table.}
 
-	\begin{center}
-		\small
-		\begin{tabular}{llll}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\)
-			& \(8(9+3)+16=112\)
-			& \(8(4+1)+10=50\)
-			& \(112-50=62\) \\
-			
-			\((A_1,S_2)\)
-			& \(5(9+2)+16=71\)
-			& \(5(4+3)+15=50\)
-			& \(71-50=21\) \\
-			
-			\((A_2,S_1)\)
-			& \(10(11+3)+24=164\)
-			& \(10(5+1)+10=70\)
-			& \(164-70=94\) \\
-			
-			\((A_2,S_2)\)
-			& \(6(11+2)+24=102\)
-			& \(6(5+3)+15=63\)
-			& \(102-63=39\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Use the standard delivery plan. \\
+\(A_2\) & --- & Use the express delivery plan. \\
+\(S_1\) & --- & High demand with light traffic. \\
+\(S_2\) & --- & Moderate demand with heavy traffic. \\
+\(q(A_1,S_1)\) & 8 hundreds of delivery batches & Forecast quantity for \(A_1\) under \(S_1\). \\
+\(r(A_1)\) & 9 thousand USD per hundred delivery batches & Delivery service rate for \(A_1\) (rate per unit). \\
+\(r(S_1)\) & 3 thousand USD per hundred delivery batches & Demand supplement for \(S_1\) (rate per unit). \\
+\(f_r(A_1)\) & 16 thousand USD & Service agreement payment for \(A_1\) (fixed amount). \\
+\(c(A_1)\) & 4 thousand USD per hundred delivery batches & Operating rate for \(A_1\) (rate per unit). \\
+\(c(S_1)\) & 1 thousand USD per hundred delivery batches & Traffic-related rate for \(S_1\) (rate per unit). \\
+\(f_c(S_1)\) & 10 thousand USD & Distribution arrangement cost for \(S_1\) (fixed amount). \\
+\(q(A_1,S_2)\) & 5 hundreds of delivery batches & Forecast quantity for \(A_1\) under \(S_2\). \\
+\(r(S_2)\) & 2 thousand USD per hundred delivery batches & Demand supplement for \(S_2\) (rate per unit). \\
+\(c(S_2)\) & 3 thousand USD per hundred delivery batches & Traffic-related rate for \(S_2\) (rate per unit). \\
+\(f_c(S_2)\) & 15 thousand USD & Distribution arrangement cost for \(S_2\) (fixed amount). \\
+\(q(A_2,S_1)\) & 10 hundreds of delivery batches & Forecast quantity for \(A_2\) under \(S_1\). \\
+\(r(A_2)\) & 11 thousand USD per hundred delivery batches & Delivery service rate for \(A_2\) (rate per unit). \\
+\(f_r(A_2)\) & 24 thousand USD & Service agreement payment for \(A_2\) (fixed amount). \\
+\(c(A_2)\) & 5 thousand USD per hundred delivery batches & Operating rate for \(A_2\) (rate per unit). \\
+\(q(A_2,S_2)\) & 6 hundreds of delivery batches & Forecast quantity for \(A_2\) under \(S_2\). \\
+\bottomrule
+\end{longtable}
 
-	The resulting payoff table is:
+\clearpage
+\textbf{2. Symbolic and numerical calculations.}
 
-	\begin{center}
-		\begin{tabular}{lrr}
-			\toprule
-			Alternative
-			& High demand, light traffic
-			& Moderate demand, heavy traffic \\
-			\midrule
-			Standard delivery plan & 62 & 21 \\
-			Express delivery plan & 94 & 39 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Revenue}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)[r(A_1)+r(S_1)]+f_r(A_1)} & \SymbolicCell{q(A_1,S_2)[r(A_1)+r(S_2)]+f_r(A_1)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)[r(A_2)+r(S_1)]+f_r(A_2)} & \SymbolicCell{q(A_2,S_2)[r(A_2)+r(S_2)]+f_r(A_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{8(9+3)+16}{112} & \CalcResult{5(9+2)+16}{71} \\
+\(A_2\) & \CalcResult{10(11+3)+24}{164} & \CalcResult{6(11+2)+24}{102} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Cost}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)[c(A_1)+c(S_1)]+f_c(S_1)} & \SymbolicCell{q(A_1,S_2)[c(A_1)+c(S_2)]+f_c(S_2)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)[c(A_2)+c(S_1)]+f_c(S_1)} & \SymbolicCell{q(A_2,S_2)[c(A_2)+c(S_2)]+f_c(S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{8(4+1)+10}{50} & \CalcResult{5(4+3)+15}{50} \\
+\(A_2\) & \CalcResult{10(5+1)+10}{70} & \CalcResult{6(5+3)+15}{63} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{112-50}{62} & \CalcResult{71-50}{21} \\
+\(A_2\) & \CalcResult{164-70}{94} & \CalcResult{102-63}{39} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \(62\) & \(21\) \\
+\(A_2\) & \(94\) & \(39\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
+
 
 	\secInicio[sec:problem15-regional-parcel-delivery-c1-c3][sec:three-component-models]
+\end{CalculationLandscape}
+
 
 	\subsection{Solar Installation Programme (C1--C3)}
 	\label{sec:problem16-solar-installation-programme-c1-c3}
@@ -1839,84 +2840,117 @@
 
 	\secInicio[sec:problem16-solar-installation-programme-c1-c3][sec:three-component-models]
 
-	\subsubsection*{C3 - Calculating profit and building the payoff table.}
+	\begin{CalculationLandscape}{14in}{11in}
+\subsubsection*{C3 - Calculating profit and building the payoff table.}
 	\phantomsection
 	\label{subsec:problem16-solar-installation-programme-c3}
 
-	For every alternative--state pair, calculate
-	\[
-	\begin{aligned}
-		R(A_i,S_j)
-		&=
-		q(A_i,S_j)
-		\left[
-		r(A_i)+r(S_j)
-		\right]
-		+
-		f_r(S_j),
-		\\
-		C(A_i,S_j)
-		&=
-		q(A_i,S_j)c(A_i)
-		+
-		f_c(A_i)
-		+
-		f_c(S_j),
-		\\
-		P(A_i,S_j)
-		&=
-		R(A_i,S_j)-C(A_i,S_j).
-	\end{aligned}
-	\]
+\textbf{1. Input table.}
 
-	\begin{center}
-		\small
-		\begin{tabular}{llll}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\)
-			& \(7(12+4)+20=132\)
-			& \(7(6)+18+9=69\)
-			& \(132-69=63\) \\
-			
-			\((A_1,S_2)\)
-			& \(4(12+2)+11=67\)
-			& \(4(6)+18+14=56\)
-			& \(67-56=11\) \\
-			
-			\((A_2,S_1)\)
-			& \(6(18+4)+20=152\)
-			& \(6(8)+25+9=82\)
-			& \(152-82=70\) \\
-			
-			\((A_2,S_2)\)
-			& \(3(18+2)+11=71\)
-			& \(3(8)+25+14=63\)
-			& \(71-63=8\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Offer the standard-panel programme. \\
+\(A_2\) & --- & Offer the high-efficiency-panel programme. \\
+\(S_1\) & --- & Strong commercial demand. \\
+\(S_2\) & --- & Limited residential demand. \\
+\(q(A_1,S_1)\) & 7 installation batches & Forecast quantity for \(A_1\) under \(S_1\). \\
+\(r(A_1)\) & 12 thousand USD per installation batch & Panel installation revenue rate for \(A_1\) (rate per unit). \\
+\(r(S_1)\) & 4 thousand USD per installation batch & Market supplement for \(S_1\) (rate per unit). \\
+\(f_r(S_1)\) & 20 thousand USD & Incentive payment for \(S_1\) (fixed amount). \\
+\(c(A_1)\) & 6 thousand USD per installation batch & Installation input rate for \(A_1\) (rate per unit). \\
+\(f_c(A_1)\) & 18 thousand USD & Programme setup cost for \(A_1\) (fixed amount). \\
+\(f_c(S_1)\) & 9 thousand USD & Permit cost for \(S_1\) (fixed amount). \\
+\(q(A_1,S_2)\) & 4 installation batches & Forecast quantity for \(A_1\) under \(S_2\). \\
+\(r(S_2)\) & 2 thousand USD per installation batch & Market supplement for \(S_2\) (rate per unit). \\
+\(f_r(S_2)\) & 11 thousand USD & Incentive payment for \(S_2\) (fixed amount). \\
+\(f_c(S_2)\) & 14 thousand USD & Permit cost for \(S_2\) (fixed amount). \\
+\(q(A_2,S_1)\) & 6 installation batches & Forecast quantity for \(A_2\) under \(S_1\). \\
+\(r(A_2)\) & 18 thousand USD per installation batch & Panel installation revenue rate for \(A_2\) (rate per unit). \\
+\(c(A_2)\) & 8 thousand USD per installation batch & Installation input rate for \(A_2\) (rate per unit). \\
+\(f_c(A_2)\) & 25 thousand USD & Programme setup cost for \(A_2\) (fixed amount). \\
+\(q(A_2,S_2)\) & 3 installation batches & Forecast quantity for \(A_2\) under \(S_2\). \\
+\bottomrule
+\end{longtable}
 
-	The resulting payoff table is:
+\clearpage
+\textbf{2. Symbolic and numerical calculations.}
 
-	\begin{center}
-		\begin{tabular}{lrr}
-			\toprule
-			Alternative
-			& Strong commercial demand
-			& Limited residential demand \\
-			\midrule
-			Standard-panel programme & 63 & 11 \\
-			High-efficiency-panel programme & 70 & 8 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Revenue}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)[r(A_1)+r(S_1)]+f_r(S_1)} & \SymbolicCell{q(A_1,S_2)[r(A_1)+r(S_2)]+f_r(S_2)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)[r(A_2)+r(S_1)]+f_r(S_1)} & \SymbolicCell{q(A_2,S_2)[r(A_2)+r(S_2)]+f_r(S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{7(12+4)+20}{132} & \CalcResult{4(12+2)+11}{67} \\
+\(A_2\) & \CalcResult{6(18+4)+20}{152} & \CalcResult{3(18+2)+11}{71} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Cost}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)c(A_1)+f_c(A_1)+f_c(S_1)} & \SymbolicCell{q(A_1,S_2)c(A_1)+f_c(A_1)+f_c(S_2)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)c(A_2)+f_c(A_2)+f_c(S_1)} & \SymbolicCell{q(A_2,S_2)c(A_2)+f_c(A_2)+f_c(S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{7(6)+18+9}{69} & \CalcResult{4(6)+18+14}{56} \\
+\(A_2\) & \CalcResult{6(8)+25+9}{82} & \CalcResult{3(8)+25+14}{63} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{132-69}{63} & \CalcResult{67-56}{11} \\
+\(A_2\) & \CalcResult{152-82}{70} & \CalcResult{71-63}{8} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \(63\) & \(11\) \\
+\(A_2\) & \(70\) & \(8\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
+
 
 	\secInicio[sec:problem16-solar-installation-programme-c1-c3][sec:three-component-models]
+\end{CalculationLandscape}
+
 
 	\subsection{Hybrid Conference Production (C1--C3)}
 	\label{sec:problem17-hybrid-conference-production-c1-c3}
@@ -1996,83 +3030,117 @@
 
 	\secInicio[sec:problem17-hybrid-conference-production-c1-c3][sec:three-component-models]
 
-	\subsubsection*{C3 - Calculating profit and building the payoff table.}
+	\begin{CalculationLandscape}{14in}{11in}
+\subsubsection*{C3 - Calculating profit and building the payoff table.}
 	\phantomsection
 	\label{subsec:problem17-hybrid-conference-production-c3}
 
-	For every alternative--state pair, calculate
-	\[
-	\begin{aligned}
-		R(A_i,S_j)
-		&=
-		q(A_i,S_j)r(A_i)
-		+
-		f_r(A_i)
-		+
-		f_r(S_j),
-		\\
-		C(A_i,S_j)
-		&=
-		q(A_i,S_j)c(S_j)
-		+
-		f_c(A_i)
-		+
-		f_c(S_j),
-		\\
-		P(A_i,S_j)
-		&=
-		R(A_i,S_j)-C(A_i,S_j).
-	\end{aligned}
-	\]
+\textbf{1. Input table.}
 
-	\begin{center}
-		\small
-		\begin{tabular}{llll}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\)
-			& \(6(13)+14+18=110\)
-			& \(6(5)+24+8=62\)
-			& \(110-62=48\) \\
-			
-			\((A_1,S_2)\)
-			& \(4(13)+14+9=75\)
-			& \(4(7)+24+13=65\)
-			& \(75-65=10\) \\
-			
-			\((A_2,S_1)\)
-			& \(8(16)+22+18=168\)
-			& \(8(5)+37+8=85\)
-			& \(168-85=83\) \\
-			
-			\((A_2,S_2)\)
-			& \(5(16)+22+9=111\)
-			& \(5(7)+37+13=85\)
-			& \(111-85=26\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Use the standard hybrid package. \\
+\(A_2\) & --- & Use the immersive hybrid package. \\
+\(S_1\) & --- & Strong attendance and sponsorship. \\
+\(S_2\) & --- & Limited attendance and sponsorship. \\
+\(q(A_1,S_1)\) & 6 event segments & Forecast quantity for \(A_1\) under \(S_1\). \\
+\(r(A_1)\) & 13 thousand USD per event segment & Segment revenue rate for \(A_1\) (rate per unit). \\
+\(f_r(A_1)\) & 14 thousand USD & Booking contract payment for \(A_1\) (fixed amount). \\
+\(f_r(S_1)\) & 18 thousand USD & Sponsorship payment for \(S_1\) (fixed amount). \\
+\(c(S_1)\) & 5 thousand USD per event segment & Segment delivery rate for \(S_1\) (rate per unit). \\
+\(f_c(A_1)\) & 24 thousand USD & Package setup cost for \(A_1\) (fixed amount). \\
+\(f_c(S_1)\) & 8 thousand USD & Licensing cost for \(S_1\) (fixed amount). \\
+\(q(A_1,S_2)\) & 4 event segments & Forecast quantity for \(A_1\) under \(S_2\). \\
+\(f_r(S_2)\) & 9 thousand USD & Sponsorship payment for \(S_2\) (fixed amount). \\
+\(c(S_2)\) & 7 thousand USD per event segment & Segment delivery rate for \(S_2\) (rate per unit). \\
+\(f_c(S_2)\) & 13 thousand USD & Licensing cost for \(S_2\) (fixed amount). \\
+\(q(A_2,S_1)\) & 8 event segments & Forecast quantity for \(A_2\) under \(S_1\). \\
+\(r(A_2)\) & 16 thousand USD per event segment & Segment revenue rate for \(A_2\) (rate per unit). \\
+\(f_r(A_2)\) & 22 thousand USD & Booking contract payment for \(A_2\) (fixed amount). \\
+\(f_c(A_2)\) & 37 thousand USD & Package setup cost for \(A_2\) (fixed amount). \\
+\(q(A_2,S_2)\) & 5 event segments & Forecast quantity for \(A_2\) under \(S_2\). \\
+\bottomrule
+\end{longtable}
 
-	The resulting payoff table is:
+\clearpage
+\textbf{2. Symbolic and numerical calculations.}
 
-	\begin{center}
-		\begin{tabular}{lrr}
-			\toprule
-			Alternative
-			& Strong attendance and sponsorship
-			& Limited attendance and sponsorship \\
-			\midrule
-			Standard hybrid package & 48 & 10 \\
-			Immersive hybrid package & 83 & 26 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Revenue}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)r(A_1)+f_r(A_1)+f_r(S_1)} & \SymbolicCell{q(A_1,S_2)r(A_1)+f_r(A_1)+f_r(S_2)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)r(A_2)+f_r(A_2)+f_r(S_1)} & \SymbolicCell{q(A_2,S_2)r(A_2)+f_r(A_2)+f_r(S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{6(13)+14+18}{110} & \CalcResult{4(13)+14+9}{75} \\
+\(A_2\) & \CalcResult{8(16)+22+18}{168} & \CalcResult{5(16)+22+9}{111} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Cost}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)c(S_1)+f_c(A_1)+f_c(S_1)} & \SymbolicCell{q(A_1,S_2)c(S_2)+f_c(A_1)+f_c(S_2)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)c(S_1)+f_c(A_2)+f_c(S_1)} & \SymbolicCell{q(A_2,S_2)c(S_2)+f_c(A_2)+f_c(S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{6(5)+24+8}{62} & \CalcResult{4(7)+24+13}{65} \\
+\(A_2\) & \CalcResult{8(5)+37+8}{85} & \CalcResult{5(7)+37+13}{85} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{110-62}{48} & \CalcResult{75-65}{10} \\
+\(A_2\) & \CalcResult{168-85}{83} & \CalcResult{111-85}{26} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \(48\) & \(10\) \\
+\(A_2\) & \(83\) & \(26\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
+
 
 	\secInicio[sec:problem17-hybrid-conference-production-c1-c3][sec:three-component-models]
+\end{CalculationLandscape}
+
 
 	\subsection{Cold-Storage Export Contract (C1--C3)}
 	\label{sec:problem18-cold-storage-export-contract-c1-c3}
@@ -2154,85 +3222,120 @@
 
 	\secInicio[sec:problem18-cold-storage-export-contract-c1-c3][sec:three-component-models]
 
-	\subsubsection*{C3 - Calculating profit and building the payoff table.}
+	\begin{CalculationLandscape}{14in}{11in}
+\subsubsection*{C3 - Calculating profit and building the payoff table.}
 	\phantomsection
 	\label{subsec:problem18-cold-storage-export-contract-c3}
 
-	For every alternative--state pair, calculate
-	\[
-	\begin{aligned}
-		R(A_i,S_j)
-		&=
-		q(A_i,S_j)r(S_j)
-		+
-		f_r(A_i)
-		+
-		f_r(S_j),
-		\\
-		C(A_i,S_j)
-		&=
-		q(A_i,S_j)
-		\left[
-		c(A_i)+c(S_j)
-		\right]
-		+
-		f_c(A_i),
-		\\
-		P(A_i,S_j)
-		&=
-		R(A_i,S_j)-C(A_i,S_j).
-	\end{aligned}
-	\]
+\textbf{1. Input table.}
 
-	\begin{center}
-		\small
-		\begin{tabular}{llll}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\)
-			& \(9(10)+20+16=126\)
-			& \(9(4+2)+28=82\)
-			& \(126-82=44\) \\
-			
-			\((A_1,S_2)\)
-			& \(5(7)+20+8=63\)
-			& \(5(4+4)+28=68\)
-			& \(63-68=-5\) \\
-			
-			\((A_2,S_1)\)
-			& \(12(10)+30+16=166\)
-			& \(12(3+2)+42=102\)
-			& \(166-102=64\) \\
-			
-			\((A_2,S_2)\)
-			& \(7(7)+30+8=87\)
-			& \(7(3+4)+42=91\)
-			& \(87-91=-4\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Use the modular cold-storage facility. \\
+\(A_2\) & --- & Use the large cold-storage facility. \\
+\(S_1\) & --- & Strong export demand. \\
+\(S_2\) & --- & Limited export demand. \\
+\(q(A_1,S_1)\) & 9 storage batches & Forecast quantity for \(A_1\) under \(S_1\). \\
+\(r(S_1)\) & 10 thousand USD per storage batch & Export revenue rate for \(S_1\) (rate per unit). \\
+\(f_r(A_1)\) & 20 thousand USD & Capacity agreement payment for \(A_1\) (fixed amount). \\
+\(f_r(S_1)\) & 16 thousand USD & Export programme payment for \(S_1\) (fixed amount). \\
+\(c(A_1)\) & 4 thousand USD per storage batch & Facility operating rate for \(A_1\) (rate per unit). \\
+\(c(S_1)\) & 2 thousand USD per storage batch & Energy rate for \(S_1\) (rate per unit). \\
+\(f_c(A_1)\) & 28 thousand USD & Configuration preparation cost for \(A_1\) (fixed amount). \\
+\(q(A_1,S_2)\) & 5 storage batches & Forecast quantity for \(A_1\) under \(S_2\). \\
+\(r(S_2)\) & 7 thousand USD per storage batch & Export revenue rate for \(S_2\) (rate per unit). \\
+\(f_r(S_2)\) & 8 thousand USD & Export programme payment for \(S_2\) (fixed amount). \\
+\(c(S_2)\) & 4 thousand USD per storage batch & Energy rate for \(S_2\) (rate per unit). \\
+\(q(A_2,S_1)\) & 12 storage batches & Forecast quantity for \(A_2\) under \(S_1\). \\
+\(f_r(A_2)\) & 30 thousand USD & Capacity agreement payment for \(A_2\) (fixed amount). \\
+\(c(A_2)\) & 3 thousand USD per storage batch & Facility operating rate for \(A_2\) (rate per unit). \\
+\(f_c(A_2)\) & 42 thousand USD & Configuration preparation cost for \(A_2\) (fixed amount). \\
+\(q(A_2,S_2)\) & 7 storage batches & Forecast quantity for \(A_2\) under \(S_2\). \\
+\bottomrule
+\end{longtable}
 
-	The resulting payoff table is:
+\clearpage
+\textbf{2. Symbolic and numerical calculations.}
 
-	\begin{center}
-		\begin{tabular}{lrr}
-			\toprule
-			Alternative & Strong export demand & Limited export demand \\
-			\midrule
-			Modular cold-storage facility & 44 & \(-5\) \\
-			Large cold-storage facility & 64 & \(-4\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Revenue}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)r(S_1)+f_r(A_1)+f_r(S_1)} & \SymbolicCell{q(A_1,S_2)r(S_2)+f_r(A_1)+f_r(S_2)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)r(S_1)+f_r(A_2)+f_r(S_1)} & \SymbolicCell{q(A_2,S_2)r(S_2)+f_r(A_2)+f_r(S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{9(10)+20+16}{126} & \CalcResult{5(7)+20+8}{63} \\
+\(A_2\) & \CalcResult{12(10)+30+16}{166} & \CalcResult{7(7)+30+8}{87} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Cost}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)[c(A_1)+c(S_1)]+f_c(A_1)} & \SymbolicCell{q(A_1,S_2)[c(A_1)+c(S_2)]+f_c(A_1)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)[c(A_2)+c(S_1)]+f_c(A_2)} & \SymbolicCell{q(A_2,S_2)[c(A_2)+c(S_2)]+f_c(A_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{9(4+2)+28}{82} & \CalcResult{5(4+4)+28}{68} \\
+\(A_2\) & \CalcResult{12(3+2)+42}{102} & \CalcResult{7(3+4)+42}{91} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{126-82}{44} & \CalcResult{63-68}{-5} \\
+\(A_2\) & \CalcResult{166-102}{64} & \CalcResult{87-91}{-4} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \(44\) & \(-5\) \\
+\(A_2\) & \(64\) & \(-4\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
 
 	The negative payoffs under limited export demand represent losses because
 	the revenue earned does not cover the variable and fixed costs.
 
+
 	\secInicio[sec:problem18-cold-storage-export-contract-c1-c3][sec:three-component-models]
+\end{CalculationLandscape}
+
 
 	\section{Complete Four-Component Models}
 	\label{sec:complete-four-component-models}
@@ -2335,89 +3438,121 @@
 
 	\secInicio[sec:problem19-smart-manufacturing-contract-c1-c3][sec:complete-four-component-models]
 
-	\subsubsection*{C3 - Calculating profit and building the payoff table.}
+	\begin{CalculationLandscape}{14in}{11in}
+\subsubsection*{C3 - Calculating profit and building the payoff table.}
 	\phantomsection
 	\label{subsec:problem19-smart-manufacturing-contract-c3}
 
-	For every alternative--state pair, calculate
-	\[
-	\begin{aligned}
-		R(A_i,S_j)
-		&=
-		q(A_i,S_j)
-		\left[
-		r(A_i)+r(S_j)
-		\right]
-		+
-		f_r(A_i)
-		+
-		f_r(S_j),
-		\\
-		C(A_i,S_j)
-		&=
-		q(A_i,S_j)
-		\left[
-		c(A_i)+c(S_j)
-		\right]
-		+
-		f_c(A_i)
-		+
-		f_c(S_j),
-		\\
-		P(A_i,S_j)
-		&=
-		R(A_i,S_j)-C(A_i,S_j).
-	\end{aligned}
-	\]
+\textbf{1. Input table.}
 
-	\begin{center}
-		\small
-		\begin{tabular}{llll}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\)
-			& \(8(12+4)+18+14=160\)
-			& \(8(5+2)+24+9=89\)
-			& \(160-89=71\) \\
-			
-			\((A_1,S_2)\)
-			& \(5(12+2)+18+7=95\)
-			& \(5(5+4)+24+15=84\)
-			& \(95-84=11\) \\
-			
-			\((A_2,S_1)\)
-			& \(11(15+4)+28+14=251\)
-			& \(11(6+2)+38+9=135\)
-			& \(251-135=116\) \\
-			
-			\((A_2,S_2)\)
-			& \(6(15+2)+28+7=137\)
-			& \(6(6+4)+38+15=113\)
-			& \(137-113=24\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Use the conventional assembly system. \\
+\(A_2\) & --- & Use the automated assembly system. \\
+\(S_1\) & --- & Strong demand with favourable input conditions. \\
+\(S_2\) & --- & Limited demand with expensive inputs. \\
+\(q(A_1,S_1)\) & 8 production batches & Forecast quantity for \(A_1\) under \(S_1\). \\
+\(r(A_1)\) & 12 thousand USD per production batch & Assembly revenue rate for \(A_1\) (rate per unit). \\
+\(r(S_1)\) & 4 thousand USD per production batch & Market supplement for \(S_1\) (rate per unit). \\
+\(f_r(A_1)\) & 18 thousand USD & Contract payment for \(A_1\) (fixed amount). \\
+\(f_r(S_1)\) & 14 thousand USD & Market incentive for \(S_1\) (fixed amount). \\
+\(c(A_1)\) & 5 thousand USD per production batch & Assembly operating rate for \(A_1\) (rate per unit). \\
+\(c(S_1)\) & 2 thousand USD per production batch & Material rate for \(S_1\) (rate per unit). \\
+\(f_c(A_1)\) & 24 thousand USD & System setup cost for \(A_1\) (fixed amount). \\
+\(f_c(S_1)\) & 9 thousand USD & Compliance cost for \(S_1\) (fixed amount). \\
+\(q(A_1,S_2)\) & 5 production batches & Forecast quantity for \(A_1\) under \(S_2\). \\
+\(r(S_2)\) & 2 thousand USD per production batch & Market supplement for \(S_2\) (rate per unit). \\
+\(f_r(S_2)\) & 7 thousand USD & Market incentive for \(S_2\) (fixed amount). \\
+\(c(S_2)\) & 4 thousand USD per production batch & Material rate for \(S_2\) (rate per unit). \\
+\(f_c(S_2)\) & 15 thousand USD & Compliance cost for \(S_2\) (fixed amount). \\
+\(q(A_2,S_1)\) & 11 production batches & Forecast quantity for \(A_2\) under \(S_1\). \\
+\(r(A_2)\) & 15 thousand USD per production batch & Assembly revenue rate for \(A_2\) (rate per unit). \\
+\(f_r(A_2)\) & 28 thousand USD & Contract payment for \(A_2\) (fixed amount). \\
+\(c(A_2)\) & 6 thousand USD per production batch & Assembly operating rate for \(A_2\) (rate per unit). \\
+\(f_c(A_2)\) & 38 thousand USD & System setup cost for \(A_2\) (fixed amount). \\
+\(q(A_2,S_2)\) & 6 production batches & Forecast quantity for \(A_2\) under \(S_2\). \\
+\bottomrule
+\end{longtable}
 
-	The resulting payoff table is:
+\clearpage
+\textbf{2. Symbolic and numerical calculations.}
 
-	\begin{center}
-		\begin{tabular}{lrr}
-			\toprule
-			Alternative
-			& Strong demand, favourable inputs
-			& Limited demand, expensive inputs \\
-			\midrule
-			Conventional assembly system & 71 & 11 \\
-			Automated assembly system & 116 & 24 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Revenue}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)[r(A_1)+r(S_1)]+f_r(A_1)+f_r(S_1)} & \SymbolicCell{q(A_1,S_2)[r(A_1)+r(S_2)]+f_r(A_1)+f_r(S_2)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)[r(A_2)+r(S_1)]+f_r(A_2)+f_r(S_1)} & \SymbolicCell{q(A_2,S_2)[r(A_2)+r(S_2)]+f_r(A_2)+f_r(S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{8(12+4)+18+14}{160} & \CalcResult{5(12+2)+18+7}{95} \\
+\(A_2\) & \CalcResult{11(15+4)+28+14}{251} & \CalcResult{6(15+2)+28+7}{137} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Cost}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)[c(A_1)+c(S_1)]+f_c(A_1)+f_c(S_1)} & \SymbolicCell{q(A_1,S_2)[c(A_1)+c(S_2)]+f_c(A_1)+f_c(S_2)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)[c(A_2)+c(S_1)]+f_c(A_2)+f_c(S_1)} & \SymbolicCell{q(A_2,S_2)[c(A_2)+c(S_2)]+f_c(A_2)+f_c(S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{8(5+2)+24+9}{89} & \CalcResult{5(5+4)+24+15}{84} \\
+\(A_2\) & \CalcResult{11(6+2)+38+9}{135} & \CalcResult{6(6+4)+38+15}{113} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{160-89}{71} & \CalcResult{95-84}{11} \\
+\(A_2\) & \CalcResult{251-135}{116} & \CalcResult{137-113}{24} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \(71\) & \(11\) \\
+\(A_2\) & \(116\) & \(24\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
+
 
 	\secInicio[sec:problem19-smart-manufacturing-contract-c1-c3][sec:complete-four-component-models]
+\end{CalculationLandscape}
+
 
 	\subsection{Distribution Centre Automation (C1--C3)}
 	\label{sec:problem20-distribution-centre-automation-c1-c3}
@@ -2511,100 +3646,135 @@
 
 	\secInicio[sec:problem20-distribution-centre-automation-c1-c3][sec:complete-four-component-models]
 
-	\subsubsection*{C3 - Calculating profit and building the payoff table.}
+	\begin{CalculationLandscape}{14in}{11in}
+\subsubsection*{C3 - Calculating profit and building the payoff table.}
 	\phantomsection
 	\label{subsec:problem20-distribution-centre-automation-c3}
 
-	For every alternative--state pair, calculate
-	\[
-	\begin{aligned}
-		R(A_i,S_j)
-		&=
-		q(A_i,S_j)
-		\left[
-		r(A_i)+r(S_j)
-		\right]
-		+
-		f_r(A_i)
-		+
-		f_r(S_j),
-		\\
-		C(A_i,S_j)
-		&=
-		q(A_i,S_j)
-		\left[
-		c(A_i)+c(S_j)
-		\right]
-		+
-		f_c(A_i)
-		+
-		f_c(S_j),
-		\\
-		P(A_i,S_j)
-		&=
-		R(A_i,S_j)-C(A_i,S_j).
-	\end{aligned}
-	\]
+\textbf{1. Input table.}
 
-	\begin{center}
-		\small
-		\begin{tabular}{llll}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\)
-			& \(8(12+4)+16+15=159\)
-			& \(8(5+2)+22+9=87\)
-			& \(159-87=72\) \\
-			
-			\((A_1,S_2)\)
-			& \(5(12+2)+16+8=94\)
-			& \(5(5+4)+22+16=83\)
-			& \(94-83=11\) \\
-			
-			\((A_2,S_1)\)
-			& \(11(15+4)+24+15=248\)
-			& \(11(6+2)+34+9=131\)
-			& \(248-131=117\) \\
-			
-			\((A_2,S_2)\)
-			& \(7(15+2)+24+8=151\)
-			& \(7(6+4)+34+16=120\)
-			& \(151-120=31\) \\
-			
-			\((A_3,S_1)\)
-			& \(14(18+4)+35+15=358\)
-			& \(14(8+2)+50+9=199\)
-			& \(358-199=159\) \\
-			
-			\((A_3,S_2)\)
-			& \(8(18+2)+35+8=203\)
-			& \(8(8+4)+50+16=162\)
-			& \(203-162=41\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Use the manual distribution configuration. \\
+\(A_2\) & --- & Use the semi-automated distribution configuration. \\
+\(A_3\) & --- & Use the robotic distribution configuration. \\
+\(S_1\) & --- & High order volume with favourable energy prices. \\
+\(S_2\) & --- & Moderate order volume with expensive energy. \\
+\(q(A_1,S_1)\) & 8 hundreds of order batches & Forecast quantity for \(A_1\) under \(S_1\). \\
+\(r(A_1)\) & 12 thousand USD per hundred order batches & Distribution service rate for \(A_1\) (rate per unit). \\
+\(r(S_1)\) & 4 thousand USD per hundred order batches & Market supplement for \(S_1\) (rate per unit). \\
+\(f_r(A_1)\) & 16 thousand USD & Service contract payment for \(A_1\) (fixed amount). \\
+\(f_r(S_1)\) & 15 thousand USD & Delivery incentive for \(S_1\) (fixed amount). \\
+\(c(A_1)\) & 5 thousand USD per hundred order batches & Configuration operating rate for \(A_1\) (rate per unit). \\
+\(c(S_1)\) & 2 thousand USD per hundred order batches & Energy rate for \(S_1\) (rate per unit). \\
+\(f_c(A_1)\) & 22 thousand USD & Installation cost for \(A_1\) (fixed amount). \\
+\(f_c(S_1)\) & 9 thousand USD & Compliance cost for \(S_1\) (fixed amount). \\
+\(q(A_1,S_2)\) & 5 hundreds of order batches & Forecast quantity for \(A_1\) under \(S_2\). \\
+\(r(S_2)\) & 2 thousand USD per hundred order batches & Market supplement for \(S_2\) (rate per unit). \\
+\(f_r(S_2)\) & 8 thousand USD & Delivery incentive for \(S_2\) (fixed amount). \\
+\(c(S_2)\) & 4 thousand USD per hundred order batches & Energy rate for \(S_2\) (rate per unit). \\
+\(f_c(S_2)\) & 16 thousand USD & Compliance cost for \(S_2\) (fixed amount). \\
+\(q(A_2,S_1)\) & 11 hundreds of order batches & Forecast quantity for \(A_2\) under \(S_1\). \\
+\(r(A_2)\) & 15 thousand USD per hundred order batches & Distribution service rate for \(A_2\) (rate per unit). \\
+\(f_r(A_2)\) & 24 thousand USD & Service contract payment for \(A_2\) (fixed amount). \\
+\(c(A_2)\) & 6 thousand USD per hundred order batches & Configuration operating rate for \(A_2\) (rate per unit). \\
+\(f_c(A_2)\) & 34 thousand USD & Installation cost for \(A_2\) (fixed amount). \\
+\(q(A_2,S_2)\) & 7 hundreds of order batches & Forecast quantity for \(A_2\) under \(S_2\). \\
+\(q(A_3,S_1)\) & 14 hundreds of order batches & Forecast quantity for \(A_3\) under \(S_1\). \\
+\(r(A_3)\) & 18 thousand USD per hundred order batches & Distribution service rate for \(A_3\) (rate per unit). \\
+\(f_r(A_3)\) & 35 thousand USD & Service contract payment for \(A_3\) (fixed amount). \\
+\(c(A_3)\) & 8 thousand USD per hundred order batches & Configuration operating rate for \(A_3\) (rate per unit). \\
+\(f_c(A_3)\) & 50 thousand USD & Installation cost for \(A_3\) (fixed amount). \\
+\(q(A_3,S_2)\) & 8 hundreds of order batches & Forecast quantity for \(A_3\) under \(S_2\). \\
+\bottomrule
+\end{longtable}
 
-	The resulting payoff table is:
+\clearpage
+\textbf{2. Symbolic and numerical calculations.}
 
-	\begin{center}
-		\begin{tabular}{lrr}
-			\toprule
-			Alternative
-			& High order volume
-			& Moderate order volume \\
-			\midrule
-			Manual distribution configuration & 72 & 11 \\
-			Semi-automated distribution configuration & 117 & 31 \\
-			Robotic distribution configuration & 159 & 41 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Revenue}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)[r(A_1)+r(S_1)]+f_r(A_1)+f_r(S_1)} & \SymbolicCell{q(A_1,S_2)[r(A_1)+r(S_2)]+f_r(A_1)+f_r(S_2)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)[r(A_2)+r(S_1)]+f_r(A_2)+f_r(S_1)} & \SymbolicCell{q(A_2,S_2)[r(A_2)+r(S_2)]+f_r(A_2)+f_r(S_2)} \\
+\(A_3\) & \SymbolicCell{q(A_3,S_1)[r(A_3)+r(S_1)]+f_r(A_3)+f_r(S_1)} & \SymbolicCell{q(A_3,S_2)[r(A_3)+r(S_2)]+f_r(A_3)+f_r(S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{8(12+4)+16+15}{159} & \CalcResult{5(12+2)+16+8}{94} \\
+\(A_2\) & \CalcResult{11(15+4)+24+15}{248} & \CalcResult{7(15+2)+24+8}{151} \\
+\(A_3\) & \CalcResult{14(18+4)+35+15}{358} & \CalcResult{8(18+2)+35+8}{203} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Cost}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)[c(A_1)+c(S_1)]+f_c(A_1)+f_c(S_1)} & \SymbolicCell{q(A_1,S_2)[c(A_1)+c(S_2)]+f_c(A_1)+f_c(S_2)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)[c(A_2)+c(S_1)]+f_c(A_2)+f_c(S_1)} & \SymbolicCell{q(A_2,S_2)[c(A_2)+c(S_2)]+f_c(A_2)+f_c(S_2)} \\
+\(A_3\) & \SymbolicCell{q(A_3,S_1)[c(A_3)+c(S_1)]+f_c(A_3)+f_c(S_1)} & \SymbolicCell{q(A_3,S_2)[c(A_3)+c(S_2)]+f_c(A_3)+f_c(S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{8(5+2)+22+9}{87} & \CalcResult{5(5+4)+22+16}{83} \\
+\(A_2\) & \CalcResult{11(6+2)+34+9}{131} & \CalcResult{7(6+4)+34+16}{120} \\
+\(A_3\) & \CalcResult{14(8+2)+50+9}{199} & \CalcResult{8(8+4)+50+16}{162} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} \\
+\(A_3\) & \SymbolicCell{R(A_3,S_1)-C(A_3,S_1)} & \SymbolicCell{R(A_3,S_2)-C(A_3,S_2)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \CalcResult{159-87}{72} & \CalcResult{94-83}{11} \\
+\(A_2\) & \CalcResult{248-131}{117} & \CalcResult{151-120}{31} \\
+\(A_3\) & \CalcResult{358-199}{159} & \CalcResult{203-162}{41} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) \\
+\midrule
+\(A_1\) & \(72\) & \(11\) \\
+\(A_2\) & \(117\) & \(31\) \\
+\(A_3\) & \(159\) & \(41\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
+
 
 	\secInicio[sec:problem20-distribution-centre-automation-c1-c3][sec:complete-four-component-models]
+\end{CalculationLandscape}
+
 
 	\subsection{Electric Vehicle Charging Network (C1--C3)}
 	\label{sec:problem21-electric-vehicle-charging-network-c1-c3}
@@ -2698,103 +3868,131 @@
 
 	\secInicio[sec:problem21-electric-vehicle-charging-network-c1-c3][sec:complete-four-component-models]
 
-	\subsubsection*{C3 - Calculating profit and building the payoff table.}
+	\begin{CalculationLandscape}{17in}{11in}
+\subsubsection*{C3 - Calculating profit and building the payoff table.}
 	\phantomsection
 	\label{subsec:problem21-electric-vehicle-charging-network-c3}
 
-	For every alternative--state pair, calculate
-	\[
-	\begin{aligned}
-		R(A_i,S_j)
-		&=
-		q(A_i,S_j)
-		\left[
-		r(A_i)+r(S_j)
-		\right]
-		+
-		f_r(A_i)
-		+
-		f_r(S_j),
-		\\
-		C(A_i,S_j)
-		&=
-		q(A_i,S_j)
-		\left[
-		c(A_i)+c(S_j)
-		\right]
-		+
-		f_c(A_i)
-		+
-		f_c(S_j),
-		\\
-		P(A_i,S_j)
-		&=
-		R(A_i,S_j)-C(A_i,S_j).
-	\end{aligned}
-	\]
+\textbf{1. Input table.}
 
-	\begin{center}
-		\small
-		\begin{tabular}{llll}
-			\toprule
-			Cell
-			& \(R(A_i,S_j)\)
-			& \(C(A_i,S_j)\)
-			& \(P(A_i,S_j)=R(A_i,S_j)-C(A_i,S_j)\) \\
-			\midrule
-			\((A_1,S_1)\)
-			& \(10(11+4)+18+16=184\)
-			& \(10(4+2)+25+8=93\)
-			& \(184-93=91\) \\
-			
-			\((A_1,S_2)\)
-			& \(7(11+3)+18+10=126\)
-			& \(7(4+3)+25+12=86\)
-			& \(126-86=40\) \\
-			
-			\((A_1,S_3)\)
-			& \(4(11+2)+18+5=75\)
-			& \(4(4+5)+25+18=79\)
-			& \(75-79=-4\) \\
-			
-			\((A_2,S_1)\)
-			& \(14(16+4)+30+16=326\)
-			& \(14(7+2)+45+8=179\)
-			& \(326-179=147\) \\
-			
-			\((A_2,S_2)\)
-			& \(9(16+3)+30+10=211\)
-			& \(9(7+3)+45+12=147\)
-			& \(211-147=64\) \\
-			
-			\((A_2,S_3)\)
-			& \(5(16+2)+30+5=125\)
-			& \(5(7+5)+45+18=123\)
-			& \(125-123=2\) \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.25\linewidth}>{\raggedright\arraybackslash}p{0.50\linewidth}@{}}
+\toprule Symbol & Value & Meaning in this problem. \\ \midrule
+\endhead
+\(A_1\) & --- & Build the neighbourhood charging network. \\
+\(A_2\) & --- & Build the rapid-charging network. \\
+\(S_1\) & --- & High utilisation with favourable electricity prices. \\
+\(S_2\) & --- & Moderate utilisation with standard electricity prices. \\
+\(S_3\) & --- & Low utilisation with expensive electricity. \\
+\(q(A_1,S_1)\) & 10 hundreds of charging-session batches & Forecast quantity for \(A_1\) under \(S_1\). \\
+\(r(A_1)\) & 11 thousand USD per hundred charging-session batches & Charging service rate for \(A_1\) (rate per unit). \\
+\(r(S_1)\) & 4 thousand USD per hundred charging-session batches & Utilisation supplement for \(S_1\) (rate per unit). \\
+\(f_r(A_1)\) & 18 thousand USD & Network agreement payment for \(A_1\) (fixed amount). \\
+\(f_r(S_1)\) & 16 thousand USD & Utilisation incentive for \(S_1\) (fixed amount). \\
+\(c(A_1)\) & 4 thousand USD per hundred charging-session batches & Equipment rate for \(A_1\) (rate per unit). \\
+\(c(S_1)\) & 2 thousand USD per hundred charging-session batches & Electricity rate for \(S_1\) (rate per unit). \\
+\(f_c(A_1)\) & 25 thousand USD & Infrastructure cost for \(A_1\) (fixed amount). \\
+\(f_c(S_1)\) & 8 thousand USD & Maintenance cost for \(S_1\) (fixed amount). \\
+\(q(A_1,S_2)\) & 7 hundreds of charging-session batches & Forecast quantity for \(A_1\) under \(S_2\). \\
+\(r(S_2)\) & 3 thousand USD per hundred charging-session batches & Utilisation supplement for \(S_2\) (rate per unit). \\
+\(f_r(S_2)\) & 10 thousand USD & Utilisation incentive for \(S_2\) (fixed amount). \\
+\(c(S_2)\) & 3 thousand USD per hundred charging-session batches & Electricity rate for \(S_2\) (rate per unit). \\
+\(f_c(S_2)\) & 12 thousand USD & Maintenance cost for \(S_2\) (fixed amount). \\
+\(q(A_1,S_3)\) & 4 hundreds of charging-session batches & Forecast quantity for \(A_1\) under \(S_3\). \\
+\(r(S_3)\) & 2 thousand USD per hundred charging-session batches & Utilisation supplement for \(S_3\) (rate per unit). \\
+\(f_r(S_3)\) & 5 thousand USD & Utilisation incentive for \(S_3\) (fixed amount). \\
+\(c(S_3)\) & 5 thousand USD per hundred charging-session batches & Electricity rate for \(S_3\) (rate per unit). \\
+\(f_c(S_3)\) & 18 thousand USD & Maintenance cost for \(S_3\) (fixed amount). \\
+\(q(A_2,S_1)\) & 14 hundreds of charging-session batches & Forecast quantity for \(A_2\) under \(S_1\). \\
+\(r(A_2)\) & 16 thousand USD per hundred charging-session batches & Charging service rate for \(A_2\) (rate per unit). \\
+\(f_r(A_2)\) & 30 thousand USD & Network agreement payment for \(A_2\) (fixed amount). \\
+\(c(A_2)\) & 7 thousand USD per hundred charging-session batches & Equipment rate for \(A_2\) (rate per unit). \\
+\(f_c(A_2)\) & 45 thousand USD & Infrastructure cost for \(A_2\) (fixed amount). \\
+\(q(A_2,S_2)\) & 9 hundreds of charging-session batches & Forecast quantity for \(A_2\) under \(S_2\). \\
+\(q(A_2,S_3)\) & 5 hundreds of charging-session batches & Forecast quantity for \(A_2\) under \(S_3\). \\
+\bottomrule
+\end{longtable}
 
-	The resulting payoff table is:
+\clearpage
+\textbf{2. Symbolic and numerical calculations.}
 
-	\begin{center}
-		\begin{tabular}{lrrr}
-			\toprule
-			Alternative
-			& High utilisation
-			& Moderate utilisation
-			& Low utilisation \\
-			\midrule
-			Neighbourhood charging network & 91 & 40 & \(-4\) \\
-			Rapid-charging network & 147 & 64 & 2 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
+All calculated amounts below are in thousand USD. The row and column indices refer to the input table.
+
+\CalculationPair{Revenue}{
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) & \(S_3\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)[r(A_1)+r(S_1)]+f_r(A_1)+f_r(S_1)} & \SymbolicCell{q(A_1,S_2)[r(A_1)+r(S_2)]+f_r(A_1)+f_r(S_2)} & \SymbolicCell{q(A_1,S_3)[r(A_1)+r(S_3)]+f_r(A_1)+f_r(S_3)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)[r(A_2)+r(S_1)]+f_r(A_2)+f_r(S_1)} & \SymbolicCell{q(A_2,S_2)[r(A_2)+r(S_2)]+f_r(A_2)+f_r(S_2)} & \SymbolicCell{q(A_2,S_3)[r(A_2)+r(S_3)]+f_r(A_2)+f_r(S_3)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) & \(S_3\) \\
+\midrule
+\(A_1\) & \CalcResult{10(11+4)+18+16}{184} & \CalcResult{7(11+3)+18+10}{126} & \CalcResult{4(11+2)+18+5}{75} \\
+\(A_2\) & \CalcResult{14(16+4)+30+16}{326} & \CalcResult{9(16+3)+30+10}{211} & \CalcResult{5(16+2)+30+5}{125} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Cost}{
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) & \(S_3\) \\
+\midrule
+\(A_1\) & \SymbolicCell{q(A_1,S_1)[c(A_1)+c(S_1)]+f_c(A_1)+f_c(S_1)} & \SymbolicCell{q(A_1,S_2)[c(A_1)+c(S_2)]+f_c(A_1)+f_c(S_2)} & \SymbolicCell{q(A_1,S_3)[c(A_1)+c(S_3)]+f_c(A_1)+f_c(S_3)} \\
+\(A_2\) & \SymbolicCell{q(A_2,S_1)[c(A_2)+c(S_1)]+f_c(A_2)+f_c(S_1)} & \SymbolicCell{q(A_2,S_2)[c(A_2)+c(S_2)]+f_c(A_2)+f_c(S_2)} & \SymbolicCell{q(A_2,S_3)[c(A_2)+c(S_3)]+f_c(A_2)+f_c(S_3)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) & \(S_3\) \\
+\midrule
+\(A_1\) & \CalcResult{10(4+2)+25+8}{93} & \CalcResult{7(4+3)+25+12}{86} & \CalcResult{4(4+5)+25+18}{79} \\
+\(A_2\) & \CalcResult{14(7+2)+45+8}{179} & \CalcResult{9(7+3)+45+12}{147} & \CalcResult{5(7+5)+45+18}{123} \\
+\bottomrule
+\end{tabular}}
+
+\CalculationPair{Profit}{
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) & \(S_3\) \\
+\midrule
+\(A_1\) & \SymbolicCell{R(A_1,S_1)-C(A_1,S_1)} & \SymbolicCell{R(A_1,S_2)-C(A_1,S_2)} & \SymbolicCell{R(A_1,S_3)-C(A_1,S_3)} \\
+\(A_2\) & \SymbolicCell{R(A_2,S_1)-C(A_2,S_1)} & \SymbolicCell{R(A_2,S_2)-C(A_2,S_2)} & \SymbolicCell{R(A_2,S_3)-C(A_2,S_3)} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) & \(S_3\) \\
+\midrule
+\(A_1\) & \CalcResult{184-93}{91} & \CalcResult{126-86}{40} & \CalcResult{75-79}{-4} \\
+\(A_2\) & \CalcResult{326-179}{147} & \CalcResult{211-147}{64} & \CalcResult{125-123}{2} \\
+\bottomrule
+\end{tabular}}
+
+\noindent\begin{minipage}{\linewidth}
+\textbf{3. Final payoff table: profit (thousand USD).}
+\begin{center}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Alternative & \(S_1\) & \(S_2\) & \(S_3\) \\
+\midrule
+\(A_1\) & \(91\) & \(40\) & \(-4\) \\
+\(A_2\) & \(147\) & \(64\) & \(2\) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+
 
 	The negative payoff for the neighbourhood charging network under low
 	utilisation represents a loss because the revenue earned does not cover the
 	variable and fixed costs.
 
+
 	\secInicio[sec:problem21-electric-vehicle-charging-network-c1-c3][sec:complete-four-component-models]
+\end{CalculationLandscape}
+
 
 \end{document}
