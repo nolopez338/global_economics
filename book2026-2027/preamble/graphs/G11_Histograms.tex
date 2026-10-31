@@ -1,0 +1,169 @@
+% ============================================================
+% Histogram with explicit interval boundaries and frequencies
+% Requires tikz, pgfplots and graphicx (loaded by preamble.tex).
+% Uses the preamble's pgfplots compat=1.18: coordinates are in axis units.
+% ============================================================
+% #1 = comma-separated pairs (a,b); bins must be ordered and contiguous
+% #2 = comma-separated nonnegative frequencies (bar heights, not densities)
+% #3 = displayed width, including labels (e.g. 0.8\textwidth)
+% #4 = displayed height, including labels (e.g. 6cm)
+% #5 = TikZ fill color
+% #6 = positive x-grid spacing in histogram data units
+% #7 = positive y-grid spacing in frequency units
+%
+% Minimal example (unequal widths and different frequencies):
+% \HistogramGraph{(0,1),(1,3),(3,6),(6,10)}{2,7,4,9}
+%                {0.8\textwidth}{6cm}{blue!25}{1}{2}
+% Decimal spacings (e.g. {0.5}{0.25}) are also supported.
+% Grid ticks start at xmin and zero respectively. Off-grid interval
+% boundaries retain their labels, without adding irregular grid lines.
+%
+% Parsing and drawing are local to each call. The final resize includes
+% labels and borders; coordinates and tick labels retain their data values.
+\ExplSyntaxOn
+\clist_new:N \l__histogram_intervals_clist
+\clist_new:N \l__histogram_frequencies_clist
+\seq_new:N \l__histogram_pair_seq
+\tl_new:N \l__histogram_input_tl
+\tl_new:N \l__histogram_ticks_tl
+\tl_new:N \l__histogram_bars_tl
+\tl_new:N \l__histogram_grid_tl
+\clist_new:N \l__histogram_xticks_clist
+\clist_new:N \l__histogram_yticks_clist
+\clist_new:N \l__histogram_boundaries_clist
+\fp_new:N \l__histogram_min_fp
+\fp_new:N \l__histogram_max_fp
+\fp_new:N \l__histogram_peak_fp
+\fp_new:N \l__histogram_top_fp
+\bool_new:N \l__histogram_valid_bool
+
+\newcommand{\HistogramGraph}[7]{%
+    \group_begin:
+    % Protect the commas inside pairs before splitting the interval list.
+    \tl_set:Nn \l__histogram_input_tl {#1}
+    \regex_replace_all:nnN { \(\s*([^,()]+),\s*([^,()]+)\) }
+        { \1/\2 } \l__histogram_input_tl
+    \clist_set:NV \l__histogram_intervals_clist \l__histogram_input_tl
+    \clist_set:Nn \l__histogram_frequencies_clist {#2}
+    \bool_set_true:N \l__histogram_valid_bool
+    \fp_compare:nNnF {#6} > {0}
+        {\bool_set_false:N \l__histogram_valid_bool}
+    \fp_compare:nNnF {#7} > {0}
+        {\bool_set_false:N \l__histogram_valid_bool}
+    \tl_clear:N \l__histogram_ticks_tl
+    \tl_clear:N \l__histogram_bars_tl
+    \fp_zero:N \l__histogram_peak_fp
+    \int_compare:nNnTF {\clist_count:N \l__histogram_intervals_clist}
+        = {\clist_count:N \l__histogram_frequencies_clist}
+        {
+            \clist_if_empty:NT \l__histogram_intervals_clist
+                {\bool_set_false:N \l__histogram_valid_bool}
+            \int_step_inline:nn {\clist_count:N \l__histogram_intervals_clist} {
+                \tl_set:Nx \l__histogram_input_tl
+                    {\clist_item:Nn \l__histogram_intervals_clist {##1}}
+                \exp_args:NNnV \seq_set_split:Nnn \l__histogram_pair_seq {/} \l__histogram_input_tl
+                \int_compare:nNnTF {\seq_count:N \l__histogram_pair_seq} = {2}
+                    {
+                        \fp_set:Nn \l_tmpa_fp {\seq_item:Nn \l__histogram_pair_seq {1}}
+                        \fp_set:Nn \l_tmpb_fp {\seq_item:Nn \l__histogram_pair_seq {2}}
+                        \int_compare:nNnTF {##1} = {1}
+                            {
+                                \fp_set_eq:NN \l__histogram_min_fp \l_tmpa_fp
+                                \tl_put_right:Nx \l__histogram_ticks_tl {\fp_use:N \l_tmpa_fp}
+                            }
+                            {
+                                \fp_compare:nNnF {\l_tmpa_fp} = {\l__histogram_max_fp}
+                                    {\bool_set_false:N \l__histogram_valid_bool}
+                            }
+                        \fp_compare:nNnF {\l_tmpb_fp} > {\l_tmpa_fp}
+                            {\bool_set_false:N \l__histogram_valid_bool}
+                        \fp_compare:nNnT
+                            {\clist_item:Nn \l__histogram_frequencies_clist {##1}} < {0}
+                            {\bool_set_false:N \l__histogram_valid_bool}
+                        \fp_set_eq:NN \l__histogram_max_fp \l_tmpb_fp
+                        \fp_set:Nn \l__histogram_peak_fp {
+                            max(\l__histogram_peak_fp,
+                                \clist_item:Nn \l__histogram_frequencies_clist {##1})}
+                        \tl_put_right:Nx \l__histogram_ticks_tl {,\fp_use:N \l_tmpb_fp}
+                        % Explicit rectangles preserve unequal bin widths.
+                        \tl_put_right:Nx \l__histogram_bars_tl {
+                            \exp_not:N \draw [draw=black,fill={\exp_not:n {#5}}]
+                                (\fp_use:N \l_tmpa_fp,0) rectangle
+                                (\fp_use:N \l_tmpb_fp,
+                                    \clist_item:Nn \l__histogram_frequencies_clist {##1});
+                        }
+                    }
+                    {\bool_set_false:N \l__histogram_valid_bool}
+            }
+        }
+        {\bool_set_false:N \l__histogram_valid_bool}
+    \bool_if:NTF \l__histogram_valid_bool
+        {
+            % Compute ticks and TikZ grid paths from data limits, before
+            % resizing. Integer indices avoid accumulated decimal error.
+            \fp_set:Nn \l__histogram_top_fp {1.15*max(1,\l__histogram_peak_fp)}
+            \tl_clear:N \l__histogram_grid_tl
+            \clist_clear:N \l__histogram_xticks_clist
+            \clist_clear:N \l__histogram_yticks_clist
+            \clist_set:NV \l__histogram_boundaries_clist \l__histogram_ticks_tl
+            \int_step_inline:nnnn {0}{1}
+                {\fp_eval:n {floor((\l__histogram_max_fp-\l__histogram_min_fp)/(#6))}}
+                {
+                    \tl_set:Nx \l__histogram_input_tl
+                        {\fp_eval:n {\l__histogram_min_fp+##1*(#6)}}
+                    \clist_put_right:NV \l__histogram_xticks_clist \l__histogram_input_tl
+                    \exp_args:NNV \clist_remove_all:Nn
+                        \l__histogram_boundaries_clist \l__histogram_input_tl
+                    \tl_put_right:Nx \l__histogram_grid_tl {
+                        \exp_not:N \draw [gray!20,thin]
+                            (\l__histogram_input_tl,0) --
+                            (\l__histogram_input_tl,\fp_use:N \l__histogram_top_fp);
+                    }
+                }
+            \int_step_inline:nnnn {0}{1}
+                {\fp_eval:n {floor(\l__histogram_top_fp/(#7))}}
+                {
+                    \tl_set:Nx \l__histogram_input_tl {\fp_eval:n {##1*(#7)}}
+                    \clist_put_right:NV \l__histogram_yticks_clist \l__histogram_input_tl
+                    \tl_put_right:Nx \l__histogram_grid_tl {
+                        \exp_not:N \draw [gray!20,thin]
+                            (\fp_use:N \l__histogram_min_fp,\l__histogram_input_tl) --
+                            (\fp_use:N \l__histogram_max_fp,\l__histogram_input_tl);
+                    }
+                }
+            \begin{center}
+                \resizebox{#3}{#4}{%
+                    \begin{tikzpicture}
+                        \begin{axis}[
+                            width=#3,height=#4,
+                            axis~lines=left,xlabel={$x$},ylabel={Frequency},
+                            xmin=\fp_use:N \l__histogram_min_fp,
+                            xmax=\fp_use:N \l__histogram_max_fp,
+                            ymin=0,ymax=\fp_use:N \l__histogram_top_fp,
+                            xtick/.expanded={\l__histogram_xticks_clist},
+                            ytick/.expanded={\l__histogram_yticks_clist},
+                            extra~x~ticks/.expanded={\l__histogram_boundaries_clist},
+                            extra~x~tick~style={grid=none},
+                            scaled~ticks=false,
+                            tick~label~style={font=\small},
+                            label~style={font=\small},
+                            grid=none,axis~on~top,clip=false
+                        ]
+                            % Grid first, opaque bars second, axes on top.
+                            \tl_use:N \l__histogram_grid_tl
+                            \tl_use:N \l__histogram_bars_tl
+                        \end{axis}
+                    \end{tikzpicture}%
+                }
+            \end{center}
+        }
+        {
+            \PackageError{G11_Histograms}{Invalid~histogram~data}
+                {Supply~equally~many~nonempty~intervals~and~frequencies.^^J
+                 Use~ordered,~contiguous~(a,b)~pairs~with~a<b~and~frequencies>=0.^^J
+                 Both~grid~spacings~must~be~positive.}
+        }
+    \group_end:
+}
+\ExplSyntaxOff
+

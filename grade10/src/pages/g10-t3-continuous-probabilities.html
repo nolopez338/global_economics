@@ -1,0 +1,3383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="../../../assets/png/icon_global.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grade 10 - Continuous Probabilities</title>
+  <link rel="stylesheet" href="../../../assets/css/base.css">
+  <link rel="stylesheet" href="../../../assets/css/components.css">
+  <link rel="stylesheet" href="../../../assets/css/theme.css">
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #2563eb;
+      --primary-soft: #dbeafe;
+      --danger: #dc2626;
+      --ok: #059669;
+      --border: #e5e7eb;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1.25rem;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .back-link {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+
+    .page-link {
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.25rem, 2.4vw, 1.9rem);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .muted { color: var(--muted); }
+
+    .grid {
+      display: grid;
+      gap: 0.75rem;
+      grid-template-columns: repeat(12, 1fr);
+    }
+
+    .field { display: flex; flex-direction: column; gap: 0.3rem; }
+    .col-12 { grid-column: span 12; }
+    .col-6 { grid-column: span 6; }
+    .col-4 { grid-column: span 4; }
+    .col-3 { grid-column: span 3; }
+
+    label { font-weight: 600; font-size: 0.95rem; }
+
+    input, select, button {
+      font: inherit;
+      padding: 0.55rem 0.65rem;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      color: var(--text);
+    }
+
+    button {
+      cursor: pointer;
+      border-color: transparent;
+      font-weight: 600;
+    }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-secondary { background: #e2e8f0; color: #0f172a; }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .status {
+      margin-top: 0.75rem;
+      padding: 0.65rem 0.8rem;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      font-weight: 600;
+    }
+
+    .status.ok {
+      background: #ecfdf5;
+      color: #065f46;
+      border-color: #a7f3d0;
+    }
+
+    .status.warn {
+      background: #fff7ed;
+      color: #9a3412;
+      border-color: #fed7aa;
+    }
+
+    .status.error {
+      background: #fef2f2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+
+    .error-box {
+      margin-top: 0.75rem;
+      padding: 0.65rem 0.8rem;
+      border-radius: 8px;
+      border: 1px solid #fecaca;
+      background: #fef2f2;
+      color: #991b1b;
+    }
+
+    .error-box[hidden] { display: none; }
+    .error-box ul { margin: 0.35rem 0 0; padding-left: 1.2rem; }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .metric {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem;
+      background: #fafafa;
+    }
+
+    .metric .k { color: var(--muted); font-size: 0.85rem; }
+    .metric .v { font-weight: 700; font-size: 1rem; }
+
+    .graph-wrap {
+      position: relative;
+      width: 100%;
+      min-height: 360px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+      margin-top: 0.4rem;
+      padding: 0.1rem;
+    }
+
+    .graph-overlay-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.45rem 0.55rem;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+      max-width: 320px;
+      margin-bottom: 0.7rem;
+    }
+
+    .graph-overlay-controls label {
+      font-size: 0.82rem;
+      line-height: 1.2;
+    }
+
+    .graph-overlay-controls input[type="number"] {
+      width: 112px;
+      padding: 0.35rem 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .toggle-inline {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .input-toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+    }
+
+    .input-toggle-row input[type="number"] {
+      flex: 0 1 160px;
+      min-width: 120px;
+    }
+
+    .param-slider {
+      width: 100%;
+      padding: 0;
+      margin-top: 0.25rem;
+      accent-color: var(--primary);
+    }
+
+    .pw-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .pw-cell input[type="range"] {
+      padding: 0;
+      margin: 0;
+    }
+
+    .graph-x-range {
+      margin-top: 0.7rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.9rem;
+    }
+
+    .graph-x-range .field {
+      min-width: 160px;
+      max-width: 220px;
+    }
+
+    .graph-x-range .field:last-child {
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .graph-x-range .field:last-child input[type="number"] {
+      margin-left: auto;
+    }
+
+    .graph-x-range input[type="range"] {
+      width: 100%;
+      padding: 0;
+      margin-top: 0.3rem;
+      accent-color: var(--primary);
+    }
+
+    .slider-endpoints {
+      margin-top: 0.3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .slider-endpoint-input {
+      width: 56px;
+      min-width: 56px;
+      padding: 0.16rem 0.22rem;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      line-height: 1.1;
+      text-align: center;
+    }
+
+    canvas {
+      width: 100%;
+      height: 420px;
+      display: block;
+      touch-action: none;
+    }
+
+    .tooltip {
+      position: absolute;
+      pointer-events: none;
+      transform: translate(-50%, -115%);
+      background: rgba(17, 24, 39, 0.92);
+      color: white;
+      border-radius: 6px;
+      padding: 0.35rem 0.45rem;
+      font-size: 0.82rem;
+      white-space: nowrap;
+      display: none;
+      z-index: 5;
+    }
+
+    .params-panel[hidden] {
+      display: none;
+    }
+
+    .points-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.35rem;
+    }
+
+    .points-table th,
+    .points-table td {
+      border: 1px solid var(--border);
+      padding: 0.35rem;
+      text-align: left;
+    }
+
+    .points-table input {
+      width: 100%;
+      padding: 0.4rem 0.5rem;
+      border-radius: 6px;
+    }
+
+    .remove-row {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .probability-summary {
+      margin-top: 0.9rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 0.55rem;
+    }
+
+    .prob-result-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .prob-box {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.65rem 0.7rem;
+      background: #f8fafc;
+      position: relative;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+    }
+
+    .prob-box:hover {
+      border-color: #a78bfa;
+      background: #f5f3ff;
+      box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.2);
+    }
+
+    .prob-box .expr {
+      font-size: 0.86rem;
+      color: var(--muted);
+      margin-bottom: 0.28rem;
+      padding-right: 1.5rem;
+    }
+
+    .prob-box .value {
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .prob-delete {
+      position: absolute;
+      top: 0.35rem;
+      right: 0.35rem;
+      border: 1px solid #fecaca;
+      background: #fff1f2;
+      color: #b91c1c;
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      line-height: 1;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .prob-cdf-details {
+      border: 1px solid #dbe1ea;
+      border-radius: 8px;
+      background: #ffffff;
+      overflow: hidden;
+    }
+
+    .prob-cdf-details > summary {
+      cursor: pointer;
+      padding: 0.4rem 0.55rem;
+      font-weight: 600;
+      color: #1e3a8a;
+      background: #f1f5f9;
+      list-style-position: inside;
+    }
+
+    .prob-cdf-body {
+      padding: 0.6rem;
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .prob-cdf-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem 0.9rem;
+      align-items: end;
+    }
+
+    .prob-cdf-controls .field {
+      gap: 0.2rem;
+      min-width: 150px;
+    }
+
+    .prob-cdf-controls .field label {
+      font-size: 0.8rem;
+      color: #334155;
+      font-weight: 600;
+    }
+
+    .prob-cdf-controls input[type="number"] {
+      padding: 0.35rem 0.45rem;
+      font-size: 0.88rem;
+    }
+
+    .prob-cdf-controls .toggle-inline {
+      font-size: 0.84rem;
+      margin-top: 0.2rem;
+    }
+
+    .prob-cdf-wrap {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .prob-cdf-canvas {
+      width: 100%;
+      height: 220px;
+      display: block;
+    }
+
+
+    .generated-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: end;
+      margin-bottom: 0.6rem;
+    }
+
+    .generated-controls .field {
+      min-width: 170px;
+      gap: 0.2rem;
+    }
+
+    .generated-controls .field label {
+      font-size: 0.82rem;
+      color: #334155;
+    }
+
+    .generated-controls button {
+      padding: 0.45rem 0.65rem;
+      font-size: 0.88rem;
+    }
+
+    .generated-sample-count {
+      margin-left: auto;
+      color: #334155;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .generated-chart-wrap {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .generated-canvas {
+      width: 100%;
+      height: 220px;
+      display: block;
+    }
+
+    .generated-scatter-section {
+      margin-top: 0.7rem;
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .generated-scatter-section h4,
+    .generated-table-section h3 {
+      margin: 0;
+      font-size: 0.98rem;
+    }
+
+    .generated-table-section {
+      margin-top: 0.9rem;
+      display: grid;
+      gap: 0.45rem;
+    }
+
+    .generated-table-wrap {
+      max-height: 300px;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .generated-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .generated-table th,
+    .generated-table td {
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0.45rem 0.55rem;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    .generated-table th {
+      position: sticky;
+      top: 0;
+      background: #f8fafc;
+      z-index: 1;
+    }
+
+    .subsection {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #f8fafc;
+      overflow: hidden;
+      margin-top: 0.45rem;
+    }
+
+    .subsection > summary {
+      cursor: pointer;
+      padding: 0.55rem 0.7rem;
+      font-weight: 700;
+      background: #eef2ff;
+      color: #1e3a8a;
+    }
+
+    .subsection-body {
+      padding: 0.7rem;
+    }
+
+    .graph-control-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.9rem;
+      align-items: start;
+    }
+
+    .graph-main-content {
+      min-width: 0;
+    }
+
+    .right-control-panel {
+      width: 190px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      overflow: hidden;
+      transition: width 0.22s ease;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+    }
+
+    .right-control-panel.collapsed {
+      width: 52px;
+    }
+
+    .right-control-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.5rem 0.6rem;
+      background: #eef2ff;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .right-control-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      white-space: nowrap;
+    }
+
+    .right-control-panel.collapsed .right-control-title {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      margin: 0 auto;
+      font-size: 0.8rem;
+    }
+
+    .right-control-toggle {
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      color: #1e3a8a;
+      padding: 0.25rem 0.42rem;
+      min-width: 1.95rem;
+      line-height: 1;
+    }
+
+    .right-control-body {
+      padding: 0.7rem;
+      display: grid;
+      gap: 0.65rem;
+    }
+
+    .right-control-panel.collapsed .right-control-body {
+      display: none;
+    }
+
+    .right-control-body .grid {
+      grid-template-columns: 1fr;
+      gap: 0.6rem;
+    }
+
+    .right-control-body .col-6,
+    .right-control-body .col-4,
+    .right-control-body .col-3,
+    .right-control-body .col-12 {
+      grid-column: span 12;
+    }
+
+    .right-control-body .actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .right-control-body .actions button {
+      width: 100%;
+    }
+
+    .right-control-body .input-toggle-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.45rem;
+    }
+
+    .right-control-body .input-toggle-row input[type="number"] {
+      min-width: 0;
+      width: 100%;
+      flex: none;
+    }
+
+    .right-control-body .status,
+    .right-control-body .error-box {
+      margin-top: 0;
+    }
+
+    @media (max-width: 840px) {
+      .col-6, .col-4, .col-3 { grid-column: span 12; }
+      canvas { height: 340px; }
+      .graph-overlay-controls {
+        max-width: none;
+      }
+      .graph-x-range {
+        flex-direction: column;
+      }
+      .graph-x-range .field:last-child {
+        margin-left: 0;
+        text-align: left;
+      }
+      .graph-x-range .field:last-child input[type="number"] {
+        margin-left: 0;
+      }
+      .graph-control-layout {
+        grid-template-columns: 1fr;
+      }
+      .right-control-panel,
+      .right-control-panel.collapsed {
+        width: 100%;
+      }
+      .right-control-panel.collapsed .right-control-title {
+        writing-mode: horizontal-tb;
+        transform: none;
+        margin: 0;
+      }
+      .right-control-panel.collapsed .right-control-body {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body class="theme-grade10">
+  <main class="container term-layout">
+    <header class="site-header">
+      <a href="../G10_T3.html" class="page-link">&larr; Back to pages</a>
+      <h1>Continuous Probability Distributions (PDF Explorer)</h1>
+      <p>Probability density functions for continuous random variables, including interval probability, normalization, and interactive PDF graph exploration.</p>
+    </header>
+
+    <section class="card content-card">
+      <h2>Introduction</h2>
+      <p>
+        A <strong>continuous random variable</strong> can take any value in an interval (or across all real numbers).
+        Instead of listing probabilities at single points, we use a <strong>probability density function (PDF)</strong>.
+      </p>
+      <p>
+        For a valid PDF, two key properties are required: <strong>f(x) ≥ 0</strong> for all x, and the
+        <strong>total area under the curve is 1</strong>. For continuous variables, probability at a single point is 0,
+        and probabilities on intervals are found using the <strong>area under the curve</strong> over that interval.
+      </p>
+    </section>
+
+    <section class="card content-card">
+      <h2>PDF Input</h2>
+      <details class="subsection" open>
+        <summary>Distribution &amp; practice selection</summary>
+        <div class="subsection-body">
+          <div class="grid">
+            <div class="field col-12">
+              <label for="distributionType">Distribution type</label>
+              <select id="distributionType">
+                <option value="uniform">Uniform</option>
+                <option value="triangular">Triangular</option>
+                <option value="trapezoid">Trapezoid</option>
+                <option value="piecewise">Piecewise linear</option>
+                <option value="normal">Normal</option>
+              </select>
+            </div>
+
+            <div class="field col-12">
+              <label for="exampleSelector">Practice example</label>
+              <select id="exampleSelector">
+                <option value="none">None</option>
+                <option value="1">Problem 1</option>
+                <option value="2">Problem 2</option>
+                <option value="3">Problem 3</option>
+                <option value="4">Problem 4</option>
+                <option value="5">Problem 5</option>
+                <option value="6">Problem 6</option>
+                <option value="7">Problem 7</option>
+                <option value="8">Problem 8</option>
+                <option value="9">Problem 9</option>
+                <option value="10">Problem 10</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section id="computed-results" class="card content-card collapsible">
+      <h2>
+        <button class="collapse-toggle" type="button" aria-expanded="true" id="computed-results-toggle" aria-controls="computed-results-content">
+          <span class="toggle-label">Computed results</span>
+          <span class="toggle-icon" aria-hidden="true">−</span>
+        </button>
+      </h2>
+      <div class="collapsible-content" id="computed-results-content" role="region" aria-labelledby="computed-results-toggle">
+        <div id="results" class="results-grid"></div>
+      </div>
+    </section>
+
+    <section class="card content-card">
+      <h2>PDF graph</h2>
+      <div class="graph-control-layout">
+        <div class="graph-main-content">
+          <div class="graph-overlay-controls">
+            <div class="field">
+              <label for="yTopInput">y-top</label>
+              <input id="yTopInput" type="number" step="any" value="1" />
+            </div>
+            <label class="toggle-inline"><input id="autoYTopToggle" type="checkbox" checked /> Auto-adjust y-top from PDF</label>
+          </div>
+          <div class="graph-wrap" id="graphWrap">
+            <canvas id="pdfCanvas"></canvas>
+            <div class="tooltip" id="tooltip"></div>
+          </div>
+          <div class="graph-x-range">
+            <div class="field">
+              <label for="xMinInput">x-min</label>
+              <input id="xMinInput" type="number" step="any" value="-1" />
+              <input id="xMinSlider" class="param-slider" type="range" step="0.001" />
+              <div class="slider-endpoints">
+                <input id="xMinSliderMinInput" class="slider-endpoint-input" type="number" step="any" value="-2" aria-label="x-min slider minimum" />
+                <input id="xMinSliderMaxInput" class="slider-endpoint-input" type="number" step="any" value="4" aria-label="x-min slider maximum" />
+              </div>
+            </div>
+            <div class="field">
+              <label for="xMaxInput">x-max</label>
+              <input id="xMaxInput" type="number" step="any" value="3" />
+              <input id="xMaxSlider" class="param-slider" type="range" step="0.001" />
+              <div class="slider-endpoints">
+                <input id="xMaxSliderMinInput" class="slider-endpoint-input" type="number" step="any" value="-2" aria-label="x-max slider minimum" />
+                <input id="xMaxSliderMaxInput" class="slider-endpoint-input" type="number" step="any" value="4" aria-label="x-max slider maximum" />
+              </div>
+            </div>
+          </div>
+
+          <details id="generatedHistogramDetails" class="prob-cdf-details" open>
+            <summary>Generated data histogram</summary>
+            <div class="prob-cdf-body">
+              <div class="generated-controls">
+                <div class="field">
+                  <label for="generationMode">Mode</label>
+                  <select id="generationMode">
+                    <option value="scratch">Generate Data from Scratch</option>
+                    <option value="add">Add Data</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="generationBatchSize">Batch size</label>
+                  <select id="generationBatchSize">
+                    <option value="1">1</option>
+                    <option value="10">10</option>
+                    <option value="100" selected>100</option>
+                    <option value="1000">1000</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="histogramBinCount">Histogram bins</label>
+                  <input id="histogramBinCount" type="number" min="3" max="60" step="1" value="20" />
+                </div>
+                <button id="generateDataBtn" type="button" class="btn-primary">Generate Data</button>
+                <button id="clearDataBtn" type="button" class="btn-secondary">Clear Data</button>
+                <div id="generatedSampleCount" class="generated-sample-count">Samples: 0</div>
+              </div>
+              <div class="generated-chart-wrap">
+                <canvas id="histogramCanvas" class="generated-canvas"></canvas>
+              </div>
+              <div class="generated-scatter-section">
+                <h4>Generated data scatter plot</h4>
+                <div class="generated-chart-wrap">
+                  <canvas id="scatterCanvas" class="generated-canvas"></canvas>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <div id="probabilitySummary" class="probability-summary" aria-live="polite"></div>
+          <details id="sharedCdfDetails" class="prob-cdf-details">
+            <summary>CDF view</summary>
+            <div class="prob-cdf-body">
+              <div class="prob-cdf-controls">
+                <div class="field">
+                  <label for="cdfYTopInput">y-top (CDF)</label>
+                  <input id="cdfYTopInput" type="number" step="any" value="1.05" />
+                </div>
+                <label class="toggle-inline" for="cdfAutoYTopToggle">
+                  <input id="cdfAutoYTopToggle" type="checkbox" checked />
+                  Auto-adjust local y-top
+                </label>
+              </div>
+              <div class="prob-cdf-wrap">
+                <canvas id="sharedCdfCanvas" class="prob-cdf-canvas"></canvas>
+              </div>
+            </div>
+          </details>
+
+          <section class="generated-table-section" aria-live="polite">
+            <h3>Generated data table</h3>
+            <div class="generated-table-wrap">
+              <table class="generated-table">
+                <thead><tr><th>ID</th><th>Value</th></tr></thead>
+                <tbody id="generatedDataTableBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+        <aside id="rightControlPanel" class="right-control-panel" aria-label="Distribution controls">
+          <div class="right-control-header">
+            <span class="right-control-title">Distribution controls</span>
+            <button id="rightControlToggle" class="right-control-toggle" type="button" aria-expanded="true" aria-controls="rightControlBody" title="Collapse controls">⮞</button>
+          </div>
+          <div id="rightControlBody" class="right-control-body">
+            <label class="toggle-inline">
+              <input id="useMeanStdToggle" type="checkbox" />
+              Use Mean and Std
+            </label>
+
+            <div id="meanStdParams" class="params-panel" hidden>
+              <div class="grid">
+                <div class="field col-12">
+                  <label for="modeMeanInput">Mean</label>
+                  <input id="modeMeanInput" type="number" step="any" value="0.5" />
+                  <input id="modeMeanSlider" class="param-slider" type="range" step="0.001" />
+                </div>
+                <div class="field col-12">
+                  <label for="modeStdInput">Std</label>
+                  <input id="modeStdInput" type="number" min="0.001" step="any" value="0.288675" />
+                  <input id="modeStdSlider" class="param-slider" type="range" step="0.001" min="0.001" />
+                </div>
+              </div>
+            </div>
+
+            <div id="uniformParams" class="params-panel">
+              <div class="grid">
+                <div class="field col-6">
+                  <label for="uniformA">a (left bound)</label>
+                  <input id="uniformA" type="number" step="any" value="0" />
+                  <input id="uniformASlider" class="param-slider" type="range" step="0.001" />
+                </div>
+                <div class="field col-6">
+                  <label for="uniformB">b (right bound)</label>
+                  <input id="uniformB" type="number" step="any" value="1" />
+                  <input id="uniformBSlider" class="param-slider" type="range" step="0.001" />
+                </div>
+                <div class="field col-6" id="uniformHeightField">
+                  <label for="uniformHeight">Height</label>
+                  <div class="input-toggle-row">
+                    <input id="uniformHeight" type="number" step="any" value="1" min="0" />
+                    <label class="toggle-inline"><input data-autoadjust-toggle type="checkbox" checked /> autoadjust</label>
+                  </div>
+                  <input id="uniformHeightSlider" class="param-slider" type="range" step="0.001" />
+                </div>
+              </div>
+            </div>
+
+            <div id="triangularParams" class="params-panel" hidden>
+              <div class="grid">
+                <div class="field col-4">
+                  <label for="triA">a (left bound)</label>
+                  <input id="triA" type="number" step="any" value="0" />
+                  <input id="triASlider" class="param-slider" type="range" step="0.001" />
+                </div>
+                <div class="field col-4">
+                  <label for="triM">m (mode)</label>
+                  <input id="triM" type="number" step="any" value="1" />
+                  <input id="triMSlider" class="param-slider" type="range" step="0.001" />
+                </div>
+                <div class="field col-4">
+                  <label for="triB">b (right bound)</label>
+                  <input id="triB" type="number" step="any" value="2" />
+                  <input id="triBSlider" class="param-slider" type="range" step="0.001" />
+                </div>
+                <div class="field col-4" id="triHeightField">
+                  <label for="triHeight">Height of m</label>
+                  <div class="input-toggle-row">
+                    <input id="triHeight" type="number" step="any" value="1" min="0" />
+                    <label class="toggle-inline"><input data-autoadjust-toggle type="checkbox" checked /> autoadjust</label>
+                  </div>
+                  <input id="triHeightSlider" class="param-slider" type="range" step="0.001" />
+                </div>
+              </div>
+            </div>
+
+            <div id="trapezoidParams" class="params-panel" hidden>
+              <div class="grid">
+                <div class="field col-3">
+                  <label for="trapA">a (left bound)</label>
+                  <input id="trapA" type="number" step="any" value="0" />
+                  <input id="trapASlider" class="param-slider" type="range" step="0.001" />
+                </div>
+                <div class="field col-3">
+                  <label for="trapB">b (start plateau)</label>
+                  <input id="trapB" type="number" step="any" value="1" />
+                  <input id="trapBSlider" class="param-slider" type="range" step="0.001" />
+                </div>
+                <div class="field col-3">
+                  <label for="trapC">c (end plateau)</label>
+                  <input id="trapC" type="number" step="any" value="2" />
+                  <input id="trapCSlider" class="param-slider" type="range" step="0.001" />
+                </div>
+                <div class="field col-3">
+                  <label for="trapD">d (right bound)</label>
+                  <input id="trapD" type="number" step="any" value="3" />
+                  <input id="trapDSlider" class="param-slider" type="range" step="0.001" />
+                </div>
+                <div class="field col-3" id="trapHeightField">
+                  <label for="trapHeight">Height of plateau</label>
+                  <div class="input-toggle-row">
+                    <input id="trapHeight" type="number" step="any" value="1" min="0" />
+                    <label class="toggle-inline"><input data-autoadjust-toggle type="checkbox" checked /> autoadjust</label>
+                  </div>
+                  <input id="trapHeightSlider" class="param-slider" type="range" step="0.001" />
+                </div>
+              </div>
+            </div>
+
+            <div id="piecewiseParams" class="params-panel" hidden>
+              <div class="actions" style="justify-content: space-between;">
+                <label>Points (x, y)</label>
+                <label class="toggle-inline"><input data-autoadjust-toggle type="checkbox" checked /> autoadjust</label>
+              </div>
+              <table class="points-table">
+                <thead>
+                  <tr><th>x</th><th>y</th><th>Action</th></tr>
+                </thead>
+                <tbody id="piecewiseRows"></tbody>
+              </table>
+              <div class="actions" style="margin-top:0.6rem;">
+                <button id="addPointBtn" class="btn-secondary" type="button">Add row</button>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button id="updateBtn" class="btn-primary" type="button">Update graph</button>
+              <button id="resetBtn" class="btn-secondary" type="button">Reset</button>
+            </div>
+
+            <div id="status" class="status warn" role="status">Adjust the distribution parameters to update the graph.</div>
+            <div id="errorBox" class="error-box" role="alert" hidden></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <script src="../../../assets/js/collapsible.js"></script>
+
+  <script>
+    (() => {
+      const INTERNAL_SAMPLES = 500;
+      const EPS = 1e-3;
+      const HIT_RADIUS_POINT = 10;
+      const HIT_RADIUS_LINE = 8;
+      const els = {
+        distributionType: document.getElementById('distributionType'),
+        exampleSelector: document.getElementById('exampleSelector'),
+        uniformParams: document.getElementById('uniformParams'),
+        triangularParams: document.getElementById('triangularParams'),
+        trapezoidParams: document.getElementById('trapezoidParams'),
+        piecewiseParams: document.getElementById('piecewiseParams'),
+        uniformA: document.getElementById('uniformA'),
+        uniformB: document.getElementById('uniformB'),
+        triA: document.getElementById('triA'),
+        triM: document.getElementById('triM'),
+        triB: document.getElementById('triB'),
+        trapA: document.getElementById('trapA'),
+        trapB: document.getElementById('trapB'),
+        trapC: document.getElementById('trapC'),
+        trapD: document.getElementById('trapD'),
+        uniformHeightField: document.getElementById('uniformHeightField'),
+        triHeightField: document.getElementById('triHeightField'),
+        trapHeightField: document.getElementById('trapHeightField'),
+        uniformHeight: document.getElementById('uniformHeight'),
+        triHeight: document.getElementById('triHeight'),
+        trapHeight: document.getElementById('trapHeight'),
+        uniformASlider: document.getElementById('uniformASlider'),
+        uniformBSlider: document.getElementById('uniformBSlider'),
+        uniformHeightSlider: document.getElementById('uniformHeightSlider'),
+        triASlider: document.getElementById('triASlider'),
+        triMSlider: document.getElementById('triMSlider'),
+        triBSlider: document.getElementById('triBSlider'),
+        triHeightSlider: document.getElementById('triHeightSlider'),
+        trapASlider: document.getElementById('trapASlider'),
+        trapBSlider: document.getElementById('trapBSlider'),
+        trapCSlider: document.getElementById('trapCSlider'),
+        trapDSlider: document.getElementById('trapDSlider'),
+        trapHeightSlider: document.getElementById('trapHeightSlider'),
+        piecewiseRows: document.getElementById('piecewiseRows'),
+        addPointBtn: document.getElementById('addPointBtn'),
+        updateBtn: document.getElementById('updateBtn'),
+        resetBtn: document.getElementById('resetBtn'),
+        autoadjustToggles: Array.from(document.querySelectorAll('[data-autoadjust-toggle]')),
+        status: document.getElementById('status'),
+        results: document.getElementById('results'),
+        canvas: document.getElementById('pdfCanvas'),
+        graphWrap: document.getElementById('graphWrap'),
+        tooltip: document.getElementById('tooltip'),
+        errorBox: document.getElementById('errorBox'),
+        xMinInput: document.getElementById('xMinInput'),
+        xMaxInput: document.getElementById('xMaxInput'),
+        xMinSlider: document.getElementById('xMinSlider'),
+        xMaxSlider: document.getElementById('xMaxSlider'),
+        xMinSliderMinInput: document.getElementById('xMinSliderMinInput'),
+        xMinSliderMaxInput: document.getElementById('xMinSliderMaxInput'),
+        xMaxSliderMinInput: document.getElementById('xMaxSliderMinInput'),
+        xMaxSliderMaxInput: document.getElementById('xMaxSliderMaxInput'),
+        yTopInput: document.getElementById('yTopInput'),
+        autoYTopToggle: document.getElementById('autoYTopToggle'),
+        probabilitySummary: document.getElementById('probabilitySummary'),
+        sharedCdfDetails: document.getElementById('sharedCdfDetails'),
+        cdfYTopInput: document.getElementById('cdfYTopInput'),
+        cdfAutoYTopToggle: document.getElementById('cdfAutoYTopToggle'),
+        sharedCdfCanvas: document.getElementById('sharedCdfCanvas'),
+        generationMode: document.getElementById('generationMode'),
+        generationBatchSize: document.getElementById('generationBatchSize'),
+        histogramBinCount: document.getElementById('histogramBinCount'),
+        generateDataBtn: document.getElementById('generateDataBtn'),
+        clearDataBtn: document.getElementById('clearDataBtn'),
+        generatedSampleCount: document.getElementById('generatedSampleCount'),
+        histogramCanvas: document.getElementById('histogramCanvas'),
+        scatterCanvas: document.getElementById('scatterCanvas'),
+        generatedDataTableBody: document.getElementById('generatedDataTableBody'),
+        rightControlPanel: document.getElementById('rightControlPanel'),
+        rightControlToggle: document.getElementById('rightControlToggle'),
+        useMeanStdToggle: document.getElementById('useMeanStdToggle'),
+        meanStdParams: document.getElementById('meanStdParams'),
+        modeMeanInput: document.getElementById('modeMeanInput'),
+        modeStdInput: document.getElementById('modeStdInput'),
+        modeMeanSlider: document.getElementById('modeMeanSlider'),
+        modeStdSlider: document.getElementById('modeStdSlider')
+      };
+
+      const setRightPanelCollapsed = (collapsed) => {
+        if (!els.rightControlPanel || !els.rightControlToggle) return;
+        els.rightControlPanel.classList.toggle('collapsed', collapsed);
+        els.rightControlToggle.setAttribute('aria-expanded', String(!collapsed));
+        els.rightControlToggle.textContent = collapsed ? '⮜' : '⮞';
+        els.rightControlToggle.title = collapsed ? 'Expand controls' : 'Collapse controls';
+      };
+
+      const defaults = {
+        distributionType: 'uniform',
+        exampleSelector: 'none',
+        uniform: { a: 0, b: 1 },
+        triangular: { a: 0, m: 1, b: 2 },
+        trapezoid: { a: 0, b: 1, c: 2, d: 3 },
+        manualHeight: {
+          uniform: 1,
+          triangular: 1,
+          trapezoid: 1
+        },
+        piecewise: [
+          { x: 0, y: 0 },
+          { x: 1, y: 1 },
+          { x: 2, y: 0 }
+        ],
+        autoadjust: true,
+        useMeanStdMode: false
+      };
+
+
+      const EXAMPLE_POINT_EPS = 1e-6;
+      const problemExamples = {
+        '1': {
+          distributionType: 'uniform',
+          uniform: { a: 0, b: 5 },
+          xRange: { min: -1, max: 6 }
+        },
+        '2': {
+          distributionType: 'piecewise',
+          piecewise: [
+            { x: 2, y: 0 },
+            { x: 8, y: 1 / 3 }
+          ],
+          xRange: { min: 1, max: 9 }
+        },
+        '3': {
+          distributionType: 'piecewise',
+          piecewise: [
+            { x: 0, y: 1 / 6 },
+            { x: 1, y: 1 / 6 },
+            { x: 1 + EXAMPLE_POINT_EPS, y: 1 / 3 },
+            { x: 3, y: 1 / 3 },
+            { x: 3 + EXAMPLE_POINT_EPS, y: 1 / 6 },
+            { x: 4, y: 1 / 6 }
+          ],
+          xRange: { min: -1, max: 5 }
+        },
+        '4': {
+          distributionType: 'triangular',
+          triangular: { a: -1, m: 1, b: 3 },
+          xRange: { min: -2, max: 4 }
+        },
+        '5': {
+          distributionType: 'piecewise',
+          piecewise: [
+            { x: 0, y: 1 / 10 },
+            { x: 2, y: 1 / 10 },
+            { x: 2 + EXAMPLE_POINT_EPS, y: 1 / 5 },
+            { x: 6, y: 1 / 5 }
+          ],
+          xRange: { min: -1, max: 7 }
+        },
+        '6': {
+          distributionType: 'piecewise',
+          piecewise: [
+            { x: 1, y: 1 / 2 },
+            { x: 5, y: 0 }
+          ],
+          xRange: { min: 0, max: 6 }
+        },
+        '7': {
+          distributionType: 'trapezoid',
+          trapezoid: { a: 0, b: 2, c: 4, d: 6 },
+          xRange: { min: -1, max: 7 }
+        },
+        '8': {
+          distributionType: 'piecewise',
+          piecewise: [
+            { x: 2, y: 1 / 12 },
+            { x: 8, y: 1 / 4 }
+          ],
+          xRange: { min: 1, max: 9 }
+        },
+        '9': {
+          distributionType: 'triangular',
+          triangular: { a: -2, m: 0, b: 2 },
+          xRange: { min: -3, max: 3 }
+        },
+        '10': {
+          distributionType: 'piecewise',
+          piecewise: [
+            { x: 0, y: 1 / 9 },
+            { x: 4, y: 1 / 9 },
+            { x: 4 + EXAMPLE_POINT_EPS, y: 1 / 18 },
+            { x: 8, y: 1 / 18 },
+            { x: 8 + EXAMPLE_POINT_EPS, y: 1 / 6 },
+            { x: 10, y: 1 / 6 }
+          ],
+          xRange: { min: -1, max: 11 }
+        }
+      };
+
+      let applyingExampleSelection = false;
+
+      const state = {
+        x: [],
+        y: [],
+        xmin: -1,
+        xmax: 3,
+        ymin: 0,
+        ymax: 1,
+        hoverIndex: -1,
+        points: [],
+        interactionTargets: [],
+        hoverTargetId: null,
+        drag: null,
+        yAutoTop: 1,
+        autoYTopEnabled: true,
+        probabilityMarkers: [],
+        hoveredProbabilityRegion: null,
+        cdfView: { autoYTopEnabled: true, yTop: 1.05 },
+        plot: { m: { l: 62, r: 20, t: 18, b: 46 }, w: 1, h: 1, rectWidth: 1, rectHeight: 420 },
+        generatedData: [],
+        useMeanStdMode: false,
+        currentModel: null,
+        normalRangeInitialized: false,
+        skipMeanStdCanonicalOnce: false,
+        sliderRanges: {
+          xMin: { min: -2, max: 4 },
+          xMax: { min: -2, max: 4 }
+        }
+      };
+
+      function getAutoadjustValue() {
+        return els.autoadjustToggles.length ? els.autoadjustToggles[0].checked : true;
+      }
+
+      function setAutoadjustValue(value) {
+        const checked = Boolean(value);
+        els.autoadjustToggles.forEach((toggle) => {
+          toggle.checked = checked;
+        });
+      }
+
+      function fmt(v, digits = 4) {
+        if (!Number.isFinite(v)) return 'NaN';
+        const abs = Math.abs(v);
+        if (abs > 0 && abs < 0.001) return v.toExponential(2);
+        return v.toFixed(digits);
+      }
+
+      function toInputNumber(v) {
+        if (!Number.isFinite(v)) return '0';
+        return String(Number(v.toFixed(6)));
+      }
+
+
+      function setSliderBounds(slider, min, max, step = 0.001) {
+        if (!slider) return;
+        const lo = Number.isFinite(min) ? min : 0;
+        const hi = Number.isFinite(max) ? max : lo + 1;
+        const safeHi = hi > lo ? hi : lo + 1;
+        slider.min = toInputNumber(lo);
+        slider.max = toInputNumber(safeHi);
+        slider.step = toInputNumber(step);
+      }
+
+      function syncInputSlider(input, slider) {
+        if (!input || !slider) return;
+        const n = Number(input.value);
+        if (!Number.isFinite(n)) return;
+        slider.value = toInputNumber(clamp(n, Number(slider.min), Number(slider.max)));
+      }
+
+      function bindInputAndSlider(input, slider, onInput) {
+        if (!input || !slider) return;
+        const handler = () => {
+          syncInputSlider(input, slider);
+          if (typeof onInput === 'function') onInput();
+        };
+        input.addEventListener('input', handler);
+        input.addEventListener('change', handler);
+        slider.addEventListener('input', () => {
+          input.value = slider.value;
+          if (typeof onInput === 'function') onInput();
+        });
+        slider.addEventListener('change', () => {
+          input.value = slider.value;
+          if (typeof onInput === 'function') onInput();
+        });
+      }
+
+      function setDefaultXSliderRangesFromValues(xmin, xmax) {
+        const safeMin = Number.isFinite(xmin) ? xmin : -1;
+        const safeMax = Number.isFinite(xmax) ? xmax : 3;
+        const span = Math.max(1, safeMax - safeMin);
+        const pad = span * 0.25;
+        const rangeMin = safeMin - pad;
+        const rangeMax = safeMax + pad;
+        state.sliderRanges.xMin.min = rangeMin;
+        state.sliderRanges.xMin.max = rangeMax;
+        state.sliderRanges.xMax.min = rangeMin;
+        state.sliderRanges.xMax.max = rangeMax;
+        els.xMinSliderMinInput.value = toInputNumber(rangeMin);
+        els.xMinSliderMaxInput.value = toInputNumber(rangeMax);
+        els.xMaxSliderMinInput.value = toInputNumber(rangeMin);
+        els.xMaxSliderMaxInput.value = toInputNumber(rangeMax);
+      }
+
+      function sanitizeXSliderRangeInputs() {
+        const fallbackMin = Math.min(state.xmin, state.xmax) - 1;
+        const fallbackMax = Math.max(state.xmin, state.xmax) + 1;
+        const sanitizePair = (minInput, maxInput, target) => {
+          let min = Number(minInput.value);
+          let max = Number(maxInput.value);
+          if (!Number.isFinite(min)) min = Number.isFinite(target.min) ? target.min : fallbackMin;
+          if (!Number.isFinite(max)) max = Number.isFinite(target.max) ? target.max : fallbackMax;
+          if (!(max - min > EPS)) max = min + 1;
+          target.min = min;
+          target.max = max;
+          minInput.value = toInputNumber(min);
+          maxInput.value = toInputNumber(max);
+        };
+        sanitizePair(els.xMinSliderMinInput, els.xMinSliderMaxInput, state.sliderRanges.xMin);
+        sanitizePair(els.xMaxSliderMinInput, els.xMaxSliderMaxInput, state.sliderRanges.xMax);
+        if (state.sliderRanges.xMax.max - state.sliderRanges.xMin.min <= EPS) {
+          state.sliderRanges.xMax.max = state.sliderRanges.xMin.min + 1;
+          els.xMaxSliderMaxInput.value = toInputNumber(state.sliderRanges.xMax.max);
+        }
+      }
+
+      function syncFixedSlidersFromInputs() {
+        [
+          [els.uniformA, els.uniformASlider],
+          [els.uniformB, els.uniformBSlider],
+          [els.uniformHeight, els.uniformHeightSlider],
+          [els.triA, els.triASlider],
+          [els.triM, els.triMSlider],
+          [els.triB, els.triBSlider],
+          [els.triHeight, els.triHeightSlider],
+          [els.trapA, els.trapASlider],
+          [els.trapB, els.trapBSlider],
+          [els.trapC, els.trapCSlider],
+          [els.trapD, els.trapDSlider],
+          [els.trapHeight, els.trapHeightSlider],
+          [els.modeMeanInput, els.modeMeanSlider],
+          [els.modeStdInput, els.modeStdSlider]
+        ].forEach(([input, slider]) => syncInputSlider(input, slider));
+
+        Array.from(els.piecewiseRows.querySelectorAll('tr')).forEach((row) => {
+          syncInputSlider(row.querySelector('.pw-x'), row.querySelector('.pw-x-slider'));
+          syncInputSlider(row.querySelector('.pw-y'), row.querySelector('.pw-y-slider'));
+        });
+      }
+
+      function getUniformSliderBoundValues() {
+        let a = Number(els.uniformA.value);
+        let b = Number(els.uniformB.value);
+
+        if (!Number.isFinite(a)) a = defaults.uniform.a;
+        if (!Number.isFinite(b)) b = defaults.uniform.b;
+
+        const aSliderMaxRaw = Number.isFinite(b) ? Math.min(b - EPS, state.xmax) : state.xmax;
+        const bSliderMinRaw = Number.isFinite(a) ? Math.max(a + EPS, state.xmin) : state.xmin;
+
+        return {
+          aSliderMin: state.xmin,
+          aSliderMax: Math.max(state.xmin + EPS, aSliderMaxRaw),
+          bSliderMin: Math.min(state.xmax - EPS, bSliderMinRaw),
+          bSliderMax: state.xmax
+        };
+      }
+
+      function updateSliderRanges() {
+        const span = Math.max(1, state.xmax - state.xmin);
+        const rangeMin = state.xmin - 0.25 * span;
+        const rangeMax = state.xmax + 0.25 * span;
+        const heightMax = Math.max(2, state.yAutoTop * 2, Number(els.uniformHeight.value), Number(els.triHeight.value), Number(els.trapHeight.value));
+        sanitizeXSliderRangeInputs();
+        const xMinRange = state.sliderRanges.xMin;
+        const xMaxRange = state.sliderRanges.xMax;
+        setSliderBounds(els.xMinSlider, xMinRange.min, Math.min(xMinRange.max, state.xmax - EPS), 0.001);
+        setSliderBounds(els.xMaxSlider, Math.max(xMaxRange.min, state.xmin + EPS), xMaxRange.max, 0.001);
+        syncInputSlider(els.xMinInput, els.xMinSlider);
+        syncInputSlider(els.xMaxInput, els.xMaxSlider);
+
+        const uniformSliderBounds = getUniformSliderBoundValues();
+        setSliderBounds(els.uniformASlider, uniformSliderBounds.aSliderMin, uniformSliderBounds.aSliderMax);
+        setSliderBounds(els.uniformBSlider, uniformSliderBounds.bSliderMin, uniformSliderBounds.bSliderMax);
+        setSliderBounds(els.uniformHeightSlider, 0, heightMax, 0.0005);
+
+        const ta = Number(els.triA.value);
+        const tm = Number(els.triM.value);
+        const tb = Number(els.triB.value);
+        setSliderBounds(els.triASlider, rangeMin, tm - EPS);
+        setSliderBounds(els.triMSlider, ta + EPS, tb - EPS);
+        setSliderBounds(els.triBSlider, tm + EPS, rangeMax);
+        setSliderBounds(els.triHeightSlider, 0, heightMax, 0.0005);
+
+        const pa = Number(els.trapA.value);
+        const pb = Number(els.trapB.value);
+        const pc = Number(els.trapC.value);
+        const pd = Number(els.trapD.value);
+        setSliderBounds(els.trapASlider, rangeMin, pb - EPS);
+        setSliderBounds(els.trapBSlider, pa + EPS, pc);
+        setSliderBounds(els.trapCSlider, pb, pd - EPS);
+        setSliderBounds(els.trapDSlider, pc + EPS, rangeMax);
+        setSliderBounds(els.trapHeightSlider, 0, heightMax, 0.0005);
+
+        const meanRangePadding = Math.max(1, span * 0.5);
+        const meanMin = rangeMin - meanRangePadding;
+        const meanMax = rangeMax + meanRangePadding;
+        const stdMax = Math.max(0.5, span * 2, Number(els.modeStdInput.value));
+        setSliderBounds(els.modeMeanSlider, meanMin, meanMax, 0.001);
+        setSliderBounds(els.modeStdSlider, EPS, stdMax, 0.001);
+
+        const rows = Array.from(els.piecewiseRows.querySelectorAll('tr'));
+        rows.forEach((row, i) => {
+          const xInput = row.querySelector('.pw-x');
+          const yInput = row.querySelector('.pw-y');
+          const xSlider = row.querySelector('.pw-x-slider');
+          const ySlider = row.querySelector('.pw-y-slider');
+          const prev = i === 0 ? rangeMin : Number(rows[i - 1].querySelector('.pw-x').value) + EPS;
+          const next = i === rows.length - 1 ? rangeMax : Number(rows[i + 1].querySelector('.pw-x').value) - EPS;
+          setSliderBounds(xSlider, prev, next, 0.001);
+          setSliderBounds(ySlider, 0, heightMax, 0.0005);
+          syncInputSlider(xInput, xSlider);
+          syncInputSlider(yInput, ySlider);
+        });
+      }
+
+      function showPanels() {
+        const t = els.distributionType.value;
+        if (t === 'normal') {
+          state.useMeanStdMode = true;
+          els.useMeanStdToggle.checked = true;
+          els.useMeanStdToggle.disabled = true;
+        } else {
+          els.useMeanStdToggle.disabled = false;
+        }
+        const useMeanStd = state.useMeanStdMode;
+        els.meanStdParams.hidden = !useMeanStd;
+        els.uniformParams.hidden = t === 'normal' || useMeanStd || t !== 'uniform';
+        els.triangularParams.hidden = t === 'normal' || useMeanStd || t !== 'triangular';
+        els.trapezoidParams.hidden = t === 'normal' || useMeanStd || t !== 'trapezoid';
+        els.piecewiseParams.hidden = t === 'normal' || useMeanStd || t !== 'piecewise';
+        const autoadjust = getAutoadjustValue();
+        els.uniformHeight.disabled = autoadjust;
+        els.triHeight.disabled = autoadjust;
+        els.trapHeight.disabled = autoadjust;
+        els.uniformHeightSlider.disabled = autoadjust;
+        els.triHeightSlider.disabled = autoadjust;
+        els.trapHeightSlider.disabled = autoadjust;
+        Array.from(els.piecewiseRows.querySelectorAll('tr')).forEach((row) => {
+          const yInput = row.querySelector('.pw-y');
+          const ySlider = row.querySelector('.pw-y-slider');
+          if (yInput) yInput.disabled = autoadjust;
+          if (ySlider) ySlider.disabled = autoadjust;
+        });
+      }
+
+      function setStatus(kind, message) {
+        els.status.className = `status ${kind}`;
+        els.status.textContent = message;
+      }
+
+      function setErrors(errors) {
+        if (!errors.length) {
+          els.errorBox.hidden = true;
+          els.errorBox.innerHTML = '';
+          return;
+        }
+        els.errorBox.hidden = false;
+        els.errorBox.innerHTML = `<strong>Validation issues</strong><ul>${errors.map((e) => `<li>${e}</li>`).join('')}</ul>`;
+      }
+
+      function trapArea(points) {
+        let area = 0;
+        for (let i = 0; i < points.length - 1; i++) {
+          const p1 = points[i];
+          const p2 = points[i + 1];
+          const dx = p2.x - p1.x;
+          if (!Number.isFinite(dx) || dx <= 0) return NaN;
+          area += dx * (p1.y + p2.y) / 2;
+        }
+        return area;
+      }
+
+      function trapezoidIntegralSafe(x, y) {
+        if (!Array.isArray(x) || !Array.isArray(y)) return { ok: false, value: NaN, reason: 'Inputs must be arrays.' };
+        if (x.length !== y.length) return { ok: false, value: NaN, reason: 'x and y arrays have different lengths.' };
+        if (x.length < 2) return { ok: false, value: NaN, reason: 'At least two samples are required.' };
+        let area = 0;
+        for (let i = 0; i < x.length - 1; i++) {
+          const dx = x[i + 1] - x[i];
+          const ya = y[i];
+          const yb = y[i + 1];
+          if (!Number.isFinite(dx) || !Number.isFinite(ya) || !Number.isFinite(yb)) {
+            return { ok: false, value: NaN, reason: `Non-finite value at segment ${i}.` };
+          }
+          if (dx < 0) return { ok: false, value: NaN, reason: 'x must be nondecreasing for integration.' };
+          area += dx * (ya + yb) / 2;
+        }
+        return { ok: true, value: area };
+      }
+
+      function modeInputs() {
+        let mean = Number(els.modeMeanInput.value);
+        let std = Number(els.modeStdInput.value);
+        if (!Number.isFinite(mean)) mean = 0;
+        if (!Number.isFinite(std) || std < EPS) std = EPS;
+        els.modeMeanInput.value = toInputNumber(mean);
+        els.modeStdInput.value = toInputNumber(std);
+        return { mean, std };
+      }
+
+      function applyCanonicalParamsFromMeanStd(type, mean, std) {
+        const safeStd = Math.max(0, std);
+        if (type === 'uniform') {
+          const halfWidth = Math.sqrt(3) * safeStd;
+          const a = mean - halfWidth;
+          const b = mean + halfWidth + (safeStd === 0 ? EPS : 0);
+          els.uniformA.value = toInputNumber(a);
+          els.uniformB.value = toInputNumber(Math.max(b, a + EPS));
+          return;
+        }
+        if (type === 'triangular') {
+          // Canonical family: symmetric triangle with mode at mean.
+          const halfWidth = Math.sqrt(6) * safeStd;
+          const a = mean - halfWidth;
+          const m = mean;
+          const b = mean + halfWidth + (safeStd === 0 ? EPS : 0);
+          els.triA.value = toInputNumber(a);
+          els.triM.value = toInputNumber(m);
+          els.triB.value = toInputNumber(Math.max(b, m + EPS));
+          return;
+        }
+        if (type === 'trapezoid') {
+          // Canonical family: symmetric trapezoid with fixed shoulder ratio q.
+          const q = 0.5;
+          const factor = (q * q + 2 * q + 3) / 18;
+          const halfWidth = safeStd / Math.sqrt(factor || 1);
+          const a = mean - halfWidth;
+          const d = mean + halfWidth + (safeStd === 0 ? EPS : 0);
+          const b = mean - q * halfWidth;
+          const c = mean + q * halfWidth;
+          els.trapA.value = toInputNumber(a);
+          els.trapB.value = toInputNumber(Math.max(a + EPS, b));
+          els.trapC.value = toInputNumber(Math.max(Number(els.trapB.value), c));
+          els.trapD.value = toInputNumber(Math.max(Number(els.trapC.value) + EPS, d));
+          return;
+        }
+        if (type === 'piecewise') {
+          // Canonical family: symmetric 4-point piecewise-linear plateau with fixed shoulder ratio q.
+          const q = 1 / 3;
+          const factor = (q * q + 2 * q + 3) / 18;
+          const halfWidth = safeStd / Math.sqrt(factor || 1);
+          const points = [
+            { x: mean - halfWidth, y: 0 },
+            { x: mean - q * halfWidth, y: 1 },
+            { x: mean + q * halfWidth, y: 1 },
+            { x: mean + halfWidth + (safeStd === 0 ? EPS : 0), y: 0 }
+          ];
+          replacePiecewiseRows(points);
+        }
+      }
+
+      function updateModeInputsFromStats(mean, variance) {
+        if (!state.useMeanStdMode) return;
+        if (els.distributionType.value === 'normal') return;
+        const std = Number.isFinite(variance) && variance >= 0 ? Math.sqrt(variance) : 0;
+        if (Number.isFinite(mean)) els.modeMeanInput.value = toInputNumber(mean);
+        if (Number.isFinite(std)) els.modeStdInput.value = toInputNumber(std);
+      }
+
+      function updateResults({ type, mean, variance, params, meanStdDriven }) {
+        const std = Number.isFinite(variance) && variance >= 0 ? Math.sqrt(variance) : NaN;
+        const cards = [['Type', type]];
+        if (meanStdDriven) {
+          cards.push(['Mode', 'Mean & Std inputs']);
+          cards.push(['Input Mean', fmt(mean)]);
+          cards.push(['Input Std', fmt(std)]);
+          cards.push(['Derived parameters', 'From Mean & Std']);
+          if (type === 'uniform') {
+            cards.push(['a (derived)', fmt(params.a)]);
+            cards.push(['b (derived)', fmt(params.b)]);
+          } else if (type === 'triangular') {
+            cards.push(['a (derived)', fmt(params.a)]);
+            cards.push(['m (derived)', fmt(params.m)]);
+            cards.push(['b (derived)', fmt(params.b)]);
+          } else if (type === 'trapezoid') {
+            cards.push(['a (derived)', fmt(params.a)]);
+            cards.push(['b (derived)', fmt(params.b)]);
+            cards.push(['c (derived)', fmt(params.c)]);
+            cards.push(['d (derived)', fmt(params.d)]);
+          } else if (type === 'piecewise') {
+            (params.raw || []).forEach((p, i) => {
+              cards.push([`P${i + 1} (derived)`, `(${fmt(p.x, 3)}, ${fmt(p.y, 3)})`]);
+            });
+          }
+          cards.push(['Variance Var(X)=σ²', fmt(std * std)]);
+        } else {
+          cards.push(['Mean E[X]', fmt(mean)]);
+          cards.push(['Variance Var(X)', fmt(variance)]);
+          cards.push(['Std dev σ', fmt(std)]);
+        }
+        els.results.innerHTML = cards.map(([k, v]) => `<div class="metric"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
+      }
+
+      function resolveXAxisRange(defaultMin, defaultMax, errors) {
+        sanitizeXSliderRangeInputs();
+        let xmin = Number(els.xMinInput.value);
+        let xmax = Number(els.xMaxInput.value);
+        const hasValid = Number.isFinite(xmin) && Number.isFinite(xmax) && (xmax - xmin > EPS);
+
+        if (!hasValid) {
+          if (els.xMinInput.value !== '' || els.xMaxInput.value !== '') {
+            errors.push('x-range inputs must satisfy x-max > x-min. Auto range was used.');
+          }
+          xmin = defaultMin;
+          xmax = defaultMax;
+        }
+
+        xmin = clamp(xmin, state.sliderRanges.xMin.min, state.sliderRanges.xMin.max);
+        xmax = clamp(xmax, state.sliderRanges.xMax.min, state.sliderRanges.xMax.max);
+
+        if (!(xmax - xmin > EPS)) {
+          const xMinLimit = Math.min(state.sliderRanges.xMin.max, xmax - EPS);
+          if (xMinLimit >= state.sliderRanges.xMin.min) xmin = clamp(xmin, state.sliderRanges.xMin.min, xMinLimit);
+          const xMaxLimit = Math.max(state.sliderRanges.xMax.min, xmin + EPS);
+          if (xMaxLimit <= state.sliderRanges.xMax.max) xmax = clamp(xmax, xMaxLimit, state.sliderRanges.xMax.max);
+        }
+
+        if (!(xmax - xmin > EPS)) {
+          const fallbackXMinMax = Math.min(state.sliderRanges.xMin.max, state.sliderRanges.xMax.max - EPS);
+          xmin = clamp(defaultMin, state.sliderRanges.xMin.min, fallbackXMinMax);
+          const fallbackXMaxMin = Math.max(state.sliderRanges.xMax.min, xmin + EPS);
+          xmax = clamp(defaultMax, fallbackXMaxMin, state.sliderRanges.xMax.max);
+          if (!(xmax - xmin > EPS)) {
+            xmin = state.sliderRanges.xMin.min;
+            xmax = Math.max(xmin + EPS, state.sliderRanges.xMax.max);
+          }
+          errors.push('x-range was clamped to satisfy fixed slider limits and x-max > x-min.');
+        }
+
+        els.xMinInput.value = toInputNumber(xmin);
+        els.xMaxInput.value = toInputNumber(xmax);
+        return { xmin, xmax };
+      }
+
+      function syncYTopInput(autoTop) {
+        const autoEnabled = els.autoYTopToggle.checked;
+        state.autoYTopEnabled = autoEnabled;
+        els.yTopInput.disabled = autoEnabled;
+        if (autoEnabled) {
+          els.yTopInput.value = toInputNumber(autoTop);
+        }
+      }
+
+      function normalizePoints(points, errors) {
+        const area = trapArea(points);
+        if (!Number.isFinite(area) || area <= 0) {
+          errors.push('Area must be positive to normalize the PDF. A flat fallback density was used.');
+          const left = points[0].x;
+          const right = points[points.length - 1].x;
+          const width = Math.max(EPS, right - left);
+          return [{ x: left, y: 1 / width }, { x: right, y: 1 / width }];
+        }
+        return points.map((p) => ({ x: p.x, y: p.y / area }));
+      }
+
+      function getPiecewiseRows() {
+        return Array.from(els.piecewiseRows.querySelectorAll('tr')).map((row) => {
+          const x = Number(row.querySelector('.pw-x').value);
+          const y = Number(row.querySelector('.pw-y').value);
+          return { x, y };
+        });
+      }
+
+      function setPiecewiseX(index, value) {
+        const row = els.piecewiseRows.querySelectorAll('tr')[index];
+        if (!row) return;
+        const input = row.querySelector('.pw-x');
+        const slider = row.querySelector('.pw-x-slider');
+        input.value = toInputNumber(value);
+        syncInputSlider(input, slider);
+      }
+
+      function setPiecewiseY(index, value) {
+        const row = els.piecewiseRows.querySelectorAll('tr')[index];
+        if (!row) return;
+        const input = row.querySelector('.pw-y');
+        const slider = row.querySelector('.pw-y-slider');
+        input.value = toInputNumber(Math.max(0, value));
+        syncInputSlider(input, slider);
+      }
+
+      function clamp(v, lo, hi) {
+        return Math.min(hi, Math.max(lo, v));
+      }
+
+      function readAndSanitize() {
+        const type = els.distributionType.value;
+        let autoadjust = getAutoadjustValue();
+        const useMeanStd = state.useMeanStdMode;
+        const errors = [];
+        let params = {};
+        let points = [];
+
+        if (useMeanStd && !state.skipMeanStdCanonicalOnce) {
+          const { mean, std } = modeInputs();
+          if (type !== 'normal') applyCanonicalParamsFromMeanStd(type, mean, std);
+          if (!autoadjust) {
+            setAutoadjustValue(true);
+            autoadjust = true;
+          }
+        }
+        state.skipMeanStdCanonicalOnce = false;
+
+        if (type === 'uniform') {
+          let a = Number(els.uniformA.value);
+          let b = Number(els.uniformB.value);
+          if (!Number.isFinite(a)) { errors.push('Uniform parameter a must be numeric.'); a = defaults.uniform.a; }
+          if (!Number.isFinite(b)) { errors.push('Uniform parameter b must be numeric.'); b = defaults.uniform.b; }
+          if (!(b - a > EPS)) {
+            errors.push('Uniform requires b > a. Values were clamped.');
+            if (b <= a) b = a + 1;
+            if (b - a <= EPS) b = a + EPS;
+          }
+          els.uniformA.value = toInputNumber(a);
+          els.uniformB.value = toInputNumber(b);
+          let height = Number(els.uniformHeight.value);
+          if (!Number.isFinite(height)) {
+            errors.push('Uniform height must be numeric.');
+            height = defaults.manualHeight.uniform;
+          }
+          if (height < 0) {
+            errors.push('Uniform height must be ≥ 0.');
+            height = 0;
+          }
+          params = { a, b, height };
+          points = [{ x: a, y: height }, { x: b, y: height }];
+          if (autoadjust) {
+            points = normalizePoints(points, errors);
+            els.uniformHeight.value = toInputNumber(points[0].y);
+          } else {
+            els.uniformHeight.value = toInputNumber(height);
+          }
+        }
+
+        if (type === 'triangular') {
+          let a = Number(els.triA.value);
+          let m = Number(els.triM.value);
+          let b = Number(els.triB.value);
+          if (!Number.isFinite(a)) { errors.push('Triangular parameter a must be numeric.'); a = defaults.triangular.a; }
+          if (!Number.isFinite(m)) { errors.push('Triangular parameter m must be numeric.'); m = defaults.triangular.m; }
+          if (!Number.isFinite(b)) { errors.push('Triangular parameter b must be numeric.'); b = defaults.triangular.b; }
+          if (!(a < m)) {
+            errors.push('Triangular requires a < m. Value a was clamped.');
+            a = m - 1;
+          }
+          if (!(m < b)) {
+            errors.push('Triangular requires m < b. Value b was clamped.');
+            b = m + 1;
+          }
+          if (!(a < m - EPS)) a = m - EPS;
+          if (!(b > m + EPS)) b = m + EPS;
+          els.triA.value = toInputNumber(a);
+          els.triM.value = toInputNumber(m);
+          els.triB.value = toInputNumber(b);
+          let height = Number(els.triHeight.value);
+          if (!Number.isFinite(height)) {
+            errors.push('Triangular height of m must be numeric.');
+            height = defaults.manualHeight.triangular;
+          }
+          if (height < 0) {
+            errors.push('Triangular height of m must be ≥ 0.');
+            height = 0;
+          }
+          params = { a, m, b, height };
+          points = [{ x: a, y: 0 }, { x: m, y: height }, { x: b, y: 0 }];
+          if (autoadjust) {
+            points = normalizePoints(points, errors);
+            els.triHeight.value = toInputNumber(points[1].y);
+          } else {
+            els.triHeight.value = toInputNumber(height);
+          }
+        }
+
+        if (type === 'trapezoid') {
+          let a = Number(els.trapA.value);
+          let b = Number(els.trapB.value);
+          let c = Number(els.trapC.value);
+          let d = Number(els.trapD.value);
+          if (!Number.isFinite(a)) { errors.push('Trapezoid parameter a must be numeric.'); a = defaults.trapezoid.a; }
+          if (!Number.isFinite(b)) { errors.push('Trapezoid parameter b must be numeric.'); b = defaults.trapezoid.b; }
+          if (!Number.isFinite(c)) { errors.push('Trapezoid parameter c must be numeric.'); c = defaults.trapezoid.c; }
+          if (!Number.isFinite(d)) { errors.push('Trapezoid parameter d must be numeric.'); d = defaults.trapezoid.d; }
+
+          if (!(b > a)) { errors.push('Trapezoid requires a < b.'); b = a + 1; }
+          if (c < b) { errors.push('Trapezoid requires b ≤ c.'); c = b; }
+          if (!(d > c)) { errors.push('Trapezoid requires c < d.'); d = c + 1; }
+          if (!(a < b - EPS)) a = b - EPS;
+          if (!(d > c + EPS)) d = c + EPS;
+
+          els.trapA.value = toInputNumber(a);
+          els.trapB.value = toInputNumber(b);
+          els.trapC.value = toInputNumber(c);
+          els.trapD.value = toInputNumber(d);
+          let height = Number(els.trapHeight.value);
+          if (!Number.isFinite(height)) {
+            errors.push('Trapezoid height of plateau must be numeric.');
+            height = defaults.manualHeight.trapezoid;
+          }
+          if (height < 0) {
+            errors.push('Trapezoid height of plateau must be ≥ 0.');
+            height = 0;
+          }
+          params = { a, b, c, d, height };
+          points = [{ x: a, y: 0 }, { x: b, y: height }, { x: c, y: height }, { x: d, y: 0 }];
+          if (autoadjust) {
+            points = normalizePoints(points, errors);
+            els.trapHeight.value = toInputNumber(points[1].y);
+          } else {
+            els.trapHeight.value = toInputNumber(height);
+          }
+        }
+
+        if (type === 'piecewise') {
+          const rows = getPiecewiseRows();
+          if (rows.length < 2) errors.push('Piecewise linear requires at least two points.');
+          points = rows.map((p, i) => {
+            let x = p.x;
+            const yInput = els.piecewiseRows.querySelectorAll('tr')[i]?.querySelector('.pw-y');
+            let y = p.y;
+            if (!Number.isFinite(x)) { errors.push(`Row ${i + 1}: x must be numeric.`); x = i; }
+            if (autoadjust && yInput) {
+              const rememberedY = Number(yInput.dataset.manualY);
+              if (Number.isFinite(rememberedY)) y = rememberedY;
+            }
+            if (!Number.isFinite(y)) { errors.push(`Row ${i + 1}: y must be numeric.`); y = 0; }
+            if (y < 0) { errors.push(`Row ${i + 1}: y must be ≥ 0.`); y = 0; }
+            return { x, y };
+          });
+          for (let i = 1; i < points.length; i++) {
+            if (!(points[i].x > points[i - 1].x)) {
+              errors.push('Piecewise linear requires strictly increasing x values. Values were clamped.');
+              points[i].x = points[i - 1].x + EPS;
+            }
+          }
+          points.forEach((p, i) => {
+            setPiecewiseX(i, p.x);
+            const row = els.piecewiseRows.querySelectorAll('tr')[i];
+            if (row) {
+              const yInput = row.querySelector('.pw-y');
+              if (!autoadjust) {
+                yInput.value = toInputNumber(p.y);
+                yInput.dataset.manualY = toInputNumber(p.y);
+              }
+            }
+          });
+          params = { raw: points.map((p) => ({ ...p })) };
+          if (autoadjust) {
+            points = normalizePoints(points, errors);
+            points.forEach((p, i) => setPiecewiseY(i, p.y));
+          }
+        }
+
+        if (type === 'normal') {
+          const meanStd = modeInputs();
+          const mean = meanStd.mean;
+          const std = Math.max(EPS, meanStd.std);
+          els.modeStdInput.value = toInputNumber(std);
+          params = { mean, std };
+          const xminInput = Number(els.xMinInput.value);
+          const xmaxInput = Number(els.xMaxInput.value);
+          const safeXmin = Number.isFinite(xminInput) ? xminInput : mean - 4 * std;
+          const safeXmax = Number.isFinite(xmaxInput) && xmaxInput > safeXmin + EPS ? xmaxInput : mean + 4 * std;
+          const sampleCount = INTERNAL_SAMPLES;
+          const step = (safeXmax - safeXmin) / Math.max(1, sampleCount - 1);
+          points = [];
+          for (let i = 0; i < sampleCount; i++) {
+            const xVal = safeXmin + i * step;
+            const z = (xVal - mean) / std;
+            const yVal = Math.exp(-0.5 * z * z) / (std * Math.sqrt(2 * Math.PI));
+            points.push({ x: xVal, y: yVal });
+          }
+        }
+
+        return { type, params, points, errors };
+      }
+
+      function evaluatePiecewise(points, xVal) {
+        if (xVal < points[0].x || xVal > points[points.length - 1].x) return 0;
+        for (let i = 0; i < points.length - 1; i++) {
+          const p1 = points[i];
+          const p2 = points[i + 1];
+          if (xVal >= p1.x && xVal <= p2.x) {
+            const dx = p2.x - p1.x;
+            if (dx <= 0) return 0;
+            const t = (xVal - p1.x) / dx;
+            return p1.y + t * (p2.y - p1.y);
+          }
+        }
+        return 0;
+      }
+
+      function erfApprox(x) {
+        const sign = x >= 0 ? 1 : -1;
+        const ax = Math.abs(x);
+        const a1 = 0.254829592;
+        const a2 = -0.284496736;
+        const a3 = 1.421413741;
+        const a4 = -1.453152027;
+        const a5 = 1.061405429;
+        const p = 0.3275911;
+        const t = 1 / (1 + p * ax);
+        const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-ax * ax);
+        return sign * y;
+      }
+
+      function normalCdf(x, mean, std) {
+        const safeStd = Math.max(EPS, std);
+        const z = (x - mean) / (safeStd * Math.sqrt(2));
+        const erfFn = typeof Math.erf === 'function' ? Math.erf : erfApprox;
+        return 0.5 * (1 + erfFn(z));
+      }
+
+      function cdfAtX(xVal) {
+        if (state.currentModel?.type === 'normal') {
+          const mean = Number(state.currentModel.params?.mean);
+          const std = Math.max(EPS, Number(state.currentModel.params?.std));
+          return clamp(normalCdf(xVal, Number.isFinite(mean) ? mean : 0, std), 0, 1);
+        }
+        if (!state.x.length || !state.y.length) return 0;
+        if (xVal <= state.x[0]) return 0;
+        if (xVal >= state.x[state.x.length - 1]) return 1;
+
+        let area = 0;
+        for (let i = 0; i < state.x.length - 1; i++) {
+          const xa = state.x[i];
+          const xb = state.x[i + 1];
+          const ya = state.y[i];
+          const yb = state.y[i + 1];
+          if (xVal >= xb) {
+            area += (xb - xa) * (ya + yb) / 2;
+            continue;
+          }
+          if (xVal > xa) {
+            const t = (xVal - xa) / (xb - xa || 1);
+            const yx = ya + t * (yb - ya);
+            area += (xVal - xa) * (ya + yx) / 2;
+          }
+          break;
+        }
+        return clamp(area, 0, 1);
+      }
+
+      function clampMarkersToRange() {
+        if (!state.probabilityMarkers.length) return;
+        state.probabilityMarkers = state.probabilityMarkers
+          .slice(0, 2)
+          .map((marker) => ({ ...marker, x: clamp(marker.x, state.xmin, state.xmax) }));
+      }
+
+      function removeProbabilityMarker(id) {
+        const before = state.probabilityMarkers.length;
+        state.probabilityMarkers = state.probabilityMarkers.filter((m) => m.id !== id);
+        if (state.drag && state.drag.id === id) state.drag = null;
+        if (state.hoverTargetId === id) state.hoverTargetId = null;
+        if (state.probabilityMarkers.length !== before) evaluateAndDraw();
+      }
+
+      function markerLabel(index) {
+        return index === 0 ? 'x₁' : 'x₂';
+      }
+
+      function buildProbabilitySections() {
+        const markers = state.probabilityMarkers;
+        const sections = [];
+
+        markers.forEach((marker, index) => {
+          const p = cdfAtX(marker.x);
+          const label = markerLabel(index);
+          sections.push({
+            id: `single-${marker.id}`,
+            expression: `Probability of X ≤ ${label} (${fmt(marker.x, 3)})`,
+            value: fmt(p, 4),
+            dots: [{ x: marker.x, y: p }],
+            deletableMarkerId: marker.id,
+            graphRegion: { mode: 'left', x: marker.x }
+          });
+        });
+
+        if (markers.length === 2) {
+          const ordered = [...markers].sort((a, b) => a.x - b.x);
+          const lo = ordered[0].x;
+          const hi = ordered[1].x;
+          const fLo = cdfAtX(lo);
+          const fHi = cdfAtX(hi);
+          const p = clamp(fHi - fLo, 0, 1);
+          sections.push({
+            id: `interval-${ordered.map((m) => m.id).join('-')}`,
+            expression: `Probability of ${fmt(lo, 3)} ≤ X ≤ ${fmt(hi, 3)}`,
+            value: fmt(p, 4),
+            dots: [{ x: lo, y: fLo }, { x: hi, y: fHi }],
+            graphRegion: { mode: 'between', x1: lo, x2: hi }
+          });
+        }
+
+        return sections;
+      }
+
+      function getSharedCdfDots() {
+        if (!state.probabilityMarkers.length) return [];
+        return [...state.probabilityMarkers]
+          .slice(0, 2)
+          .map((marker) => ({ x: marker.x, y: cdfAtX(marker.x) }))
+          .sort((a, b) => a.x - b.x);
+      }
+
+      function drawSharedCdfSection() {
+        if (!els.sharedCdfDetails.open) return;
+        const canvas = els.sharedCdfCanvas;
+        const yTopInput = els.cdfYTopInput;
+        const autoToggle = els.cdfAutoYTopToggle;
+        if (!canvas || !yTopInput || !autoToggle) return;
+
+        const viewState = state.cdfView;
+        viewState.autoYTopEnabled = autoToggle.checked;
+        yTopInput.disabled = viewState.autoYTopEnabled;
+
+        const rect = canvas.getBoundingClientRect();
+        const width = Math.max(220, rect.width || 220);
+        const height = 220;
+        const dpr = Math.max(1, window.devicePixelRatio || 1);
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+        canvas.style.height = `${height}px`;
+
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, width, height);
+
+        const m = { l: 52, r: 14, t: 14, b: 34 };
+        const w = width - m.l - m.r;
+        const h = height - m.t - m.b;
+        const xmin = state.xmin;
+        const xmax = state.xmax;
+        const ymin = 0;
+        const dots = getSharedCdfDots();
+        const dotsMaxY = dots.length ? Math.max(...dots.map((d) => d.y)) : 1;
+        const autoTop = Math.max(1.02, dotsMaxY * 1.05);
+        const requestedTop = Number(yTopInput.value);
+        const manualValid = Number.isFinite(requestedTop) && requestedTop > ymin + EPS;
+        let ymax = autoTop;
+        if (!viewState.autoYTopEnabled && manualValid) {
+          ymax = requestedTop;
+        } else if (!viewState.autoYTopEnabled && !manualValid) {
+          ymax = autoTop;
+        }
+        viewState.yTop = ymax;
+        yTopInput.value = toInputNumber(ymax);
+
+        drawAxesWithLabel(ctx, m, w, h, xmin, xmax, ymin, ymax, 'F(x)');
+
+        const points = [];
+        const sampleCount = INTERNAL_SAMPLES;
+        const step = (xmax - xmin) / Math.max(1, sampleCount - 1);
+        for (let i = 0; i < sampleCount; i++) {
+          const xv = xmin + i * step;
+          points.push({ x: xv, y: cdfAtX(xv) });
+        }
+
+        const px = (v) => m.l + ((v - xmin) / (xmax - xmin || 1)) * w;
+        const py = (v) => m.t + h - ((v - ymin) / (ymax - ymin || 1)) * h;
+
+        ctx.beginPath();
+        points.forEach((p, i) => {
+          const cx = px(p.x);
+          const cy = py(p.y);
+          if (i === 0) ctx.moveTo(cx, cy); else ctx.lineTo(cx, cy);
+        });
+        ctx.strokeStyle = '#0f766e';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        dots.forEach((dot, index) => {
+          const dx = px(dot.x);
+          const dy = py(dot.y);
+          ctx.beginPath();
+          ctx.arc(dx, dy, 4.6, 0, Math.PI * 2);
+          ctx.fillStyle = index === 0 ? '#be123c' : '#7c3aed';
+          ctx.fill();
+          ctx.lineWidth = 1.6;
+          ctx.strokeStyle = '#ffffff';
+          ctx.stroke();
+        });
+      }
+
+      function renderProbabilitySummary() {
+        const sections = buildProbabilitySections();
+        state.hoveredProbabilityRegion = null;
+
+        if (!sections.length) {
+          els.probabilitySummary.innerHTML = '';
+          drawSharedCdfSection();
+          return;
+        }
+
+        els.probabilitySummary.innerHTML = sections.map((section) => `
+          <div class="prob-result-section">
+            <div class="prob-box" data-graph-region='${JSON.stringify(section.graphRegion || null)}'>
+              ${section.deletableMarkerId ? `<button type="button" class="prob-delete" data-delete-marker="${section.deletableMarkerId}" aria-label="Delete probability marker">×</button>` : ''}
+              <div class="expr">${section.expression}</div>
+              <div class="value">${section.value}</div>
+            </div>
+          </div>
+        `).join('');
+        drawSharedCdfSection();
+      }
+
+      function createProbabilityMarker(clientX) {
+        if (state.probabilityMarkers.length >= 2) {
+          setStatus('warn', 'Only two probability markers can be shown at once. Delete one to add another.');
+          return;
+        }
+        const data = pixelToData(clientX, 0);
+        let xVal = clamp(data.xVal, state.xmin, state.xmax);
+        const selectedLine = state.interactionTargets.find((t) => t.id === state.hoverTargetId && t.kind === 'line');
+        if (selectedLine) xVal = clamp(selectedLine.x, state.xmin, state.xmax);
+        const marker = {
+          id: `prob-marker-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
+          x: xVal
+        };
+        state.probabilityMarkers.push(marker);
+        evaluateAndDraw();
+      }
+
+      function buildInteractionTargets(model) {
+        const targets = [];
+        if (!model.points.length) return targets;
+        const autoadjust = getAutoadjustValue();
+
+        const pushLine = (id, x, label) => targets.push({
+          id,
+          kind: 'line',
+          x,
+          label,
+          draggableX: true,
+          draggableY: false
+        });
+        const pushPoint = (id, x, y, label, index) => targets.push({
+          id,
+          kind: 'point',
+          x,
+          y,
+          label,
+          index,
+          draggableX: true,
+          draggableY: true
+        });
+        const pushHorizontal = (id, y, xMin, xMax, label) => targets.push({
+          id,
+          kind: 'hline',
+          y,
+          xMin,
+          xMax,
+          label,
+          draggableX: false,
+          draggableY: true
+        });
+
+        if (model.type === 'uniform') {
+          pushLine('uniform-a', model.params.a, 'a');
+          pushLine('uniform-b', model.params.b, 'b');
+          if (!autoadjust) {
+            pushHorizontal('uniform-height', model.params.height, model.params.a, model.params.b, 'h');
+          }
+        }
+
+        if (model.type === 'triangular') {
+          pushLine('triangular-a', model.params.a, 'a');
+          pushLine('triangular-m', model.params.m, 'm');
+          pushLine('triangular-b', model.params.b, 'b');
+          if (!autoadjust) {
+            pushHorizontal('triangular-height', model.params.height, model.params.a, model.params.b, 'hₘ');
+          }
+        }
+
+        if (model.type === 'trapezoid') {
+          pushLine('trapezoid-a', model.params.a, 'a');
+          pushLine('trapezoid-b', model.params.b, 'b');
+          pushLine('trapezoid-c', model.params.c, 'c');
+          pushLine('trapezoid-d', model.params.d, 'd');
+          if (!autoadjust) {
+            pushHorizontal('trapezoid-height', model.params.height, model.params.a, model.params.d, 'hₚ');
+          }
+        }
+
+        if (model.type === 'piecewise') {
+          const raw = model.params.raw || [];
+          raw.forEach((pt, i) => {
+            pushLine(`piecewise-line-${i}`, pt.x, `x${i + 1}`);
+            const pointY = autoadjust ? (model.points[i] ? model.points[i].y : 0) : pt.y;
+            pushPoint(`piecewise-point-${i}`, pt.x, pointY, `P${i + 1}`, i);
+            if (!autoadjust) {
+              const xMin = i === 0 ? pt.x : raw[i - 1].x;
+              const xMax = i === raw.length - 1 ? pt.x : raw[i + 1].x;
+              pushHorizontal(`piecewise-height-${i}`, pt.y, xMin, xMax, `y${i + 1}`);
+            }
+          });
+        }
+
+        if (model.type === 'normal') {
+          const mean = model.params.mean;
+          const std = Math.max(EPS, model.params.std);
+          pushLine('normal-mean', mean, 'μ');
+          pushLine('normal-left-sd', mean - std, 'μ−σ');
+          pushLine('normal-right-sd', mean + std, 'μ+σ');
+        }
+
+        state.probabilityMarkers.forEach((marker, index) => {
+          const xVal = clamp(marker.x, state.xmin, state.xmax);
+          const yVal = evaluatePiecewise(model.points, xVal);
+          targets.push({
+            id: marker.id,
+            kind: 'line',
+            x: xVal,
+            y: yVal,
+            label: `p${index + 1}`,
+            draggableX: true,
+            draggableY: false,
+            markerKind: 'probability'
+          });
+          targets.push({
+            id: `${marker.id}-point`,
+            markerId: marker.id,
+            kind: 'point',
+            x: xVal,
+            y: yVal,
+            label: `p${index + 1}`,
+            draggableX: true,
+            draggableY: false,
+            markerKind: 'probability'
+          });
+        });
+
+        return targets;
+      }
+
+      function buildSamplerFromCurrentPdf() {
+        if (state.currentModel?.type === 'normal') {
+          const mean = Number(state.currentModel.params?.mean);
+          const std = Math.max(EPS, Number(state.currentModel.params?.std));
+          return function sampleNormalOne() {
+            let u = 0;
+            let v = 0;
+            while (u === 0) u = Math.random();
+            while (v === 0) v = Math.random();
+            const z = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+            return (Number.isFinite(mean) ? mean : 0) + std * z;
+          };
+        }
+        if (!state.x.length || !state.y.length) return null;
+        const segments = [];
+        let totalArea = 0;
+        for (let i = 0; i < state.x.length - 1; i++) {
+          const xa = state.x[i];
+          const xb = state.x[i + 1];
+          const ya = Math.max(0, state.y[i]);
+          const yb = Math.max(0, state.y[i + 1]);
+          const dx = xb - xa;
+          if (!(dx > 0)) continue;
+          const area = dx * (ya + yb) / 2;
+          if (area <= 0) continue;
+          segments.push({ xa, xb, ya, yb, dx, area, cumulativeStart: totalArea });
+          totalArea += area;
+        }
+        if (!(totalArea > 0) || !segments.length) return null;
+
+        return function sampleOne() {
+          const targetArea = Math.random() * totalArea;
+          let seg = segments[segments.length - 1];
+          for (let i = 0; i < segments.length; i++) {
+            const candidate = segments[i];
+            if (targetArea <= candidate.cumulativeStart + candidate.area) {
+              seg = candidate;
+              break;
+            }
+          }
+
+          const localArea = targetArea - seg.cumulativeStart;
+          const slope = (seg.yb - seg.ya) / seg.dx;
+          let t;
+          if (Math.abs(slope) < 1e-12) {
+            t = seg.ya > 0 ? localArea / seg.ya : seg.dx * Math.random();
+          } else {
+            const disc = Math.max(0, seg.ya * seg.ya + 2 * slope * localArea);
+            const root = Math.sqrt(disc);
+            const t1 = (-seg.ya + root) / slope;
+            const t2 = (-seg.ya - root) / slope;
+            const valid = [t1, t2].find((v) => Number.isFinite(v) && v >= -1e-9 && v <= seg.dx + 1e-9);
+            t = Number.isFinite(valid) ? valid : clamp(t1, 0, seg.dx);
+          }
+          return clamp(seg.xa + t, seg.xa, seg.xb);
+        };
+      }
+
+      function drawSimpleAxes(ctx, m, w, h, xmin, xmax, ymin, ymax, yLabel, xLabel) {
+        drawAxesWithLabel(ctx, m, w, h, xmin, xmax, ymin, ymax, yLabel);
+        ctx.fillStyle = '#111827';
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(xLabel, m.l + w / 2, m.t + h + 32);
+      }
+
+      function renderGeneratedTable() {
+        const rows = state.generatedData;
+        if (!rows.length) {
+          els.generatedDataTableBody.innerHTML = '<tr><td colspan="2" class="muted">No generated data yet.</td></tr>';
+          return;
+        }
+        els.generatedDataTableBody.innerHTML = rows.map((row) => `<tr><td>${row.id}</td><td>${fmt(row.value, 6)}</td></tr>`).join('');
+      }
+
+      function setupCanvas(canvas, targetHeight = 220) {
+        const rect = canvas.getBoundingClientRect();
+        const width = Math.max(220, rect.width || 220);
+        const dpr = Math.max(1, window.devicePixelRatio || 1);
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(targetHeight * dpr);
+        canvas.style.height = `${targetHeight}px`;
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, width, targetHeight);
+        return { ctx, width, height: targetHeight };
+      }
+
+      function renderHistogram() {
+        const { ctx, width, height } = setupCanvas(els.histogramCanvas);
+        const m = { l: 52, r: 16, t: 14, b: 36 };
+        const w = width - m.l - m.r;
+        const h = height - m.t - m.b;
+        const data = state.generatedData.map((d) => d.value);
+        const xmin = state.x.length ? state.x[0] : 0;
+        const xmax = state.x.length ? state.x[state.x.length - 1] : 1;
+
+        if (!data.length) {
+          drawAxesWithLabel(ctx, m, w, h, xmin, xmax, 0, 1, 'Count');
+          ctx.fillStyle = '#64748b';
+          ctx.font = '13px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('No generated data yet.', m.l + w / 2, m.t + h / 2);
+          return;
+        }
+
+        const requestedBins = Math.round(Number(els.histogramBinCount.value));
+        const binCount = clamp(Number.isFinite(requestedBins) ? requestedBins : 20, 3, 60);
+        els.histogramBinCount.value = String(binCount);
+        const span = Math.max(1e-9, xmax - xmin);
+        const binWidth = span / binCount;
+        const counts = new Array(binCount).fill(0);
+        data.forEach((v) => {
+          const idx = clamp(Math.floor((v - xmin) / binWidth), 0, binCount - 1);
+          counts[idx] += 1;
+        });
+        const yMax = Math.max(1, ...counts) * 1.1;
+
+        drawAxesWithLabel(ctx, m, w, h, xmin, xmax, 0, yMax, 'Count');
+        ctx.fillStyle = 'rgba(37, 99, 235, 0.72)';
+        ctx.strokeStyle = '#1d4ed8';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < binCount; i++) {
+          const x0 = m.l + (i / binCount) * w;
+          const x1 = m.l + ((i + 1) / binCount) * w;
+          const barH = (counts[i] / yMax) * h;
+          const y0 = m.t + h - barH;
+          ctx.fillRect(x0 + 1, y0, Math.max(1, x1 - x0 - 2), barH);
+          ctx.strokeRect(x0 + 1, y0, Math.max(1, x1 - x0 - 2), barH);
+        }
+      }
+
+      function renderScatterPlot() {
+        const { ctx, width, height } = setupCanvas(els.scatterCanvas);
+        const m = { l: 52, r: 16, t: 14, b: 40 };
+        const w = width - m.l - m.r;
+        const h = height - m.t - m.b;
+        const rows = state.generatedData;
+        const xMax = Math.max(1, rows.length);
+        const yMinBase = state.x.length ? state.x[0] : 0;
+        const yMaxBase = state.x.length ? state.x[state.x.length - 1] : 1;
+
+        if (!rows.length) {
+          drawAxesWithLabel(ctx, m, w, h, 1, 1, yMinBase, yMaxBase, 'Generated value');
+          ctx.fillStyle = '#64748b';
+          ctx.font = '13px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('No generated data yet.', m.l + w / 2, m.t + h / 2);
+          return;
+        }
+
+        const yVals = rows.map((r) => r.value);
+        const yMin = Math.min(yMinBase, ...yVals);
+        const yMax = Math.max(yMaxBase, ...yVals);
+        const safeYMax = yMax > yMin ? yMax : yMin + 1;
+        drawAxesWithLabel(ctx, m, w, h, 1, xMax, yMin, safeYMax, 'Generated value');
+
+        const px = (v) => m.l + ((v - 1) / (xMax - 1 || 1)) * w;
+        const py = (v) => m.t + h - ((v - yMin) / (safeYMax - yMin || 1)) * h;
+        const radius = rows.length > 800 ? 1.4 : rows.length > 200 ? 1.9 : 2.6;
+        ctx.fillStyle = 'rgba(124, 58, 237, 0.72)';
+        rows.forEach((row) => {
+          ctx.beginPath();
+          ctx.arc(px(row.id), py(row.value), radius, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        ctx.fillStyle = '#111827';
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Sample ID', m.l + w / 2, m.t + h + 32);
+      }
+
+      function renderGeneratedDataViews() {
+        els.generatedSampleCount.textContent = `Samples: ${state.generatedData.length}`;
+        renderHistogram();
+        renderScatterPlot();
+        renderGeneratedTable();
+      }
+
+      function generateData() {
+        const sampler = buildSamplerFromCurrentPdf();
+        if (!sampler) {
+          setStatus('warn', 'Unable to sample from the current PDF. Adjust parameters and try again.');
+          return;
+        }
+        const mode = els.generationMode.value;
+        const batchSize = Number(els.generationBatchSize.value);
+        if (mode === 'scratch') state.generatedData = [];
+        for (let i = 0; i < batchSize; i++) {
+          state.generatedData.push({ id: state.generatedData.length + 1, value: sampler() });
+        }
+        renderGeneratedDataViews();
+      }
+
+      function clearGeneratedData() {
+        state.generatedData = [];
+        renderGeneratedDataViews();
+      }
+
+
+      function evaluateAndDraw() {
+        showPanels();
+        const model = readAndSanitize();
+        const errors = [...model.errors];
+        const points = model.points;
+
+        const pMin = points[0].x;
+        const pMax = points[points.length - 1].x;
+        const width = Math.max(1, pMax - pMin);
+        const defaultXMin = pMin - 0.15 * width;
+        const defaultXMax = pMax + 0.15 * width;
+        const { xmin, xmax } = resolveXAxisRange(defaultXMin, defaultXMax, errors);
+
+        const x = new Array(INTERNAL_SAMPLES);
+        const y = new Array(INTERNAL_SAMPLES);
+        const step = (xmax - xmin) / (INTERNAL_SAMPLES - 1);
+
+        for (let i = 0; i < INTERNAL_SAMPLES; i++) {
+          const xv = xmin + i * step;
+          const yv = evaluatePiecewise(points, xv);
+          x[i] = xv;
+          y[i] = yv;
+        }
+
+        const areaRes = trapezoidIntegralSafe(x, y);
+        const xf = x.map((v, i) => v * y[i]);
+        const meanRes = trapezoidIntegralSafe(x, xf);
+        const integratedMean = meanRes.ok ? meanRes.value : NaN;
+        const varf = x.map((v, i) => (v - integratedMean) * (v - integratedMean) * y[i]);
+        const varianceRes = trapezoidIntegralSafe(x, varf);
+        const mean = model.type === 'normal' ? model.params.mean : integratedMean;
+        const variance = model.type === 'normal' ? model.params.std * model.params.std : varianceRes.value;
+
+        if (!areaRes.ok) errors.push(`Area integration failed: ${areaRes.reason}`);
+        if (!meanRes.ok) errors.push(`Mean integration failed: ${meanRes.reason}`);
+        if (!varianceRes.ok) errors.push(`Variance integration failed: ${varianceRes.reason}`);
+
+        state.x = x;
+        state.y = y;
+        state.xmin = xmin;
+        state.xmax = xmax;
+        state.points = points;
+        state.currentModel = {
+          type: model.type,
+          params: { ...model.params }
+        };
+        clampMarkersToRange();
+        state.interactionTargets = buildInteractionTargets(model);
+        if (!state.interactionTargets.some((t) => t.id === state.hoverTargetId)) state.hoverTargetId = null;
+        state.yAutoTop = Math.max(1e-6, Math.max(...y) * 1.08);
+        syncYTopInput(state.yAutoTop);
+        updateSliderRanges();
+        syncFixedSlidersFromInputs();
+        updateModeInputsFromStats(mean, variance);
+
+        updateResults({
+          type: model.type,
+          params: model.params,
+          mean,
+          variance,
+          meanStdDriven: state.useMeanStdMode
+        });
+
+        const autoadjust = getAutoadjustValue();
+        if (errors.length) {
+          setStatus('error', 'Graph rendered with validation errors. See details below.');
+        } else if (!autoadjust) {
+          const areaText = areaRes.ok ? fmt(areaRes.value) : 'NaN';
+          if (areaRes.ok && Math.abs(areaRes.value - 1) <= 0.01) {
+            setStatus('ok', `Manual heights enabled. Area ≈ ${areaText} (close to a valid PDF).`);
+          } else {
+            setStatus('warn', `Manual heights enabled. Area ≈ ${areaText}; adjust heights if you want a valid PDF.`);
+          }
+        } else {
+          setStatus('ok', `Valid PDF rendered. Area ≈ ${fmt(areaRes.value)}.`);
+        }
+        setErrors(errors);
+        renderProbabilitySummary();
+        drawGraph();
+        renderGeneratedDataViews();
+      }
+
+      function dataToPixel(xVal, yVal) {
+        const { m, w, h } = state.plot;
+        const px = m.l + ((xVal - state.xmin) / (state.xmax - state.xmin || 1)) * w;
+        const py = m.t + h - ((yVal - state.ymin) / (state.ymax - state.ymin || 1)) * h;
+        return { px, py };
+      }
+
+      function pixelToData(clientX, clientY) {
+        const rect = els.canvas.getBoundingClientRect();
+        const { m, w, h } = state.plot;
+        const xPix = clientX - rect.left;
+        const yPix = clientY - rect.top;
+        const tx = (xPix - m.l) / (w || 1);
+        const ty = (yPix - m.t) / (h || 1);
+        const xVal = state.xmin + tx * (state.xmax - state.xmin);
+        const yVal = state.ymax - ty * (state.ymax - state.ymin);
+        return { xVal, yVal, xPix, yPix };
+      }
+
+      function drawGraph() {
+        const c = els.canvas;
+        const rect = els.graphWrap.getBoundingClientRect();
+        const dpr = Math.max(1, window.devicePixelRatio || 1);
+        c.width = Math.floor(rect.width * dpr);
+        c.height = Math.floor(420 * dpr);
+        c.style.height = '420px';
+
+        const ctx = c.getContext('2d');
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, rect.width, 420);
+
+        const m = { l: 62, r: 20, t: 18, b: 46 };
+        const w = rect.width - m.l - m.r;
+        const h = 420 - m.t - m.b;
+        state.plot = { m, w, h, rectWidth: rect.width, rectHeight: 420 };
+
+        if (!state.x.length || !state.y.length) {
+          state.ymin = 0; state.ymax = 1;
+          drawAxes(ctx, m, w, h, 0, 1, 0, 1);
+          return;
+        }
+
+        const x = state.x;
+        const y = state.y;
+        const xmin = state.xmin;
+        const xmax = state.xmax;
+        let ymax = Math.max(...y);
+        let ymin = Math.min(...y);
+        const autoTop = Math.max(1e-6, ymax * 1.08);
+        ymin = Math.min(0, ymin * 1.08);
+        const requestedTop = Number(els.yTopInput.value);
+        const manualTopIsValid = Number.isFinite(requestedTop) && requestedTop > ymin + EPS;
+        if (state.autoYTopEnabled) {
+          ymax = autoTop;
+          els.yTopInput.value = toInputNumber(autoTop);
+        } else if (manualTopIsValid) {
+          ymax = requestedTop;
+        } else {
+          ymax = autoTop;
+          els.yTopInput.value = toInputNumber(autoTop);
+        }
+        if (Math.abs(ymax - ymin) < 1e-9) ymax = ymin + 1;
+        state.ymin = ymin;
+        state.ymax = ymax;
+
+        const px = (v) => m.l + ((v - xmin) / (xmax - xmin || 1)) * w;
+        const py = (v) => m.t + h - ((v - ymin) / (ymax - ymin)) * h;
+
+        const drawFilledRegion = (region, fillStyle) => {
+          if (!region || !x.length) return;
+          const isBetween = region.mode === 'between';
+          const lo = isBetween ? Math.max(xmin, Math.min(region.x1, region.x2)) : xmin;
+          const hi = isBetween ? Math.min(xmax, Math.max(region.x1, region.x2)) : Math.min(xmax, region.x);
+          if (!Number.isFinite(lo) || !Number.isFinite(hi) || hi <= lo) return;
+          const segment = [];
+          if (lo > x[0]) segment.push({ x: lo, y: evaluatePiecewise(state.points, lo) });
+          for (let i = 0; i < x.length; i++) {
+            if (x[i] >= lo && x[i] <= hi) segment.push({ x: x[i], y: y[i] });
+          }
+          if (hi < x[x.length - 1]) segment.push({ x: hi, y: evaluatePiecewise(state.points, hi) });
+          if (segment.length < 2) return;
+          const baseY = py(0);
+          ctx.beginPath();
+          ctx.moveTo(px(segment[0].x), baseY);
+          segment.forEach((pt) => ctx.lineTo(px(pt.x), py(pt.y)));
+          ctx.lineTo(px(segment[segment.length - 1].x), baseY);
+          ctx.closePath();
+          ctx.fillStyle = fillStyle;
+          ctx.fill();
+        };
+
+        const activeMarkerRegion = (() => {
+          if (state.probabilityMarkers.length === 1) {
+            return { mode: 'left', x: state.probabilityMarkers[0].x };
+          }
+          if (state.probabilityMarkers.length === 2) {
+            const sorted = [...state.probabilityMarkers].sort((a, b) => a.x - b.x);
+            return { mode: 'between', x1: sorted[0].x, x2: sorted[1].x };
+          }
+          return null;
+        })();
+
+        drawAxes(ctx, m, w, h, xmin, xmax, ymin, ymax);
+
+        drawFilledRegion({ mode: 'between', x1: x[0], x2: x[x.length - 1] }, 'rgba(147, 197, 253, 0.3)');
+        drawFilledRegion(activeMarkerRegion, 'rgba(167, 139, 250, 0.34)');
+        if (state.hoveredProbabilityRegion) {
+          drawFilledRegion(state.hoveredProbabilityRegion, 'rgba(126, 34, 206, 0.26)');
+        }
+
+        ctx.beginPath();
+        for (let i = 0; i < x.length; i++) {
+          const cx = px(x[i]);
+          const cy = py(y[i]);
+          if (i === 0) ctx.moveTo(cx, cy); else ctx.lineTo(cx, cy);
+        }
+        ctx.strokeStyle = '#1d4ed8';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        const topY = m.t;
+        const bottomY = m.t + h;
+        state.interactionTargets.filter((t) => t.kind === 'line').forEach((line) => {
+          const linePx = dataToPixel(line.x, 0).px;
+          if (!Number.isFinite(linePx)) return;
+          const active = state.drag && state.drag.id === line.id;
+          const hovered = state.hoverTargetId === line.id;
+          const isProb = line.markerKind === 'probability';
+          const baseColor = isProb ? 'rgba(124, 58, 237, 0.55)' : 'rgba(37, 99, 235, 0.45)';
+          const hoverColor = isProb ? 'rgba(124, 58, 237, 0.92)' : 'rgba(37, 99, 235, 0.88)';
+          ctx.beginPath();
+          ctx.moveTo(linePx, topY);
+          ctx.lineTo(linePx, bottomY);
+          ctx.strokeStyle = active ? 'rgba(245, 158, 11, 0.95)' : hovered ? hoverColor : baseColor;
+          ctx.lineWidth = active ? 3 : hovered ? 2.4 : 1.6;
+          ctx.stroke();
+
+          ctx.fillStyle = active ? '#b45309' : isProb ? '#6d28d9' : '#1d4ed8';
+          ctx.font = '11px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(line.label, linePx, m.t + 12);
+        });
+
+        state.interactionTargets.filter((t) => t.kind === 'hline').forEach((line) => {
+          const from = dataToPixel(line.xMin, line.y);
+          const to = dataToPixel(line.xMax, line.y);
+          if (!Number.isFinite(from.py) || !Number.isFinite(from.px) || !Number.isFinite(to.px)) return;
+          const active = state.drag && state.drag.id === line.id;
+          const hovered = state.hoverTargetId === line.id;
+          if (!active && !hovered) return;
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(from.px, from.py);
+          ctx.lineTo(to.px, to.py);
+          ctx.setLineDash([7, 5]);
+          ctx.strokeStyle = active ? 'rgba(245, 158, 11, 0.96)' : 'rgba(16, 185, 129, 0.88)';
+          ctx.lineWidth = active ? 3 : 2.2;
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.fillStyle = active ? '#b45309' : '#047857';
+          ctx.font = '11px sans-serif';
+          ctx.textAlign = 'left';
+          ctx.fillText(line.label, Math.min(to.px - 18, from.px + 6), from.py - 6);
+          ctx.restore();
+        });
+
+        state.interactionTargets.filter((t) => t.kind === 'point').forEach((point) => {
+          const pxy = dataToPixel(point.x, point.y);
+          const active = state.drag && (state.drag.id === point.id || state.drag.id === point.markerId);
+          const hovered = state.hoverTargetId === point.id || state.hoverTargetId === point.markerId;
+          const isProb = point.markerKind === 'probability';
+          const radius = active ? 7 : hovered ? 6 : 5;
+          ctx.beginPath();
+          ctx.arc(pxy.px, pxy.py, radius, 0, Math.PI * 2);
+          ctx.fillStyle = active ? '#f59e0b' : hovered ? (isProb ? '#7c3aed' : '#2563eb') : (isProb ? '#5b21b6' : '#0f172a');
+          ctx.globalAlpha = 0.96;
+          ctx.fill();
+          ctx.globalAlpha = 1;
+          ctx.lineWidth = active ? 2.3 : 1.5;
+          ctx.strokeStyle = '#ffffff';
+          ctx.stroke();
+        });
+
+        if (state.hoverIndex >= 0 && state.hoverIndex < x.length) {
+          const i = state.hoverIndex;
+          const cx = px(x[i]);
+          const cy = py(y[i]);
+          ctx.beginPath();
+          ctx.arc(cx, cy, 4.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#dc2626';
+          ctx.fill();
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+      }
+
+      function drawAxesWithLabel(ctx, m, w, h, xmin, xmax, ymin, ymax, yLabel) {
+        const x0 = m.l;
+        const y0 = m.t + h;
+        ctx.save();
+
+        const ticks = 8;
+        ctx.strokeStyle = '#e5e7eb';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= ticks; i++) {
+          const tx = m.l + (i / ticks) * w;
+          ctx.beginPath();
+          ctx.moveTo(tx, m.t);
+          ctx.lineTo(tx, m.t + h);
+          ctx.stroke();
+        }
+        for (let i = 0; i <= ticks; i++) {
+          const ty = m.t + (i / ticks) * h;
+          ctx.beginPath();
+          ctx.moveTo(m.l, ty);
+          ctx.lineTo(m.l + w, ty);
+          ctx.stroke();
+        }
+
+        ctx.strokeStyle = '#111827';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(m.l, m.t);
+        ctx.lineTo(m.l, y0);
+        ctx.lineTo(m.l + w, y0);
+        ctx.stroke();
+
+        ctx.fillStyle = '#111827';
+        ctx.font = '12px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('x', x0 + w / 2, m.t + h + 32);
+
+        ctx.save();
+        ctx.translate(18, m.t + h / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.textAlign = 'center';
+        ctx.fillText(yLabel, 0, 0);
+        ctx.restore();
+
+        ctx.fillStyle = '#4b5563';
+        ctx.textAlign = 'center';
+        for (let i = 0; i <= ticks; i++) {
+          const xv = xmin + (i / ticks) * (xmax - xmin);
+          const tx = m.l + (i / ticks) * w;
+          ctx.fillText(fmt(xv, 2), tx, y0 + 16);
+        }
+
+        ctx.textAlign = 'right';
+        for (let i = 0; i <= ticks; i++) {
+          const yv = ymax - (i / ticks) * (ymax - ymin);
+          const ty = m.t + (i / ticks) * h;
+          ctx.fillText(fmt(yv, 2), m.l - 8, ty + 4);
+        }
+
+        ctx.restore();
+      }
+
+      function drawAxes(ctx, m, w, h, xmin, xmax, ymin, ymax) {
+        drawAxesWithLabel(ctx, m, w, h, xmin, xmax, ymin, ymax, 'f(x)');
+      }
+
+      function hitTestTarget(clientX, clientY) {
+        const rect = els.canvas.getBoundingClientRect();
+        const xPix = clientX - rect.left;
+        const yPix = clientY - rect.top;
+        const { m, h } = state.plot;
+        const topY = m.t;
+        const bottomY = m.t + h;
+        let best = null;
+
+        state.interactionTargets.filter((t) => t.kind === 'point').forEach((target) => {
+          const p = dataToPixel(target.x, target.y);
+          const d = Math.hypot(p.px - xPix, p.py - yPix);
+          if (d <= HIT_RADIUS_POINT && (!best || d < best.score)) best = { target, score: d };
+        });
+        if (best) return best.target;
+
+        if (yPix >= topY - 8 && yPix <= bottomY + 8) {
+          state.interactionTargets.filter((t) => t.kind === 'line').forEach((target) => {
+            const lineX = dataToPixel(target.x, 0).px;
+            const d = Math.abs(lineX - xPix);
+            if (d <= HIT_RADIUS_LINE && (!best || d < best.score)) best = { target, score: d };
+          });
+        }
+
+        state.interactionTargets.filter((t) => t.kind === 'hline').forEach((target) => {
+          const pStart = dataToPixel(target.xMin, target.y);
+          const pEnd = dataToPixel(target.xMax, target.y);
+          const left = Math.min(pStart.px, pEnd.px);
+          const right = Math.max(pStart.px, pEnd.px);
+          if (xPix < left || xPix > right) return;
+          const d = Math.abs(pStart.py - yPix);
+          if (d <= HIT_RADIUS_LINE && (!best || d < best.score)) best = { target, score: d };
+        });
+        return best ? best.target : null;
+      }
+
+      function setCursor(clientX, clientY) {
+        if (state.drag) {
+          els.canvas.style.cursor = 'grabbing';
+          return;
+        }
+        const target = hitTestTarget(clientX, clientY);
+        els.canvas.style.cursor = target ? 'grab' : 'default';
+      }
+
+      function applyDrag(clientX, clientY) {
+        if (!state.drag) return;
+        const { xVal, yVal } = pixelToData(clientX, clientY);
+        const type = els.distributionType.value;
+        const useMeanStd = state.useMeanStdMode;
+        const dragId = state.drag.id;
+        const markerFromPoint = dragId.endsWith('-point') ? dragId.slice(0, -6) : null;
+        const markerId = markerFromPoint || dragId;
+        const marker = state.probabilityMarkers.find((m) => m.id === markerId);
+        if (marker) {
+          marker.x = clamp(xVal, state.xmin, state.xmax);
+          evaluateAndDraw();
+          return;
+        }
+
+        if (type === 'uniform') {
+          let a = Number(els.uniformA.value);
+          let b = Number(els.uniformB.value);
+          if (dragId === 'uniform-a') a = clamp(xVal, state.xmin, Math.min(state.xmax, b - EPS));
+          if (dragId === 'uniform-b') b = clamp(xVal, Math.max(state.xmin, a + EPS), state.xmax);
+          if (dragId === 'uniform-height') {
+            els.uniformHeight.value = toInputNumber(Math.max(0, yVal));
+          }
+          els.uniformA.value = toInputNumber(a);
+          els.uniformB.value = toInputNumber(b);
+        }
+
+        if (type === 'triangular') {
+          let a = Number(els.triA.value);
+          const m = Number(els.triM.value);
+          let b = Number(els.triB.value);
+          let mode = m;
+          if (dragId === 'triangular-a') a = clamp(xVal, -Infinity, mode - EPS);
+          if (dragId === 'triangular-m') mode = clamp(xVal, a + EPS, b - EPS);
+          if (dragId === 'triangular-b') b = clamp(xVal, mode + EPS, Infinity);
+          if (dragId === 'triangular-m') {
+            a = clamp(a, -Infinity, mode - EPS);
+            b = clamp(b, mode + EPS, Infinity);
+          }
+          if (dragId === 'triangular-height') {
+            els.triHeight.value = toInputNumber(Math.max(0, yVal));
+          }
+          els.triA.value = toInputNumber(a);
+          els.triM.value = toInputNumber(mode);
+          els.triB.value = toInputNumber(b);
+        }
+
+        if (type === 'trapezoid') {
+          let a = Number(els.trapA.value);
+          const b = Number(els.trapB.value);
+          const c = Number(els.trapC.value);
+          let bb = b;
+          let cc = c;
+          let d = Number(els.trapD.value);
+          if (dragId === 'trapezoid-a') a = clamp(xVal, -Infinity, bb - EPS);
+          if (dragId === 'trapezoid-b') bb = clamp(xVal, a + EPS, cc);
+          if (dragId === 'trapezoid-c') cc = clamp(xVal, bb, d - EPS);
+          if (dragId === 'trapezoid-d') d = clamp(xVal, cc + EPS, Infinity);
+          if (dragId === 'trapezoid-b') cc = clamp(cc, bb, d - EPS);
+          if (dragId === 'trapezoid-c') bb = clamp(bb, a + EPS, cc);
+          if (dragId === 'trapezoid-height') {
+            els.trapHeight.value = toInputNumber(Math.max(0, yVal));
+          }
+          els.trapA.value = toInputNumber(a);
+          els.trapB.value = toInputNumber(bb);
+          els.trapC.value = toInputNumber(cc);
+          els.trapD.value = toInputNumber(d);
+        }
+
+        if (type === 'piecewise') {
+          const rows = getPiecewiseRows();
+          const idxMatch = dragId.match(/piecewise-(?:line|point)-(\d+)/);
+          if (idxMatch) {
+            const i = Number(idxMatch[1]);
+            if (Number.isInteger(i) && i >= 0 && i < rows.length) {
+              const prevX = i === 0 ? -Infinity : rows[i - 1].x + EPS;
+              const nextX = i === rows.length - 1 ? Infinity : rows[i + 1].x - EPS;
+              setPiecewiseX(i, clamp(xVal, prevX, nextX));
+              if (dragId.startsWith('piecewise-point-')) {
+                setPiecewiseY(i, Math.max(0, yVal));
+              }
+            }
+          }
+          const heightMatch = dragId.match(/piecewise-height-(\d+)/);
+          if (heightMatch) {
+            const i = Number(heightMatch[1]);
+            if (Number.isInteger(i) && i >= 0 && i < rows.length) {
+              setPiecewiseY(i, Math.max(0, yVal));
+            }
+          }
+        }
+
+        if (type === 'normal') {
+          let mean = Number(els.modeMeanInput.value);
+          let std = Number(els.modeStdInput.value);
+          if (!Number.isFinite(mean)) mean = 0;
+          if (!Number.isFinite(std) || std < EPS) std = EPS;
+          if (dragId === 'normal-mean') mean = xVal;
+          if (dragId === 'normal-left-sd') std = Math.max(EPS, Math.abs(mean - xVal));
+          if (dragId === 'normal-right-sd') std = Math.max(EPS, Math.abs(xVal - mean));
+          els.modeMeanInput.value = toInputNumber(mean);
+          els.modeStdInput.value = toInputNumber(std);
+        }
+
+        if (useMeanStd && type !== 'normal') state.skipMeanStdCanonicalOnce = true;
+        evaluateAndDraw();
+      }
+
+      function startDrag(evt) {
+        if (evt.button !== 0) return;
+        const target = hitTestTarget(evt.clientX, evt.clientY);
+        if (!target) {
+          createProbabilityMarker(evt.clientX);
+          if (evt.cancelable) evt.preventDefault();
+          return;
+        }
+        const dragId = target.markerId || target.id;
+        state.drag = { id: dragId, pointerId: evt.pointerId };
+        state.hoverTargetId = dragId;
+        els.tooltip.style.display = 'none';
+        els.canvas.style.cursor = 'grabbing';
+        if (els.canvas.setPointerCapture) els.canvas.setPointerCapture(evt.pointerId);
+        if (evt.cancelable) evt.preventDefault();
+        drawGraph();
+      }
+
+      function movePointer(evt) {
+        if (state.drag) {
+          applyDrag(evt.clientX, evt.clientY);
+          if (evt.cancelable) evt.preventDefault();
+          return;
+        }
+        const hit = hitTestTarget(evt.clientX, evt.clientY);
+        state.hoverTargetId = hit ? (hit.markerId || hit.id) : null;
+        setCursor(evt.clientX, evt.clientY);
+        if (hit) {
+          state.hoverIndex = -1;
+          els.tooltip.style.display = 'none';
+          drawGraph();
+          return;
+        }
+        handleHover(evt.clientX, evt.clientY);
+      }
+
+      function endDrag(evt) {
+        if (state.drag && evt && els.canvas.releasePointerCapture && Number.isInteger(evt.pointerId)) {
+          try { els.canvas.releasePointerCapture(evt.pointerId); } catch (_) {}
+        }
+        state.drag = null;
+        state.hoverTargetId = null;
+        els.canvas.style.cursor = 'default';
+        evaluateAndDraw();
+      }
+
+      function handleHover(clientX, clientY) {
+        if (!state.x.length) {
+          els.tooltip.style.display = 'none';
+          return;
+        }
+
+        const rect = els.canvas.getBoundingClientRect();
+        const xPix = clientX - rect.left;
+        const m = { l: 62, r: 20 };
+        const plotW = rect.width - m.l - m.r;
+        if (xPix < m.l || xPix > m.l + plotW) {
+          state.hoverIndex = -1;
+          els.tooltip.style.display = 'none';
+          drawGraph();
+          return;
+        }
+
+        const t = (xPix - m.l) / plotW;
+        const xVal = state.xmin + t * (state.xmax - state.xmin);
+        const sampleSpan = state.x[state.x.length - 1] - state.x[0];
+        const normalized = sampleSpan === 0 ? 0.5 : (xVal - state.x[0]) / sampleSpan;
+        const idx = Math.max(0, Math.min(state.x.length - 1, Math.round(normalized * (state.x.length - 1))));
+        state.hoverIndex = idx;
+        drawGraph();
+
+        const tip = els.tooltip;
+        tip.style.display = 'block';
+        tip.style.left = `${xPix}px`;
+        const yPix = (() => {
+          const yVal = state.y[idx];
+          const mTop = 18;
+          const mBottom = 46;
+          const plotH = rect.height - mTop - mBottom;
+          return mTop + plotH - ((yVal - state.ymin) / (state.ymax - state.ymin || 1)) * plotH;
+        })();
+        tip.style.top = `${Math.max(18, yPix)}px`;
+        tip.textContent = `x=${fmt(state.x[idx])}, f(x)=${fmt(state.y[idx])}`;
+      }
+
+      function handleGraphRightClick(evt) {
+        if (evt.cancelable) evt.preventDefault();
+        const hit = hitTestTarget(evt.clientX, evt.clientY);
+        if (hit) {
+          const markerId = hit.markerId || hit.id;
+          const marker = state.probabilityMarkers.find((m) => m.id === markerId);
+          if (marker) {
+            removeProbabilityMarker(marker.id);
+            return;
+          }
+        }
+        createProbabilityMarker(evt.clientX);
+      }
+
+
+      function replacePiecewiseRows(points) {
+        els.piecewiseRows.innerHTML = '';
+        points.forEach((p) => addPiecewiseRow(p.x, p.y));
+      }
+
+      function applyExampleSelection(problemId) {
+        const config = problemExamples[problemId];
+        if (!config) return;
+
+        applyingExampleSelection = true;
+        els.distributionType.value = config.distributionType;
+
+        if (config.uniform) {
+          els.uniformA.value = toInputNumber(config.uniform.a);
+          els.uniformB.value = toInputNumber(config.uniform.b);
+        }
+
+        if (config.triangular) {
+          els.triA.value = toInputNumber(config.triangular.a);
+          els.triM.value = toInputNumber(config.triangular.m);
+          els.triB.value = toInputNumber(config.triangular.b);
+        }
+
+        if (config.trapezoid) {
+          els.trapA.value = toInputNumber(config.trapezoid.a);
+          els.trapB.value = toInputNumber(config.trapezoid.b);
+          els.trapC.value = toInputNumber(config.trapezoid.c);
+          els.trapD.value = toInputNumber(config.trapezoid.d);
+        }
+
+        if (config.piecewise) {
+          replacePiecewiseRows(config.piecewise);
+        }
+
+        if (config.xRange) {
+          els.xMinInput.value = toInputNumber(config.xRange.min);
+          els.xMaxInput.value = toInputNumber(config.xRange.max);
+          setDefaultXSliderRangesFromValues(config.xRange.min, config.xRange.max);
+        }
+
+        applyingExampleSelection = false;
+        if (state.useMeanStdMode) state.skipMeanStdCanonicalOnce = true;
+        evaluateAndDraw();
+      }
+
+      function getExampleIdFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const fromQuery = params.get('example') || params.get('problem');
+        if (fromQuery && problemExamples[fromQuery]) return fromQuery;
+
+        const hash = window.location.hash.replace(/^#/, '').trim();
+        if (!hash) return null;
+        const hashMatch = hash.match(/^(?:example-?|problem-?)?(\d+)$/i);
+        if (!hashMatch) return null;
+        const fromHash = hashMatch[1];
+        return problemExamples[fromHash] ? fromHash : null;
+      }
+
+      function addPiecewiseRow(x = 0, y = 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <div class="pw-cell">
+              <input class="pw-x" type="number" step="any" value="${x}" />
+              <input class="pw-x-slider" type="range" step="0.001" />
+            </div>
+          </td>
+          <td>
+            <div class="pw-cell">
+              <input class="pw-y" type="number" step="any" value="${y}" min="0" />
+              <input class="pw-y-slider" type="range" step="0.001" min="0" />
+            </div>
+          </td>
+          <td><button type="button" class="btn-secondary remove-row">Remove</button></td>
+        `;
+        const xInput = tr.querySelector('.pw-x');
+        const yInput = tr.querySelector('.pw-y');
+        const xSlider = tr.querySelector('.pw-x-slider');
+        const ySlider = tr.querySelector('.pw-y-slider');
+        yInput.dataset.manualY = toInputNumber(y);
+
+        bindInputAndSlider(xInput, xSlider, evaluateAndDraw);
+        bindInputAndSlider(yInput, ySlider, () => {
+          if (!getAutoadjustValue()) yInput.dataset.manualY = yInput.value;
+          evaluateAndDraw();
+        });
+
+        yInput.addEventListener('input', () => {
+          if (!getAutoadjustValue()) yInput.dataset.manualY = yInput.value;
+        });
+        yInput.addEventListener('change', () => {
+          if (!getAutoadjustValue()) yInput.dataset.manualY = yInput.value;
+        });
+
+        tr.querySelector('.remove-row').addEventListener('click', () => {
+          if (els.piecewiseRows.children.length <= 2) {
+            setStatus('warn', 'Piecewise linear distribution needs at least two points.');
+            return;
+          }
+          tr.remove();
+          evaluateAndDraw();
+        });
+        els.piecewiseRows.appendChild(tr);
+        updateSliderRanges();
+        syncInputSlider(xInput, xSlider);
+        syncInputSlider(yInput, ySlider);
+      }
+
+      function resetAll() {
+        els.distributionType.value = defaults.distributionType;
+        els.exampleSelector.value = defaults.exampleSelector;
+        els.uniformA.value = defaults.uniform.a;
+        els.uniformB.value = defaults.uniform.b;
+        els.triA.value = defaults.triangular.a;
+        els.triM.value = defaults.triangular.m;
+        els.triB.value = defaults.triangular.b;
+        els.trapA.value = defaults.trapezoid.a;
+        els.trapB.value = defaults.trapezoid.b;
+        els.trapC.value = defaults.trapezoid.c;
+        els.trapD.value = defaults.trapezoid.d;
+        els.uniformHeight.value = defaults.manualHeight.uniform;
+        els.triHeight.value = defaults.manualHeight.triangular;
+        els.trapHeight.value = defaults.manualHeight.trapezoid;
+        state.useMeanStdMode = defaults.useMeanStdMode;
+        els.useMeanStdToggle.checked = defaults.useMeanStdMode;
+        els.modeMeanInput.value = '0.5';
+        els.modeStdInput.value = '0.288675';
+        state.normalRangeInitialized = false;
+        setAutoadjustValue(defaults.autoadjust);
+        els.autoYTopToggle.checked = true;
+        els.yTopInput.value = '1';
+        els.xMinInput.value = '-1';
+        els.xMaxInput.value = '3';
+        setDefaultXSliderRangesFromValues(-1, 3);
+        state.probabilityMarkers = [];
+        state.hoveredProbabilityRegion = null;
+        state.cdfView = { autoYTopEnabled: true, yTop: 1.05 };
+        state.generatedData = [];
+        els.cdfAutoYTopToggle.checked = true;
+        els.cdfYTopInput.value = '1.05';
+        els.cdfYTopInput.disabled = true;
+        els.piecewiseRows.innerHTML = '';
+        defaults.piecewise.forEach((p) => addPiecewiseRow(p.x, p.y));
+        evaluateAndDraw();
+      }
+
+      let resizeTimer = null;
+      window.addEventListener('resize', () => {
+        if (resizeTimer) clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          drawGraph();
+          drawSharedCdfSection();
+          renderGeneratedDataViews();
+        }, 140);
+      });
+
+      [
+        [els.xMinInput, els.xMinSlider],
+        [els.xMaxInput, els.xMaxSlider],
+        [els.uniformA, els.uniformASlider],
+        [els.uniformB, els.uniformBSlider],
+        [els.triA, els.triASlider],
+        [els.triM, els.triMSlider],
+        [els.triB, els.triBSlider],
+        [els.trapA, els.trapASlider],
+        [els.trapB, els.trapBSlider],
+        [els.trapC, els.trapCSlider],
+        [els.trapD, els.trapDSlider],
+        [els.uniformHeight, els.uniformHeightSlider],
+        [els.triHeight, els.triHeightSlider],
+        [els.trapHeight, els.trapHeightSlider]
+      ].forEach(([input, slider]) => bindInputAndSlider(input, slider, evaluateAndDraw));
+
+      els.distributionType.addEventListener('change', () => {
+        const nextType = els.distributionType.value;
+        if (nextType === 'normal') {
+          state.useMeanStdMode = true;
+          els.useMeanStdToggle.checked = true;
+          if (!state.normalRangeInitialized) {
+            const mean = Number(els.modeMeanInput.value);
+            let std = Number(els.modeStdInput.value);
+            const safeMean = Number.isFinite(mean) ? mean : 0;
+            if (!Number.isFinite(std) || std < EPS) std = 1;
+            els.modeMeanInput.value = toInputNumber(safeMean);
+            els.modeStdInput.value = toInputNumber(std);
+            els.xMinInput.value = toInputNumber(safeMean - 4 * std);
+            els.xMaxInput.value = toInputNumber(safeMean + 4 * std);
+            setDefaultXSliderRangesFromValues(safeMean - 4 * std, safeMean + 4 * std);
+            state.normalRangeInitialized = true;
+          }
+        } else {
+          state.normalRangeInitialized = false;
+        }
+        if (!applyingExampleSelection) {
+          els.exampleSelector.value = defaults.exampleSelector;
+        }
+        evaluateAndDraw();
+      });
+
+      els.exampleSelector.addEventListener('change', () => {
+        const problemId = els.exampleSelector.value;
+        if (problemId === 'none') return;
+        applyExampleSelection(problemId);
+      });
+      els.rightControlToggle.addEventListener('click', () => {
+        setRightPanelCollapsed(!els.rightControlPanel.classList.contains('collapsed'));
+      });
+
+      els.addPointBtn.addEventListener('click', () => {
+        const rows = getPiecewiseRows();
+        const last = rows[rows.length - 1] || { x: 0, y: 0 };
+        addPiecewiseRow(last.x + 1, last.y);
+        evaluateAndDraw();
+      });
+
+      els.updateBtn.addEventListener('click', evaluateAndDraw);
+      els.resetBtn.addEventListener('click', resetAll);
+      els.useMeanStdToggle.addEventListener('change', () => {
+        if (els.distributionType.value === 'normal') {
+          state.useMeanStdMode = true;
+          els.useMeanStdToggle.checked = true;
+          return;
+        }
+        state.useMeanStdMode = els.useMeanStdToggle.checked;
+        evaluateAndDraw();
+      });
+      bindInputAndSlider(els.modeMeanInput, els.modeMeanSlider, evaluateAndDraw);
+      bindInputAndSlider(els.modeStdInput, els.modeStdSlider, evaluateAndDraw);
+      els.autoadjustToggles.forEach((toggle) => {
+        toggle.addEventListener('change', () => {
+          setAutoadjustValue(toggle.checked);
+          evaluateAndDraw();
+        });
+      });
+      els.autoYTopToggle.addEventListener('change', evaluateAndDraw);
+      els.yTopInput.addEventListener('change', evaluateAndDraw);
+      els.yTopInput.addEventListener('input', evaluateAndDraw);
+      [els.xMinSliderMinInput, els.xMinSliderMaxInput, els.xMaxSliderMinInput, els.xMaxSliderMaxInput].forEach((input) => {
+        input.addEventListener('input', evaluateAndDraw);
+        input.addEventListener('change', evaluateAndDraw);
+      });
+      els.sharedCdfDetails.addEventListener('toggle', drawSharedCdfSection);
+      els.cdfAutoYTopToggle.addEventListener('change', () => {
+        state.cdfView.autoYTopEnabled = els.cdfAutoYTopToggle.checked;
+        drawSharedCdfSection();
+      });
+      els.cdfYTopInput.addEventListener('input', () => {
+        state.cdfView.autoYTopEnabled = false;
+        els.cdfAutoYTopToggle.checked = false;
+        drawSharedCdfSection();
+      });
+      els.cdfYTopInput.addEventListener('change', () => {
+        state.cdfView.autoYTopEnabled = false;
+        els.cdfAutoYTopToggle.checked = false;
+        drawSharedCdfSection();
+      });
+
+      els.generateDataBtn.addEventListener('click', generateData);
+      els.clearDataBtn.addEventListener('click', clearGeneratedData);
+      els.histogramBinCount.addEventListener('change', renderHistogram);
+      els.histogramBinCount.addEventListener('input', renderHistogram);
+
+      els.canvas.addEventListener('pointermove', movePointer);
+      els.canvas.addEventListener('pointerdown', startDrag);
+      els.canvas.addEventListener('pointerup', endDrag);
+      els.canvas.addEventListener('pointercancel', endDrag);
+      els.canvas.addEventListener('contextmenu', handleGraphRightClick);
+      els.graphWrap.addEventListener('contextmenu', (evt) => evt.preventDefault());
+      els.probabilitySummary.addEventListener('click', (evt) => {
+        const btn = evt.target.closest('[data-delete-marker]');
+        if (!btn) return;
+        removeProbabilityMarker(btn.getAttribute('data-delete-marker'));
+      });
+      els.probabilitySummary.addEventListener('mouseover', (evt) => {
+        const box = evt.target.closest('.prob-box[data-graph-region]');
+        if (!box) return;
+        const region = box.dataset.graphRegion;
+        if (!region) return;
+        try {
+          state.hoveredProbabilityRegion = JSON.parse(region);
+        } catch (_) {
+          state.hoveredProbabilityRegion = null;
+        }
+        drawGraph();
+      });
+      els.probabilitySummary.addEventListener('mouseout', (evt) => {
+        const box = evt.target.closest('.prob-box[data-graph-region]');
+        if (!box) return;
+        const next = evt.relatedTarget;
+        if (next && box.contains(next)) return;
+        state.hoveredProbabilityRegion = null;
+        drawGraph();
+      });
+      els.canvas.addEventListener('mouseleave', () => {
+        state.hoverIndex = -1;
+        state.hoverTargetId = null;
+        els.tooltip.style.display = 'none';
+        if (!state.drag) els.canvas.style.cursor = 'default';
+        drawGraph();
+      });
+      window.addEventListener('pointerup', endDrag);
+
+      resetAll();
+      const initialExampleId = getExampleIdFromUrl();
+      if (initialExampleId) {
+        els.exampleSelector.value = initialExampleId;
+        applyExampleSelection(initialExampleId);
+      }
+    })();
+  </script>
+</body>
+</html>

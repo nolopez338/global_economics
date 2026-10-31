@@ -1,0 +1,1383 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="../../assets/png/icon_students.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Picture Manager</title>
+
+<style>
+    :root {
+        --navy: #2e4057;
+        --blue: #1b52a0;
+        --teal: #10867c;
+        --gray-50: #f8fafc;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+        --gray-300: #cbd5e1;
+        --gray-500: #64748b;
+        --gray-700: #334155;
+        --gray-900: #0f172a;
+        --radius: 10px;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: var(--gray-100);
+        color: var(--gray-900);
+    }
+
+    header {
+        background: var(--navy);
+        color: white;
+        padding: 20px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    header h1 {
+        margin: 0 0 5px;
+        font-size: 24px;
+    }
+
+    header p {
+        margin: 0;
+        opacity: 0.85;
+        font-size: 14px;
+    }
+
+    .header-content {
+        min-width: 0;
+    }
+
+    .header-folder-button {
+        background: white;
+        color: var(--navy);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        flex-shrink: 0;
+    }
+
+    .header-folder-button:hover {
+        background: var(--gray-100);
+    }
+
+    main {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .toolbar,
+    .status-panel,
+    .group-filter-panel,
+    .practice-panel {
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius);
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .toolbar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    button,
+    input,
+    select {
+        font: inherit;
+    }
+
+    button {
+        border: 0;
+        border-radius: 7px;
+        padding: 9px 14px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .primary {
+        background: var(--blue);
+        color: white;
+    }
+
+    .success {
+        background: var(--teal);
+        color: white;
+    }
+
+    .toolbar input[type="search"] {
+        min-width: 240px;
+        flex: 1;
+        max-width: 400px;
+    }
+
+    input,
+    select {
+        border: 1px solid var(--gray-300);
+        border-radius: 7px;
+        padding: 9px 10px;
+        background: white;
+    }
+
+    .status-title {
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .status-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(160px, 1fr));
+        gap: 10px;
+    }
+
+    .status-item {
+        border-radius: 8px;
+        padding: 12px;
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+    }
+
+    .status-item .number {
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .status-item .label {
+        color: var(--gray-500);
+        font-size: 13px;
+        margin-top: 3px;
+    }
+
+    .status-message {
+        margin-top: 12px;
+        padding: 10px 12px;
+        border-radius: 7px;
+        display: none;
+        font-size: 14px;
+    }
+
+    .status-message.visible {
+        display: block;
+    }
+
+    .status-message.info {
+        background: #eef5ff;
+        color: #174a8b;
+    }
+
+    .status-message.success {
+        background: #edf9f3;
+        color: #17633f;
+    }
+
+    .status-message.error {
+        background: #fff0ef;
+        color: #8f2117;
+    }
+
+    .status-message.warning {
+        background: #fff8e8;
+        color: #8a5700;
+    }
+
+    .folder-info {
+        color: var(--gray-500);
+        font-size: 13px;
+        margin-top: 8px;
+        word-break: break-all;
+    }
+
+    .group-filter-panel {
+        padding: 16px;
+    }
+
+    .group-filter-title {
+        font-weight: 700;
+        margin-bottom: 12px;
+    }
+
+    .group-filters {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .group-card {
+        background: var(--gray-50);
+        border: 1px solid var(--gray-200);
+        border-radius: 8px;
+        min-height: 54px;
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        user-select: none;
+        transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    .group-card:hover {
+        border-color: var(--gray-300);
+        background: var(--gray-100);
+    }
+
+    .group-card.selected {
+        background: var(--blue);
+        border-color: var(--blue);
+        color: white;
+    }
+
+    .group-card input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .group-card-label {
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .practice-panel {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .practice-info {
+        color: var(--gray-500);
+        font-size: 13px;
+    }
+
+    .practice-view {
+        display: none;
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 16px;
+    }
+
+    .practice-view.visible {
+        display: block;
+    }
+
+    .practice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .practice-title {
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    .practice-progress {
+        color: var(--gray-500);
+        font-size: 14px;
+        text-align: right;
+    }
+
+    .practice-score {
+        font-size: 12px;
+        margin-top: 3px;
+    }
+
+    .practice-content {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .practice-picture {
+        height: 400px;
+        background: var(--gray-100);
+        border-radius: var(--radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    .practice-picture img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .practice-question {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .practice-input-row {
+        display: flex;
+        gap: 10px;
+    }
+
+    .practice-input {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .practice-result {
+        margin-top: 14px;
+        padding: 12px;
+        border-radius: 7px;
+        font-weight: 700;
+        display: none;
+    }
+
+    .practice-result.visible {
+        display: block;
+    }
+
+    .practice-result.correct {
+        background: #edf9f3;
+        color: #17633f;
+    }
+
+    .practice-result.error {
+        background: #fff0ef;
+        color: #8f2117;
+    }
+
+    .practice-full-name {
+        margin-top: 6px;
+        font-weight: 700;
+    }
+
+    .practice-next {
+        margin-top: 14px;
+        display: none;
+    }
+
+    .practice-next.visible {
+        display: inline-block;
+    }
+
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 16px;
+    }
+
+    .card {
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .picture-container {
+        height: 250px;
+        background: var(--gray-100);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .picture-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .picture-placeholder {
+        color: var(--gray-500);
+        font-size: 13px;
+    }
+
+    .card-content {
+        padding: 14px;
+    }
+
+    .student-name {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .current-filename {
+        color: var(--gray-500);
+        font-size: 12px;
+        word-break: break-all;
+        margin-bottom: 12px;
+    }
+
+    .empty {
+        background: white;
+        border: 1px dashed var(--gray-300);
+        border-radius: var(--radius);
+        padding: 40px;
+        text-align: center;
+        color: var(--gray-500);
+    }
+
+    .loading {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    @media (max-width: 800px) {
+        header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .header-folder-button {
+            align-self: flex-start;
+        }
+
+        .status-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .group-filters {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .toolbar input[type="search"] {
+            max-width: none;
+            width: 100%;
+        }
+
+        .practice-picture {
+            height: 300px;
+        }
+    }
+
+    @media (max-width: 500px) {
+        .status-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .group-filters {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .practice-input-row {
+            flex-direction: column;
+        }
+    }
+</style>
+
+</head>
+
+<body>
+
+<header>
+    <div class="header-content">
+        <h1>Student Picture Manager</h1>
+        <p>Select the project folder that contains the student PNG files.</p>
+        <p>Start filenames with A-, B-, C-, D-, or E- to assign a group.</p>
+    </div>
+
+    <button id="selectFolderBtn" class="header-folder-button">
+        Select Project Folder
+    </button>
+    <input id="folderInput" type="file" webkitdirectory multiple hidden>
+</header>
+
+<main>
+
+<section class="status-panel">
+    <div class="status-title">Project Status</div>
+
+    <div class="status-grid">
+        <div class="status-item">
+            <div id="studentCount" class="number">0</div>
+            <div class="label">Total students</div>
+        </div>
+
+        <div class="status-item">
+            <div id="statusGroupA" class="number">0</div>
+            <div class="label">Group A</div>
+        </div>
+
+        <div class="status-item">
+            <div id="statusGroupB" class="number">0</div>
+            <div class="label">Group B</div>
+        </div>
+
+        <div class="status-item">
+            <div id="statusGroupC" class="number">0</div>
+            <div class="label">Group C</div>
+        </div>
+
+        <div class="status-item">
+            <div id="statusGroupD" class="number">0</div>
+            <div class="label">Group D</div>
+        </div>
+
+        <div class="status-item">
+            <div id="statusGroupE" class="number">0</div>
+            <div class="label">Group E</div>
+        </div>
+
+        <div class="status-item">
+            <div id="statusNoGroup" class="number">0</div>
+            <div class="label">No Group</div>
+        </div>
+    </div>
+
+    <div id="folderInfo" class="folder-info">
+        No pictures folder selected.
+    </div>
+
+    <div id="statusMessage" class="status-message"></div>
+</section>
+
+<section class="group-filter-panel">
+    <div class="group-filter-title">Groups</div>
+
+    <div class="group-filters">
+        <label class="group-card" data-group="A">
+            <input type="checkbox" value="A">
+            <span class="group-card-label">A (0)</span>
+        </label>
+
+        <label class="group-card" data-group="B">
+            <input type="checkbox" value="B">
+            <span class="group-card-label">B (0)</span>
+        </label>
+
+        <label class="group-card" data-group="C">
+            <input type="checkbox" value="C">
+            <span class="group-card-label">C (0)</span>
+        </label>
+
+        <label class="group-card" data-group="D">
+            <input type="checkbox" value="D">
+            <span class="group-card-label">D (0)</span>
+        </label>
+
+        <label class="group-card" data-group="E">
+            <input type="checkbox" value="E">
+            <span class="group-card-label">E (0)</span>
+        </label>
+    </div>
+</section>
+
+<section class="toolbar">
+    <input
+        id="searchInput"
+        type="search"
+        placeholder="Search students or filenames..."
+        disabled
+    >
+
+    <select id="sortSelect" disabled>
+        <option value="az">A–Z</option>
+        <option value="za">Z–A</option>
+    </select>
+
+    <button id="practiceModeBtn" class="primary" type="button" disabled>
+        Practice Mode
+    </button>
+</section>
+
+<section id="practiceView" class="practice-view">
+    <div class="practice-header">
+        <div class="practice-title">Practice Mode</div>
+        <div class="practice-progress">
+            <div id="practiceProgress"></div>
+            <div id="practiceScore" class="practice-score"></div>
+        </div>
+    </div>
+
+    <div class="practice-content">
+        <div id="practicePicture" class="practice-picture"></div>
+
+        <div class="practice-question">
+            What is this student's name?
+        </div>
+
+        <div class="practice-input-row">
+            <input
+                id="practiceInput"
+                class="practice-input"
+                type="text"
+                placeholder="Enter the student's name..."
+                autocomplete="off"
+            >
+
+            <button
+                id="practiceSubmitBtn"
+                class="primary"
+                type="button"
+            >
+                Submit
+            </button>
+        </div>
+
+        <div id="practiceResult" class="practice-result">
+            <div id="practiceResultMessage"></div>
+            <div id="practiceFullName" class="practice-full-name"></div>
+        </div>
+
+        <button
+            id="practiceNextBtn"
+            class="success practice-next"
+            type="button"
+        >
+            Next Student
+        </button>
+    </div>
+</section>
+
+<section id="cards" class="cards">
+    <div class="empty">
+        Select the pictures folder to begin.
+    </div>
+</section>
+
+</main>
+
+<script src="assets/js/student-name-matcher.js"></script>
+<script>
+"use strict";
+
+/* =========================================================
+   State
+   ========================================================= */
+
+const state = {
+    pngFiles: [],
+    imageUrls: [],
+    selectedGroups: new Set(),
+    practiceStudents: [],
+    practiceMistakes: [],
+    practiceMistakeCount: 0,
+    practiceTotalStudents: 0,
+    practiceRound: 1,
+    practiceIndex: 0,
+    practiceActive: false
+};
+
+/* =========================================================
+   DOM
+   ========================================================= */
+
+const selectFolderBtn = document.getElementById("selectFolderBtn");
+const folderInput = document.getElementById("folderInput");
+const searchInput = document.getElementById("searchInput");
+const sortSelect = document.getElementById("sortSelect");
+const practiceModeBtn = document.getElementById("practiceModeBtn");
+
+const cardsContainer = document.getElementById("cards");
+
+const studentCount = document.getElementById("studentCount");
+const statusGroupCounts = Object.fromEntries(
+    ["A", "B", "C", "D", "E"].map(group => [
+        group,
+        document.getElementById(`statusGroup${group}`)
+    ])
+);
+const statusNoGroup = document.getElementById("statusNoGroup");
+
+const folderInfo = document.getElementById("folderInfo");
+const statusMessage = document.getElementById("statusMessage");
+
+const groupCards = document.querySelectorAll(".group-card");
+
+const practiceView = document.getElementById("practiceView");
+const practiceProgress = document.getElementById("practiceProgress");
+const practiceScore = document.getElementById("practiceScore");
+const practicePicture = document.getElementById("practicePicture");
+const practiceInput = document.getElementById("practiceInput");
+const practiceSubmitBtn = document.getElementById("practiceSubmitBtn");
+const practiceResult = document.getElementById("practiceResult");
+const practiceResultMessage = document.getElementById("practiceResultMessage");
+const practiceFullName = document.getElementById("practiceFullName");
+const practiceNextBtn = document.getElementById("practiceNextBtn");
+
+/* =========================================================
+   Group filtering
+   ========================================================= */
+
+function getStudentGroup(filename) {
+    const match = filename.match(/^([A-E])-/i);
+    return match ? match[1].toUpperCase() : null;
+}
+
+function updateGroupCardStates() {
+    groupCards.forEach(card => {
+        const group = card.dataset.group;
+        const checkbox = card.querySelector("input");
+
+        const selected = state.selectedGroups.has(group);
+
+        checkbox.checked = selected;
+        card.classList.toggle("selected", selected);
+    });
+}
+
+groupCards.forEach(card => {
+    card.addEventListener("click", event => {
+        event.preventDefault();
+
+        const group = card.dataset.group;
+
+        if (state.selectedGroups.has(group)) {
+            state.selectedGroups.delete(group);
+        } else {
+            state.selectedGroups.add(group);
+        }
+
+        updateGroupCardStates();
+        renderStudents();
+
+        if (state.practiceActive) {
+            exitPracticeMode();
+        }
+    });
+});
+
+/* =========================================================
+   Utility functions
+   ========================================================= */
+
+function showStatus(message, type = "info") {
+    statusMessage.textContent = message;
+    statusMessage.className = `status-message visible ${type}`;
+}
+
+function humanizeFilename(filename) {
+    return filename
+        .replace(/\.png$/i, "")
+        .replace(/_/g, " ")
+        .trim()
+        .replace(/\s+/g, " ")
+        .replace(/\b\w/g, char => char.toUpperCase());
+}
+
+/* =========================================================
+   Local folder selection - Read Only
+   ========================================================= */
+
+function selectPicturesFolder() {
+    // Clearing the value ensures selecting the same folder fires "change".
+    folderInput.value = "";
+    folderInput.click();
+}
+
+function loadPicturesFolder(fileList) {
+    if (!fileList.length) {
+        return;
+    }
+
+    try {
+        document.body.classList.add("loading");
+
+        scanPngFiles(fileList);
+        updateStatusCounters();
+        renderStudents();
+
+        const firstRelativePath = fileList[0].webkitRelativePath;
+        const folderName = firstRelativePath
+            ? firstRelativePath.split("/")[0]
+            : "Selected folder";
+
+        folderInfo.textContent =
+            `Project folder: ${folderName}`;
+
+        searchInput.disabled = false;
+        sortSelect.disabled = false;
+        practiceModeBtn.disabled = false;
+
+        showStatus(
+            state.pngFiles.length > 0
+                ? "Pictures folder loaded successfully."
+                : "The selected folder does not contain any PNG files.",
+            state.pngFiles.length > 0 ? "success" : "warning"
+        );
+
+    } catch (error) {
+        console.error(error);
+
+        showStatus(
+            `Could not load the pictures folder: ${error.message}`,
+            "error"
+        );
+    } finally {
+        document.body.classList.remove("loading");
+    }
+}
+
+function scanPngFiles(fileList) {
+    state.pngFiles = Array.from(fileList)
+        .filter(file => /\.png$/i.test(file.name))
+        .map(file => ({
+            name: file.name,
+            relativePath: file.webkitRelativePath || file.name,
+            file
+        }));
+
+    state.pngFiles.sort((a, b) =>
+        a.name.localeCompare(
+            b.name,
+            undefined,
+            {
+                sensitivity: "base"
+            }
+        )
+    );
+}
+
+function updateStatusCounters() {
+    const counts = { A: 0, B: 0, C: 0, D: 0, E: 0 };
+    let noGroupCount = 0;
+
+    state.pngFiles.forEach(file => {
+        const group = getStudentGroup(file.name);
+
+        if (group) {
+            counts[group]++;
+        } else {
+            noGroupCount++;
+        }
+    });
+
+    studentCount.textContent = state.pngFiles.length;
+    statusNoGroup.textContent = noGroupCount;
+
+    groupCards.forEach(card => {
+        const group = card.dataset.group;
+        statusGroupCounts[group].textContent = counts[group];
+        card.querySelector(".group-card-label").textContent =
+            `${group} (${counts[group]})`;
+    });
+}
+
+/* =========================================================
+   Filtering
+   ========================================================= */
+
+function getFilteredStudents() {
+    const searchTerm =
+        searchInput.value.trim().toLowerCase();
+
+    const sortDirection =
+        sortSelect.value;
+
+    const files = [...state.pngFiles];
+
+    files.sort((a, b) => {
+        const comparison =
+            humanizeFilename(a.name)
+                .localeCompare(
+                    humanizeFilename(b.name),
+                    undefined,
+                    {
+                        sensitivity: "base"
+                    }
+                );
+
+        return sortDirection === "az"
+            ? comparison
+            : -comparison;
+    });
+
+    return files.filter(file => {
+        const group =
+            getStudentGroup(file.name);
+
+        if (
+            state.selectedGroups.size > 0 &&
+            !state.selectedGroups.has(group)
+        ) {
+            return false;
+        }
+
+        if (!searchTerm) {
+            return true;
+        }
+
+        return (
+            file.name
+                .toLowerCase()
+                .includes(searchTerm) ||
+            humanizeFilename(file.name)
+                .toLowerCase()
+                .includes(searchTerm)
+        );
+    });
+}
+
+/* =========================================================
+   Rendering
+   ========================================================= */
+
+function renderStudents() {
+    state.imageUrls.forEach(url =>
+        URL.revokeObjectURL(url)
+    );
+
+    state.imageUrls = [];
+
+    const filtered = getFilteredStudents();
+
+    cardsContainer.innerHTML = "";
+
+    if (!filtered.length) {
+        cardsContainer.innerHTML = `
+            <div class="empty">
+                No matching PNG files found.
+            </div>
+        `;
+
+        return;
+    }
+
+    for (const file of filtered) {
+        const card =
+            document.createElement("article");
+
+        card.className = "card";
+
+        const pictureContainer =
+            document.createElement("div");
+
+        pictureContainer.className =
+            "picture-container";
+
+        const img =
+            document.createElement("img");
+
+        img.alt =
+            humanizeFilename(file.name);
+
+        img.loading = "lazy";
+
+        const content =
+            document.createElement("div");
+
+        content.className = "card-content";
+
+        const studentName =
+            document.createElement("div");
+
+        studentName.className =
+            "student-name";
+
+        studentName.textContent =
+            humanizeFilename(file.name);
+
+        const currentFilename =
+            document.createElement("div");
+
+        currentFilename.className =
+            "current-filename";
+
+        currentFilename.textContent =
+            `Current: ${file.relativePath}`;
+
+        content.appendChild(studentName);
+        content.appendChild(currentFilename);
+
+        card.appendChild(pictureContainer);
+        card.appendChild(content);
+
+        cardsContainer.appendChild(card);
+
+        createImagePreview(
+            file.file,
+            img,
+            pictureContainer
+        );
+    }
+}
+
+function createImagePreview(
+    file,
+    img,
+    container
+) {
+    try {
+        const url =
+            URL.createObjectURL(file);
+
+        state.imageUrls.push(url);
+
+        img.src = url;
+
+        container.appendChild(img);
+
+    } catch (error) {
+        const placeholder =
+            document.createElement("div");
+
+        placeholder.className =
+            "picture-placeholder";
+
+        placeholder.textContent =
+            "Could not load image.";
+
+        container.appendChild(placeholder);
+    }
+}
+
+/* =========================================================
+   Practice Mode
+   ========================================================= */
+
+function getPracticeFullNameFromFilename(filename) {
+    return StudentNameMatcher.getFullName(filename);
+}
+
+function shuffleStudents(students) {
+    const shuffled = [...students];
+
+    for (let index = shuffled.length - 1; index > 0; index--) {
+        const randomIndex = Math.floor(
+            Math.random() * (index + 1)
+        );
+
+        [shuffled[index], shuffled[randomIndex]] =
+            [shuffled[randomIndex], shuffled[index]];
+    }
+
+    return shuffled;
+}
+
+function showPracticeFullName(fullName, matchedIndexes) {
+    const components =
+        StudentNameMatcher.getNameComponents(fullName);
+    const matched = new Set(matchedIndexes);
+    let position = 0;
+
+    practiceFullName.replaceChildren();
+
+    components.forEach((component, index) => {
+        practiceFullName.append(
+            fullName.slice(position, component.start)
+        );
+
+        if (matched.has(index)) {
+            const strong = document.createElement("strong");
+            strong.textContent = component.text;
+            practiceFullName.appendChild(strong);
+        } else {
+            practiceFullName.append(component.text);
+        }
+
+        position = component.end;
+    });
+
+    practiceFullName.append(fullName.slice(position));
+}
+
+function enterPracticeMode() {
+    const filtered = getFilteredStudents();
+
+    if (!filtered.length) {
+        showStatus(
+            "There are no students matching the current search and group filters.",
+            "warning"
+        );
+        return;
+    }
+
+    state.practiceStudents = shuffleStudents(filtered);
+    state.practiceMistakes = [];
+    state.practiceMistakeCount = 0;
+    state.practiceTotalStudents = filtered.length;
+    state.practiceRound = 1;
+    state.practiceIndex = 0;
+    state.practiceActive = true;
+
+    cardsContainer.style.display = "none";
+    practiceView.classList.add("visible");
+
+    renderPracticeStudent();
+}
+
+function renderPracticeStudent() {
+    if (
+        !state.practiceActive ||
+        !state.practiceStudents.length
+    ) {
+        return;
+    }
+
+    const student =
+        state.practiceStudents[state.practiceIndex];
+
+    const roundLabel = state.practiceRound === 1
+        ? "Round 1"
+        : `Mistake Round ${state.practiceRound - 1}`;
+
+    practiceProgress.textContent =
+        `${roundLabel} · Student ${state.practiceIndex + 1} of ${state.practiceStudents.length}`;
+    updatePracticeScore();
+
+    practicePicture.innerHTML = "";
+
+    const img =
+        document.createElement("img");
+
+    img.alt = "Student portrait";
+
+    practicePicture.appendChild(img);
+
+    loadPracticeImage(student.file, img);
+
+    practiceInput.value = "";
+    practiceInput.disabled = false;
+    practiceSubmitBtn.disabled = false;
+
+    practiceResult.className =
+        "practice-result";
+
+    practiceResultMessage.textContent = "";
+    practiceFullName.textContent = "";
+
+    practiceNextBtn.classList.remove("visible");
+
+    practiceInput.focus();
+}
+
+function loadPracticeImage(file, img) {
+    try {
+        const url =
+            URL.createObjectURL(file);
+
+        state.imageUrls.push(url);
+
+        img.src = url;
+
+    } catch (error) {
+        if (!img.isConnected) {
+            return;
+        }
+
+        practicePicture.innerHTML = "";
+
+        const placeholder =
+            document.createElement("div");
+
+        placeholder.className =
+            "picture-placeholder";
+
+        placeholder.textContent =
+            "Could not load image.";
+
+        practicePicture.appendChild(placeholder);
+    }
+}
+
+function updatePracticeScore() {
+    practiceScore.textContent =
+        `Mistakes ${state.practiceMistakeCount} / Total Students ${state.practiceTotalStudents}`;
+}
+
+function submitPracticeAnswer() {
+    if (
+        !state.practiceActive ||
+        !state.practiceStudents.length
+    ) {
+        return;
+    }
+
+    const student =
+        state.practiceStudents[state.practiceIndex];
+
+    if (!student) {
+        return;
+    }
+
+    const fullName =
+        getPracticeFullNameFromFilename(student.name);
+
+    const answerMatch = StudentNameMatcher.matchAnswer(
+        practiceInput.value,
+        student.name
+    );
+    const correct = answerMatch.correct;
+
+    practiceInput.disabled = true;
+    practiceSubmitBtn.disabled = true;
+
+    practiceResult.classList.add("visible");
+
+    showPracticeFullName(
+        fullName,
+        answerMatch.matchedComponentIndexes
+    );
+
+    if (correct) {
+        practiceResult.classList.remove("error");
+        practiceResult.classList.add("correct");
+
+        practiceResultMessage.textContent =
+            "Correct!";
+    } else {
+        state.practiceMistakes.push(student);
+        state.practiceMistakeCount++;
+        updatePracticeScore();
+
+        practiceResult.classList.remove("correct");
+        practiceResult.classList.add("error");
+
+        practiceResultMessage.textContent =
+            "Incorrect!";
+    }
+
+    practiceNextBtn.classList.add("visible");
+
+    practiceNextBtn.focus();
+}
+
+function nextPracticeStudent() {
+    if (!state.practiceActive) {
+        return;
+    }
+
+    if (
+        state.practiceIndex >=
+        state.practiceStudents.length - 1
+    ) {
+        if (!state.practiceMistakes.length) {
+            finishPracticeMode();
+            return;
+        }
+
+        state.practiceStudents =
+            shuffleStudents(state.practiceMistakes);
+        state.practiceMistakes = [];
+        state.practiceRound++;
+        state.practiceIndex = 0;
+        renderPracticeStudent();
+        return;
+    }
+
+    state.practiceIndex++;
+    renderPracticeStudent();
+}
+
+function finishPracticeMode() {
+    state.practiceActive = false;
+    state.practiceStudents = [];
+    state.practiceMistakes = [];
+    state.practiceMistakeCount = 0;
+    state.practiceTotalStudents = 0;
+    state.practiceRound = 1;
+    state.practiceIndex = 0;
+
+    practiceView.classList.remove("visible");
+    cardsContainer.style.display = "grid";
+
+    renderStudents();
+}
+
+function exitPracticeMode() {
+    if (!state.practiceActive) {
+        return;
+    }
+
+    finishPracticeMode();
+}
+
+practiceModeBtn.addEventListener(
+    "click",
+    enterPracticeMode
+);
+
+practiceSubmitBtn.addEventListener(
+    "click",
+    submitPracticeAnswer
+);
+
+practiceNextBtn.addEventListener(
+    "click",
+    nextPracticeStudent
+);
+
+practiceInput.addEventListener(
+    "keydown",
+    event => {
+        if (event.key !== "Enter") {
+            return;
+        }
+
+        event.preventDefault();
+
+        if (practiceSubmitBtn.disabled) {
+            nextPracticeStudent();
+        } else {
+            submitPracticeAnswer();
+        }
+    }
+);
+
+/* =========================================================
+   Event listeners
+   ========================================================= */
+
+selectFolderBtn.addEventListener(
+    "click",
+    selectPicturesFolder
+);
+
+folderInput.addEventListener(
+    "change",
+    () => loadPicturesFolder(folderInput.files)
+);
+
+searchInput.addEventListener(
+    "input",
+    () => {
+        if (state.practiceActive) {
+            exitPracticeMode();
+        }
+
+        renderStudents();
+    }
+);
+
+sortSelect.addEventListener(
+    "change",
+    () => {
+        if (state.practiceActive) {
+            exitPracticeMode();
+        }
+
+        renderStudents();
+    }
+);
+
+/* =========================================================
+   Startup
+   ========================================================= */
+
+updateGroupCardStates();
+</script>
+
+</body>
+</html>

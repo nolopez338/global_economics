@@ -1,0 +1,1102 @@
+const resultView = document.getElementById('resultView');
+const groupFilter = document.getElementById('groupFilter');
+const sortRows = document.getElementById('sortRows');
+const sortCols = document.getElementById('sortCols');
+const sortRowsAscBtn = document.getElementById('sortRowsAscBtn');
+const sortRowsDescBtn = document.getElementById('sortRowsDescBtn');
+const sortColsAscBtn = document.getElementById('sortColsAscBtn');
+const sortColsDescBtn = document.getElementById('sortColsDescBtn');
+const searchBox = document.getElementById('searchBox');
+const showNames = document.getElementById('showNames');
+const showMissing = document.getElementById('showMissing');
+const stats = document.getElementById('stats');
+const activeSummary = document.getElementById('activeSummary');
+const namesEl = document.getElementById('names');
+const heatmapEl = document.getElementById('heatmap');
+const topBarsEl = document.getElementById('topBars');
+const topBarsContentEl = document.getElementById('topBarsHistogram') || document.getElementById('topBarsContent') || topBarsEl;
+const rightBarsContentEl = document.getElementById('rightBarsContent') || document.getElementById('rightBars');
+const gridEl = document.getElementById('dashboardGrid');
+const tooltip = document.getElementById('tooltip');
+const detailPanel = document.getElementById('detailPanel');
+const vizPanel = document.querySelector('.vizPanel');
+const vizToolbar = document.getElementById('vizToolbar');
+const vizToolbarCollapseBtn = document.getElementById('vizToolbarCollapseBtn');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
+const dashboardScroll = document.querySelector('.dashboardScroll');
+const questionOverviewBtn = document.getElementById('questionOverviewBtn');
+const studentOverviewBtn = document.getElementById('studentOverviewBtn');
+
+let questionOverviewMode = false;
+let studentOverviewMode = false;
+let sortRowsDirection = 'desc';
+let sortColsDirection = 'desc';
+const accumulatedDiagnosticsWarned = new Set();
+
+function cloneRows(rows) {
+  return rows.map(row => ({
+    ...row,
+    answers: [...row.answers]
+  }));
+}
+
+function normalizeMatricula(value) {
+  return String(value ?? '').trim();
+}
+
+function nullAnswers(length) {
+  return Array.from({ length }, () => null);
+}
+
+function studentMatchLabel(row) {
+  const matricula = normalizeMatricula(row.matricula) || 'blank matrícula';
+  const name = row.name || 'blank name';
+  return `${name} (${matricula})`;
+}
+
+function warnAccumulatedDiagnostic(code, message) {
+  if (accumulatedDiagnosticsWarned.has(code)) return;
+  accumulatedDiagnosticsWarned.add(code);
+  console.warn(`[Accumulated matching] ${message}`);
+}
+
+function warnAccumulatedMatchingDiagnostics(rows, blankNameMatches) {
+  const namesToMatriculas = new Map();
+  const matriculasToNames = new Map();
+
+  rows.forEach(row => {
+    const name = row.name || '';
+    const matricula = normalizeMatricula(row.matricula);
+
+    if (name && matricula) {
+      if (!namesToMatriculas.has(name)) namesToMatriculas.set(name, new Set());
+      namesToMatriculas.get(name).add(matricula);
+
+      if (!matriculasToNames.has(matricula)) matriculasToNames.set(matricula, new Set());
+      matriculasToNames.get(matricula).add(name);
+    }
+  });
+
+  namesToMatriculas.forEach((matriculas, name) => {
+    if (matriculas.size < 2) return;
+    warnAccumulatedDiagnostic(
+      `name:${name}:${[...matriculas].sort().join('|')}`,
+      `Exact name appears with multiple matrículas: ${name} (${[...matriculas].sort().join(', ')}).`
+    );
+  });
+
+  matriculasToNames.forEach((names, matricula) => {
+    if (names.size < 2) return;
+    warnAccumulatedDiagnostic(
+      `matricula:${matricula}:${[...names].sort().join('|')}`,
+      `Matrícula appears with multiple names: ${matricula} (${[...names].sort().join(' | ')}).`
+    );
+  });
+
+  blankNameMatches.forEach(({ row, matched }) => {
+    warnAccumulatedDiagnostic(
+      `blank:${row.name}:${matched.matricula || ''}`,
+      `Blank matrícula matched by exact name: ${studentMatchLabel(row)} -> ${studentMatchLabel(matched)}.`
+    );
+  });
+}
+
+function orderedDatasetIds() {
+  return Object.keys(DATASETS);
+}
+
+function prefixedQuestions(datasetIds) {
+  return datasetIds.flatMap((paperId, index) => {
+    const prefix = `P${index + 1}`;
+    return DATASETS[paperId].questions.map(question => `${prefix}-${question}`);
+  });
+}
+
+function buildAccumulatedDataset() {
+  const datasetIds = orderedDatasetIds();
+  const records = new Map();
+  const nameIndex = new Map();
+  const sourceRows = [];
+  const blankNameMatches = [];
+
+  datasetIds.forEach(paperId => {
+    const dataset = DATASETS[paperId];
+    dataset.rows.forEach(row => {
+      sourceRows.push(row);
+      const matricula = normalizeMatricula(row.matricula);
+      const matriculaKey = matricula ? `m:${matricula}` : '';
+      const nameKey = `n:${row.name}`;
+      let key = '';
+
+      if (matriculaKey && records.has(matriculaKey)) key = matriculaKey;
+      else if (nameIndex.has(row.name)) {
+        key = nameIndex.get(row.name);
+        if (!matriculaKey) blankNameMatches.push({ row, matched: records.get(key) });
+      } else key = matriculaKey || nameKey;
+
+      if (!records.has(key)) {
+        records.set(key, {
+          curso: row.curso,
+          grupo: row.grupo,
+          no: row.no,
+          matricula: row.matricula,
+          name: row.name,
+          papers: {}
+        });
+        nameIndex.set(row.name, key);
+      }
+
+      const record = records.get(key);
+      record.curso = record.curso || row.curso;
+      record.grupo = record.grupo || row.grupo;
+      record.no = record.no || row.no;
+      record.matricula = record.matricula || row.matricula;
+      record.name = record.name || row.name;
+      record.papers[paperId] = [...row.answers];
+    });
+  });
+
+  warnAccumulatedMatchingDiagnostics(sourceRows, blankNameMatches);
+
+  const rows = Array.from(records.values()).map(record => {
+    const answers = datasetIds.flatMap(paperId => {
+      const dataset = DATASETS[paperId];
+      return record.papers[paperId] || nullAnswers(dataset.questions.length);
+    });
+    const c = counts(answers);
+    return {
+      curso: record.curso,
+      grupo: record.grupo,
+      no: record.no,
+      matricula: record.matricula,
+      name: record.name,
+      answers,
+      bien: c.pos,
+      mal: c.neg,
+      nr: c.zero + c.miss
+    };
+  });
+
+  return {
+    label: 'Accumulated: Paper 1 + Paper 2',
+    questions: prefixedQuestions(datasetIds),
+    rows
+  };
+}
+
+function getActiveDataset() {
+  if (resultView.value === 'accumulated') return buildAccumulatedDataset();
+  const dataset = DATASETS[resultView.value] || DATASETS.paper1;
+  return {
+    label: dataset.label,
+    questions: [...dataset.questions],
+    rows: cloneRows(dataset.rows)
+  };
+}
+
+function isMissingAnswer(value) {
+  return value === null || value === undefined || Number.isNaN(value);
+}
+
+function counts(values) {
+  return values.reduce((acc, value) => {
+    if (isMissingAnswer(value)) acc.miss += 1;
+    else if (value > 0) acc.pos += Number(value);
+    else if (value === 0) acc.zero += 1;
+    else acc.neg += 1;
+    return acc;
+  }, { pos: 0, zero: 0, neg: 0, miss: 0 });
+}
+
+function rowCounts(row, colOrder) {
+  return counts(colOrder.map(i => row.answers[i]));
+}
+
+function ratioSortConfig(sortValue) {
+  const configs = {
+    posNegRatio: {
+      numerator: 'pos',
+      denominator: 'neg',
+      label: 'Positive / Negative ratio'
+    },
+    posZeroRatio: {
+      numerator: 'pos',
+      denominator: 'zero',
+      label: 'Positive / Non responses ratio'
+    },
+    negZeroRatio: {
+      numerator: 'neg',
+      denominator: 'zero',
+      label: 'Negative / Non responses ratio'
+    }
+  };
+
+  return configs[sortValue] || null;
+}
+
+function ratioValue(countsObject, config) {
+  if (!config) return null;
+
+  const numerator = countsObject[config.numerator] || 0;
+  const denominator = countsObject[config.denominator] || 0;
+
+  if (denominator === 0) return null;
+
+  return numerator / denominator;
+}
+
+function formatRatio(value) {
+  return value === null || value === undefined || Number.isNaN(value)
+    ? '—'
+    : value.toFixed(2);
+}
+
+function isOriginalSort(value) {
+  return value === 'original';
+}
+
+
+function compareMetric(aValue, bValue, direction) {
+  if (aValue === null && bValue === null) return 0;
+  if (aValue === null) return 1;
+  if (bValue === null) return -1;
+
+  return direction === 'asc'
+    ? aValue - bValue
+    : bValue - aValue;
+}
+
+function updateSortDirectionButtons() {
+  const rowsOriginal = isOriginalSort(sortRows.value);
+  const colsOriginal = isOriginalSort(sortCols.value);
+
+  sortRowsAscBtn.disabled = rowsOriginal;
+  sortRowsDescBtn.disabled = rowsOriginal;
+  sortColsAscBtn.disabled = colsOriginal;
+  sortColsDescBtn.disabled = colsOriginal;
+
+  sortRowsAscBtn.classList.toggle('isActive', !rowsOriginal && sortRowsDirection === 'asc');
+  sortRowsDescBtn.classList.toggle('isActive', !rowsOriginal && sortRowsDirection === 'desc');
+
+  sortColsAscBtn.classList.toggle('isActive', !colsOriginal && sortColsDirection === 'asc');
+  sortColsDescBtn.classList.toggle('isActive', !colsOriginal && sortColsDirection === 'desc');
+}
+
+function ratioTooltipRows(c) {
+  return `<div class='tipRows'>${[
+    ['pos', 'Positive units', c.pos],
+    ['zero', 'Non Responses', c.zero],
+    ['neg', 'Negative units', c.neg]
+  ].map(([key, label, value]) => `
+    <div class='tipRow'>
+      <span><i class='tipMiniSwatch ${key}'></i>${label}</span>
+      <span>${value}</span>
+    </div>
+  `).join('')}</div>`;
+}
+
+function ratioBarTooltip(title, c, ratioConfig, ratio) {
+  return `<b>${safe(title)}</b><br><span>${safe(ratioConfig.label)}: ${formatRatio(ratio)}</span>${ratioTooltipRows(c)}`;
+}
+
+function hasMissingValues(row, colOrder) {
+  return colOrder.some(i => isMissingAnswer(row.answers[i]));
+}
+
+function colCounts(rows, colIndex) {
+  return counts(rows.map(r => r.answers[colIndex]));
+}
+
+function pct(n, total) {
+  return total ? Math.round((n / total) * 1000) / 10 : 0;
+}
+
+function safe(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
+}
+
+// Escapes only enough to place trusted, generated tooltip HTML inside double-quoted data-* attributes.
+// Do not use for untrusted user-provided HTML.
+function attrSafe(value) {
+  return String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+}
+
+
+function histogramTooltipAttr(html) {
+  return attrSafe(html);
+}
+
+function responseParts(c, includeMissing = true) {
+  const parts = [
+    ['pos', c.pos],
+    ['zero', c.zero],
+    ['neg', c.neg]
+  ];
+  if (includeMissing) parts.push(['miss', c.miss]);
+  return parts;
+}
+
+function ratioLength(value, maxValue, maxLength) {
+  return value === null ? 0 : (value / maxValue) * maxLength;
+}
+
+function tooltipHitRect(x, y, width, height, tip) {
+  return `<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="transparent" data-tip="${tip}" />`;
+}
+
+function verticalStackedSegmentRects(parts, maxValue, x, baseY, barW, barMaxH, tip, options = {}) {
+  let y = baseY;
+  return parts.map(([key, value]) => {
+    const h = (value / maxValue) * barMaxH;
+    y -= h;
+    if (h <= 0) return '';
+    const rx = options.rx ? ` rx="${options.rx}"` : '';
+    return `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${colors[key]}"${rx} data-tip="${tip}" />`;
+  }).join('');
+}
+
+function horizontalStackedSegmentRects(parts, total, xStart, y, scaledW, h, tip, options = {}) {
+  let x = xStart;
+  return parts.map(([key, value]) => {
+    const w = (value / total) * scaledW;
+    const rect = w > 0
+      ? `<rect x="${x}" y="${y}" width="${options.minVisible ? Math.max(1, w) : w}" height="${h}" fill="${colors[key]}" data-tip="${tip}" />`
+      : '';
+    x += w;
+    return rect;
+  }).join('');
+}
+
+function tooltipRows(c, total) {
+  const visibleTotal = total || c.pos + c.zero + c.neg || 1;
+  const rows = [
+    ['pos', 'Positive units', c.pos],
+    ['zero', 'Non Responses', c.zero],
+    ['neg', 'Negative units', c.neg]
+  ];
+  return `<div class='tipRows'>${rows.map(([key, label, value]) => `
+    <div class='tipRow'>
+      <span><i class='tipMiniSwatch ${key}'></i>${label}</span>
+      <span>${value} · ${pct(value, visibleTotal)}%</span>
+    </div>
+  `).join('')}</div>`;
+}
+
+
+function tooltipCountsWithoutMissing(c) {
+  return {
+    pos: c.pos || 0,
+    zero: c.zero || 0,
+    neg: c.neg || 0
+  };
+}
+
+function verticalMiniBarHtml(c) {
+  const clean = tooltipCountsWithoutMissing(c);
+  const total = clean.pos + clean.zero + clean.neg || 1;
+  const parts = [
+    ['pos', clean.pos],
+    ['zero', clean.zero],
+    ['neg', clean.neg]
+  ];
+  return `<div class='mergedTipVBar'>${parts.map(([key, value]) => {
+    const size = value > 0 ? Math.max(pct(value, total), 1) : 0;
+    return `<span class='tipSeg ${key}' style='height:${size}%'></span>`;
+  }).join('')}</div>`;
+}
+
+function mergedCellTooltipHtml(dataset, rows, row, colOrder, colIndex) {
+  const question = dataset.questions[colIndex];
+  const questionCounts = colCounts(rows, colIndex);
+  const studentCounts = rowCounts(row, colOrder);
+
+  return `
+    <div class='mergedCellTip'>
+      <div class='mergedCellTipSection'>
+        <div class='mergedCellTipTitle'>Question ${safe(question)}</div>
+        <div class='mergedCellTipBody'>
+          ${verticalMiniBarHtml(questionCounts)}
+          ${tooltipRows(questionCounts)}
+        </div>
+      </div>
+      <div class='mergedCellTipDivider'></div>
+      <div class='mergedCellTipSection'>
+        <div class='mergedCellTipTitle'>${safe(row.name)}</div>
+        <div class='mergedCellTipSub'>Group ${safe(row.grupo)} · No. ${safe(row.no || '—')}</div>
+        <div class='mergedCellTipBody'>
+          ${verticalMiniBarHtml(studentCounts)}
+          ${tooltipRows(studentCounts)}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function expandedBarTooltip(title, c, orientation = 'vertical', subtitle = 'Expanded stacked bar') {
+  const total = c.pos + c.zero + c.neg || 1;
+  const parts = [
+    ['pos', c.pos],
+    ['zero', c.zero],
+    ['neg', c.neg]
+  ];
+  const segments = parts.map(([key, value]) => {
+    const size = Math.max(value > 0 ? pct(value, total) : 0, value > 0 ? 1 : 0);
+    const dim = orientation === 'vertical' ? `height:${size}%` : `width:${size}%`;
+    return `<span class='tipSeg ${key}' style='${dim}'></span>`;
+  }).join('');
+  if (orientation === 'vertical') {
+    return `<b>${safe(title)}</b><br><span>${subtitle}</span>
+      <div class='tipGrid'>
+        <div class='tipVBar'>${segments}</div>
+        ${tooltipRows(c, total)}
+      </div>`;
+  }
+  return `<b>${safe(title)}</b><br><span>${subtitle}</span>
+    <div class='tipHBar'>${segments}</div>
+    ${tooltipRows(c, total)}`;
+}
+
+function questionTooltipHtml(dataset, rows, colIndex) {
+  const question = dataset.questions[colIndex];
+  const c = colCounts(rows, colIndex);
+  return expandedBarTooltip(`Question ${question}`, c, 'vertical');
+}
+
+function studentTooltipHtml(row, colOrder) {
+  const c = rowCounts(row, colOrder);
+  return studentBarTooltip(row, c);
+}
+
+function heatmapCellTooltipAttributes(dataset, rows, row, colOrder, colIndex) {
+  const questionTip = attrSafe(questionTooltipHtml(dataset, rows, colIndex));
+  const studentTip = attrSafe(studentTooltipHtml(row, colOrder));
+  const mergedTip = attrSafe(mergedCellTooltipHtml(dataset, rows, row, colOrder, colIndex));
+  return `data-tip="${mergedTip}" data-question-tip="${questionTip}" data-student-tip="${studentTip}"`;
+}
+
+
+function colorForValue(value) {
+  if (isMissingAnswer(value)) return colors.miss;
+  if (value > 0) return colors.pos;
+  if (value === 0) return colors.zero;
+  return colors.neg;
+}
+
+function ensureTooltipInFullscreenContext() {
+  if (!tooltip) return;
+
+  const fullscreenRoot = document.fullscreenElement;
+  if (fullscreenRoot && vizPanel && fullscreenRoot.contains(vizPanel)) {
+    if (tooltip.parentElement !== fullscreenRoot) fullscreenRoot.appendChild(tooltip);
+  } else if (!fullscreenRoot && tooltip.parentElement !== document.body) {
+    document.body.appendChild(tooltip);
+  }
+}
+
+function showTip(html, event) {
+  ensureTooltipInFullscreenContext();
+  tooltip.innerHTML = html;
+  tooltip.style.opacity = 1;
+  moveTip(event);
+}
+
+function moveTip(event) {
+  const pad = 14;
+  const rect = tooltip.getBoundingClientRect();
+  let x = event.clientX + pad;
+  let y = event.clientY + pad;
+  if (x + rect.width > window.innerWidth - 8) x = event.clientX - rect.width - pad;
+  if (y + rect.height > window.innerHeight - 8) y = event.clientY - rect.height - pad;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top = y + 'px';
+}
+
+function hideTip() { tooltip.style.opacity = 0; }
+
+function updateDetailPanel(html) {
+  if (!detailPanel || !html) return;
+  detailPanel.innerHTML = html;
+}
+
+function setActiveDetailTarget(root, target) {
+  root.querySelectorAll('.detailTargetActive').forEach(el => el.classList.remove('detailTargetActive'));
+  if (target) target.classList.add('detailTargetActive');
+}
+
+function showDetailTarget(root, target) {
+  if (!target) return;
+  setActiveDetailTarget(root, target);
+  updateDetailPanel(target.getAttribute('data-tip'));
+}
+
+function detailTargets(root) {
+  return Array.from(root.querySelectorAll('[data-tip]'));
+}
+
+function moveDetailSelection(root, direction) {
+  const targets = detailTargets(root);
+  if (!targets.length) return;
+  const current = root.querySelector('.detailTargetActive');
+  const currentIndex = Math.max(0, targets.indexOf(current));
+  const nextIndex = (currentIndex + direction + targets.length) % targets.length;
+  showDetailTarget(root, targets[nextIndex]);
+}
+
+function activateFirstDetail(root) {
+  const current = root.querySelector('.detailTargetActive');
+  showDetailTarget(root, current || detailTargets(root)[0]);
+}
+
+function prepareDetailGroup(root) {
+  if (!root || root.dataset.detailReady === 'true') return;
+  root.dataset.detailReady = 'true';
+  root.setAttribute('tabindex', '0');
+  root.setAttribute('role', 'group');
+  root.setAttribute('aria-describedby', 'detailPanel');
+  root.addEventListener('focus', () => activateFirstDetail(root));
+  root.addEventListener('keydown', event => {
+    const directions = {
+      ArrowRight: 1,
+      ArrowDown: 1,
+      ArrowLeft: -1,
+      ArrowUp: -1
+    };
+    if (!Object.prototype.hasOwnProperty.call(directions, event.key)) return;
+    event.preventDefault();
+    moveDetailSelection(root, directions[event.key]);
+  });
+}
+
+
+function firstLastName(name) {
+  return String(name || '').trim().split(/\s+/)[0] || '';
+}
+
+function measureTextWidth(text) {
+  if (!measureTextWidth.canvas) {
+    measureTextWidth.canvas = document.createElement('canvas');
+    measureTextWidth.context = measureTextWidth.canvas.getContext('2d');
+  }
+  const context = measureTextWidth.context;
+  if (context) {
+    context.font = '12px Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    return context.measureText(String(text || '')).width;
+  }
+  return String(text || '').length * 8;
+}
+
+function compactNameColumnWidth(rows) {
+  const names = rows.map(row => firstLastName(row.name));
+  const maxTextWidth = names.reduce((max, name) => Math.max(max, measureTextWidth(name)), 0);
+  const badgeWidth = 26;
+  const gap = 8;
+  const horizontalPadding = 20;
+  const safetyPadding = 14;
+  return Math.ceil(badgeWidth + gap + horizontalPadding + safetyPadding + maxTextWidth);
+}
+
+function filteredRows(dataset) {
+  const group = groupFilter.value;
+  const query = searchBox.value.trim().toLowerCase();
+  let rows = dataset.rows.filter(row => group === 'all' || row.grupo === group);
+  if (query) {
+    rows = rows.filter(row => (row.name + ' ' + row.matricula).toLowerCase().includes(query));
+  }
+  return rows;
+}
+
+function sortedRows(rows, colOrder) {
+  const sorted = [...rows];
+  const sort = sortRows.value;
+  const ratioConfig = ratioSortConfig(sort);
+
+  if (ratioConfig) {
+    sorted.sort((a, b) => {
+      const aRatio = ratioValue(rowCounts(a, colOrder), ratioConfig);
+      const bRatio = ratioValue(rowCounts(b, colOrder), ratioConfig);
+
+      return compareMetric(aRatio, bRatio, sortRowsDirection) || a.name.localeCompare(b.name, 'es');
+    });
+  } else {
+    if (sort === 'nameAsc') {
+      sorted.sort((a, b) => sortRowsDirection === 'asc'
+        ? a.name.localeCompare(b.name, 'es')
+        : b.name.localeCompare(a.name, 'es'));
+    }
+    if (sort === 'positive') sorted.sort((a, b) => compareMetric(rowCounts(a, colOrder).pos, rowCounts(b, colOrder).pos, sortRowsDirection) || a.name.localeCompare(b.name, 'es'));
+    if (sort === 'negative') sorted.sort((a, b) => compareMetric(rowCounts(a, colOrder).neg, rowCounts(b, colOrder).neg, sortRowsDirection) || a.name.localeCompare(b.name, 'es'));
+    if (sort === 'zero') sorted.sort((a, b) => compareMetric(rowCounts(a, colOrder).zero, rowCounts(b, colOrder).zero, sortRowsDirection) || a.name.localeCompare(b.name, 'es'));
+  }
+  return sorted;
+}
+
+function sortedCols(dataset, rows) {
+  const cols = dataset.questions.map((q, i) => i);
+  const sort = sortCols.value;
+  const ratioConfig = ratioSortConfig(sort);
+
+  if (ratioConfig) {
+    cols.sort((a, b) => {
+      const aRatio = ratioValue(colCounts(rows, a), ratioConfig);
+      const bRatio = ratioValue(colCounts(rows, b), ratioConfig);
+
+      return compareMetric(aRatio, bRatio, sortColsDirection) || a - b;
+    });
+  } else {
+    if (sort === 'positive') cols.sort((a, b) => compareMetric(colCounts(rows, a).pos, colCounts(rows, b).pos, sortColsDirection) || a - b);
+    if (sort === 'negative') cols.sort((a, b) => compareMetric(colCounts(rows, a).neg, colCounts(rows, b).neg, sortColsDirection) || a - b);
+    if (sort === 'zero') cols.sort((a, b) => compareMetric(colCounts(rows, a).zero, colCounts(rows, b).zero, sortColsDirection) || a - b);
+  }
+  return cols;
+}
+
+function renderStats(dataset, rows, colOrder) {
+  const allValues = rows.flatMap(row => colOrder.map(i => row.answers[i]));
+  const c = counts(allValues);
+
+  const card = ([label, value, note]) => `
+    <div class="card">
+      <div class="label">${label}</div>
+      <div class="value">${value}</div>
+      <div class="note">${note}</div>
+    </div>
+  `;
+
+  const selectionCards = [
+    ['Result View', dataset.label, ''],
+    ['Students', rows.length, '']
+  ].map(card).join('');
+
+  const responseCards = [
+    ['Positive Units', c.pos, ''],
+    ['Negative Units', c.neg, ''],
+    ['Non Responses', c.zero, '']
+  ].map(card).join('');
+
+  stats.innerHTML = `
+    <div class="statGroup selectionGroup">
+      <div class="statGroupTitle">Selection</div>
+      <div class="statGroupCards">${selectionCards}</div>
+    </div>
+    <div class="statGroup responseGroup">
+      <div class="statGroupTitle">Summary</div>
+      <div class="statGroupCards">${responseCards}</div>
+    </div>
+  `;
+
+  activeSummary.textContent = `${dataset.label} · ${dataset.questions.length} questions · ${rows.length} students`;
+}
+
+
+function renderQuestionRatioHistogram(dataset, rows, colOrder, effectiveCellW) {
+  const ratioConfig = ratioSortConfig(sortCols.value);
+  if (!ratioConfig) return false;
+
+  const width = colOrder.length * effectiveCellW;
+  const values = colOrder.map(colIndex => {
+    const c = colCounts(rows, colIndex);
+    return { colIndex, counts: c, ratio: ratioValue(c, ratioConfig) };
+  });
+  const maxRatio = Math.max(1, ...values.map(item => item.ratio ?? 0));
+  const barMaxH = 64;
+  const baseY = 82;
+  const labelY = questionOverviewMode ? 103 : 102;
+  const fontSize = questionOverviewMode ? (effectiveCellW < 14 ? 8 : effectiveCellW < 22 ? 9 : 10) : 11;
+  const rotate = questionOverviewMode && effectiveCellW < 24;
+  let svg = `<svg width="${width}" height="${topH}" role="img" aria-label="Question ratio histogram">`;
+
+  values.forEach((item, visualIndex) => {
+    const q = dataset.questions[item.colIndex];
+    const x = questionOverviewMode
+      ? visualIndex * effectiveCellW
+      : visualIndex * effectiveCellW + Math.min(5, Math.max(1, effectiveCellW * 0.15));
+    const barW = questionOverviewMode
+      ? Math.max(1, effectiveCellW - 1)
+      : Math.max(1, effectiveCellW - Math.min(10, Math.max(2, effectiveCellW * 0.3)));
+    const h = ratioLength(item.ratio, maxRatio, barMaxH);
+    const y = baseY - h;
+    const tip = histogramTooltipAttr(ratioBarTooltip(`Question ${q}`, item.counts, ratioConfig, item.ratio));
+
+    if (h > 0) svg += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${colors.ratio}" rx="2" data-tip="${tip}" />`;
+    svg += tooltipHitRect(visualIndex * effectiveCellW, baseY - barMaxH, effectiveCellW, barMaxH, tip);
+    svg += questionOverviewMode
+      ? `<line x1="${visualIndex * effectiveCellW}" y1="82" x2="${visualIndex * effectiveCellW}" y2="88" stroke="#94a3b8" stroke-width="1" />`
+      : `<line x1="${visualIndex * effectiveCellW}" y1="82" x2="${visualIndex * effectiveCellW + effectiveCellW}" y2="82" stroke="#d7dde8" />`;
+    const labelX = visualIndex * effectiveCellW + effectiveCellW / 2;
+    if (rotate) {
+      svg += `<text x="${labelX}" y="${labelY}" font-size="${fontSize}" text-anchor="end" fill="#334155" font-weight="700" transform="rotate(-55 ${labelX} ${labelY})">${safe(q)}</text>`;
+    } else {
+      svg += `<text x="${labelX}" y="${labelY}" font-size="${fontSize}" text-anchor="middle" fill="#334155" font-weight="700">${safe(q)}</text>`;
+    }
+  });
+  svg += `<line x1="0" y1="82" x2="${width}" y2="82" stroke="#d7dde8" />`;
+  svg += '</svg>';
+  topBarsContentEl.innerHTML = svg;
+  attachTips(topBarsContentEl);
+  return true;
+}
+
+function renderTopBars(dataset, rows, colOrder, effectiveCellW) {
+  const width = colOrder.length * effectiveCellW;
+  const maxRows = Math.max(1, ...colOrder.map(colIndex => {
+    const c = colCounts(rows, colIndex);
+    return c.pos + c.zero + c.neg + c.miss;
+  }));
+  const barMaxH = 64;
+  const labelY = 102;
+  let svg = `<svg width="${width}" height="${topH}" role="img" aria-label="Column stacked bar accumulations">`;
+  colOrder.forEach((colIndex, visualIndex) => {
+    const q = dataset.questions[colIndex];
+    const c = colCounts(rows, colIndex);
+    const x = visualIndex * effectiveCellW + Math.min(5, Math.max(1, effectiveCellW * 0.15));
+    const barW = Math.max(1, effectiveCellW - Math.min(10, Math.max(2, effectiveCellW * 0.3)));
+    const tip = histogramTooltipAttr(expandedBarTooltip(`Question ${q}`, c, 'vertical'));
+    svg += verticalStackedSegmentRects(responseParts(c), maxRows, x, 78, barW, barMaxH, tip, { rx: 2 });
+    svg += `<line x1="${visualIndex * effectiveCellW}" y1="82" x2="${visualIndex * effectiveCellW + effectiveCellW}" y2="82" stroke="#d7dde8" />`;
+    svg += `<text x="${visualIndex * effectiveCellW + effectiveCellW / 2}" y="${labelY}" font-size="11" text-anchor="middle" fill="#334155" font-weight="700">${safe(q)}</text>`;
+  });
+  svg += '</svg>';
+  topBarsContentEl.innerHTML = svg;
+  attachTips(topBarsContentEl);
+}
+
+function renderNames(rows, effectiveCellH) {
+  const compact = !showNames.checked;
+  namesEl.style.setProperty('--cellH', effectiveCellH + 'px');
+  namesEl.innerHTML = rows.map(row => {
+    const displayName = compact ? firstLastName(row.name) : row.name;
+    return `
+      <div class="nameCell" title="${attrSafe(row.name)}">
+        <span class="groupBadge">${safe(row.grupo)}</span>
+        <span class="nameText">${safe(displayName)}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderHeatmap(dataset, rows, colOrder, effectiveCellW, effectiveCellH) {
+  const width = colOrder.length * effectiveCellW;
+  const height = rows.length * effectiveCellH;
+  const showCellText = !questionOverviewMode && !studentOverviewMode;
+  let svg = `<svg width="${width}" height="${height}" role="img" aria-label="Raw answer heatmap">`;
+  rows.forEach((row, r) => {
+    colOrder.forEach((colIndex, c) => {
+      const value = row.answers[colIndex];
+      const x = c * effectiveCellW;
+      const y = r * effectiveCellH;
+      const fill = colorForValue(value);
+      const textColor = value === 0 ? '#3c3108' : '#ffffff';
+      const isMissing = isMissingAnswer(value);
+      const shown = isMissing ? '' : value;
+      if (isMissing) {
+        // Missing cells stay visible using the missing color, but intentionally have
+        // no data-tip, data-question-tip, or data-student-tip attributes. That
+        // keeps missing values in filtering/counts/histogram segments without
+        // surfacing a separate missing-value row in individual cell tooltips.
+        svg += `<rect x="${x}" y="${y}" width="${effectiveCellW}" height="${effectiveCellH}" fill="${fill}" stroke="#ffffff" stroke-width="1" />`;
+      } else {
+        const tooltipAttributes = heatmapCellTooltipAttributes(dataset, rows, row, colOrder, colIndex);
+        svg += `<rect x="${x}" y="${y}" width="${effectiveCellW}" height="${effectiveCellH}" fill="${fill}" stroke="#ffffff" stroke-width="1" ${tooltipAttributes} />`;
+      }
+      if (showCellText && shown !== '') svg += `<text x="${x + effectiveCellW / 2}" y="${y + effectiveCellH / 2 + 4}" font-size="11" text-anchor="middle" fill="${textColor}" font-weight="750" pointer-events="none">${shown}</text>`;
+    });
+  });
+  svg += '</svg>';
+  heatmapEl.innerHTML = svg;
+  attachTips(heatmapEl);
+}
+
+function studentBarTooltip(row, c) {
+  return expandedBarTooltip(
+    row.name,
+    c,
+    'horizontal',
+    `Group: ${safe(row.grupo)} · No. ${safe(row.no || '—')}`
+  );
+}
+
+
+function renderStudentRatioHistogram(rows, colOrder, effectiveCellH) {
+  const ratioConfig = ratioSortConfig(sortRows.value);
+  if (!ratioConfig) return false;
+
+  const width = studentOverviewMode ? 198 : 180;
+  const barW = studentOverviewMode ? 172 : 132;
+  const values = rows.map(row => {
+    const c = rowCounts(row, colOrder);
+    return { row, counts: c, ratio: ratioValue(c, ratioConfig) };
+  });
+  const maxRatio = Math.max(1, ...values.map(item => item.ratio ?? 0));
+
+  if (studentOverviewMode) {
+    const height = rows.length * effectiveCellH;
+    let svg = `<svg width="${width}" height="${height}" role="img" aria-label="Student ratio histogram">`;
+    values.forEach((item, index) => {
+      const y = index * effectiveCellH;
+      const h = Math.max(1, effectiveCellH - 1);
+      const w = ratioLength(item.ratio, maxRatio, barW);
+      const tip = histogramTooltipAttr(ratioBarTooltip(`${item.row.name} · Group: ${item.row.grupo}`, item.counts, ratioConfig, item.ratio));
+      if (w > 0) svg += `<rect x="0" y="${y}" width="${Math.max(1, w)}" height="${h}" fill="${colors.ratio}" data-tip="${tip}" />`;
+      svg += tooltipHitRect(0, y, barW, h, tip);
+      svg += `<line x1="${barW + 4}" y1="${y}" x2="${barW + 14}" y2="${y}" stroke="#94a3b8" stroke-width="1" />`;
+    });
+    svg += '</svg>';
+    rightBarsContentEl.innerHTML = svg;
+    attachTips(rightBarsContentEl);
+    return true;
+  }
+
+  rightBarsContentEl.style.setProperty('--cellH', effectiveCellH + 'px');
+  rightBarsContentEl.innerHTML = values.map(item => {
+    const w = item.ratio === null ? 0 : (item.ratio / maxRatio) * 100;
+    const tip = histogramTooltipAttr(ratioBarTooltip(`${item.row.name} · Group: ${item.row.grupo}`, item.counts, ratioConfig, item.ratio));
+    return `
+      <div class="rowBar" data-tip="${tip}">
+        <div class="stack" style="background:#edf2f7">
+          <div class="segment" style="width:${w}%;background:${colors.ratio}"></div>
+        </div>
+        <div class="barText">${formatRatio(item.ratio)}</div>
+      </div>
+    `;
+  }).join('');
+  attachTips(rightBarsContentEl);
+  return true;
+}
+
+function renderRightBars(rows, colOrder, effectiveCellH) {
+  rightBarsContentEl.style.setProperty('--cellH', effectiveCellH + 'px');
+  rightBarsContentEl.innerHTML = rows.map(row => {
+    const c = rowCounts(row, colOrder);
+    const total = c.pos + c.zero + c.neg + c.miss || 1;
+    const tip = histogramTooltipAttr(studentBarTooltip(row, c));
+    return `
+      <div class="rowBar" data-tip="${tip}">
+        <div class="stack">
+          <div class="segment pos" style="width:${pct(c.pos, total)}%"></div>
+          <div class="segment zero" style="width:${pct(c.zero, total)}%"></div>
+          <div class="segment neg" style="width:${pct(c.neg, total)}%"></div>
+          <div class="segment miss" style="width:${pct(c.miss, total)}%"></div>
+        </div>
+        <div class="barText">${c.pos}/${c.zero}/${c.neg}</div>
+      </div>
+    `;
+  }).join('');
+  attachTips(rightBarsContentEl);
+}
+
+function renderQuestionOverviewHistogram(dataset, rows, colOrder, effectiveCellW) {
+  const width = colOrder.length * effectiveCellW;
+  const maxRows = Math.max(1, ...colOrder.map(colIndex => {
+    const c = colCounts(rows, colIndex);
+    return c.pos + c.zero + c.neg + c.miss;
+  }));
+  const barMaxH = 66;
+  const baseY = 78;
+  const labelY = 103;
+  const fontSize = effectiveCellW < 14 ? 8 : effectiveCellW < 22 ? 9 : 10;
+  const rotate = effectiveCellW < 24;
+  let svg = `<svg width="${width}" height="${topH}" role="img" aria-label="Compressed question overview histogram">`;
+  colOrder.forEach((colIndex, visualIndex) => {
+    const q = dataset.questions[colIndex];
+    const c = colCounts(rows, colIndex);
+    const x = visualIndex * effectiveCellW;
+    const barW = Math.max(1, effectiveCellW - 1);
+    const tip = histogramTooltipAttr(expandedBarTooltip(`Question ${q}`, c, 'vertical'));
+    svg += verticalStackedSegmentRects(responseParts(c), maxRows, x, baseY, barW, barMaxH, tip);
+    svg += `<line x1="${x}" y1="82" x2="${x}" y2="88" stroke="#94a3b8" stroke-width="1" />`;
+    const labelX = x + effectiveCellW / 2;
+    if (rotate) {
+      svg += `<text x="${labelX}" y="${labelY}" font-size="${fontSize}" text-anchor="end" fill="#334155" font-weight="700" transform="rotate(-55 ${labelX} ${labelY})">${safe(q)}</text>`;
+    } else {
+      svg += `<text x="${labelX}" y="${labelY}" font-size="${fontSize}" text-anchor="middle" fill="#334155" font-weight="700">${safe(q)}</text>`;
+    }
+  });
+  svg += `<line x1="0" y1="82" x2="${width}" y2="82" stroke="#d7dde8" />`;
+  svg += '</svg>';
+  topBarsContentEl.innerHTML = svg;
+  attachTips(topBarsContentEl);
+}
+
+function renderStudentOverviewHistogram(rows, colOrder, effectiveCellH) {
+  const width = 198;
+  const height = rows.length * effectiveCellH;
+  const barW = 172;
+  const maxTotal = Math.max(1, ...rows.map(row => {
+    const c = rowCounts(row, colOrder);
+    return c.pos + c.zero + c.neg + c.miss;
+  }));
+  let svg = `<svg width="${width}" height="${height}" role="img" aria-label="Compressed student overview histogram">`;
+  rows.forEach((row, index) => {
+    const c = rowCounts(row, colOrder);
+    const total = c.pos + c.zero + c.neg + c.miss || 1;
+    const y = index * effectiveCellH;
+    const h = Math.max(1, effectiveCellH - 1);
+    const scaledW = Math.max(1, (total / maxTotal) * barW);
+    const tip = histogramTooltipAttr(studentBarTooltip(row, c));
+    svg += horizontalStackedSegmentRects(responseParts(c), total, 0, y, scaledW, h, tip, { minVisible: true });
+    svg += `<line x1="${barW + 4}" y1="${y}" x2="${barW + 14}" y2="${y}" stroke="#94a3b8" stroke-width="1" />`;
+  });
+  svg += '</svg>';
+  rightBarsContentEl.innerHTML = svg;
+  attachTips(rightBarsContentEl);
+}
+
+function attachTips(root) {
+  prepareDetailGroup(root);
+  root.querySelectorAll('[data-tip]').forEach(el => {
+    el.addEventListener('mouseenter', event => showTip(el.getAttribute('data-tip'), event));
+    el.addEventListener('mousemove', moveTip);
+    el.addEventListener('mouseleave', hideTip);
+    el.addEventListener('click', () => showDetailTarget(root, el));
+    el.addEventListener('touchstart', () => showDetailTarget(root, el), { passive: true });
+  });
+}
+
+
+function render() {
+  const dataset = getActiveDataset();
+  const fullColOrder = dataset.questions.map((_, i) => i);
+  let rowsPreSort = filteredRows(dataset);
+
+  if (!showMissing.checked) {
+    rowsPreSort = rowsPreSort.filter(row => !hasMissingValues(row, fullColOrder));
+  }
+
+  const colOrder = sortedCols(dataset, rowsPreSort);
+  const rows = sortedRows(rowsPreSort, colOrder);
+  gridEl.classList.toggle('studentOverviewActive', studentOverviewMode);
+  const nameColumnWidth = studentOverviewMode ? 0 : (showNames.checked ? 260 : compactNameColumnWidth(rows));
+  const rightColumnWidth = studentOverviewMode ? 210 : 180;
+  const availableHeatmapWidth = Math.max(120, (dashboardScroll?.clientWidth || window.innerWidth) - nameColumnWidth - rightColumnWidth);
+  const availableHeatmapHeight = Math.max(180, (dashboardScroll?.clientHeight || window.innerHeight - 360) - topH);
+  const effectiveCellW = questionOverviewMode && colOrder.length
+    ? Math.max(4, Math.floor(availableHeatmapWidth / colOrder.length))
+    : cellW;
+  const effectiveCellH = studentOverviewMode && rows.length
+    ? Math.max(4, Math.floor(availableHeatmapHeight / rows.length))
+    : cellH;
+  const heatmapWidth = colOrder.length * effectiveCellW;
+  gridEl.style.gridTemplateColumns = `${nameColumnWidth}px ${heatmapWidth}px ${rightColumnWidth}px`;
+  renderStats(dataset, rows, colOrder);
+  if (!renderQuestionRatioHistogram(dataset, rows, colOrder, effectiveCellW)) {
+    if (questionOverviewMode) renderQuestionOverviewHistogram(dataset, rows, colOrder, effectiveCellW);
+    else renderTopBars(dataset, rows, colOrder, effectiveCellW);
+  }
+  renderNames(rows, effectiveCellH);
+  renderHeatmap(dataset, rows, colOrder, effectiveCellW, effectiveCellH);
+  if (!renderStudentRatioHistogram(rows, colOrder, effectiveCellH)) {
+    if (studentOverviewMode) renderStudentOverviewHistogram(rows, colOrder, effectiveCellH);
+    else renderRightBars(rows, colOrder, effectiveCellH);
+  }
+}
+
+function isVizPanelFullscreen() {
+  return document.fullscreenElement === vizPanel;
+}
+
+function setVizToolbarCollapsed(collapsed) {
+  if (!vizToolbar || !vizToolbarCollapseBtn) return;
+
+  vizToolbar.classList.toggle('isCollapsed', collapsed);
+  vizToolbarCollapseBtn.setAttribute('aria-expanded', String(!collapsed));
+  vizToolbarCollapseBtn.setAttribute(
+    'title',
+    collapsed ? 'Expand visualization controls' : 'Collapse visualization controls'
+  );
+
+  const icon = vizToolbarCollapseBtn.querySelector('.collapseIcon');
+  if (icon) icon.textContent = collapsed ? '▸' : '▾';
+}
+
+function updateFullscreenButton() {
+  if (!fullscreenBtn) return;
+
+  const active = isVizPanelFullscreen();
+  fullscreenBtn.setAttribute(
+    'aria-label',
+    active ? 'Exit fullscreen' : 'Open visualization in fullscreen'
+  );
+  fullscreenBtn.setAttribute(
+    'title',
+    active ? 'Exit fullscreen' : 'Fullscreen'
+  );
+  fullscreenBtn.textContent = active ? '×' : '⛶';
+}
+
+async function toggleFullscreen() {
+  if (!vizPanel) return;
+
+  try {
+    if (isVizPanelFullscreen()) {
+      await document.exitFullscreen();
+    } else {
+      await vizPanel.requestFullscreen();
+    }
+  } catch (error) {
+    console.warn('Fullscreen mode could not be toggled:', error);
+  }
+}
+
+[resultView, groupFilter, searchBox, showNames, showMissing].forEach(control => control.addEventListener('input', render));
+sortRows.addEventListener('input', () => {
+  updateSortDirectionButtons();
+  render();
+});
+sortCols.addEventListener('input', () => {
+  updateSortDirectionButtons();
+  render();
+});
+sortRowsAscBtn.addEventListener('click', () => {
+  if (isOriginalSort(sortRows.value)) return;
+  sortRowsDirection = 'asc';
+  updateSortDirectionButtons();
+  render();
+});
+sortRowsDescBtn.addEventListener('click', () => {
+  if (isOriginalSort(sortRows.value)) return;
+  sortRowsDirection = 'desc';
+  updateSortDirectionButtons();
+  render();
+});
+sortColsAscBtn.addEventListener('click', () => {
+  if (isOriginalSort(sortCols.value)) return;
+  sortColsDirection = 'asc';
+  updateSortDirectionButtons();
+  render();
+});
+sortColsDescBtn.addEventListener('click', () => {
+  if (isOriginalSort(sortCols.value)) return;
+  sortColsDirection = 'desc';
+  updateSortDirectionButtons();
+  render();
+});
+if (questionOverviewBtn) questionOverviewBtn.addEventListener('click', () => {
+  questionOverviewMode = !questionOverviewMode;
+  questionOverviewBtn.setAttribute('aria-pressed', String(questionOverviewMode));
+  render();
+});
+if (studentOverviewBtn) studentOverviewBtn.addEventListener('click', () => {
+  studentOverviewMode = !studentOverviewMode;
+  studentOverviewBtn.setAttribute('aria-pressed', String(studentOverviewMode));
+  render();
+});
+if (fullscreenBtn) fullscreenBtn.addEventListener('click', toggleFullscreen);
+if (vizToolbarCollapseBtn) vizToolbarCollapseBtn.addEventListener('click', () => {
+  if (!vizToolbar) return;
+  setVizToolbarCollapsed(!vizToolbar.classList.contains('isCollapsed'));
+});
+window.addEventListener('resize', render);
+document.addEventListener('fullscreenchange', () => {
+  updateFullscreenButton();
+  ensureTooltipInFullscreenContext();
+});
+updateFullscreenButton();
+updateSortDirectionButtons();
+setVizToolbarCollapsed(false);
+render();

@@ -1,0 +1,432 @@
+% ==========================================================
+% DOCUMENT CLASS AND PAGE GEOMETRY
+% ==========================================================
+% Shared article preamble for teaching materials; load before document content.
+% Defines the class, layout, packages, navigation, and criterion/task helpers.
+% Exam layout is added by preamble_exams.tex; unused definitions are archived
+% separately in preamble-unused.tex and are not loaded here.
+% No custom environments are defined here; lists, tables, and boxes use packages.
+\documentclass[11pt]{article}
+
+\usepackage[
+margin=0.37in,
+bottom=0.55in,
+top=0.4in
+]{geometry}
+
+% Global page spacing.
+\linespread{1.2}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+% ==========================================================
+% ENCODING AND TYPOGRAPHY
+% ==========================================================
+% Input/font encoding and improved typographic spacing.
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\usepackage{bm}
+
+% Optional language configuration.
+% \usepackage[spanish]{babel}
+% \selectlanguage{spanish}
+
+% ==========================================================
+% MATHEMATICS
+% ==========================================================
+% Standard mathematics packages.
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+
+% ==========================================================
+% TABLES AND MULTICOLUMN LAYOUTS
+% ==========================================================
+% Table, long table, flexible column, and multicolumn support.
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{tabularx}
+
+% Slightly increases row height in tables.
+\renewcommand{\arraystretch}{1.1}
+
+% ==========================================================
+% CONDITIONALS AND COMMAND-DEFINITION HELPERS
+% ==========================================================
+% Compatibility conditionals, empty-label tests, and structured command arguments.
+\usepackage{ifthen}
+\usepackage{etoolbox}
+\usepackage{xparse}
+
+% \SimpleSecIniciotrue selects line arrows; \SimpleSecIniciofalse restores
+% outlined arrows (default). Set before using \secInicio.
+\newif\ifSimpleSecInicio
+\SimpleSecIniciofalse
+
+% ==========================================================
+% PAGE NUMBERING AND TABLE OF CONTENTS
+% ==========================================================
+% Use the standard numbered footer on every page.
+\usepackage{fancyhdr}
+\pagestyle{plain}
+
+% Table of contents formatting.
+\usepackage{tocloft}
+
+% Hide subsection page numbers; commented options also simplify section entries.
+%\renewcommand{\cftdot}{}
+%\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+%\cftpagenumbersoff{section}
+\cftpagenumbersoff{subsection}
+
+% ==========================================================
+% GRAPHICS, FIGURES, TIKZ, AND PGFPLOTS
+% ==========================================================
+% Image inclusion and figure placement.
+\usepackage{graphicx}
+\usepackage{float}
+% \usepackage{subfigure} % Optional legacy subfigure package.
+\usepackage{subcaption}
+\usepackage{verbatim}
+
+% Default image folder.
+\graphicspath{{imgs}}
+
+% TikZ and plot support.
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,trees}
+\usetikzlibrary{patterns}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+% ==========================================================
+% COLORS
+% ==========================================================
+% Navigation arrows, contents entries, problem links, and task-link colors.
+\usepackage{xcolor}
+
+
+\definecolor{links}{HTML}{FFAB00}  % Orange
+\definecolor{links2}{HTML}{0000B3} % Dark blue
+\definecolor{links3}{HTML}{B0005A} % Dark red
+\definecolor{tocLinkDark}{HTML}{8C3F33}
+\definecolor{darkgold}{HTML}{FFAB00}
+\definecolor{darkred}{HTML}{8B0000}
+\definecolor{taskLinkDarkBlue}{HTML}{0B3D91}
+
+% ==========================================================
+% BOXES AND FRAMES
+% ==========================================================
+% Box and frame packages.
+\usepackage{adjustbox}
+\usepackage{mdframed}
+\usepackage[most]{tcolorbox}
+
+
+% Global framed-box settings.
+\setlength{\fboxrule}{1pt}
+\setlength{\fboxsep}{5pt}
+
+\usepackage[table]{xcolor}
+
+% ==========================================================
+% LISTS AND CODE FORMATTING
+% ==========================================================
+% List customization.
+\usepackage{enumitem}
+
+\setlist[itemize]{
+	leftmargin=1.2em,
+	itemsep=0.35em,
+	topsep=0.35em
+}
+
+% Code typesetting.
+\usepackage{listings}
+
+% ==========================================================
+% HYPERLINKS AND NAVIGATION
+% ==========================================================
+% Hyperref should be loaded near the end of the preamble.
+\usepackage{hyperref}
+
+\hypersetup{
+	colorlinks=true,
+	linkcolor=tocLinkDark,
+	filecolor=magenta,
+	urlcolor=taskLinkDarkBlue,
+	citecolor=tocLinkDark
+}
+
+% Improved PDF bookmarks; loaded after hyperref.
+\usepackage{bookmark}
+
+% Install after tocloft replaces \tableofcontents at begin-document time.
+% Scope the contents-link color without changing other internal links.
+\AddToHook{begindocument/end}{%
+	\let\OriginalTableOfContents\tableofcontents
+	\renewcommand{\tableofcontents}{%
+		\begingroup
+		\hypersetup{linkcolor=darkgold}%
+		\OriginalTableOfContents
+		\endgroup
+	}%
+}
+
+% \TaskHyperref{label}{text}: dark-blue internal link to an existing label.
+\newcommand{\TaskHyperref}[2]{%
+	\hyperref[#1]{\textcolor{taskLinkDarkBlue}{#2}}%
+}
+
+% Icon scale factor; customize with \renewcommand{\secInicioIconMultiplier}{...}.
+\newcommand{\secInicioIconMultiplier}{0.5}
+
+% \secInicioIcon{color}{direction}: TikZ navigation arrow in an xcolor color.
+% "down" points down; all other values (including "up" and "toc") point up.
+\NewDocumentCommand{\secInicioIcon}{m m}{%
+	\scalebox{\secInicioIconMultiplier}{%
+		\begin{tikzpicture}[scale=0.55, baseline=-0.5ex]
+			\ifSimpleSecInicio
+			\ifstrequal{#2}{down}{%
+				\draw[
+				->,
+				draw=#1,
+				line width=2.4pt,
+				line cap=round
+				] (0,0.60) -- (0,-1.00);%
+			}{%
+				\draw[
+				->,
+				draw=#1,
+				line width=2.4pt,
+				line cap=round
+				] (0,-1.10) -- (0,0.50);%
+			}%
+			\else
+			\ifstrequal{#2}{down}{%
+				\draw[
+				draw=#1,
+				line width=1.4pt,
+				line join=round,
+				rotate=180
+				]
+				(-0.35,-1.20) --
+				(0.35,-1.20) --
+				(0.35,0.10) --
+				(0.75,0.10) --
+				(0,1.10) --
+				(-0.75,0.10) --
+				(-0.35,0.10) --
+				cycle;%
+			}{%
+				\draw[
+				draw=#1,
+				line width=1.4pt,
+				line join=round
+				]
+				(-0.35,-1.20) --
+				(0.35,-1.20) --
+				(0.35,0.10) --
+				(0.75,0.10) --
+				(0,1.10) --
+				(-0.75,0.10) --
+				(-0.35,0.10) --
+				cycle;%
+			}%
+			\fi
+		\end{tikzpicture}%
+	}%
+}
+
+% \secInicio[blue-label][red-label]: right-aligned upward navigation arrows.
+% Always links to "toc"; define \label{toc} at the table of contents.
+% Optional labels add blue/red links independently; empty arguments omit them.
+% Example: \secInicio[][sec:practice] shows TOC and red arrows.
+\NewDocumentCommand{\secInicio}{O{} O{}}{%
+	\vspace{-3mm}
+	\par\noindent
+	\begingroup
+	\setlength{\fboxsep}{0.45em}%
+	\setlength{\fboxrule}{0.4pt}%
+	\hfill
+	\fcolorbox{white}{white}{%
+		% Always display the TOC arrow
+		\hyperref[toc]{%
+			\secInicioIcon{links}{up}%
+		}%
+		\ifstrempty{#2}{}{%
+			\hspace{0.8em}%
+			\hyperref[#2]{%
+				\secInicioIcon{links3}{up}%
+			}%
+		}%
+		%
+		\ifstrempty{#1}{}{%
+			\hspace{0.8em}%
+			\hyperref[#1]{%
+				\secInicioIcon{links2}{up}%
+			}%
+		}%
+	}%
+	\par
+	\endgroup
+}
+
+
+% ----------------------------------------------------------
+% Problem navigation and criterion-linked list items
+% ----------------------------------------------------------
+% \SectionProblemsTableOfContents{rows}: centered, single-column problem index.
+% Supply \SectionProblemLink entries separated by \\; omit the final row break.
+\newcommand{\SectionProblemsTableOfContents}[1]{%
+	\begingroup
+	\hypersetup{linkcolor=darkred}%
+	\vspace{-2mm}
+	\begin{center}
+		\begin{tabular}{@{}l@{}}
+			\toprule
+			\textbf{Problems:} \\
+			\midrule
+			#1 \\
+			\bottomrule
+		\end{tabular}
+	\end{center}
+	\vspace{-8mm}
+	\endgroup
+}
+
+% \SectionProblemLink{label}{title}: link prefixed by the target section number.
+% Use a label attached to a numbered section/subsection.
+\newcommand{\SectionProblemLink}[2]{%
+	\hyperref[#1]{\ref*{#1}.\enspace #2}%
+}
+
+% \sml{text}: locally smaller text, often used inside score labels.
+\newcommand{\sml}[1]{%
+	{\small #1}%
+}
+
+% \CriterionTask{target-label}{criterion-number}{description}: linked C-number item.
+% Use inside a list; \QuestionsTasks calls it for each entry.
+\newcommand{\CriterionTask}[3]{%
+	\item[\TaskHyperref{#1}{\textbf{C#2}}]%
+	\TaskHyperref{#1}{#3}%
+}
+
+% ------------------------------------------------
+% Scored sections and contents titles
+% ------------------------------------------------
+% \TOCScoredTitle{title}{score}: aligned TOC columns; PDF bookmarks use title only.
+% Internal helper for \sectionScored.
+\DeclareRobustCommand{\TOCScoredTitle}[2]{%
+	\texorpdfstring{%
+		\makebox[0.56\textwidth][l]{#1}%
+		\makebox[0.20\textwidth][l]{\score{#2}}%
+	}{#1}%
+}
+
+% \score{text}: right-aligned bold bracketed score, e.g. \score{C1-5}.
+\newcommand{\score}[1]{%
+	\hfill \textbf{[#1]}
+}
+
+% \score{text}: right-aligned bold bracketed score, e.g. \score{C1-5}.
+\newcommand{\sscore}[1]{%
+	\textbf{[#1]}
+}
+
+% \sectionScored{title}{score}{label}: numbered heading with score and label;
+% its contents entry uses \TOCScoredTitle for aligned title/score columns.
+\newcommand{\sectionScored}[3]{%
+	\section
+	[\TOCScoredTitle{#1}{#2}]
+	{#1 \score{#2}}%
+	\label{#3}%
+}
+
+
+
+% \boxed{math}: replaces the standard math box with a pale rounded tcolorbox.
+% Use in math mode, e.g. \[\boxed{x=2}\].
+\renewcommand{\boxed}[1]{%
+	\tcboxmath[
+	colback=gray!2,
+	colframe=gray!10,
+	boxrule=0.7pt,
+	arc=4pt,
+	boxsep=3pt,
+	left=2pt,
+	right=2pt,
+	top=1pt,
+	bottom=1pt
+	]{#1}%
+}
+
+
+% ----------------------------------------------------------
+% Questions/tasks block and its private expl3 parsing helpers
+% ----------------------------------------------------------
+% Builds a criterion-linked enumerate list with a heading and navigation arrows.
+% Syntax: \QuestionsTasks{entries}, \QuestionsTasks[section-label]{entries},
+% or \QuestionsTasks[before|after][section-label]{entries}.
+% Entries are comma-separated: {criterion number}/{target label}/{description}.
+% Brace each field to protect commas or slashes in its content.
+% Example: \QuestionsTasks[sec:practice]{{6}/{sol:q1}/{Estimate the probability.}}
+% before/after are reserved heading-placement options (default: after).
+% Omitted, blank, or NaN (case-insensitive) labels call \secInicio without
+% arguments; other labels call \secInicio[][section-label] (TOC + red arrow).
+% Example: \QuestionsTasks[sec:examples]{entries} uses no blue arrow.
+% [before] preserves blocks whose heading precedes the spacing commands.
+\ExplSyntaxOn
+% Private scratch state: split entry fields and the optional navigation target.
+\seq_new:N \l_questions_tasks_entry_seq
+\tl_new:N \l_questions_tasks_criterion_tl
+\tl_new:N \l_questions_tasks_label_tl
+\tl_new:N \l_questions_tasks_description_tl
+\tl_new:N \l_questions_tasks_navigation_tl
+% Emit target/criterion/description; VVV expands the three stored field values.
+\cs_new_protected:Npn \questions_tasks_emit:nnn #1 #2 #3 {
+	\CriterionTask{#1}{#2}{#3}
+}
+\cs_generate_variant:Nn \questions_tasks_emit:nnn {VVV}
+% Expand the stored section label into the red-arrow argument of \secInicio.
+\cs_new_protected:Npn \questions_tasks_navigation:n #1 {\secInicio[][#1]}
+\NewDocumentCommand{\QuestionsTasks}{O{after} o m}{
+	\tl_clear:N \l_questions_tasks_navigation_tl
+	\IfNoValueTF{#2}{
+		\str_case:nnF {#1} {{before}{} {after}{}} {
+			\tl_set:Nn \l_questions_tasks_navigation_tl {#1}
+		}
+	}{
+		\tl_set:Nn \l_questions_tasks_navigation_tl {#2}
+	}
+	\tl_trim_spaces:N \l_questions_tasks_navigation_tl
+	\str_if_eq:nnT {#1} {before} {\textbf{Questions/Tasks}}
+	\vspace{2mm}
+	\tl_if_blank:VTF \l_questions_tasks_navigation_tl {\secInicio}{
+		\str_if_eq:eeTF {\str_lowercase:f {\l_questions_tasks_navigation_tl}} {nan}
+		{\secInicio}
+		{\exp_args:NV \questions_tasks_navigation:n \l_questions_tasks_navigation_tl}
+	}
+	\vspace{-8mm}
+	\str_if_eq:nnF {#1} {before} {\textbf{Questions/Tasks}}
+	\begin{enumerate}
+		\clist_map_inline:nn {#3} {
+			\seq_set_split:Nnn \l_questions_tasks_entry_seq {/} {##1}
+			\seq_pop_left:NN \l_questions_tasks_entry_seq \l_questions_tasks_criterion_tl
+			\seq_pop_left:NN \l_questions_tasks_entry_seq \l_questions_tasks_label_tl
+			\seq_pop_left:NN \l_questions_tasks_entry_seq \l_questions_tasks_description_tl
+			\questions_tasks_emit:VVV
+			\l_questions_tasks_label_tl
+			\l_questions_tasks_criterion_tl
+			\l_questions_tasks_description_tl
+		}
+	\end{enumerate}
+}
+\ExplSyntaxOff

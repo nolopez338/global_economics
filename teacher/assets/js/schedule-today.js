@@ -1,0 +1,147 @@
+/*
+  Purpose:
+  Highlights today within schedule tables and inserts a visual “Today” divider row.
+
+  Responsibilities:
+  - Parses schedule date cells and compares them against the current local date
+  - Applies/removes today-specific row classes and indicator rows in standard schedule tables
+  - Skips full-schedule pages so dedicated full-schedule marker logic can run separately
+*/
+const isFullSchedulePage = () =>
+  /\/full_schedule\.html$/i.test(window.location.pathname || "");
+
+const buildTodayIndicatorRow = (columnCount) => {
+  const row = document.createElement("tr");
+  row.className = "today-indicator-row";
+
+  const cell = document.createElement("td");
+  cell.colSpan = columnCount;
+
+  const indicator = document.createElement("div");
+  indicator.className = "today-indicator";
+
+  const label = document.createElement("span");
+  label.textContent = "Today";
+
+  indicator.append(label);
+  cell.append(indicator);
+  row.append(cell);
+
+  return row;
+};
+
+const normalizeDateString = (raw) => {
+  if (!raw) {
+    return null;
+  }
+
+  const match = String(raw)
+    .trim()
+    .match(/^(\d{4})\s*(?:[-\/]|\s\/\s)\s*(\d{1,2})\s*(?:[-\/]|\s\/\s)\s*(\d{1,2})$/);
+  if (!match) {
+    return null;
+  }
+
+  const [, year, month, day] = match;
+  return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+};
+
+const applyTodayMarker = (table) => {
+  if (isFullSchedulePage()) {
+    return;
+  }
+
+  const body = table.tBodies[0];
+  if (!body) {
+    return;
+  }
+
+  body.querySelectorAll(".today-indicator-row").forEach((row) => row.remove());
+  body.querySelectorAll(".today-row").forEach((row) => row.classList.remove("today-row"));
+
+  const rows = Array.from(body.rows);
+  if (rows.length === 0) {
+    return;
+  }
+
+  const headerCells = Array.from(table.tHead?.rows[0]?.cells ?? []);
+  const detectedDateColumnIndex = headerCells.findIndex(
+    (cell) => cell.textContent.trim().toLowerCase() === "date"
+  );
+  const dateColumnIndex = detectedDateColumnIndex >= 0 ? detectedDateColumnIndex : 1;
+
+  // Compute today in local time using ISO format for reliable comparison.
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, "0");
+  const dd = String(today.getDate()).padStart(2, "0");
+  const todayISO = `${yyyy}-${mm}-${dd}`;
+
+  const columnCount =
+    table.tHead?.rows[0]?.cells.length ?? rows[0]?.cells.length ?? 1;
+
+  let hasParseableDate = false;
+  let firstGreaterDateRow = null;
+
+  for (const row of rows) {
+    const dateCell = row.cells[dateColumnIndex];
+    if (!dateCell) {
+      continue;
+    }
+
+    const rowDateNormalized = normalizeDateString(
+      row.dataset.date || dateCell.textContent
+    );
+    if (!rowDateNormalized) {
+      continue;
+    }
+
+    hasParseableDate = true;
+
+    if (rowDateNormalized === todayISO) {
+      row.classList.add("today-row");
+      return;
+    }
+
+    if (!firstGreaterDateRow && rowDateNormalized > todayISO) {
+      firstGreaterDateRow = row;
+    }
+  }
+
+  if (!hasParseableDate) {
+    return;
+  }
+
+  const todayRow = buildTodayIndicatorRow(columnCount);
+  if (firstGreaterDateRow) {
+    body.insertBefore(todayRow, firstGreaterDateRow);
+    return;
+  }
+
+  body.append(todayRow);
+};
+
+const applyTodayMarkers = () => {
+  if (isFullSchedulePage()) {
+    return;
+  }
+
+  document
+    .querySelectorAll(".class-schedule-table")
+    .forEach((table) => applyTodayMarker(table));
+};
+
+document.addEventListener("class-schedule-rendered", (event) => {
+  if (isFullSchedulePage()) {
+    return;
+  }
+
+  const table = event.detail?.table;
+  if (table) {
+    applyTodayMarker(table);
+  }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  applyTodayMarkers();
+});

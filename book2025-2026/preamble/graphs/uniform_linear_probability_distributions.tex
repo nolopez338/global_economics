@@ -1,0 +1,320 @@
+
+\newcommand{\PiecewiseProbGraph}[6]{
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\supportA}{#1}
+			\pgfmathsetmacro{\supportB}{#2}
+			\pgfmathsetmacro{\pad}{0.12*(\supportB-\supportA)}
+			\begin{axis}[
+				width=9cm,
+				height=5cm,
+				axis lines=left,
+				xlabel={$x$},
+				ylabel={$f(x)$},
+				xmin={\supportA-\pad},
+				xmax={\supportB+\pad},
+				ymin=0,
+				ymax=0.45,
+				grid=both,
+				xtick={#6}
+				]
+				\addplot[domain=#1:#2, samples=200, draw=none, fill=blue!20, fill opacity=0.35] {#3} \closedcycle;
+				\addplot[domain=#4:#5, samples=200, draw=none, fill=blue!60, fill opacity=0.55] {#3} \closedcycle;
+				\addplot[smooth, domain=#1:#2, samples=200] {#3};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\UniformEndpointGraph}[9]{%
+	\begin{center}
+		\begin{tikzpicture}[x=#1cm,y=8cm]
+			% axes
+			\draw[->] (#2,0) -- (#3,0) node[right] {$x$};
+			\draw[->] (0,-0.01) -- (0,#4);
+			
+			% support shading
+			\fill[blue!20, fill opacity=0.35] (0,0) rectangle (#5,#6);
+			
+			% highlighted region
+			\fill[blue!60, fill opacity=0.55] (#7,0) rectangle (#8,#6);
+			
+			% top density segment
+			\draw[thick] (0,#6) -- (#5,#6);
+			
+			% custom guides and labels
+			#9
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\UniformVariableEndpointsGraph}[9]{%
+	% Main graph macro for Uniform(a,b)
+	% Arguments:
+	% 1 = x-scale
+	% 2 = x-axis minimum
+	% 3 = x-axis maximum
+	% 4 = support start
+	% 5 = support end
+	% 6 = density height
+	% 7 = highlighted region start
+	% 8 = highlighted region end
+	% 9 = extra TikZ code (guides, labels, etc.)
+	\begin{center}
+		\begin{tikzpicture}[x=#1cm,y=8cm]
+			% automatic y-axis height
+			\pgfmathsetmacro{\UniformYTop}{max(0.18,1.8*#6)}
+			
+			% axes
+			\draw[->] (#2,0) -- (#3,0) node[right] {$x$};
+			\draw[->] (0,-0.01) -- (0,\UniformYTop);
+			
+			% support shading
+			\fill[blue!20, fill opacity=0.35] (#4,0) rectangle (#5,#6);
+			
+			% highlighted region
+			\fill[blue!60, fill opacity=0.55] (#7,0) rectangle (#8,#6);
+			
+			% top density segment
+			\draw[thick] (#4,#6) -- (#5,#6);
+			
+			% custom guides and labels
+			#9
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\UniformGuideSet}[6]{%
+	% Helper macro for the five repeated dashed guides and x-axis labels
+	% Arguments:
+	% 1 = coord/label pair for first mark  (example: 0.8/a)
+	% 2 = coord/label pair for second mark (example: 2.8/2)
+	% 3 = coord/label pair for third mark  (example: 7.2/7)
+	% 4 = coord/label pair for fourth mark (example: 8.4/8)
+	% 5 = coord/label pair for fifth mark  (example: 10.2/b)
+	% 6 = guide height
+	\foreach \x/\lab in {#1,#2,#3,#4,#5}{%
+		\draw[dashed] (\x,0) -- (\x,#6);
+		\node[below] at (\x,0) {$\lab$};
+	}%
+}
+
+\newcommand{\COneGraph}[7]{
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\supportA}{#1}
+			\pgfmathsetmacro{\supportB}{#2}
+			\pgfmathsetmacro{\pad}{0.12*(\supportB-\supportA)}
+			\begin{axis}[
+				width=9cm,
+				height=5cm,
+				axis lines=left,
+				xlabel={$x$},
+				ylabel={$f(x)$},
+				xmin={\supportA-\pad},
+				xmax={\supportB+\pad},
+				ymin=0,
+				ymax=#7,
+				grid=both,
+				xtick={#6}
+				]
+				\addplot[domain=#1:#2, samples=160, draw=none, fill=blue!20, fill opacity=0.35] {#3} \closedcycle;
+				\addplot[domain=#4:#5, samples=160, draw=none, fill=blue!60, fill opacity=0.55] {#3} \closedcycle;
+				\addplot[smooth, domain=#1:#2, samples=160, thick] {#3};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\COneCompareGraph}[6]{
+	\begin{center}
+		\begin{tikzpicture}
+			\begin{axis}[
+				width=9cm,
+				height=5cm,
+				axis lines=left,
+				xlabel={$x$},
+				ylabel={$f(x)$},
+				xmin=#1,
+				xmax=#2,
+				ymin=0,
+				ymax=#6,
+				grid=both,
+				xtick={0,1,2,3,4,5}
+				]
+				\addplot[smooth, domain=#3:#4, samples=150, thick, blue] {#5};
+				\addplot[smooth, domain=#3:#4, samples=150, thick, red, dashed] {#5*1.6};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\CtwoProbGraph}[7]{
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\supportA}{#1}
+			\pgfmathsetmacro{\supportB}{#2}
+			\pgfmathsetmacro{\pad}{0.12*(\supportB-\supportA)}
+			\begin{axis}[
+				width=9cm,
+				height=5cm,
+				axis lines=left,
+				xlabel={$x$},
+				ylabel={$f(x)$},
+				xmin={\supportA-\pad},
+				xmax={\supportB+\pad},
+				ymin=0,
+				ymax=#7,
+				grid=both,
+				xtick={#6}
+				]
+				\addplot[domain=#1:#2, samples=400, const plot, draw=none, fill=blue!20, fill opacity=0.35] {#3} \closedcycle;
+				\addplot[domain=#4:#5, samples=400, const plot, draw=none, fill=blue!60, fill opacity=0.55] {#3} \closedcycle;
+				\addplot[domain=#1:#2, samples=400, const plot, very thick] {#3};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\CtwoThresholdGraph}[7]{
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\supportA}{#1}
+			\pgfmathsetmacro{\supportB}{#2}
+			\pgfmathsetmacro{\pad}{0.12*(\supportB-\supportA)}
+			\begin{axis}[
+				width=9cm,
+				height=5cm,
+				axis lines=left,
+				xlabel={$x$},
+				ylabel={$f(x)$},
+				xmin={\supportA-\pad},
+				xmax={\supportB+\pad},
+				ymin=0,
+				ymax=#6,
+				grid=both,
+				xtick={#5}
+				]
+				\addplot[domain=#1:#4, samples=400, const plot, draw=none, fill=red!25, fill opacity=0.55] {#3} \closedcycle;
+				\addplot[domain=#4:#2, samples=400, const plot, draw=none, fill=green!25, fill opacity=0.55] {#3} \closedcycle;
+				\addplot[domain=#1:#2, samples=400, const plot, very thick, blue] {#3};
+				\addplot[dashed, thick, black] coordinates {(#4,0) (#4,#7)};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\LinearProbGraph}[6]{
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\supportA}{#1}
+			\pgfmathsetmacro{\supportB}{#2}
+			\pgfmathsetmacro{\pad}{0.12*(\supportB-\supportA)}
+			\begin{axis}[
+				width=9cm,
+				height=5cm,
+				axis lines=left,
+				xlabel={$x$},
+				ylabel={$f(x)$},
+				xmin={\supportA-\pad},
+				xmax={\supportB+\pad},
+				ymin=0,
+				ymax=0.075,
+				grid=both,
+				xtick={#6}
+				]
+				\addplot[domain=#1:#2, samples=150, draw=none, fill=blue!20, fill opacity=0.35] {#3} \closedcycle;
+				\addplot[domain=#4:#5, samples=150, draw=none, fill=blue!60, fill opacity=0.55] {#3} \closedcycle;
+				\addplot[smooth, domain=#1:#2, samples=150] {#3};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\LinearThresholdGraph}[7]{
+	\begin{center}
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\supportA}{#1}
+			\pgfmathsetmacro{\supportB}{#2}
+			\pgfmathsetmacro{\pad}{0.12*(\supportB-\supportA)}
+			\begin{axis}[
+				width=9cm,
+				height=5cm,
+				axis lines=left,
+				xlabel={$x$},
+				ylabel={$f(x)$},
+				xmin={\supportA-\pad},
+				xmax={\supportB+\pad},
+				ymin=0,
+				ymax=#6,
+				grid=both,
+				xtick={#5}
+				]
+				\addplot[domain=#1:#4, samples=180, draw=none, fill=red!25, fill opacity=0.55] {#3} \closedcycle;
+				\addplot[domain=#4:#2, samples=180, draw=none, fill=green!25, fill opacity=0.55] {#3} \closedcycle;
+				\addplot[smooth, domain=#1:#2, samples=180, very thick, blue] {#3};
+				\addplot[dashed, thick, black] coordinates {(#4,0) (#4,#7)};
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+\newcommand{\InvestmentUniformDensityGraph}[5]{%
+	\begin{tikzpicture}
+		\pgfmathsetmacro{\GraphXMin}{(#1)-0.8}
+		\pgfmathsetmacro{\GraphXMax}{(#2)+0.8}
+		\pgfmathsetmacro{\PdfHeight}{#3}
+		\begin{axis}[
+			width=5.3cm,
+			height=2.6cm,
+			axis lines=left,
+			xmin=\GraphXMin,
+			xmax=\GraphXMax,
+			ymin=0,
+			ymax=#4,
+			xtick={#5},
+			ytick=\empty,
+			tick label style={font=\scriptsize},
+			xlabel={$v$},
+			xlabel style={font=\scriptsize},
+			grid=both,
+			clip=false
+			]
+			\addplot[very thick, blue] coordinates {(#1,\PdfHeight) (#2,\PdfHeight)};
+			\addplot[thick, blue] coordinates {(#1,0) (#1,\PdfHeight)};
+			\addplot[thick, blue] coordinates {(#2,0) (#2,\PdfHeight)};
+		\end{axis}
+	\end{tikzpicture}%
+}
+
+\newcommand{\InvestmentThresholdGraph}[6]{%
+	\begin{tikzpicture}
+		\pgfmathsetmacro{\GraphXMin}{(#1)-0.8}
+		\pgfmathsetmacro{\GraphXMax}{(#2)+0.8}
+		\pgfmathsetmacro{\PdfHeight}{#3}
+		\begin{axis}[
+			width=5.3cm,
+			height=2.6cm,
+			axis lines=left,
+			xmin=\GraphXMin,
+			xmax=\GraphXMax,
+			ymin=0,
+			ymax=#6,
+			xtick={#5},
+			ytick=\empty,
+			tick label style={font=\scriptsize},
+			xlabel={$v$},
+			xlabel style={font=\scriptsize},
+			grid=both,
+			clip=false
+			]
+			\draw[fill=red!25, draw=none] (axis cs:#1,0) rectangle (axis cs:#4,\PdfHeight);
+			\draw[fill=green!20, draw=none] (axis cs:#4,0) rectangle (axis cs:#2,\PdfHeight);
+			\addplot[very thick, blue] coordinates {(#1,\PdfHeight) (#2,\PdfHeight)};
+			\addplot[thick, blue] coordinates {(#1,0) (#1,\PdfHeight)};
+			\addplot[thick, blue] coordinates {(#2,0) (#2,\PdfHeight)};
+			\addplot[dashed, thick, black] coordinates {(#4,0) (#4,\PdfHeight)};
+			\node[font=\scriptsize, anchor=south] at (axis cs:#4,\PdfHeight) {investment};
+		\end{axis}
+	\end{tikzpicture}%
+}

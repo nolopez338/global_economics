@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="../../assets/png/icon_calendar.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2026–2027 Academic Calendar</title>
+  <link rel="stylesheet" href="../assets/css/general_calendar.css" />
+</head>
+<body>
+  <main>
+    <div class="page-header">
+      <a id="week-view-link" class="header-button" href="./teacher/schedule.html">Week View</a>
+      <h1>2026–2027 Academic Calendar</h1>
+    </div>
+    <section id="highlights-legend" class="legend-block" aria-label="Calendar highlights"></section>
+    <p id="notice" class="notice" hidden></p>
+    <section id="calendar-year" class="calendar-year" aria-label="2026–2027 academic-year calendar"></section>
+    <section id="filter-section" class="filter-section" aria-label="Date range filter">
+      <div class="filter-header">
+        <h2 class="filter-title">Filters</h2>
+        <button id="filter-toggle" class="filter-toggle" type="button" aria-controls="filter-content" aria-expanded="true">
+          ↑
+        </button>
+      </div>
+      <div id="filter-content" class="filter-content">
+        <div class="filter-field">
+          <label for="from-date" class="filter-label">From</label>
+          <input id="from-date" class="filter-input" type="date" value="2026-08-01" min="2026-08-01" max="2027-06-30" />
+        </div>
+        <div class="filter-field">
+          <label for="to-date" class="filter-label">To</label>
+          <input id="to-date" class="filter-input" type="date" value="2027-06-30" min="2026-08-01" max="2027-06-30" />
+        </div>
+      </div>
+    </section>
+
+    <section class="theme-toggle-section" aria-label="Theme controls">
+      <label class="theme-toggle" for="dark-mode-toggle">
+        <span class="theme-toggle-label">Dark mode</span>
+        <span class="theme-toggle-control">
+          <input type="checkbox" id="dark-mode-toggle" aria-label="Toggle dark mode">
+          <span class="theme-toggle-slider" aria-hidden="true"></span>
+        </span>
+      </label>
+    </section>
+  </main>
+
+  <script src="../assets/js/databases/year-calendar-data.js"></script>
+  <script src="../assets/js/theme-toggle.js"></script>
+  <script>
+    (function initializeYearCalendar() {
+      const calendar = window.academicCalendar;
+      const container = document.getElementById("calendar-year");
+      const notice = document.getElementById("notice");
+      const fromDateInput = document.getElementById("from-date");
+      const toDateInput = document.getElementById("to-date");
+      const filterSection = document.getElementById("filter-section");
+      const filterToggleButton = document.getElementById("filter-toggle");
+      const legendContainer = document.getElementById("highlights-legend");
+      const ACADEMIC_YEAR = "2026-2027";
+      const DEFAULT_FROM_DATE = "2026-08-01";
+      const DEFAULT_TO_DATE = "2027-06-30";
+      const FROM_STORAGE_KEY = "generalCalendar.fromDate";
+      const TO_STORAGE_KEY = "generalCalendar.toDate";
+      const FILTER_VISIBILITY_STORAGE_KEY = "generalCalendar.filtersCollapsed";
+      const HIGHLIGHT_COLORS_STORAGE_KEY = "generalCalendar.highlightColors";
+
+      const weekViewLink = document.getElementById("week-view-link");
+      const origin = new URLSearchParams(window.location.search).get("origin");
+      const returnTargets = {
+        "schedule": "../schedule.html",
+        "schedule-teacher": "../schedule-teacher.html",
+      };
+      if (weekViewLink) {
+        weekViewLink.href = returnTargets[origin] || returnTargets.schedule;
+      }
+
+      if (!calendar || !container || !notice || !fromDateInput || !toDateInput ||
+          !filterSection || !filterToggleButton || !legendContainer) {
+        if (notice) {
+          notice.hidden = false;
+          notice.textContent = "Unable to load academic calendar data.";
+        }
+        return;
+      }
+
+      const config = calendar.academicYearRegistry[ACADEMIC_YEAR];
+      if (!config) {
+        notice.hidden = false;
+        notice.textContent = `Unable to load the ${ACADEMIC_YEAR} academic calendar.`;
+        return;
+      }
+
+      function toIsoLocalDate(date) {
+        return [
+          String(date.getFullYear()).padStart(4, "0"),
+          String(date.getMonth() + 1).padStart(2, "0"),
+          String(date.getDate()).padStart(2, "0"),
+        ].join("-");
+      }
+
+      const todayIsoDate = toIsoLocalDate(new Date());
+
+      function getAcademicMonths() {
+        const months = [];
+        let year = config.firstMonth.calendarYear;
+        let month = config.firstMonth.month;
+        const lastMonthValue = config.lastMonth.calendarYear * 12 + config.lastMonth.month;
+
+        while (year * 12 + month <= lastMonthValue) {
+          months.push(calendar.getAcademicMonthData(ACADEMIC_YEAR, month, year));
+          month += 1;
+          if (month === 13) {
+            month = 1;
+            year += 1;
+          }
+        }
+        return months;
+      }
+
+      const academicMonths = getAcademicMonths();
+      const termClasses = new Map(config.terms.map((term, index) => [term.name, `term-${index + 1}`]));
+      const legendItems = [
+        ...config.terms.map((term, index) => ({
+          id: `term-${index + 1}`,
+          label: term.name,
+          colorVar: `--term-${index + 1}`,
+          defaultColor: ["#3e5ca8", "#8a4f9e", "#288567"][index] || "#3e5ca8",
+        })),
+        { id: "holidays", label: "Holiday", className: "holiday", colorVar: "--highlight-holidays", defaultColor: "#e0b52e" },
+        { id: "today", label: "Today", className: "today", colorVar: "--highlight-today", defaultColor: "#dbe9ff" },
+      ];
+
+      function normalizeHexColor(value, fallback) {
+        if (typeof value !== "string") return fallback;
+        const match = /^#([a-f\d]{6}|[a-f\d]{3})$/i.exec(value.trim());
+        if (!match) return fallback;
+        const digits = match[1].length === 3
+          ? match[1].split("").map((digit) => digit.repeat(2)).join("")
+          : match[1];
+        return `#${digits.toLowerCase()}`;
+      }
+
+      function applyLegendColors() {
+        legendItems.forEach((item) => {
+          document.documentElement.style.setProperty(item.colorVar, item.currentColor);
+        });
+      }
+
+      function restoreLegendColors() {
+        let stored = {};
+        try {
+          stored = JSON.parse(localStorage.getItem(HIGHLIGHT_COLORS_STORAGE_KEY) || "{}") || {};
+        } catch (error) {
+          // Storage is optional.
+        }
+        legendItems.forEach((item) => {
+          item.currentColor = normalizeHexColor(stored[item.id], item.defaultColor);
+        });
+        applyLegendColors();
+      }
+
+      function saveLegendColors() {
+        try {
+          localStorage.setItem(
+            HIGHLIGHT_COLORS_STORAGE_KEY,
+            JSON.stringify(Object.fromEntries(legendItems.map((item) => [item.id, item.currentColor])))
+          );
+        } catch (error) {
+          // Storage is optional.
+        }
+      }
+
+      function renderLegend() {
+        const title = document.createElement("h2");
+        title.className = "legend-title";
+        title.textContent = "Calendar key";
+
+        const list = document.createElement("ul");
+        list.className = "legend-list";
+        legendItems.forEach((legendItem) => {
+          const { id, label } = legendItem;
+          const item = document.createElement("li");
+          item.className = "legend-item";
+          item.setAttribute("role", "button");
+          item.setAttribute("tabindex", "0");
+          item.title = `Change color for ${label}`;
+          const swatch = document.createElement("span");
+          swatch.className = `legend-swatch legend-${id}`;
+          swatch.setAttribute("aria-hidden", "true");
+          item.append(swatch, document.createTextNode(label));
+
+          const colorInput = document.createElement("input");
+          colorInput.className = "legend-color-input";
+          colorInput.type = "color";
+          colorInput.value = legendItem.currentColor;
+          colorInput.setAttribute("aria-label", `Pick color for ${label}`);
+          const openPicker = () => colorInput.click();
+          item.addEventListener("click", openPicker);
+          item.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              openPicker();
+            }
+          });
+          colorInput.addEventListener("input", () => {
+            legendItem.currentColor = normalizeHexColor(colorInput.value, legendItem.defaultColor);
+            applyLegendColors();
+            saveLegendColors();
+          });
+          item.appendChild(colorInput);
+          list.appendChild(item);
+        });
+        legendContainer.replaceChildren(title, list);
+      }
+
+      function isValidDateString(value) {
+        if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+        try {
+          return calendar.normalizeDate(value) === value;
+        } catch (error) {
+          return false;
+        }
+      }
+
+      function normalizeStoredDate(value, fallback) {
+        return isValidDateString(value) && value >= DEFAULT_FROM_DATE && value <= DEFAULT_TO_DATE
+          ? value
+          : fallback;
+      }
+
+      function getCurrentRange() {
+        const from = normalizeStoredDate(fromDateInput.value, DEFAULT_FROM_DATE);
+        const to = normalizeStoredDate(toDateInput.value, DEFAULT_TO_DATE);
+        return { from, to, isValid: from <= to };
+      }
+
+      function restoreFilterState() {
+        let from = null;
+        let to = null;
+        try {
+          from = localStorage.getItem(FROM_STORAGE_KEY);
+          to = localStorage.getItem(TO_STORAGE_KEY);
+        } catch (error) {
+          // Storage is optional.
+        }
+        fromDateInput.value = normalizeStoredDate(from, DEFAULT_FROM_DATE);
+        toDateInput.value = normalizeStoredDate(to, DEFAULT_TO_DATE);
+        if (fromDateInput.value > toDateInput.value) {
+          fromDateInput.value = DEFAULT_FROM_DATE;
+          toDateInput.value = DEFAULT_TO_DATE;
+        }
+      }
+
+      function saveFilterState() {
+        const range = getCurrentRange();
+        if (!range.isValid) return;
+        try {
+          localStorage.setItem(FROM_STORAGE_KEY, range.from);
+          localStorage.setItem(TO_STORAGE_KEY, range.to);
+        } catch (error) {
+          // Storage is optional.
+        }
+      }
+
+      function renderCalendar() {
+        const range = getCurrentRange();
+        container.replaceChildren();
+        if (!range.isValid) {
+          notice.hidden = false;
+          notice.textContent = "Invalid range: From date must be on or before To date.";
+          return;
+        }
+        notice.hidden = true;
+        notice.textContent = "";
+
+        academicMonths.forEach(({ calendarYear, monthData }) => {
+          const monthCard = document.createElement("article");
+          monthCard.className = "month-card";
+          monthCard.setAttribute("aria-label", `${monthData.name} ${calendarYear}`);
+
+          const heading = document.createElement("h2");
+          heading.className = "month-name";
+          heading.textContent = `${monthData.name} ${calendarYear}`;
+          monthCard.appendChild(heading);
+
+          const weekdayRow = document.createElement("div");
+          weekdayRow.className = "weekday-row";
+          weekdayRow.setAttribute("aria-hidden", "true");
+          calendar.getCalendarData(calendarYear).weekdays.forEach((label) => {
+            const weekday = document.createElement("div");
+            weekday.className = "weekday";
+            weekday.textContent = label;
+            weekdayRow.appendChild(weekday);
+          });
+          monthCard.appendChild(weekdayRow);
+
+          const monthGrid = document.createElement("div");
+          monthGrid.className = "month-grid";
+          monthData.weeks.forEach((week) => {
+            const weekRow = document.createElement("div");
+            weekRow.className = "week-row";
+            week.forEach((day) => {
+              const dayCell = document.createElement("div");
+              dayCell.className = "day-cell";
+              if (day === null) {
+                dayCell.classList.add("empty");
+                dayCell.setAttribute("aria-hidden", "true");
+                weekRow.appendChild(dayCell);
+                return;
+              }
+
+              const isoDate = `${calendarYear}-${String(monthData.month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+              if (isoDate < range.from || isoDate > range.to) {
+                dayCell.classList.add("filtered");
+                dayCell.setAttribute("aria-hidden", "true");
+                weekRow.appendChild(dayCell);
+                return;
+              }
+
+              const info = calendar.getAcademicDateInfo(isoDate);
+              const termClass = info.term ? termClasses.get(info.term) : null;
+              const accessibleParts = [isoDate];
+              const dayNumber = document.createElement("span");
+              dayNumber.className = "day-number";
+              dayNumber.textContent = String(day);
+              dayCell.appendChild(dayNumber);
+              dayCell.classList.add("selectable-date");
+              dayCell.setAttribute("role", "link");
+              dayCell.setAttribute("tabindex", "0");
+              const openFullSchedule = () => {
+                window.location.href = `full_schedule.html?date=${encodeURIComponent(isoDate)}`;
+              };
+              dayCell.addEventListener("click", openFullSchedule);
+              dayCell.addEventListener("keydown", (event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  openFullSchedule();
+                }
+              });
+
+              if (termClass) {
+                dayCell.classList.add(termClass);
+                accessibleParts.push(info.term);
+              }
+              if (info.cycleNumber !== null && info.cycleDay !== null) {
+                const cycle = document.createElement("span");
+                cycle.className = "cycle-day";
+                if (termClass) {
+                  cycle.classList.add(termClass);
+                }
+                cycle.textContent = `${info.cycleNumber}-${info.cycleDay}`;
+                cycle.setAttribute("aria-hidden", "true");
+                dayCell.appendChild(cycle);
+                accessibleParts.push(`cycle ${info.cycleNumber}, day ${info.cycleDay}`);
+              }
+              if (info.holiday) {
+                dayCell.classList.add("holiday");
+                const holiday = document.createElement("span");
+                holiday.className = "special-date";
+                holiday.textContent = info.holiday.name;
+                dayCell.appendChild(holiday);
+                accessibleParts.push(info.holiday.name);
+              }
+              if (isoDate === todayIsoDate) {
+                dayCell.classList.add("today");
+                accessibleParts.push("today");
+              }
+              dayCell.setAttribute("aria-label", accessibleParts.join(", "));
+              weekRow.appendChild(dayCell);
+            });
+            monthGrid.appendChild(weekRow);
+          });
+          monthCard.appendChild(monthGrid);
+          container.appendChild(monthCard);
+        });
+      }
+
+      function setFiltersCollapsed(collapsed) {
+        filterSection.classList.toggle("is-collapsed", collapsed);
+        filterToggleButton.setAttribute("aria-expanded", String(!collapsed));
+        filterToggleButton.textContent = collapsed ? "↓" : "↑";
+      }
+
+      function restoreFilterVisibility() {
+        let collapsed = false;
+        try {
+          collapsed = localStorage.getItem(FILTER_VISIBILITY_STORAGE_KEY) === "true";
+        } catch (error) {
+          // Storage is optional.
+        }
+        setFiltersCollapsed(collapsed);
+      }
+
+      function handleFilterInput() {
+        saveFilterState();
+        renderCalendar();
+      }
+
+      fromDateInput.addEventListener("input", handleFilterInput);
+      toDateInput.addEventListener("input", handleFilterInput);
+      filterToggleButton.addEventListener("click", () => {
+        const collapsed = !filterSection.classList.contains("is-collapsed");
+        setFiltersCollapsed(collapsed);
+        try {
+          localStorage.setItem(FILTER_VISIBILITY_STORAGE_KEY, String(collapsed));
+        } catch (error) {
+          // Storage is optional.
+        }
+      });
+
+      restoreLegendColors();
+      renderLegend();
+      restoreFilterVisibility();
+      restoreFilterState();
+      renderCalendar();
+    })();
+  </script>
+</body>
+</html>

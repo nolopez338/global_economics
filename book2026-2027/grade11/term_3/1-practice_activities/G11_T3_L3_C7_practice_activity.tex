@@ -1,0 +1,505 @@
+\makeatletter
+\def\input@path{{./}{../}{../../}{../../../}{../../../../}{preamble/}{../preamble/}{../../preamble/}{../../../preamble/}}
+\makeatother
+
+\input{preamble_exams.tex}
+
+% #1 = coefficient k in the curve y = k\sqrt{n}
+% #2 = critical value shown as a horizontal line
+% #3 = x-axis maximum
+% #4 = y-axis maximum
+% #5 = minimum sample size n_{\min}, shown as a vertical line
+\newcommand{\MinNGraph}[5]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\begin{axis}[
+				width=0.72\textwidth,
+				height=5.2cm,
+				xlabel={$n$},
+				ylabel={$k\sqrt{n}$ and critical value},
+				xmin=0,
+				xmax=#3,
+				ymin=0,
+				ymax=#4,
+				grid=both,
+				legend style={at={(0.02,0.98)},anchor=north west,font=\scriptsize}
+				]
+				\addplot[red,very thick,domain=1:#5,samples=120]{#1*sqrt(x)};
+				\addlegendentry{$#1\sqrt{n}$ below critical}
+				
+				\addplot[green!60!black,very thick,domain=#5:#3,samples=120]{#1*sqrt(x)};
+				\addlegendentry{$#1\sqrt{n}$ above critical}
+				
+				\addplot[blue!70!black,ultra thick,dashed] coordinates {(0,#2) (#3,#2)};
+				\addlegendentry{critical $=#2$}
+				
+				\addplot[blue!70!black,ultra thick,densely dotted] coordinates {(#5,0) (#5,#4)};
+				\addlegendentry{$n_{\min}=#5$}
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+% #1 = coefficient k in the curve y = -k\sqrt{n}
+% #2 = critical value z_{\alpha}, shown in the graph as -#2
+% #3 = x-axis maximum
+% #4 = y-axis minimum
+% #5 = minimum sample size n_{\min}, shown as a vertical line
+\newcommand{\LeftTailMinNGraph}[5]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\begin{axis}[
+				width=0.72\textwidth,
+				height=5.2cm,
+				xlabel={$n$},
+				ylabel={$-k\sqrt{n}$ and critical value},
+				xmin=0,
+				xmax=#3,
+				ymin=#4,
+				ymax=0,
+				grid=both,
+				legend style={at={(0.02,0.02)},anchor=south west,font=\scriptsize}
+				]
+				\addplot[green!60!black,very thick,domain=1:#5,samples=120]{-#1*sqrt(x)};
+				\addlegendentry{$-#1\sqrt{n}$ above critical}
+				
+				\addplot[red,very thick,domain=#5:#3,samples=120]{-#1*sqrt(x)};
+				\addlegendentry{$-#1\sqrt{n}$ below critical}
+				
+				\addplot[blue!70!black,ultra thick,dashed] coordinates {(0,-#2) (#3,-#2)};
+				\addlegendentry{critical $=-#2$}
+				
+				\addplot[blue!70!black,ultra thick,densely dotted] coordinates {(#5,0) (#5,#4)};
+				\addlegendentry{$n_{\min}=#5$}
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+% #1 = coefficient k in z = k\sqrt{n}
+% #2 = x-axis maximum
+% #3 = y-axis maximum
+% #4 = critical value for higher-tail, \alpha=10\%
+% #5 = critical value for higher-tail, \alpha=5\% and two-tailed, \alpha=10\%
+% #6 = critical value for two-tailed, \alpha=5\%
+% #7 = n_{\min} for higher-tail, \alpha=10\%
+% #8 = n_{\min} for higher-tail, \alpha=5\% and two-tailed, \alpha=10\%
+% #9 = n_{\min} for two-tailed, \alpha=5\%
+\newcommand{\CompareTailThresholdsGraph}[9]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\begin{axis}[
+				width=0.82\textwidth,
+				height=7cm,
+				xlabel={$n$},
+				ylabel={$z=#1\sqrt{n}$ and critical values},
+				xmin=0,
+				xmax=#2,
+				ymin=0,
+				ymax=#3,
+				grid=both,
+				legend style={at={(0.5,1.03)},anchor=south,font=\scriptsize},
+				every axis plot/.append style={thick}
+				]
+				\addplot[blue,domain=1:#2,samples=200]{#1*sqrt(x)};
+				\addlegendentry{$z=#1\sqrt{n}$}
+				
+				\addplot[red,ultra thick,dashed] coordinates {(0,#4) (#2,#4)};
+				\addlegendentry{Higher-tail, $\alpha=10\%$: $z_{\alpha}=#4$}
+				
+				\addplot[orange!85!black,ultra thick,dashed] coordinates {(0,#5) (#2,#5)};
+				\addlegendentry{Higher-tail, $\alpha=5\%$ and two-tailed, $\alpha=10\%$: $#5$}
+				
+				\addplot[green!60!black,ultra thick,dashed] coordinates {(0,#6) (#2,#6)};
+				\addlegendentry{Two-tailed, $\alpha=5\%$: $z_{\alpha/2}=#6$}
+				
+				\addplot[red,ultra thick,densely dotted] coordinates {(#7,0) (#7,#4)};
+				\addplot[orange!85!black,ultra thick,densely dotted] coordinates {(#8,0) (#8,#5)};
+				\addplot[green!60!black,ultra thick,densely dotted] coordinates {(#9,0) (#9,#6)};
+				
+				\addplot[only marks,mark=*,mark size=2pt,red] coordinates {(#7,#4)};
+				\addplot[only marks,mark=*,mark size=2pt,orange!85!black] coordinates {(#8,#5)};
+				\addplot[only marks,mark=*,mark size=2pt,green!60!black] coordinates {(#9,#6)};
+				
+				\node[font=\scriptsize,anchor=south] at (axis cs:#7,0.06) {$n=#7$};
+				\node[font=\scriptsize,anchor=south] at (axis cs:#8,0.06) {$n=#8$};
+				\node[font=\scriptsize,anchor=south] at (axis cs:#9,0.06) {$n=#9$};
+				
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+% #1 = coefficient k in z = -k\sqrt{n}
+% #2 = x-axis maximum
+% #3 = y-axis minimum
+% #4 = critical value for left-tail, \alpha=10\%
+% #5 = critical value for left-tail, \alpha=5\% and two-tailed, \alpha=10\%
+% #6 = critical value for two-tailed, \alpha=5\%
+% #7 = n_{\min} for left-tail, \alpha=10\%
+% #8 = n_{\min} for left-tail, \alpha=5\% and two-tailed, \alpha=10\%
+% #9 = n_{\min} for two-tailed, \alpha=5\%
+\newcommand{\CompareLeftTailThresholdsGraph}[9]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\begin{axis}[
+				width=0.82\textwidth,
+				height=7cm,
+				xlabel={$n$},
+				ylabel={$z=-#1\sqrt{n}$ and critical values},
+				xmin=0,
+				xmax=#2,
+				ymin=#3,
+				ymax=0,
+				grid=both,
+				legend style={at={(0.5,1.03)},anchor=south,font=\scriptsize},
+				every axis plot/.append style={thick}
+				]
+				\addplot[blue,domain=1:#2,samples=200]{-#1*sqrt(x)};
+				\addlegendentry{$z=-#1\sqrt{n}$}
+				
+				\addplot[red,ultra thick,dashed] coordinates {(0,-#4) (#2,-#4)};
+				\addlegendentry{Left-tail, $\alpha=10\%$: $-z_{\alpha}=-#4$}
+				
+				\addplot[orange!85!black,ultra thick,dashed] coordinates {(0,-#5) (#2,-#5)};
+				\addlegendentry{Left-tail, $\alpha=5\%$ and two-tailed, $\alpha=10\%$: $-#5$}
+				
+				\addplot[green!60!black,ultra thick,dashed] coordinates {(0,-#6) (#2,-#6)};
+				\addlegendentry{Two-tailed, $\alpha=5\%$: $-z_{\alpha/2}=-#6$}
+				
+				\addplot[red,ultra thick,densely dotted] coordinates {(#7,0) (#7,-#4)};
+				\addplot[orange!85!black,ultra thick,densely dotted] coordinates {(#8,0) (#8,-#5)};
+				\addplot[green!60!black,ultra thick,densely dotted] coordinates {(#9,0) (#9,-#6)};
+				
+				\addplot[only marks,mark=*,mark size=2pt,red] coordinates {(#7,-#4)};
+				\addplot[only marks,mark=*,mark size=2pt,orange!85!black] coordinates {(#8,-#5)};
+				\addplot[only marks,mark=*,mark size=2pt,green!60!black] coordinates {(#9,-#6)};
+				
+				\node[font=\scriptsize,anchor=north] at (axis cs:#7,-0.06) {$n=#7$};
+				\node[font=\scriptsize,anchor=north] at (axis cs:#8,-0.06) {$n=#8$};
+				\node[font=\scriptsize,anchor=north] at (axis cs:#9,-0.06) {$n=#9$};
+				
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+
+% #1 = coefficient k in z = k\sqrt{n}
+% #2 = x-axis maximum
+% #3 = y-axis maximum
+% #4 = critical value for \alpha=10\%
+% #5 = critical value for \alpha=5\%
+% #6 = critical value for \alpha=1\%
+% #7 = n_{\min} for \alpha=10\%
+% #8 = n_{\min} for \alpha=5\%
+% #9 = n_{\min} for \alpha=1\%
+\newcommand{\RightTailMultipleSignificanceGraph}[9]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\begin{axis}[
+				width=0.82\textwidth,
+				height=7cm,
+				xlabel={$n$},
+				ylabel={$z=#1\sqrt{n}$ and critical values},
+				xmin=0,
+				xmax=#2,
+				ymin=0,
+				ymax=#3,
+				grid=both,
+				legend style={at={(0.5,1.03)},anchor=south,font=\scriptsize},
+				every axis plot/.append style={thick}
+				]
+				\addplot[blue,domain=1:#2,samples=200]{#1*sqrt(x)};
+				\addlegendentry{$z=#1\sqrt{n}$}
+				
+				\addplot[red,ultra thick,dashed] coordinates {(0,#4) (#2,#4)};
+				\addlegendentry{Right-tail, $\alpha=10\%$: $z_{\alpha}=#4$}
+				
+				\addplot[orange!85!black,ultra thick,dashed] coordinates {(0,#5) (#2,#5)};
+				\addlegendentry{Right-tail, $\alpha=5\%$: $z_{\alpha}=#5$}
+				
+				\addplot[green!60!black,ultra thick,dashed] coordinates {(0,#6) (#2,#6)};
+				\addlegendentry{Right-tail, $\alpha=1\%$: $z_{\alpha}=#6$}
+				
+				\addplot[red,ultra thick,densely dotted] coordinates {(#7,0) (#7,#4)};
+				\addplot[orange!85!black,ultra thick,densely dotted] coordinates {(#8,0) (#8,#5)};
+				\addplot[green!60!black,ultra thick,densely dotted] coordinates {(#9,0) (#9,#6)};
+				
+				\addplot[only marks,mark=*,mark size=2pt,red] coordinates {(#7,#4)};
+				\addplot[only marks,mark=*,mark size=2pt,orange!85!black] coordinates {(#8,#5)};
+				\addplot[only marks,mark=*,mark size=2pt,green!60!black] coordinates {(#9,#6)};
+				
+				\node[font=\scriptsize,anchor=south] at (axis cs:#7,0.06) {$n=#7$};
+				\node[font=\scriptsize,anchor=south] at (axis cs:#8,0.06) {$n=#8$};
+				\node[font=\scriptsize,anchor=south] at (axis cs:#9,0.06) {$n=#9$};
+				
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+% #1 = coefficient k in z = -k\sqrt{n}
+% #2 = x-axis maximum
+% #3 = y-axis minimum
+% #4 = critical value for \alpha=10\%
+% #5 = critical value for \alpha=5\%
+% #6 = critical value for \alpha=1\%
+% #7 = n_{\min} for \alpha=10\%
+% #8 = n_{\min} for \alpha=5\%
+% #9 = n_{\min} for \alpha=1\%
+\newcommand{\LeftTailMultipleSignificanceGraph}[9]{%
+	\begin{center}
+		\begin{tikzpicture}
+			\begin{axis}[
+				width=0.82\textwidth,
+				height=7cm,
+				xlabel={$n$},
+				ylabel={$z=-#1\sqrt{n}$ and critical values},
+				xmin=0,
+				xmax=#2,
+				ymin=#3,
+				ymax=0,
+				grid=both,
+				legend style={at={(0.5,1.03)},anchor=south,font=\scriptsize},
+				every axis plot/.append style={thick}
+				]
+				\addplot[blue,domain=1:#2,samples=200]{-#1*sqrt(x)};
+				\addlegendentry{$z=-#1\sqrt{n}$}
+				
+				\addplot[red,ultra thick,dashed] coordinates {(0,-#4) (#2,-#4)};
+				\addlegendentry{Left-tail, $\alpha=10\%$: $-z_{\alpha}=-#4$}
+				
+				\addplot[orange!85!black,ultra thick,dashed] coordinates {(0,-#5) (#2,-#5)};
+				\addlegendentry{Left-tail, $\alpha=5\%$: $-z_{\alpha}=-#5$}
+				
+				\addplot[green!60!black,ultra thick,dashed] coordinates {(0,-#6) (#2,-#6)};
+				\addlegendentry{Left-tail, $\alpha=1\%$: $-z_{\alpha}=-#6$}
+				
+				\addplot[red,ultra thick,densely dotted] coordinates {(#7,0) (#7,-#4)};
+				\addplot[orange!85!black,ultra thick,densely dotted] coordinates {(#8,0) (#8,-#5)};
+				\addplot[green!60!black,ultra thick,densely dotted] coordinates {(#9,0) (#9,-#6)};
+				
+				\addplot[only marks,mark=*,mark size=2pt,red] coordinates {(#7,-#4)};
+				\addplot[only marks,mark=*,mark size=2pt,orange!85!black] coordinates {(#8,-#5)};
+				\addplot[only marks,mark=*,mark size=2pt,green!60!black] coordinates {(#9,-#6)};
+				
+				\node[font=\scriptsize,anchor=north] at (axis cs:#7,-0.06) {$n=#7$};
+				\node[font=\scriptsize,anchor=north] at (axis cs:#8,-0.06) {$n=#8$};
+				\node[font=\scriptsize,anchor=north] at (axis cs:#9,-0.06) {$n=#9$};
+				
+			\end{axis}
+		\end{tikzpicture}
+	\end{center}
+}
+
+
+\title{Term 3 --- Lesson 1 Practice Activity (C7) with Solutions}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\section*{Evaluated criterion}
+\begin{itemize}
+\item C7: Uses one-sample mean \(z\)-tests with known \(\sigma\) to find the minimum sample size required to reject \(H_0\), then interprets the result in context.
+\end{itemize}
+
+\section{Reference rule for all problems}
+
+For the sample mean case,
+\[
+z=\frac{\bar x-\mu_0}{\sigma/\sqrt{n}}.
+\]
+
+Solving for \(n\),
+\[
+z=\frac{(\bar x-\mu_0)\sqrt{n}}{\sigma}
+\qquad \longrightarrow \qquad
+z\sigma=(\bar x-\mu_0)\sqrt{n}
+\qquad \longrightarrow \qquad
+\sqrt{n}=\frac{z\sigma}{\bar x-\mu_0}
+\qquad \longrightarrow \qquad
+n=\left(\frac{z\sigma}{\bar x-\mu_0}\right)^2.
+\]
+
+Using a required critical value \(z^*\), the full expression is
+\[
+n=\left(\frac{z^*\sigma}{\bar x-\mu_0}\right)^2.
+\]
+
+For the proportion case, the notation changes from \(\bar x\) to \(\hat p\), and from \(\mu_0\) to \(p_0\). The standard deviation can be calculated directly using \(p_0\):
+\[
+\sigma_{\hat p}=\sqrt{p_0(1-p_0)}.
+\]
+
+Therefore, for the proportion case,
+\[
+z=\frac{\hat p-p_0}{\frac{\sqrt{p_0(1-p_0)}}{\sqrt{n}}} = \frac{\hat p-p_0}{\sqrt{\frac{p_0(1-p_0)}{n}}}..
+\]
+
+Solving for \(n\),
+\[
+z=\frac{(\hat p-p_0)\sqrt{n}}{\sqrt{p_0(1-p_0)}}
+\qquad \longrightarrow \qquad
+\sqrt{n}=\frac{z\sqrt{p_0(1-p_0)}}{\hat p-p_0}
+\qquad \longrightarrow \qquad
+n=\left(\frac{z\sqrt{p_0(1-p_0)}}{\hat p-p_0}\right)^2.
+\]
+
+Using a required critical value \(z^*\), the full expression is
+\[
+n=\frac{(z^*)^2p_0(1-p_0)}{(\hat p-p_0)^2}.
+\]
+
+Reject \(H_0\) when: higher-tail \(z\ge z_\alpha\), lower-tail \(z\le -z_\alpha\), two-tailed \(|z|\ge z_{\alpha/2}\).
+
+\section{Problem 1: Right-tail, one significance level}
+\subsection*{C7}
+\begin{itemize}
+	\item \textbf{Context:} A previous study found that the average export price is \(120\). However, newly obtained data showed an observed export average of \(124\). We want to determine whether there is enough evidence to update the previous study's claim.
+	\item \textbf{Parameter:} \(\mu\) average export price.
+	\item \textbf{Hypotheses:} \(H_0:\mu=120\), \(H_a:\mu>120\).
+	\item \textbf{Known standard deviation:} \(\sigma=20\), \textbf{Observed mean:} \(\bar x=124\), \textbf{Significance:} \(\alpha=5\%\).
+	\item \textbf{Test statistic:} \(z(n)=\frac{124-120}{20/\sqrt n}=0.2\sqrt n\).
+	\item \textbf{Critical value:} \(z_{5\%}=1.645\).
+	\item \textbf{Inequality:} \(0.2\sqrt n\ge1.645\Rightarrow n\ge67.65\).
+	\item \textbf{Minimum sample size:} \(n_{\min}=68\).
+	\item \textbf{Interpretation:} Need at least 68 records to reject \(H_0\) and conclude that there is enough evidence to update the previous study's claim.
+\end{itemize}
+\MinNGraph{0.2}{1.645}{100}{4}{68}
+
+\section{Problem 2: Left-tail, one significance level}
+\subsection*{C7}
+\begin{itemize}
+	\item \textbf{Context:} A previous study found that the average delivery time is \(18\) days. However, newly obtained delivery-time records showed an observed average of \(17\) days. We want to determine whether there is enough evidence to update the previous study's claim and conclude that the average delivery time has decreased.
+	\item \textbf{Parameter:} \(\mu\) average delivery days.
+	\item \textbf{Hypotheses:} \(H_0:\mu=18\), \(H_a:\mu<18\).
+	\item \textbf{Known standard deviation:} \(\sigma=4\), \textbf{Observed mean:} \(\bar x=17\), \textbf{Significance:} \(\alpha=10\%\).
+	\item \textbf{Test statistic:} \(z(n)=-0.25\sqrt n\).
+	\item \textbf{Critical value:} \(-z_{10\%}=-1.282\).
+	\item \textbf{Inequality:} \(-0.25\sqrt n\le-1.282\Rightarrow n\ge26.30\).
+	\item \textbf{Minimum sample size:} \(n_{\min}=27\).
+	\item \textbf{Interpretation:} Need at least 27 observations to reject \(H_0\) and conclude that there is enough evidence to update the previous study's claim.
+\end{itemize}
+\LeftTailMinNGraph{0.25}{1.282}{80}{-4}{27}
+
+\section{Problem 3: Comparing a left-tail test and a two-tailed test}
+\subsection*{C7}
+\begin{itemize}
+	\item \textbf{Context:} A previous study found that the average income is \(900\). However, newly obtained survey data showed an observed average income of \(885\). Since the observed average is lower than \(900\), a left-tail test can be used if the goal is only to test whether income decreased. A two-tailed test can also be used if the goal is to determine whether the previous study's claim should be updated in either direction.
+	\item \textbf{Test setup:} \(\mu_0=900\), \(\bar x=885\), \(\sigma=60\), so
+	\[
+	z=\frac{885-900}{60/\sqrt n}=-0.25\sqrt n.
+	\]
+	\item \textbf{Left-tail test:} \(H_0:\mu=900\), \(H_a:\mu<900\). Reject \(H_0\) when \(z\le -z_{\alpha}\).
+	\[
+	\alpha=10\%\Rightarrow n_{\min}=27,
+	\qquad
+	\alpha=5\%\Rightarrow n_{\min}=44.
+	\]
+	\item \textbf{Two-tailed test:} \(H_0:\mu=900\), \(H_a:\mu\ne900\). Reject \(H_0\) when \(|z|\ge z_{\alpha/2}\).
+	\[
+	\alpha=10\%\Rightarrow n_{\min}=44,
+	\qquad
+	\alpha=5\%\Rightarrow n_{\min}=62.
+	\]
+	\item \textbf{Comparison:} For the same significance level, the two-tailed test requires a larger sample size because it uses a larger critical value. In this context, the left-tail test only checks for a decrease, while the two-tailed test checks for any meaningful change from the previous study's value.
+\end{itemize}
+\CompareLeftTailThresholdsGraph{0.25}{75}{-2.2}{1.282}{1.645}{1.960}{27}{44}{62}
+
+\section{Problem 4: Comparing a right-tail test and a two-tailed test}
+\subsection*{C7}
+\begin{itemize}
+	\item \textbf{Context:} A previous study found that the average income is \(900\). However, newly obtained survey data showed an observed average income of \(915\). Since the observed average is higher than \(900\), a higher-tail test can be used if the goal is only to test whether income increased. A two-tailed test can also be used if the goal is to determine whether the previous study's claim should be updated in either direction.
+	\item \textbf{Test setup:} \(\mu_0=900\), \(\bar x=915\), \(\sigma=60\), so
+	\[
+	z=\frac{915-900}{60/\sqrt n}=0.25\sqrt n.
+	\]
+	\item \textbf{Higher-tail test:} \(H_0:\mu=900\), \(H_a:\mu>900\). Reject \(H_0\) when \(z\ge z_{\alpha}\).
+	\[
+	\alpha=10\%\Rightarrow n_{\min}=27,
+	\qquad
+	\alpha=5\%\Rightarrow n_{\min}=44.
+	\]
+	\item \textbf{Two-tailed test:} \(H_0:\mu=900\), \(H_a:\mu\ne900\). Reject \(H_0\) when \(|z|\ge z_{\alpha/2}\).
+	\[
+	\alpha=10\%\Rightarrow n_{\min}=44,
+	\qquad
+	\alpha=5\%\Rightarrow n_{\min}=62.
+	\]
+	\item \textbf{Comparison:} For the same significance level, the two-tailed test requires a larger sample size because it uses a larger critical value. In this context, the higher-tail test only checks for an increase, while the two-tailed test checks for any meaningful change from the previous study's value.
+\end{itemize}
+\CompareTailThresholdsGraph{0.25}{75}{2.2}{1.282}{1.645}{1.960}{27}{44}{62}
+\section{Problem 7: Left-tail test with multiple significance levels}
+\subsection*{C7}
+\begin{itemize}
+	\item \textbf{Context:} A previous study found that the average production index is \(150\). However, newly obtained data showed an observed average production index of \(144\). Since the observed average is lower than \(150\), a left-tail test is used to determine whether there is enough evidence to update the previous study's claim and conclude that the average production index has decreased.
+	\item \textbf{Test setup:} \(\mu_0=150\), \(\bar x=144\), \(\sigma=30\), so
+	\[
+	z=\frac{144-150}{30/\sqrt n}=-0.2\sqrt n.
+	\]
+	\item \textbf{Left-tail test:} \(H_0:\mu=150\), \(H_a:\mu<150\). Reject \(H_0\) when \(z\le -z_{\alpha}\).
+	\[
+	\alpha=10\%\Rightarrow -z_{\alpha}=-1.282
+	\qquad \longrightarrow \qquad
+	-0.2\sqrt n\le-1.282
+	\qquad \longrightarrow \qquad
+	n_{\min}=42.
+	\]
+	\[
+	\alpha=5\%\Rightarrow -z_{\alpha}=-1.645
+	\qquad \longrightarrow \qquad
+	-0.2\sqrt n\le-1.645
+	\qquad \longrightarrow \qquad
+	n_{\min}=68.
+	\]
+	\[
+	\alpha=1\%\Rightarrow -z_{\alpha}=-2.326
+	\qquad \longrightarrow \qquad
+	-0.2\sqrt n\le-2.326
+	\qquad \longrightarrow \qquad
+	n_{\min}=136.
+	\]
+	\item \textbf{Comparison:} As \(\alpha\) becomes smaller, the critical value moves farther into the left tail. Therefore, a stricter significance level requires a larger minimum sample size.
+\end{itemize}
+\LeftTailMultipleSignificanceGraph{0.2}{150}{-2.6}{1.282}{1.645}{2.326}{42}{68}{136}
+
+\section{Problem 6: Right-tail test with multiple significance levels}
+\subsection*{C7}
+\begin{itemize}
+	\item \textbf{Context:} A previous study found that the average production index is \(150\). However, newly obtained data showed an observed average production index of \(156\). Since the observed average is higher than \(150\), a right-tail test is used to determine whether there is enough evidence to update the previous study's claim and conclude that the average production index has increased.
+	\item \textbf{Test setup:} \(\mu_0=150\), \(\bar x=156\), \(\sigma=30\), so
+	\[
+	z=\frac{156-150}{30/\sqrt n}=0.2\sqrt n.
+	\]
+	\item \textbf{Right-tail test:} \(H_0:\mu=150\), \(H_a:\mu>150\). Reject \(H_0\) when \(z\ge z_{\alpha}\).
+	\[
+	\alpha=10\%\Rightarrow z_{\alpha}=1.282
+	\qquad \longrightarrow \qquad
+	0.2\sqrt n\ge1.282
+	\qquad \longrightarrow \qquad
+	n_{\min}=42.
+	\]
+	\[
+	\alpha=5\%\Rightarrow z_{\alpha}=1.645
+	\qquad \longrightarrow \qquad
+	0.2\sqrt n\ge1.645
+	\qquad \longrightarrow \qquad
+	n_{\min}=68.
+	\]
+	\[
+	\alpha=1\%\Rightarrow z_{\alpha}=2.326
+	\qquad \longrightarrow \qquad
+	0.2\sqrt n\ge2.326
+	\qquad \longrightarrow \qquad
+	n_{\min}=136.
+	\]
+	\item \textbf{Comparison:} As \(\alpha\) becomes smaller, the critical value becomes larger. Therefore, a stricter significance level requires a larger minimum sample size.
+\end{itemize}
+\RightTailMultipleSignificanceGraph{0.2}{150}{2.6}{1.282}{1.645}{2.326}{42}{68}{136}
+
+
+\end{document}

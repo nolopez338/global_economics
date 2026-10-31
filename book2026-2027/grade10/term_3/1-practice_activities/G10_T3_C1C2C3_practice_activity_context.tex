@@ -1,0 +1,725 @@
+\makeatletter
+\def\input@path{{./}{../}{../../}{../../../}{../../../../}{preamble/}{../preamble/}{../../preamble/}{../../../preamble/}}
+\makeatother	
+
+\input{preamble_exams.tex}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+\title{Term 3 Practice Activity: C1 Density Functions}
+\author{}
+\date{}
+
+\begin{document}
+	\maketitle
+	
+	\setcounter{tocdepth}{1}
+	\setcounter{secnumdepth}{2}
+	\tableofcontents
+	
+	\section*{Evaluated criteria}
+	\begin{itemize}
+		\item C1. Describes probabilities in continuous variables as a density function.
+		\item C2. Explains how a uniform random variable works..
+		\item C3. Expresses how to work with distributions that have linear behaviour.
+	\end{itemize}
+	
+	
+	\newcommand{\COneGraph}[7]{
+		\begin{center}
+			\begin{tikzpicture}
+				\pgfmathsetmacro{\supportA}{#1}
+				\pgfmathsetmacro{\supportB}{#2}
+				\pgfmathsetmacro{\pad}{0.12*(\supportB-\supportA)}
+				\begin{axis}[
+					width=9cm,
+					height=5cm,
+					axis lines=left,
+					xlabel={$x$},
+					ylabel={$f(x)$},
+					xmin={\supportA-\pad},
+					xmax={\supportB+\pad},
+					ymin=0,
+					ymax=#7,
+					grid=both,
+					xtick={#6}
+					]
+					\addplot[domain=#1:#2, samples=160, draw=none, fill=blue!20, fill opacity=0.35] {#3} \closedcycle;
+					\addplot[domain=#4:#5, samples=160, draw=none, fill=blue!60, fill opacity=0.55] {#3} \closedcycle;
+					\addplot[smooth, domain=#1:#2, samples=160, thick] {#3};
+				\end{axis}
+			\end{tikzpicture}
+		\end{center}
+	}
+	
+	\newcommand{\COneCompareGraph}[6]{
+		\begin{center}
+			\begin{tikzpicture}
+				\begin{axis}[
+					width=9cm,
+					height=5cm,
+					axis lines=left,
+					xlabel={$x$},
+					ylabel={$f(x)$},
+					xmin=#1,
+					xmax=#2,
+					ymin=0,
+					ymax=#6,
+					grid=both,
+					xtick={0,1,2,3,4,5}
+					]
+					\addplot[smooth, domain=#3:#4, samples=150, thick, blue] {#5};
+					\addplot[smooth, domain=#3:#4, samples=150, thick, red, dashed] {#5*1.6};
+				\end{axis}
+			\end{tikzpicture}
+		\end{center}
+	}
+	
+	\newcommand{\CtwoProbGraph}[7]{
+		\begin{center}
+			\begin{tikzpicture}
+				\pgfmathsetmacro{\supportA}{#1}
+				\pgfmathsetmacro{\supportB}{#2}
+				\pgfmathsetmacro{\pad}{0.12*(\supportB-\supportA)}
+				\begin{axis}[
+					width=9cm,
+					height=5cm,
+					axis lines=left,
+					xlabel={$x$},
+					ylabel={$f(x)$},
+					xmin={\supportA-\pad},
+					xmax={\supportB+\pad},
+					ymin=0,
+					ymax=#7,
+					grid=both,
+					xtick={#6}
+					]
+					\addplot[domain=#1:#2, samples=400, const plot, draw=none, fill=blue!20, fill opacity=0.35] {#3} \closedcycle;
+					\addplot[domain=#4:#5, samples=400, const plot, draw=none, fill=blue!60, fill opacity=0.55] {#3} \closedcycle;
+					\addplot[domain=#1:#2, samples=400, const plot, very thick] {#3};
+				\end{axis}
+			\end{tikzpicture}
+		\end{center}
+	}
+	
+	\newcommand{\LinearProbGraph}[6]{
+		\begin{center}
+			\begin{tikzpicture}
+				\pgfmathsetmacro{\supportA}{#1}
+				\pgfmathsetmacro{\supportB}{#2}
+				\pgfmathsetmacro{\pad}{0.12*(\supportB-\supportA)}
+				\begin{axis}[
+					width=9cm,
+					height=5cm,
+					axis lines=left,
+					xlabel={$x$},
+					ylabel={$f(x)$},
+					xmin={\supportA-\pad},
+					xmax={\supportB+\pad},
+					ymin=0,
+					ymax=0.075,
+					grid=both,
+					xtick={#6}
+					]
+					\addplot[domain=#1:#2, samples=150, draw=none, fill=blue!20, fill opacity=0.35] {#3} \closedcycle;
+					\addplot[domain=#4:#5, samples=150, draw=none, fill=blue!60, fill opacity=0.55] {#3} \closedcycle;
+					\addplot[smooth, domain=#1:#2, samples=150] {#3};
+				\end{axis}
+			\end{tikzpicture}
+		\end{center}
+	}
+	
+	\newcommand{\PiecewiseProbGraph}[6]{
+		\begin{center}
+			\begin{tikzpicture}
+				\pgfmathsetmacro{\supportA}{#1}
+				\pgfmathsetmacro{\supportB}{#2}
+				\pgfmathsetmacro{\pad}{0.12*(\supportB-\supportA)}
+				\begin{axis}[
+					width=9cm,
+					height=5cm,
+					axis lines=left,
+					xlabel={$x$},
+					ylabel={$f(x)$},
+					xmin={\supportA-\pad},
+					xmax={\supportB+\pad},
+					ymin=0,
+					ymax=0.075,
+					grid=both,
+					xtick={#6}
+					]
+					\addplot[domain=#1:#2, samples=200, draw=none, fill=blue!20, fill opacity=0.35] {#3} \closedcycle;
+					\addplot[domain=#4:#5, samples=200, draw=none, fill=blue!60, fill opacity=0.55] {#3} \closedcycle;
+					\addplot[smooth, domain=#1:#2, samples=200] {#3};
+				\end{axis}
+			\end{tikzpicture}
+		\end{center}
+	}
+	
+	% --------------------------------------------------
+	\section{First-Investment Product Resale Plans (C1)}
+	
+	\textbf{Problem description:}
+	An entrepreneur is comparing five first-investment plans to buy products and resell them in local and national markets. The plans require starting amounts of 10, 20, 30, 40, and 50 million pesos, respectively. For each plan, they estimate a minimum and maximum end-of-quarter value after sales. Because they do not have enough market evidence to favor any value inside each interval, they model each final value as equally likely across its projected range.
+	
+	For the first investment option, which requires 10 million pesos, the end-of-quarter value is projected to lie between 8 and 16 million pesos. For the second investment option, which requires 20 million pesos, the end-of-quarter value is projected to lie between 14 and 30 million pesos. For the third investment option, which requires 30 million pesos, the end-of-quarter value is projected to lie between 21 and 39 million pesos. For the fourth investment option, which requires 40 million pesos, the end-of-quarter value is projected to lie between 26 and 46 million pesos. For the fifth investment option, which requires 50 million pesos, the end-of-quarter value is projected to lie between 47 and 67 million pesos.
+	
+	Here, a \emph{loss} occurs when the final value is below the amount invested, and an \emph{earning} occurs when the final value is above the amount invested.
+	
+	\textbf{Questions/Tasks.}
+	\begin{enumerate}[label=\textbf{\alph*)}]
+		\item Write the density constant for each investment note.
+		\item Find the probability of loss and the probability of earning for each investment note. Then identify which investment has the highest probability of generating losses and which investment has the highest probability of generating earnings.
+	\end{enumerate}
+	
+	\subsection*{a)}
+	For a uniform distribution on $[a,b]$, the density is
+	\[
+	f(v)=\frac{1}{b-a}\qquad \text{for }a\le v\le b.
+	\]
+	
+	Therefore,
+	\[
+	f_{V_1}(v)=\frac{1}{16-8}=\frac18
+	\qquad \text{for }8\le v\le 16,
+	\]
+	\[
+	f_{V_2}(v)=\frac{1}{30-14}=\frac{1}{16}
+	\qquad \text{for }14\le v\le 30,
+	\]
+	\[
+	f_{V_3}(v)=\frac{1}{39-21}=\frac{1}{18}
+	\qquad \text{for }21\le v\le 39,
+	\]
+	\[
+	f_{V_4}(v)=\frac{1}{46-26}=\frac{1}{20}
+	\qquad \text{for }26\le v\le 46,
+	\]
+	\[
+	f_{V_5}(v)=\frac{1}{67-47}=\frac{1}{20}
+	\qquad \text{for }47\le v\le 67.
+	\]
+	
+	\subsection*{b)}
+	Since these are continuous models, the probability of ending with exactly the invested amount is $0$. So we compare interval lengths.
+	
+	\medskip
+	
+	\textbf{First investment option.}
+	The initial investment is 10 million pesos, and the end-of-quarter value is between 8 and 16 million pesos.
+	
+	Loss
+	\[
+	P(V_1<10)=\frac{10-8}{16-8}=\frac{2}{8}=\frac14.
+	\]
+	
+	Earning
+	\[
+	P(V_1>10)=\frac{16-10}{16-8}=\frac{6}{8}=\frac34.
+	\]
+	\CtwoProbGraph{8}{16}{1/8}{10}{16}{8,10,16}{0.18}
+	
+	\medskip
+	
+	\textbf{Second investment option.}
+	The initial investment is 20 million pesos, and the end-of-quarter value is between 14 and 30 million pesos.
+	
+	Loss
+	\[
+	P(V_2<20)=\frac{20-14}{30-14}=\frac{6}{16}=\frac38.
+	\]
+	
+	Earning
+	\[
+	P(V_2>20)=\frac{30-20}{30-14}=\frac{10}{16}=\frac58.
+	\]
+	\CtwoProbGraph{14}{30}{1/16}{20}{30}{14,20,30}{0.14}
+	
+	\medskip
+	
+	\textbf{Third investment option.}
+	The initial investment is 30 million pesos, and the end-of-quarter value is between 21 and 39 million pesos.
+	
+	Loss
+	\[
+	P(V_3<30)=\frac{30-21}{39-21}=\frac{9}{18}=\frac12.
+	\]
+	
+	Earning
+	\[
+	P(V_3>30)=\frac{39-30}{39-21}=\frac{9}{18}=\frac12.
+	\]
+	\CtwoProbGraph{21}{39}{1/18}{30}{39}{21,30,39}{0.12}
+	
+	\medskip
+	
+	\textbf{Fourth investment option.}
+	The initial investment is 40 million pesos, and the end-of-quarter value is between 26 and 46 million pesos.
+	
+	Loss
+	\[
+	P(V_4<40)=\frac{40-26}{46-26}=\frac{14}{20}=\frac{7}{10}.
+	\]
+	
+	Earning
+	\[
+	P(V_4>40)=\frac{46-40}{46-26}=\frac{6}{20}=\frac{3}{10}.
+	\]
+	\CtwoProbGraph{26}{46}{1/20}{40}{46}{26,40,46}{0.12}
+	
+	\medskip
+	
+	\textbf{Fifth investment option.}
+	The initial investment is 50 million pesos, and the end-of-quarter value is between 47 and 67 million pesos.
+	
+	Loss
+	\[
+	P(V_5<50)=\frac{50-47}{67-47}=\frac{3}{20}.
+	\]
+	
+	Earning
+	\[
+	P(V_5>50)=\frac{67-50}{67-47}=\frac{17}{20}.
+	\]
+	\CtwoProbGraph{47}{67}{1/20}{50}{67}{47,50,67}{0.12}
+	
+	Comparing the loss probabilities
+	\[
+	\frac14,\quad \frac38,\quad \frac12,\quad \frac{7}{10},\quad \frac{3}{20},
+	\]
+	the largest is
+	\[
+	\frac{7}{10}.
+	\]
+	So the investment with the highest probability of generating losses is the fourth investment option, which requires 40 million pesos.
+	
+	Comparing the earning probabilities
+	\[
+	\frac34,\quad \frac58,\quad \frac12,\quad \frac{3}{10},\quad \frac{17}{20},
+	\]
+	the largest is
+	\[
+	\frac{17}{20}.
+	\]
+	So the investment with the highest probability of generating earnings is the fifth investment option, which requires 50 million pesos.
+	
+	\section{Online Coffee Sales Investment (C1)}
+	
+	\textbf{Problem description}
+	A small entrepreneur runs a home-based online resale business selling packaged specialty coffee through local digital channels and limited neighborhood delivery. The business has a bounded final value: it cannot fall below fifty million pesos because even in a weak quarter, most of the remaining inventory could still be sold at discount or recovered at wholesale value, and it cannot exceed ninety million pesos because storage, packaging, and delivery capacity are limited. Outcomes within this range are not equally likely. Lower values are possible if demand starts slowly or deliveries are inconsistent, while higher values become gradually more likely as repeat customers stabilize sales. The exact minimum value of fifty million pesos is considered extremely unlikely and, under the continuous model, its probability can be treated as zero. A relative invests seventy million pesos as the main benchmark amount, so results below that level represent a loss and results above it represent an earning.
+	
+	The investor is not fully convinced that outcomes above eighty-five million pesos are realistic for a first-cycle business of this size. Based on his knowledge of the local market, he believes that very strong sales are possible but not especially reliable, so he wants to know the probability that the final value ends between seventy and eighty-five million pesos. For him, that interval is the most relevant one for deciding whether the investment is worth the risk, because it would allow recovery of the original seventy million pesos while still leaving a moderate surplus for a manageable second order. Although values above eighty-five million pesos may occur, he does not want to base the decision mainly on those more optimistic outcomes.
+	
+	\textbf{Questions/Tasks.}
+	\begin{enumerate}[label=\textbf{\alph*)}]
+		\item Determine the density constant and write the pdf.
+		\item Find the probability of loss and the probability of earning.
+		\item Compute the probability that the money obtained is above 85 million.
+		\item Compute the probability that the money obtained falls between 70 and 85 million.
+	\end{enumerate}
+	
+	\subsection*{a)}
+	Let $V$ denote the end-of-quarter value, measured in million pesos. Since the density rises linearly from the lower endpoint $50$ to the upper endpoint $90$, we model it by
+	\[
+	f(v)=k(v-50)\qquad \text{for }50\le v\le 90,
+	\]
+	and
+	\[
+	f(v)=0\qquad \text{otherwise.}
+	\]
+	
+	To determine $k$, use total area $=1$. The graph is a straight line from $(50,0)$ up to $(90,40k)$, so the region under the density is a triangle with base $40$ and height $40k$. Therefore,
+	\[
+	\frac12(40)(40k)=1.
+	\]
+	So
+	\[
+	800k=1
+	\qquad \Rightarrow \qquad
+	k=\frac{1}{800}.
+	\]
+	
+	Hence the pdf is
+	\[
+	f(v)=\frac{1}{800}(v-50)\qquad \text{for }50\le v\le 90.
+	\]
+	\LinearProbGraph{50}{90}{(x-50)/800}{50}{90}{50,70,90}
+	
+	\subsection*{b)}
+	\textbf{Probability of loss.} A loss occurs when the final value is below the purchase price of $70$ million pesos. On the interval from $50$ to $70$, the graph forms a smaller triangle.
+	
+	Its base is
+	\[
+	70-50=20,
+	\]
+	and its height is
+	\[
+	f(70)=\frac{1}{800}(70-50)=\frac{20}{800}=\frac{1}{40}.
+	\]
+	So
+	\[
+	P(\text{loss})=P(V<70)=\frac12(20)\left(\frac{1}{40}\right)=\frac14.
+	\]
+	\LinearProbGraph{50}{90}{(x-50)/800}{50}{70}{50,70,90}
+	
+	\textbf{Probability of earning.}
+	An earning occurs when the final value is above the purchase price of $70$ million pesos. Since the total probability is $1$ and a loss occurs when the final value is below $70$, we use the complement rule
+	\[
+	P(\text{earning})=P(V>70)=1-P(V<70).
+	\]
+	\[
+	\text{Loss} \rightarrow P(V<70)=\frac14
+	\qquad\qquad
+	\text{Earning} \rightarrow P(V>70)=1-\frac14=\frac34
+	\]
+	\LinearProbGraph{50}{90}{(x-50)/800}{70}{90}{50,70,90}
+	
+	\subsection*{c)}
+	Now compute the probability that the money obtained is above $85$ million pesos.
+	
+	Instead of calculating the small region to the right of $85$, it is easier to first calculate the probability that the money obtained is less than $85$ million pesos. On the interval from $50$ to $85$, the graph forms a triangle.
+	
+	Its base is
+	\[
+	85-50=35,
+	\]
+	and its height is
+	\[
+	f(85)=\frac{1}{800}(85-50)=\frac{35}{800}=\frac{7}{160}.
+	\]
+	
+	So
+	\[
+	P(V<85)=\frac12(35)\left(\frac{7}{160}\right)=\frac{245}{320}=\frac{49}{64}.
+	\]
+	
+	Using the complement rule,
+	\[
+	P(V>85)=1-P(V<85)=1-\frac{49}{64}=\frac{15}{64}.
+	\]
+	
+	Thus, the probability that the money obtained is above $85$ million pesos is
+	\[
+	\frac{15}{64}.
+	\]
+	\LinearProbGraph{50}{90}{(x-50)/800}{85}{90}{50,70,85,90}
+	
+	\subsection*{d)}
+	Now compute the probability that the money obtained falls between $70$ and $85$ million pesos.
+	
+	From part b),
+	\[
+	P(V>70)=\frac34.
+	\]
+	
+	From part c),
+	\[
+	P(V>85)=\frac{15}{64}.
+	\]
+	
+	Therefore, using the difference of these two events,
+	\[
+	P(70\le V\le 85)=P(V>70)-P(V>85)
+	=\frac34-\frac{15}{64}
+	=\frac{48}{64}-\frac{15}{64}
+	=\frac{33}{64}.
+	\]
+	
+	Thus, the probability that the money obtained falls between $70$ and $85$ million pesos is
+	\[
+	\frac{33}{64}.
+	\]
+	\LinearProbGraph{50}{90}{(x-50)/800}{70}{85}{50,70,85,90}
+	
+	\section{Two-Scenario Inventory Investment (C2)}
+	
+	\textbf{Problem description:}
+	A seller invests in a short-term inventory deal to resell packaged foods in nearby cities. For the quarter, they consider two realistic market scenarios. In Scenario 1, transport bottlenecks continue and restocking stays slow; this has probability $0.4$. In Scenario 2, transport returns to normal and inventory rotates faster; this has probability $0.6$. If Scenario 1 occurs, the final value of the investment is expected to end between fifty and seventy million pesos, with all values in that interval treated as equally plausible. If Scenario 2 occurs, the final value is expected to end between sixty and ninety million pesos, again with all values in that interval treated as equally plausible. The initial investment is sixty-five million pesos. A loss occurs if the final value is below that amount, and an earning occurs if the final value is above it.
+	
+	\textbf{Questions/Tasks.}
+	\begin{enumerate}[label=\textbf{\alph*)}]
+		\item Write the conditional density for each scenario.
+		\item Build the unconditional pdf of the final value as a piecewise function.
+		\item Verify that the unconditional pdf integrates to one.
+		\item Find the probability of loss and the probability of earning.
+		\item Find the probability that the final value falls inside the overlap interval.
+	\end{enumerate}
+	
+	A conditional density function describes how the final value is distributed once one specific scenario is assumed to be true. In this problem, each scenario has its own density because the investment behaves differently depending on whether transport problems continue or normal logistics return. So, the conditional density tells us how the final value is distributed under that particular market condition.
+	
+	The general, or unconditional, density function combines those scenario-specific densities into one overall model. It describes the distribution of the final value before knowing which scenario actually occurs, and it is obtained by weighting the conditional densities by the probabilities of the scenarios. The overlap interval is especially important because it contains values that are plausible in both market scenarios. For a small investor, this shared middle range is often more useful for planning than extreme values that appear only under one scenario, since it represents outcomes that remain feasible whether logistics stay difficult or improve.
+	
+	\subsection*{a)}
+	Let $V$ be the final value of the investment, measured in million pesos.
+	
+	Under the delayed-clearance scenario, the value is uniformly distributed on $[50,70]$. Therefore, the conditional density is
+	\[
+	f_{V\mid S_1}(v)=
+	\begin{cases}
+		\dfrac{1}{20}, & 50\le v\le 70,\\[4pt]
+		0, & \text{otherwise.}
+	\end{cases}
+	\]
+	
+	Under the normal-clearance scenario, the value is uniformly distributed on $[60,90]$. Therefore, the conditional density is
+	\[
+	f_{V\mid S_2}(v)=
+	\begin{cases}
+		\dfrac{1}{30}, & 60\le v\le 90,\\[4pt]
+		0, & \text{otherwise.}
+	\end{cases}
+	\]
+	
+	The scenario probabilities are
+	\[
+	P(S_1)=0.4
+	\qquad \text{and} \qquad
+	P(S_2)=0.6.
+	\]
+	\CtwoProbGraph{50}{90}{x < 60 ? 1/50 : (x <= 70 ? 1/25 : 1/50)}{50}{90}{50,60,70,90}{6e-2}
+	
+	So the unconditional density is the mixture
+	\[
+	f_V(v)=0.4\,f_{V\mid S_1}(v)+0.6\,f_{V\mid S_2}(v).
+	\]
+	
+	\subsection*{b)}
+	Now build it by intervals.
+	
+	For $50\le v<60$, only Scenario 1 contributes, so
+	\[
+	f_V(v)=0.4\left(\frac{1}{20}\right)=\frac{1}{50}.
+	\]
+	
+	For $60\le v\le 70$, both scenarios contribute, so
+	\[
+	f_V(v)=0.4\left(\frac{1}{20}\right)+0.6\left(\frac{1}{30}\right)
+	=\frac{1}{50}+\frac{1}{50}
+	=\frac{1}{25}.
+	\]
+	
+	For $70<v\le 90$, only Scenario 2 contributes, so
+	\[
+	f_V(v)=0.6\left(\frac{1}{30}\right)=\frac{1}{50}.
+	\]
+	
+	Therefore, the unconditional pdf is
+	\[
+	f_V(v)=
+	\begin{cases}
+		\dfrac{1}{50}, & 50\le v<60,\\[6pt]
+		\dfrac{1}{25}, & 60\le v\le 70,\\[6pt]
+		\dfrac{1}{50}, & 70<v\le 90,\\[6pt]
+		0, & \text{otherwise.}
+	\end{cases}
+	\]
+	\CtwoProbGraph{50}{90}{x < 60 ? 1/50 : (x <= 70 ? 1/25 : 1/50)}{60}{70}{50,60,70,90}{6e-2}
+	
+	\subsection*{c)}
+	Use the total area of the three rectangles.
+	
+	From $50$ to $60$, the width is $10$ and the height is $\dfrac{1}{50}$, so the area is
+	\[
+	10\left(\frac{1}{50}\right)=\frac{1}{5}.
+	\]
+	
+	From $60$ to $70$, the width is $10$ and the height is $\dfrac{1}{25}$, so the area is
+	\[
+	10\left(\frac{1}{25}\right)=\frac{2}{5}.
+	\]
+	
+	From $70$ to $90$, the width is $20$ and the height is $\dfrac{1}{50}$, so the area is
+	\[
+	20\left(\frac{1}{50}\right)=\frac{2}{5}.
+	\]
+	
+	Adding the three pieces,
+	\[
+	\frac{1}{5}+\frac{2}{5}+\frac{2}{5}=1.
+	\]
+	So the unconditional density is valid.
+	
+	\subsection*{d)}
+	\textbf{Probability of loss.} A loss occurs when the final value is below the purchase price of $65$ million pesos. This includes the whole interval from $50$ to $60$, plus the interval from $60$ to $65$.
+	
+	From $50$ to $60$, the area is
+	\[
+	10\left(\frac{1}{50}\right)=\frac{1}{5}.
+	\]
+	
+	From $60$ to $65$, the width is $5$ and the height is $\dfrac{1}{25}$, so the area is
+	\[
+	5\left(\frac{1}{25}\right)=\frac{1}{5}.
+	\]
+	
+	Therefore,
+	\[
+	P(\text{loss})=P(V<65)=\frac{1}{5}+\frac{1}{5}=\frac{2}{5}.
+	\]
+	\CtwoProbGraph{50}{90}{x < 60 ? 1/50 : (x <= 70 ? 1/25 : 1/50)}{50}{65}{50,60,65,70,90}{6e-2}
+	
+	\textbf{Probability of earning.}
+	An earning occurs when the final value is above the purchase price of $65$ million pesos. Since the total probability is $1$ and a loss occurs when the final value is below $65$, we use the complement rule
+	\[
+	P(\text{earning})=P(V>65)=1-P(V<65).
+	\]
+	From the previous result,
+	\[
+	P(V<65)=\frac{2}{5}.
+	\]
+	Therefore,
+	\[
+	P(V>65)=1-\frac{2}{5}=\frac{3}{5}.
+	\]
+	\CtwoProbGraph{50}{90}{x < 60 ? 1/50 : (x <= 70 ? 1/25 : 1/50)}{65}{90}{50,60,65,70,90}{6e-2}
+	
+	\subsection*{e)}
+	The overlap interval is from $60$ to $70$. Over this region, the density is constant at $\dfrac{1}{25}$, so
+	\[
+	P(60\le V\le 70)=10\left(\frac{1}{25}\right)=\frac{2}{5}.
+	\]
+	\CtwoProbGraph{50}{90}{x < 60 ? 1/50 : (x <= 70 ? 1/25 : 1/50)}{60}{70}{50,60,70,90}{6e-2}
+	
+	% --------------------------------------------------
+	\section{Small-Business Investment with an Asymmetric Triangular Density (C3)}
+	
+	\textbf{Problem description:}
+	An investor invests in a short-term small-business opportunity: buying low-cost clothing bundles to resell online and at weekend markets. They estimate the final value cannot be below zero million pesos because, in this simplified model, the end-of-period value cannot be negative. They also estimate it cannot exceed thirty million pesos because their first-round sales capacity is limited. Their most likely final value is twelve million pesos, based on expected demand from regular customers. Values below twelve million pesos are possible, but become less likely as results move farther down from that level. Values above twelve million pesos are also possible, but after that point, very high outcomes become gradually less likely. Since the model is continuous, the probability of obtaining any exact extreme value can be considered $0$, so the probabilities of ending at exactly zero million pesos or exactly thirty million pesos are treated as $0$. The initial investment is six million pesos. A loss occurs if the final value is below that amount, and an earning occurs if the final value is above it.
+	
+	\textbf{Questions/Tasks.}
+	\begin{itemize}
+		\item \textbf{a)} Write the pdf as a piecewise function.
+		\item \textbf{b)} Verify that the total area under the density is one.
+		\item \textbf{c)} Find the probability of loss and the probability of earning.
+		\item \textbf{d)} Find the specific probability of earning more than 50\% of the investment.
+	\end{itemize}
+	
+	\subsection*{a)}
+	Let $V$ be the final value of the investment, measured in million pesos.
+	
+	The support is from $0$ to $30$, and the most likely value is $12$. Since the model is triangular, the graph rises linearly from $(0,0)$ to the peak at $(12,h)$, then falls linearly from $(12,h)$ to $(30,0)$.
+	
+	First determine the peak height $h$ from total area $=1$. The whole graph is one triangle with base
+	\[
+	30-0=30.
+	\]
+	So
+	\[
+	\frac12(30)(h)=1.
+	\]
+	Hence
+	\[
+	15h=1
+	\qquad \Rightarrow \qquad
+	h=\frac{1}{15}.
+	\]
+	
+	Now write each linear piece.
+	
+	On the interval from $0$ to $12$, the line goes through $(0,0)$ and $(12,\tfrac{1}{15})$. Its slope is
+	\[
+	\frac{\tfrac{1}{15}-0}{12-0}=\frac{1}{180}.
+	\]
+	So the left-hand piece is
+	\[
+	f(v)=\frac{v}{180}\qquad \text{for }0\le v\le 12.
+	\]
+	
+	On the interval from $12$ to $30$, the line goes through $(12,\tfrac{1}{15})$ and $(30,0)$. Its slope is
+	\[
+	\frac{0-\tfrac{1}{15}}{30-12}=-\frac{1}{270}.
+	\]
+	So the right-hand piece is
+	\[
+	f(v)=\frac{30-v}{270}\qquad \text{for }12\le v\le 30.
+	\]
+	
+	Therefore, the pdf is
+	\[
+	f(v)=
+	\begin{cases}
+		\dfrac{v}{180}, & 0\le v\le 12,\\[6pt]
+		\dfrac{30-v}{270}, & 12\le v\le 30,\\[6pt]
+		0, & \text{otherwise.}
+	\end{cases}
+	\]
+	\PiecewiseProbGraph{0}{30}{x <= 12 ? x/180 : (30-x)/270}{0}{30}{0,6,12,30}
+	
+	\subsection*{b)}
+	The graph is a single triangle with base $30$ and height $\dfrac{1}{15}$. Therefore,
+	\[
+	\text{Total area}=\frac12(30)\left(\frac{1}{15}\right)=1.
+	\]
+	So this is a valid pdf.
+	
+	\subsection*{c)}
+	\textbf{Probability of loss.} A loss occurs when the final value is below the purchase price of $6$ million pesos. On the graph, this is the small triangle from $0$ to $6$.
+	
+	Its base is
+	\[
+	6-0=6.
+	\]
+	Its height is
+	\[
+	f(6)=\frac{6}{180}=\frac{1}{30}.
+	\]
+	So
+	\[
+	P(\text{loss})=P(V<6)=\frac12(6)\left(\frac{1}{30}\right)=\frac{6}{60}=\frac{1}{10}.
+	\]
+	\PiecewiseProbGraph{0}{30}{x <= 12 ? x/180 : (30-x)/270}{0}{6}{0,6,12,30}
+	
+	\textbf{Probability of earning.}
+	An earning occurs when the final value is above the purchase price of $6$ million pesos. Since the total probability is $1$ and a loss occurs when the final value is below $6$, we use the complement rule
+	\[
+	P(\text{earning})=P(V>6)=1-P(V<6).
+	\]
+	From the previous result,
+	\[
+	P(V<6)=\frac{1}{10}.
+	\]
+	Therefore,
+	\[
+	P(V>6)=1-\frac{1}{10}=\frac{9}{10}.
+	\]
+	\PiecewiseProbGraph{0}{30}{x <= 12 ? x/180 : (30-x)/270}{6}{30}{0,6,12,30}
+	
+	\subsection*{d)}
+	The investment amount is $6$ million pesos, so earning more than $50\%$ means ending above
+	\[
+	6(1.5)=9.
+	\]
+	Therefore, we need
+	\[
+	P(\text{earning more than }50\%)=P(V>9).
+	\]
+	
+	Notice that $9$ lies to the left of the most probable value $12$. For that reason, the complement rule is convenient here, because the excluded region from $0$ to $9$ is a simple triangle.
+	
+	So
+	\[
+	P(V>9)=1-P(V\le 9).
+	\]
+	
+	On the interval from $0$ to $9$, the graph forms a triangle.
+	
+	Its base is
+	\[
+	9-0=9,
+	\]
+	and its height is
+	\[
+	f(9)=\frac{9}{180}=\frac{1}{20}.
+	\]
+	
+	Hence
+	\[
+	P(V\le 9)=\frac12(9)\left(\frac{1}{20}\right)=\frac{9}{40}.
+	\]
+	
+	Therefore,
+	\[
+	P(V>9)=1-\frac{9}{40}=\frac{31}{40}.
+	\]
+	\PiecewiseProbGraph{0}{30}{x <= 12 ? x/180 : (30-x)/270}{9}{30}{0,6,9,12,30}
+\end{document}

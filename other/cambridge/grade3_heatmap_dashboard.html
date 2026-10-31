@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="../../assets/png/icon_global.png">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cambridge Stage 4 Results</title>
+  <link rel="stylesheet" href="grade3_heatmap_dashboard.css" />
+</head>
+<body>
+  <header>
+    <h1>Cambridge - Stage 4 Results</h1>
+  </header>
+
+  <main class="wrap">
+    <section class="controls" aria-label="Dashboard controls">
+      <div class="control view">
+        <label for="resultView">Result view</label>
+        <select id="resultView">
+          <option value="paper1">Paper 1</option>
+          <option value="paper2">Paper 2</option>
+          <option value="accumulated">Accumulated</option>
+        </select>
+      </div>
+      <div class="control">
+        <label for="groupFilter">Group</label>
+        <select id="groupFilter">
+          <option value="all">All groups</option>
+          <option value="C">Group C</option>
+          <option value="F">Group F</option>
+        </select>
+      </div>
+      <div class="control search">
+        <label for="searchBox">Search student</label>
+        <input id="searchBox" type="search" placeholder="Type a name or matrícula" />
+      </div>
+    </section>
+
+    <section class="stats groupedStats" id="stats"></section>
+
+    <section class="vizPanel">
+      <div class="vizToolbar" id="vizToolbar" aria-label="Visualization controls">
+        <div class="vizToolbarHeader">
+          <button
+            id="vizToolbarCollapseBtn"
+            class="vizToolbarCollapseBtn"
+            type="button"
+            aria-expanded="true"
+            aria-controls="vizToolbarBody"
+            title="Collapse visualization controls"
+          >
+            Controls
+            <span class="collapseIcon" aria-hidden="true">▾</span>
+          </button>
+          <span id="activeSummary" aria-live="polite"></span>
+        </div>
+        <div class="vizToolbarBody" id="vizToolbarBody">
+          <div class="legend">
+            <div class="legendItems">
+              <span><i class="swatch" style="background:var(--green)"></i>Positive</span>
+              <span><i class="swatch" style="background:var(--yellow)"></i>Non Responses</span>
+              <span><i class="swatch" style="background:var(--red)"></i>Negative</span>
+              <label class="missingLegendToggle" title="Show or hide students with missing values">
+                <input id="showMissing" type="checkbox" aria-label="Show students with missing values" />
+                <span class="missingSwatch" aria-hidden="true"></span>
+                <span>Missing</span>
+              </label>
+            </div>
+          </div>
+          <div class="vizToolbarControls">
+            <div class="vizToolbarGroup">
+              <label for="sortRows">Sort students</label>
+              <div class="sortControlWithDirection">
+                <select id="sortRows">
+                  <option value="original">Original order</option>
+                  <option value="positive">Positives</option>
+                  <option value="negative">Negatives</option>
+                  <option value="zero">Non responses</option>
+                  <option value="posNegRatio">Positive / Negative ratio</option>
+                  <option value="posZeroRatio">Positive / Non responses ratio</option>
+                  <option value="negZeroRatio">Negative / Non responses ratio</option>
+                  <option value="nameAsc">Name A–Z</option>
+                </select>
+
+                <div class="sortDirectionButtons" aria-label="Student sort direction">
+                  <button id="sortRowsAscBtn" class="sortDirectionBtn" type="button" title="Sort students from lower to higher" aria-label="Sort students from lower to higher">▲</button>
+                  <button id="sortRowsDescBtn" class="sortDirectionBtn isActive" type="button" title="Sort students from higher to lower" aria-label="Sort students from higher to lower">▼</button>
+                </div>
+              </div>
+            </div>
+            <div class="vizToolbarGroup">
+              <label for="sortCols">Sort questions</label>
+              <div class="sortControlWithDirection">
+                <select id="sortCols">
+                  <option value="original">Original order</option>
+                  <option value="positive">Positives</option>
+                  <option value="negative">Negatives</option>
+                  <option value="zero">Non responses</option>
+                  <option value="posNegRatio">Positive / Negative ratio</option>
+                  <option value="posZeroRatio">Positive / Non responses ratio</option>
+                  <option value="negZeroRatio">Negative / Non responses ratio</option>
+                </select>
+
+                <div class="sortDirectionButtons" aria-label="Question sort direction">
+                  <button id="sortColsAscBtn" class="sortDirectionBtn" type="button" title="Sort questions from lower to higher" aria-label="Sort questions from lower to higher">▲</button>
+                  <button id="sortColsDescBtn" class="sortDirectionBtn isActive" type="button" title="Sort questions from higher to lower" aria-label="Sort questions from higher to lower">▼</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <aside class="detailPanel" id="detailPanel" aria-live="polite" aria-label="Selected chart details">
+        <p class="detailPanelPlaceholder">Focus or select a heatmap cell or histogram bar to view details here.</p>
+      </aside>
+      <div class="dashboardScroll">
+        <div class="dashboardGrid" id="dashboardGrid">
+          <div class="corner">
+            <div class="cornerDiagonal" aria-hidden="true"></div>
+            <div class="cornerQuestions">Questions</div>
+            <label class="cornerStudentsToggle" title="Toggle full or compact student names">
+              <input id="showNames" type="checkbox" checked aria-label="Use full row labels" />
+              <span>Students</span>
+            </label>
+          </div>
+          <div class="topBars" id="topBars">
+            <div class="topBarsContent" id="topBarsContent">
+              <div class="questionOverviewButtonLayer">
+                <button
+                  id="questionOverviewBtn"
+                  class="overviewToggleBtn questionOverviewFixedBtn"
+                  type="button"
+                  aria-pressed="false"
+                  title="Show full question scope"
+                >
+                  Full question scope
+                </button>
+              </div>
+              <div class="topBarsHistogram" id="topBarsHistogram"></div>
+            </div>
+          </div>
+          <div class="rightHeader">
+            <button id="fullscreenBtn" class="fullscreenBtn" type="button" aria-label="Open visualization in fullscreen" title="Fullscreen">
+              ⛶
+            </button>
+          </div>
+          <div class="names" id="names"></div>
+          <div class="heatmap" id="heatmap"></div>
+          <div class="rightBars" id="rightBars">
+            <div class="studentOverviewButtonLayer">
+              <button
+                id="studentOverviewBtn"
+                class="overviewToggleBtn studentOverviewFixedBtn"
+                type="button"
+                aria-pressed="false"
+                title="Show full student scope"
+              >
+                Full student scope
+              </button>
+            </div>
+            <div class="rightBarsContent" id="rightBarsContent"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="tooltip" id="tooltip"></div>
+
+  <script src="grade3_heatmap_dashboard_data.js"></script>
+  <script src="grade3_heatmap_dashboard.js"></script>
+</body>
+</html>

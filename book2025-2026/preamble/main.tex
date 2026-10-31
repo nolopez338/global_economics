@@ -1,0 +1,365 @@
+\input{preamble}
+
+% ===========================================
+\title{\LARGE Preamble Guide}
+\date{}
+% ===========================================
+
+\begin{document}
+	
+	\begin{minipage}{\anchoPag}
+		\thispagestyle{empty}
+		\background
+		
+		% =================
+		\maketitle
+		\vspace{-2cm}
+		% =================
+		
+		\begin{mdframed}[style=estiloGeneral]
+			This document explains the structure of the LaTeX preamble used as the base template. Each section below corresponds to a block in the preamble and includes what it does, why it is useful, and the commands that depend on it.
+		\end{mdframed}
+		
+		% =============================================================
+		\subsection{Description}
+		
+		This file documents the preamble that is used as a shared base for multiple LaTeX documents. Other files include it with \texttt{\textbackslash input\{preambulo\}}, so changing the preamble modifies every document that imports it. The preamble includes packages, page settings, colors, frames, hyperlinks, and custom commands used across guides.
+		
+		% ----------------------------------------------------------
+		\subsection{General}\label{sec:general}
+		
+		\begin{enumerate}
+			\item Document type: \texttt{standalone} is used with \texttt{varwidth} to produce compact pages and allow custom margins.
+			\item Margins: \texttt{geometry} sets custom margins for the page layout.
+			\item Line spacing: \texttt{\textbackslash linespread\{1.2\}} increases readability.
+			\item Input encoding: \texttt{inputenc} with \texttt{utf8} supports accented characters.
+		\end{enumerate}
+		
+		\begin{mdframed}[style=code]
+			\begin{verbatim}
+				\documentclass[varwidth, margin=2cm, 12pt]{standalone}
+				\usepackage[left=2cm, right=-8cm, top=1cm, bottom=2.5cm]{geometry}
+				\linespread{1.2}
+				\usepackage[utf8]{inputenc}
+			\end{verbatim}
+		\end{mdframed}
+
+		
+		% ----------------------------------------------------------
+		\subsection{Tables}\label{sec:tables}
+		
+		\begin{enumerate}
+			\item \texttt{multicol}: allows text or content to be split into columns.
+			\item \texttt{longtable}: supports tables that span multiple pages.
+			\item \texttt{array}: provides extra control over column formatting.
+			\item \texttt{booktabs}: improves table rules and spacing for cleaner design.
+		\end{enumerate}
+		
+		\begin{mdframed}[style=code]
+			\begin{verbatim}
+				\usepackage{multicol}
+				\usepackage{longtable}
+				\usepackage{array}
+				\usepackage{booktabs}
+			\end{verbatim}
+		\end{mdframed}
+		
+		% ----------------------------------------------------------
+		\subsection{Mathematics}\label{sec:math}
+		
+		\begin{enumerate}
+			\item \texttt{amsmath}: improves equation environments and alignment.
+			\item \texttt{amssymb} and \texttt{amsfonts}: provide additional math symbols and fonts.
+			\item \texttt{mathtools}: extends \texttt{amsmath} with extra tools and fixes.
+		\end{enumerate}
+		
+		\begin{mdframed}[style=code]
+			\begin{verbatim}
+				\usepackage{amsmath}
+				\usepackage{amssymb}
+				\usepackage{amsfonts}
+				\usepackage{mathtools}
+			\end{verbatim}
+		\end{mdframed}
+		
+		% ----------------------------------------------------------
+		\subsection{Hidden Content Switch}\label{sec:hidden}
+		
+		This section defines a boolean switch to show or hide explanatory content without deleting it.
+		
+		\begin{enumerate}
+			\item \texttt{\textbackslash newboolean\{explicaciones\}} creates the switch.
+			\item \texttt{\textbackslash mostrarExplicaciones\{true/false\}} turns explanations on or off.
+			\item \texttt{\textbackslash explicacion\{A\}\{B\}} prints \texttt{A} when the switch is true, and \texttt{B} when it is false.
+		\end{enumerate}
+		
+		\begin{mdframed}[style=code]
+			\begin{verbatim}
+				\newboolean{explicaciones}
+				\newcommand{\explicacion}[2]{\ifthenelse{\boolean{explicaciones}}{#1}{#2}}
+				\newcommand{\mostrarExplicaciones}[1]{\setboolean{explicaciones}{#1}}
+			\end{verbatim}
+		\end{mdframed}
+		
+		\begin{mdframed}[style=estiloGeneral]
+			Example usage:
+			
+			\mostrarExplicaciones{true}
+			
+			\explicacion{This text will appear.}{This text will be hidden.}
+		\end{mdframed}
+		
+		% ----------------------------------------------------------
+		\subsection{Numbering and Table of Contents}\label{sec:numbering}
+		
+		\begin{enumerate}
+			\item \texttt{fancyhdr} is loaded, but page numbering is disabled with \texttt{\textbackslash pagestyle\{empty\}}.
+			\item \texttt{tocloft} customizes the table of contents.
+			\item Dots and page numbers are removed for sections and subsections.
+		\end{enumerate}
+		
+		\begin{mdframed}[style=code]
+			\begin{verbatim}
+				\usepackage{fancyhdr}
+				\pagestyle{empty}
+				
+				\usepackage{tocloft}
+				\renewcommand{\cftdot}{}
+				\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+				\cftpagenumbersoff{section}
+				\cftpagenumbersoff{subsection}
+			\end{verbatim}
+		\end{mdframed}
+		
+		% ----------------------------------------------------------
+		\subsection{Images, Figures, and Colors}\label{sec:images}
+		
+		\subsection{Images and positioning}
+		
+		\begin{enumerate}
+			\item \texttt{graphicx} enables \texttt{\textbackslash includegraphics}.
+			\item \texttt{float} allows better control of figure placement.
+			\item \texttt{subcaption} enables subfigures.
+			\item \texttt{\textbackslash graphicspath\{\{imgs\}\}} sets the default image folder.
+		\end{enumerate}
+		
+		\begin{mdframed}[style=code]
+			\begin{verbatim}
+				\usepackage{graphicx}
+				\usepackage{float}
+				\graphicspath{{imgs}}
+				\usepackage{subcaption}
+			\end{verbatim}
+		\end{mdframed}
+		
+		\subsection{TikZ figures}
+		
+		\begin{enumerate}
+			\item \texttt{tikz} supports vector graphics drawn in LaTeX.
+			\item \texttt{arrows.meta} adds arrow styles and tools.
+		\end{enumerate}
+		
+		\begin{mdframed}[style=code]
+			\begin{verbatim}
+				\usepackage{tikz}
+				\usetikzlibrary{arrows.meta}
+			\end{verbatim}
+		\end{mdframed}
+		
+		\subsection{Color palette}
+		
+		This palette defines named colors used across frames, background, and hyperlink styling.
+		
+		\begin{mdframed}[style=code]
+			\begin{verbatim}
+				\usepackage{xcolor}
+				\definecolor{popUp}{HTML}{666666}
+				\definecolor{backgroundC}{HTML}{D0E8F2}
+				\definecolor{backgroundCC}{HTML}{FFFFFF}
+				\definecolor{links}{HTML}{CC6F5F}
+			\end{verbatim}
+		\end{mdframed}
+		
+		% ----------------------------------------------------------
+		\subsection{Frames}\label{sec:frames}
+		
+		Frames are used to highlight content blocks and code blocks in a consistent style.
+		
+		\begin{enumerate}
+			\item \texttt{tcolorbox} provides advanced box tools and is used for \texttt{\textbackslash fboxC}.
+			\item \texttt{adjustbox} and the \texttt{\textbackslash fboxrule} / \texttt{\textbackslash fboxsep} lengths tune borders and padding.
+			\item \texttt{mdframed} defines two main styles:
+			\begin{itemize}
+				\item \texttt{estiloGeneral}: main content frame with rounded corners.
+				\item \texttt{code}: code frame with a light gray background.
+			\end{itemize}
+		\end{enumerate}
+		
+		\begin{mdframed}[style=code]
+			\begin{verbatim}
+				\mdfdefinestyle{estiloGeneral}{...}
+				\mdfdefinestyle{code}{...}
+				\newtcbox{\fboxC}{...}
+			\end{verbatim}
+		\end{mdframed}
+		
+		\begin{mdframed}[style=estiloGeneral]
+			This is a sample frame using \texttt{estiloGeneral}.
+		\end{mdframed}
+		
+		\begin{mdframed}[style=code]
+			This is a sample frame using \texttt{code}.
+		\end{mdframed}
+		
+		% ----------------------------------------------------------
+		\subsection{Page Settings}\label{sec:page}
+		
+		\subsection{Background commands}
+		
+		\begin{enumerate}
+			\item \texttt{\textbackslash background} paints the page background using TikZ and \texttt{backgroundC}.
+			\item \texttt{\textbackslash backgroundC} paints an alternative background using \texttt{backgroundCC}.
+		\end{enumerate}
+		
+		\begin{mdframed}[style=code]
+			\begin{verbatim}
+				\newcommand{\background}{...}
+				\newcommand{\backgroundC}{...}
+			\end{verbatim}
+		\end{mdframed}
+		
+		\subsection{Page width macro}
+		
+		\begin{enumerate}
+			\item \texttt{\textbackslash anchoPag} defines the minipage width used in documents.
+		\end{enumerate}
+		
+		\begin{mdframed}[style=code]
+			\begin{verbatim}
+				\newcommand{\anchoPag}[0]{20cm}
+			\end{verbatim}
+		\end{mdframed}
+		
+		% ----------------------------------------------------------
+		\subsection{Font and Code Listings}\label{sec:font}
+		
+		\begin{enumerate}
+			\item \texttt{tgbonum} sets the main text font.
+			\item \texttt{listings} is used for code formatting, including a custom Python style.
+			\item \texttt{babel} is configured for Spanish in this preamble, affecting hyphenation and language rules.
+		\end{enumerate}
+		
+		\begin{mdframed}[style=code]
+			\begin{verbatim}
+				\usepackage{tgbonum}
+				\usepackage{listings}
+				\usepackage[spanish]{babel}
+				\selectlanguage{spanish}
+				\lstdefinestyle{python}{...}
+			\end{verbatim}
+		\end{mdframed}
+		
+		% ----------------------------------------------------------
+		\subsection{Hyperlinks and Custom Link Commands}\label{sec:links}
+		
+		\subsection{Hyperref configuration}
+		
+		\begin{enumerate}
+			\item \texttt{hyperref} enables clickable links.
+			\item \texttt{\textbackslash hypersetup} defines link colors using the color palette.
+		\end{enumerate}
+		
+		\begin{mdframed}[style=code]
+			\begin{verbatim}
+				\usepackage{hyperref}
+				\hypersetup{
+					colorlinks=true,
+					linkcolor=links,
+					filecolor=magenta,
+					urlcolor=brown,
+				}
+			\end{verbatim}
+		\end{mdframed}
+		
+		\subsection{Custom link commands}
+		
+		\begin{enumerate}
+			\item \texttt{\textbackslash bigLink\{url\}\{text\}} creates a centered framed large hyperlink.
+			\item \texttt{\textbackslash smallLink\{url\}\{text\}} creates a centered framed normal hyperlink.
+			\item \texttt{\textbackslash bfLink\{url\}\{text\}} creates a bold clickable text link.
+			\item \texttt{\textbackslash smallUrl\{url\}} prints a framed URL centered on the page.
+		\end{enumerate}
+		
+		\begin{mdframed}[style=estiloGeneral]
+			Examples:
+			
+			\bigLink{https://www.latex-project.org/}{LaTeX Project}
+			
+			\smallLink{https://ctan.org/}{CTAN}
+			
+			\bfLink{https://www.overleaf.com/}{Overleaf}
+			
+			\smallUrl{https://www.monterrosaleshomeschool.edu.co/}
+		\end{mdframed}
+		
+		% ----------------------------------------------------------
+		\subsection{Custom Figure Commands}\label{sec:figcmd}
+		
+		These commands wrap \texttt{\textbackslash includegraphics} with consistent spacing and optional framing, and can optionally create clickable images.
+		
+		\begin{enumerate}
+			\item \texttt{\textbackslash espacioImagenes} controls horizontal offset applied to figures.
+			\item \texttt{\textbackslash fig} inserts an image without a frame.
+			\item \texttt{\textbackslash ffig} inserts an image in a \texttt{figure} environment with a visible frame.
+			\item \texttt{\textbackslash hfig} inserts a framed image that links to a URL.
+			\item \texttt{\textbackslash hffig} inserts an unframed image that links to a URL.
+		\end{enumerate}
+		
+		\begin{mdframed}[style=code]
+			\begin{verbatim}
+				\newcommand{\fig}[3][\espacioImagenes]{...}
+				\newcommand{\ffig}[2]{...}
+				\newcommand{\hfig}[3]{...}
+				\newcommand{\hffig}[3]{...}
+			\end{verbatim}
+		\end{mdframed}
+		
+		% ----------------------------------------------------------
+		\subsection{Other Utility Commands}\label{sec:other}
+		
+		\begin{enumerate}
+			\item \texttt{\textbackslash cuadro\{...\}} wraps content in the general styled frame.
+			\item \texttt{\textbackslash linkExplicacion\{url\}} places a clickable video explanation image.
+			\item \texttt{\textbackslash subSecLink\{url\}\{text\}} creates an unnumbered subsubsection that is a hyperlink.
+			\item \texttt{\textbackslash esp} adds vertical spacing.
+			\item \texttt{\textbackslash secInicio} creates a clickable button that jumps back to the start section labeled \texttt{sec:inicio}.
+		\end{enumerate}
+		
+		\begin{mdframed}[style=estiloGeneral]
+			Example:
+			
+			\cuadro{This content is inside a \texttt{\textbackslash cuadro} frame.}
+			
+			\esp
+			
+			\subSecLink{https://ctan.org/pkg/mdframed}{mdframed package}
+		\end{mdframed}
+		
+		% ----------------------------------------------------------
+		\subsection{Navigation and Visual Examples}\label{sec:navigation}
+		
+		\begin{enumerate}
+			\item The command \texttt{\textbackslash secInicio} depends on a label called \texttt{sec:inicio}.
+			\item If your document includes a table of contents section labeled \texttt{sec:inicio}, the button will jump there.
+		\end{enumerate}
+		
+		\begin{mdframed}[style=estiloGeneral]
+			Below is a visual example of a clickable image link:
+			
+			\hfig{https://www.monterrosaleshomeschool.edu.co/}{0.4}{principal/logo}
+		\end{mdframed}
+		
+		\secInicio
+		
+	\end{minipage}
+\end{document}

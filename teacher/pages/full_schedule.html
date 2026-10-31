@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="../../assets/png/icon_calendar.png">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Full Schedule</title>
+  <link rel="stylesheet" href="../../assets/css/schedule.css" />
+  <style>
+
+    .class-schedule-table thead th:nth-child(1),
+    .class-schedule-table tbody td:nth-child(1) {
+      width: 55px;
+    }
+
+    .class-schedule-table thead th:nth-child(2),
+    .class-schedule-table tbody td:nth-child(2) {
+      width: 55px;
+    }
+
+    .class-schedule-table thead th:nth-child(3),
+    .class-schedule-table tbody td:nth-child(3) {
+      width: 55px;
+    }
+
+
+    .class-schedule-table thead th:nth-child(4),
+    .class-schedule-table tbody td:nth-child(4) {
+      width: 110px;
+    }
+
+    .class-schedule-table thead th:nth-child(5),
+    .class-schedule-table tbody td:nth-child(5) {
+      width: 80px;
+    }
+
+    .class-schedule-table thead th:nth-child(6),
+    .class-schedule-table tbody td:nth-child(6) {
+      width: 50px;
+    }
+
+    .class-schedule-table thead th:nth-child(7),
+    .class-schedule-table tbody td:nth-child(7) {
+      width: 380px;
+    }
+
+    .class-schedule-table tbody tr.date-change-divider td,
+    .class-schedule-table tbody tr.date-change-divider th {
+      border-top: 3px solid #666a7a;
+    }
+
+    .today-indicator-row td {
+      border-top: 2px solid #cbd5e1;
+    }
+
+    .today-indicator::before,
+    .today-indicator::after {
+      height: 2px;
+      background: #e2e8f0;
+    }
+
+    .past-dates-toggle-main {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .past-dates-count-input {
+      width: 52px;
+      height: 26px;
+      padding: 2px 6px;
+      border: 1px solid var(--grid);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .past-dates-count-input:focus-visible {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 1px;
+    }
+
+    .schedule-date-control {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .schedule-date-control label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .schedule-date-picker {
+      min-height: 36px;
+      padding: 6px 9px;
+      border: 1px solid var(--grid);
+      border-radius: 7px;
+      background: var(--bg);
+      color: var(--ink);
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .schedule-date-picker:focus-visible {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+    }
+
+    body.dark-theme .schedule-date-picker {
+      color-scheme: dark;
+    }
+
+    @media (max-width: 560px) {
+      .schedule-date-control {
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main id="class-page"></main>
+  <script src="../assets/js/databases/year-calendar-data.js" defer></script>
+  <script src="../assets/js/databases/class-data.js" defer></script>
+  <script src="../assets/js/class-page.js" defer></script>
+  <script src="../assets/js/databases/schedule-data.js" defer></script>
+  <script src="../assets/js/schedule-renderer.js" defer></script>
+  <script src="../assets/js/schedule-today.js" defer></script>
+  <script src="../assets/js/full-schedule-page.js" defer></script>
+  <script src="../assets/js/full-schedule-today.js" defer></script>
+  <script src="../assets/js/theme-toggle.js" defer></script>
+  <script>
+    (function () {
+      var DEFAULT_PAST_DATES = 2;
+      var ORIGIN_TO_BACK_LINK = {
+        schedule: '../schedule.html',
+        'schedule-teacher': '../schedule-teacher.html'
+      };
+
+      function isValidISODate(value) {
+        var match = typeof value === 'string' && value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (!match) return false;
+        var date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+        return date.getFullYear() === Number(match[1]) &&
+          date.getMonth() === Number(match[2]) - 1 && date.getDate() === Number(match[3]);
+      }
+
+      function actualTodayISO() {
+        var today = new Date();
+        return [today.getFullYear(), String(today.getMonth() + 1).padStart(2, '0'),
+          String(today.getDate()).padStart(2, '0')].join('-');
+      }
+
+      var requestedDate = new URLSearchParams(window.location.search || '').get('date');
+      var focusedDate = isValidISODate(requestedDate) ? requestedDate : actualTodayISO();
+      window.fullScheduleDateFocus = {
+        get: function () { return focusedDate; },
+        isExplicit: function () { return isValidISODate(requestedDate); },
+        set: function (value) {
+          if (!isValidISODate(value)) return false;
+          focusedDate = value;
+          requestedDate = value;
+          var url = new URL(window.location.href);
+          url.searchParams.set('date', value);
+          window.history.replaceState({}, '', url);
+          document.dispatchEvent(new CustomEvent('full-schedule-focus-changed', {
+            detail: { date: value }
+          }));
+          return true;
+        }
+      };
+
+      function getBackLinkFromOrigin() {
+        var params = new URLSearchParams(window.location.search || '');
+        var origin = params.get('origin');
+        return ORIGIN_TO_BACK_LINK[origin] || '../schedule.html';
+      }
+
+      function updateBackToScheduleLink() {
+        var link = document.querySelector('.breadcrumbs .back-link');
+        if (!link) {
+          return;
+        }
+
+        link.setAttribute('href', getBackLinkFromOrigin());
+      }
+
+      function normalizeDate(raw) {
+        if (!raw) {
+          return null;
+        }
+
+        var match = String(raw).trim().match(/^(\d{4})\s*(?:[-\/]|\s\/\s)\s*(\d{1,2})\s*(?:[-\/]|\s\/\s)\s*(\d{1,2})$/);
+        if (!match) {
+          return null;
+        }
+
+        var year = match[1];
+        var month = match[2].padStart(2, '0');
+        var day = match[3].padStart(2, '0');
+        return year + '-' + month + '-' + day;
+      }
+
+      function formatDisplayDate(raw) {
+        var normalized = normalizeDate(raw);
+        if (!normalized) {
+          return raw || '';
+        }
+
+        var parts = normalized.split('-');
+        return parts[0] + ' / ' + parts[1] + ' / ' + parts[2];
+      }
+
+      function getTodayISODate() {
+        return window.fullScheduleDateFocus.get();
+      }
+
+      function parseCount(input) {
+        if (!input) {
+          return DEFAULT_PAST_DATES;
+        }
+
+        var parsed = Number.parseInt(input.value, 10);
+        if (!Number.isFinite(parsed)) {
+          parsed = DEFAULT_PAST_DATES;
+        }
+
+        if (parsed < 0) {
+          parsed = 0;
+        }
+
+        input.value = String(parsed);
+        return parsed;
+      }
+
+      function buildPastDateRows(table) {
+        var todayISO = getTodayISODate();
+        return Array.from(table.tBodies[0]?.rows || []).filter(function (row) {
+          if (!row || row.classList.contains('past-dates-toggle-row')) {
+            return false;
+          }
+
+          var normalized = normalizeDate(row.dataset.date);
+          return Boolean(normalized && normalized < todayISO);
+        });
+      }
+
+
+      function markDateChangeDividers(table) {
+        if (!table || !table.tBodies || !table.tBodies[0]) {
+          return;
+        }
+
+        var rows = Array.from(table.tBodies[0].rows || []);
+        var previousDate = null;
+
+        rows.forEach(function (row) {
+          row.classList.remove('date-change-divider');
+
+          if (!row || row.hidden || row.classList.contains('past-dates-toggle-row') || row.classList.contains('today-indicator-row')) {
+            return;
+          }
+
+          var currentDate = normalizeDate(row.dataset.date);
+          if (!currentDate) {
+            return;
+          }
+
+          if (previousDate && currentDate !== previousDate) {
+            row.classList.add('date-change-divider');
+          }
+
+          previousDate = currentDate;
+        });
+      }
+
+      function updatePastRows(table, toggleButton, countInput) {
+        var rows = buildPastDateRows(table);
+        if (rows.length === 0) {
+          return;
+        }
+
+        var dates = Array.from(new Set(rows.map(function (row) {
+          return normalizeDate(row.dataset.date);
+        }).filter(Boolean))).sort();
+
+        var visibleCount = parseCount(countInput);
+        var visibleDateSet = new Set(dates.slice(Math.max(0, dates.length - visibleCount)));
+
+        var expanded = toggleButton.getAttribute('aria-expanded') === 'true';
+
+        rows.forEach(function (row) {
+          var date = normalizeDate(row.dataset.date);
+          var shouldAlwaysShow = visibleDateSet.has(date);
+          row.hidden = !(shouldAlwaysShow || expanded);
+        });
+
+        markDateChangeDividers(table);
+      }
+
+      function wirePastDatesControl(table) {
+        var toggleButton = table.querySelector('.past-dates-toggle');
+        var toggleLabel = toggleButton?.querySelector('.toggle-label');
+
+        if (!toggleButton || !toggleLabel || toggleButton.dataset.countInputAttached === 'true') {
+          return;
+        }
+
+        var mainGroup = document.createElement('span');
+        mainGroup.className = 'past-dates-toggle-main';
+
+        toggleLabel.before(mainGroup);
+        mainGroup.append(toggleLabel);
+
+        var countInput = document.createElement('input');
+        countInput.type = 'number';
+        countInput.className = 'past-dates-count-input';
+        countInput.min = '0';
+        countInput.step = '1';
+        countInput.inputMode = 'numeric';
+        countInput.setAttribute('aria-label', 'Number of past dates to show');
+        countInput.value = String(DEFAULT_PAST_DATES);
+
+        mainGroup.append(countInput);
+
+        countInput.addEventListener('click', function (event) {
+          event.stopPropagation();
+        });
+
+        countInput.addEventListener('keydown', function (event) {
+          event.stopPropagation();
+        });
+
+        var onChange = function () {
+          updatePastRows(table, toggleButton, countInput);
+        };
+
+        countInput.addEventListener('input', onChange);
+        countInput.addEventListener('change', onChange);
+        countInput.addEventListener('blur', onChange);
+
+        toggleButton.addEventListener('click', function () {
+          updatePastRows(table, toggleButton, countInput);
+        });
+
+        toggleButton.dataset.countInputAttached = 'true';
+        updatePastRows(table, toggleButton, countInput);
+      }
+
+      function updateRenderedDateCells(table) {
+        if (!table) {
+          return;
+        }
+
+        Array.from(table.tBodies[0]?.rows || []).forEach(function (row) {
+          if (!row || row.classList.contains('past-dates-toggle-row') || row.classList.contains('today-indicator-row')) {
+            return;
+          }
+
+          var dateCell = row.cells[3];
+          if (!dateCell) {
+            return;
+          }
+
+          dateCell.textContent = formatDisplayDate(row.dataset.date || dateCell.textContent);
+        });
+      }
+
+      function attachControls() {
+        updateBackToScheduleLink();
+
+        document.querySelectorAll('.class-schedule-table').forEach(function (table) {
+          wirePastDatesControl(table);
+          updateRenderedDateCells(table);
+          markDateChangeDividers(table);
+        });
+      }
+
+      document.addEventListener('class-schedule-rendered', function (event) {
+        updateBackToScheduleLink();
+        var table = event.detail?.table || null;
+        wirePastDatesControl(table);
+        updateRenderedDateCells(table);
+        markDateChangeDividers(table);
+      });
+
+      document.addEventListener('full-schedule-focus-changed', function () {
+        document.querySelectorAll('.class-schedule-table').forEach(function (table) {
+          var toggle = table.querySelector('.past-dates-toggle');
+          var count = table.querySelector('.past-dates-count-input');
+          if (toggle && count) updatePastRows(table, toggle, count);
+          markDateChangeDividers(table);
+        });
+      });
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attachControls);
+      } else {
+        attachControls();
+      }
+    })();
+  </script>
+</body>
+</html>

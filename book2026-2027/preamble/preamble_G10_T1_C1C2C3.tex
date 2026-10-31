@@ -1,0 +1,174 @@
+% Unified Grade 10 Term 1 C1--C3 presentation layer.
+% Loads the article class and common navigation/scoring exactly once.
+\input{preamble.tex}
+
+\ExplSyntaxOn
+
+\seq_new:N \l_decision_alternatives_seq
+\seq_new:N \l_decision_states_seq
+\int_new:N \l_decision_slot_count_int
+\dim_new:N \l_decision_slot_width_dim
+
+\cs_new_protected:Npn \decision_prepare_lists:nn #1 #2
+{
+	\seq_set_split:Nnn \l_decision_alternatives_seq { ; } { #1 }
+	\seq_set_split:Nnn \l_decision_states_seq { ; } { #2 }
+	
+	\seq_set_map:NNn \l_decision_alternatives_seq \l_decision_alternatives_seq
+	{
+		\tl_trim_spaces:n {##1}
+	}
+	\seq_set_map:NNn \l_decision_states_seq \l_decision_states_seq
+	{
+		\tl_trim_spaces:n {##1}
+	}
+	
+	\int_set:Nn \l_decision_slot_count_int
+	{
+		\int_max:nn
+		{ \seq_count:N \l_decision_alternatives_seq }
+		{ \seq_count:N \l_decision_states_seq }
+	}
+}
+
+\cs_new_protected:Npn \decision_print_slots:Nn #1 #2
+{
+	\dim_set:Nn \l_decision_slot_width_dim
+	{
+		\linewidth / \int_use:N \l_decision_slot_count_int
+	}
+	
+	\int_step_inline:nn { \l_decision_slot_count_int }
+	{
+		\parbox[t]{\l_decision_slot_width_dim}
+		{
+			\raggedright
+			\int_compare:nTF {##1 <= \seq_count:N #1}
+			{
+				\textbf{\(#2\sb{##1}\):}~\seq_item:Nn #1 {##1}
+			}
+			{
+				\strut
+			}
+		}%
+	}
+}
+
+\NewDocumentCommand{\DecisionElementsTable}{mmmm}
+{
+	\decision_prepare_lists:nn {#1} {#2}
+	
+	\begin{center}
+		\begin{tabularx}{\linewidth}
+			{@{}p{2.65cm}>{\raggedright\arraybackslash}X@{}}
+			\toprule
+			Element & Description \\
+			\midrule
+			Alternatives & \decision_print_slots:Nn
+			\l_decision_alternatives_seq {A} \\
+			States~of~nature & \decision_print_slots:Nn
+			\l_decision_states_seq {S} \\
+			Uncertain~event & #3 \\
+			Consequences & #4 \\
+			\bottomrule
+		\end{tabularx}
+	\end{center}
+}
+
+\ExplSyntaxOff
+
+
+% All calculation-cell interfaces take {expression lines}{visible result}.
+% Break corresponding symbolic/numerical expressions at the same components.
+\usepackage{pdflscape}
+\usepackage{needspace}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcolumntype{M}{>{\centering\arraybackslash}m{0.16\linewidth}}
+\newcommand{\PayoffStrut}{\vphantom{\begin{gathered}1\\1\end{gathered}}}
+\newsavebox{\CalculationCellBox}
+\newlength{\CalculationCellHeight}
+\newlength{\CalculationCellDepth}
+\newif\ifMeasuringCalculations
+\newcommand{\CalculationCell}[2]{%
+  \sbox{\CalculationCellBox}{\ensuremath{\begin{gathered}#1\\= #2\end{gathered}}}%
+  \ifMeasuringCalculations
+    \ifdim\ht\CalculationCellBox>\CalculationCellHeight
+      \global\CalculationCellHeight=\ht\CalculationCellBox\fi
+    \ifdim\dp\CalculationCellBox>\CalculationCellDepth
+      \global\CalculationCellDepth=\dp\CalculationCellBox\fi
+  \fi
+  \ensuremath{\vphantom{\rule[-\CalculationCellDepth]{0pt}{%
+    \dimexpr\CalculationCellHeight+\CalculationCellDepth\relax}}}%
+  \usebox{\CalculationCellBox}%
+}
+\newcommand{\SymbolicCell}[2]{\CalculationCell{#1}{#2}}
+\newcommand{\CalcResult}[2]{\CalculationCell{#1}{#2}}
+\newcommand{\PayoffNumber}[2]{\CalcResult{#1}{#2}}
+\newsavebox{\SymbolicTableBox}
+\newsavebox{\NumericalTableBox}
+\newlength{\SymbolicTableWidth}
+\newlength{\NumericalTableWidth}
+% \CalculationPair{heading}{symbolic tabular}{numerical tabular}.
+% Measure every cell before typesetting either table. The shared height/depth
+% gives corresponding rows the same baselines, including four-plus-line cells.
+% No scaling: call on a wider CalculationLandscape page when necessary.
+\newcommand{\CalculationPair}[3]{%
+  \par\medskip\noindent
+  \begin{minipage}{\linewidth}
+    \linespread{1}\selectfont\setlength{\parskip}{0pt}%
+    \setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.15}%
+    \medmuskip=2mu\thickmuskip=3mu\relax
+    \global\CalculationCellHeight=0pt \global\CalculationCellDepth=0pt
+    \MeasuringCalculationstrue
+    \sbox{\SymbolicTableBox}{#2}\sbox{\NumericalTableBox}{#3}%
+    \MeasuringCalculationsfalse
+    \setlength{\SymbolicTableWidth}{\wd\SymbolicTableBox}%
+    \setlength{\NumericalTableWidth}{\wd\NumericalTableBox}%
+    \ifdim\NumericalTableWidth<145pt \setlength{\NumericalTableWidth}{145pt}\fi
+    \textbf{#1}\par\smallskip
+    \noindent\hbox to\linewidth{\hfil
+      \begin{minipage}[t]{\SymbolicTableWidth}
+        \centering\textbf{\strut Symbolic calculations.}\par\smallskip #2
+      \end{minipage}\hspace{20pt}%
+      \begin{minipage}[t]{\NumericalTableWidth}
+        \centering\textbf{\strut Numerical calculations.}\par\smallskip #3
+      \end{minipage}\hfil}%
+  \end{minipage}\par\medskip
+}
+% Content rows: symbol & value (with units) & contextual meaning \\.
+\newcommand{\SymbolsTable}[1]{%
+  \par\medskip\textbf{Symbols, values, and meanings.}\par
+  \begin{center}\small
+  \begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}}
+  \toprule Symbol & Value (including units) & Meaning in this problem \\ \midrule
+  #1
+  \bottomrule\end{tabularx}\end{center}%
+}
+% \FinalPayoffTable{units/measure}{state headings}{alternative rows}.
+\newcommand{\FinalPayoffTable}[3]{%
+  \par\noindent\begin{minipage}{\linewidth}
+  \begin{center}\textbf{Final payoff table (#1).}\par\smallskip
+  \begin{tabular}{@{}l*{\numexpr\CalculationStateCount\relax}{c}@{}}
+  \toprule Alternative & #2 \\ \midrule #3 \bottomrule
+  \end{tabular}\end{center}\end{minipage}\par%
+}
+\newcommand{\CalculationStateCount}{2}
+% Explicit sheet dimensions, with exact restoration of the caller's geometry
+% and media size. This also preserves classroom/exam margin overrides.
+\newenvironment{CalculationLandscape}[2]{%
+  \clearpage
+  \edef\CalculationPreviousWidth{\the\paperwidth}%
+  \edef\CalculationPreviousHeight{\the\paperheight}%
+  \savegeometry{CalculationPreviousGeometry}%
+  \newgeometry{left=0.4in,right=0.4in,top=0.4in,textheight=\dimexpr#2-0.95in\relax}%
+  \paperwidth=#1\relax\paperheight=#2\relax
+  \pdfpagewidth=\paperwidth\pdfpageheight=\paperheight
+  \textwidth=\dimexpr#1-0.8in\relax
+  \hsize=\textwidth\linewidth=\textwidth\columnwidth=\textwidth
+}{%
+  \clearpage
+  \paperwidth=\CalculationPreviousWidth\relax
+  \paperheight=\CalculationPreviousHeight\relax
+  \pdfpagewidth=\paperwidth\pdfpageheight=\paperheight
+  \loadgeometry{CalculationPreviousGeometry}%
+}

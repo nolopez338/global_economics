@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="../../../assets/png/icon_global.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scatter Plot, Correlation, and Regression Explorer</title>
+  <style>
+    :root {
+      --bg: #f6f8fc;
+      --panel: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --grid: #e5e7eb;
+      --axis: #334155;
+      --point: #0f766e;
+      --line: #dc2626;
+      --border: #d1d5db;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--text);
+      background: linear-gradient(160deg, #f8fafc, var(--bg));
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.25rem, 2vw, 1.75rem);
+      line-height: 1.2;
+    }
+
+    .subtitle {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .resource-block {
+      margin-bottom: 16px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #f9fafb;
+    }
+
+    .resource-block a {
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .resource-block a:hover {
+      text-decoration: underline;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(380px, 1.25fr) minmax(280px, 0.9fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .plot-panel,
+    .control-panel,
+    .concept-panel {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      padding: 14px;
+    }
+
+    .concept-panel {
+      margin-top: 18px;
+      background: #fcfdff;
+    }
+
+    canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      cursor: default;
+    }
+
+    .section-title {
+      margin: 0 0 12px;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .control-group {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+      color: #374151;
+      font-weight: 600;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    input:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+
+    .readout {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px 10px;
+      margin: 10px 0 14px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #f9fafb;
+      font-size: 0.95rem;
+    }
+
+    .readout .key {
+      color: #374151;
+      font-weight: 600;
+    }
+
+    .readout .value {
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .equation-box {
+      margin: 12px 0;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #bfdbfe;
+      background: #eff6ff;
+      color: #1e3a8a;
+      font-weight: 700;
+      font-size: 1rem;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #1e3a8a;
+      font-weight: 700;
+      font-size: 0.82rem;
+      margin-top: 6px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 9px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.93rem;
+      font-weight: 700;
+      padding: 10px 12px;
+      cursor: pointer;
+    }
+
+    button:hover { filter: brightness(1.03); }
+
+    .button-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .ghost {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .notes {
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      color: #374151;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .notes p,
+    .concept-panel p {
+      margin: 0 0 8px;
+    }
+
+    .formula {
+      padding: 8px 10px;
+      border-left: 3px solid #93c5fd;
+      background: #f8fbff;
+      border-radius: 8px;
+      margin: 10px 0;
+      font-family: "Cambria Math", "Times New Roman", serif;
+      font-size: 0.96rem;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .memory-aid {
+      margin-top: 8px;
+      padding: 10px;
+      border: 1px dashed #93c5fd;
+      border-radius: 10px;
+      background: #f8fbff;
+      font-size: 0.92rem;
+    }
+
+    .tip {
+      color: var(--muted);
+      font-size: 0.84rem;
+      margin-top: 8px;
+    }
+
+    .mode-toggle {
+      margin-bottom: 14px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #f9fafb;
+    }
+
+    .mode-toggle .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .mode-toggle label {
+      margin: 0;
+    }
+
+    .mode-toggle input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+    }
+
+    .mode-state {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+
+    <section class="resource-block" aria-label="Activity resource">
+      <a href="https://correosanbartoloedu-my.sharepoint.com/:b:/g/personal/nicolas_lopez_sanbartolo_edu_co/IQBDJpJUEleIR5r20sKK9QDAAdReL-JAMIrT5aDQMzfs54Y?e=qzDFu2" target="_blank" rel="noopener noreferrer">Coefficient Correlation Activity</a>
+    </section>
+
+    <h1>Scatter Plot, Linear Correlation, and Regression Explorer</h1>
+    <p class="subtitle">Adjust the target linear correlation coefficient and regression parameters to see a live model of \(y=a+bx+\varepsilon\).</p>
+
+    <section class="layout">
+      <div class="plot-panel">
+        <h2 class="section-title">Scatter Plot and Regression Line</h2>
+        <canvas id="plot" width="700" height="520" aria-label="Scatter plot with x and y axes and regression line"></canvas>
+        <p class="tip">Tip: Drag points directly on the graph. Then move sliders to continue from that current cloud without rebuilding everything.</p>
+      </div>
+
+      <aside class="control-panel">
+        <h2 class="section-title">Controls & Outputs</h2>
+
+        <div class="mode-toggle">
+          <div class="row">
+            <label for="regressionModeToggle">Use regression controls</label>
+            <input id="regressionModeToggle" type="checkbox" checked aria-describedby="modeStateText" />
+          </div>
+          <p id="modeStateText" class="mode-state">Regression mode active: adjust intercept (a) and slope (b).</p>
+        </div>
+
+        <div class="control-group">
+          <label for="targetSlider">Target linear correlation coefficient (r): <span id="targetValue">0.00</span></label>
+          <input id="targetSlider" type="range" min="-1" max="1" step="0.01" value="0" />
+        </div>
+
+        <div class="control-group">
+          <label for="slopeSlider">Regression slope coefficient (b): <span id="slopeValue">1.00</span></label>
+          <input id="slopeSlider" type="range" min="-3" max="3" step="0.01" value="1" />
+        </div>
+
+        <div class="control-group">
+          <label for="interceptSlider">Regression intercept (a): <span id="interceptValue">0.00</span></label>
+          <input id="interceptSlider" type="range" min="-2.5" max="2.5" step="0.01" value="0" />
+        </div>
+
+        <div class="control-group">
+          <label for="pointCount">Number of points</label>
+          <input id="pointCount" type="number" min="5" max="120" step="1" value="28" />
+        </div>
+
+        <div class="control-group">
+          <label for="xZoomSlider">X-axis zoom: <span id="xZoomValue">1.00×</span></label>
+          <input id="xZoomSlider" type="range" min="0.5" max="4" step="0.05" value="1" />
+        </div>
+
+        <div class="control-group">
+          <label for="yZoomSlider">Y-axis zoom: <span id="yZoomValue">1.00×</span></label>
+          <input id="yZoomSlider" type="range" min="0.5" max="4" step="0.05" value="1" />
+        </div>
+
+        <div class="readout" style="margin-top: 4px; margin-bottom: 14px;">
+          <div class="key">Visible x-range</div><div id="xRangeReadout" class="value">[-3.00, 3.00]</div>
+          <div class="key">Visible y-range</div><div id="yRangeReadout" class="value">[-3.00, 3.00]</div>
+        </div>
+
+        <div class="equation-box" id="equationReadout">ŷ = 0.000 + 1.000x</div>
+
+        <div class="readout">
+          <div class="key">Target r</div><div id="targetReadout" class="value">0.000</div>
+          <div class="key">Actual r (Pearson)</div><div id="actualReadout" class="value">0.000</div>
+          <div class="key">Regression slope b</div><div id="slopeReadout" class="value">1.000</div>
+          <div class="key">Regression intercept a</div><div id="interceptReadout" class="value">0.000</div>
+        </div>
+
+        <div>
+          <div class="key" style="font-size: 0.9rem; font-weight: 600; color:#374151;">Association strength</div>
+          <div id="qualitative" class="badge">Near zero</div>
+        </div>
+
+        <div class="button-row" style="margin-top:14px;">
+          <button id="regenBtn" type="button">Generate New Dataset</button>
+          <button id="resetBtn" class="ghost" type="button">Reset</button>
+          <button id="resetViewBtn" class="ghost" type="button">Reset View</button>
+        </div>
+
+        <div class="notes">
+          <p><strong>What is correlation?</strong> The Pearson linear correlation coefficient <em>r</em> measures the strength and direction of a linear relationship between two variables.</p>
+          <p><strong>Range of r:</strong> from -1 (perfect negative line) to +1 (perfect positive line). Values near 0 indicate weak linear association.</p>
+          <p><strong>Important:</strong> Correlation describes association, not causation.</p>
+          <p><strong>Zoom controls:</strong> These change only the visible graph window. Data values are not changed by zooming.</p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="concept-panel" aria-label="Conceptual distinction between correlation and slope">
+      <h2 class="section-title">How are <em>r</em> and <em>b</em> related, and why are they different?</h2>
+      <p>The linear correlation coefficient <em>r</em> answers: <strong>How strong and in what direction is the linear association?</strong> The regression slope coefficient <em>b</em> answers: <strong>How much does predicted \(y\) change when \(x\) increases by 1 unit?</strong></p>
+      <p>So, <em>r</em> is a <strong>measure of association</strong>, while <em>b</em> is a <strong>measure of change</strong>.</p>
+
+      <div class="formula">r = [nΣxy - (Σx)(Σy)] / √([nΣx² - (Σx)²][nΣy² - (Σy)²])</div>
+      <div class="formula">b = [nΣxy - (Σx)(Σy)] / [nΣx² - (Σx)²]</div>
+
+      <p>Both formulas have the same numerator, but the denominators are different. Therefore, <em>r</em> and <em>b</em> are generally not equal.</p>
+      <div class="formula">b = r(s<sub>y</sub> / s<sub>x</sub>)</div>
+      <p>Here, \(s_y\) is the standard deviation of \(y\), and \(s_x\) is the standard deviation of \(x\). This relationship explains why <em>r</em> and <em>b</em> may sometimes look similar but are usually different.</p>
+      <p><strong>Interpretation:</strong> <em>r</em> is always between -1 and 1 and has no units. The slope coefficient <em>b</em> is not restricted to [-1, 1] and has units of <em>y</em> per unit of <em>x</em>.</p>
+      <p>If <em>r = b</em> in one example, that is a special case where \(s_y / s_x = 1\), meaning the spread of \(x\) and \(y\) is the same. This is not a general rule.</p>
+
+      <div class="memory-aid">
+        <strong>Memory aid:</strong><br />
+        • <em>r</em>: “How strong is the linear relationship?”<br />
+        • <em>b</em>: “How much does predicted <em>y</em> change when <em>x</em> increases by 1?”
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const canvas = document.getElementById('plot');
+      const ctx = canvas.getContext('2d');
+
+      const targetSlider = document.getElementById('targetSlider');
+      const slopeSlider = document.getElementById('slopeSlider');
+      const interceptSlider = document.getElementById('interceptSlider');
+      const regressionModeToggle = document.getElementById('regressionModeToggle');
+      const modeStateText = document.getElementById('modeStateText');
+      const targetValue = document.getElementById('targetValue');
+      const slopeValue = document.getElementById('slopeValue');
+      const interceptValue = document.getElementById('interceptValue');
+      const pointCountInput = document.getElementById('pointCount');
+      const targetReadout = document.getElementById('targetReadout');
+      const actualReadout = document.getElementById('actualReadout');
+      const slopeReadout = document.getElementById('slopeReadout');
+      const interceptReadout = document.getElementById('interceptReadout');
+      const equationReadout = document.getElementById('equationReadout');
+      const qualitative = document.getElementById('qualitative');
+      const regenBtn = document.getElementById('regenBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const xZoomSlider = document.getElementById('xZoomSlider');
+      const yZoomSlider = document.getElementById('yZoomSlider');
+      const xZoomValue = document.getElementById('xZoomValue');
+      const yZoomValue = document.getElementById('yZoomValue');
+      const xRangeReadout = document.getElementById('xRangeReadout');
+      const yRangeReadout = document.getElementById('yRangeReadout');
+      const resetViewBtn = document.getElementById('resetViewBtn');
+
+      const margin = { top: 20, right: 20, bottom: 46, left: 56 };
+      const dataXMin = -3;
+      const dataXMax = 3;
+      const dataYMin = -3;
+      const dataYMax = 3;
+      const defaultVisibleXMin = -3;
+      const defaultVisibleXMax = 3;
+      const defaultVisibleYMin = -3;
+      const defaultVisibleYMax = 3;
+      const defaultVisibleXCenter = (defaultVisibleXMin + defaultVisibleXMax) / 2;
+      const defaultVisibleYCenter = (defaultVisibleYMin + defaultVisibleYMax) / 2;
+      const defaultVisibleXWidth = defaultVisibleXMax - defaultVisibleXMin;
+      const defaultVisibleYHeight = defaultVisibleYMax - defaultVisibleYMin;
+      const pointRadius = 5;
+      const EPS = 1e-9;
+
+      let visibleXMin = defaultVisibleXMin;
+      let visibleXMax = defaultVisibleXMax;
+      let visibleYMin = defaultVisibleYMin;
+      let visibleYMax = defaultVisibleYMax;
+
+      let points = [];
+      let dragIndex = -1;
+      let latent = { xStd: [], zStd: [] };
+      let isProgrammaticControlSync = false;
+      let isRegressionMode = regressionModeToggle.checked;
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function randn() {
+        let u = 0;
+        let v = 0;
+        while (u === 0) u = Math.random();
+        while (v === 0) v = Math.random();
+        return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+      }
+
+      function mean(arr) {
+        return arr.reduce((sum, x) => sum + x, 0) / arr.length;
+      }
+
+      function std(arr, m) {
+        const variance = arr.reduce((acc, x) => acc + (x - m) ** 2, 0) / arr.length;
+        return Math.sqrt(variance);
+      }
+
+      function dot(a, b) {
+        let sum = 0;
+        for (let i = 0; i < a.length; i++) sum += a[i] * b[i];
+        return sum;
+      }
+
+      function standardize(arr) {
+        if (arr.length === 0) return [];
+        const m = mean(arr);
+        const s = std(arr, m);
+        if (s < EPS) return arr.map((_, i) => (i % 2 === 0 ? -1 : 1));
+        return arr.map((v) => (v - m) / s);
+      }
+
+      function orthogonalizedStandardNoise(raw, xStd) {
+        let z = raw.slice();
+        const xNormSq = dot(xStd, xStd);
+        if (xNormSq > EPS) {
+          const projScale = dot(z, xStd) / xNormSq;
+          z = z.map((v, i) => v - projScale * xStd[i]);
+        }
+        z = standardize(z);
+        if (xNormSq > EPS) {
+          const correction = dot(z, xStd) / xNormSq;
+          z = z.map((v, i) => v - correction * xStd[i]);
+          z = standardize(z);
+        }
+        return z;
+      }
+
+      function computeStats(data) {
+        const n = data.length;
+        if (n < 2) return { n, mx: 0, my: 0, sx: 0, sy: 0, cov: 0, r: 0, slope: 0, intercept: 0 };
+        const xs = data.map((p) => p.x);
+        const ys = data.map((p) => p.y);
+        const mx = mean(xs);
+        const my = mean(ys);
+        const sx = std(xs, mx);
+        const sy = std(ys, my);
+        if (sx < EPS || sy < EPS) {
+          return { n, mx, my, sx, sy, cov: 0, r: 0, slope: 0, intercept: my };
+        }
+        let cov = 0;
+        for (let i = 0; i < n; i++) cov += (xs[i] - mx) * (ys[i] - my);
+        cov /= n;
+        const slope = cov / (sx * sx);
+        const intercept = my - slope * mx;
+        const r = clamp(cov / (sx * sy), -1, 1);
+        return { n, mx, my, sx, sy, cov, r, slope, intercept };
+      }
+
+      function createRandomLatentDataset(count) {
+        const xRaw = Array.from({ length: count }, () => randn());
+        const zRaw = Array.from({ length: count }, () => randn());
+        latent.xStd = standardize(xRaw);
+        latent.zStd = orthogonalizedStandardNoise(zRaw, latent.xStd);
+      }
+
+      function addLatentPoints(countToAdd) {
+        for (let i = 0; i < countToAdd; i++) {
+          latent.xStd.push(randn());
+          latent.zStd.push(randn());
+        }
+        latent.xStd = standardize(latent.xStd);
+        latent.zStd = orthogonalizedStandardNoise(latent.zStd, latent.xStd);
+      }
+
+      function removeLatentPoints(countToRemove) {
+        if (countToRemove <= 0) return;
+        latent.xStd.splice(-countToRemove, countToRemove);
+        latent.zStd.splice(-countToRemove, countToRemove);
+        latent.xStd = standardize(latent.xStd);
+        latent.zStd = orthogonalizedStandardNoise(latent.zStd, latent.xStd);
+      }
+
+      function syncLatentFromPoints() {
+        if (points.length < 2) return;
+        const stats = computeStats(points);
+        const xs = points.map((p) => p.x);
+        const residuals = points.map((p) => p.y - stats.intercept - stats.slope * p.x);
+        const xStd = standardize(xs);
+        const zStd = orthogonalizedStandardNoise(residuals, xStd);
+        latent = { xStd, zStd };
+      }
+
+      function composeFromLatent(controlR, controlSlope, controlIntercept) {
+        const absR = Math.abs(controlR);
+        const noiseScale = absR < 0.01
+          ? Math.max(Math.abs(controlSlope), 0.1) * 3
+          : Math.max(Math.abs(controlSlope), 0.05) * Math.sqrt(Math.max(0, (1 / (absR * absR)) - 1));
+
+        points = latent.xStd.map((x, i) => ({
+          x: clamp(x, dataXMin, dataXMax),
+          y: clamp(controlIntercept + controlSlope * x + noiseScale * latent.zStd[i], dataYMin, dataYMax)
+        }));
+      }
+
+      function setControls({ targetR, slope, intercept }) {
+        isProgrammaticControlSync = true;
+        if (typeof targetR === 'number') targetSlider.value = clamp(targetR, -1, 1).toFixed(2);
+        if (typeof slope === 'number') slopeSlider.value = clamp(slope, -3, 3).toFixed(2);
+        if (typeof intercept === 'number') interceptSlider.value = clamp(intercept, -2.5, 2.5).toFixed(2);
+        isProgrammaticControlSync = false;
+      }
+
+      function applyModeState() {
+        targetSlider.disabled = isRegressionMode;
+        slopeSlider.disabled = !isRegressionMode;
+        interceptSlider.disabled = !isRegressionMode;
+
+        modeStateText.textContent = isRegressionMode
+          ? 'Regression mode active: adjust intercept (a) and slope (b).'
+          : 'Correlation mode active: adjust target correlation coefficient (r).';
+      }
+
+      function getQualitativeLabel(r) {
+        if (r >= 0.7) return 'Strong positive';
+        if (r >= 0.3) return 'Weak positive';
+        if (r > -0.3) return 'Near zero';
+        if (r > -0.7) return 'Weak negative';
+        return 'Strong negative';
+      }
+
+      function updateViewportFromZoom() {
+        const xZoom = Number(xZoomSlider.value);
+        const yZoom = Number(yZoomSlider.value);
+
+        const halfX = (defaultVisibleXWidth / xZoom) / 2;
+        const halfY = (defaultVisibleYHeight / yZoom) / 2;
+
+        visibleXMin = defaultVisibleXCenter - halfX;
+        visibleXMax = defaultVisibleXCenter + halfX;
+        visibleYMin = defaultVisibleYCenter - halfY;
+        visibleYMax = defaultVisibleYCenter + halfY;
+
+        xZoomValue.textContent = `${xZoom.toFixed(2)}×`;
+        yZoomValue.textContent = `${yZoom.toFixed(2)}×`;
+        xRangeReadout.textContent = `[${visibleXMin.toFixed(2)}, ${visibleXMax.toFixed(2)}]`;
+        yRangeReadout.textContent = `[${visibleYMin.toFixed(2)}, ${visibleYMax.toFixed(2)}]`;
+      }
+
+      function refreshReadouts() {
+        const targetR = Number(targetSlider.value);
+        const stats = computeStats(points);
+
+        targetValue.textContent = targetR.toFixed(2);
+        slopeValue.textContent = Number(slopeSlider.value).toFixed(2);
+        interceptValue.textContent = Number(interceptSlider.value).toFixed(2);
+
+        targetReadout.textContent = targetR.toFixed(3);
+        actualReadout.textContent = stats.r.toFixed(3);
+        slopeReadout.textContent = stats.slope.toFixed(3);
+        interceptReadout.textContent = stats.intercept.toFixed(3);
+
+        const sign = stats.slope >= 0 ? '+' : '-';
+        equationReadout.textContent = `ŷ = ${stats.intercept.toFixed(3)} ${sign} ${Math.abs(stats.slope).toFixed(3)}x`;
+        qualitative.textContent = getQualitativeLabel(stats.r);
+      }
+
+      function xToPx(x) {
+        const plotW = canvas.width - margin.left - margin.right;
+        return margin.left + ((x - visibleXMin) / (visibleXMax - visibleXMin)) * plotW;
+      }
+
+      function yToPx(y) {
+        const plotH = canvas.height - margin.top - margin.bottom;
+        return margin.top + ((visibleYMax - y) / (visibleYMax - visibleYMin)) * plotH;
+      }
+
+      function pxToX(px) {
+        const plotW = canvas.width - margin.left - margin.right;
+        return visibleXMin + ((px - margin.left) / plotW) * (visibleXMax - visibleXMin);
+      }
+
+      function pxToY(py) {
+        const plotH = canvas.height - margin.top - margin.bottom;
+        return visibleYMax - ((py - margin.top) / plotH) * (visibleYMax - visibleYMin);
+      }
+
+      function calculateTicks(min, max) {
+        const span = max - min;
+        if (span <= 0) return [min];
+        const roughStep = span / 6;
+        const power = Math.pow(10, Math.floor(Math.log10(roughStep)));
+        const multipliers = [1, 2, 5, 10];
+        let step = power;
+        for (const m of multipliers) {
+          if (m * power >= roughStep) {
+            step = m * power;
+            break;
+          }
+        }
+
+        const ticks = [];
+        const start = Math.ceil(min / step) * step;
+        for (let t = start; t <= max + EPS; t += step) {
+          ticks.push(Number(t.toFixed(10)));
+        }
+        return ticks;
+      }
+
+      function drawAxes() {
+        const plotLeft = margin.left;
+        const plotRight = canvas.width - margin.right;
+        const plotTop = margin.top;
+        const plotBottom = canvas.height - margin.bottom;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = '#e5e7eb';
+        ctx.lineWidth = 1;
+        ctx.fillStyle = '#6b7280';
+        ctx.font = '12px Inter, Segoe UI, sans-serif';
+
+        const xTicks = calculateTicks(visibleXMin, visibleXMax);
+        const yTicks = calculateTicks(visibleYMin, visibleYMax);
+
+        xTicks.forEach((t) => {
+          const px = xToPx(t);
+          ctx.beginPath();
+          ctx.moveTo(px, plotTop);
+          ctx.lineTo(px, plotBottom);
+          ctx.stroke();
+          ctx.fillText(t.toFixed(2).replace(/\.00$/, ''), px - 10, plotBottom + 18);
+        });
+
+        yTicks.forEach((t) => {
+          const py = yToPx(t);
+          ctx.beginPath();
+          ctx.moveTo(plotLeft, py);
+          ctx.lineTo(plotRight, py);
+          ctx.stroke();
+          if (Math.abs(t) > EPS) ctx.fillText(t.toFixed(2).replace(/\.00$/, ''), plotLeft - 34, py + 4);
+        });
+
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 2;
+
+        if (visibleYMin <= 0 && visibleYMax >= 0) {
+          const zeroY = yToPx(0);
+          ctx.beginPath();
+          ctx.moveTo(plotLeft, zeroY);
+          ctx.lineTo(plotRight, zeroY);
+          ctx.stroke();
+          ctx.fillStyle = '#0f172a';
+          ctx.font = '700 14px Inter, Segoe UI, sans-serif';
+          ctx.fillText('x', plotRight - 12, zeroY - 8);
+        }
+
+        if (visibleXMin <= 0 && visibleXMax >= 0) {
+          const zeroX = xToPx(0);
+          ctx.beginPath();
+          ctx.moveTo(zeroX, plotTop);
+          ctx.lineTo(zeroX, plotBottom);
+          ctx.stroke();
+          ctx.fillStyle = '#0f172a';
+          ctx.font = '700 14px Inter, Segoe UI, sans-serif';
+          ctx.fillText('y', zeroX + 8, plotTop + 16);
+        }
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(plotLeft, plotTop, plotRight - plotLeft, plotBottom - plotTop);
+        ctx.clip();
+
+        drawRegressionLine();
+        drawPoints();
+
+        ctx.restore();
+      }
+
+      function drawRegressionLine() {
+        const stats = computeStats(points);
+        const yAtMinX = stats.intercept + stats.slope * visibleXMin;
+        const yAtMaxX = stats.intercept + stats.slope * visibleXMax;
+
+        ctx.save();
+        ctx.strokeStyle = 'rgba(220, 38, 38, 0.95)';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(xToPx(visibleXMin), yToPx(yAtMinX));
+        ctx.lineTo(xToPx(visibleXMax), yToPx(yAtMaxX));
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawPoints() {
+        ctx.fillStyle = 'rgba(15, 118, 110, 0.9)';
+        ctx.strokeStyle = '#0f766e';
+        ctx.lineWidth = 1;
+
+        points.forEach((p) => {
+          if (p.x < visibleXMin || p.x > visibleXMax || p.y < visibleYMin || p.y > visibleYMax) {
+            return;
+          }
+          const px = xToPx(p.x);
+          const py = yToPx(p.y);
+          ctx.beginPath();
+          ctx.arc(px, py, pointRadius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        });
+      }
+
+      function renderAll() {
+        updateViewportFromZoom();
+        drawAxes();
+        refreshReadouts();
+      }
+
+      function recomputeAndSyncFromDataset({ updateTarget = true, updateSlope = true, updateIntercept = true } = {}) {
+        const stats = computeStats(points);
+        setControls({
+          targetR: updateTarget ? stats.r : undefined,
+          slope: updateSlope ? stats.slope : undefined,
+          intercept: updateIntercept ? stats.intercept : undefined
+        });
+        syncLatentFromPoints();
+        renderAll();
+      }
+
+      function handleRChange() {
+        if (isProgrammaticControlSync || isRegressionMode || points.length < 2) return;
+
+        const targetR = Number(targetSlider.value);
+        const stats = computeStats(points);
+        const xs = points.map((p) => p.x);
+        const residual = points.map((p) => p.y - stats.intercept - stats.slope * p.x);
+        const residualOrth = orthogonalizedStandardNoise(residual, standardize(xs));
+
+        const rawResidualScale = std(residual, mean(residual));
+        const absTarget = Math.min(0.999, Math.abs(targetR));
+        const slopeSign = targetR === 0 ? (Math.sign(stats.slope) || 1) : Math.sign(targetR);
+        const slopeMagnitude = Math.max(Math.abs(stats.slope), 0.05);
+        const newSlope = slopeMagnitude * slopeSign;
+
+        let desiredResidualScale;
+        if (absTarget < 0.01) {
+          desiredResidualScale = Math.max(stats.sx, 1) * 2.8;
+        } else {
+          desiredResidualScale = Math.abs(newSlope) * Math.max(stats.sx, 0.2) * Math.sqrt((1 / (absTarget * absTarget)) - 1);
+        }
+
+        const k = rawResidualScale < EPS ? 0 : desiredResidualScale / rawResidualScale;
+        const newIntercept = stats.my - newSlope * stats.mx;
+
+        points = points.map((p, i) => ({
+          x: p.x,
+          y: clamp(newIntercept + newSlope * p.x + (k * rawResidualScale * residualOrth[i]), dataYMin, dataYMax)
+        }));
+
+        recomputeAndSyncFromDataset({ updateTarget: false, updateSlope: true, updateIntercept: true });
+      }
+
+      function handleAChange() {
+        if (isProgrammaticControlSync || !isRegressionMode || points.length < 2) return;
+
+        const targetA = Number(interceptSlider.value);
+        const stats = computeStats(points);
+        const delta = targetA - stats.intercept;
+
+        points = points.map((p) => ({ x: p.x, y: clamp(p.y + delta, dataYMin, dataYMax) }));
+        recomputeAndSyncFromDataset({ updateTarget: true, updateSlope: true, updateIntercept: true });
+      }
+
+      function handleBChange() {
+        if (isProgrammaticControlSync || !isRegressionMode || points.length < 2) return;
+
+        const targetB = Number(slopeSlider.value);
+        const stats = computeStats(points);
+        const residual = points.map((p) => p.y - stats.intercept - stats.slope * p.x);
+        const newIntercept = stats.my - targetB * stats.mx;
+
+        points = points.map((p, i) => ({
+          x: p.x,
+          y: clamp(newIntercept + targetB * p.x + residual[i], dataYMin, dataYMax)
+        }));
+
+        recomputeAndSyncFromDataset({ updateTarget: true, updateSlope: true, updateIntercept: true });
+      }
+
+      function regenerateLatentDataset() {
+        const count = clamp(parseInt(pointCountInput.value, 10) || 28, 5, 120);
+        pointCountInput.value = count;
+        createRandomLatentDataset(count);
+        composeFromLatent(Number(targetSlider.value), Number(slopeSlider.value), Number(interceptSlider.value));
+        recomputeAndSyncFromDataset({ updateTarget: true, updateSlope: true, updateIntercept: true });
+      }
+
+      function handlePointCountChange() {
+        const nextCount = clamp(parseInt(pointCountInput.value, 10) || points.length || 28, 5, 120);
+        pointCountInput.value = nextCount;
+
+        syncLatentFromPoints();
+        const currentCount = latent.xStd.length;
+        if (nextCount > currentCount) addLatentPoints(nextCount - currentCount);
+        if (nextCount < currentCount) removeLatentPoints(currentCount - nextCount);
+
+        composeFromLatent(Number(targetSlider.value), Number(slopeSlider.value), Number(interceptSlider.value));
+        recomputeAndSyncFromDataset({ updateTarget: true, updateSlope: true, updateIntercept: true });
+      }
+
+      function resetViewport() {
+        xZoomSlider.value = '1';
+        yZoomSlider.value = '1';
+        renderAll();
+      }
+
+      function resetControlsAndDataset() {
+        setControls({ targetR: 0, slope: 1, intercept: 0 });
+        pointCountInput.value = '28';
+        resetViewport();
+        regenerateLatentDataset();
+      }
+
+      targetSlider.addEventListener('input', handleRChange);
+      slopeSlider.addEventListener('input', handleBChange);
+      interceptSlider.addEventListener('input', handleAChange);
+      regressionModeToggle.addEventListener('change', () => {
+        isRegressionMode = regressionModeToggle.checked;
+        applyModeState();
+        renderAll();
+      });
+      pointCountInput.addEventListener('change', handlePointCountChange);
+      regenBtn.addEventListener('click', regenerateLatentDataset);
+      resetBtn.addEventListener('click', resetControlsAndDataset);
+      xZoomSlider.addEventListener('input', renderAll);
+      yZoomSlider.addEventListener('input', renderAll);
+      resetViewBtn.addEventListener('click', resetViewport);
+
+      canvas.addEventListener('mousedown', (event) => {
+        const rect = canvas.getBoundingClientRect();
+        const mx = event.clientX - rect.left;
+        const my = event.clientY - rect.top;
+
+        dragIndex = -1;
+        let closestDist = Infinity;
+
+        points.forEach((p, i) => {
+          const dx = xToPx(p.x) - mx;
+          const dy = yToPx(p.y) - my;
+          const d = Math.hypot(dx, dy);
+          if (d < pointRadius + 4 && d < closestDist) {
+            closestDist = d;
+            dragIndex = i;
+          }
+        });
+
+        if (dragIndex !== -1) canvas.style.cursor = 'grabbing';
+      });
+
+      canvas.addEventListener('mousemove', (event) => {
+        if (dragIndex === -1) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const mx = event.clientX - rect.left;
+        const my = event.clientY - rect.top;
+
+        points[dragIndex].x = clamp(pxToX(mx), dataXMin, dataXMax);
+        points[dragIndex].y = clamp(pxToY(my), dataYMin, dataYMax);
+
+        recomputeAndSyncFromDataset({ updateTarget: true, updateSlope: true, updateIntercept: true });
+      });
+
+      function endDrag() {
+        if (dragIndex === -1) return;
+        dragIndex = -1;
+        canvas.style.cursor = 'default';
+        syncLatentFromPoints();
+      }
+
+      canvas.addEventListener('mouseup', endDrag);
+      canvas.addEventListener('mouseleave', endDrag);
+
+      applyModeState();
+      resetControlsAndDataset();
+    })();
+  </script>
+</body>
+</html>
