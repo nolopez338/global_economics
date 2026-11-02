@@ -1,12 +1,21 @@
 """Repartir una cuenta: pagos iguales, sin incógnitas algebraicas.
 
 Manim Community 0.17.3. Renderizar desde la raíz del repositorio:
-    manim -qh --fps 60 assets/manim/restaurant_bill.py RestaurantBillShares
+    manim -qh --fps 60 assets/manim/algebra/stage2_algebraic_expressions/restaurant_bill.py RestaurantBillShares
 
 Los medios se guardan fuera del repositorio, en San Bartolo/manim_media.
+Videos: San Bartolo/manim_media/videos/algebra/stage2_1/{quality}.
 """
 
 from pathlib import Path
+import sys
+
+# Manim loads scripts by path; imports must also work outside the repository.
+REPOSITORY_ROOT = str(Path(__file__).resolve().parents[4])
+if REPOSITORY_ROOT not in sys.path:
+    sys.path.insert(0, REPOSITORY_ROOT)
+
+from assets.manim.algebra.output_config import AlgebraScene
 
 from manim import (
     DOWN, LEFT, RIGHT, UP, WHITE, Brace, Circle, Create, FadeIn, FadeOut,
@@ -28,8 +37,11 @@ C_COLOR = "#FFA45C"
 COLORS = (A_COLOR, B_COLOR, C_COLOR)
 
 
-class RestaurantBillShares(Scene):
+class RestaurantBillShares(AlgebraScene):
     """Una explicación pausada con palabras, cuatro bloques y aritmética."""
+
+    stage_number = 2
+    video_number = 1
 
     def words(self, message, size=28, color=WHITE, colors=None):
         obj = Text(message, font="Segoe UI", font_size=size, color=color,
