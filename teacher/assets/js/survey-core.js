@@ -8,6 +8,14 @@
   const unavailable = new Set(['missing', 'corrupted', 'not_applicable', 'not_collected', 'unresolved_evidence']);
   const blank = v => v === null || v === undefined || (typeof v === 'string' && !v.trim());
   const numeric = v => blank(v) || typeof v === 'boolean' || v instanceof Date ? null : (Number.isFinite(Number(v)) ? Number(v) : null);
+  const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  function measurement(field, v) {
+    if (field !== 'q01_birth_weekday') return numeric(v);
+    const day = weekdays.findIndex(day => day.toLowerCase() === String(v ?? '').trim().toLowerCase());
+    if (day >= 0) return day + 1;
+    const code = numeric(v);
+    return Number.isInteger(code) && code >= 1 && code <= 7 ? code : null;
+  }
   const title = s => s.replace(/^q\d+_/, '').replace(/_/g, ' ').replace(/\best\b/g, 'estimated').replace(/\bapprox\b/g, 'approximate').replace(/^./, c => c.toUpperCase());
   const originals = {
     q02_siblings: ['Number of siblings', 'count', 1, true], q03_pets: ['Number of pets', 'count', 1, true],
@@ -90,6 +98,10 @@
       const percent=unit==='percentage';
       const completedAge=['q01_age_completed_years','q01_age_at_next_birthday'].includes(field);
       meta.push({field,label:title(field)+(d.Classification==='estimated'?' (estimate / projection)':''),unit:percent?'%':unit,width:completedAge||field==='q07_nonqualifying_days'?1:null,integer:/completed|days_lived|days_until|age_at_next/.test(field)||field==='q07_nonqualifying_days',domain:field==='q07_nonqualifying_days'?[0,7]:null,kind:category?'categorical':'numeric',topic:topic(field),dependencies,scale:percent?100:1,classification:d.Classification,description:d['Calculation and assumptions']});
+      if (field === 'q01_birth_weekday') Object.assign(meta[meta.length - 1], {
+        kind:'numeric', width:1, integer:true, domain:[1,7],
+        description:'Birth weekday encoded as Monday=1, Tuesday=2, Wednesday=3, Thursday=4, Friday=5, Saturday=6, Sunday=7. Weekday codes repeat cyclically each week.'
+      });
     }
     const config=sheets['Derivation config'].rows;
     if(!config.some(r=>r.Setting==='Survey reference date'))throw new Error('Derivation config: reference date missing.');
@@ -111,10 +123,10 @@
   function value(model,row,field,allowed) {
     if(!qualityPass(model,row,field,allowed))return null;
     if(field==='phone_to_homework_minutes_ratio' && numeric(row.q08_study_minutes)===0)return null;
-    const v=numeric(row[field]); return v===null?null:v*(model.meta.find(m=>m.field===field)?.scale||1);
+    const v=measurement(field,row[field]); return v===null?null:v*(model.meta.find(m=>m.field===field)?.scale||1);
   }
   function filterRows(rows, f) {
-    return rows.filter(r=>(!f.grades || f.grades.has(String(r.grade))) && (!f.classes || f.classes.has(r.class_label)) && (!f.ranges || f.ranges.every(a=>{const v=numeric(r[a.field]);return v!==null&&(a.min===null||v>=a.min)&&(a.max===null||v<=a.max);})) && (!f.categories || f.categories.every(a=>a.values.has(String(r[a.field])))));
+    return rows.filter(r=>(!f.grades || f.grades.has(String(r.grade))) && (!f.classes || f.classes.has(r.class_label)) && (!f.ranges || f.ranges.every(a=>{const v=measurement(a.field,r[a.field]);return v!==null&&(a.min===null||v>=a.min)&&(a.max===null||v<=a.max);})) && (!f.categories || f.categories.every(a=>a.values.has(String(r[a.field])))));
   }
   function quantile(sorted,p) { if(!sorted.length)return null; const i=(sorted.length-1)*p,j=Math.floor(i);return sorted[j]+(sorted[Math.ceil(i)]-sorted[j])*(i-j); }
   function stats(values) {

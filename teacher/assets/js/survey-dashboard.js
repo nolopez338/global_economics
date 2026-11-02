@@ -4,6 +4,7 @@
   const C = window.SurveyCore, $ = id => document.getElementById(id);
   const palette=['#24766b','#b56b37','#557db0','#8966a5','#a34966','#477f94','#79772d','#a65735','#5968aa','#357950'];
   const rankColors=['#24766b','#598bb0','#c68a43'];
+  const weekdays=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
   let model, filtered=[], selection=null, frequency=[], rankFrequency=[], sortField='Questionnaire ID', ascending=true, sourceName='', reference='', requestVersion=0;
   const state={grades:new Set(),classes:new Set(),quality:new Set(),ranges:[],categories:[]};
   const fmt=v=>v===null||v===undefined||!Number.isFinite(Number(v))?'Unavailable':Number(v).toLocaleString('en-US',{maximumFractionDigits:3});
@@ -34,13 +35,13 @@
   function fieldLabel(f){return model.meta.find(m=>m.field===f)?.label||C.title(f);}
   function categoryLabel(field,v){
     const m=model.meta.find(m=>m.field===field);
+    if(field==='q01_birth_weekday'&&weekdays.includes(v))return `${v} (${weekdays.indexOf(v)+1})`;
     if(m?.unit==='0/1')return Number(v)===1?'Yes':'No';
     if(m?.unit==='quarter')return 'Q'+v;
     return String(v);
   }
   function categoryChoices(field){
     const a=[...new Set(model.rows.map(r=>r[field]).filter(v=>!C.blank(v)).map(String))];
-    const weekdays=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
     if(field==='q01_birth_weekday')return a.sort((x,y)=>weekdays.indexOf(x)-weekdays.indexOf(y));
     if(field==='q09_math_enjoyment_category')return a.sort((x,y)=>['Negative','Neutral','Positive'].indexOf(x)-['Negative','Neutral','Positive'].indexOf(y));
     return a.sort((x,y)=>{const p=parseFloat(x),q=parseFloat(y);return Number.isFinite(p)&&Number.isFinite(q)?p-q:x.localeCompare(y);});
@@ -233,7 +234,7 @@
       const nums=model.meta.filter(m=>m.kind==='numeric').map(m=>({value:m.field,label:`${m.label} (${m.unit})`}));
       for(const id of ['range-field','scatter-x','scatter-y'])options($(id),nums);
       $('scatter-x').value='q06_phone_hours';$('scatter-y').value='q05_sleep_hours';
-      const cats=model.meta.filter(m=>m.kind==='categorical').map(m=>({value:m.field,label:m.label}));
+      const cats=model.meta.filter(m=>m.kind==='categorical'||m.field==='q01_birth_weekday').map(m=>({value:m.field,label:m.label}));
       options($('secondary-category'),cats,'q09_math_enjoyment_category');
       options($('category-field'),[...cats,...[16,17,18].flatMap(q=>[1,2,3].map(i=>({value:`q${q}_choice_${i}`,label:`Q${q} · choice ${i}`})))]);populateCategoryValues();
       $('show-identities').checked=false;verify();table($('config-table'),['Setting','Value','Meaning'],model.config.map(r=>[r.Setting,txt(r.Value),r.Meaning]),'Workbook derivation configuration');

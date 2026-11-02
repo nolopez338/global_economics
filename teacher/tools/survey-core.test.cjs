@@ -29,6 +29,28 @@ test('integer-centered bins and exercise domain retain zero and seven',()=>{
   assert.deepEqual(edges,[-.5,.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5]);
   assert.equal(C.histogram([0,3,7],edges).reduce((s,b)=>s+b.count,0),3);
 });
+
+test('birth weekdays use Monday=1 through Sunday=7 without changing workbook names',()=>{
+  const field='q01_birth_weekday',m=model.meta.find(m=>m.field===field);
+  assert.equal(m.kind,'numeric');assert.equal(m.width,1);assert.equal(m.integer,true);
+  assert.deepEqual(m.domain,[1,7]);assert.deepEqual(m.dependencies,['q01_date_of_birth']);
+  const days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  days.forEach((day,i)=>{
+    const row=model.rows.find(r=>r[field]===day);
+    assert.ok(row);assert.equal(C.value(model,row,field,null),i+1);
+    assert.equal(row[field],day);
+    assert.equal(C.value(model,row,field,new Set()),null);
+  });
+  const row=model.rows.find(r=>r[field]==='Monday');
+  for(const invalid of ['',null,'unknown',0,8,1.5])assert.equal(C.value(model,{...row,[field]:invalid},field,null),null);
+  assert.equal(C.value(model,{...row,[field]:' monday '},field,null),1);
+  assert.equal(C.value(model,{...row,[field]:7},field,null),7);
+  const vs=values(field),edges=C.binEdges(vs,{width:m.width,integer:m.integer,domain:m.domain});
+  assert.deepEqual(edges,[.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5]);
+  assert.deepEqual(C.histogram(vs,edges).map(b=>b.count),days.map(day=>model.rows.filter(r=>r[field]===day&&C.qualityPass(model,r,field,null)).length));
+  const weekdays=C.filterRows(model.rows,{ranges:[{field,min:1,max:5}]});
+  assert.ok(weekdays.length>0);assert.ok(weekdays.every(r=>days.slice(0,5).includes(r[field])));
+});
 test('automatic fallback handles small, constant, zero-IQR and fractional data',()=>{
   for(const v of [[3],[3,3,3],[0,0,0,0,9],[-10,-4.75,0,10]]){
     const edges=C.binEdges(v,{mode:'auto'});assert.ok(edges.length>=2);
