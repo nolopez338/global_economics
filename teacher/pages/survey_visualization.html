@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Survey Explorer · Teacher dashboard</title>
+  <link rel="icon" href="../../assets/png/icon_calendar.png">
+  <link rel="stylesheet" href="../../assets/css/schedule.css">
+  <link rel="stylesheet" href="../assets/css/survey-visualization.css">
+  <script src="../assets/vendor/sheetjs/xlsx.full.min.js" defer></script>
+  <script src="../assets/js/survey-core.js" defer></script>
+  <script src="../assets/js/survey-dashboard.js" defer></script>
+</head>
+<body>
+<main id="survey-page">
+  <a class="back-link" href="../schedule.html">← Back to Schedule</a>
+  <header class="survey-header">
+    <div><p class="eyebrow">GLOBAL ECONOMICS · TEACHER TOOLS</p><h1>Survey Explorer</h1><p class="subtitle">Explore our students’ habits, experiences, and preferences.</p></div>
+    <div class="source-box"><label for="workbook-file">Open a local XLSX workbook</label><input id="workbook-file" type="file" accept=".xlsx"><p id="source">Source: survey_data_extended.xlsx</p><p id="reference">Reference date: loading…</p></div>
+  </header>
+  <p id="load-status" role="status" aria-live="polite">Loading workbook…</p>
+  <noscript>This dashboard requires JavaScript. All workbook processing happens locally.</noscript>
+  <div id="dashboard" hidden>
+    <section class="summary-grid" aria-label="Analysis summary">
+      <article><span>Total questionnaires</span><strong id="total-n">—</strong><small>One record per questionnaire</small></article>
+      <article><span>Filtered questionnaires</span><strong id="filtered-n">—</strong><small>Grade, class, and additional filters</small></article>
+      <article><span>Usable active values</span><strong id="usable-n">—</strong><small id="usable-note">Selected variable & quality</small></article>
+      <article><span>Unavailable / excluded</span><strong id="missing-n">—</strong><small id="missing-note">Missing or outside quality selection</small></article>
+    </section>
+    <div class="dashboard-grid">
+      <aside class="page-card filters" aria-label="Global filters">
+        <div class="section-heading"><h2>Filters</h2><button id="clear-filters" type="button">Reset all</button></div>
+        <fieldset><legend>Grade</legend><div id="grade-options" class="checks"></div><div class="mini-actions"><button data-select="grades:all">Select all</button><button data-select="grades:none">Clear all</button></div></fieldset>
+        <fieldset><legend>Class</legend><div id="class-options" class="checks"></div><div class="mini-actions"><button data-select="classes:all">Select all</button><button data-select="classes:none">Clear all</button></div></fieldset>
+        <fieldset><legend>Answer quality</legend><p class="hint">Applies to the active answer. Derived values use their documented source answers.</p><div id="quality-options" class="checks vertical"></div><div class="mini-actions"><button data-select="quality:all">Select all</button><button data-select="quality:none">Clear all</button></div></fieldset>
+        <details><summary>Additional numeric filters</summary><label for="range-field">Measurement</label><select id="range-field"></select><div class="two-inputs"><label>Minimum<input id="range-min" type="number" step="any"></label><label>Maximum<input id="range-max" type="number" step="any"></label></div><button id="add-range">Add range filter</button><p class="hint">Inclusive bounds; blank values do not pass. Uses stored units (fraction for shares).</p></details>
+        <details><summary>Category & choice filters</summary><label for="category-field">Category or ranked choice</label><select id="category-field"></select><label for="category-values">Values (Ctrl / ⌘ to select several)</label><select id="category-values" multiple size="5"></select><button id="add-category">Add category filter</button></details>
+        <p class="hint">OR within each selection; AND between filters. Clearing all classes gives no results.</p>
+      </aside>
+      <div class="explorers">
+        <div id="filter-chips" class="chips" aria-label="Active global filters"></div>
+        <section class="page-card" aria-labelledby="distribution-heading">
+          <div class="section-heading"><div><p class="eyebrow">01 · DISTRIBUTIONS</p><h2 id="distribution-heading">Numerical explorer</h2></div><button id="reset-chart">Reset chart settings</button></div>
+          <div class="control-grid"><label>Find a measurement<input id="variable-search" type="search" placeholder="Search sleep, phone, age…"></label><label>Active variable<select id="variable"></select></label></div>
+          <p id="variable-description" class="hint"></p>
+          <div class="control-grid compact">
+            <label>Binning<select id="bin-mode"><option value="width">Bin width</option><option value="count">Number of bins</option><option value="auto">Automatic (Freedman–Diaconis)</option></select></label>
+            <label>Width<input id="bin-width" type="number" min="0.000001" step="any" value="0.5"></label>
+            <label>Number of bins<input id="bin-count" type="number" min="1" max="200" value="10"></label>
+            <label>Bin origin (optional)<input id="bin-origin" type="number" step="any" placeholder="Default"></label>
+            <label>Measure<select id="measure"><option value="count">Frequency counts</option><option value="percent">Percentage of usable n</option></select></label>
+            <label>Compare<select id="compare"><option value="pooled">Pooled</option><option value="grade">By grade</option><option value="class_label">By class</option></select></label>
+            <label>Comparison layout<select id="compare-layout"><option value="overlay">Overlaid</option><option value="small">Small multiples</option></select></label>
+            <label class="inline-check"><input id="mean-marker" type="checkbox"> Mean marker</label><label class="inline-check"><input id="median-marker" type="checkbox"> Median marker</label>
+          </div>
+          <h3 id="chart-title"></h3><p id="chart-caption" class="hint"></p>
+          <div id="histogram" class="chart-host"></div><div id="stats" class="stats-grid"></div>
+          <div class="export-actions"><button id="frequency-export">Export frequency CSV</button><button data-image="histogram">Save chart image (SVG)</button></div>
+          <details><summary>Accessible frequency table</summary><div id="frequency-table" class="table-scroll"></div></details>
+        </section>
+        <section class="page-card" aria-labelledby="ranking-heading">
+          <p class="eyebrow">02 · ORDERED PREFERENCES</p><h2 id="ranking-heading">Ranked-preference explorer</h2>
+          <div class="control-grid compact">
+            <label>Question<select id="rank-question"><option value="16">Q16 · University career area</option><option value="17">Q17 · Preferred free-time activity</option><option value="18">Q18 · Preferred way of learning</option></select></label>
+            <label>Display<select id="rank-mode"><option value="1">First choice</option><option value="2">Second choice</option><option value="3">Third choice</option><option value="top">Selected anywhere in top three</option><option value="split">Counts split by rank</option><option value="points">Total weighted preference points</option></select></label>
+            <label>Completeness<select id="rank-completeness"><option value="all">All usable (including partial)</option><option value="complete">Complete only</option><option value="partial">Partial only</option></select></label>
+            <label>Measure<select id="rank-measure"><option value="count">Counts / points</option><option value="percent">Percentage of eligible respondents</option></select></label>
+            <label>Compare<select id="rank-compare"><option value="pooled">Pooled</option><option value="grade">By grade</option><option value="class_label">By class</option></select></label>
+          </div>
+          <p id="ranking-caption" class="hint"></p><div id="ranking-chart" class="chart-host"></div>
+          <div class="export-actions"><button data-image="ranking-chart">Save ranking image (SVG)</button><button id="ranking-export">Export ranking CSV</button></div>
+          <details><summary>Ranking frequency table</summary><div id="ranking-table" class="table-scroll"></div></details>
+          <details><summary>Inspect Q16 “Other” wording</summary><label>Search original wording<input id="other-search" type="search" placeholder="Case-insensitive search"></label><div id="other-table" class="table-scroll"></div></details>
+        </section>
+        <section class="page-card" aria-labelledby="secondary-heading">
+          <p class="eyebrow">03 · OTHER PERSPECTIVES</p><h2 id="secondary-heading">Categories & associations</h2>
+          <div class="control-grid"><label>View<select id="secondary-mode"><option value="category">Categorical frequency</option><option value="box">Box plot of active variable</option><option value="scatter">Scatterplot</option></select></label><label id="secondary-category-label">Category<select id="secondary-category"></select></label><label id="box-group-label">Box plot groups<select id="box-group"><option value="grade">Grade</option><option value="class_label">Class</option></select></label></div>
+          <div id="scatter-controls" class="control-grid"><label>Preset<select id="scatter-preset"><option value="q06_phone_hours,q05_sleep_hours">Phone vs sleep</option><option value="q06_phone_hours,q08_study_minutes">Phone vs study</option><option value="q07_exercise_days,q05_sleep_hours">Exercise vs sleep</option><option value="q08_study_minutes,q09_math_enjoyment">Study vs math enjoyment</option><option value="q04_commute_minutes,q05_sleep_hours">Commute vs sleep</option></select></label><label>X measurement<select id="scatter-x"></select></label><label>Y measurement<select id="scatter-y"></select></label></div>
+          <p id="secondary-caption" class="hint"></p><div id="secondary-chart" class="chart-host"></div><button data-image="secondary-chart">Save chart image (SVG)</button><details><summary>Accessible values table</summary><div id="secondary-table" class="table-scroll"></div></details>
+        </section>
+        <section class="page-card" aria-labelledby="details-heading">
+          <div class="section-heading"><h2 id="details-heading">Respondent details</h2><button id="clear-selection">Clear chart selection</button></div>
+          <p id="selection-status" role="status"></p><p class="hint">Chart selections only affect this table. The full filtered distribution stays visible.</p>
+          <div class="control-grid"><label>Search visible fields<input id="detail-search" type="search"></label><label class="inline-check"><input id="show-identities" type="checkbox"> Teacher control: reveal names & student IDs</label></div>
+          <button id="analysis-export">Export filtered analysis CSV (visible fields)</button><p class="hint">Export includes all globally filtered records, irrespective of chart selection or text search. Questionnaire IDs, names, and student IDs are excluded unless the teacher control is enabled.</p>
+          <div id="detail-table" class="table-scroll"></div>
+        </section>
+        <details class="page-card"><summary>Data quality & completeness</summary><p id="verification"></p><p>Height in this source has 97 unavailable values out of 206. This is a benchmark, not an exclusion rule.</p><div id="completeness-chart" class="chart-host"></div><div id="completeness-table" class="table-scroll"></div><h3>Related audit & issue evidence</h3><p class="hint">Joined by questionnaire ID and field; one questionnaire remains one observation. Identity audit entries are excluded.</p><div id="evidence-table" class="table-scroll"></div></details>
+        <details class="page-card"><summary>Methodology, definitions & assumptions</summary>
+          <p>We use the populated sheets and task-specific notes rather than the older template introduction. Blanks remain unavailable; genuine zeros and negative enjoyment scores remain observations. Recorded anomalies (including a completed age of 0 and inconsistent first-phone age) are preserved. No plausibility exclusions are applied.</p>
+          <p>Histogram intervals are lower-inclusive and upper-exclusive, with the final upper endpoint included. Comparisons share edges and percentages normalize within each group’s usable n. Automatic binning uses width 2 × IQR / ∛n (Freedman–Diaconis); zero IQR or n &lt; 4 falls back to Sturges’ number of bins. Constant data uses a width of 1. Bins are limited to 2,000 for browser responsiveness. Quartiles use linear interpolation at (n−1)p; standard deviation uses n−1 and requires two observations.</p>
+          <p>Quality filters inspect only the current answer. Derived measurements have no invented answer status: all documented source dependencies must pass the selected statuses. Their source statuses and derived issues are shown in details. “Unavailable / excluded” includes blank or unusable values and values excluded by the quality filter; these counts are broken out below the cards. New workbook statuses appear automatically.</p>
+          <p>Complete rankings have a unique 1, 2, and 3 with no invalid or duplicate rank codes; blank unselected options are allowed. Consistent partial rankings retain known choices. Zero means explicitly unranked in original rank fields; blank means uncertain/unavailable. Selected and points fields use the workbook’s documented partial-ranking convention. Rank-specific denominators count respondents with that usable rank; top-three and split-rank percentages use eligible respondents and can total above 100%. Points (3, 2, 1) are preference scores, never probabilities.</p>
+          <p>A zero homework denominator leaves the phone/homework ratio unavailable. The phone-minus-homework difference can remain valid. Books have no reporting period. Exercise minutes are a lower bound from qualifying days; nonqualifying days can include exercise. First-phone elapsed years are approximate. Annual phone totals and weekly travel are estimates/projections. No ages or birthday values are recalculated using the current date. Scatterplots use pairwise-complete observations and describe associations without implying causation.</p>
+          <div id="config-table" class="table-scroll"></div><p>Workbook text is rendered as text, and uploaded files stay in this browser. No workbook contents are sent to external services. CSV text that could execute as a spreadsheet formula is prefixed with an apostrophe for safe export.</p>
+          <p>Parser: locally bundled <a href="https://docs.sheetjs.com/">SheetJS CE 0.20.3</a>, Apache 2.0; <a href="../assets/vendor/sheetjs/LICENSE">license</a>. Charts are accessible inline SVG with equivalent tables.</p>
+        </details>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+</html>
