@@ -1,0 +1,235 @@
+% ============================================================
+% Discrete bar graphs: outcomes, assigned values, and PMFs.
+% Requires tikz, pgfplots, graphicx (already in preamble.tex).
+% Matches G11_Histograms: black borders, pale fills, gray!20 grid,
+% small axis text, compat=1.18 data coordinates, final resize with labels.
+% ============================================================
+% All three commands: [options]{horizontal list}{height list}
+% \GTenOutcomeProbabilityGraph[options]{categories}{probabilities}
+% \GTenOutcomeValueGraph[options]{categories}{assigned numerical values}
+% \GTenPMFGraph[options]{numerical values}{probabilities}
+%
+% Options (local to each call):
+% width=.48\linewidth, height=5cm: final size INCLUDING labels/borders.
+% xlabel=..., ylabel=...: descriptive labels, including units when needed.
+% color=blue!25: TikZ fill color; ystep=.1: positive vertical grid spacing.
+% xhighlight=..., yhighlight=...: optional named background colors for tick
+% labels; yhighlight also marks bar-height labels. Text colors are preserved.
+% Use the existing GTenHL... names from highlights.tex, with color=<name>!32
+% for pale bars. Wrap axis-label fragments in the corresponding marker macros.
+% Empty highlights (the default) preserve existing callers and need no palette.
+% xstep=1: positive numeric horizontal grid spacing (PMF only).
+% rotate=0: category-label rotation in degrees; use 35 for long lists.
+% tail=0: omitted probability; finite complete probability lists sum to 1.
+% For a partial infinite PMF set tail to its exact missing mass and explain
+% the continuing support in the caption. Heights are NEVER renormalized.
+%
+% Examples:
+% \GTenOutcomeProbabilityGraph{cash,debit,credit}{.25,.45,.30}
+% \GTenOutcomeValueGraph[ylabel={Fee (USD)},ystep=1]
+%     {cash,debit,credit}{0,1,1}
+% \GTenPMFGraph[xlabel={Gain (USD)},xstep=10]{-20,0,30}{.2,.5,.3}
+% \GTenPMFGraph[tail=1/256]{1,2,3,4,5,6,7,8}
+%     {1/2,1/4,1/8,1/16,1/32,1/64,1/128,1/256}
+%
+% Lists must be nonempty and equally long. Numeric PMF locations must be
+% strictly increasing: real spacing, negative locations and gaps survive.
+% Probability heights and tail must lie in [0,1], totaling 1 together.
+% Assigned values may be negative. Zero heights have a baseline marker;
+% labels sit above positive/zero bars and below negative bars.
+% Bars occupy 55% of the minimum location gap (categories have gap 1),
+% so discrete values are separated, never treated as histogram intervals.
+% Private names are prefixed gtenbar; parsing and drawing are grouped.
+\ExplSyntaxOn
+\clist_new:N \l__gtenbar_x_clist
+\clist_new:N \l__gtenbar_y_clist
+\clist_new:N \l__gtenbar_ticks_clist
+\tl_new:N \l__gtenbar_bars_tl
+\tl_new:N \l__gtenbar_grid_tl
+\tl_new:N \l__gtenbar_width_tl
+\tl_new:N \l__gtenbar_height_tl
+\tl_new:N \l__gtenbar_xlabel_tl
+\tl_new:N \l__gtenbar_ylabel_tl
+\tl_new:N \l__gtenbar_color_tl
+\tl_new:N \l__gtenbar_xhighlight_tl
+\tl_new:N \l__gtenbar_yhighlight_tl
+\fp_new:N \l__gtenbar_xstep_fp
+\fp_new:N \l__gtenbar_ystep_fp
+\fp_new:N \l__gtenbar_tail_fp
+\fp_new:N \l__gtenbar_rotate_fp
+\fp_new:N \l__gtenbar_min_fp
+\fp_new:N \l__gtenbar_max_fp
+\fp_new:N \l__gtenbar_low_fp
+\fp_new:N \l__gtenbar_top_fp
+\fp_new:N \l__gtenbar_gap_fp
+\fp_new:N \l__gtenbar_x_fp
+\fp_new:N \l__gtenbar_prev_fp
+\fp_new:N \l__gtenbar_y_fp
+\fp_new:N \l__gtenbar_sum_fp
+\bool_new:N \l__gtenbar_valid_bool
+\keys_define:nn {gtenbar} {
+ width .tl_set:N=\l__gtenbar_width_tl,
+ height .tl_set:N=\l__gtenbar_height_tl,
+ xlabel .tl_set:N=\l__gtenbar_xlabel_tl,
+ ylabel .tl_set:N=\l__gtenbar_ylabel_tl,
+ color .tl_set:N=\l__gtenbar_color_tl,
+ xhighlight .tl_set:N=\l__gtenbar_xhighlight_tl,
+ yhighlight .tl_set:N=\l__gtenbar_yhighlight_tl,
+ xstep .fp_set:N=\l__gtenbar_xstep_fp,
+ ystep .fp_set:N=\l__gtenbar_ystep_fp,
+ tail .fp_set:N=\l__gtenbar_tail_fp,
+ rotate .fp_set:N=\l__gtenbar_rotate_fp
+}
+\cs_new_protected:Npn \__gtenbar_draw:nnnn #1#2#3#4 {
+ \group_begin:
+ \keys_set:nn {gtenbar} {width=.48\linewidth,height=5cm,
+   xlabel=Outcome,ylabel=Probability,color=blue!25,
+   xstep=1,ystep=.1,tail=0,rotate=0,xhighlight=,yhighlight=}
+ \str_if_eq:nnT {#1}{value}
+   {\keys_set:nn {gtenbar}{ylabel=Assigned~value,ystep=1,color=orange!25}}
+ \str_if_eq:nnT {#1}{pmf}
+   {\keys_set:nn {gtenbar}{xlabel=Numerical~value,color=green!25}}
+ \keys_set:nn {gtenbar}{#2}
+ % Background-only markers: neutral glyphs, outlines, axes and grid survive.
+ \tikzset{gtenbar~x~marker/.style={},gtenbar~y~marker/.style={}}
+ \tl_if_empty:NF \l__gtenbar_xhighlight_tl {
+  \tikzset{gtenbar~x~marker/.style={fill=\l__gtenbar_xhighlight_tl,
+   fill~opacity=.32,text~opacity=1,inner~sep=1pt}}
+ }
+ \tl_if_empty:NF \l__gtenbar_yhighlight_tl {
+  \tikzset{gtenbar~y~marker/.style={fill=\l__gtenbar_yhighlight_tl,
+   fill~opacity=.32,text~opacity=1,inner~sep=1pt}}
+ }
+ \clist_set:Nn \l__gtenbar_x_clist {#3}
+ \clist_set:Nn \l__gtenbar_y_clist {#4}
+ \clist_clear:N \l__gtenbar_ticks_clist
+ \tl_clear:N \l__gtenbar_bars_tl
+ \tl_clear:N \l__gtenbar_grid_tl
+ \bool_set_true:N \l__gtenbar_valid_bool
+ \fp_zero:N \l__gtenbar_low_fp
+ \fp_zero:N \l__gtenbar_top_fp
+ \fp_zero:N \l__gtenbar_sum_fp
+ \fp_set:Nn \l__gtenbar_gap_fp {1}
+ \fp_compare:nF {\l__gtenbar_xstep_fp>0 && \l__gtenbar_ystep_fp>0
+   && \l__gtenbar_tail_fp>=0 && \l__gtenbar_tail_fp<=1}
+   {\bool_set_false:N \l__gtenbar_valid_bool}
+ \clist_if_empty:NT \l__gtenbar_x_clist {\bool_set_false:N \l__gtenbar_valid_bool}
+ \int_compare:nNnF {\clist_count:N \l__gtenbar_x_clist} =
+   {\clist_count:N \l__gtenbar_y_clist} {\bool_set_false:N \l__gtenbar_valid_bool}
+ \bool_if:NT \l__gtenbar_valid_bool {
+  \int_step_inline:nn {\clist_count:N \l__gtenbar_x_clist} {
+   \fp_set:Nn \l__gtenbar_x_fp {##1}
+   \str_if_eq:nnT {#1}{pmf}
+    {\fp_set:Nn \l__gtenbar_x_fp {\clist_item:Nn \l__gtenbar_x_clist {##1}}}
+   \int_compare:nNnTF {##1}={1}
+    {\fp_set_eq:NN \l__gtenbar_min_fp \l__gtenbar_x_fp}
+    {\str_if_eq:nnT {#1}{pmf} {
+      \fp_compare:nNnF {\l__gtenbar_x_fp}>{\l__gtenbar_prev_fp}
+        {\bool_set_false:N \l__gtenbar_valid_bool}
+      \int_compare:nNnTF {##1}={2}
+        {\fp_set:Nn \l__gtenbar_gap_fp {\l__gtenbar_x_fp-\l__gtenbar_prev_fp}}
+        {\fp_set:Nn \l__gtenbar_gap_fp {min(\l__gtenbar_gap_fp,\l__gtenbar_x_fp-\l__gtenbar_prev_fp)}}
+    }}
+   \fp_set_eq:NN \l__gtenbar_prev_fp \l__gtenbar_x_fp
+   \fp_set_eq:NN \l__gtenbar_max_fp \l__gtenbar_x_fp
+   \clist_put_right:Nx \l__gtenbar_ticks_clist {\fp_use:N \l__gtenbar_x_fp}
+   \fp_set:Nn \l__gtenbar_y_fp {\clist_item:Nn \l__gtenbar_y_clist {##1}}
+   \str_if_eq:nnF {#1}{value} {
+    \fp_compare:nF {\l__gtenbar_y_fp>=0 && \l__gtenbar_y_fp<=1}
+      {\bool_set_false:N \l__gtenbar_valid_bool}
+   }
+   \fp_add:Nn \l__gtenbar_sum_fp {\l__gtenbar_y_fp}
+   \fp_set:Nn \l__gtenbar_low_fp {min(\l__gtenbar_low_fp,\l__gtenbar_y_fp)}
+   \fp_set:Nn \l__gtenbar_top_fp {max(\l__gtenbar_top_fp,\l__gtenbar_y_fp)}
+  }
+  \str_if_eq:nnF {#1}{value} {
+   \fp_compare:nF {abs(\l__gtenbar_sum_fp+\l__gtenbar_tail_fp-1)<.000001}
+    {\bool_set_false:N \l__gtenbar_valid_bool}
+  }
+ }
+ \bool_if:NTF \l__gtenbar_valid_bool {
+  \int_step_inline:nn {\clist_count:N \l__gtenbar_x_clist} {
+   \fp_set:Nn \l__gtenbar_x_fp {\clist_item:Nn \l__gtenbar_ticks_clist {##1}}
+   \fp_set:Nn \l__gtenbar_y_fp {\clist_item:Nn \l__gtenbar_y_clist {##1}}
+   \tl_put_right:Nx \l__gtenbar_bars_tl {
+    \exp_not:N \draw [black,fill={\exp_not:V \l__gtenbar_color_tl}]
+     (\fp_eval:n {\l__gtenbar_x_fp-.275*\l__gtenbar_gap_fp},0) rectangle
+     (\fp_eval:n {\l__gtenbar_x_fp+.275*\l__gtenbar_gap_fp},\fp_use:N \l__gtenbar_y_fp);
+    \exp_not:N \node [gtenbar~y~marker,font=\exp_not:N \small,
+     yshift=\tl_if_empty:NTF \l__gtenbar_yhighlight_tl {0pt}
+       {\fp_compare:nNnTF {\l__gtenbar_y_fp}<{0}{-2pt}{2pt}},
+     anchor=\fp_compare:nNnTF {\l__gtenbar_y_fp}<{0}{north}{south}]
+     at (\fp_use:N \l__gtenbar_x_fp,\fp_use:N \l__gtenbar_y_fp)
+     {$\exp_not:N \pgfmathprintnumber[fixed,precision=4]{\fp_use:N \l__gtenbar_y_fp}$};
+   }
+   \fp_compare:nNnT {\l__gtenbar_y_fp}={0} {
+    \tl_put_right:Nx \l__gtenbar_bars_tl {
+     \exp_not:N \fill (\fp_use:N \l__gtenbar_x_fp,0) circle (1.5pt);
+    }
+   }
+  }
+  \fp_set:Nn \l_tmpa_fp {max(\l__gtenbar_ystep_fp,\l__gtenbar_top_fp-\l__gtenbar_low_fp)}
+  \fp_set:Nn \l__gtenbar_top_fp {\l__gtenbar_top_fp+.22*\l_tmpa_fp}
+  \fp_compare:nNnT {\l__gtenbar_low_fp}<{0}
+   {\fp_sub:Nn \l__gtenbar_low_fp {.22*\l_tmpa_fp}}
+  \fp_sub:Nn \l__gtenbar_min_fp {.65*\l__gtenbar_gap_fp}
+  \fp_add:Nn \l__gtenbar_max_fp {.65*\l__gtenbar_gap_fp}
+  % Grid follows integer multiples of the requested spacing, anchored at 0.
+  \int_step_inline:nnnn {\fp_eval:n {ceil(\l__gtenbar_low_fp/\l__gtenbar_ystep_fp)}}{1}
+   {\fp_eval:n {floor(\l__gtenbar_top_fp/\l__gtenbar_ystep_fp)}} {
+   \tl_put_right:Nx \l__gtenbar_grid_tl {
+    \exp_not:N \draw [gray!20,thin]
+    (\fp_use:N \l__gtenbar_min_fp,\fp_eval:n {##1*\l__gtenbar_ystep_fp}) --
+    (\fp_use:N \l__gtenbar_max_fp,\fp_eval:n {##1*\l__gtenbar_ystep_fp});
+   }
+  }
+  \str_if_eq:nnTF {#1}{pmf}
+   {\int_step_inline:nnnn {\fp_eval:n {ceil(\l__gtenbar_min_fp/\l__gtenbar_xstep_fp)}}{1}
+    {\fp_eval:n {floor(\l__gtenbar_max_fp/\l__gtenbar_xstep_fp)}} {
+     \tl_put_right:Nx \l__gtenbar_grid_tl {
+      \exp_not:N \draw [gray!20,thin]
+      (\fp_eval:n {##1*\l__gtenbar_xstep_fp},\fp_use:N \l__gtenbar_low_fp) --
+      (\fp_eval:n {##1*\l__gtenbar_xstep_fp},\fp_use:N \l__gtenbar_top_fp);
+     }
+   }}
+   {\clist_map_inline:Nn \l__gtenbar_ticks_clist {
+    \tl_put_right:Nx \l__gtenbar_grid_tl {
+     \exp_not:N \draw [gray!20,thin] (##1,\fp_use:N \l__gtenbar_low_fp) --
+      (##1,\fp_use:N \l__gtenbar_top_fp);
+    }
+   }}
+  \resizebox{\l__gtenbar_width_tl}{\l__gtenbar_height_tl}{%
+   \begin{tikzpicture}
+   \begin{axis}[width=\l__gtenbar_width_tl,height=\l__gtenbar_height_tl,
+    axis~lines=left,xlabel={\l__gtenbar_xlabel_tl},ylabel={\l__gtenbar_ylabel_tl},
+    xmin=\fp_use:N \l__gtenbar_min_fp,xmax=\fp_use:N \l__gtenbar_max_fp,
+    ymin=\fp_use:N \l__gtenbar_low_fp,ymax=\fp_use:N \l__gtenbar_top_fp,
+    xtick/.expanded={\l__gtenbar_ticks_clist},
+    ytick~distance=\fp_use:N \l__gtenbar_ystep_fp,
+    scaled~ticks=false,tick~label~style={font=\small,/pgf/number~format/fixed},label~style={font=\small},
+    xticklabel~style={gtenbar~x~marker,rotate=\fp_use:N \l__gtenbar_rotate_fp},
+    yticklabel~style={gtenbar~y~marker},
+    grid=none,axis~on~top,clip=false]
+    \str_if_eq:nnF {#1}{pmf}
+     {\pgfplotsset{xticklabels/.expanded={\l__gtenbar_x_clist}}}
+    \tl_use:N \l__gtenbar_grid_tl
+    \draw [black,thin] (\fp_use:N \l__gtenbar_min_fp,0) -- (\fp_use:N \l__gtenbar_max_fp,0);
+    \tl_use:N \l__gtenbar_bars_tl
+   \end{axis}
+   \end{tikzpicture}%
+  }
+ }{
+  \PackageError{G10_T2_bar_graphs}{Invalid~discrete~bar~graph~data}
+   {Use~equally~long~nonempty~lists,~positive~tick~spacings,~and~strictly^^J
+    increasing~numeric~PMF~locations.~Probabilities~must~be~in~[0,1]^^J
+    and~sum~to~1~including~the~specified~tail.}
+ }
+ \group_end:
+}
+\NewDocumentCommand{\GTenOutcomeProbabilityGraph}{O{} m m}
+ {\__gtenbar_draw:nnnn {outcome}{#1}{#2}{#3}}
+\NewDocumentCommand{\GTenOutcomeValueGraph}{O{} m m}
+ {\__gtenbar_draw:nnnn {value}{#1}{#2}{#3}}
+\NewDocumentCommand{\GTenPMFGraph}{O{} m m}
+ {\__gtenbar_draw:nnnn {pmf}{#1}{#2}{#3}}
+\ExplSyntaxOff

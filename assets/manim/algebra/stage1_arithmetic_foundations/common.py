@@ -1,13 +1,11 @@
 """Shared appearance, layout, animation and explicit clocks (Manim 0.17.3).
 
-Render a topic through its module, or the complete video through preliminaries.py.
-Videos: San Bartolo/manim_media/videos/algebra/stageX_Y/{quality}.
+Render a topic through its module, or the complete video through 00_preliminaries.py.
+Videos: San Bartolo/manim_media/videos/algebra/stage1.
 The scene numbers are declared in each video module; paths are file-relative.
 """
 
 from pathlib import Path
-
-from assets.manim.algebra.output_config import AlgebraScene
 
 from manim import (
     UP, WHITE, Create, FadeIn, FadeOut, Line, MathTex, Scene, Text, VGroup, config,
@@ -34,15 +32,27 @@ POWERS_SECONDS = 48
 PROPERTIES_SECONDS = 42
 CLOSING_SECONDS = 13
 BEAT_SECONDS = (OPENING_SECONDS, ADDING_SUBTRACTING_SECONDS,
-                SIGNED_MULTIPLICATION_SECONDS, FRACTIONS_SECONDS, RATIOS_SECONDS,
-                ORDER_SECONDS, POWERS_SECONDS, PROPERTIES_SECONDS, CLOSING_SECONDS)
+                SIGNED_MULTIPLICATION_SECONDS, PROPERTIES_SECONDS, FRACTIONS_SECONDS,
+                RATIOS_SECONDS, POWERS_SECONDS, ORDER_SECONDS, CLOSING_SECONDS)
 PLANNED_SECONDS = sum(BEAT_SECONDS)
 
 
-class ArithmeticScene(AlgebraScene):
+class ArithmeticScene(Scene):
     """All plays and waits use the explicit lesson clock, including reading pauses."""
 
     stage_number = 1
+
+    def __init__(self, *args, **kwargs):
+        config.video_dir = "{media_dir}/videos/algebra/stage1"
+        # Match the source filename so the videos sort in the lesson order.
+        source_name = {
+            0: "preliminaries", 1: "adding_subtracting",
+            2: "signed_multiplication_absolute_value", 3: "real_number_properties",
+            4: "fractions_decimals", 5: "ratios_percentages",
+            6: "powers_roots", 7: "order_of_operations",
+        }[self.video_number]
+        config.output_file = f"{self.video_number:02d}_{source_name}"
+        super().__init__(*args, **kwargs)
 
     def setup(self):
         super().setup()
