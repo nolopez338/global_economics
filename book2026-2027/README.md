@@ -11,8 +11,9 @@ Verified source areas are:
 - Grade 9 material directly under `grade9/`;
 - Grade 10 Terms 1 and 3 under `grade10/`;
 - Grade 11 Terms 2 and 3 under `grade11/`;
-- olympiad, Cambridge, and diploma material under `olympiad/`; and
-- year-local preambles, templates, graphs, and images under `preamble/`.
+- olympiad, Cambridge, and diploma material under `olympiad/`;
+- year-local preambles, graphs, and images under `preamble/`; and
+- guides and LaTeX scaffolds in the [authoring folder](authoring/README.md).
 
 Many `.tex` files declare `\documentclass` and appear to be document entry
 points; others are imported fragments or templates. The repository does not
@@ -31,5 +32,5 @@ Grade 10 Term 1 sources below `grade10/term_1/` use the confirmed
 anomalies outside this authorized term migration remain unchanged pending an
 owner decision and a supported compilation workflow.
 
-PDFs and compiler auxiliary files are ignored by the root `.gitignore`.
+The root `.gitignore` excludes common LaTeX auxiliary files.
 `clean-latex.bat` removes common generated files on Windows.
