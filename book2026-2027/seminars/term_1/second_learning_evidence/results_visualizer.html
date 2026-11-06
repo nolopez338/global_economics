@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resultados por criterio · Grado 10</title>
+<style>
+  :root {
+    color-scheme: light;
+    --ink: #173348;
+    --muted: #496071;
+    --line: #d6e1e7;
+    --yes: #176b58;
+    --no: #a84039;
+    --pending: #dce5eb;
+    font: 16px/1.5 system-ui, sans-serif;
+    color: var(--ink);
+    background: #f2f6f8;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  header { background: #142f43; color: white; border-bottom: 5px solid #44b7a3; }
+  .wrap { max-width: 1150px; margin: auto; padding: 1.5rem clamp(1rem, 4vw, 2.5rem); }
+  .eyebrow { margin: 0; color: #a4e4d9; letter-spacing: .12em; text-transform: uppercase; font-size: .78rem; font-weight: 700; }
+  h1 { font-size: clamp(1.9rem, 5vw, 3rem); line-height: 1.1; margin: .3rem 0 .6rem; }
+  h2 { margin: 0; font-size: 1.2rem; }
+  p { margin: .35rem 0; }
+  .panel { background: white; border: 1px solid var(--line); border-radius: .8rem; padding: clamp(.85rem, 3vw, 1.4rem); margin-bottom: 1rem; }
+  .controls, .legend { display: flex; flex-wrap: wrap; gap: .75rem 1.2rem; align-items: end; }
+  label { display: grid; gap: .25rem; font-weight: 650; }
+  input, select { max-width: 100%; min-height: 2.6rem; font: inherit; color: inherit; }
+  input[type="search"], select { border: 1px solid #9eafbc; border-radius: .4rem; padding: .4rem .6rem; background: white; }
+  .muted, .legend { color: var(--muted); font-size: .9rem; }
+  .legend { margin: .6rem 0; }
+  .legend span { display: inline-flex; align-items: center; gap: .35rem; }
+  .swatch { width: .8rem; height: .8rem; border-radius: .18rem; }
+  .yes { background: var(--yes); color: white; }
+  .no { background: var(--no); color: white; }
+  .pending { background: var(--pending); color: var(--ink); }
+  .bar-row { display: grid; grid-template-columns: 2.5rem 1fr minmax(7rem, auto); gap: .6rem; align-items: center; margin: .4rem 0; }
+  .bar { display: flex; height: .85rem; border-radius: 1rem; overflow: hidden; background: #f2f6f8; }
+  .counts { text-align: right; font-size: .85rem; font-variant-numeric: tabular-nums; }
+  .table-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  th, td { border-bottom: 1px solid var(--line); padding: .5rem .45rem; text-align: center; }
+  th:first-child { text-align: left; }
+  tbody tr.group-shaded { background: #eaf5e8; }
+  tbody th { min-width: 11rem; font-weight: 650; }
+  .submissions { min-width: 9rem; text-align: left; }
+  .submissions ul { margin: 0; padding: 0; list-style: none; }
+  .submissions a { color: #145d8c; }
+  .badge { display: inline-block; min-width: 2.5rem; padding: .15rem .35rem; border-radius: .3rem; font-size: .78rem; font-weight: 700; }
+  .criterion-result { white-space: nowrap; }
+  #error { color: #842f2b; }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <p class="eyebrow">Global Economics · Grado 10 · Periodo 1</p>
+  <h1>Resultados por criterio</h1>
+  <p>Segunda evidencia de aprendizaje</p>
+</div></header>
+<main class="wrap">
+  <section class="panel" aria-label="Fuente de datos">
+    <label for="file">Abrir CSV</label>
+    <input type="file" id="file" accept=".csv,text/csv">
+    <p class="muted" id="source" role="status">Selecciona resultados_criterios.csv.</p>
+    <p id="error" role="alert" hidden></p>
+  </section>
+  <div id="dashboard" hidden>
+    <section class="panel" aria-label="Filtros">
+      <div class="controls">
+        <label>Buscar estudiante<input type="search" id="search" placeholder="Nombre o apellido"></label>
+        <label>Criterios visibles<select id="scope"><option value="second">C5–C10</option><option value="all">C1–C10</option></select></label>
+        <label>Mostrar estudiantes con
+          <select id="filter">
+            <option value="all">Cualquier resultado</option>
+            <option value="yes">Al menos un Sí</option>
+            <option value="no">Al menos un No</option>
+            <option value="pending">Al menos un pendiente</option>
+          </select>
+        </label>
+      </div>
+      <p class="muted" id="summary" role="status"></p>
+    </section>
+    <section class="panel" aria-labelledby="chart-heading">
+      <h2 id="chart-heading">Distribución por criterio</h2>
+      <div class="legend">
+        <span><i class="swatch yes" aria-hidden="true"></i>Sí</span>
+        <span><i class="swatch no" aria-hidden="true"></i>No</span>
+        <span><i class="swatch pending" aria-hidden="true"></i>Pendiente</span>
+      </div>
+      <div id="chart"></div>
+    </section>
+    <section class="panel" aria-labelledby="table-heading">
+      <h2 id="table-heading">Resultados individuales</h2>
+      <p class="muted">Los criterios sin resultado ni porcentaje se muestran como pendientes.</p>
+      <label for="sort">Ordenar por
+        <select id="sort">
+          <option value="alphabetical">Orden alfabético</option>
+          <option value="group">Por grupo</option>
+        </select>
+      </label>
+      <div class="table-scroll" role="region" aria-label="Tabla de resultados" tabindex="0">
+        <table aria-labelledby="table-heading"><thead id="head"></thead><tbody id="rows"></tbody></table>
+      </div>
+    </section>
+  </div>
+</main>
+<script>
+  const csvName = 'resultados_criterios.csv';
+  const criteria = Array.from({length: 10}, (_, i) => 'C' + (i + 1));
+  const statuses = {yes: 'Sí', no: 'No', pending: 'Pendiente'};
+  const byId = id => document.getElementById(id);
+  let students = [];
+  let groupedStudents = [];
+
+  function parseCSV(text) {
+    const rows = [];
+    let row = [], field = '', quoted = false;
+    text = text.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
+    for (let i = 0; i < text.length; i++) {
+      const character = text[i];
+      if (character === '"' && quoted && text[i + 1] === '"') {
+        field += '"';
+        i++;
+      } else if (character === '"' && (quoted || field === '')) {
+        quoted = !quoted;
+      } else if (!quoted && (character === ',' || character === '\n')) {
+        row.push(field);
+        field = '';
+        if (character === '\n') {
+          rows.push(row);
+          row = [];
+        }
+      } else {
+        field += character;
+      }
+    }
+    if (quoted) throw new Error('El CSV tiene comillas sin cerrar.');
+    if (row.length || field) rows.push([...row, field]);
+    return rows.filter(record => record.some(value => value.trim()));
+  }
+
+  function normalize(value) {
+    return value.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().trim();
+  }
+
+  function submissionLinks(value) {
+    const links = new Set();
+    for (const line of value.split('\n')) {
+      const address = line.trim();
+      if (!address) continue;
+      try {
+        const url = new URL(address);
+        if (url.protocol === 'http:' || url.protocol === 'https:') {
+          links.add(address);
+        } else if (url.protocol === 'file:') {
+          // The CSV's absolute file paths refer to PDFs shipped beside this page.
+          const filename = decodeURIComponent(url.pathname.split('/').pop());
+          if (/\.pdf$/i.test(filename) && !/[\/\\\x00-\x1f]/.test(filename)) {
+            links.add('./' + encodeURIComponent(filename) + url.search + url.hash);
+          }
+        }
+      } catch {
+        // Skip malformed URLs and malformed filename escapes.
+      }
+    }
+    return [...links];
+  }
+
+  function readStudents(text) {
+    const [header = [], ...records] = parseCSV(text);
+    const nameIndex = header.indexOf('ESTUDIANTES');
+    const columns = criteria.map(criterion => header.indexOf(criterion));
+    if (nameIndex < 0 || columns.includes(-1)) {
+      throw new Error('El CSV debe contener ESTUDIANTES y las columnas C1–C10.');
+    }
+    const percentageColumns = criteria.map(criterion => header.indexOf(criterion + 'P'));
+    const submissionColumn = header.indexOf('ENLACE_ACTIVIDAD');
+    return records.map((record, index) => {
+      const name = record[nameIndex]?.trim();
+      if (record.length !== header.length || !name) {
+        throw new Error('Revisa la fila de datos ' + (index + 1) + '.');
+      }
+      const results = columns.map(column => {
+        const value = normalize(record[column]);
+        if (!value) return 'pending';
+        if (value === 'si' || value === 'yes') return 'yes';
+        if (value === 'no') return 'no';
+        throw new Error('Resultado inesperado para ' + name + ' en ' + header[column] + '.');
+      });
+      const percentages = percentageColumns.map(column => record[column]?.trim() ?? '');
+      const links = submissionLinks(record[submissionColumn] ?? '');
+      return {name, results, percentages, links};
+    });
+  }
+
+  function groupStudents(roster) {
+    const parents = roster.map((_, index) => index);
+    const firstByLink = new Map();
+
+    function root(index) {
+      while (parents[index] !== index) {
+        parents[index] = parents[parents[index]];
+        index = parents[index];
+      }
+      return index;
+    }
+
+    // Merge all components that share a parsed submission link.
+    for (const [index, student] of roster.entries()) {
+      for (const link of student.links) {
+        if (firstByLink.has(link)) {
+          parents[root(index)] = root(firstByLink.get(link));
+        } else {
+          firstByLink.set(link, index);
+        }
+      }
+    }
+
+    // The roster is alphabetical, so insertion order also sorts the groups.
+    const groups = new Map();
+    const unlinked = [];
+    for (const [index, student] of roster.entries()) {
+      if (!student.links.length) {
+        unlinked.push(student);
+        continue;
+      }
+      const group = root(index);
+      student.group = group;
+      if (!groups.has(group)) groups.set(group, []);
+      groups.get(group).push(student);
+    }
+    return [...groups.values()].flat().concat(unlinked);
+  }
+
+  function element(tag, label, className) {
+    const node = document.createElement(tag);
+    if (label) node.textContent = label;
+    if (className) node.className = className;
+    return node;
+  }
+
+  function submissionCell(links) {
+    const cell = element('td', '', 'submissions');
+    if (!links.length) {
+      cell.append(element('span', 'Sin enlace registrado', 'muted'));
+      return cell;
+    }
+    const list = element('ul');
+    for (const [index, href] of links.entries()) {
+      const item = element('li');
+      const label = links.length === 1 ? 'Ver PDF' : 'Ver PDF ' + (index + 1);
+      const link = element('a', label);
+      link.href = href;
+      item.append(link);
+      list.append(item);
+    }
+    cell.append(list);
+    return cell;
+  }
+
+  function criterionStart() {
+    return byId('scope').value === 'all' ? 0 : 4;
+  }
+
+  function filteredStudents(roster, start) {
+    const query = normalize(byId('search').value).split(/\s+/);
+    const filter = byId('filter').value;
+    return roster.filter(({name, results}) =>
+      query.every(word => normalize(name).includes(word)) &&
+      (filter === 'all' || results.slice(start).includes(filter))
+    );
+  }
+
+  function render() {
+    const start = criterionStart();
+    const visibleCriteria = criteria.slice(start);
+    const visible = filteredStudents(students, start);
+    const totals = {yes: 0, no: 0, pending: 0};
+    const bars = visibleCriteria.map((criterion, index) => {
+      const counts = {yes: 0, no: 0, pending: 0};
+      for (const student of visible) counts[student.results[start + index]]++;
+      const row = element('div', '', 'bar-row');
+      const bar = element('div', '', 'bar');
+      bar.setAttribute('aria-hidden', 'true');
+      for (const key of Object.keys(statuses)) {
+        totals[key] += counts[key];
+        if (counts[key]) {
+          const segment = element('span', '', key);
+          segment.style.flexGrow = counts[key];
+          bar.append(segment);
+        }
+      }
+      const values = element('span', Object.values(counts).join(' / '), 'counts');
+      values.setAttribute('aria-label', counts.yes + ' Sí, ' + counts.no + ' No, ' + counts.pending + ' pendientes');
+      row.append(element('strong', criterion), bar, values);
+      return row;
+    });
+    byId('chart').replaceChildren(...bars);
+    byId('summary').textContent = visible.length + ' de ' + students.length + ' estudiantes · ' +
+      totals.yes + ' Sí · ' + totals.no + ' No · ' + totals.pending + ' pendientes';
+
+    const headings = element('tr');
+    for (const label of ['Estudiante', ...visibleCriteria, 'Entregas']) {
+      const th = element('th', label);
+      th.scope = 'col';
+      headings.append(th);
+    }
+    byId('head').replaceChildren(headings);
+    renderRows();
+  }
+
+  function renderRows() {
+    const start = criterionStart();
+    const sortByGroup = byId('sort').value === 'group';
+    const roster = sortByGroup ? groupedStudents : students;
+    let previousGroup;
+    let shaded = false;
+    const rows = filteredStudents(roster, start).map(({name, results, percentages, links, group}) => {
+      const row = element('tr');
+      if (sortByGroup && group !== undefined) {
+        if (group !== previousGroup) {
+          shaded = !shaded;
+          previousGroup = group;
+        }
+        if (shaded) row.className = 'group-shaded';
+      }
+      const heading = element('th', name);
+      heading.scope = 'row';
+      row.append(heading);
+      for (let index = start; index < criteria.length; index++) {
+        const result = results[index];
+        const percentage = percentages[index];
+        const cell = element('td', '', 'criterion-result');
+        const showBadge = result !== 'pending' || !percentage;
+        if (showBadge) cell.append(element('span', statuses[result], 'badge ' + result));
+        if (percentage) {
+          const label = percentage.endsWith('%') ? percentage : percentage + '%';
+          cell.append(element('span', (showBadge ? ' · ' : '') + label, 'muted'));
+        }
+        row.append(cell);
+      }
+      row.append(submissionCell(links));
+      return row;
+    });
+    if (!rows.length) {
+      const row = element('tr');
+      const cell = element('td', 'No hay estudiantes que coincidan con los filtros.');
+      cell.colSpan = criteria.length - start + 2;
+      row.append(cell);
+      rows.push(row);
+    }
+    byId('rows').replaceChildren(...rows);
+  }
+
+  function loadResults(text, filename) {
+    students = readStudents(text).sort((a, b) => a.name.localeCompare(b.name, 'es'));
+    groupedStudents = groupStudents(students);
+    byId('error').hidden = true;
+    byId('source').textContent = filename + ' · ' + students.length + ' estudiantes';
+    byId('dashboard').hidden = false;
+    render();
+  }
+
+  byId('file').addEventListener('change', async event => {
+    const [file] = event.target.files;
+    if (!file) return;
+    try {
+      loadResults(await file.text(), file.name);
+    } catch (error) {
+      byId('error').textContent = error.message;
+      byId('error').hidden = false;
+    } finally {
+      event.target.value = '';
+    }
+  });
+  byId('search').addEventListener('input', render);
+  byId('scope').addEventListener('change', render);
+  byId('filter').addEventListener('change', render);
+  byId('sort').addEventListener('change', renderRows);
+
+  if (location.protocol === 'http:' || location.protocol === 'https:') {
+    fetch(csvName, {cache: 'no-store'}).then(response => {
+      if (!response.ok) throw new Error('CSV no disponible');
+      return response.text();
+    }).then(text => {
+      if (byId('dashboard').hidden) loadResults(text, csvName);
+    }).catch(() => {
+      if (byId('dashboard').hidden) byId('source').textContent = 'Selecciona ' + csvName + ' para cargar los resultados.';
+    });
+  }
+</script>
+</body>
+</html>
