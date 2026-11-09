@@ -144,6 +144,7 @@
     const links = document.querySelectorAll('a.page-link[href]');
     links.forEach((link) => {
       if (!isPdfPageLink(link)) return;
+      if (link.target === '_blank' && link.relList.contains('noopener')) return;
       link.setAttribute('target', '_blank');
       link.setAttribute('rel', 'noopener noreferrer');
     });

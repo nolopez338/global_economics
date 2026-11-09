@@ -5,10 +5,11 @@
 \makeatother
 \input{preamble_G10_T1_C1C2C3}
 \input{graphs/highlights}
+% \GTenHighlightsfalse % Uncomment to disable instructional highlights.
 
 \geometry{letterpaper,margin=0.72in}
 \linespread{1.04}
-\setlength{\parskip}{3pt}
+\setlength{\parskip}{3pt minus 2pt}
 \setlist[enumerate]{leftmargin=*,nosep}
 \setlist[itemize]{leftmargin=*,nosep}
 % Keep the standard heading anchors while tightening the review layout.
@@ -24,18 +25,28 @@
 \newcommand{\Example}[1]{\textbf{#1}\par}
 \newcommand{\Decision}{\textbf{Decision.}\enspace}
 \newcommand{\SourceValue}[1]{\HighlightStroke{black!25}{#1}}
-\newcommand{\Deciding}[1]{\ensuremath{\boldsymbol{#1}}}
+\newcommand{\RegretValue}[1]{\HighlightStroke{GTenHLOutcome}{#1}}
+\DeclareRobustCommand{\Deciding}[1]{%
+  \ifGTenHighlights
+    \ifmmode\boldsymbol{#1}\else\textbf{#1}\fi
+  \else#1\fi}
 \newcommand{\ReviewLink}[1]{\hyperref[crit:#1]{\underline{\textbf{C#1}}}}
-\newcommand{\BackToMap}{\par\noindent\hfill\hyperref[sec:summary]{\small\underline{Back to the summary}}\par}
 
 % Compact versions of the filtering tree styles in the C8--C9 key.
 \tikzset{
+  review guide/.style={},
   cNine survivor/.style={draw,align=center,font=\small,text width=29mm,minimum height=6mm},
-  cNine selected/.style={cNine survivor,very thick,fill=black!8},
+  cNine selected/.style={cNine survivor},
   cNine eliminated/.style={align=left,font=\small,anchor=west},
-  cNine keep/.style={-{Stealth},thick},
+  cNine keep/.style={-{Stealth},review guide},
   cNine discard/.style={-{Stealth},dashed}
 }
+\ifGTenHighlights
+  \tikzset{
+    review guide/.style={thick},
+    cNine selected/.append style={very thick,fill=black!8}
+  }
+\fi
 
 \begin{document}
 
@@ -45,6 +56,11 @@
   \smallskip 2026--2027\par
 }
 
+\setcounter{tocdepth}{1}
+\phantomsection
+\label{toc}
+\tableofcontents
+
 \section{Introduction}
 First, identify what the decision maker can choose and what the world will reveal later. Next, organize the possible outcomes in a payoff table. Once the payoffs are clear, compare decisions under uncertainty, test how a recommendation changes, and apply criteria in sequence when the problem calls for several rounds of filtering.
 
@@ -52,6 +68,10 @@ First, identify what the decision maker can choose and what the world will revea
 
 Scan the summary to recognize the task and find the method. Follow a criterion link to check your setup, intermediate calculations, and conclusion against a worked example.
 
+\par\nobreak
+\secInicio
+
+\clearpage
 \section{Summarized Outline}\label{sec:summary}
 {\small
 \begin{tabularx}{\linewidth}{@{}l L L L@{}}
@@ -91,8 +111,8 @@ EMV/Bayes & Yes & Row weighted sum & Highest & Highest expected payoff & Depends
 \centering
 \begin{tikzpicture}[>=Stealth]
   \draw (0,0) grid[xstep=.55,ystep=.37] (1.65,.74);
-  \draw[->,thick] (.06,.55) -- (1.59,.55);
-  \draw[->,thick,dashed] (.82,.78) -- (.82,-.13);
+  \draw[->,review guide] (.06,.55) -- (1.59,.55);
+  \draw[->,review guide,dashed] (.82,.78) -- (.82,-.13);
 \end{tikzpicture}
 \end{minipage}\hfill
 \begin{minipage}{0.73\linewidth}
@@ -100,10 +120,12 @@ EMV/Bayes & Yes & Row weighted sum & Highest & Highest expected payoff & Depends
 \textbf{Down a state column} (dashed) gives the best payoff to use as that state's regret benchmark.
 \end{minipage}
 }
+\par\nobreak
+\secInicio
 
 \clearpage
 \section{Step-by-Step Outline}
-In the examples, a \SourceValue{shaded value} marks the payoff being traced. \textbf{Bold deciding values} mark the statistic used to justify a recommendation. Always carry the original monetary unit through the calculation.
+In the examples, \SourceValue{gray shading} traces a payoff from its definition or calculation into a table or comparison. \RegretValue{Purple shading} follows a calculated regret into the regret table. \GTenHLProbability{Blue shading} links state probabilities to their weights in EMV. \Deciding{Bold deciding values} mark the statistic or threshold that determines the recommendation. The graph emphasizes the tie, and the tree emphasizes the final selection. Always carry the original monetary unit through the calculation.
 
 \subsection{C1 \textemdash{} Identify the decision elements}\label{crit:1}
 \Cue The question asks you to characterize a choice under uncertainty.
@@ -112,13 +134,15 @@ In the examples, a \SourceValue{shaded value} marks the payoff being traced. \te
   \item List the states of nature in order and say when the actual state is revealed.
   \item Explain how the state changes the outcome and name the payoff measure.
 \end{enumerate}
-\textbf{Craft Workshop.} The studio chooses a workshop to earn a net contribution.
+\textbf{Craft Workshop.} The studio chooses a workshop to earn a \SourceValue{net contribution}.
 \DecisionElementsTable
   {Pottery workshop; Weaving workshop}
   {Strong tourist demand; Weak tourist demand}
   {The studio cannot control tourist demand. It learns the demand state after choosing.}
-  {Demand changes attendance and the extra contribution per participant. Each payoff is the total net contribution in USD for one workshop and one demand state.}
+  {Demand changes attendance and the extra contribution per participant. Each payoff is the \SourceValue{total net contribution} in USD for one workshop and one demand state.}
 For Pottery under strong demand, \(12+6=18\) USD per participant before sponsorship. The studio controls the workshop choice. Demand determines which of that workshop's payoffs it earns.
+\par\nobreak
+\secInicio[][sec:summary]
 
 \subsection{C2 \textemdash{} Build a payoff table from contributions}\label{crit:2}
 \Cue The givens include per-participant contributions, attendance, and a fixed amount.
@@ -129,10 +153,10 @@ For Pottery under strong demand, \(12+6=18\) USD per participant before sponsors
         \(P_{ay}(A_i,S_j)=q_{ij}(v_i+d_j)+f_i\).
 \end{enumerate}
 \textbf{Craft Workshop, continued.} Pottery and Weaving contribute \(12,15\) USD per participant and receive sponsorships of \(80,50\) USD, respectively. Strong and weak demand add \(6,2\) USD per participant.
-\CalculationPair{Net contribution (USD)}{
+\CalculationPair{\SourceValue{Net contribution} (USD)}{
   \begin{tabular}{@{}lcc@{}}
   \toprule & Strong (\(S_1\)) & Weak (\(S_2\))\\\midrule
-  \(A_1\) & \SymbolicCell{q_{11}(v_1+d_1)+f_1}{P_{ay}(A_1,S_1)}
+  \(A_1\) & \SymbolicCell{q_{11}(v_1+d_1)+f_1}{\SourceValue{P_{ay}(A_1,S_1)}}
           & \SymbolicCell{q_{12}(v_1+d_2)+f_1}{P_{ay}(A_1,S_2)}\\
   \(A_2\) & \SymbolicCell{q_{21}(v_2+d_1)+f_2}{P_{ay}(A_2,S_1)}
           & \SymbolicCell{q_{22}(v_2+d_2)+f_2}{P_{ay}(A_2,S_2)}\\
@@ -151,9 +175,11 @@ For Pottery under strong demand, \(12+6=18\) USD per participant before sponsors
   Weaving workshop (\(A_2\)) & 554 & 322\\
 }
 \Decision The Pottery workshop earns the higher contribution under both strong and weak demand.
-\BackToMap
+\par\nobreak\vspace{6pt}
+\secInicio[][sec:summary]
 
 \clearpage
+\enlargethispage{12pt}
 \subsection{C3 \textemdash{} Build a profit table from revenue and costs}\label{crit:3}
 \Cue You have sales quantities, revenue per sale, variable costs, and fixed costs.
 \begin{enumerate}
@@ -170,7 +196,7 @@ Strong and weak demand add \(8,3\) USD per place and incur fixed seasonal costs 
   \toprule \textbf{Component} & \textbf{Expression}\\\midrule
   Revenue & \(R_{11}=q_{11}(b_1+s_1)\)\\
   Variable cost & \(VC_{11}=q_{11}c_1\)\\
-  Profit & \(P(A_1,S_1)=R_{11}-VC_{11}-F_1\)\\
+  Profit & \(\SourceValue{P(A_1,S_1)}=R_{11}-VC_{11}-F_1\)\\
   \bottomrule
   \end{tabular}
 }{
@@ -198,6 +224,8 @@ Countryside (\(A_2\)) & Strong (\(S_1\)) & 70 & 3710 & 1820 & 500 & 1390\\
   Countryside route (\(A_2\)) & 1390 & 230\\
 }
 \Decision The town route has higher seasonal profit in both demand states.
+\par\nobreak
+\secInicio[][sec:summary]
 
 \subsection{C4 \textemdash{} Compare Maximax and Maximin}\label{crit:4}
 \Cue The question asks for an optimistic choice or the best protection against a poor outcome.
@@ -212,17 +240,19 @@ A retailer chooses a stock plan with no demand probabilities. Profits are in tho
 \toprule
 Alternative & High & Medium & Low & Row max \(M_i\) & Row min \(m_i\)\\
 \midrule
-Bulk order (\(A_1\)) & 120 & 48 & \(-30\) & \(\Deciding{120}\) & \(-30\)\\
+Bulk order (\(A_1\)) & \SourceValue{120} & 48 & \(-30\) & \(\Deciding{120}\) & \(-30\)\\
 Regular order (\(A_2\)) & 84 & 57 & 16 & 84 & 16\\
 Small order (\(A_3\)) & 55 & 43 & \(\SourceValue{29}\) & 55 & \(\Deciding{29}\)\\
 Pre-orders only (\(A_4\)) & 24 & 24 & 24 & 24 & 24\\
 \bottomrule
 \end{tabular}\par}
-\Decision Maximax selects \textbf{Bulk order}, with an upside of 120 and a possible loss of 30.
+\Decision Maximax selects \textbf{Bulk order}, with an upside of \Deciding{120} and a possible loss of 30.
 Maximin selects \textbf{Small order}. Its minimum, \(\min\{55,43,\SourceValue{29}\}=\Deciding{29}\), gives the best protection, with an upside of 55.
-\BackToMap
+\par\nobreak\vspace{6pt}
+\secInicio[][sec:summary]
 
 \clearpage
+\enlargethispage{12pt}
 \subsection{C5 \textemdash{} Minimize maximum regret}\label{crit:5}
 \Cue The decision maker wants to limit the largest profit they could miss.
 \begin{enumerate}
@@ -259,16 +289,18 @@ State best \(b_j\) & 78 & 48 & 30\\
 Plan & High & Medium & Low & Row max\\
 \midrule
 \(A_1\) & 0 & 16 & 42 & 42\\
-\(A_2\) & 18 & 0 & 12 & \(\Deciding{18}\)\\
+\(A_2\) & \RegretValue{18} & 0 & 12 & \(\Deciding{18}\)\\
 \(A_3\) & 38 & 10 & 0 & 38\\
 \bottomrule
 \end{tabular}
 \end{minipage}
 
-For \(A_2\), the regrets are \(78-\SourceValue{60}=18\), \(48-48=0\), and \(30-18=12\).
+For \(A_2\), the regrets are \(78-\SourceValue{60}=\RegretValue{18}\), \(48-48=0\), and \(30-18=12\).
 For \(A_1\) under low demand, subtracting a negative payoff gives \(30-(-12)=42\).
 The smallest row maximum is \(\min\{42,18,38\}=\Deciding{18}\).
-\Decision Choose \textbf{Medium purchase} (\(A_2\)). Its largest possible missed profit is 18 thousand USD.
+\Decision Choose \textbf{Medium purchase} (\(A_2\)). Its largest possible missed profit is \Deciding{18} thousand USD.
+\par\nobreak\vspace{6pt}
+\secInicio[][sec:summary]
 
 \subsection{C6 \textemdash{} Calculate EMV and apply Bayes}\label{crit:6}
 \Cue The question supplies state probabilities and asks for the highest expected payoff.
@@ -283,7 +315,7 @@ A cooperative chooses a packing plan before export demand is known. Payoffs and 
 \begin{tabular}{@{}lrrr@{}}
 \toprule
 Alternative & Strong & Steady & Weak\\
-\(P(S_j)\) & 0.40 & 0.35 & 0.25\\
+\(P(S_j)\) & \GTenHLProbability{0.40} & \GTenHLProbability{0.35} & \GTenHLProbability{0.25}\\
 \midrule
 Premium packs (\(A_1\)) & 90 & 44 & \(-12\)\\
 Mixed packs (\(A_2\)) & \(\SourceValue{68}\) & 58 & 24\\
@@ -291,14 +323,15 @@ Basic packs (\(A_3\)) & 46 & 48 & 38\\
 \bottomrule
 \end{tabular}
 \end{center}
-Each probability is in \([0,1]\), and \(0.40+0.35+0.25=1\).
+Each probability is in \([0,1]\), and \(\GTenHLProbability{0.40}+\GTenHLProbability{0.35}+\GTenHLProbability{0.25}=1\).
 \begin{align*}
 \mathrm{EMV}(A_1)&=0.40(90)+0.35(44)+0.25(-12)=36+15.40-3=48.40,\\
-\mathrm{EMV}(A_2)&=0.40(\SourceValue{68})+0.35(58)+0.25(24)=27.20+20.30+6=\Deciding{53.50},\\
+\mathrm{EMV}(A_2)&=\GTenHLProbability{0.40}(\SourceValue{68})+\GTenHLProbability{0.35}(58)+\GTenHLProbability{0.25}(24)=27.20+20.30+6=\Deciding{53.50},\\
 \mathrm{EMV}(A_3)&=0.40(46)+0.35(48)+0.25(38)=18.40+16.80+9.50=44.70.
 \end{align*}
-\Decision Choose \textbf{Mixed packs} (\(A_2\)). Under the stated probabilities, expected profit is 53.50 thousand USD (USD 53,500). The profit actually earned depends on which state occurs.
-\BackToMap
+\Decision Choose \textbf{Mixed packs} (\(A_2\)). Under the stated probabilities, expected profit is \Deciding{53.50} thousand USD (USD 53,500). The profit actually earned depends on which state occurs.
+\par\nobreak
+\secInicio[][sec:summary]
 
 \clearpage
 \subsection{C7 \textemdash{} Find where the EMV recommendation changes}\label{crit:7}
@@ -315,21 +348,21 @@ A training business chooses a launch plan before enrolment is known. Profits are
 \begin{tabular}{@{}lrrr@{}}
 \toprule
 Alternative & High (\(S_1\)) & Moderate (\(S_2\)) & Low (\(S_3\))\\
-\(P(S_j)\) & \(p\) & \(p/2\) & \(1-3p/2\)\\
+\(P(S_j)\) & \(p\) & \(\GTenHLProbability{p/2}\) & \(1-3p/2\)\\
 \midrule
 Full (\(A_1\)) & 100 & 36 & \(-8\)\\
 Pilot (\(A_2\)) & 52 & 48 & 28\\
 \bottomrule
 \end{tabular}
 \end{center}
-From \(p+p/2+P(S_3)=1\), we get \(P(S_3)=1-3p/2\).
+From \(p+\GTenHLProbability{p/2}+P(S_3)=1\), we get \(P(S_3)=1-3p/2\).
 The three probability checks give \(0\le p\le1\), \(0\le p\le2\), and \(0\le p\le2/3\), respectively.
 The feasible range is their intersection, \(\boxed{0\le p\le2/3}\).
 \begin{align*}
-E_1(p)&=100p+36(p/2)-8(1-3p/2)=130p-8,\\
-E_2(p)&=52p+48(p/2)+28(1-3p/2)=28+34p.
+E_1(p)&=100p+36(\GTenHLProbability{p/2})-8(1-3p/2)=130p-8,\\
+E_2(p)&=52p+48(\GTenHLProbability{p/2})+28(1-3p/2)=28+34p.
 \end{align*}
-The tie solves \(130p-8=28+34p\), so \(96p=36\) and \(p=3/8\) is feasible. Both EMVs equal \(40.75\) thousand USD there.
+The tie solves \(130p-8=28+34p\), so \(96p=36\) and \(p=\Deciding{3/8}\) is feasible. Both EMVs equal \(40.75\) thousand USD there.
 The difference \(E_1-E_2=96p-36\) is negative below the tie and positive above it.
 At \(p=0\), \((E_1,E_2)=(-8,28)\). At \(p=2/3\), \((E_1,E_2)=(236/3,152/3)\).
 
@@ -344,9 +377,9 @@ At \(p=0\), \((E_1,E_2)=(-8,28)\). At \(p=2/3\), \((E_1,E_2)=(236/3,152/3)\).
 \toprule
 \(p\) & Recommendation\\
 \midrule
-\(0\le p<3/8\) & Pilot (\(A_2\))\\
-\(p=3/8\) & Both tied\\
-\(3/8<p\le2/3\) & Full (\(A_1\))\\
+\(0\le p<\Deciding{3/8}\) & Pilot (\(A_2\))\\
+\(p=\Deciding{3/8}\) & Both tied\\
+\(\Deciding{3/8}<p\le2/3\) & Full (\(A_1\))\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -360,7 +393,7 @@ For \(2/3<p\le1\), the low-enrolment probability is negative, so these inputs ar
   xmin=-.04,xmax=.715,ymin=-15,ymax=90,
   axis lines=left,
   xlabel={Feasible \(p\)},ylabel={EMV (thousand USD)},
-  xtick={0,0.375,0.6666667},xticklabels={\(0\),\(3/8\),\(2/3\)},
+  xtick={0,0.375,0.6666667},xticklabels={\(0\),\(\Deciding{3/8}\),\(2/3\)},
   ytick={0,20,40,60,80},
   tick label style={font=\small},label style={font=\small},
   ymajorgrids,grid style={black!17},
@@ -370,13 +403,14 @@ For \(2/3<p\le1\), the low-enrolment probability is negative, so these inputs ar
 \addlegendentry{Full (\(A_1\))}
 \addplot[black,thick,dashed,mark=square*,mark options={solid},samples=2,domain=0:2/3] {28+34*x};
 \addlegendentry{Pilot (\(A_2\))}
-\draw[thin,densely dotted] (axis cs:.375,-15) -- (axis cs:.375,40.75);
+\draw[thin,densely dotted,review guide] (axis cs:.375,-15) -- (axis cs:.375,40.75);
 \fill (axis cs:.375,40.75) circle[radius=1.5pt];
-\node[font=\small,anchor=south east,inner sep=2pt] at (axis cs:.375,40.75) {Tie};
+\node[font=\small,anchor=south east,inner sep=2pt] at (axis cs:.375,40.75) {\Deciding{Tie}};
 \end{axis}
 \end{tikzpicture}
 \end{minipage}
-\BackToMap
+\par\nobreak
+\secInicio[][sec:summary]
 
 \clearpage
 \subsection{C8 \textemdash{} Compare rules and test payoff changes}\label{crit:8}
@@ -396,27 +430,27 @@ A bicycle repair workshop chooses its capacity. Profits and deciding values are 
  & \multicolumn{3}{c}{Payoffs} & \multicolumn{4}{c}{Decision statistics}\\
 \cmidrule(lr){2-4}\cmidrule(l){5-8}
 Alternative & High & Normal & Low & Max & Min & Max regret & EMV\\
-\(P(S_j)\) & 0.2 & 0.6 & 0.2 & & & & \\
+\(P(S_j)\) & \GTenHLProbability{0.2} & \GTenHLProbability{0.6} & \GTenHLProbability{0.2} & & & & \\
 \midrule
-Large (\(A_1\)) & 120 & 25 & \(-20\) & \(\Deciding{120}\) & \(-20\) & 55 & 35\\
-Flexible (\(A_2\)) & 85 & 65 & \(-10\) & 85 & \(-10\) & \(\Deciding{45}\) & 54\\
-Basic (\(A_3\)) & 50 & 45 & 35 & 50 & \(\Deciding{35}\) & 70 & 44\\
+Large (\(A_1\)) & \SourceValue{120} & 25 & \(-20\) & \(\Deciding{120}\) & \(-20\) & 55 & 35\\
+Flexible (\(A_2\)) & 85 & 65 & \(\SourceValue{-10}\) & 85 & \(-10\) & \(\Deciding{45}\) & 54\\
+Basic (\(A_3\)) & 50 & 45 & \SourceValue{35} & 50 & \(\Deciding{35}\) & 70 & 44\\
 Partner (\(A_4\)) & 70 & 75 & 20 & 75 & 20 & 50 & \(\Deciding{63}\)\\
 \bottomrule
 \end{tabular}
 \end{center}
 The state bests are \((120,75,35)\), so \(A_2\)'s maximum regret is
-\(\max\{120-85,75-65,35-(-10)\}=45\).
-The Partner plan's EMV is \(0.2(70)+0.6(75)+0.2(20)=14+45+4=63\).
+\(\max\{120-85,75-65,35-(\SourceValue{-10})\}=\Deciding{45}\).
+The Partner plan's EMV is \(\GTenHLProbability{0.2}(70)+\GTenHLProbability{0.6}(75)+\GTenHLProbability{0.2}(20)=14+45+4=\Deciding{63}\).
 
-\Decision Maximax chooses \textbf{Large} at 120. Maximin chooses \textbf{Basic} at 35.
-Minimax Regret chooses \textbf{Flexible} at 45. EMV/Bayes chooses \textbf{Partner} at 63.
+\Decision Maximax chooses \textbf{Large} at \Deciding{120}. Maximin chooses \textbf{Basic} at \Deciding{35}.
+Minimax Regret chooses \textbf{Flexible} at \Deciding{45}. EMV/Bayes chooses \textbf{Partner} at \Deciding{63}.
 
 \textbf{Variant. Subsidy and Maximin.}
 For integer \(0\le s\le50\), replace the Low payoffs for \(A_1,A_2\) with \(-20+s,-10+s\). All payoffs must be nonnegative. \(A_1\) becomes eligible at \(s=20\), \(A_2\) at \(s=10\), and \(A_3,A_4\) are always eligible.
 The row minima in order are \(\min\{25,-20+s\},-10+s,35,20\).
 Only \(A_2\) can overtake \(A_3\), since \(A_1\)'s minimum is at most 25 and \(A_4\)'s is 20.
-Flexible ties Basic at \(s=45\), since \(-10+45=35\). It wins uniquely when \(-10+s>35\). The first such integer is \(\Deciding{s=46}\), when its minimum profit is 36 thousand USD.
+Flexible ties Basic at \(s=\Deciding{45}\), since \(\SourceValue{-10}+45=\SourceValue{35}\). It wins uniquely when \(-10+s>35\). The first such integer is \(s=\Deciding{46}\), when its minimum profit is 36 thousand USD.
 
 \Example{Community Market Stall}
 Profits are in hundred USD. A sponsor replaces Compact's High payoff of \(48\) with an integer \(g\) in \([48,80]\). Both payoffs must be at least 20.
@@ -427,17 +461,18 @@ Alternative & High & Low & Eligible for this range?\\
 \midrule
 Large (\(C_1\)) & 80 & 10 & No\\
 Compact (\(C_2\)) & \(g\) & 32 & Yes\\
-Standard (\(C_3\)) & 70 & 25 & Yes\\
+Standard (\(C_3\)) & \SourceValue{70} & 25 & Yes\\
 Premium (\(C_4\)) & 90 & \(-5\) & No\\
 \bottomrule
 \end{tabular}
 \end{center}
 The original unrestricted benchmarks were \((90,32)\), and Standard won on maximum regret \(20\).
-After screening, the benchmarks are \((\max\{g,70\},32)\).
+After screening, the benchmarks are \((\max\{g,\SourceValue{70}\},32)\).
 Thus \(R(C_2)=\max\{70-g,0\}\) and \(R(C_3)=\max\{g-70,7\}\).
-Up to \(g=70\), compare \(70-g\) with \(7\). At \(g=63\) both regrets equal 7. The first integer with \(70-g<7\) is \(\Deciding{g=64}\).
+Up to \(g=70\), compare \(70-g\) with \(7\). At \(g=\Deciding{63}\) both regrets equal 7. The first integer with \(70-g<7\) is \(g=\Deciding{64}\).
 Compact then wins with regret 6 versus 7, and its high-attendance profit is USD 6,400.
-\BackToMap
+\par\nobreak
+\secInicio[][sec:summary]
 
 \clearpage
 \subsection{C9 \textemdash{} Apply criteria in stages}\label{crit:9}
@@ -463,7 +498,7 @@ Stage and rule & Survivors (value) & Eliminated (value)\\
 0. Start & \(D_1\) through \(D_6\) & \textemdash\\
 1. EMV/Bayes, best 3 & \(D_1(65)\), \(D_2(65)\), \(D_3(65)\) & \(D_4(59)\), \(D_5(53)\), \(D_6(43)\)\\
 2. Maximax, best 2 & \(D_1(100)\), \(D_2(90)\) & \(D_3(80)\)\\
-3. Maximin, final & \(\Deciding{D_2(10)}\) & \(D_1(0)\)\\
+3. Maximin, final & \(D_2(\Deciding{10})\) & \(D_1(0)\)\\
 \bottomrule
 \end{tabularx}
 \end{minipage}\hfill
@@ -473,7 +508,7 @@ Stage and rule & Survivors (value) & Eliminated (value)\\
   \node[cNine survivor] (s0) at (0,0) {All six \(D_i\)};
   \node[cNine survivor] (s1) at (0,-1.15) {\(D_1,D_2,D_3\)};
   \node[cNine survivor] (s2) at (0,-2.30) {\(D_1,D_2\)};
-  \node[cNine selected] (s3) at (0,-3.45) {\textbf{Selected \(D_2\)}};
+  \node[cNine selected] (s3) at (0,-3.45) {\Deciding{Selected \(D_2\)}};
   \node[cNine eliminated] (e1) at (1.58,-.575) {Out \(D_4,D_5,D_6\)};
   \node[cNine eliminated] (e2) at (1.58,-1.725) {Out \(D_3\)};
   \node[cNine eliminated] (e3) at (1.58,-2.875) {Out \(D_1\)};
@@ -488,7 +523,9 @@ Stage and rule & Survivors (value) & Eliminated (value)\\
 \medskip
 All three plans with EMV 65 fit into the three available places. Next \(100>90>80\) leaves \(D_1,D_2\).
 
-\Decision The bookseller selects \textbf{\(D_2\)}. Of the two finalists, it has the higher worst-case profit, 10 hundred USD (USD 1,000).
+\Decision The bookseller selects \textbf{\(D_2\)}. Of the two finalists, it has the higher worst-case profit, \Deciding{10} hundred USD (USD 1,000).
+\par\nobreak
+\secInicio[][sec:summary]
 
 \subsection{C10 \textemdash{} Justify a criterion in context}\label{crit:10}
 \Cue The question asks which rule suits the decision maker and why.
@@ -498,7 +535,7 @@ All three plans with EMV 65 fit into the three available places. Next \(100>90>8
   \item Choose the rule that fits, show its deciding calculation, and explain what the result means for this decision.
 \end{enumerate}
 \Example{Sportswear Stock, with a cash constraint}
-Suppose the retailer has no reliable demand probabilities and needs to protect cash in a weak season. The row minima from \ReviewLink{4} are \(-30,16,29,24\) thousand USD. Maximin fits that priority because it compares the worst outcomes. Since \(\max\{-30,16,29,24\}=\Deciding{29}\), the retailer should choose \textbf{Small order}, whose lowest listed profit is 29 thousand USD.
+Suppose the retailer has no reliable demand probabilities and needs to protect cash in a weak season. The row minima from \ReviewLink{4} are \(-30,16,29,24\) thousand USD. Maximin fits that priority because it compares the worst outcomes. Since \(\max\{-30,16,29,24\}=\Deciding{29}\), the retailer should choose \textbf{Small order}, whose lowest listed profit is \Deciding{29} thousand USD.
 
 \textbf{Interactive Decision Webpage activity checklist.}
 Use the same reasoning to interpret the webpage's recommendations. Check that users can do the following.
@@ -510,7 +547,8 @@ Use the same reasoning to interpret the webpage's recommendations. Check that us
   \item See calculations and visuals update automatically. Check that the layout is clear and responsive, results agree, and invalid inputs are handled.
   \item Find a visible, accessible link to the AI development conversation.
 \end{itemize}
-\BackToMap
+\par\nobreak
+\secInicio[][sec:summary]
 
 \end{document}
 
