@@ -1,0 +1,451 @@
+\documentclass[12pt,aspectratio=169]{beamer}
+\usepackage{amsmath,booktabs,tabularx}
+
+\makeatletter
+\def\input@path{{../../../preamble/}{book2026-2027/preamble/}}
+\makeatother
+\input{graphs/highlights.tex}
+% \GTenHighlightsfalse % Uncomment to disable instructional highlights.
+\input{graphs/specific_highlights.tex}
+
+\definecolor{LessonInk}{HTML}{132A3E}
+\definecolor{LessonTeal}{HTML}{17675E}
+\definecolor{LessonTint}{HTML}{EAF2F1}
+\setbeamercolor{normal text}{fg=LessonInk,bg=white}
+\setbeamercolor{structure}{fg=LessonTeal}
+\setbeamercolor{frametitle}{fg=LessonInk}
+\setbeamercolor{lesson footer}{fg=LessonTeal,bg=LessonTint}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamersize{text margin left=9mm,text margin right=9mm}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{%
+  \begin{beamercolorbox}[wd=\paperwidth,ht=3ex,dp=1.3ex,leftskip=9mm,rightskip=9mm]{lesson footer}
+    \footnotesize\insertsectionhead\hfill\insertframenumber/\inserttotalframenumber
+  \end{beamercolorbox}%
+}
+\setbeamercovered{invisible}
+\renewcommand{\arraystretch}{1.22}
+
+\title{Outcomes, Support and Probability Mass Functions}
+\subtitle{Grade 10, Term 2, Lesson 1, Criterion C1}
+\author{}
+\date{}
+
+% The three arguments are the first overlays showing the F, E and C columns.
+% Reuse the same table when students read the mappings back to form groups.
+\newcommand{\ShopMap}[3]{%
+  \begin{center}
+    \begin{tabular}{@{}lcccc@{}}
+      \toprule
+      \textbf{Outcome} $\GTenHLOutcome{\omega}$ &
+      $P(\GTenHLOutcome{\omega})$ &
+      \visible<#1->{$\GTenHLValue{F}(\GTenHLOutcome{\omega})$ (\GTenHLValue{USD})} &
+      \visible<#2->{$\GTenHLSecond{E}(\GTenHLOutcome{\omega})$} &
+      \visible<#3->{$\GTenHLThird{C}(\GTenHLOutcome{\omega})$} \\
+      \midrule
+      \GTenHLOutcome{Cash} & \GTenHLProbability{0.1} &
+      \visible<#1->{\GTenHLValue{0}} & \visible<#2->{\GTenHLSecond{0}} & \visible<#3->{\GTenHLThird{0}} \\
+      \GTenHLOutcome{Debit card} & \GTenHLProbability{0.2} &
+      \visible<#1->{\GTenHLValue{1}} & \visible<#2->{\GTenHLSecond{1}} & \visible<#3->{\GTenHLThird{1}} \\
+      \GTenHLOutcome{Credit card} & \GTenHLProbability{0.3} &
+      \visible<#1->{\GTenHLValue{1}} & \visible<#2->{\GTenHLSecond{1}} & \visible<#3->{\GTenHLThird{1}} \\
+      \GTenHLOutcome{Mobile wallet} & \GTenHLProbability{0.4} &
+      \visible<#1->{\GTenHLValue{2}} & \visible<#2->{\GTenHLSecond{1}} & \visible<#3->{\GTenHLThird{0}} \\
+      \bottomrule
+    \end{tabular}
+  \end{center}%
+}
+
+\newcommand{\ShopFee}{$\GTenHLValue{F}$ is the payment fee in \GTenHLValue{USD}.}
+\newcommand{\ShopElectronic}{$\GTenHLSecond{E}$ is $\GTenHLSecond{1}$ for an electronic
+  payment and $\GTenHLSecond{0}$ otherwise (unitless).}
+\newcommand{\ShopCard}{$\GTenHLThird{C}$ is $\GTenHLThird{1}$ for a card payment
+  and $\GTenHLThird{0}$ otherwise (unitless).}
+
+% Reveal the ordered sample space by number of buyers. With all arguments
+% equal to 1, the same list is available to consult on the later frames.
+\newcommand{\NotebookOutcomes}[4]{%
+  \[
+    \visible<#1->{\GTenHLOutcome{\Omega}=\{\GTenHLOutcome{\mathrm{NNN}}}%
+    \visible<#2->{,\,\GTenHLOutcome{\mathrm{BNN}},\,\GTenHLOutcome{\mathrm{NBN}},\,\GTenHLOutcome{\mathrm{NNB}}}%
+    \visible<#3->{,\,\GTenHLOutcome{\mathrm{BBN}},\,\GTenHLOutcome{\mathrm{BNB}},\,\GTenHLOutcome{\mathrm{NBB}}}%
+    \visible<#4->{,\,\GTenHLOutcome{\mathrm{BBB}}\}.}
+  \]%
+}
+
+\newcommand{\NotebookCount}{$\GTenHLValue{X}$ counts the buyers among the three visitors.}
+\newcommand{\NotebookRevenue}{$\GTenHLSecond{Y}=5\GTenHLValue{X}$ is total notebook revenue
+  in \GTenHLSecond{USD}.}
+\newcommand{\NotebookFirst}{$\GTenHLThird{Z}$ is $\GTenHLThird{1}$ if the first visitor buys
+  and $\GTenHLThird{0}$ if the first visitor passes (unitless).}
+\newcommand{\NotebookDecisions}{In visitor order, \GTenHLOutcome{B} means buy
+  (\GTenHLProbability{0.4}) and \GTenHLOutcome{N} means pass (\GTenHLProbability{0.6}).}
+\newcommand{\NotebookEventRule}{Independence lets us multiply the decision probabilities
+  within an outcome. The matching outcomes are mutually exclusive, so we add their probabilities.}
+
+\newcommand{\NotebookSupports}{%
+  \begin{center}
+    \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xll@{}}
+      \toprule
+      \textbf{Variable} & \textbf{Finite support} & \textbf{Units} \\
+      \midrule
+      \NotebookCount &
+      $\GTenHLValue{\{0,1,2,3\}}$ & \GTenHLValue{buyers} \\
+      $\GTenHLSecond{Y}=5\GTenHLValue{X}$ is total notebook revenue. &
+      $\GTenHLSecond{\{0,5,10,15\}}$ & \GTenHLSecond{USD} \\
+      $\GTenHLThird{Z}$ is $\GTenHLThird{1}$ if the first visitor buys
+      and $\GTenHLThird{0}$ if the first visitor passes. &
+      $\GTenHLThird{\{0,1\}}$ & Unitless \\
+      \bottomrule
+    \end{tabularx}
+  \end{center}%
+}
+
+\begin{document}
+
+\section{Introduction}
+
+\begin{frame}
+  \vfill
+  {\color{LessonTeal}\bfseries\insertsubtitle\par}
+  \medskip
+  {\huge\bfseries\inserttitle\par}
+  \bigskip
+  \textbf{C1.} Characterises discrete random variables in economic and
+  financial contexts by identifying their support, probability mass function
+  and possible outcomes.
+  \vfill
+  All data are hypothetical teaching models. Keep exact expressions where
+  useful and round final probabilities to four decimal places.
+  \vfill
+\end{frame}
+
+\begin{frame}[t]{Highlight legend}
+  \PracticeHighlightLegend{G10-T2-C1}
+\end{frame}
+
+\section{School shop}
+
+\begin{frame}[t]{Payment outcomes and their assigned values}
+  A school shop receives one payment. The payment method is the
+  \emph{complete outcome}. A \emph{random variable} assigns a number
+  to each outcome.
+
+  \ShopMap{2}{3}{4}
+
+  \visible<2->{\ShopFee}\par
+  \visible<3->{\ShopElectronic}\par
+  \visible<4->{\ShopCard}
+\end{frame}
+
+\begin{frame}[t]{Supports of the fee and indicators}
+  The \emph{support} is the set of values with positive probability.
+
+  \ShopMap{1}{1}{1}
+
+  \ShopFee\par
+  \ShopElectronic\par
+  \ShopCard\par
+  \smallskip
+  \textbf{Predict.} Which distinct values appear in each variable's column?
+
+  \smallskip
+  \visible<2->{\makebox[\linewidth]{%
+    $\GTenHLValue{F}\colon\GTenHLValue{\{0,1,2\}}$ (\GTenHLValue{USD})\quad
+    $\GTenHLSecond{E}\colon\GTenHLSecond{\{0,1\}}$ (unitless)\quad
+    $\GTenHLThird{C}\colon\GTenHLThird{\{0,1\}}$ (unitless)}}
+\end{frame}
+
+\begin{frame}[t]{Probability of a 1 USD fee}
+  A \emph{probability mass function} (PMF) gives each value's probability.
+  Add the probabilities of mutually exclusive outcomes with that value.
+
+  \ShopMap{1}{1}{1}
+
+  \ShopFee\par
+  \textbf{Predict.} Which outcomes give $\GTenHLValue{F}=\GTenHLValue{1}$?
+
+  \visible<2->{\GTenHLOutcome{Debit card} and \GTenHLOutcome{Credit card}.}
+  \[
+    \visible<3->{P(\GTenHLValue{F}=\GTenHLValue{1})
+      =\GTenHLProbability{0.2}+\GTenHLProbability{0.3}=\GTenHLProbability{0.5}.}
+  \]
+\end{frame}
+
+\begin{frame}[t]{Probability of an electronic payment}
+  \ShopMap{1}{1}{1}
+
+  \ShopElectronic\par
+  \medskip
+  \textbf{Predict.} Which outcomes give $\GTenHLSecond{E}=\GTenHLSecond{1}$?
+
+  \visible<2->{\GTenHLOutcome{Debit card}, \GTenHLOutcome{Credit card}
+    and \GTenHLOutcome{Mobile wallet}.}
+  \[
+    \visible<3->{P(\GTenHLSecond{E}=\GTenHLSecond{1})
+      =\GTenHLProbability{0.2}+\GTenHLProbability{0.3}
+      +\GTenHLProbability{0.4}=\GTenHLProbability{0.9}.}
+  \]
+\end{frame}
+
+\begin{frame}[t]{Probability of a card payment}
+  \ShopMap{1}{1}{1}
+
+  \ShopCard\par
+  \medskip
+  \textbf{Predict.} Which outcomes give $\GTenHLThird{C}=\GTenHLThird{1}$?
+
+  \visible<2->{\GTenHLOutcome{Debit card} and \GTenHLOutcome{Credit card}.}
+  \[
+    \visible<3->{P(\GTenHLThird{C}=\GTenHLThird{1})
+      =\GTenHLProbability{0.2}+\GTenHLProbability{0.3}=\GTenHLProbability{0.5}.}
+  \]
+\end{frame}
+
+\begin{frame}[t]{The fee PMF}
+  \ShopMap{1}{1}{1}
+
+  \begin{center}
+    \begin{tabular}{@{}lccc@{}}
+      \toprule
+      Fee value $\GTenHLValue{f}$ (\GTenHLValue{USD}) &
+      \GTenHLValue{0} & \GTenHLValue{1} & \GTenHLValue{2} \\
+      \midrule
+      $P(\GTenHLValue{F}=\GTenHLValue{f})$ &
+      \GTenHLProbability{0.1} & \GTenHLProbability{0.5} & \GTenHLProbability{0.4} \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \emph{Worksheet reading.} See the worked grouping problem for the
+  full fee calculation.
+\end{frame}
+
+\begin{frame}[t]{The electronic-payment and card-payment PMFs}
+  \ShopElectronic\par
+  \ShopCard
+
+  \begin{center}
+    \begin{tabular}{@{}lcc@{}}
+      \toprule
+      Electronic-payment value $\GTenHLSecond{e}$ &
+      \GTenHLSecond{0} & \GTenHLSecond{1} \\
+      \midrule
+      $P(\GTenHLSecond{E}=\GTenHLSecond{e})$ &
+      \GTenHLProbability{0.1} & \GTenHLProbability{0.9} \\
+      \midrule
+      Card-payment value $\GTenHLThird{c}$ &
+      \GTenHLThird{0} & \GTenHLThird{1} \\
+      \midrule
+      $P(\GTenHLThird{C}=\GTenHLThird{c})$ &
+      \GTenHLProbability{0.5} & \GTenHLProbability{0.5} \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  $\GTenHLSecond{E}$ and $\GTenHLThird{C}$ share a support but have
+  different masses. All probabilities are unitless.
+\end{frame}
+
+\section{Notebook sale}
+
+\begin{frame}[t]{Three independent visitor decisions}
+  A school enterprise offers a 5 USD notebook to each of three visitors.
+
+  \begin{center}
+    \begin{tabular}{@{}lcc@{}}
+      \toprule
+      \textbf{Decision} & \textbf{Symbol} & \textbf{Probability} \\
+      \midrule
+      Buy  & \GTenHLOutcome{B} & \GTenHLProbability{0.4} \\
+      Pass & \GTenHLOutcome{N} & \GTenHLProbability{0.6} \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  Assume the visitors decide \emph{independently}. One visitor's decision
+  leaves the other visitors' probabilities the same.
+\end{frame}
+
+\begin{frame}[t]{Eight ordered outcomes}
+  Choose \GTenHLOutcome{B} or \GTenHLOutcome{N} for each visitor.
+  Read the three positions in visitor order.
+
+  \medskip
+  \textbf{Predict.} List the complete outcomes with zero, one, two and
+  three buyers.
+
+  \NotebookOutcomes{2}{3}{4}{5}
+\end{frame}
+
+\begin{frame}[t]{Probability that only the first visitor buys}
+  \NotebookOutcomes{1}{1}{1}{1}
+
+  In \GTenHLOutcome{BNN}, only the first visitor buys. Independence lets us
+  multiply the three decision probabilities in visitor order.
+
+  \medskip
+  \textbf{Predict.} Which factor belongs to each position in \GTenHLOutcome{BNN}?
+  \[
+    P(\GTenHLOutcome{\mathrm{BNN}})
+    \visible<2->{=\GTenHLProbability{0.4}}\,
+    \visible<3->{\times\GTenHLProbability{0.6}}\,
+    \visible<4->{\times\GTenHLProbability{0.6}}\,
+    \visible<5->{=\GTenHLProbability{0.144}.}
+  \]
+\end{frame}
+
+\begin{frame}[t]{Outcomes with the same probability product}
+  \NotebookOutcomes{1}{1}{1}{1}
+
+  \textbf{Predict.} Which outcomes have the same factors, possibly in a
+  different order?
+
+  \begin{center}
+    \begin{tabular}{@{}lc@{}}
+      \toprule
+      \textbf{Complete outcomes} & \textbf{Probability of each outcome} \\
+      \midrule
+      \visible<2->{\GTenHLOutcome{NNN}} &
+      \visible<3->{$\GTenHLProbability{0.6}^{3}=\GTenHLProbability{0.216}$} \\
+      \visible<2->{\GTenHLOutcome{BNN}, \GTenHLOutcome{NBN}, \GTenHLOutcome{NNB}} &
+      \visible<3->{$\GTenHLProbability{0.4}\times\GTenHLProbability{0.6}
+        \times\GTenHLProbability{0.6}=\GTenHLProbability{0.144}$} \\
+      \visible<2->{\GTenHLOutcome{BBN}, \GTenHLOutcome{BNB}, \GTenHLOutcome{NBB}} &
+      \visible<3->{$\GTenHLProbability{0.4}^{2}\times\GTenHLProbability{0.6}
+        =\GTenHLProbability{0.096}$} \\
+      \visible<2->{\GTenHLOutcome{BBB}} &
+      \visible<3->{$\GTenHLProbability{0.4}^{3}=\GTenHLProbability{0.064}$} \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}[t]{Buyer count, revenue and first visitor}
+  \NotebookOutcomes{1}{1}{1}{1}
+
+  \NotebookSupports
+\end{frame}
+
+\begin{frame}[t]{Comparing \GTenHLOutcome{BNN} and \GTenHLOutcome{NBN}}
+  In visitor order, \GTenHLOutcome{B} means buy and \GTenHLOutcome{N} means pass.\par
+  \NotebookCount\par
+  \NotebookRevenue\par
+  \NotebookFirst\par
+  \medskip
+  \textbf{Predict.} Which values agree for these two outcomes?
+
+  \begin{center}
+    \begin{tabular}{@{}lccc@{}}
+      \toprule
+      \textbf{Outcome} & $\GTenHLValue{X}$ (\GTenHLValue{buyers}) &
+      $\GTenHLSecond{Y}$ (\GTenHLSecond{USD}) & $\GTenHLThird{Z}$ (unitless) \\
+      \midrule
+      \GTenHLOutcome{BNN} & \visible<2->{\GTenHLValue{1}} &
+      \visible<2->{\GTenHLSecond{5}} & \visible<3->{\GTenHLThird{1}} \\
+      \GTenHLOutcome{NBN} & \visible<2->{\GTenHLValue{1}} &
+      \visible<2->{\GTenHLSecond{5}} & \visible<3->{\GTenHLThird{0}} \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+
+  \visible<2->{Both outcomes have one buyer, so the count and revenue agree.}\par
+  \medskip
+  \visible<3->{The first visitor buys in \GTenHLOutcome{BNN} and passes in
+    \GTenHLOutcome{NBN}, so $\GTenHLThird{Z}$ differs.}
+\end{frame}
+
+\begin{frame}[t]{Probability of exactly one buyer}
+  \NotebookCount\par
+  \NotebookDecisions
+  \NotebookOutcomes{1}{1}{1}{1}
+
+  \textbf{Predict.} Which outcomes give $\GTenHLValue{X}=\GTenHLValue{1}$?
+
+  \visible<2->{Add the probabilities of \GTenHLOutcome{BNN},
+    \GTenHLOutcome{NBN} and \GTenHLOutcome{NNB}. These complete outcomes
+    are mutually exclusive.}
+  \[
+    \begin{aligned}
+      \visible<3->{P(\GTenHLValue{X}=\GTenHLValue{1})}
+      &\visible<3->{=P(\GTenHLOutcome{\mathrm{BNN}})+P(\GTenHLOutcome{\mathrm{NBN}})
+        +P(\GTenHLOutcome{\mathrm{NNB}})}\\
+      &\visible<4->{=\GTenHLProbability{0.144}+\GTenHLProbability{0.144}
+        +\GTenHLProbability{0.144}=\GTenHLProbability{0.432}.}
+    \end{aligned}
+  \]
+
+  \visible<4->{\emph{Worksheet reading.} The worked school-sale problem
+    completes all three PMFs. The notation reference shows how to write
+    and check the sums.}
+\end{frame}
+
+\begin{frame}[t]{Probability of 10 USD in revenue}
+  \NotebookCount\par
+  \NotebookRevenue\par
+  \NotebookDecisions
+  \NotebookOutcomes{1}{1}{1}{1}
+
+  \textbf{Predict.} Which outcomes give $\GTenHLSecond{Y}=\GTenHLSecond{10}$?
+
+  \visible<2->{At 5 USD per notebook, 10 USD means $10\div5=2$ buyers.
+    The matches are \GTenHLOutcome{BBN}, \GTenHLOutcome{BNB} and \GTenHLOutcome{NBB}.}
+  \[
+    \begin{aligned}
+      \visible<3->{P(\GTenHLSecond{Y}=\GTenHLSecond{10})}
+      &\visible<3->{=P(\GTenHLOutcome{\mathrm{BBN}})+P(\GTenHLOutcome{\mathrm{BNB}})
+        +P(\GTenHLOutcome{\mathrm{NBB}})}\\
+      &\visible<4->{=\GTenHLProbability{0.096}+\GTenHLProbability{0.096}
+        +\GTenHLProbability{0.096}}
+        \visible<5->{=\GTenHLProbability{0.2880}.}
+    \end{aligned}
+  \]
+
+  \visible<3->{\NotebookEventRule}
+\end{frame}
+
+\begin{frame}[t]{Probability for the first visitor}
+  \NotebookFirst\par
+  \NotebookDecisions
+  \NotebookOutcomes{1}{1}{1}{1}
+
+  \textbf{Predict.} Which outcomes give $\GTenHLThird{Z}=\GTenHLThird{1}$?
+
+  \visible<2->{Only the first position must be \GTenHLOutcome{B}. The other
+    two visitors may buy or pass. The matches are \GTenHLOutcome{BNN},
+    \GTenHLOutcome{BBN}, \GTenHLOutcome{BNB} and \GTenHLOutcome{BBB}.}
+  \[
+    \begin{aligned}
+      \visible<3->{P(\GTenHLThird{Z}=\GTenHLThird{1})}
+      &\visible<3->{=P(\GTenHLOutcome{\mathrm{BNN}})+P(\GTenHLOutcome{\mathrm{BBN}})
+        +P(\GTenHLOutcome{\mathrm{BNB}})+P(\GTenHLOutcome{\mathrm{BBB}})}\\
+      &\visible<4->{=\GTenHLProbability{0.144}+\GTenHLProbability{0.096}
+        +\GTenHLProbability{0.096}+\GTenHLProbability{0.064}}
+        \visible<5->{=\GTenHLProbability{0.4000}.}
+    \end{aligned}
+  \]
+
+  \visible<3->{\NotebookEventRule}\par
+  \medskip
+  \visible<6->{This equals the original \GTenHLProbability{0.4} probability
+    that the first visitor buys.}
+\end{frame}
+
+\section{Discrete and continuous}
+
+\begin{frame}[t]{Discrete supports and purchase time}
+  Braces list the values in a support.
+  \NotebookSupports
+
+  \visible<2->{A \textbf{countably infinite} support has infinitely many values
+    that can be listed one by one, as in $\{1,2,3,\ldots\}$.}\par
+
+  \medskip
+  \visible<3->{The \textbf{exact time to complete a purchase} in seconds is continuous.
+    It can take values throughout an interval.}\par
+
+  \medskip
+  \visible<4->{\textbf{Purchase time recorded in whole seconds} takes discrete values.}
+\end{frame}
+
+\end{document}
