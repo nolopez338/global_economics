@@ -111,7 +111,7 @@ for (const [index, record] of records.entries()) {
   if (record.Weekday !== weekdayNames[info.weekday]) fail(`row ${rowNumber} Weekday is incorrect`);
   if (record.Day !== info.cycleDay) fail(`row ${rowNumber} Day must be ${info.cycleDay}`);
   for (const field of ["Description", "Material", "Material teacher", "Summary"]) {
-    if (record[field] !== "-") fail(`row ${rowNumber} ${field} must be "-"`);
+    if (record[field].trim() === "") fail(`row ${rowNumber} ${field} must contain text or "-"`);
   }
   const key = `${classId}|${isoDate}`;
   if (actualKeys.has(key)) fail(`row ${rowNumber} duplicates ${key}`);

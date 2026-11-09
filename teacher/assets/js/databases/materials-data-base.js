@@ -5,6 +5,9 @@
 */
 
 // Edit records directly; schedule generation must never overwrite this file.
+// Term 2 Google references stay in their class slots.
+// Review the Grade 11 Term 2 first evidence exam and practice resources before linking them to either session.
+// G11_T2_L1_exam.tex covers C1 through C5, across both sessions.
 
 window.MATERIALS_DATA_BASE = [
   {

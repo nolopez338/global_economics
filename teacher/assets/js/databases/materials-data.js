@@ -3,6 +3,7 @@
   Manually maintained dated class materials. This file is authoritative.
 */
 // Edit records directly; schedule generation must never overwrite this file.
+// Term 2 Google references stay on their meeting dates. See materials-data-base.js for the evidence resource review.
 window.MATERIALS_DATA = [
   {
     "Grade": 10,

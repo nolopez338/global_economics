@@ -292,7 +292,7 @@ teacher material, and summary.
 `authoring/generate-schedule-data.js` is the canonical Node generator. It parses
 the CSV, imports `year-calendar-data.js`, validates supported classes, dates,
 terms, weekdays, cycle days/numbers, required meeting coverage, duplicate keys,
-placeholder content, and ordering, then writes
+nonblank content fields (using `-` for placeholders), and ordering, then writes
 `assets/js/schedule-data.js`. A validation failure occurs before the existing
 artifact is replaced. Run it from the repository root with:
 
