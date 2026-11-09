@@ -18,8 +18,6 @@ Provides Grade 10 Term 2 discrete-probability practice activities with worked ec
 | [`G10_T2_L3_C8_practice_activity.tex`](G10_T2_L3_C8_practice_activity.tex) | LaTeX | Teaches C8 expected value, variance, standard deviation, monetary transformations, and limits of dispersion as a financial-risk measure. |
 | [`G10_T2_L3_C9_practice_activity.tex`](G10_T2_L3_C9_practice_activity.tex) | LaTeX | Teaches C9 selection and justification of Bernoulli, binomial, geometric, negative binomial, and Poisson models using observation rules and assumptions. |
 | [`README-G10T2PA.md`](README-G10T2PA.md) | Markdown | Summarizes this directory, its source files, public entry point, and document sections. |
-| [`VALIDATION.md`](VALIDATION.md) | Markdown | Records build instructions, numerical and structural audit coverage, and prior visual-review results; its Term 1 filenames and C1 problem count predate the current sources. |
-| [`validate_probability.py`](validate_probability.py) | Python | Audits source answers, distribution probabilities, moment tables, PMF/CDF properties, graph coordinates, and activity structure using SciPy and exact fractions. |
 
 ## Folders
 
@@ -38,9 +36,7 @@ None.
 ├── G10_T2_L2_C7_practice_activity.tex
 ├── G10_T2_L3_C8_practice_activity.tex
 ├── G10_T2_L3_C9_practice_activity.tex
-├── README-G10T2PA.md
-├── VALIDATION.md
-└── validate_probability.py
+└── README-G10T2PA.md
 ```
 
 ## Public Commands
