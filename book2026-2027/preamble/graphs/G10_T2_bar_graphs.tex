@@ -15,6 +15,8 @@
 % color=blue!25: TikZ fill color; ystep=.1: positive vertical grid spacing.
 % xhighlight=..., yhighlight=...: optional named background colors for tick
 % labels; yhighlight also marks bar-height labels. Text colors are preserved.
+% When the instructional switch is off, graphs with either marker use plain
+% labels and a neutral bar fill.
 % Use the existing GTenHL... names from highlights.tex, with color=<name>!32
 % for pale bars. Wrap axis-label fragments in the corresponding marker macros.
 % Empty highlights (the default) preserve existing callers and need no palette.
@@ -90,6 +92,14 @@
  \str_if_eq:nnT {#1}{pmf}
    {\keys_set:nn {gtenbar}{xlabel=Numerical~value,color=green!25}}
  \keys_set:nn {gtenbar}{#2}
+ \cs_if_exist:NT \ifGTenHighlights {
+  \ifGTenHighlights\else
+   \bool_lazy_and:nnF
+    {\tl_if_empty_p:N \l__gtenbar_xhighlight_tl}
+    {\tl_if_empty_p:N \l__gtenbar_yhighlight_tl}
+    {\keys_set:nn {gtenbar}{xhighlight=,yhighlight=,color=black!20}}
+  \fi
+ }
  % Background-only markers: neutral glyphs, outlines, axes and grid survive.
  \tikzset{gtenbar~x~marker/.style={},gtenbar~y~marker/.style={}}
  \tl_if_empty:NF \l__gtenbar_xhighlight_tl {

@@ -1,0 +1,685 @@
+% Compile with pdfLaTeX from this directory. The review follows the two Term 1
+% worked solution keys and ../../../fundamentals/normal-table.tex.
+\makeatletter
+\def\input@path{{../../../preamble/}{book2026-2027/preamble/}}
+\makeatother
+\input{preamble.tex}
+\input{graphs/uniform_linear_probability_distributions.tex}
+\input{graphs/G11_C4.tex}
+\input{graphs/G11_Histograms.tex}
+
+\geometry{letterpaper,margin=0.73in}
+\linespread{1.06}
+\setlength{\parskip}{4pt}
+\setcounter{secnumdepth}{1}
+\setlist[enumerate]{leftmargin=1.7em,topsep=3pt,itemsep=2pt,parsep=2pt}
+\hypersetup{pdftitle={Grade 11 Global Economics --- Term 1 Review Outline},
+  linkcolor=taskLinkDarkBlue}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\Tri}{\operatorname{Tri}}
+\newcommand{\Exp}{\operatorname{Exp}}
+\newcommand{\Pois}{\operatorname{Poisson}}
+\newcommand{\Method}[1]{\par\smallskip\noindent\textbf{\textcolor{taskLinkDarkBlue}{Method.}} #1\par}
+\newcommand{\Worked}[1]{\par\smallskip\noindent\textbf{\textcolor{taskLinkDarkBlue}{Worked example.}} #1\par}
+\newcommand{\ReviewCheck}[1]{\textbf{Check.} #1}
+\newcommand{\GuideGraph}[2]{%
+  \par\smallskip\noindent\begin{minipage}{\linewidth}
+  \centering #1\par\smallskip{\small #2\par}
+  \end{minipage}\par\smallskip}
+
+% The restart and compass follow the diagrams in the C1--C7 key.
+\newcommand{\ReviewCycle}{%
+  \begin{tikzpicture}[x=0.16cm,y=1cm]
+    \fill[blue!30] (0,0) rectangle (11,0.55);
+    \fill[blue!30] (52,0) rectangle (60,0.55);
+    \draw (0,0) rectangle (60,0.55);
+    \draw[->] (-1,0)--(63,0) node[right]{min};
+    \foreach \tick in {0,11,52,60}
+      \draw (\tick,0)--++(0,-0.1) node[below]{$\tick$};
+    \draw[->,thick] (59,0.88) to[bend right=11]
+      node[above]{restart \(60\equiv0\)} (1,0.88);
+  \end{tikzpicture}}
+\newcommand{\ReviewNorth}[2]{%
+  \begin{tikzpicture}[scale=0.73]
+    \fill[blue!30] (0,0)--({90-#1}:2)
+      arc[start angle={90-#1},end angle={90+#1},radius=2]--cycle;
+    \draw[thick] (0,0) circle (2);
+    \draw[->] (0,0)--(90:2.65) node[above]{North (\(0\))};
+    \draw[dashed] (0,0)--({90-#1}:2.2)
+                  (0,0)--({90+#1}:2.2);
+    \node[anchor=west] at ({90-#1}:2.28) {$+#2$};
+    \node[anchor=east] at ({90+#1}:2.28) {$-#2$};
+  \end{tikzpicture}}
+
+% Standardized density panels follow the reference sheet's axis and fill style.
+% Arguments are axis symbol, density, shaded interval, ticks, and dashed cutoffs.
+\newcommand{\ReviewBell}[6]{%
+  \begin{tikzpicture}
+    \begin{axis}[width=\linewidth,height=3.65cm,axis lines=middle,
+      axis on top,xmin=-4.5,xmax=4.5,ymin=0,ymax=0.46,
+      xtick={#5},ytick=\empty,scaled ticks=false,
+      tick label style={font=\small,/pgf/number format/precision=3},
+      xlabel={$#1$},xlabel style={at={(axis description cs:1,0.04)},anchor=west},
+      clip=false,samples=140]
+      \addplot[draw=none,fill=blue!30,domain=#3:#4] {#2}\closedcycle;
+      \addplot[thick,domain=-4.5:4.5] {#2};
+      \node[font=\small,anchor=north,yshift=-2pt] at (axis cs:0,0) {$0$};
+      \foreach \cutoff in {#6}{
+        \addplot[dashed,domain=0:0.13,samples=2] ({\cutoff},{x});
+      }
+    \end{axis}
+  \end{tikzpicture}}
+\newcommand{\ReviewNormalDensity}{exp(-x^2/2)/sqrt(2*pi)}
+% Normalizing constant for the t density with nine degrees of freedom.
+\newcommand{\ReviewTDensityNine}{0.3880349089*(1+x^2/9)^(-5)}
+
+\begin{document}
+\begin{center}
+  {\LARGE\bfseries Grade 11 Global Economics\\[2pt]--- Term 1 Review Outline\par}
+  \smallskip
+  {\large 2026--2027\par}
+\end{center}
+
+\section{Introduction}
+This term starts with choosing a probability model and finding probabilities and theoretical statistics. You then use sample records to estimate probabilities, summarize data, and compare the results with the model. Normal and Student's \(t\) tables let you move between cutoffs and probabilities. In C10, you bring modelling and data analysis together to investigate an economic or financial question.
+
+Use the summary to match a question to a method and recall what to write. Follow a criterion link when you need to see the steps or check your working against an example.
+
+\textbf{A routine for any question.} (1) Define the variable and list the givens, with units. (2) Mark the event or statistic requested and choose a model or data method. (3) Write the formula, counts, area, or table entry and substitute the values. (4) Check the support, units, and rounding, then explain what the result means in the situation.
+
+\textbf{Rounding.} For C1--C7, report probabilities to four decimals, percentages to two, and statistics, rates, and times to three where needed. Keep unrounded values for comparisons. For C8--C9, follow the rounding steps beside the table methods.
+
+\section{Summarized Outline}\label{sec:map}
+{\small
+\begin{tabularx}{\linewidth}{@{}l L{0.26\linewidth} L{0.25\linewidth} Y@{}}
+\toprule
+& \textbf{Question cue} & \textbf{Choose} & \textbf{Write on paper}\\
+\midrule
+\hyperref[crit:c1]{\textbf{C1}} & Count, measurement, or model description & Discrete or continuous family & Variable, clue, parameters, support, and meaning of any area\\
+\hyperref[crit:c2]{\textbf{C2}} & Flat or straight-sided density & Rectangle, triangle, or trapezoid areas & Support, height, lines if needed, shaded bounds and area\\
+\hyperref[crit:c3]{\textbf{C3}} & Repeating cycle or uniform heading & Length or angle proportion & Pieces across the restart, favorable measure, full measure\\
+\hyperref[crit:c4]{\textbf{C4}} & Wait until next arrival or infer rate & Exponential tails and Poisson count mean & Rate units, event equation, logarithm if solving for rate\\
+\hyperref[crit:c5]{\textbf{C5}} & Model mean, variance, or SD & Theoretical moment formulas & Parameters, substitutions, units, interpretation\\
+\hyperref[crit:c6]{\textbf{C6}} & Observed fraction in an event & Relative frequency and model errors & Endpoint rule, \(k,n,k/n\), and errors\\
+\hyperref[crit:c7]{\textbf{C7}} & Mean or spread from records & Weighted sample statistics & Frequencies, values or midpoints, sums and \(n-1\)\\
+\hyperref[crit:c8]{\textbf{C8}} & Probability or cutoff with a \(t\) model & Printed one-tail \(t\) table & df, signed cutoffs, columns, tail arithmetic or back-transform\\
+\hyperref[crit:c9]{\textbf{C9}} & Compare normal and \(t\) & Both lookups at the shared scale & Both results, absolute difference and two percentage differences\\
+\hyperref[crit:c10]{\textbf{C10}} & Propose a model or investigate a question & Match a model to real economic data & Brief choice for the exam, methods and evidence for the report\\
+\bottomrule
+\end{tabularx}
+}
+
+\clearpage
+\subsection*{Model clues and supports}
+{\small
+\begin{tabularx}{\linewidth}{@{}Y l l@{}}
+\toprule
+\textbf{Clue} & \textbf{Model and parameters} & \textbf{Support}\\
+\midrule
+One success/failure outcome & Bernoulli\((p)\) & \(\{0,1\}\)\\
+Successes in \(n\) independent trials with common \(p\) & \(\operatorname{Bin}(n,p)\) & \(\{0,1,\dots,n\}\)\\
+Independent trials through first success with common \(p\) & \(\operatorname{Geom}(p)\) & \(\{1,2,\dots\}\)\\
+Count in a period of length \(d\) in a Poisson process & \(\Pois(\lambda d)\) & \(\{0,1,2,\dots\}\)\\
+Equal-length intervals equally likely on a bounded range & \(U(a,b)\) & \([a,b]\)\\
+Straight slopes with a peak at \(c\), possibly at an endpoint & \(\Tri(a,b,c)\) & \([a,b]\)\\
+Exact normal bell centered at \(\mu\) with SD \(\sigma\) & \(N(\mu,\sigma^2)\) & \(\mathbb R\)\\
+Waiting time to the next event in a Poisson process & \(\Exp(\lambda)\) & \([0,\infty)\)\\
+\bottomrule
+\end{tabularx}
+}
+
+\subsection*{Theoretical moments}
+{\small
+\begin{tabularx}{\linewidth}{@{}Y l l l@{}}
+\toprule
+\textbf{Model} & \textbf{Mean \(\mu\)} & \textbf{Variance \(\sigma^2\)} & \textbf{SD}\\
+\midrule
+\(U(a,b)\) & \((a+b)/2\) & \((b-a)^2/12\) & \((b-a)/\sqrt{12}\)\\
+\(\Tri(a,b,c)\) & \((a+b+c)/3\) & \((a^2+b^2+c^2-ab-ac-bc)/18\) & \(\sqrt{\sigma^2}\)\\
+\(\Tri(a,b,a)\), decreasing & \((2a+b)/3\) & \((b-a)^2/18\) & \((b-a)/\sqrt{18}\)\\
+\(\Tri(a,b,b)\), increasing & \((a+2b)/3\) & \((b-a)^2/18\) & \((b-a)/\sqrt{18}\)\\
+\(N(\mu,\sigma^2)\) & \(\mu\) & \(\sigma^2\) & \(\sigma\)\\
+\(\Exp(\lambda)\) & \(1/\lambda\) & \(1/\lambda^2\) & \(1/\lambda\)\\
+\bottomrule
+\end{tabularx}
+}
+
+\subsection*{Reading a sample record}
+{\small
+\begin{tabularx}{\linewidth}{@{}L{0.21\linewidth}YY@{}}
+\toprule
+\textbf{Record} & \textbf{Probability (C6)} & \textbf{Statistics (C7)}\\
+\midrule
+Raw list & Count qualifying entries, including repeats. & Use actual values with weight 1 or tally repeats.\\
+Exact frequency table & Add frequencies of qualifying values. & Weight each exact value by its frequency.\\
+Grouped classes & Add counts for complete eligible classes. & Use each class midpoint with its frequency.\\
+Frequency histogram & Read bar heights as counts, then use class bounds. & Read heights as weights and use class midpoints.\\
+\bottomrule
+\end{tabularx}
+}
+\par\smallskip\textbf{Check the class boundaries.} When an event cuts through a class, the grouped record alone leaves the within-class count unknown.
+
+\subsection*{Choosing and reading a table}
+{\small
+\begin{tabularx}{\linewidth}{@{}l YY@{}}
+\toprule
+\textbf{Table} & \textbf{Given a cutoff (direct)} & \textbf{Given an area (inverse)}\\
+\midrule
+Normal CDF & Round \(z\) to two decimals. Row and hundredths column for \(|z|\) give \(\Phi(|z|)\). Reflect for negative \(z\). & Convert to a left area. Find the closest printed CDF (using symmetry for negative cutoffs), then read \(z\).\\
+Student's \(t\) & Set \(\nu=n-1\). Find \(|c|\) in that row to read its one-tail column \(\alpha\). Reflect or complement as needed. & Choose row \(\nu\) and the one-tail column \(\alpha\). Assign a sign and return to context with \(x=m+ac\).\\
+\bottomrule
+\end{tabularx}
+}
+\par\smallskip Use the 2026--2027 \emph{Standard Normal Distribution and Student's \(t\) Reference Sheets}.
+
+
+\clearpage
+\section{Step-by-Step Outline}
+\subsection{C1 --- Identify the variable, model, and support}\label{crit:c1}
+\Method{Use these steps when a question describes how a variable is measured or generated.}
+\begin{enumerate}
+  \item Define \(X\) in context. A count or coded outcome is discrete. A measurement that can take any value in an interval is continuous.
+  \item Match the wording to a model clue. Name the parameters and give their values with units where applicable. \ReviewCheck{A stated rate must be multiplied by the observation length to get a Poisson count mean.}
+  \item Write the support, the possible values under the model. If the description only suggests a shape, state the assumption needed to use it.
+\end{enumerate}
+\Worked{Identify the models from these short descriptions.}
+{\small
+\begin{tabularx}{\linewidth}{@{}L{0.38\linewidth}Y@{}}
+\toprule
+\textbf{Variable and clue} & \textbf{Classification, model, and support}\\
+\midrule
+One cooperative member's repayment, timely with probability \(0.92\) &
+Discrete. Code timely as 1 and late as 0. Bernoulli\((0.92)\), \(\{0,1\}\).\\
+Timely repayments among 40 independent members, each with \(p=0.92\) &
+Discrete. Fixed number of trials gives \(\operatorname{Bin}(40,0.92)\), \(\{0,\ldots,40\}\).\\
+Invoices checked through the first error, with independent checks and \(p=0.08\) &
+Discrete. \(\operatorname{Geom}(0.08)\), \(\{1,2,\ldots\}\). The first error counts as a trial.\\
+Enquiries in 3 days, with independent arrivals at a constant rate of 5 per day, one at a time &
+Discrete. Count mean \(5(3)=15\) gives \(\Pois(15)\), \(\{0,1,\ldots\}\).\\
+Scale error equally likely over equal-length intervals from \(-3\) to \(3\) g &
+Continuous. \(U(-3,3)\), \([-3,3]\) g.\\
+Poster completion time on \([10,30]\) min with straight branches peaking at 18 min &
+Continuous. \(\Tri(10,30,18)\), \([10,30]\) min. A single rising line for the tank fraction on \([0,1]\) gives \(\Tri(0,1,1)\).\\
+Filling error with an exact normal bell, center 0 g and SD 4 g &
+Continuous. \(4^2=16\) gives \(N(0,16)\), \(\mathbb R\) in grams.\\
+Time to the next repair request in a Poisson process of rate 12 per hour &
+Continuous. \(\lambda=12/60=1/5\) per minute gives \(\Exp(1/5)\), \([0,\infty)\) min.\\
+\bottomrule
+\end{tabularx}
+}
+
+\ReviewCheck{A steadily decreasing delivery-time pattern on \([15,45]\) min gives \(\Tri(15,45,15)\) if you assume a straight line. Symmetric masses centered at 5 kg with SD 1.2 kg give \(N(5,1.44)\) if you assume a normal shape. In the second case the model support is \(\mathbb R\), while real masses are nonnegative.}
+
+\Method{Read a continuous density in three ways.}
+\begin{enumerate}
+  \item Read \(f(x)\) as the height at \(x\), in inverse units. For the scale error \(Y\sim U(-3,3)\), the height is \(1/6\ \mathrm{g}^{-1}\) on the support and \(P(Y=0)=0\).
+  \item Read \(P(l<Y<u)\) as the area between the two cutoffs. For \(-1<Y<1\), the area is \(2(1/6)\approx0.3333\).
+  \item Read \(F(u)=P(Y\le u)\) as all the area to the left. Here \(F(1)=(1-(-3))/6\approx0.6667\), so about \(66.67\%\) of errors are at most 1 g. \ReviewCheck{Area is unitless. Including an endpoint leaves a continuous probability unchanged.}
+\end{enumerate}
+
+\clearpage
+\subsection{C2 --- Find probabilities from density areas}\label{crit:c2}
+\Method{Use geometry for constant or piecewise-linear densities.}
+\begin{enumerate}
+  \item Mark the support and the event, then keep only the part of the event inside the support.
+  \item Find the height or line equations if needed. The total area is 1.
+  \item Split at each change of slope. Add rectangles, triangles, or trapezoids, or subtract simpler outside pieces from 1. A straight segment from \(l\) to \(u\) contributes \((u-l)[f(l)+f(u)]/2\).
+\end{enumerate}
+\Worked{Uniform labelling time \(B\sim U(3,15)\) min. The flat height is \(1/12\ \mathrm{min}^{-1}\). For 6 to 9 min, the rectangle gives \(P(6\le B\le9)=(9-6)/12=0.2500\), so one quarter of times fall in that interval.}
+
+\Worked{Market-stall setup time \(S\) in minutes. Find \(P(9\le S\le19)\).}
+\begin{enumerate}
+  \item Use \(\Tri(5,25,13)\). The support is \([5,25]\) and the mode is 13, so the vertices are \((5,0),(13,H),(25,0)\). Normalize with \(1=\tfrac12(25-5)H\), giving \(H=1/10\ \mathrm{min}^{-1}\).
+  \item Find each slope using rise over run, and anchor each line at its zero endpoint.
+  \[
+    m_1=\frac{1/10}{13-5}=\frac{1}{80},\qquad
+    m_2=\frac{-1/10}{25-13}=-\frac{1}{120},\qquad
+    f(s)=\begin{cases}
+      (s-5)/80 & 5\le s\le13,\\
+      (25-s)/120 & 13<s\le25,\\
+      0 & \text{otherwise}.
+    \end{cases}
+  \]
+  \ReviewCheck{Both branches reach \(1/10\) at the mode.}
+  \item The event crosses the mode. With \(f(9)=f(19)=1/20\), remove the two outside triangles:
+  \[
+    1-\tfrac12(9-5)(1/20)-\tfrac12(25-19)(1/20)=0.7500.
+  \]
+  Equivalently, the two inside trapezoids give \(\tfrac12(4+6)(1/20+1/10)=0.7500\).
+  The model puts \(75.00\%\) of setup times between 9 and 19 min.
+\end{enumerate}
+
+\textbf{Changed support.} With support \([0,30]\), keep mode 13. Recalculate the height \(2/30=1/15\), the slopes \((1/15)/13=1/195\) and \(-(1/15)/17=-1/255\), and the branch heights at the cutoffs. The new lines are \(s/195\) on \([0,13]\) and \((30-s)/255\) on \((13,30]\), with zero density elsewhere. The same event now covers
+\[
+  1-\tfrac12(9)(9/195)-\tfrac12(11)(11/255)=\frac{368}{663}\approx0.5551,
+\]
+or \(55.51\%\) of setup times. \ReviewCheck{The bases and heights of both removed triangles changed.}
+
+\noindent
+\begin{minipage}[t]{0.49\linewidth}
+  \GuideGraph{\resizebox{0.97\linewidth}{!}{\begin{minipage}{9.8cm}
+  \COneGraph[s]{5}{25}{(x<=13)*((x-5)/80)+(x>13)*((25-x)/120)}
+    {9}{19}{5,9,13,19,25}{0.13}\end{minipage}}}{Original. Read the darker area from 9 to 19 min under the peak at 13 min.}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.49\linewidth}
+  \GuideGraph{\resizebox{0.97\linewidth}{!}{\begin{minipage}{9.8cm}
+  \COneGraph[s]{0}{30}{(x<=13)*(x/195)+(x>13)*((30-x)/255)}
+    {9}{19}{0,9,13,19,30}{0.13}\end{minipage}}}{Changed support. Read the same cutoffs under the lower peak. Both vertical axes show density in \(\mathrm{min}^{-1}\).}
+\end{minipage}
+
+\clearpage
+\subsection{C3 --- Handle wraparound in cycles and directions}\label{crit:c3}
+\Method{Use length for a uniform position in a cycle and angle for a uniform direction.}
+\begin{enumerate}
+  \item Mark the full cycle or turn. Put the cutoffs and the full measure in the same units.
+  \item If the event crosses the restart or north, split it into the piece before and the piece after that point. \ReviewCheck{A tolerance \emph{on either side} contributes twice.}
+  \item Add the favorable lengths or angles, then divide by the length of the full cycle or angle of the full turn.
+\end{enumerate}
+\Worked{An alarm is uniform in a 60-minute inspection cycle. From minute 52 through the restart to minute 11, the event is \([52,60)\cup[0,11]\).}
+\GuideGraph{\ReviewCycle}{Add the two blue lengths. The arrow connects minute 60 to minute 0.}
+\[
+  P=\frac{(60-52)+11}{60}=\frac{19}{60}\approx0.3167.
+\]
+About \(31.67\%\) of alarms fall in that window. For the variant within 200 seconds of a restart, \(200/60=10/3\) min per side. The event is \([170/3,60)\cup[0,10/3]\), so \(P=2(10/3)/60=1/9\approx0.1111\). About \(11.11\%\) of alarms fall within that tolerance.
+
+\Worked{A drone's heading is uniform around north. Compare two angular tolerances.}
+\GuideGraph{\ReviewNorth{20}{\pi/9}\hspace{2cm}\ReviewNorth{15}{15^\circ}}{Read the whole blue sector, on both sides of north. A full turn is \(2\pi\) radians or \(360^\circ\).}
+\begin{align*}
+  [0,\pi/9]\cup[17\pi/9,2\pi)\ \text{rad} &\quad\Longrightarrow\quad
+      P_{\pi/9}=\frac{2(\pi/9)}{2\pi}=\frac19\approx0.1111,\\
+  [0,15]\cup[345,360)\ \text{degrees} &\quad\Longrightarrow\quad
+      P_{15^\circ}=\frac{2(15^\circ)}{360^\circ}=\frac1{12}\approx0.0833.
+\end{align*}
+The \(\pi/9\) tolerance is more likely by \(1/9-1/12=1/36\), or \(2.78\) percentage points. Relative to the \(15^\circ\) probability, that is \((1/36)/(1/12)\times100\%=33.33\%\) higher.
+
+\clearpage
+\subsection{C4 --- Model waiting times and recover rates}\label{crit:c4}
+\Method{Use \(\Exp(\lambda)\) for the wait \(T\) to the next event in a Poisson process.}
+\begin{enumerate}
+  \item Check that arrivals are independent, occur one at a time at a constant rate over the relevant period, and that multiple arrivals in a very short interval are negligible. Use a separate rate for each stable shift if rates change. A wait that spans a rate change needs a different model.
+  \item Use rate \(=\) expected count divided by elapsed time, or \(\lambda=1/E(T)\). \ReviewCheck{The rate and cutoff units must cancel in \(\lambda t\).} The density is \(f_T(t)=\lambda e^{-\lambda t}\) on \([0,\infty)\), zero elsewhere.
+  \item Mark the requested region. For \(t\ge0\), the area right of \(t\) is \(R(t)=e^{-\lambda t}\), and the area left of \(t\) is \(1-R(t)\). Subtract nested areas for an interval and add disjoint areas for outside tails.
+\end{enumerate}
+\Worked{Charging spaces become free at a constant rate within each scenario. Read \(t\) in minutes and \(f_T(t)\) in inverse minutes.}
+
+\noindent
+\begin{minipage}[t]{0.49\linewidth}
+\GuideGraph{\resizebox{0.97\linewidth}{!}{%
+  \begin{minipage}{11cm}\ExponentialLessThanGraph{(1/6)}{4}{6}\end{minipage}}}
+  {Left of 4. Rate \(5/30=1/6\) per min.}
+\(\displaystyle P(T<4)=1-e^{-4/6}\approx0.4866.\)
+\end{minipage}\hfill
+\begin{minipage}[t]{0.49\linewidth}
+\GuideGraph{\resizebox{0.97\linewidth}{!}{%
+  \begin{minipage}{13cm}\ExponentialGreaterThanGraph{0.25}{6}{6}\end{minipage}}}
+  {Right of 6, continuing to infinity. Mean wait 4 min gives rate \(1/4\) per min.}
+\(\displaystyle P(T>6)=e^{-6/4}\approx0.2231.\)
+\end{minipage}
+
+\noindent
+\begin{minipage}[t]{0.49\linewidth}
+\GuideGraph{\resizebox{0.94\linewidth}{!}{%
+  \begin{minipage}{10cm}\ExponentialProbabilityGraph{0.15}{2}{7}\end{minipage}}}
+  {Between 2 and 7. Rate \(3/20\) per min.}
+\(\displaystyle P(2<T<7)=e^{-3/10}-e^{-21/20}\approx0.3909.\)
+\end{minipage}\hfill
+\begin{minipage}[t]{0.49\linewidth}
+\GuideGraph{%
+\begin{tikzpicture}
+\begin{axis}[width=0.97\linewidth,height=2.95cm,axis lines=left,xmin=0,xmax=22,
+  ymin=0,ymax=0.24,xlabel={$t$},ytick={0,0.2},xtick={0,3,8,15,20},
+  tick label style={font=\small},grid=major]
+  \addplot[domain=0:3,samples=60,draw=none,fill=blue!35]{0.2*exp(-0.2*x)}\closedcycle;
+  \addplot[domain=8:22,samples=90,draw=none,fill=blue!35]{0.2*exp(-0.2*x)}\closedcycle;
+  \addplot[domain=0:22,samples=120,thick]{0.2*exp(-0.2*x)};
+  \addplot[dashed] coordinates {(3,0)(3,0.1097623)};
+  \addplot[dashed] coordinates {(8,0)(8,0.0403793)};
+  \node[font=\small] at (axis cs:13,0.16){$f_T(t)=\frac15 e^{-t/5}$};
+\end{axis}
+\end{tikzpicture}}
+{Before 3 or after 8. Rate \(12/60=1/5\) per min. The right tail continues to infinity.}
+\(\displaystyle P(T<3\text{ or }T>8)=1-e^{-3/5}+e^{-8/5}\approx0.6531.\)
+\end{minipage}
+The four modeled chances are \(48.66\%\), \(22.31\%\), \(39.09\%\), and \(65.31\%\) for their respective opening windows.
+
+\Method{Work backward from a waiting probability to find an arrival rate.}
+\begin{enumerate}
+  \item Convert the given probability to a right-tail area \(r\). Take logs in \(e^{-\lambda t}=r\), giving \(\lambda=-\ln(r)/t\).
+  \item Express rates in the same time unit. Multiply a per-minute rate by 60 for a per-hour rate, keeping the exact value during conversion.
+\end{enumerate}
+\Worked{Recover rates from tails. In a morning receipt shift, \(P(T>10)=0.40\). Then \(\lambda=-\ln(0.40)/10\approx0.092\) receipts/min, giving \(60\lambda=-6\ln(0.40)\approx5.498\) receipts/hour. In the afternoon \(P(T<6)=0.80\), so \(r=0.20\) and \(\lambda=-\ln(0.20)/6\approx0.268\) receipts/min, giving \(16.094\) receipts/hour. The modeled receipt rate is higher in the afternoon.}
+
+\clearpage
+\Method{\textbf{C4 continued.} Use Poisson count means when the question compares expected counts.}
+\begin{enumerate}
+  \item Find both rates in the same units and write \(E[N(t)]=\lambda t\) for each process.
+  \item Equate the difference to the requested count and solve for the common elapsed time.
+\end{enumerate}
+\Worked{Compare expected counts for two payment channels. If \(P(T_A<5)=0.75\), then \(e^{-5\lambda_A}=0.25\) gives \(\lambda_A=\ln4/5\). If \(P(T_B>5)=0.50\), then \(e^{-5\lambda_B}=0.50\) gives \(\lambda_B=\ln2/5\). Both rates are payments/min.}
+\[
+  E[N_A(t)]-E[N_B(t)]=(\lambda_A-\lambda_B)t=3
+    \quad\Longrightarrow\quad t=\frac{15}{\ln2}\approx21.640\ \mathrm{min}.
+\]
+After that elapsed time A's expected count is three higher. \ReviewCheck{The actual counts are random.}
+
+\subsection{C5 --- Compute and interpret theoretical moments}\label{crit:c5}
+\Method{Use model parameters to find the expected value and spread.}
+\begin{enumerate}
+  \item Identify the model and its parameters. For a normal curve, the center gives \(\mu\) and the inflection points are at \(\mu\pm\sigma\).
+  \item Substitute into the moment formulas on the summary page. Take the square root of the variance for SD.
+  \item State the mean as a long-run average and the SD as the scale of variation about it. \ReviewCheck{Mean and SD use the variable's units. Variance uses squared units.}
+\end{enumerate}
+\Worked{Compute mean, variance, and SD for the models below.}
+{\small
+\begin{tabularx}{\linewidth}{@{}L{0.28\linewidth}Y Y l@{}}
+\toprule
+\textbf{Time model} & \textbf{Mean} & \textbf{Variance} & \textbf{SD}\\
+\midrule
+Uniform labelling \(U(3,15)\) & \((3+15)/2=9\) min & \((15-3)^2/12=12\ \mathrm{min}^2\) & \(\sqrt{12}\approx3.464\) min\\
+Increasing labelling \(\Tri(3,15,15)\) & \((3+2(15))/3=11\) min & \((15-3)^2/18=8\ \mathrm{min}^2\) & \(\sqrt8\approx2.828\) min\\
+Decreasing production \(\Tri(1,10,1)\) & \((2(1)+10)/3=4\) h & \((10-1)^2/18=4.500\ \mathrm{h}^2\) & \(\sqrt{9/2}\approx2.121\) h\\
+Repair duration \(\Tri(10,30,18)\) & \((10+30+18)/3\approx19.333\) min & \((100+900+324-300-180-540)/18=152/9\approx16.889\ \mathrm{min}^2\) & \(\sqrt{152/9}\approx4.110\) min\\
+Between repair requests \(\Exp(12/60)\) & \(1/(1/5)=5\) min & \(1/(1/5)^2=25\ \mathrm{min}^2\) & \(1/(1/5)=5\) min\\
+\bottomrule
+\end{tabularx}
+}
+\par\smallskip The increasing labelling model has a higher average time and a smaller SD than the uniform model. Production averages 4 h, repairs average about 19.333 min, and the wait between requests averages 5 min with an SD of 5 min.
+
+\Worked{Infer normal parameters and rescale. Daily revenue \(R\) is in thousands of COP. Its center is 1800 and its inflection points are 1680 and 1920, so \(\sigma=1920-1800=1800-1680=120\) and \(R\sim N(1800,14400)\). For \(Y=kR\), multiply the mean by \(k\), variance by \(k^2\), and SD by \(|k|\). With \(k=1000\),}
+\[
+ E(Y)=1000(1800)=1{,}800{,}000\ \mathrm{COP},\quad
+ \operatorname{Var}(Y)=1000^2(14400)=14{,}400{,}000{,}000\ \mathrm{COP}^2,
+\]
+\[
+ \operatorname{SD}(Y)=1000(120)=120{,}000\ \mathrm{COP}.
+\]
+The workshop averages 1,800,000 COP per day over the long run, with daily variation measured by the SD of 120,000 COP.
+
+
+\clearpage
+\subsection{C6 --- Estimate an event probability from sample data}\label{crit:c6}
+\Method{Use relative frequency when the question asks how often an event occurred in observed data.}
+\begin{enumerate}
+  \item Write the event with its endpoints. Count all observations \(n\), and count qualifying observations \(k\). Add counts and totals across disjoint records of the same sample. \ReviewCheck{Keep repeated values and apply the endpoint rule to each one.}
+  \item Use \(\widehat P=k/n\). For a grouped table or frequency histogram, add the counts of the included classes when the cutoffs match class boundaries and the inclusion rules agree.
+  \item For theoretical probability \(P_0\), calculate \(E=|\widehat P-P_0|\) and \(100E/|P_0|\) as a percentage. Keep the exact fraction during working. \ReviewCheck{A zero reference value leaves the percentage error undefined.}
+\end{enumerate}
+
+\Worked{Parcel masses in kg, from disjoint records. For \(2\le X<3\), the eligible values from the raw list of 20 are \(2.0,2.2,2.4,2.5,2.7,2.0,2.3,2.6,2.9\). In the separate table of 30 parcels, \(2.0,2.4,2.6,2.8\) have frequencies \(3,5,7,6\). Include 2 and exclude 3.}
+\[
+ k=9+(3+5+7+6)=30,\qquad n=20+30=50,\qquad \widehat P=30/50=0.6000.
+\]
+With \(P_0=0.40\), \(E=|30/50-0.40|=0.2000\) and \(E/P_0\times100\%=50.00\%\). The sample proportion is \(60.00\%\), or 20 percentage points above the model.
+
+\Worked{Grouped transfer times in seconds. The classes \([0,4),[4,8),[8,12),[12,16)\) have counts \(3,9,5,3\). For \(4\le X<12\), \(k=9+5=14\) and \(n=20\), so \(\widehat P=14/20=0.7000\). Against \(P_0=0.75\), \(E=0.0500\) and \(0.05/0.75\times100\%\approx6.67\%\). The observed share is \(70.00\%\), below the model.}
+
+\Worked{Collection-queue wait times from a histogram. Find the observed share with \(2\le X<6\) min.}
+\GuideGraph{\HistogramGraph{(0,2),(2,4),(4,6),(6,8)}{4,10,8,2}
+  {0.68\linewidth}{4.15cm}{blue!25}{2}{2}}
+  {Read heights 10 and 8 for the bars from 2 to 6 min. The class on the right starts at 6 min and is excluded.}
+\[
+  k=10+8=18,\qquad n=4+10+8+2=24,\qquad \widehat P=18/24=0.7500.
+\]
+With \(P_0=0.70\), \(E=|18/24-0.70|=0.0500\) and \(0.05/0.70\times100\%\approx7.14\%\). Three quarters of the sample waited in the stated interval, five percentage points above the model.
+
+\clearpage
+\subsection{C7 --- Calculate and compare sample statistics}\label{crit:c7}
+\Method{Use weighted working to find the mean, variance, and SD of a sample.}
+\begin{enumerate}
+  \item Let \(v_i\) be an exact value \(x_i\) or, for a grouped record, a midpoint \(m_i=(\text{left}+\text{right})/2\). Let \(f_i\) be its frequency. A raw entry contributes weight 1. Combine disjoint records by adding frequencies.
+  \item Calculate \(n=\sum f_i\), \(\bar x=\sum f_i v_i/n\), and \(Q=\sum f_i(v_i-\bar x)^2\). You can also use \(Q=\sum f_iv_i^2-(\sum f_iv_i)^2/n\).
+  \item Compute \(s^2=Q/(n-1)\) and \(s=\sqrt{s^2}\). \ReviewCheck{Use \(n-1\) for sample variance. With midpoints, label the statistics and their errors as estimates.}
+  \item For each statistic \(z\) requested, compare with its theoretical counterpart \(z_0\) using \(E=|z-z_0|\) and \(E/|z_0|\times100\%\) if \(z_0\ne0\). Keep unrounded working values and match units.
+\end{enumerate}
+
+\Worked{Exact cold-room readings in \(^{\circ}\mathrm C\). The raw values \(6,8,9,11,12\) combine with frequencies \(2,3,2\) at \(6,9,12\). The resulting frequencies at \(6,8,9,11,12\) are \(3,1,4,1,3\).}
+\begin{align*}
+ n&=12,\qquad \bar x=\frac{3(6)+8+4(9)+11+3(12)}{12}=\frac{109}{12}\approx9.083,\\
+ Q&=\big[3(6^2)+8^2+4(9^2)+11^2+3(12^2)\big]-109^2/12=707/12,\\
+ s^2&=(707/12)/(12-1)=707/132\approx5.356,\qquad s=\sqrt{707/132}\approx2.314.
+\end{align*}
+Both \(\bar x\) and \(s\) are in \(^{\circ}\mathrm C\), and \(s^2\) is in \((^{\circ}\mathrm C)^2\). The mean exceeds the model's \(9\) by \(1/12\approx0.083\ ^{\circ}\mathrm C\), or \((1/12)/9\times100\%\approx0.93\%\). Variance exceeds the model's \(5\) by \(47/132\approx0.356\ (^{\circ}\mathrm C)^2\), or \((47/132)/5\times100\%\approx7.12\%\).
+
+\Worked{Grouped courier times in minutes. Classes \([8,12),[12,16),[16,20)\) have weights \(2,3,1\) at midpoints \(10,14,18\).}
+\[
+ \bar x\approx\frac{2(10)+3(14)+18}{6}=\frac{40}{3},\quad
+ Q=1112-80^2/6=\frac{136}{3},\quad s^2\approx\frac{136/3}{6-1}=\frac{136}{15}.
+\]
+The midpoint estimates are \(13.333\) min, \(9.067\ \mathrm{min}^2\), and \(s\approx\sqrt{136/15}\approx3.011\) min. Against theory \(14\) min and \(12\ \mathrm{min}^2\), both estimates are lower. Their absolute errors are \(2/3\approx0.667\) min and \(44/15\approx2.933\ \mathrm{min}^2\). The percentage errors are \((2/3)/14\times100\%\approx4.76\%\) and \((44/15)/12\times100\%\approx24.44\%\).
+
+\Worked{Container masses from a frequency histogram.}
+\noindent
+\begin{minipage}[t]{0.43\linewidth}
+\vspace{0pt}
+\GuideGraph{\HistogramGraph{(4,6),(6,8),(8,10),(10,12)}{2,3,2,1}
+  {0.97\linewidth}{3.55cm}{orange!30}{2}{1}}
+  {Read midpoints in kg and take the four heights as weights.}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.54\linewidth}
+\vspace{0pt}
+Midpoints \(5,7,9,11\) have weights \(2,3,2,1\), giving \(n=8\). The midpoint working is
+\begin{align*}
+ \bar x&\approx[2(5)+3(7)+2(9)+11]/8=7.500\ \mathrm{kg},\\
+ Q&=480-60^2/8=30,\qquad s^2\approx30/7\approx4.286\ \mathrm{kg}^2,\\
+ s&\approx\sqrt{30/7}\approx2.070\ \mathrm{kg}.
+\end{align*}
+Against theory \(7\) kg and \(4\ \mathrm{kg}^2\), the estimates are higher by \(0.500\) kg and \(2/7\approx0.286\ \mathrm{kg}^2\). Dividing by 7 and 4 respectively gives \(7.14\%\) for both.
+\end{minipage}
+
+\clearpage
+\subsection{C8 --- Read the Student's \texorpdfstring{\(t\)}{t} table}\label{crit:c8}
+The key uses the signed-deviation model \(X=m+aT\), with \(a>0\), \(T\sim t_\nu\), and \(\nu=n-1\). Negative \(X\) means below the contextual reference. Standardized values are measured relative to \(m\).
+
+\Method{Direct questions give the cutoffs and ask for an area.}
+\begin{enumerate}
+  \item Write \(\nu=n-1\) and standardize each given cutoff with \(c=(x-m)/a\).
+  \item Find \(|c|\) in row \(\nu\). The column gives \(\alpha=P(T>|c|)=P(T<-|c|)\) at table precision. Use the printed entries \(0.30,0.20,0.10,0.05,0.025,0.01,0.005\) for one-tail areas.
+  \item Reflect a negative cutoff. Complement if the event includes the center and extends to one end. Subtract nested tails for an interval or add disjoint tails. \ReviewCheck{At \(c=0\) each tail is \(0.5\). A tail that includes the center extends over more than half the curve.}
+\end{enumerate}
+
+The exercise cutoffs match the printed \(t\) entries after standardizing. If \(|c|\) lies between two entries, the associated columns bound its one-tail probability.
+
+\Worked{Five direct variants. Each \((m,a)\) pair gives the location and scale in the stated units. Use the table areas shown.}
+{\small
+\begin{tabularx}{\linewidth}{@{}L{0.28\linewidth}YY@{}}
+\toprule
+\textbf{Event and givens} & \textbf{Standardize and look up} & \textbf{Combine and interpret}\\
+\midrule
+\textbf{Left tail.} Courier arrival deviation \(X<-4.499\) min, \((m,a)=(1,3)\), \(n=10\). &
+\(c=(-4.499-1)/3=-1.833\). Row 9, column \(0.05\) gives \(1.833\). &
+Reflect to the left tail, \(P\approx0.05\). About \(5\%\) arrive more than 4.50 min early.\\[2pt]
+\textbf{Right tail.} Freight cost deviation \(X>-10.984\) dollars, \((m,a)=(-4,8)\), \(n=13\). &
+\(c=(-10.984+4)/8=-0.873\). Row 12, column \(0.20\) gives \(0.873\). &
+\(P\approx1-0.20=0.80\). About \(80\%\) cost more than the threshold of 10.98 dollars below budget.\\[2pt]
+\textbf{Interval above \(m\).} Energy deviation \(7.19<X<12.476\) kWh, \((m,a)=(2,6)\), \(n=17\). &
+\(c_L=(7.19-2)/6=0.865\), \(c_U=(12.476-2)/6=1.746\). Row 16, columns \(0.20,0.05\). &
+Subtract nested right tails. \(P\approx0.20-0.05=0.15\). About \(15\%\) of days fall in that above-forecast band.\\[2pt]
+\textbf{Interval below \(m\).} Crop mass deviation \(-8.095<X<-3.688\) tonnes, \((m,a)=(-1,3)\), \(n=8\). &
+\(c_L=(-8.095+1)/3=-2.365\), \(c_U=(-3.688+1)/3=-0.896\). Row 7, columns \(0.025,0.20\). &
+Subtract the smaller left tail. \(P\approx0.20-0.025=0.175\). About \(17.5\%\) of shipments fall in that below-forecast band.\\[2pt]
+\textbf{Unequal outside tails.} Revenue alert \(X<-5.772\) or \(X>7.76\) in thousands of dollars, \((m,a)=(2,4)\), \(n=7\). &
+\(c_L=(-5.772-2)/4=-1.943\), \(c_U=(7.76-2)/4=1.440\). Row 6, columns \(0.05,0.10\). &
+Add disjoint tails. \(P\approx0.05+0.10=0.15\), so about \(15\%\) of weeks trigger an alert.\\
+\bottomrule
+\end{tabularx}
+}
+\GuideGraph{%
+  \begin{minipage}{0.62\linewidth}\ReviewBell{t}{\ReviewTDensityNine}{-4.5}{-1.833}{-1.833,0}{-1.833}\end{minipage}}
+  {Courier arrivals. Reflect the printed right-tail cutoff to \(-1.833\). The blue left tail has table area \(0.05\).}
+
+\clearpage
+\subsubsection*{C8 continued --- Find cutoffs from areas}
+\Method{Inverse questions give an area and ask for one or two cutoffs.}
+\begin{enumerate}
+  \item Turn the requested area into the needed one-tail probabilities. For central area \(p\), each excluded tail is \((1-p)/2\). For equal outside tails of total area \(q\), each is \(q/2\). Use unequal areas separately.
+  \item In row \(\nu=n-1\), read the positive critical value in each one-tail column. Assign minus to the lower cutoff and plus to the upper cutoff for the small tails shown here. For a tail larger than \(0.5\), use its complement to identify the cutoff on the opposite side.
+  \item Back-transform each signed value with \(x=m+ac\). Report contextual cutoffs to two decimals. \ReviewCheck{For equal tails, the two limits are equally far from \(m\).}
+\end{enumerate}
+
+\Worked{Five inverse variants using the printed table. The back-transformation puts the limits in the units of \(X\).}
+{\small
+\begin{tabularx}{\linewidth}{@{}L{0.26\linewidth}L{0.26\linewidth}Y@{}}
+\toprule
+\textbf{Target and givens} & \textbf{Row, column, and sign} & \textbf{Back-transform and interpret}\\
+\midrule
+\textbf{Lower cutoff.} Operating cost, dollars, \((m,a)=(-3,5)\), \(n=15\). Left area \(0.10\). &
+Row 14, column \(0.10\) gives \(1.345\). Use \(c=-1.345\). &
+\(x=-3+5(-1.345)=-9.725\approx-9.73\). About \(10\%\) of days cost more than 9.73 dollars below budget.\\[3pt]
+\textbf{Upper cutoff.} Loading time, min, \((m,a)=(2,7)\), \(n=21\). Right area \(0.025\). &
+Row 20, column \(0.025\) gives \(c=2.086\). &
+\(x=2+7(2.086)=16.602\approx16.60\). About \(2.5\%\) of jobs take more than 16.60 min above target.\\[3pt]
+\textbf{Central interval.} Demand, tonnes, \((m,a)=(4,9)\), \(n=12\). Central \(0.90\). &
+\((1-0.90)/2=0.05\). Row 11, column \(0.05\) gives \(c=\pm1.796\). &
+\(4\pm9(1.796)\) gives \((-12.164,20.164)\). About \(90\%\) of demand deviations fall between \(-12.16\) and \(20.16\) tonnes.\\[3pt]
+\textbf{Equal outside tails.} Package mass, g, \((m,a)=(-0.4,1.2)\), \(n=9\). Total \(0.05\). &
+\(0.05/2=0.025\). Row 8, column \(0.025\) gives \(c=\pm2.306\). &
+\(-0.4\pm1.2(2.306)\) gives \((-3.1672,2.3672)\). About \(2.5\%\) fall below \(-3.17\) g and \(2.5\%\) above \(2.37\) g.\\[3pt]
+\textbf{Unequal outside tails.} Dispatch times, min, \((m,a)=(-2,6)\), \(n=16\). Left \(0.01\), right \(0.10\). &
+Row 15, column \(0.01\) gives \(c_L=-2.602\) after reflection. Column \(0.10\) gives \(c_U=1.341\). &
+\(L=-2-6(2.602)=-17.612\) and \(U=-2+6(1.341)=6.046\). The model puts \(1\%\) more than 17.61 min early and \(10\%\) more than 6.05 min late.\\
+\bottomrule
+\end{tabularx}
+}
+
+
+\clearpage
+\subsection{C9 --- Compare normal and Student's \texorpdfstring{\(t\)}{t} results}\label{crit:c9}
+For this criterion, choose normal when the population SD is known, and Student's \(t\) when the population SD is estimated from a sample, using \(\nu=n-1\). When asked to compare, calculate both.
+
+\textbf{Shared scale in these comparisons.} Use \(X_T=m+aT\) and \(X_N=m+aZ\) with the same \(m\) and stated approximate SD as the scale \(a\). In this teaching convention, \(\operatorname{SD}(X_N)=a\) and \(\operatorname{SD}(X_T)=a\sqrt{\nu/(\nu-2)}\) for \(\nu>2\). Use the supplied \(a\) directly. Table results are approximate because the printed entries are rounded.
+
+\Method{For a direct comparison, use the same event and standardize each cutoff once.}
+\begin{enumerate}
+  \item For \(t\), keep the standardized cutoff \(c\) at the printed precision and find the one-tail area in row \(n-1\).
+  \item For normal, round each \(c\) to two decimals to get \(z\) before lookup. The table gives \(\Phi(z)=P(Z\le z)\). For negative \(z\), use \(\Phi(-|z|)=1-\Phi(|z|)\). For a right tail use \(1-\Phi(z)\), and for an interval use \(\Phi(z_U)-\Phi(z_L)\).
+  \item For results \(r_T,r_N\), report \(E_A=|r_T-r_N|\), then \(E_{Pt}=E_A/|r_T|\times100\%\) and \(E_{Pn}=E_A/|r_N|\times100\%\). \ReviewCheck{Use four decimals for probabilities and their absolute difference, two for the percentages. A zero denominator leaves the corresponding percentage undefined.}
+\end{enumerate}
+
+\Worked{The table pairs the methods for three events. Each comparison uses the same \((m,a)\) and sample size.}
+{\small
+\begin{tabularx}{\linewidth}{@{}L{0.24\linewidth}YY@{}}
+\toprule
+\textbf{Event and cutoffs} & \textbf{Student's \(t\)} & \textbf{Normal}\\
+\midrule
+Sales shortfall \(X<-11.165\) thousand dollars. \((m,a)=(-2,5)\), \(n=10\).
+\(c=(-11.165+2)/5=-1.833\). &
+Row 9, column \(0.05\), gives \(1.833\). Reflect for \(p_T=0.0500\). &
+\(z=-1.83\). Row \(1.8\), column \(0.03\), gives \(\Phi(1.83)=0.9664\).
+\(p_N=1-0.9664=0.0336\).\\[2pt]
+Delivery deviation \(X>-0.472\) min. \((m,a)=(3,4)\), \(n=15\).
+\(c=(-0.472-3)/4=-0.868\). &
+Row 14, column \(0.20\), gives \(0.868\).
+The requested area is \(p_T=1-0.2000=0.8000\). &
+\(z=-0.87\). Row \(0.8\), column \(0.07\), gives \(\Phi(0.87)=0.8078\).
+\(p_N=1-(1-0.8078)=0.8078\).\\[2pt]
+Fuel deviation \(-7.136<X<14.074\) L. \((m,a)=(1,6)\), \(n=13\).
+\(c_L=(-7.136-1)/6=-1.356\), \(c_U=(14.074-1)/6=2.179\). &
+Row 12, columns \(0.10\) and \(0.025\), give the two outside areas.
+\(p_T=1-0.1000-0.0250=0.8750\). &
+\(z_L=-1.36,\ z_U=2.18\). Row \(1.3\), col. \(0.06\) gives \(0.9131\).
+Row \(2.1\), col. \(0.08\) gives \(0.9854\).
+\(p_N=0.9854-(1-0.9131)=0.8985\).\\
+\bottomrule
+\end{tabularx}
+}
+
+{\small
+\begin{tabularx}{\linewidth}{@{}l l YY@{}}
+\toprule
+\textbf{Event} & \textbf{\(E_A\)} & \textbf{\(E_{Pt}\)} & \textbf{\(E_{Pn}\)}\\
+\midrule
+Sales shortfall & \(|0.0500-0.0336|=0.0164\) & \(0.0164/0.0500\times100\%=32.80\%\) & \(0.0164/0.0336\times100\%\approx48.81\%\)\\
+Delivery & \(|0.8000-0.8078|=0.0078\) & \(0.0078/0.8000\times100\%\approx0.98\%\) & \(0.0078/0.8078\times100\%\approx0.97\%\)\\
+Fuel band & \(|0.8750-0.8985|=0.0235\) & \(0.0235/0.8750\times100\%\approx2.69\%\) & \(0.0235/0.8985\times100\%\approx2.62\%\)\\
+\bottomrule
+\end{tabularx}
+}
+\par\smallskip Student's \(t\) gives the sales shortfall more probability by 1.64 percentage points. Normal gives the delivery event 0.78 percentage points more and the fuel band 2.35 percentage points more. The percentages compare model results with each other.
+
+\clearpage
+\subsubsection*{C9 continued --- Compare inverse cutoffs}
+\Method{For an inverse comparison, start with areas and find a cutoff under each model.}
+\begin{enumerate}
+  \item Write the one-tail areas for \(t\) and the left cumulative targets for normal. A right-tail area \(\alpha\) gives normal target \(1-\alpha\).
+  \item Read the signed \(t\) cutoff from the one-tail columns. Find the closest printed normal CDF entry, using symmetry for negative cutoffs. For a tie at \(0.0500\) or \(0.9500\), choose \(|z|=1.64\).
+  \item Back-transform each standardized cutoff using \(x=m+ac\). Compare unrounded contextual results, pairing lower with lower and upper with upper. \ReviewCheck{Round cutoffs and their absolute differences to two decimals with units. Give percentage differences to two decimals.}
+\end{enumerate}
+
+\Worked{Single-cutoff variants.}
+{\small
+\begin{tabularx}{\linewidth}{@{}L{0.20\linewidth}YY@{}}
+\toprule
+\textbf{Event and givens} & \textbf{Student's \(t\)} & \textbf{Normal}\\
+\midrule
+Lowest \(5\%\) of batch cost deviations, dollars. \((m,a)=(-1,2.5)\), \(n=8\). &
+Row 7, column \(0.05\), gives \(c_T=-1.895\) by symmetry.
+\(x_T=-1+2.5(-1.895)=-5.7375\). &
+Row \(1.6\), columns \(0.04,0.05\), gives \(0.9495,0.9505\).
+The reflected areas \(0.0505,0.0495\) tie, so \(c_N=-1.64\) and \(x_N=-1+2.5(-1.64)=-5.10\).\\[3pt]
+Highest \(10\%\) of order processing deviations, min. \((m,a)=(2,3.5)\), \(n=17\). &
+Row 16, column \(0.10\), gives \(c_T=1.337\).
+\(x_T=2+3.5(1.337)=6.6795\). &
+Target \(0.9000\). Row \(1.2\), column \(0.08\), gives \(0.8997\), closer than \(0.9015\) in column \(0.09\). Use \(c_N=1.28\), so \(x_N=2+3.5(1.28)=6.48\).\\
+\bottomrule
+\end{tabularx}
+}
+\par\smallskip The batch savings thresholds are \(5.74\) dollars under \(t\) and \(5.10\) dollars under normal. From the unrounded cutoffs, \(E_A=0.6375\approx0.64\) dollars, \(E_{Pt}=0.6375/5.7375\times100\%\approx11.11\%\), and \(E_{Pn}=0.6375/5.10\times100\%=12.50\%\).
+
+For the slowest orders, the upper cutoffs are \(6.68\) and \(6.48\) min above target. Here \(E_A=0.1995\approx0.20\) min, \(E_{Pt}=0.1995/6.6795\times100\%\approx2.99\%\), and \(E_{Pn}=0.1995/6.48\times100\%\approx3.08\%\).
+
+\Worked{Central \(95\%\) of cargo mass deviations in kg. Use \((m,a)=(1.5,4)\), \(n=10\), and split the remaining \(0.05\) into two tails of \(0.025\). Row 9, column \(0.025\), gives \(c_T=\pm2.262\). Normal row \(1.9\), column \(0.06\), gives \(\Phi(1.96)=0.9750\), so the cutoffs for targets \(0.0250,0.9750\) are \(c_N=\pm1.96\).}
+
+\noindent
+\begin{minipage}[t]{0.49\linewidth}
+\GuideGraph{\ReviewBell{t}{\ReviewTDensityNine}{-2.262}{2.262}{-2.262,0,2.262}{-2.262,2.262}}
+  {Student's \(t\), df \(=9\). Read the central \(95\%\) between the two \(t\) cutoffs.}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.49\linewidth}
+\GuideGraph{\ReviewBell{z}{\ReviewNormalDensity}{-1.96}{1.96}{-1.96,0,1.96}{-1.96,1.96}}
+  {Standard normal. Read the same central area between the closer normal cutoffs.}
+\end{minipage}
+
+{\small
+\begin{tabularx}{\linewidth}{@{}l Y Y l l@{}}
+\toprule
+\textbf{End} & \textbf{Back-transform \(t\)} & \textbf{Back-transform normal} & \textbf{\(E_{Pt}\)} & \textbf{\(E_{Pn}\)}\\
+\midrule
+Lower & \(1.5-4(2.262)=-7.548\) & \(1.5-4(1.96)=-6.34\) &
+\(100(1.208)/7.548\approx16.00\%\) & \(100(1.208)/6.34\approx19.05\%\)\\
+Upper & \(1.5+4(2.262)=10.548\) & \(1.5+4(1.96)=9.34\) &
+\(100(1.208)/10.548\approx11.45\%\) & \(100(1.208)/9.34\approx12.93\%\)\\
+\bottomrule
+\end{tabularx}
+}
+\par\smallskip Each endpoint differs by \(1.208\approx1.21\) kg in absolute value. The central cargo deviations are about \((-7.55,10.55)\) kg under \(t\) and \((-6.34,9.34)\) kg under normal. In both cases, \(2.5\%\) lie beyond each end.
+
+\clearpage
+\subsection{C10 --- Choose a model and plan an investigation}\label{crit:c10}
+\Method{For the brief exam response, choose one of the proposed models and describe plausible data in one or two sentences.}
+\begin{enumerate}
+  \item Match the variable to one option. Consider a linear density over a finite interval, an exponential distribution for waiting times, or a normal distribution for measurements.
+  \item Name a real economic or financial setting, the variable, and its units. Explain the condition that makes your proposed model plausible.
+  \item State what you would check with observations. \ReviewCheck{Describe model fit as something to investigate with data.}
+\end{enumerate}
+
+\Worked{Exponential waiting times. \textit{I would study the minutes between payment requests reaching a small business during a stable trading period, proposing an exponential model if requests arrive independently at a constant average rate. I would use real observations to check those assumptions.}}
+
+\subsubsection*{Separate report checklist}
+Use your selected model to investigate an economic or financial question.
+\begin{itemize}[label=\(\square\),leftmargin=1.65em,itemsep=5pt]
+  \item \textbf{Research question.} State the question, the variable you will study, and its economic or financial context.
+  \item \textbf{Real data.} Identify the observations you used and explain what they measure.
+  \item \textbf{Model and methods.} Justify the selected continuous model and the analysis methods.
+  \item \textbf{Simulation.} Describe the simulation and report its results.
+  \item \textbf{Sampling analysis.} Present the sampling analysis and explain what the results show.
+  \item \textbf{Portfolio risk.} Include and interpret the portfolio-risk measures used.
+  \item \textbf{Assumptions and limitations.} State the conditions your analysis relies on and explain its limits.
+  \item \textbf{Conclusion.} Answer the research question with evidence from your results.
+\end{itemize}
+
+\smallskip
+\hyperref[sec:map]{Return to the C1--C10 summary}
+
+\end{document}
+
