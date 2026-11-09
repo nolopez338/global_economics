@@ -12,6 +12,17 @@ When the output source directory is outside that search range, add the absolute 
 $env:TEXINPUTS = 'C:/path/to/repo/book2026-2027/preamble/;'
 ```
 
+## Section layout
+
+Keep the title, linked contents, **Evaluated criteria**, and a brief instruction to try each task before opening its solution in the unnumbered front matter. Use `\section` for the four required stages, even for a short activity.
+
+1. **Introduction** — Start with a short, accessible example. Add a quick check about a distinction or a meaningful change where it helps.
+2. **Notation Reference and Practice Procedure** — Summarize the relevant notation, definitions, formulas, or representations, then give reusable steps for choosing an approach, reasoning through the task, and interpreting or checking the result.
+3. **General Worked Problems** — Use numbered problem subsections with self-contained prompts and criterion-linked worked solutions. Where the topic supports a follow-up, ask how a meaningful change to the initial application affects the reasoning and what the available information supports.
+4. **Advanced Problems** — Build on the same reasoning at the requested level. Ask students to connect ideas, compare cases or representations, or justify a conclusion under more demanding conditions. Use the linked problem pattern here too.
+
+When distinct concepts, methods, or problem families need separate framing, replace the single General Worked Problems section with two or more consecutive `\section{General Worked Problems --- [Descriptive Focus]}` blocks. Give each block its own section label and linked problem list. This is the only split that adds numbered top-level sections. Keep Advanced Problems last and organize all other material within the four stages using subsections. Put requested independent practice in a distinct subsection within the appropriate stage.
+
 ## Navigation
 
 - Keep `\phantomsection\label{toc}` immediately before `\tableofcontents` for the return arrows. Add an unnumbered front-matter heading to the contents with `\addcontentsline` immediately after its heading if it should appear there.
@@ -35,3 +46,5 @@ pdflatex -interaction=nonstopmode -halt-on-error -output-directory="$buildDirect
 ```
 
 Repeat until the contents and cross-references resolve and the log has no undefined references, duplicate destinations, or requests to rerun. Inspect the PDF for legible equations, tables, and graphs, and for clipping or awkward page breaks. Follow the contents entries, problem list links, task links, and return arrows to confirm that each lands at the intended heading or contents.
+
+As a final check, compare the source headings with the numbered entries in the compiled contents. Verify Introduction, Notation Reference and Practice Procedure, General Worked Problems, and Advanced Problems in that order, with Advanced Problems last. If the count exceeds four, verify that every extra heading comes from replacing the single General Worked Problems section with consecutive focused groups and that each group has a linked problem list. Confirm that front matter is unnumbered and that any independent practice sits within its stage.
