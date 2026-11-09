@@ -12,13 +12,24 @@ Verified source areas are:
 - Grade 10 Terms 1 and 3 under `grade10/`;
 - Grade 11 Terms 2 and 3 under `grade11/`;
 - olympiad, Cambridge, and diploma material under `olympiad/`;
-- year-local preambles, graphs, and images under `preamble/`; and
-- guides and LaTeX scaffolds in the [authoring folder](authoring/README.md).
+- year-local preambles, graphs, and images under `preamble/`.
 
 Many `.tex` files declare `\documentclass` and appear to be document entry
 points; others are imported fragments or templates. The repository does not
 identify a supported TeX distribution, engine, invocation directory, or
 complete entry-point list. Therefore no canonical compile command is asserted.
+
+## Authoring skills
+
+Each skill links to its own guide, LaTeX scaffold, and build instructions.
+
+- [Exam](../.agents/skills/global-economics-exam/SKILL.md) for student assessments with objectives, criteria, scores, and answer space.
+- [Exam Solution](../.agents/skills/global-economics-exam-solution/SKILL.md) for worked scoring keys that follow the source exam.
+- [Home Practice Activities](../.agents/skills/global-economics-home-practice/SKILL.md) for independent, criterion-linked work, including activities delivered on paper.
+- [Print Handout](../.agents/skills/global-economics-print/SKILL.md) for numbered problem contexts followed by a characterization table.
+
+The [recursive Windows build](compile_all_tex.bat) runs `latexmk -pdf` from
+each source directory and explicitly includes the four skill scaffolds.
 
 ## Independence and unresolved labels
 

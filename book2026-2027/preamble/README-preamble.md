@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Shared LaTeX preambles, graph macros, and visual assets for the project's 2026–2027 teaching materials and repository inventories. The four document scaffolds and their guides are in the [authoring folder](../authoring/README.md).
+Shared LaTeX preambles, graph macros, and visual assets for the project's 2026–2027 teaching materials and repository inventories. The [authoring skills](../README.md#authoring-skills) each provide a guide and a scaffold that use these resources.
 
 ## Files
 

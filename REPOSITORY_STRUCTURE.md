@@ -44,6 +44,7 @@ grouped rather than listed individually.
 
 ```text
 .
+├── .agents/skills/                    # Repository skills, including authoring guides and LaTeX scaffolds
 ├── .gitignore                         # Ignored LaTeX PDFs and compiler auxiliaries
 ├── README.md                          # General navigation and workflow notes
 ├── REPOSITORY_STRUCTURE.md            # This verified structural inventory
@@ -96,7 +97,6 @@ grouped rather than listed individually.
 │   └── preamble/                       # Shared year-local preambles, templates, graphs, images
 ├── book2026-2027/
 │   ├── README.md
-│   ├── authoring/                      # Deliverable guides and LaTeX scaffolds
 │   ├── clean-latex.bat
 │   ├── grade9/                         # One Term 3 source
 │   ├── grade10/{term_1,term_3}/        # Term 1 uses G10_T1-labelled files
@@ -336,8 +336,8 @@ the `.tex`, `.csv`, image, and spreadsheet files are authoring inputs.
   intentional reuse or a naming anomaly is unconfirmed.
 - **Shared resources:** this year's `preamble/` is separate and includes the
   common preambles, graph inputs, and Cambridge, Icontec, IHS, and Urraca images.
-  See the [authoring overview](book2026-2027/authoring/README.md) for guides,
-  scaffolds, and build working directories.
+  The [authoring skills](book2026-2027/README.md#authoring-skills) under
+  `.agents/skills/` contain the guides, scaffolds, and build instructions.
 - **Olympiad and related material:** `olympiad/` contains a grades 8–9 source,
   standalone probability/statistics/pedagogy sources, four diploma documents,
   and `Cambridge/` Paper 1/Paper 2 question/solution documents with an `.xlsx`

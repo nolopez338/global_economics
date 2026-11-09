@@ -13,7 +13,146 @@
   <link rel="stylesheet" href="../../../../assets/css/countdown_timer.css">
   <link rel="stylesheet" href="../../../../assets/css/mind_map_payoff_visuals.css">
   <link rel="stylesheet" href="../../../../assets/css/mind_map_criteria.css">
+  <link rel="stylesheet" href="../../../../assets/css/mind_map_effect_highlights.css">
   <link rel="stylesheet" href="../../../../assets/css/mind_map_presentation.css">
+  <style>
+    .g10-t1-outline:not(.is-presenting) [data-instructional-highlights-toggle],
+    .g10-t1-outline .outline-highlights-key,
+    .g10-t1-outline [data-outline-svg-marker] { display: none; }
+    .g10-t1-outline [data-instructional-highlights-toggle] {
+      align-self: flex-start;
+      margin-block: .1rem .6rem;
+    }
+    .g10-t1-outline [data-instructional-highlights-toggle][aria-pressed="true"] {
+      border-color: var(--primary-color);
+      background: var(--example-bg);
+    }
+    .g10-t1-outline .visual-equation span span {
+      padding: 0;
+      background: transparent;
+    }
+    .g10-t1-outline.is-presenting .mind-map-node:has(> [data-instructional-highlights-toggle][aria-pressed="true"]) {
+      & .outline-highlights-key {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .25rem .75rem;
+        margin: 0 0 .65rem;
+        font-size: var(--mind-map-font-visual-caption);
+        line-height: 1.4;
+      }
+      & span[data-outline-highlight] {
+        background: var(--mind-map-highlight-color);
+        color: #0f172a;
+        border-radius: .18em;
+        box-shadow: 0 0 0 .07em var(--mind-map-highlight-color);
+        box-decoration-break: clone;
+        -webkit-box-decoration-break: clone;
+      }
+      & [data-outline-highlight="payoff-1"] { text-decoration: underline; }
+      & [data-outline-highlight="payoff-2"] { text-decoration: double underline; }
+      & [data-outline-emphasis] { font-weight: 800; }
+      & [data-outline-emphasis="drop"] { text-decoration: underline dashed; }
+      & [data-outline-svg-marker] { display: inline; }
+      & svg [data-outline-highlight] { fill: var(--mind-map-highlight-color); }
+    }
+    .g10-t1-outline.is-presenting .outline-diagram-scroll { overflow-x: auto; }
+    .g10-t1-outline.is-presenting .concept-svg {
+      min-width: 24rem;
+      max-width: 38rem;
+      max-height: none;
+      margin-inline: auto;
+    }
+    .g10-t1-outline.is-presenting .outline-sensitivity-svg {
+      overflow: visible;
+      margin-bottom: 1.25rem;
+    }
+    .g10-t1-outline.is-presenting .outline-probability-label { transform: translateY(8px); }
+    .g10-t1-outline.is-presenting .outline-truck-label { transform: translateY(-13px); }
+    .g10-t1-outline.is-presenting .outline-shop-label { transform: translateY(-23px); }
+    .g10-t1-outline.is-presenting .outline-break-even-label { transform: translateY(25px); }
+    .g10-t1-outline.is-presenting .outline-decision-svg text { font-size: 10px; }
+    .g10-t1-outline.is-presenting .outline-survey-label { transform: translateX(-8px); }
+    .g10-t1-outline.is-presenting .outline-finance-labels { transform: translateX(-7px); }
+    .g10-t1-outline.is-presenting .outline-decision-svg .outline-constraints {
+      text-anchor: middle;
+      transform: translateX(77px);
+    }
+    @media (max-width: 560px) {
+      .g10-t1-outline.is-presenting .outline-table-scroll { overflow-x: auto; }
+      .g10-t1-outline.is-presenting .visual-table { min-width: 17rem; }
+      .g10-t1-outline.is-presenting .visual-table :is(th, td) { padding-inline: .15rem; }
+    }
+
+    .step4-intro { margin: 0 0 .75rem; font-size: var(--mind-map-font-node-body); }
+    .is-presenting:not([data-presentation-fullscreen-active]) .step4-slide .mind-map-node { padding-block: 1rem; }
+    .step4-comparison { margin: 0; }
+    .step4-comparison > div {
+      display: flex;
+      flex-wrap: wrap;
+      column-gap: .6rem;
+      padding-block: .35rem;
+      border-bottom: 1px solid #cbd5e1;
+    }
+    .step4-comparison dt { flex: 1 1 10rem; }
+    .step4-comparison dd { flex: 1.55 1 10rem; margin: 0; }
+
+    .step4-tree {
+      max-width: 23rem;
+      margin-inline: auto;
+      font-size: var(--mind-map-font-help);
+      line-height: 1.25;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+    .step4-tree-start, .step4-tree-rule { width: 50%; font-weight: 700; }
+    .step4-tree-start, .step4-tree-branch {
+      position: relative;
+      padding: .25rem;
+      border-radius: .35rem;
+      background: #e0f2fe;
+    }
+    .step4-tree-rule::before {
+      display: block;
+      width: 1px;
+      height: .45rem;
+      margin: 0 auto .15rem;
+      background: #475569;
+      content: "";
+    }
+    .step4-tree-branches {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding-top: .65rem;
+    }
+    .step4-tree-branches::before {
+      position: absolute;
+      inset: 0 25% auto;
+      height: .35rem;
+      border-left: 1px solid #475569;
+      border-bottom: 1px solid #475569;
+      content: "";
+    }
+    .step4-tree-branch { margin-inline: .15rem; }
+    .step4-tree-branch::before {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      height: .35rem;
+      border-left: 1px solid #475569;
+      content: "";
+    }
+    .step4-tree-branch + .step4-tree-branch { background: #f1f5f9; }
+    .step4-tree-selected { background: #dcfce7; font-weight: 700; }
+
+    @media (max-width: 480px) {
+      :not(.is-presenting) > .mind-map-card .step4-slide .mind-map-node { padding-inline: .85rem; }
+      .mind-map-presentation--enhanced .step4-slide .criterion-overlay {
+        right: auto;
+        width: 100dvw;
+      }
+    }
+  </style>
   <script src="../../../../assets/js/mind_map.js" defer></script>
   <script src="../../../../assets/js/countdown_timer.js" defer></script>
   <script src="../../../../assets/js/mind_map_criteria.js" defer></script>
@@ -28,7 +167,7 @@
   </header>
 
   <main class="mind-map-layout">
-    <section data-mind-map-presentation aria-labelledby="term-journey-title">
+    <section class="g10-t1-outline" data-mind-map-presentation aria-labelledby="term-journey-title">
       <div class="presentation-launch">
         <button class="presentation-button" type="button" data-presentation-start aria-expanded="false">Start presentation</button>
       </div>
@@ -51,14 +190,31 @@
           <article class="mind-map-node">
             <p class="mind-map-step-label">Step <span>1</span></p>
             <h3>Extract and organise the information</h3>
-            <p>Extract the decision alternatives, states of nature, consequences, and relevant economic or financial information from the scenario. When payoffs are not given directly, calculate them using revenues and fixed and variable costs, and then organise the alternatives, states, and payoffs in a payoff table for comparison.</p>
+            <button class="presentation-button" type="button" data-instructional-highlights-toggle data-mind-map-interactive aria-pressed="true">Instructional highlights</button>
+            <div class="outline-highlights-key">
+              <strong>Key</strong>
+              <span data-outline-highlight="green">Alternatives (Food truck, Shop)</span>
+              <span data-outline-highlight="blue">States (high or low demand)</span>
+              <span data-outline-highlight="yellow">Uncertain event</span>
+              <span data-outline-highlight="purple">Consequence</span>
+              <span data-outline-highlight="payoff-1">Truck payoffs</span>
+              <span data-outline-highlight="payoff-2">Shop payoffs</span>
+            </div>
+            <p>Extract the <span data-outline-highlight="green">decision alternatives</span>, <span data-outline-highlight="blue">states of nature</span>, <span data-outline-highlight="purple">consequences</span>, and relevant economic or financial information from the scenario. When payoffs are not given directly, calculate them using <span data-outline-emphasis>revenues</span> and <span data-outline-emphasis>fixed and variable costs</span>, and then organise the alternatives, states, and payoffs in a payoff table for comparison.</p>
             <figure class="concept-graphic" aria-labelledby="payoff-graphic-caption">
-              <figcaption id="payoff-graphic-caption">C1–C3 · Café alternatives, uncertain demand, and payoff construction ($000)</figcaption>
-              <table class="visual-table">
-                <thead><tr><th scope="col">Alternative</th><th scope="col">State</th><th scope="col">Revenue</th><th scope="col">Fixed cost</th><th scope="col">Variable cost</th><th scope="col">Payoff</th></tr></thead>
-                <tbody><tr><th rowspan="2" scope="rowgroup">Food truck</th><td>High demand</td><td>90</td><td>25</td><td>35</td><td class="chosen">30</td></tr><tr><td>Low demand</td><td>53</td><td>25</td><td>18</td><td>10</td></tr><tr><th rowspan="2" scope="rowgroup">Shop</th><td>High demand</td><td>150</td><td>55</td><td>45</td><td class="chosen">50</td></tr><tr><td>Low demand</td><td>65</td><td>55</td><td>20</td><td>−10</td></tr></tbody>
-              </table>
-              <div class="visual-equation" aria-label="Payoff equals revenue minus fixed cost minus variable cost"><span class="payoff">Payoff</span> = <span class="payoff">Fixed Payoff</span> + <span class="payoff">Variable Payoff</span> = <span>Fixed Revenue</span>+<span>Variable Revenue</span><b>−</b><span class="cost">Fixed cost</span><b>−</b><span class="cost">Variable cost</span></div>
+              <figcaption id="payoff-graphic-caption">C1–C3 · Café alternatives, <span data-outline-highlight="yellow">uncertain demand</span>, and payoff construction ($000)</figcaption>
+              <div class="outline-table-scroll">
+                <table class="visual-table">
+                  <thead><tr><th scope="col">Alternative</th><th scope="col">State</th><th scope="col">Revenue</th><th scope="col">Fixed cost</th><th scope="col">Variable cost</th><th scope="col"><span data-outline-highlight="purple">Payoff</span></th></tr></thead>
+                  <tbody>
+                    <tr><th rowspan="2" scope="rowgroup"><span data-outline-highlight="green">Food truck</span></th><td><span data-outline-highlight="blue">High demand</span></td><td>90</td><td>25</td><td>35</td><td class="chosen"><span data-outline-highlight="payoff-1">30</span></td></tr>
+                    <tr><td><span data-outline-highlight="blue">Low demand</span></td><td>53</td><td>25</td><td>18</td><td><span data-outline-highlight="payoff-1">10</span></td></tr>
+                    <tr><th rowspan="2" scope="rowgroup"><span data-outline-highlight="green">Shop</span></th><td><span data-outline-highlight="blue">High demand</span></td><td>150</td><td>55</td><td>45</td><td class="chosen"><span data-outline-highlight="payoff-2">50</span></td></tr>
+                    <tr><td><span data-outline-highlight="blue">Low demand</span></td><td>65</td><td>55</td><td>20</td><td><span data-outline-highlight="payoff-2">−10</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="visual-equation" aria-label="Payoff equals revenue minus fixed cost minus variable cost"><span class="payoff"><span data-outline-highlight="purple">Payoff</span></span> = <span class="payoff">Fixed Payoff</span> + <span class="payoff">Variable Payoff</span> = <span>Fixed Revenue</span>+<span>Variable Revenue</span><b>−</b><span class="cost">Fixed cost</span><b>−</b><span class="cost">Variable cost</span></div>
             </figure>
             <div class="criterion-control">
               <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C1" data-criterion-text="Characterises decision-making problems under uncertainty by identifying decision alternatives, states of nature, consequences, and the economic or financial context of the decision." aria-expanded="false" aria-controls="criterion-tooltip-c1">Criterion C1</button>
@@ -105,11 +261,31 @@
           <article class="mind-map-node">
             <p class="mind-map-step-label">Step <span>2</span></p>
             <h3>Decide without probabilities</h3>
+            <button class="presentation-button" type="button" data-instructional-highlights-toggle data-mind-map-interactive aria-pressed="true">Instructional highlights</button>
             <p>Use Maximax for the highest possible payoff and Maximin for the best worst-case payoff; interpret the risks and limitations. Then build an opportunity loss table and use Minimax Regret to minimise the maximum loss.</p>
             <figure class="concept-graphic" aria-labelledby="criteria-graphic-caption">
               <figcaption id="criteria-graphic-caption">C4–C5 · Three rules read the same payoff information differently ($000)</figcaption>
-              <div class="criteria-strip"><div><strong>Maximax → Shop</strong>largest best case: 50</div><div><strong>Maximin → Truck</strong>largest worst case: 10</div><div><strong>Minimax regret → Truck</strong>smallest maximum regret: 20</div></div>
-              <table class="visual-table"><thead><tr><th>Alternative</th><th>High payoff</th><th>Low payoff</th><th>High regret</th><th>Low regret</th><th>Max regret</th></tr></thead><tbody><tr class="chosen"><th>Truck</th><td>30</td><td>10</td><td>20</td><td>0</td><td>20</td></tr><tr><th>Shop</th><td class="chosen">50</td><td>−10</td><td>0</td><td>20</td><td>20</td></tr></tbody></table>
+              <div class="outline-highlights-key">
+                <strong>Key</strong>
+                <span data-outline-highlight="green">Alternatives</span>
+                <span data-outline-highlight="payoff-1">Truck payoffs</span>
+                <span data-outline-highlight="payoff-2">Shop payoffs</span>
+                <span>Maximax reads High payoff. Maximin reads Low payoff. Minimax Regret reads Max regret (both tie at 20).</span>
+              </div>
+              <div class="criteria-strip">
+                <div><strong>Maximax → <span data-outline-highlight="green">Shop</span></strong>largest best case: <span data-outline-highlight="payoff-2">50</span></div>
+                <div><strong>Maximin → <span data-outline-highlight="green">Truck</span></strong>largest worst case: <span data-outline-highlight="payoff-1">10</span></div>
+                <div><strong>Minimax regret → <span data-outline-highlight="green">Truck</span></strong>smallest maximum regret: <span data-outline-emphasis>20</span></div>
+              </div>
+              <div class="outline-table-scroll">
+                <table class="visual-table">
+                  <thead><tr><th>Alternative</th><th>High payoff</th><th>Low payoff</th><th>High regret</th><th>Low regret</th><th>Max regret</th></tr></thead>
+                  <tbody>
+                    <tr class="chosen"><th><span data-outline-highlight="green">Truck</span></th><td><span data-outline-highlight="payoff-1">30</span></td><td><span data-outline-highlight="payoff-1">10</span></td><td>20</td><td>0</td><td><span data-outline-emphasis>20</span></td></tr>
+                    <tr><th><span data-outline-highlight="green">Shop</span></th><td class="chosen"><span data-outline-highlight="payoff-2">50</span></td><td><span data-outline-highlight="payoff-2">−10</span></td><td>0</td><td>20</td><td><span data-outline-emphasis>20</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
             </figure>
             <div class="criterion-control">
               <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C4" data-criterion-text="Applies the Maximin and Maximax criteria to make optimistic or conservative decisions without probabilities, selecting the alternative with the highest possible payoff or the best worst-case, interpreting risks or limitations." aria-expanded="false" aria-controls="criterion-tooltip-c4">Criterion C4</button>
@@ -143,16 +319,37 @@
           <article class="mind-map-node">
             <p class="mind-map-step-label">Step <span>3</span></p>
             <h3>Decide with probabilities and test assumptions</h3>
+            <button class="presentation-button" type="button" data-instructional-highlights-toggle data-mind-map-interactive aria-pressed="true">Instructional highlights</button>
             <p>Use stated or estimated probabilities to calculate Expected Monetary Value and apply the Bayes decision criterion to select the highest expected payoff. Then use subjective probabilities and sensitivity analysis to determine how changes in probability assumptions affect the preferred decision.</p>
             <figure class="concept-graphic" aria-labelledby="ev-graphic-caption">
               <figcaption id="ev-graphic-caption">C6–C7 · Expected value and the probability threshold</figcaption>
-              <div class="visual-equation"><span>P(high) = 0.60</span><span>Truck: .6(30) + .4(10) = 22</span><span class="payoff">Shop: .6(50) + .4(−10) = 26 → choose</span></div>
-              <svg class="concept-svg" viewBox="0 0 360 155" role="img" aria-label="Sensitivity plot. Truck expected value begins at 10 and rises to 30. Shop begins at minus 10 and rises to 50. The lines cross at probability one half; truck is preferred below and shop above.">
-                <line x1="42" y1="128" x2="342" y2="128" stroke="#64748b"/><line x1="42" y1="128" x2="42" y2="18" stroke="#64748b"/>
-                <line x1="42" y1="104" x2="342" y2="63" stroke="#0284c7" stroke-width="3"/><line x1="42" y1="128" x2="342" y2="18" stroke="#e11d48" stroke-width="3"/>
-                <line x1="192" y1="128" x2="192" y2="73" stroke="#475569" stroke-dasharray="4"/><circle cx="192" cy="73" r="5" fill="#16a34a"/>
-                <text x="30" y="143">0</text><text x="181" y="143">0.50</text><text x="334" y="143">1</text><text x="205" y="69">break-even</text><text x="68" y="94" fill="#0284c7">Truck preferred</text><text x="240" y="43" fill="#e11d48">Shop preferred</text><text x="143" y="153">Probability of high demand</text>
-              </svg>
+              <div class="outline-highlights-key">
+                <strong>Key</strong>
+                <span data-outline-highlight="blue">High-demand state</span>
+                <span data-outline-highlight="green">Alternatives</span>
+                <span data-outline-highlight="payoff-1">Truck payoff inputs</span>
+                <span data-outline-highlight="payoff-2">Shop payoff inputs</span>
+                <span data-outline-highlight="purple">Expected payoffs (EMV)</span>
+                <span><strong>0.60</strong> assumed probability · <strong>0.50</strong> break-even threshold</span>
+              </div>
+              <div class="visual-equation">
+                <span>P(<span data-outline-highlight="blue">high</span>) = <span data-outline-emphasis>0.60</span></span>
+                <span><span data-outline-highlight="green">Truck</span>: <span data-outline-emphasis>.6</span>(<span data-outline-highlight="payoff-1">30</span>) + .4(<span data-outline-highlight="payoff-1">10</span>) = <span data-outline-highlight="purple">22</span></span>
+                <span class="payoff"><span data-outline-highlight="green">Shop</span>: <span data-outline-emphasis>.6</span>(<span data-outline-highlight="payoff-2">50</span>) + .4(<span data-outline-highlight="payoff-2">−10</span>) = <span data-outline-highlight="purple">26</span> → choose</span>
+              </div>
+              <div class="outline-diagram-scroll">
+                <svg class="concept-svg outline-sensitivity-svg" viewBox="0 0 360 155" role="img" aria-label="Sensitivity plot. Truck expected value begins at 10 and rises to 30. Shop begins at minus 10 and rises to 50. The lines cross at probability one half; truck is preferred below and shop above.">
+                  <line x1="42" y1="128" x2="342" y2="128" stroke="#64748b"/><line x1="42" y1="128" x2="42" y2="18" stroke="#64748b"/>
+                  <line x1="42" y1="104" x2="342" y2="63" stroke="#0284c7" stroke-width="3"/><line x1="42" y1="128" x2="342" y2="18" stroke="#e11d48" stroke-width="3"/>
+                  <line x1="192" y1="128" x2="192" y2="73" stroke="#475569" stroke-dasharray="4"/><circle cx="192" cy="73" r="5" fill="#16a34a"/>
+                  <circle data-outline-svg-marker cx="192" cy="73" r="8" fill="none" stroke="#334155" aria-hidden="true"/>
+                  <text x="30" y="143">0</text><text x="181" y="143" data-outline-emphasis>0.50</text><text x="334" y="143">1</text>
+                  <text x="205" y="69" class="outline-break-even-label" data-outline-emphasis>break-even</text>
+                  <text x="68" y="94" fill="#0284c7" class="outline-truck-label">Truck preferred</text>
+                  <text x="240" y="43" fill="#e11d48" class="outline-shop-label">Shop preferred</text>
+                  <text x="143" y="153" class="outline-probability-label">Probability of high demand</text>
+                </svg>
+              </div>
             </figure>
             <div class="criterion-control">
               <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C6" data-criterion-text="Calculates Expected Monetary Value using stated or estimated probabilities and applies the Bayes decision criterion to select the alternative with the highest expected payoff." aria-expanded="false" aria-controls="criterion-tooltip-c6">Criterion C6</button>
@@ -182,43 +379,89 @@
             </div>
           </article>
         </li>
-        <li class="mind-map-step" data-mind-map-slide data-mind-map-slide-scroll>
+        <li class="mind-map-step step4-slide" data-mind-map-slide data-mind-map-slide-scroll>
           <article class="mind-map-node">
             <p class="mind-map-step-label">Step <span>4</span></p>
-            <h3>Compare criteria and solve decision trees</h3>
-            <p>Contrast Maximax, Maximin, Minimax Regret, and EMV/Bayes by their information requirements, risk orientations, recommended alternatives, and limitations. Then build and solve decision trees by distinguishing decision nodes from chance nodes, assigning probabilities and payoffs, and applying backward induction to identify an optimal strategy.</p>
-            <figure class="concept-graphic" aria-labelledby="tree-graphic-caption">
-              <figcaption id="tree-graphic-caption">C8–C9 · Compare recommendations, then roll the decision tree back</figcaption>
-              <table class="visual-table"><thead><tr><th>Criterion</th><th>Needs probabilities?</th><th>View of risk</th><th>Recommendation</th></tr></thead><tbody><tr><th>Maximax</th><td>No</td><td>Optimistic</td><td>Shop</td></tr><tr><th>Maximin</th><td>No</td><td>Cautious</td><td>Truck</td></tr><tr><th>Minimax regret</th><td>No</td><td>Avoid missed opportunity</td><td>Truck</td></tr><tr class="chosen"><th>EMV / Bayes</th><td>Yes</td><td>Long-run average</td><td>Shop</td></tr></tbody></table>
-              <svg class="concept-svg" viewBox="0 0 360 150" role="img" aria-label="Decision tree comparing truck and shop. Chance nodes branch to high and low demand, and backward induction chooses the shop with expected value 26.">
-                <rect x="18" y="67" width="16" height="16" fill="#2563eb"/><text x="8" y="58">Decision</text><line x1="34" y1="75" x2="112" y2="35" stroke="#334155"/><line x1="34" y1="75" x2="112" y2="115" stroke="#334155"/><circle cx="112" cy="35" r="9" fill="#f59e0b"/><circle cx="112" cy="115" r="9" fill="#f59e0b"/>
-                <text x="58" y="44">Truck</text><text x="60" y="109">Shop</text><line x1="121" y1="31" x2="250" y2="15" stroke="#334155"/><line x1="121" y1="39" x2="250" y2="55" stroke="#334155"/><line x1="121" y1="111" x2="250" y2="91" stroke="#334155"/><line x1="121" y1="119" x2="250" y2="139" stroke="#334155"/>
-                <text x="155" y="22">High .6</text><text x="155" y="55">Low .4</text><text x="155" y="94">High .6</text><text x="155" y="137">Low .4</text><text x="255" y="18">30</text><text x="255" y="58">10</text><text x="255" y="94">50</text><text x="255" y="142">−10</text><text x="285" y="38">EV 22</text><text x="285" y="116" fill="#166534">EV 26 ✓</text>
-              </svg>
-            </figure>
-            <div class="criterion-control">
-              <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C8" data-criterion-text="Compares the Maximax, Maximin, Minimax Regret, and EMV/Bayes decision criteria by contrasting their information requirements, risk orientations, recommended alternatives, and limitations." aria-expanded="false" aria-controls="criterion-tooltip-c8">Criterion C8</button>
-              <div class="criterion-overlay" id="criterion-tooltip-c8" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c8-title">
-                <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
-                <div class="criterion-dialog" role="document">
-                  <div class="criterion-dialog-header">
-                    <h2 class="criterion-dialog-title" id="criterion-tooltip-c8-title">Criteria for this step</h2>
-                    <button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criteria for this step"><span aria-hidden="true">&times;</span></button>
+            <h3 style="--mind-map-font-presentation-title: clamp(1.75rem, 3.2vw, 2.75rem)">Compare criteria and build filtering trees</h3>
+            <button class="presentation-button" type="button" data-instructional-highlights-toggle data-mind-map-interactive aria-pressed="true">Instructional highlights</button>
+            <div class="outline-highlights-key">
+              <strong>Key</strong>
+              <span data-outline-highlight="green">Recommended alternatives</span>
+              <span><strong>Statistic</strong> each rule reads</span>
+              <span>Tree decisions <strong>Keep</strong> · <span data-outline-emphasis="drop">Drop</span> · <strong>Select</strong></span>
+            </div>
+            <p class="step4-intro">Explain why the four rules can recommend different alternatives. Then draw a filtering tree, applying each rule in order using the given statistics for the alternatives still in contention.</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: .75rem; align-items: start">
+              <figure class="concept-graphic" style="margin: 0; font-size: var(--mind-map-font-help); line-height: 1.35" aria-labelledby="workshop-comparison-caption">
+                <figcaption id="workshop-comparison-caption">C8 · Repair Workshop Plans (Q1, thousands of USD)</figcaption>
+                <dl class="step4-comparison">
+                  <div>
+                    <dt><strong>Maximax → <span data-outline-highlight="green">Large</span></strong><br><span data-outline-emphasis>Row maximum 120</span></dt>
+                    <dd>Pursues the highest payoff. Ignores downside.</dd>
                   </div>
-                  <div class="criterion-dialog-text" data-criterion-list>Compares the Maximax, Maximin, Minimax Regret, and EMV/Bayes decision criteria by contrasting their information requirements, risk orientations, recommended alternatives, and limitations.</div>
+                  <div>
+                    <dt><strong>Maximin → <span data-outline-highlight="green">Basic</span></strong><br><span data-outline-emphasis>Row minimum 35</span></dt>
+                    <dd>Picks the best worst-case payoff. Ignores upside.</dd>
+                  </div>
+                  <div>
+                    <dt><strong>Minimax Regret → <span data-outline-highlight="green">Flexible</span></strong><br><span data-outline-emphasis>Maximum regret 45</span></dt>
+                    <dd>Minimises the worst missed profit. Depends on which alternatives set the benchmarks.</dd>
+                  </div>
+                  <div>
+                    <dt><strong>EMV/Bayes → <span data-outline-highlight="green">Partner</span></strong><br><span data-outline-emphasis>EMV 63</span></dt>
+                    <dd>Maximises expected profit. Depends on reliable probabilities.</dd>
+                  </div>
+                </dl>
+                <p style="margin: .55rem 0 0">Only EMV/Bayes weights payoffs by state probabilities. The other rules compare payoff extremes or regret directly.</p>
+                <p style="margin: .4rem 0 0">Eligibility rules and payoff changes can change the choice. In <strong>Community Market Stall (Q2)</strong>, only Compact and Standard meet the payoff floor. Use their updated payoffs to recalculate each state's best payoff before finding regret.</p>
+              </figure>
+              <figure class="concept-graphic" style="margin: 0" aria-labelledby="tree-graphic-caption">
+                <figcaption id="tree-graphic-caption">C9 · Book Fair Stock (Q3, hundreds of USD)</figcaption>
+                <div class="step4-tree" role="img" aria-label="Book Fair Stock filtering tree. Start with D₁ through D₆. Stage 1 uses EMV/Bayes to keep the best three. D₁, D₂, and D₃ tie at 65 and advance, and D₄, D₅, and D₆ are eliminated. Stage 2 uses Maximax to keep the best two by row maximum. D₁ at 100 and D₂ at 90 advance, and D₃ at 80 is eliminated. Stage 3 uses Maximin to select D₂ because its minimum payoff of 10 exceeds D₁'s 0. Each stage uses the given statistics for the remaining alternatives.">
+                  <div class="step4-tree-start">Start<br>D₁–D₆</div>
+                  <div class="step4-tree-rule">1 · <span data-outline-emphasis>EMV/<wbr>Bayes</span></div>
+                  <div class="step4-tree-branches">
+                    <div class="step4-tree-branch"><span data-outline-emphasis>Keep</span> D₁, D₂, D₃<br>All tied at 65</div>
+                    <div class="step4-tree-branch"><span data-outline-emphasis="drop">Drop</span><br>D₄, D₅, D₆</div>
+                  </div>
+                  <div class="step4-tree-rule">2 · <span data-outline-emphasis>Maximax</span></div>
+                  <div class="step4-tree-branches">
+                    <div class="step4-tree-branch"><span data-outline-emphasis>Keep</span> D₁ (100)<br>and D₂ (90)</div>
+                    <div class="step4-tree-branch"><span data-outline-emphasis="drop">Drop</span> D₃ (80)</div>
+                  </div>
+                  <div class="step4-tree-rule">3 · <span data-outline-emphasis>Maximin</span></div>
+                  <div class="step4-tree-branches">
+                    <div class="step4-tree-branch step4-tree-selected">Select <span data-outline-highlight="green">D₂</span><br>Min 10</div>
+                    <div class="step4-tree-branch"><span data-outline-emphasis="drop">Drop</span> D₁<br>Min 0</div>
+                  </div>
+                </div>
+              </figure>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: .5rem">
+              <div class="criterion-control">
+                <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C8" data-criterion-text="Compares the Maximax, Maximin, Minimax Regret, and EMV/Bayes decision criteria by contrasting their information requirements, risk orientations, recommended alternatives, and limitations." aria-expanded="false" aria-controls="criterion-tooltip-c8">Criterion C8</button>
+                <div class="criterion-overlay" id="criterion-tooltip-c8" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c8-title">
+                  <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
+                  <div class="criterion-dialog" role="document">
+                    <div class="criterion-dialog-header">
+                      <h2 class="criterion-dialog-title" id="criterion-tooltip-c8-title">Criteria for this step</h2>
+                      <button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criteria for this step"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="criterion-dialog-text" data-criterion-list>Compares the Maximax, Maximin, Minimax Regret, and EMV/Bayes decision criteria by contrasting their information requirements, risk orientations, recommended alternatives, and limitations.</div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="criterion-control">
-              <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C9" data-criterion-text="Builds and solves decision trees by distinguishing decision nodes and chance nodes, assigning probabilities and payoffs, and applying backward induction to identify an optimal strategy." aria-expanded="false" aria-controls="criterion-tooltip-c9">Criterion C9</button>
-              <div class="criterion-overlay" id="criterion-tooltip-c9" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c9-title">
-                <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
-                <div class="criterion-dialog" role="document">
-                  <div class="criterion-dialog-header">
-                    <h2 class="criterion-dialog-title" id="criterion-tooltip-c9-title">Criteria for this step</h2>
-                    <button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criteria for this step"><span aria-hidden="true">&times;</span></button>
+              <div class="criterion-control">
+                <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C9" data-criterion-text="Constructs and interprets decision trees for staged filtering rules, applying decision criteria in the specified order to identify the final alternative." aria-expanded="false" aria-controls="criterion-tooltip-c9">Criterion C9</button>
+                <div class="criterion-overlay" id="criterion-tooltip-c9" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c9-title">
+                  <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
+                  <div class="criterion-dialog" role="document">
+                    <div class="criterion-dialog-header">
+                      <h2 class="criterion-dialog-title" id="criterion-tooltip-c9-title">Criteria for this step</h2>
+                      <button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criteria for this step"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="criterion-dialog-text" data-criterion-list>Constructs and interprets decision trees for staged filtering rules, applying decision criteria in the specified order to identify the final alternative.</div>
                   </div>
-                  <div class="criterion-dialog-text" data-criterion-list>Builds and solves decision trees by distinguishing decision nodes and chance nodes, assigning probabilities and payoffs, and applying backward induction to identify an optimal strategy.</div>
                 </div>
               </div>
             </div>
@@ -228,16 +471,26 @@
           <article class="mind-map-node">
             <p class="mind-map-step-label">Step <span>5</span></p>
             <h3>Evaluate and justify the decision</h3>
+            <button class="presentation-button" type="button" data-instructional-highlights-toggle data-mind-map-interactive aria-pressed="true">Instructional highlights</button>
             <p>For the economic or financial scenario, select and justify the most appropriate criterion using the available information, risk attitude, and decision context.</p>
             <figure class="concept-graphic" aria-labelledby="context-graphic-caption">
               <figcaption id="context-graphic-caption">C10 · A small café turns evidence into a defensible investment decision</figcaption>
-              <svg class="concept-svg" viewBox="0 0 360 140" role="img" aria-label="Economic decision process from market survey through cost and demand evidence, decision criteria, finance constraint, and justified launch decision.">
-                <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="#64748b"/></marker></defs>
-                <rect x="8" y="45" width="70" height="50" rx="9" fill="#e0f2fe"/><text x="21" y="65">Market survey</text><text x="19" y="81">demand data</text><line x1="78" y1="70" x2="103" y2="70" stroke="#64748b" marker-end="url(#arrow)"/>
-                <rect x="107" y="25" width="76" height="90" rx="9" fill="#fef3c7"/><text x="119" y="48">Revenue</text><text x="119" y="66">fixed costs</text><text x="119" y="84">variable costs</text><text x="119" y="102">probabilities</text><line x1="183" y1="70" x2="208" y2="70" stroke="#64748b" marker-end="url(#arrow)"/>
-                <rect x="212" y="35" width="65" height="70" rx="9" fill="#ede9fe"/><text x="222" y="57">Compare</text><text x="219" y="74">criteria +</text><text x="220" y="91">risk limits</text><line x1="277" y1="70" x2="301" y2="70" stroke="#64748b" marker-end="url(#arrow)"/>
-                <circle cx="329" cy="70" r="27" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/><text x="312" y="66">Justify</text><text x="312" y="81">launch</text><text x="103" y="132">Real constraints: loan repayments · jobs · cash-flow survival</text>
-              </svg>
+              <div class="outline-highlights-key">
+                <strong>Key</strong>
+                <span data-outline-highlight="yellow">Uncertain demand</span>
+                <span><strong>Financial evidence</strong> (revenue and costs)</span>
+                <span><strong>Constraints</strong> (risk limits and real constraints)</span>
+                <span data-outline-highlight="green">Justified action</span>
+              </div>
+              <div class="outline-diagram-scroll">
+                <svg class="concept-svg outline-decision-svg" viewBox="0 0 360 140" role="img" aria-label="Economic decision process from market survey through cost and demand evidence, decision criteria, finance constraint, and justified launch decision.">
+                  <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8z" fill="#64748b"/></marker></defs>
+                  <rect x="8" y="45" width="70" height="50" rx="9" fill="#e0f2fe"/><text x="21" y="65" class="outline-survey-label">Market survey</text><rect x="11" y="71" width="64" height="14" rx="2" data-outline-svg-marker data-outline-highlight="yellow" aria-hidden="true"/><text x="19" y="81" class="outline-survey-label">demand data</text><line x1="78" y1="70" x2="103" y2="70" stroke="#64748b" marker-end="url(#arrow)"/>
+                  <rect x="107" y="25" width="76" height="90" rx="9" fill="#fef3c7"/><g class="outline-finance-labels"><text x="119" y="48" data-outline-emphasis>Revenue</text><text x="119" y="66" data-outline-emphasis>fixed costs</text><text x="119" y="84" data-outline-emphasis>variable costs</text><text x="119" y="102">probabilities</text></g><line x1="183" y1="70" x2="208" y2="70" stroke="#64748b" marker-end="url(#arrow)"/>
+                  <rect x="212" y="35" width="65" height="70" rx="9" fill="#ede9fe"/><text x="222" y="57">Compare</text><text x="219" y="74">criteria +</text><text x="220" y="91" data-outline-emphasis>risk limits</text><line x1="277" y1="70" x2="301" y2="70" stroke="#64748b" marker-end="url(#arrow)"/>
+                  <circle cx="329" cy="70" r="27" fill="#dcfce7" stroke="#16a34a" stroke-width="2" data-outline-highlight="green"/><text x="312" y="66">Justify</text><text x="312" y="81">launch</text><text x="103" y="132" class="outline-constraints" data-outline-emphasis>Real constraints: loan repayments · jobs · cash-flow survival</text>
+                </svg>
+              </div>
             </figure>
             <div class="criterion-control">
               <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C10" data-criterion-text="Evaluates economic and financial decision-making scenarios by selecting and justifying the most appropriate decision criterion according to the information available, risk attitude, and decision context." aria-expanded="false" aria-controls="criterion-tooltip-c10">Criterion C10</button>

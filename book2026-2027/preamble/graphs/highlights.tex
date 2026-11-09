@@ -11,6 +11,7 @@
 \newif\ifGTenHighlights
 \GTenHighlightstrue
 % Switch off with \GTenHighlightsfalse (restore with \GTenHighlightstrue).
+% Use \HighlightStroke{color}{fragment} with any xcolor color.
 % Every role command accepts ONE short text OR math fragment, in its current
 % mode: \GTenHLValue{buyers}, $\GTenHLValue{X}_i^2$,
 % \[p_X(\GTenHLValue{1})=\GTenHLProbability{0.5}.\]
@@ -28,7 +29,7 @@
 \newcommand{\GTenHLMathStroke}[2]{%
   \tikz[baseline=(gtenhl.base)]\node[gten marker=\GTenHLCurrentColor]
     (gtenhl) {$\mathsurround=0pt #1#2$};}
-\newcommand{\GTenHLStroke}[2]{%
+\newcommand{\HighlightStroke}[2]{%
   \ifGTenHighlights
     \begingroup\def\GTenHLCurrentColor{#1}%
     \ifmmode\mathpalette\GTenHLMathStroke{#2}%
@@ -36,6 +37,7 @@
       (gtenhl) {#2};\fi
     \endgroup
   \else#2\fi}
+\let\GTenHLStroke\HighlightStroke
 % Roles: Value = primary variable and its values/units; Second/Third = other
 % simultaneous variables; Outcome = complete outcome or label; Probability =
 % known masses/results; Parameter = mass/constant being determined, including
@@ -46,11 +48,3 @@
 \newcommand{\GTenHLOutcome}[1]{\GTenHLStroke{GTenHLOutcome}{#1}}
 \newcommand{\GTenHLProbability}[1]{\GTenHLStroke{GTenHLProbability}{#1}}
 \newcommand{\GTenHLParameter}[1]{\GTenHLStroke{GTenHLParameter}{#1}}
-% Legends stay readable in monochrome: names and units carry the meaning.
-\newcommand{\GTenHighlightLegend}{%
-  \textbf{Marker key:} \GTenHLValue{variable and values};
-  \GTenHLOutcome{outcomes}; \GTenHLProbability{probabilities};
-  \GTenHLParameter{parameter to determine}.
-  When variables occur together: \GTenHLValue{$X$ (buyers)},
-  \GTenHLSecond{$Y$ (USD)}, \GTenHLThird{$Z$ (indicator)}.
-  Match each value to its variable's marker; probability markers have no units.}

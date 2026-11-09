@@ -448,6 +448,15 @@
         if (event.target.closest("[data-criterion-close], [data-criterion-backdrop]")) closeTooltips(null, true);
         return;
       }
+      const highlightsToggle = event.target.closest("button[data-instructional-highlights-toggle]");
+      if (highlightsToggle) {
+        if (state.active && !state.openTrigger && slides[state.index].contains(highlightsToggle)) {
+          const pressed = highlightsToggle.getAttribute("aria-pressed") === "true";
+          highlightsToggle.setAttribute("aria-pressed", String(!pressed));
+          highlightsToggle.focus({ preventScroll: true });
+        }
+        return;
+      }
       closeTooltips();
       if (!state.active) {
         const selected = event.target.closest("[data-mind-map-slide]");
