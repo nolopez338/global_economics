@@ -30,9 +30,8 @@ from xml.etree import ElementTree as ET
 
 
 CRITERIA = [f"C{i}" for i in range(1, 11)]
-OUTPUT_COLUMNS = ["No.", "Student Name", *CRITERIA, "Total Periodo", "% Periodo"]
-UNIFIED_OUTPUT_COLUMNS = ["No.", "Student Name", "Group", *CRITERIA,
-                          "Total Periodo", "% Periodo"]
+OUTPUT_COLUMNS = ["No.", "Student Name", "Grade", "Group", *CRITERIA,
+                  "Total Periodo", "% Periodo"]
 YES_WORDS = {"si", "sí", "yes", "y", "true", "1", "x", "alcanzado", "logrado"}
 NO_WORDS = {"no", "n", "false", "0", "no alcanzado", "no logrado"}
 
@@ -298,11 +297,10 @@ def export_csv(
         writer.writerows(rows)
 
 
-def write_csv_manifest(output_folder: Path) -> None:
+def write_csv_manifest(output_folder: Path, csv_paths: Sequence[Path]) -> None:
     """Index generated CSVs so a static browser page can discover their names."""
     files = sorted(
-        (path.name for path in output_folder.iterdir()
-         if path.is_file() and path.suffix.casefold() == ".csv"),
+        (path.name for path in csv_paths),
         key=lambda name: (name.casefold(), name),
     )
     manifest = output_folder / "csv-manifest.json"
@@ -372,6 +370,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     output_folder = output_folder_for(input_folder)
     output_paths = individual_output_paths(files, output_folder)
+    generated_csvs: list[Path] = []
     unified_rows: list[dict[str, object]] = []
     failures = 0
     try:
@@ -381,9 +380,15 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     for source in files:
         try:
+            class_code = re.match(r"^([0-9]+)([A-Za-z])(?=$|[-_\s])", source.stem)
+            if class_code is None:
+                raise ValueError("Could not determine class code from filename")
+            grade, group = class_code.groups()
             source_rows = read_source_file(source)
             students = extract_criteria(source_rows)
             results = calculate_period_results(students)
+            for result in results:
+                result.update(Grade=grade, Group=group.upper())
             output = output_paths[source]
             export_csv(results, output)
         except (OSError, ValueError, RuntimeError, zipfile.BadZipFile, ET.ParseError) as exc:
@@ -391,22 +396,23 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"error: could not process {source.name}: {exc}", file=sys.stderr)
             continue
 
-        group = source.stem.split("_", 1)[0]
-        unified_rows.extend({**result, "Group": group} for result in results)
+        generated_csvs.append(output)
+        unified_rows.extend(results)
         print(f"Extracted {len(results)} students from {source.name} to {output}")
 
     if unified_rows:
         unified_output = output_folder / "Unified_Extracted.csv"
         try:
-            export_csv(unified_rows, unified_output, UNIFIED_OUTPUT_COLUMNS)
+            export_csv(unified_rows, unified_output)
         except OSError as exc:
             parser.exit(1, f"error: could not write {unified_output}: {exc}\n")
+        generated_csvs.append(unified_output)
         print(f"Combined {len(unified_rows)} students into {unified_output}")
     else:
         print("error: no Excel files could be processed", file=sys.stderr)
 
     try:
-        write_csv_manifest(output_folder)
+        write_csv_manifest(output_folder, generated_csvs)
     except OSError as exc:
         parser.exit(1, f"error: could not write CSV manifest: {exc}\n")
 

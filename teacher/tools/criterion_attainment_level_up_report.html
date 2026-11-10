@@ -1,0 +1,1249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<title>Criterion Attainment | Level-up comparison</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f2f5f8; --card: #fff; --text: #14253a; --muted: #495d72; --line: #d5dfe8;
+  --navy: #112c47; --blue: #285b9b; --focus: #185bc7; --pale: #eaf1f8;
+  --up: #146052; --up-bg: #e1f3ed; --down: #963922; --down-bg: #faebe5;
+  font: 15px/1.5 "Segoe UI", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); }
+[hidden] { display: none !important; }
+main { max-width: 1510px; padding: 24px clamp(12px, 3vw, 42px) 44px; margin: auto; }
+h1, h2, h3, p { margin: 0; }
+h1 { font-size: clamp(1.85rem, 4vw, 2.7rem); line-height: 1.12; margin: 6px 0 8px; }
+h2 { font-size: 1.18rem; line-height: 1.25; }
+h3 { font-size: 1rem; }
+button, input, select { font: inherit; color: inherit; }
+button, summary { cursor: pointer; }
+button:disabled { opacity: .55; cursor: default; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.hero { padding: clamp(20px, 3vw, 32px); color: white; background: var(--navy); border-radius: 15px 15px 0 0; }
+.eyebrow { color: #a5e1d8; font-size: .74rem; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+.hero p:last-child { color: #d9e8f6; }
+.card, .sources { background: var(--card); border: 1px solid var(--line); padding: 16px clamp(14px, 2vw, 23px); }
+.card { margin-top: 14px; border-radius: 12px; min-width: 0; }
+.sources { border-radius: 0 0 15px 15px; border-top: 0; }
+.source-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 10px; }
+.snapshot { min-width: 0; background: #f7f9fc; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.snapshot h3 { color: var(--navy); }
+.toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; margin-top: 8px; }
+.toolbar label { font-weight: 650; }
+a { color: var(--blue); }
+.action, select, input[type="search"] {
+  background: white; border: 1px solid #aabacb; border-radius: 6px; padding: 6px 9px; min-height: 36px;
+}
+.action { color: var(--navy); font-weight: 650; }
+.action:hover:not(:disabled) { background: var(--pale); }
+.desc { color: var(--muted); font-size: .88rem; margin-top: 5px; }
+.toolbar select { margin-left: 4px; }
+.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; margin: 10px 0 0; }
+.metrics div { border: 1px solid var(--line); background: var(--pale); border-radius: 8px; padding: 8px 12px; }
+.metrics dt { font-size: .83rem; color: var(--muted); font-weight: 650; }
+.metrics dd { margin: 0; font-size: 1.65rem; font-weight: 750; font-variant-numeric: tabular-nums; }
+.metrics .positive, .positive { background: var(--up-bg); color: var(--up); }
+.metrics .negative, .negative { background: var(--down-bg); color: var(--down); }
+.picker { margin-top: 11px; border: 1px solid var(--line); border-radius: 7px; padding: 7px 10px; }
+summary { color: var(--navy); font-weight: 700; }
+.picker-controls { margin-top: 8px; }
+.picker-controls input { width: min(310px, 100%); }
+.picker-options {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 245px), 1fr));
+  gap: 4px 12px; max-height: 190px; overflow: auto; padding: 4px; margin: 5px -4px 0;
+}
+.picker-options label { display: flex; align-items: start; gap: 7px; border-radius: 4px; padding: 4px; cursor: pointer; }
+.picker-options label:hover, .picker-options label:focus-within { background: var(--pale); }
+.picker-options input { flex: 0 0 auto; margin-top: 4px; }
+.name { white-space: pre-wrap; overflow-wrap: anywhere; }
+.scroll { max-width: 100%; overflow: auto; padding: 3px; margin: 5px -3px 0; }
+table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: .86rem; font-variant-numeric: tabular-nums; }
+th, td { border-bottom: 1px solid var(--line); padding: 6px 8px; text-align: left; }
+thead th { background: var(--pale); color: var(--navy); }
+tbody tr:nth-child(even) { background: #f7f9fc; }
+.comparison { min-width: 790px; }
+.missing-table { min-width: 650px; }
+.comparison :is(th, td):not(:first-child), .missing-table :is(th, td):not(:first-child) { text-align: right; }
+.sort-button { border: 0; background: transparent; padding: 3px 2px; color: var(--navy); font-weight: 700; text-align: inherit; }
+.sort-button:hover { text-decoration: underline; }
+.count {
+  width: 100%; min-height: 29px; text-align: right; padding: 2px 7px; border: 1px solid transparent;
+  border-radius: 5px; font-weight: 700; position: relative; isolation: isolate;
+}
+.count::before {
+  content: ""; position: absolute; inset: 0 auto 0 0; width: var(--fill, 0%);
+  background: currentColor; opacity: .12; border-radius: 4px; z-index: -1;
+}
+.count:hover, .count[aria-pressed="true"] { border-color: currentColor; }
+.count[aria-pressed="true"] { box-shadow: inset 0 0 0 1px currentColor; }
+.neutral { background: #edf2f8; color: #36536f; }
+.unknown { background: #f1eef8; color: #54446d; }
+.delta-up { color: var(--up); font-weight: 700; }
+.delta-down { color: var(--down); font-weight: 700; }
+.nowrap { white-space: nowrap; }
+.subpanel { margin-top: 10px; }
+.hint { min-height: 1.5em; margin-top: 6px; color: var(--muted); font-size: .86rem; }
+.matrix { min-width: 1010px; table-layout: fixed; }
+.matrix :is(th, td) { padding: 4px 3px; text-align: center; }
+.matrix th:first-child { width: 84px; }
+.matrix th:nth-child(2) { width: 63px; }
+.matrix tr > :first-child { position: sticky; left: 0; background: white; border-right: 1px solid var(--line); }
+.matrix thead tr > :first-child, .matrix .grade-row > :first-child { background: var(--pale); }
+.matrix tbody tr:nth-child(even):not(.grade-row) > :first-child { background: #f7f9fc; }
+.matrix-cell { display: block; border-radius: 5px; padding: 3px; white-space: nowrap; font-weight: 700; }
+.matrix-cell small { display: block; font-size: .73rem; font-weight: 500; }
+.grade-row { background: var(--pale) !important; }
+.selection { display: flex; flex-wrap: wrap; gap: 8px 15px; align-items: center; }
+.selection.active { margin-top: 8px; padding: 6px 9px; background: #edf5ff; border-radius: 7px; }
+.student-scroll { max-height: 495px; }
+.students { min-width: 1460px; }
+.students thead th { position: sticky; top: 0; z-index: 1; }
+.students tr > :first-child {
+  position: sticky; left: 0; background: white; border-right: 1px solid var(--line); min-width: 160px; max-width: 205px;
+}
+.students tbody tr:nth-child(even) > :first-child { background: #f7f9fc; }
+.students thead th:first-child { z-index: 2; background: var(--pale); }
+.students td { vertical-align: top; }
+.badge { display: inline-block; padding: 2px 4px; border-radius: 4px; white-space: nowrap; font-size: .8rem; }
+.changed { font-weight: 700; }
+.student-strip {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(105px, 1fr));
+  gap: 6px; margin: 8px 0 0; padding: 0; list-style: none;
+}
+.student-strip li { padding: 6px; border: 1px solid var(--line); border-radius: 6px; }
+.student-strip strong { display: block; }
+.quality-summary { display: flex; flex-wrap: wrap; gap: 5px 16px; margin: 7px 0; font-size: .86rem; }
+.quality-summary span { background: var(--pale); border-radius: 5px; padding: 3px 7px; }
+.quality-records { max-height: 280px; }
+.quality-records table { min-width: 580px; }
+@media (max-width: 680px) {
+  main { padding-top: 12px; }
+  .source-grid { grid-template-columns: 1fr; }
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .students tr > :first-child { min-width: 125px; max-width: 150px; }
+}
+@media (forced-colors: active) {
+  .count[aria-pressed="true"] { outline: 2px solid Highlight; outline-offset: -2px; }
+}
+</style>
+</head>
+<body>
+<main>
+  <header class="hero">
+    <p class="eyebrow">Global Economics · Results explorer</p>
+    <h1>Criterion Attainment After Level-ups</h1>
+    <p>Compare C1–C10 for the same students across two snapshots.</p>
+  </header>
+
+  <section class="sources" aria-labelledby="sourcesTitle">
+    <h2 id="sourcesTitle">Snapshots</h2>
+    <div class="source-grid">
+      <div class="snapshot">
+        <h3>Before</h3>
+        <p><time datetime="2026-11-05">2026-11-05</time></p>
+      </div>
+      <div class="snapshot">
+        <h3>After</h3>
+        <p><time datetime="2026-11-10">2026-11-10</time></p>
+      </div>
+    </div>
+    <p class="desc" id="qualityJump" hidden><a href="#quality" id="openQuality">Review data quality and matches</a></p>
+  </section>
+
+  <section class="card" id="state" aria-labelledby="stateTitle" hidden>
+    <h2 id="stateTitle">No unambiguous matches between files</h2>
+    <p id="stateText" class="desc" role="status">Review excluded rows in the data-quality panel.</p>
+  </section>
+
+  <div id="report" hidden>
+    <section class="card" aria-labelledby="overviewTitle">
+      <h2 id="overviewTitle">Changes observed between snapshots</h2>
+      <div class="toolbar">
+        <label>Grade <select id="grade"><option value="">All</option></select></label>
+        <label>Group <select id="group"><option value="">All</option></select></label>
+        <button type="button" class="action" id="clearStudents">Clear student selection</button>
+        <button type="button" class="action" id="reset" title="Reset filters, student selection, transition and sorting.">Reset report</button>
+      </div>
+      <details class="picker" id="picker">
+        <summary id="pickerTitle">Select students</summary>
+        <div class="picker-controls">
+          <label for="search">Search matched students</label>
+          <input type="search" id="search" placeholder="Name or class" autocomplete="off">
+        </div>
+        <p class="desc" id="pickerCount" role="status"></p>
+        <div id="pickerOptions" class="picker-options" role="group" aria-label="Matching students"></div>
+      </details>
+      <p id="scope" class="desc" role="status"></p>
+      <dl class="metrics">
+        <div><dt>Matched students in view</dt><dd id="matched">0</dd></div>
+        <div class="positive"><dt>At least one No → Yes</dt><dd id="improved">0</dd></div>
+        <div class="negative"><dt>At least one Yes → No</dt><dd id="declined">0</dd></div>
+        <div><dt>Both types of change</dt><dd id="both">0</dd></div>
+      </dl>
+    </section>
+    <p id="emptyScope" class="card" role="status" hidden>No matched students fit these filters. Change a filter or clear the student selection.</p>
+
+    <div id="views">
+      <section class="card" aria-labelledby="criterionTitle">
+        <h2 id="criterionTitle">Change by criterion</h2>
+        <p class="desc">Select a column heading to sort. Select a count to show its students in the detail table below.</p>
+        <p class="desc">Paired pass rates use only students with a Yes or No in both snapshots for that criterion. <strong>pp</strong> means percentage points.</p>
+        <p id="rankSummary" class="hint"></p>
+        <div class="scroll" tabindex="0" role="region" aria-label="Criterion counts and paired pass rates">
+          <table class="comparison" aria-label="Criterion counts and paired pass rates">
+            <thead id="criterionHead"></thead><tbody id="criterionRows"></tbody>
+          </table>
+        </div>
+        <details class="subpanel" id="missingPanel">
+          <summary>Break down transitions involving missing data</summary>
+          <p class="desc">Blank or NaN means Missing. Missing → Yes is counted separately from No → Yes.</p>
+          <div class="scroll" tabindex="0" role="region" aria-label="Missing transitions by criterion">
+            <table class="missing-table" aria-label="Missing transitions by criterion">
+              <thead id="missingHead"></thead><tbody id="missingRows"></tbody>
+            </table>
+          </div>
+        </details>
+        <p id="countHint" class="hint" aria-hidden="true">Focus or hover over a count for its exact value.</p>
+        <div id="selectionBar" class="selection" hidden>
+          <span id="selectionText" role="status"></span>
+          <button type="button" id="clearTransition" class="action">Clear transition</button>
+          <a href="#studentTitle">Go to student details</a>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="classTitle">
+        <h2 id="classTitle">Comparison by grade and class</h2>
+        <p id="classLegend" class="desc">The first line shows gains (+) and losses (−). The second shows the paired pass-rate change and number of comparable pairs.</p>
+        <p id="classEmpty" class="desc" hidden>One class is in view. Its results are shown in the criterion table above.</p>
+        <div id="classScroll" class="scroll" tabindex="0" role="region" aria-label="Grade and class comparison">
+          <table class="matrix" aria-label="Grade and class comparison">
+            <thead id="classHead"></thead><tbody id="classRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="studentTitle">
+        <h2 id="studentTitle" tabindex="-1">Student details</h2>
+        <p class="desc">Values read Before → After. Changed criteria use an arrow and a highlighted label. Period totals and percentages are the exported values.</p>
+        <p class="desc" id="studentCount" role="status"></p>
+        <div id="studentSpotlight" hidden>
+          <h3 id="studentName" class="name"></h3>
+          <p class="desc" id="studentPeriod"></p>
+          <ul class="student-strip" id="studentStrip"></ul>
+        </div>
+        <div id="studentScroll" class="scroll student-scroll" tabindex="0" role="region" aria-label="Student results before and after">
+          <table class="students" aria-label="Student results before and after">
+            <thead id="studentHead"></thead><tbody id="studentRows"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <details class="card" id="quality" hidden>
+    <summary id="qualityTitle">Data quality and match review</summary>
+    <p class="desc">Students match by normalized name within Grade and Group. Repeated keys and rows without a complete identity are excluded. Record numbers are for locating rows in the export.</p>
+    <div id="qualitySummary" class="quality-summary"></div>
+    <p id="qualityState" class="desc"></p>
+    <div id="qualityScroll" class="scroll quality-records" tabindex="0" role="region" aria-label="Excluded records">
+      <table aria-label="Excluded records">
+        <thead id="qualityHead"></thead><tbody id="qualityRows"></tbody>
+      </table>
+    </div>
+  </details>
+</main>
+<!-- Each snapshot contains the CSV header followed by all source records in order. -->
+<script type="application/json" id="snapshotData">
+{
+  "before": [
+    ["No.","Student Name","Grade","Group","C1","C2","C3","C4","C5","C6","C7","C8","C9","C10","Total Periodo","% Periodo"],
+    ["1","ANDRADE GARCIA NICOLAS","10","A","No","Yes","No","No","No","Yes","No","Yes","Yes","No","4","40%"],
+    ["2","BARRERO SANCHEZ LUCIO","10","A","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["3","CARDOZO BENINCORE JERONIMO","10","A","Yes","Yes","Yes","Yes","No","Yes","No","No","Yes","No","6","60%"],
+    ["4","CHAVES CORREAL LUCIA","10","A","Yes","Yes","Yes","Yes","No","Yes","No","No","Yes","Yes","7","70%"],
+    ["5","DE LEON CASTIBLANCO JUAN JOSE","10","A","Yes","Yes","Yes","Yes","No","Yes","No","No","No","No","5","50%"],
+    ["6","ESCANDON CAMARGO SIMON","10","A","Yes","Yes","Yes","No","No","Yes","No","Yes","Yes","No","6","60%"],
+    ["7","GARCIA BECERRA MAXIMILIANO","10","A","Yes","Yes","Yes","No","","","","No","No","No","3","43%"],
+    ["8","GARCIA VARELA JOSUE","10","A","Yes","Yes","Yes","Yes","No","Yes","No","Yes","Yes","No","7","70%"],
+    ["9","GOMEZ BANDERA MIGUEL EDUARDO","10","A","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["10","HERN\u00c1NDEZ CASTA\u00d1EDA ISABELLA","10","A","Yes","Yes","No","Yes","No","Yes","Yes","No","Yes","Yes","7","70%"],
+    ["11","MALDONADO LEMUS ANDR\u00c9S CAMILO","10","A","Yes","No","No","No","Yes","Yes","Yes","No","Yes","Yes","6","60%"],
+    ["12","MOLINA RIVERA MANUEL ESTEBAN","10","A","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["13","OJEDA HURTADO JUAN FELIPE","10","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["14","OROZCO RODRIGUEZ LETICIA","10","A","Yes","Yes","No","Yes","Yes","Yes","Yes","No","Yes","Yes","8","80%"],
+    ["15","OSPINA RAMIREZ SANTIAGO","10","A","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["16","PARRA ORJUELA ANA MARIA","10","A","Yes","Yes","Yes","Yes","No","Yes","Yes","No","Yes","Yes","8","80%"],
+    ["17","PELAEZ SIERRA ISABELLA","10","A","Yes","Yes","No","Yes","No","Yes","No","No","No","No","4","40%"],
+    ["18","RUBIANO ESPEJO MARTIN","10","A","Yes","Yes","Yes","No","No","Yes","No","No","No","Yes","5","50%"],
+    ["19","RUIZ MU\u00d1OZ SARA","10","A","Yes","Yes","Yes","No","No","Yes","No","No","Yes","No","5","50%"],
+    ["20","TAPIAS L\u00d3PEZ SANTIAGO","10","A","Yes","Yes","No","No","No","Yes","No","No","Yes","No","4","40%"],
+    ["1","ADARVE PARRA PABLO","10","B","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["2","ALONSO MOYA MARIA JULIANA","10","B","Yes","Yes","No","No","No","No","No","Yes","No","No","3","30%"],
+    ["3","AMAYA BERNAL LUCIANA","10","B","Yes","No","No","No","No","No","No","No","No","No","1","10%"],
+    ["4","BARBOSA ANDRADE MARIANA","10","B","Yes","Yes","Yes","No","No","Yes","No","Yes","Yes","No","6","60%"],
+    ["5","CARRILLO CABRERA GERMAN ANDRES","10","B","Yes","Yes","No","Yes","No","No","Yes","No","Yes","No","5","50%"],
+    ["6","CHINOME ANGULO CAMILO","10","B","Yes","Yes","No","Yes","No","Yes","No","Yes","Yes","Yes","7","70%"],
+    ["7","DEL CAIRO BOLA\u00d1OS PABLO JOS\u00c9","10","B","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["8","FIGUEROA AGUIRRE SANTIAGO","10","B","No","No","No","No","No","Yes","No","No","No","Yes","2","20%"],
+    ["9","GARCIA BLANCO ANA MARIA","10","B","Yes","Yes","No","Yes","No","Yes","No","No","No","Yes","5","50%"],
+    ["10","GONZALEZ CERON DANIEL","10","B","No","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","8","80%"],
+    ["11","GUAMPE GRANADOS SOFIA","10","B","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["12","GUEVARA MENDIETA JERONIMO","10","B","Yes","No","No","No","No","Yes","Yes","No","Yes","Yes","5","50%"],
+    ["13","JARAMILLO GONZALEZ NICOLAS","10","B","Yes","No","No","Yes","Yes","Yes","No","No","Yes","Yes","6","60%"],
+    ["14","MALDONADO BAQUERO JULI\u00c1N ALEJANDRO","10","B","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["15","MELO VALENCIA MATEO ANDRES","10","B","Yes","No","No","No","No","No","No","No","No","No","1","10%"],
+    ["16","MENDEZ RAMOS JUAN JOSE","10","B","Yes","Yes","No","Yes","No","No","No","Yes","Yes","Yes","6","60%"],
+    ["17","NIETO NU\u00d1EZ JULIANA","10","B","Yes","No","No","No","No","Yes","No","No","Yes","Yes","4","40%"],
+    ["18","PARDO VARGAS GUILLERMO","10","B","Yes","Yes","Yes","Yes","No","Yes","No","Yes","Yes","No","7","70%"],
+    ["19","PE\u00d1A RODRIGUEZ SILVANNA","10","B","Yes","Yes","No","No","No","Yes","No","No","Yes","Yes","5","50%"],
+    ["20","QUIROGA FORERO SAMANTHA","10","B","Yes","Yes","No","Yes","No","Yes","No","","","Yes","5","62%"],
+    ["21","RAM\u00cdREZ BARRERO PEDRO MARTIN","10","B","Yes","No","No","No","No","Yes","No","No","No","No","2","20%"],
+    ["22","TRUJILLO TOBON ANA SOFIA","10","B","Yes","Yes","No","No","No","Yes","No","Yes","Yes","Yes","6","60%"],
+    ["23","ZAMUDIO PEREZ SIMON SANTIAGO","10","B","Yes","Yes","No","Yes","No","No","No","No","No","Yes","4","40%"],
+    ["1","ARIZA GOMEZ GABRIEL JOSE","10","C","Yes","Yes","No","Yes","No","Yes","No","Yes","Yes","No","6","60%"],
+    ["2","AYALA PALENIK PATRIK","10","C","Yes","Yes","No","No","No","Yes","Yes","Yes","No","No","5","50%"],
+    ["3","BARON ROMERO EMILIO JOSE","10","C","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["4","BERMUDEZ CRISTANCHO JUANITA","10","C","No","No","No","No","No","Yes","No","No","Yes","No","2","20%"],
+    ["5","BOGOTA ROMERO CAMILA","10","C","Yes","No","Yes","Yes","No","Yes","Yes","Yes","Yes","No","7","70%"],
+    ["6","CABALLERO HERN\u00c1NDEZ MIGUEL ANGEL","10","C","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["7","CAMARGO ABELLO SANTIAGO ARTURO","10","C","Yes","Yes","Yes","No","No","Yes","Yes","Yes","Yes","Yes","8","80%"],
+    ["8","CERVANTES SOJO SAMUEL DAVID","10","C","Yes","No","No","No","No","Yes","No","No","No","Yes","3","30%"],
+    ["9","CONTRERAS SOSA GABRIELA","10","C","Yes","Yes","No","Yes","No","Yes","No","Yes","No","Yes","6","60%"],
+    ["10","DIAZ GARZON THOMAS ENRIQUE","10","C","Yes","No","No","No","No","Yes","No","Yes","No","Yes","4","40%"],
+    ["11","GALAN OSORIO GABRIEL HERNANDO","10","C","Yes","Yes","No","No","No","Yes","No","No","Yes","Yes","5","50%"],
+    ["12","GIRALDO MARTINEZ MATIAS","10","C","No","No","No","No","No","No","Yes","Yes","No","Yes","3","30%"],
+    ["13","GUEVARA POLANCO SAMUEL ANDRES","10","C","Yes","No","No","No","No","Yes","No","No","Yes","Yes","4","40%"],
+    ["14","HERNANDEZ CASTRO ANGEL FELIPE","10","C","No","No","No","No","No","No","No","Yes","No","No","1","10%"],
+    ["15","JINETE MARIN LUCIANA","10","C","No","No","No","No","No","No","No","No","No","No","0","0%"],
+    ["16","LOPEZ CASTRILLON CARLOS SAMUEL","10","C","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["17","MENDEZ CUERO ANTONIA","10","C","No","No","No","Yes","No","Yes","Yes","No","Yes","No","4","40%"],
+    ["18","MU\u00d1OZ FONSECA SOFIA","10","C","Yes","Yes","No","No","No","Yes","No","No","Yes","No","4","40%"],
+    ["19","MU\u00d1OZ PINZON CARLOS ANDRES","10","C","No","Yes","Yes","Yes","No","Yes","Yes","Yes","No","No","6","60%"],
+    ["20","OSPINA RAMIREZ FELIPE","10","C","Yes","Yes","No","No","No","Yes","No","No","Yes","Yes","5","50%"],
+    ["21","PABON GUTIERREZ EMMANUEL","10","C","No","Yes","No","No","No","Yes","No","No","No","No","2","20%"],
+    ["22","RINCON CASTA\u00d1EDA TOMAS MAURICIO","10","C","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["1","ARENAS LOPEZ JUAN ESTEBAN","10","D","Yes","No","No","No","Yes","No","No","No","No","No","2","20%"],
+    ["2","FORERO SUAREZ MANUELA","10","D","Yes","Yes","No","Yes","No","Yes","No","Yes","Yes","No","6","60%"],
+    ["3","GALVIS VALERA VICTORIA SOF\u00cdA","10","D","No","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","No","7","70%"],
+    ["4","GONZALEZ MOJICA SEBASTI\u00c1N","10","D","Yes","Yes","No","Yes","No","Yes","Yes","Yes","Yes","No","7","70%"],
+    ["5","GUEVARA DIAZ ANDRES FELIPE","10","D","Yes","Yes","Yes","Yes","No","Yes","No","Yes","Yes","No","7","70%"],
+    ["6","GUTIERREZ BAYONA SAMUEL ESTEBAN","10","D","Yes","Yes","No","Yes","Yes","Yes","No","Yes","No","Yes","7","70%"],
+    ["7","GUTI\u00c9RREZ URIBE FABIANA","10","D","Yes","Yes","Yes","No","No","Yes","No","Yes","Yes","No","6","60%"],
+    ["8","ILLIDGE TORRES DAVID","10","D","No","Yes","No","Yes","No","Yes","No","No","Yes","No","4","40%"],
+    ["9","LEON PALACIOS MARIANA","10","D","No","Yes","No","No","No","Yes","No","Yes","Yes","No","4","40%"],
+    ["10","MEDINA AYALA SOFIA","10","D","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["11","PACHON VASQUEZ SARAH ISABEL","10","D","Yes","No","No","No","No","Yes","Yes","Yes","Yes","Yes","6","60%"],
+    ["12","PULIDO DEVIA MAR\u00cdA JOS\u00c9","10","D","","","","","","","","","","","0",""],
+    ["13","RODRIGUEZ ESTEVEZ VIOLETA","10","D","Yes","Yes","No","No","No","Yes","No","Yes","Yes","Yes","6","60%"],
+    ["14","ROMERO GAMARRA ALEJANDRO","10","D","No","Yes","Yes","No","No","Yes","Yes","Yes","Yes","No","6","60%"],
+    ["15","SALAZAR MURCIA GABRIELA","10","D","No","No","No","No","No","Yes","No","No","Yes","Yes","3","30%"],
+    ["16","SANCHEZ GONZALEZ LUCIANA EMILIA","10","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["17","SU\u00c1REZ CADENA MARTIN","10","D","Yes","Yes","No","No","No","No","Yes","No","No","No","3","30%"],
+    ["18","SUTACHAN GARAVITO LUCAS DANIEL","10","D","Yes","Yes","No","No","Yes","Yes","No","Yes","Yes","No","6","60%"],
+    ["19","TORRES RUIZ GABRIEL","10","D","No","Yes","Yes","Yes","Yes","Yes","No","No","Yes","No","6","60%"],
+    ["20","VILLAMIL VILLAMIL JUANITA","10","D","No","Yes","No","Yes","No","Yes","Yes","Yes","Yes","Yes","7","70%"],
+    ["1","ACOSTA MACIAS ERNESTO JOSE","10","E","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["2","ALVAREZ OSPINA NICOLAS","10","E","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["3","BARRIOS MEJIA SOFIA","10","E","Yes","Yes","Yes","No","No","No","Yes","Yes","Yes","Yes","7","70%"],
+    ["4","BRITO BELTRAN MARIA DANIELA","10","E","Yes","Yes","No","No","No","Yes","Yes","No","Yes","Yes","6","60%"],
+    ["5","CAMACHO GALINDO DANIEL FELIPE","10","E","Yes","Yes","No","No","Yes","Yes","Yes","No","Yes","Yes","7","70%"],
+    ["6","CAMARGO ROLDAN ALEJANDRO","10","E","Yes","Yes","Yes","No","No","Yes","Yes","No","Yes","Yes","7","70%"],
+    ["7","CAMPILLO GOMEZ TOMAS","10","E","Yes","Yes","Yes","Yes","No","Yes","No","No","Yes","Yes","7","70%"],
+    ["8","CLAVIJO GONZALEZ NICOLAS","10","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["9","COLORADO PARRADO ANA ISABELLA","10","E","Yes","No","Yes","No","No","Yes","Yes","No","Yes","Yes","6","60%"],
+    ["10","FANTI RIVERA TAMARA","10","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","No","8","80%"],
+    ["11","LOZANO BARRENECHE SEBASTIAN","10","E","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["12","MONGUI VARGAS MARIA JOSE","10","E","","","","","","","","No","Yes","Yes","2","67%"],
+    ["13","NIETO GONZ\u00c1LEZ JUAN DIEGO","10","E","Yes","Yes","Yes","Yes","No","Yes","No","Yes","Yes","No","7","70%"],
+    ["14","ORTEGA GARZ\u00d3N MARIA PAZ","10","E","Yes","Yes","Yes","No","No","Yes","No","No","Yes","Yes","6","60%"],
+    ["15","OSPINA RAMIREZ NICOLAS","10","E","Yes","No","No","Yes","No","Yes","Yes","Yes","Yes","Yes","7","70%"],
+    ["16","PATI\u00d1O GIRALDO LUCIANA","10","E","Yes","Yes","No","Yes","No","Yes","No","No","Yes","No","5","50%"],
+    ["17","PEDROZA GARZON JUAN MIGUEL","10","E","Yes","No","No","Yes","No","No","No","No","Yes","Yes","4","40%"],
+    ["18","QUINTERO LOPEZ JUANITA ROSARIO","10","E","No","No","No","Yes","No","Yes","No","No","Yes","Yes","4","40%"],
+    ["19","RODRIGUEZ RODRIGUEZ JUAN IGNACIO","10","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["20","SANCHEZ STAHELIN ANTONIO","10","E","Yes","Yes","Yes","Yes","No","Yes","No","No","Yes","Yes","7","70%"],
+    ["21","SUTACHAN RINCON JUAN PABLO","10","E","No","Yes","No","Yes","No","No","No","No","Yes","Yes","4","40%"],
+    ["22","VARELA GARZON ISABELLA","10","E","","","","","No","Yes","No","","","","1","33%"],
+    ["1","ALB\u00c1N ALVAREZ JUAN ESTEBAN","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","No","8","80%"],
+    ["2","ALVAREZ OBANDO PAULA CATALINA","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["3","BARRIOS FORERO VALERIA","11","A","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["4","BOLIVAR MOJICA JUAN SEBASTIAN","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["5","CARDENAS VELASCO JUAN RICARDO","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["6","CASADIEGO LEON SOFIA","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["7","CHALA RODRIGUEZ SAMUEL CAMILO","11","A","Yes","No","No","Yes","Yes","Yes","Yes","Yes","Yes","No","7","70%"],
+    ["8","CONDE GOMEZ NICOLAS","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["9","CORREA MUJICA LAURA LUCIA","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["10","CORREDOR CORTES MARIA MARGARITA","11","A","Yes","No","No","Yes","Yes","No","No","Yes","Yes","No","5","50%"],
+    ["11","GARC\u00cdA MALDONADO AMALIA","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["12","GARZON BARRERA VALERIA ANDREA","11","A","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["13","GODOY PEREZ VALENTINA","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["14","LONDO\u00d1O MEZA JER\u00d3NIMO","11","A","Yes","No","No","No","Yes","Yes","Yes","Yes","Yes","No","6","60%"],
+    ["15","L\u00d3PEZ CARDONA SANTIAGO","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","No","No","7","70%"],
+    ["16","MARTINEZ BOLA\u00d1O TOMAS ALBERTO","11","A","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["17","MEDINA PULECIO PEDRO LUIS","11","A","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["18","MONTENEGRO GONZ\u00c1LEZ MATEO","11","A","No","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","No","7","70%"],
+    ["19","MURILLO RINCON TOMAS","11","A","Yes","No","No","No","No","Yes","Yes","Yes","Yes","Yes","6","60%"],
+    ["20","ORJUELA AMORTEGUI MARIANA","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["21","PORRAS LEON JUAN SEBASTI\u00c1N","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["22","RODRIGUEZ MU\u00d1OZ ERIC STEVEN","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["23","SERRANO LACAYO MARIANA","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["1","CANTOR DIMATE LUCIANNA","11","B","No","No","Yes","No","Yes","Yes","No","Yes","Yes","No","5","50%"],
+    ["2","CEPEDA GARCIA MARIANA","11","B","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["3","CUBIDES ROJAS JUAN CAMILO","11","B","No","No","No","No","No","Yes","No","Yes","Yes","Yes","4","40%"],
+    ["4","CUELLAR ARBOLEDA DAVID","11","B","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["5","DIEZ VARON RAFAEL DAVID","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["6","ENCISO HARDER MAIA","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["7","FERNANDEZ MANCIPE ISABELLA","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["8","GARCIA MEJIA SOFIA","11","B","Yes","No","Yes","No","Yes","Yes","Yes","Yes","Yes","No","7","70%"],
+    ["9","GONZ\u00c1LEZ CURIEL VERONICA ISABEL","11","B","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["10","HERRERA JIMENEZ ISABELLA","11","B","Yes","Yes","Yes","No","No","Yes","Yes","Yes","Yes","Yes","8","80%"],
+    ["11","IGNACIO LUCAS VERAS","11","B","No","No","No","Yes","Yes","Yes","Yes","Yes","Yes","No","6","60%"],
+    ["12","MENDEZ RAMOS DAVID SANTIAGO","11","B","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["13","MORA VASQUEZ GONZALO JOSE","11","B","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["14","NIETO MATEUS MARTIN","11","B","No","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","8","80%"],
+    ["15","ONSHUUS ALDANA SARA LUCIA","11","B","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["16","PARRA ALVAREZ MARTIN","11","B","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["17","SALAZAR MURCIA THOMAS","11","B","Yes","No","No","Yes","Yes","Yes","Yes","Yes","Yes","No","7","70%"],
+    ["18","S\u00c1NCHEZ FONSECA ALEJANDRO","11","B","No","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","No","7","70%"],
+    ["19","SUAREZ CIFUENTES DANIEL","11","B","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["20","URREGO CARO LAURA","11","B","Yes","Yes","No","Yes","Yes","Yes","No","Yes","Yes","No","7","70%"],
+    ["21","VENEGAS PINILLA SARA GABRIELA","11","B","Yes","No","Yes","No","Yes","Yes","Yes","Yes","Yes","No","7","70%"],
+    ["22","VIASUS SANCHEZ JERONIMO","11","B","No","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","7","70%"],
+    ["23","VILLAMIL MARTINEZ MARIANA","11","B","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["1","ALVAREZ GARCIA LUCIANA MAR\u00cdA","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["2","APONTE PINILLO LUIS MARTIN","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["3","BAUTISTA SUAREZ CRISTIAN NICOLAS","11","C","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["4","CRIADO GOMEZ JUAN MARTIN LORENZO","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["5","CRISTO FRANCO SARA","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["6","CRUZ ALONSO MARIANA","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","No","8","80%"],
+    ["7","DUQUE AVILA ANDRES FELIPE","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["8","NIKOONEJAD SANCHEZ ISABELLA","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["9","OBANDO GUERRERO JUAN SEBASTIAN","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["10","OSPINA DELGADO SANTIAGO","11","C","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","No","No","7","70%"],
+    ["11","OVIEDO MENDOZA JUANITA","11","C","Yes","Yes","Yes","No","No","Yes","Yes","Yes","Yes","No","7","70%"],
+    ["12","RAMIREZ QUINTERO JERONIMO","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["13","RESTREPO PABA MARIANA","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["14","ROMERO REY ALEJANDRO","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["15","SEGURA URDINOLA LORENZO","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["16","SERRANO LARA SAMUEL","11","C","","","","","","","","","","","0",""],
+    ["17","SIOLO AVILA ANDRES FELIPE","11","C","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["18","VALLES PEDRAZA JULIAN ESTEBAN","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["19","VARGAS RICAURTE JUAN JOS\u00c9","11","C","Yes","No","No","No","Yes","Yes","Yes","Yes","Yes","Yes","7","70%"],
+    ["20","VELASQUEZ PUIN ISABELLA","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["21","ZAMUDIO PEREZ MARIA JOSE","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["22","ZIMMERMANN FORERO JUAN FELIPE","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["1","AMOROCHO SANCHEZ MARIA PAULA","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["2","AVILA SILVA JUAN CAMILO","11","D","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["3","BONILLA CORTES SUSANA","11","D","No","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","8","80%"],
+    ["4","BURGOS NASTUL MARTIN ALEJANDRO","11","D","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["5","CORTES GONZALEZ JUAN ALEJANDRO","11","D","No","Yes","Yes","Yes","Yes","Yes","Yes","","","","6","86%"],
+    ["6","DUARTE MARTINEZ MARIA ALEJANDRA","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["7","ECHEVERRI OREJARENA DANIEL","11","D","No","Yes","No","Yes","No","Yes","Yes","Yes","No","Yes","6","60%"],
+    ["8","FUNEME CRUZ VALERIA","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["9","GOMEZ PALACIOS NATHALIE","11","D","Yes","No","No","No","Yes","Yes","Yes","Yes","Yes","No","6","60%"],
+    ["10","HERNANDEZ FIQUITIVA JUAN SEBASTIAN","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["11","ISAZA BUENHOMBRE SARA GABRIELA","11","D","No","Yes","No","No","Yes","Yes","No","Yes","No","Yes","5","50%"],
+    ["12","LONDO\u00d1O BEDOYA LORENZO","11","D","No","No","Yes","Yes","Yes","Yes","No","Yes","Yes","No","6","60%"],
+    ["13","MALAGON QUIROZ GABRIELA","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","","","No","7","88%"],
+    ["14","MANTILLA LOBO GABRIELA MARIA","11","D","No","Yes","Yes","Yes","Yes","Yes","Yes","No","No","No","6","60%"],
+    ["15","MORENO ROMERO SILVANA","11","D","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["16","OSORIO PAEZ MARIA CAMILA","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["17","PARRA SANCHEZ SAMUEL","11","D","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","Yes","No","8","80%"],
+    ["18","RAMIREZ MANQUILLO CAMILA","11","D","No","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","No","7","70%"],
+    ["19","RODRIGUEZ SASTOQUE TOMAS ALEJANDRO","11","D","Yes","No","No","Yes","Yes","Yes","No","Yes","Yes","No","6","60%"],
+    ["20","RUBIO CABRERA DANIEL JERONIMO","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","Yes","9","90%"],
+    ["21","SANTOS OROZCO DANIEL DAVID","11","D","No","Yes","Yes","Yes","No","Yes","Yes","No","Yes","No","6","60%"],
+    ["22","SIERRA RONCANCIO MARIANA SOFIA","11","D","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["23","TORRES RODRIGUEZ JERONIMO","11","D","Yes","No","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","8","80%"],
+    ["24","TRESPALACIOS OLIER ANTONELLA","11","D","Yes","No","Yes","Yes","Yes","No","No","Yes","Yes","Yes","7","70%"],
+    ["1","ANGEL CHAVES MANUEL ANDRES","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["2","AVILA BARE\u00d1O JUANA VALENTINA","11","E","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["3","BAENA GOMEZ SARA","11","E","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["4","CATA\u00d1O GUTI\u00c9RREZ MARIANA","11","E","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","No","No","7","70%"],
+    ["5","CHAPARRO SANCHEZ MARIA ALEJANDRA","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["6","GIL HERRERA MARIA JUANITA","11","E","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","Yes","No","8","80%"],
+    ["7","GONZALEZ SANCHEZ MARIA JOSE","11","E","Yes","No","Yes","No","No","No","Yes","Yes","Yes","Yes","6","60%"],
+    ["8","GUTI\u00c9RREZ CORT\u00c9S JUAN DAVID","11","E","Yes","Yes","Yes","No","Yes","Yes","Yes","No","Yes","No","7","70%"],
+    ["9","HERNANDEZ BALLEN JERONIMO","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["10","JUAN DE DIOS PRIETO SARA","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["11","LARA CALVO MARIA CAMILA","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["12","MARTINEZ ARISTIZABAL JUAN ESTEBAN","11","E","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["13","MONTENEGRO GONZALEZ PEDRO ANTONIO","11","E","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["14","NIETO USGAME MARIANA","11","E","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","No","7","70%"],
+    ["15","OVIEDO RUEDA ANA LUCIA","11","E","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["16","PEREIRA FONTALVO EDGAR ANDR\u00c9S","11","E","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["17","PIMIENTO GUAVITA ANTONIA","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["18","QUINTERO CASALLAS SARA SOFIA","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["19","RAM\u00cdREZ DUQUE JER\u00d3NIMO","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["20","RAMOS KEKHAN OLGA SOFIA","11","E","Yes","No","No","No","Yes","Yes","Yes","Yes","No","Yes","6","60%"],
+    ["21","RUIZ BELTRAN JUAN PABLO","11","E","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["22","SAAVEDRA MORENO JUAN DIEGO","11","E","Yes","No","No","Yes","Yes","Yes","No","Yes","Yes","No","6","60%"],
+    ["23","SILVA PICO JUAN PABLO","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","No","No","7","70%"],
+    ["24","VERASTEGUI HERNANDEZ JUAN CAMILO","11","E","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","No","8","80%"]
+  ],
+  "after": [
+    ["No.","Student Name","Grade","Group","C1","C2","C3","C4","C5","C6","C7","C8","C9","C10","Total Periodo","% Periodo"],
+    ["1","ANDRADE GARCIA NICOLAS","10","A","Yes","Yes","Yes","No","No","Yes","Yes","Yes","Yes","No","7","70%"],
+    ["2","BARRERO SANCHEZ LUCIO","10","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["3","CARDOZO BENINCORE JERONIMO","10","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","No","8","80%"],
+    ["4","CHAVES CORREAL LUCIA","10","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","Yes","9","90%"],
+    ["5","DE LEON CASTIBLANCO JUAN JOSE","10","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","No","No","7","70%"],
+    ["6","ESCANDON CAMARGO SIMON","10","A","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","Yes","No","8","80%"],
+    ["7","GARCIA BECERRA MAXIMILIANO","10","A","Yes","Yes","Yes","No","","","","No","No","No","3","43%"],
+    ["8","GARCIA VARELA JOSUE","10","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["9","GOMEZ BANDERA MIGUEL EDUARDO","10","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["10","HERN\u00c1NDEZ CASTA\u00d1EDA ISABELLA","10","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","Yes","9","90%"],
+    ["11","MALDONADO LEMUS ANDR\u00c9S CAMILO","10","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","Yes","9","90%"],
+    ["12","MOLINA RIVERA MANUEL ESTEBAN","10","A","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["13","OJEDA HURTADO JUAN FELIPE","10","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["14","OROZCO RODRIGUEZ LETICIA","10","A","Yes","Yes","No","Yes","Yes","Yes","Yes","No","Yes","Yes","8","80%"],
+    ["15","OSPINA RAMIREZ SANTIAGO","10","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["16","PARRA ORJUELA ANA MARIA","10","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","Yes","9","90%"],
+    ["17","PELAEZ SIERRA ISABELLA","10","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","No","No","7","70%"],
+    ["18","RUBIANO ESPEJO MARTIN","10","A","Yes","Yes","Yes","Yes","Yes","Yes","No","No","No","Yes","7","70%"],
+    ["19","RUIZ MU\u00d1OZ SARA","10","A","Yes","Yes","Yes","Yes","Yes","Yes","No","No","Yes","No","7","70%"],
+    ["20","TAPIAS L\u00d3PEZ SANTIAGO","10","A","Yes","Yes","Yes","Yes","Yes","Yes","No","No","Yes","No","7","70%"],
+    ["1","ADARVE PARRA PABLO","10","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["2","ALONSO MOYA MARIA JULIANA","10","B","Yes","Yes","No","Yes","Yes","Yes","No","Yes","No","No","6","60%"],
+    ["3","AMAYA BERNAL LUCIANA","10","B","Yes","Yes","No","No","No","No","No","No","No","No","2","20%"],
+    ["4","BARBOSA ANDRADE MARIANA","10","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["5","CARRILLO CABRERA GERMAN ANDRES","10","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","No","8","80%"],
+    ["6","CHINOME ANGULO CAMILO","10","B","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","9","90%"],
+    ["7","DEL CAIRO BOLA\u00d1OS PABLO JOS\u00c9","10","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["8","FIGUEROA AGUIRRE SANTIAGO","10","B","Yes","Yes","No","Yes","Yes","Yes","No","No","No","Yes","6","60%"],
+    ["9","GARCIA BLANCO ANA MARIA","10","B","Yes","Yes","Yes","Yes","Yes","Yes","No","No","No","Yes","7","70%"],
+    ["10","GONZALEZ CERON DANIEL","10","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["11","GUAMPE GRANADOS SOFIA","10","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["12","GUEVARA MENDIETA JERONIMO","10","B","Yes","Yes","Yes","No","No","Yes","Yes","No","Yes","Yes","7","70%"],
+    ["13","JARAMILLO GONZALEZ NICOLAS","10","B","Yes","Yes","Yes","Yes","Yes","Yes","No","No","Yes","Yes","8","80%"],
+    ["14","MALDONADO BAQUERO JULI\u00c1N ALEJANDRO","10","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["15","MELO VALENCIA MATEO ANDRES","10","B","Yes","No","No","Yes","Yes","No","No","No","No","No","3","30%"],
+    ["16","MENDEZ RAMOS JUAN JOSE","10","B","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","9","90%"],
+    ["17","NIETO NU\u00d1EZ JULIANA","10","B","Yes","Yes","No","Yes","Yes","Yes","No","No","Yes","Yes","7","70%"],
+    ["18","PARDO VARGAS GUILLERMO","10","B","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","Yes","No","8","80%"],
+    ["19","PE\u00d1A RODRIGUEZ SILVANNA","10","B","Yes","Yes","Yes","No","No","Yes","Yes","No","Yes","Yes","7","70%"],
+    ["20","QUIROGA FORERO SAMANTHA","10","B","Yes","Yes","No","Yes","Yes","Yes","No","","","Yes","6","75%"],
+    ["21","RAM\u00cdREZ BARRERO PEDRO MARTIN","10","B","Yes","Yes","Yes","No","Yes","Yes","No","No","No","No","5","50%"],
+    ["22","TRUJILLO TOBON ANA SOFIA","10","B","Yes","Yes","No","Yes","No","Yes","No","Yes","Yes","Yes","7","70%"],
+    ["23","ZAMUDIO PEREZ SIMON SANTIAGO","10","B","Yes","Yes","Yes","Yes","Yes","Yes","No","No","No","Yes","7","70%"],
+    ["1","ARIZA GOMEZ GABRIEL JOSE","10","C","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["2","AYALA PALENIK PATRIK","10","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","No","8","80%"],
+    ["3","BARON ROMERO EMILIO JOSE","10","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["4","BERMUDEZ CRISTANCHO JUANITA","10","C","Yes","Yes","Yes","Yes","Yes","Yes","No","No","Yes","No","7","70%"],
+    ["5","BOGOTA ROMERO CAMILA","10","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["6","CABALLERO HERN\u00c1NDEZ MIGUEL ANGEL","10","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["7","CAMARGO ABELLO SANTIAGO ARTURO","10","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["8","CERVANTES SOJO SAMUEL DAVID","10","C","Yes","Yes","Yes","Yes","Yes","Yes","No","No","No","Yes","7","70%"],
+    ["9","CONTRERAS SOSA GABRIELA","10","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","9","90%"],
+    ["10","DIAZ GARZON THOMAS ENRIQUE","10","C","Yes","Yes","No","Yes","Yes","Yes","No","Yes","No","Yes","7","70%"],
+    ["11","GALAN OSORIO GABRIEL HERNANDO","10","C","Yes","Yes","Yes","Yes","Yes","Yes","No","No","Yes","Yes","8","80%"],
+    ["12","GIRALDO MARTINEZ MATIAS","10","C","Yes","Yes","Yes","Yes","No","No","Yes","Yes","No","Yes","7","70%"],
+    ["13","GUEVARA POLANCO SAMUEL ANDRES","10","C","Yes","Yes","Yes","Yes","Yes","Yes","No","No","Yes","Yes","8","80%"],
+    ["14","HERNANDEZ CASTRO ANGEL FELIPE","10","C","Yes","Yes","Yes","No","Yes","Yes","No","Yes","No","No","6","60%"],
+    ["15","JINETE MARIN LUCIANA","10","C","Yes","Yes","Yes","No","No","No","No","No","No","No","3","30%"],
+    ["16","LOPEZ CASTRILLON CARLOS SAMUEL","10","C","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["17","MENDEZ CUERO ANTONIA","10","C","Yes","Yes","No","Yes","Yes","Yes","Yes","No","Yes","No","7","70%"],
+    ["18","MU\u00d1OZ FONSECA SOFIA","10","C","Yes","Yes","Yes","Yes","Yes","Yes","No","No","Yes","Yes","8","80%"],
+    ["19","MU\u00d1OZ PINZON CARLOS ANDRES","10","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","No","8","80%"],
+    ["20","OSPINA RAMIREZ FELIPE","10","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","Yes","9","90%"],
+    ["21","PABON GUTIERREZ EMMANUEL","10","C","Yes","Yes","Yes","No","No","Yes","No","No","No","No","4","40%"],
+    ["22","RINCON CASTA\u00d1EDA TOMAS MAURICIO","10","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["1","ARENAS LOPEZ JUAN ESTEBAN","10","D","Yes","No","No","No","Yes","No","No","No","No","No","2","20%"],
+    ["2","FORERO SUAREZ MANUELA","10","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["3","GALVIS VALERA VICTORIA SOF\u00cdA","10","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["4","GONZALEZ MOJICA SEBASTI\u00c1N","10","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["5","GUEVARA DIAZ ANDRES FELIPE","10","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["6","GUTIERREZ BAYONA SAMUEL ESTEBAN","10","D","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","No","Yes","8","80%"],
+    ["7","GUTI\u00c9RREZ URIBE FABIANA","10","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["8","ILLIDGE TORRES DAVID","10","D","Yes","Yes","Yes","Yes","Yes","Yes","No","No","Yes","No","7","70%"],
+    ["9","LEON PALACIOS MARIANA","10","D","Yes","Yes","No","No","No","Yes","No","Yes","Yes","No","5","50%"],
+    ["10","MEDINA AYALA SOFIA","10","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["11","PACHON VASQUEZ SARAH ISABEL","10","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["12","PULIDO DEVIA MAR\u00cdA JOS\u00c9","10","D","","","","","","","","","","","0",""],
+    ["13","RODRIGUEZ ESTEVEZ VIOLETA","10","D","Yes","Yes","Yes","Yes","No","Yes","No","Yes","Yes","Yes","8","80%"],
+    ["14","ROMERO GAMARRA ALEJANDRO","10","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["15","SALAZAR MURCIA GABRIELA","10","D","Yes","Yes","Yes","Yes","No","Yes","No","No","Yes","Yes","7","70%"],
+    ["16","SANCHEZ GONZALEZ LUCIANA EMILIA","10","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["17","SU\u00c1REZ CADENA MARTIN","10","D","Yes","Yes","No","Yes","Yes","Yes","Yes","No","No","No","6","60%"],
+    ["18","SUTACHAN GARAVITO LUCAS DANIEL","10","D","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","Yes","No","8","80%"],
+    ["19","TORRES RUIZ GABRIEL","10","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","No","8","80%"],
+    ["20","VILLAMIL VILLAMIL JUANITA","10","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["1","ACOSTA MACIAS ERNESTO JOSE","10","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["2","ALVAREZ OSPINA NICOLAS","10","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["3","BARRIOS MEJIA SOFIA","10","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["4","BRITO BELTRAN MARIA DANIELA","10","E","Yes","Yes","No","Yes","Yes","Yes","Yes","No","Yes","Yes","8","80%"],
+    ["5","CAMACHO GALINDO DANIEL FELIPE","10","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","Yes","9","90%"],
+    ["6","CAMARGO ROLDAN ALEJANDRO","10","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","Yes","9","90%"],
+    ["7","CAMPILLO GOMEZ TOMAS","10","E","Yes","Yes","Yes","Yes","Yes","Yes","No","No","Yes","Yes","8","80%"],
+    ["8","CLAVIJO GONZALEZ NICOLAS","10","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["9","COLORADO PARRADO ANA ISABELLA","10","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","Yes","9","90%"],
+    ["10","FANTI RIVERA TAMARA","10","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","No","8","80%"],
+    ["11","LOZANO BARRENECHE SEBASTIAN","10","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["12","MONGUI VARGAS MARIA JOSE","10","E","No","Yes","Yes","Yes","Yes","Yes","No","No","Yes","Yes","7","70%"],
+    ["13","NIETO GONZ\u00c1LEZ JUAN DIEGO","10","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["14","ORTEGA GARZ\u00d3N MARIA PAZ","10","E","Yes","Yes","Yes","Yes","Yes","Yes","No","No","Yes","Yes","8","80%"],
+    ["15","OSPINA RAMIREZ NICOLAS","10","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["16","PATI\u00d1O GIRALDO LUCIANA","10","E","Yes","Yes","No","Yes","No","Yes","No","No","Yes","No","5","50%"],
+    ["17","PEDROZA GARZON JUAN MIGUEL","10","E","Yes","Yes","Yes","Yes","Yes","Yes","No","No","Yes","Yes","8","80%"],
+    ["18","QUINTERO LOPEZ JUANITA ROSARIO","10","E","Yes","Yes","No","Yes","Yes","Yes","Yes","No","Yes","Yes","8","80%"],
+    ["19","RODRIGUEZ RODRIGUEZ JUAN IGNACIO","10","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["20","SANCHEZ STAHELIN ANTONIO","10","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","Yes","9","90%"],
+    ["21","SUTACHAN RINCON JUAN PABLO","10","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","Yes","9","90%"],
+    ["22","VARELA GARZON ISABELLA","10","E","","","","","No","Yes","No","","","","1","33%"],
+    ["1","ALB\u00c1N ALVAREZ JUAN ESTEBAN","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","No","8","80%"],
+    ["2","ALVAREZ OBANDO PAULA CATALINA","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["3","BARRIOS FORERO VALERIA","11","A","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["4","BOLIVAR MOJICA JUAN SEBASTIAN","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["5","CARDENAS VELASCO JUAN RICARDO","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["6","CASADIEGO LEON SOFIA","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["7","CHALA RODRIGUEZ SAMUEL CAMILO","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["8","CONDE GOMEZ NICOLAS","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["9","CORREA MUJICA LAURA LUCIA","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["10","CORREDOR CORTES MARIA MARGARITA","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["11","GARC\u00cdA MALDONADO AMALIA","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["12","GARZON BARRERA VALERIA ANDREA","11","A","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["13","GODOY PEREZ VALENTINA","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["14","LONDO\u00d1O MEZA JER\u00d3NIMO","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["15","L\u00d3PEZ CARDONA SANTIAGO","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","No","No","7","70%"],
+    ["16","MARTINEZ BOLA\u00d1O TOMAS ALBERTO","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["17","MEDINA PULECIO PEDRO LUIS","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["18","MONTENEGRO GONZ\u00c1LEZ MATEO","11","A","No","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","No","7","70%"],
+    ["19","MURILLO RINCON TOMAS","11","A","Yes","No","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","8","80%"],
+    ["20","ORJUELA AMORTEGUI MARIANA","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["21","PORRAS LEON JUAN SEBASTI\u00c1N","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["22","RODRIGUEZ MU\u00d1OZ ERIC STEVEN","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["23","SERRANO LACAYO MARIANA","11","A","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["1","CANTOR DIMATE LUCIANNA","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["2","CEPEDA GARCIA MARIANA","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["3","CUBIDES ROJAS JUAN CAMILO","11","B","Yes","No","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","8","80%"],
+    ["4","CUELLAR ARBOLEDA DAVID","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["5","DIEZ VARON RAFAEL DAVID","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["6","ENCISO HARDER MAIA","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["7","FERNANDEZ MANCIPE ISABELLA","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["8","GARCIA MEJIA SOFIA","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["9","GONZ\u00c1LEZ CURIEL VERONICA ISABEL","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["10","HERRERA JIMENEZ ISABELLA","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["11","IGNACIO LUCAS VERAS","11","B","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["12","MENDEZ RAMOS DAVID SANTIAGO","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["13","MORA VASQUEZ GONZALO JOSE","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["14","NIETO MATEUS MARTIN","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["15","ONSHUUS ALDANA SARA LUCIA","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["16","PARRA ALVAREZ MARTIN","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["17","SALAZAR MURCIA THOMAS","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["18","S\u00c1NCHEZ FONSECA ALEJANDRO","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["19","SUAREZ CIFUENTES DANIEL","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["20","URREGO CARO LAURA","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["21","VENEGAS PINILLA SARA GABRIELA","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["22","VIASUS SANCHEZ JERONIMO","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["23","VILLAMIL MARTINEZ MARIANA","11","B","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["1","ALVAREZ GARCIA LUCIANA MAR\u00cdA","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["2","APONTE PINILLO LUIS MARTIN","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["3","BAUTISTA SUAREZ CRISTIAN NICOLAS","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["4","CRIADO GOMEZ JUAN MARTIN LORENZO","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["5","CRISTO FRANCO SARA","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["6","CRUZ ALONSO MARIANA","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","No","8","80%"],
+    ["7","DUQUE AVILA ANDRES FELIPE","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["8","NIKOONEJAD SANCHEZ ISABELLA","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["9","OBANDO GUERRERO JUAN SEBASTIAN","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["10","OSPINA DELGADO SANTIAGO","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","No","8","80%"],
+    ["11","OVIEDO MENDOZA JUANITA","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["12","RAMIREZ QUINTERO JERONIMO","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["13","RESTREPO PABA MARIANA","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["14","ROMERO REY ALEJANDRO","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["15","SEGURA URDINOLA LORENZO","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["16","SERRANO LARA SAMUEL","11","C","","","","","","","","","","","0",""],
+    ["17","SIOLO AVILA ANDRES FELIPE","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["18","VALLES PEDRAZA JULIAN ESTEBAN","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["19","VARGAS RICAURTE JUAN JOS\u00c9","11","C","Yes","Yes","No","No","Yes","Yes","Yes","Yes","Yes","Yes","8","80%"],
+    ["20","VELASQUEZ PUIN ISABELLA","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["21","ZAMUDIO PEREZ MARIA JOSE","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["22","ZIMMERMANN FORERO JUAN FELIPE","11","C","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["1","AMOROCHO SANCHEZ MARIA PAULA","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["2","AVILA SILVA JUAN CAMILO","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["3","BONILLA CORTES SUSANA","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["4","BURGOS NASTUL MARTIN ALEJANDRO","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["5","CORTES GONZALEZ JUAN ALEJANDRO","11","D","No","Yes","Yes","Yes","Yes","Yes","Yes","","","","6","86%"],
+    ["6","DUARTE MARTINEZ MARIA ALEJANDRA","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["7","ECHEVERRI OREJARENA DANIEL","11","D","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","No","Yes","8","80%"],
+    ["8","FUNEME CRUZ VALERIA","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["9","GOMEZ PALACIOS NATHALIE","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["10","HERNANDEZ FIQUITIVA JUAN SEBASTIAN","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["11","ISAZA BUENHOMBRE SARA GABRIELA","11","D","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","No","Yes","8","80%"],
+    ["12","LONDO\u00d1O BEDOYA LORENZO","11","D","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["13","MALAGON QUIROZ GABRIELA","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","","","No","7","88%"],
+    ["14","MANTILLA LOBO GABRIELA MARIA","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","No","No","7","70%"],
+    ["15","MORENO ROMERO SILVANA","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["16","OSORIO PAEZ MARIA CAMILA","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["17","PARRA SANCHEZ SAMUEL","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["18","RAMIREZ MANQUILLO CAMILA","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["19","RODRIGUEZ SASTOQUE TOMAS ALEJANDRO","11","D","Yes","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["20","RUBIO CABRERA DANIEL JERONIMO","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","Yes","9","90%"],
+    ["21","SANTOS OROZCO DANIEL DAVID","11","D","No","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","No","7","70%"],
+    ["22","SIERRA RONCANCIO MARIANA SOFIA","11","D","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["23","TORRES RODRIGUEZ JERONIMO","11","D","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","9","90%"],
+    ["24","TRESPALACIOS OLIER ANTONELLA","11","D","Yes","No","Yes","Yes","Yes","No","No","Yes","Yes","Yes","7","70%"],
+    ["1","ANGEL CHAVES MANUEL ANDRES","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["2","AVILA BARE\u00d1O JUANA VALENTINA","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["3","BAENA GOMEZ SARA","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["4","CATA\u00d1O GUTI\u00c9RREZ MARIANA","11","E","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","No","No","7","70%"],
+    ["5","CHAPARRO SANCHEZ MARIA ALEJANDRA","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["6","GIL HERRERA MARIA JUANITA","11","E","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","Yes","No","8","80%"],
+    ["7","GONZALEZ SANCHEZ MARIA JOSE","11","E","Yes","No","Yes","Yes","No","No","Yes","Yes","Yes","Yes","7","70%"],
+    ["8","GUTI\u00c9RREZ CORT\u00c9S JUAN DAVID","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","No","8","80%"],
+    ["9","HERNANDEZ BALLEN JERONIMO","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["10","JUAN DE DIOS PRIETO SARA","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["11","LARA CALVO MARIA CAMILA","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["12","MARTINEZ ARISTIZABAL JUAN ESTEBAN","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["13","MONTENEGRO GONZALEZ PEDRO ANTONIO","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["14","NIETO USGAME MARIANA","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","No","8","80%"],
+    ["15","OVIEDO RUEDA ANA LUCIA","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["16","PEREIRA FONTALVO EDGAR ANDR\u00c9S","11","E","Yes","Yes","Yes","Yes","No","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["17","PIMIENTO GUAVITA ANTONIA","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["18","QUINTERO CASALLAS SARA SOFIA","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","10","100%"],
+    ["19","RAM\u00cdREZ DUQUE JER\u00d3NIMO","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["20","RAMOS KEKHAN OLGA SOFIA","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","Yes","9","90%"],
+    ["21","RUIZ BELTRAN JUAN PABLO","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"],
+    ["22","SAAVEDRA MORENO JUAN DIEGO","11","E","Yes","No","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","8","80%"],
+    ["23","SILVA PICO JUAN PABLO","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","No","No","7","70%"],
+    ["24","VERASTEGUI HERNANDEZ JUAN CAMILO","11","E","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes","No","9","90%"]
+  ]
+}
+</script>
+<script>
+"use strict";
+
+const criteria = Array.from({ length: 10 }, (_, index) => `C${index + 1}`);
+const required = ["Student Name", "Grade", "Group", ...criteria, "Total Periodo", "% Periodo"];
+const missing = "Missing";
+const transitions = {
+  up: { label: "No → Yes", style: "positive", pairs: ["No|Yes"] },
+  down: { label: "Yes → No", style: "negative", pairs: ["Yes|No"] },
+  same: { label: "Unchanged recorded", style: "neutral", pairs: ["Yes|Yes", "No|No"] },
+  missing: { label: "Any missing", style: "unknown", pairs: [
+    "Missing|Yes", "Missing|No", "Yes|Missing", "No|Missing", "Missing|Missing"
+  ] }
+};
+for (const pair of transitions.missing.pairs) {
+  transitions[pair] = { label: pair.replace("|", " → "), style: "unknown", pairs: [pair] };
+}
+
+const selected = new Set();
+const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
+const precision = new Intl.NumberFormat("en", { maximumFractionDigits: 2 });
+const defaultSort = { key: "up", direction: -1 };
+const defaultHint = "Focus or hover over a count for its exact value.";
+let sort = { ...defaultSort };
+let comparison = null;
+let activeTransition = null;
+let cohort = [];
+let criterionStats = [];
+
+const byId = id => document.getElementById(id);
+const cleanSpace = value => value.trim().replace(/\s+/gu, " ");
+const normalizeName = value => cleanSpace(value).toLowerCase();
+const emptyValue = value => /^(?:nan)?$/i.test(value.trim());
+const exportedValue = value => emptyValue(value) ? "—" : value;
+const className = ({ grade, group }) => grade + group;
+const transitionKey = (student, index) => `${student.before.results[index]}|${student.after.results[index]}`;
+const ratio = (yes, total) => total ? (100 * yes / total) : null;
+const percent = value => value === null ? "—" : precision.format(value) + "%";
+const pp = value => value === null ? "—" : `${value > 0 ? "+" : ""}${precision.format(value)} pp`;
+const deltaClass = value => value > 0 ? "delta-up" : value < 0 ? "delta-down" : "";
+
+function el(tag, text, style) {
+  const node = document.createElement(tag);
+  if (text !== undefined) node.textContent = text;
+  if (style) node.className = style;
+  return node;
+}
+
+function rowHeading(text) {
+  const cell = el("th", text);
+  cell.scope = "row";
+  return cell;
+}
+
+function setHeaders(id, labels) {
+  const row = el("tr");
+  for (const label of labels) {
+    const heading = el("th", label);
+    heading.scope = "col";
+    row.append(heading);
+  }
+  byId(id).replaceChildren(row);
+}
+
+function readExport(records) {
+  const [header, ...rows] = records;
+  if (!header) throw new Error("Empty CSV. Expected an export with student records.");
+  const columns = header.map(label => label.trim().toLowerCase());
+  const absent = required.filter(label => !columns.includes(label.toLowerCase()));
+  if (absent.length) throw new Error(`Missing required columns: ${absent.join(", ")}.`);
+  const duplicated = required.filter(label => columns.indexOf(label.toLowerCase()) !== columns.lastIndexOf(label.toLowerCase()));
+  if (duplicated.length) throw new Error(`Repeated column headings: ${duplicated.join(", ")}.`);
+  if (!rows.length) throw new Error("The CSV has column headings but no student records.");
+  const indexOf = Object.fromEntries(required.map(label => [label, columns.indexOf(label.toLowerCase())]));
+  return rows.map((fields, index) => {
+    const record = index + 2;
+    if (fields.length !== header.length) throw new Error(`CSV record ${record} has ${fields.length} fields. Expected ${header.length}.`);
+    const name = fields[indexOf["Student Name"]];
+    const grade = cleanSpace(fields[indexOf.Grade]).toUpperCase();
+    const group = cleanSpace(fields[indexOf.Group]).toUpperCase();
+    const key = [name, grade, group].some(emptyValue)
+      ? null : JSON.stringify([grade, group, normalizeName(name)]);
+    const results = criteria.map(label => {
+      const value = fields[indexOf[label]];
+      if (emptyValue(value)) return missing;
+      const normalized = value.trim().toLowerCase();
+      if (normalized === "yes") return "Yes";
+      if (normalized === "no") return "No";
+      throw new Error(`CSV record ${record}, ${label} must be Yes, No, blank, or NaN.`);
+    });
+    return { record, name, grade, group, key, results,
+      total: fields[indexOf["Total Periodo"]], percentage: fields[indexOf["% Periodo"]] };
+  });
+}
+
+function compare(before, after) {
+  const keys = new Map();
+  const excluded = [];
+  const students = [];
+  const counts = { onlyBefore: 0, onlyAfter: 0, unresolvedBefore: 0, unresolvedAfter: 0 };
+  function exclude(rows, side, reason, unresolved) {
+    counts[(unresolved ? "unresolved" : "only") + side] += rows.length;
+    for (const row of rows) excluded.push({ row, side, reason });
+  }
+  for (const [side, rows] of [["Before", before], ["After", after]]) {
+    for (const row of rows) {
+      if (row.key === null) {
+        exclude([row], side, "Missing name, grade, or group", true);
+        continue;
+      }
+      if (!keys.has(row.key)) keys.set(row.key, { Before: [], After: [] });
+      keys.get(row.key)[side].push(row);
+    }
+  }
+  for (const [key, entry] of keys) {
+    const { Before, After } = entry;
+    if (Before.length > 1 || After.length > 1) {
+      const reason = `Repeated match key (${Before.length} Before, ${After.length} After)`;
+      exclude(Before, "Before", reason, true);
+      exclude(After, "After", reason, true);
+    } else if (!Before.length || !After.length) {
+      exclude(Before, "Before", "No After match", false);
+      exclude(After, "After", "No Before match", false);
+    } else {
+      const { name, grade, group } = After[0];
+      students.push({ key, name, grade, group, before: Before[0], after: After[0] });
+    }
+  }
+  students.sort((a, b) => collator.compare(a.name, b.name) || collator.compare(className(a), className(b)));
+  excluded.sort((a, b) => a.side.localeCompare(b.side) || a.row.record - b.row.record);
+  return { students, excluded, counts };
+}
+
+function statsFor(students, index) {
+  const pairs = Object.fromEntries(["Yes|Yes", "No|No", "Yes|No", "No|Yes",
+    ...transitions.missing.pairs].map(pair => [pair, 0]));
+  for (const student of students) pairs[transitionKey(student, index)]++;
+  const counts = Object.fromEntries(Object.entries(transitions).map(([key, { pairs: members }]) =>
+    [key, members.reduce((sum, pair) => sum + pairs[pair], 0)]));
+  const n = counts.up + counts.down + counts.same;
+  return { index, ...counts, n, beforeRate: ratio(pairs["Yes|Yes"] + counts.down, n),
+    afterRate: ratio(pairs["Yes|Yes"] + counts.up, n), delta: ratio(counts.up - counts.down, n) };
+}
+
+function percentageValue(text) {
+  const value = text.trim().replace(/%$/u, "").trim().replace(",", ".");
+  return /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/u.test(value) && Number.isFinite(Number(value))
+    ? Number(value) : null;
+}
+
+function periodDelta(student) {
+  const before = percentageValue(student.before.percentage);
+  const after = percentageValue(student.after.percentage);
+  return before === null || after === null ? null : after - before;
+}
+
+function setFilterOptions(id, values) {
+  const control = byId(id);
+  const current = control.value;
+  const options = [...new Set(values)].sort(collator.compare);
+  control.replaceChildren(new Option("All", ""), ...options.map(value => new Option(value, value)));
+  if (options.includes(current)) control.value = current;
+}
+
+function initializeReport() {
+  let before, after;
+  try {
+    const snapshots = JSON.parse(byId("snapshotData").textContent);
+    before = readExport(snapshots.before);
+    after = readExport(snapshots.after);
+  } catch (error) {
+    byId("stateTitle").textContent = "Invalid snapshot data";
+    byId("stateText").textContent = error.message;
+    byId("state").hidden = false;
+    return;
+  }
+
+  comparison = compare(before, after);
+  const { students } = comparison;
+  renderQuality(before.length, after.length);
+  byId("quality").hidden = false;
+  byId("qualityJump").hidden = false;
+  byId("state").hidden = students.length > 0;
+  byId("report").hidden = students.length === 0;
+  if (!students.length) {
+    byId("quality").open = true;
+    return;
+  }
+  setFilterOptions("grade", students.map(student => student.grade));
+  setFilterOptions("group", students.map(student => student.group));
+  renderPicker();
+  renderReport();
+}
+
+function renderQuality(beforeCount, afterCount) {
+  const { students, counts, excluded } = comparison;
+  const summary = byId("qualitySummary");
+  const labels = [
+    `Before loaded: ${beforeCount}`,
+    `After loaded: ${afterCount}`,
+    `Matched students: ${students.length}`,
+    `Before only: ${counts.onlyBefore}`,
+    `After only: ${counts.onlyAfter}`,
+    `Unresolved Before records: ${counts.unresolvedBefore}`,
+    `Unresolved After records: ${counts.unresolvedAfter}`
+  ];
+  summary.replaceChildren(...labels.map(label => el("span", label)));
+  byId("qualityScroll").hidden = !excluded.length;
+  byId("qualityState").textContent = excluded.length
+    ? `${excluded.length} excluded records across both files.` : "Every loaded record matched unambiguously.";
+  byId("qualityRows").replaceChildren(...excluded.map(({ row, side, reason }) => {
+    const tr = el("tr");
+    tr.append(el("td", side), el("td", row.record), el("td", row.name || "—", "name"),
+      el("td", row.grade || "—"), el("td", row.group || "—"), el("td", reason));
+    return tr;
+  }));
+}
+
+function classScope() {
+  const grade = byId("grade").value;
+  const group = byId("group").value;
+  return comparison.students.filter(student => (!grade || student.grade === grade) && (!group || student.group === group));
+}
+
+function renderPicker() {
+  const query = normalizeName(byId("search").value);
+  const options = classScope().filter(student =>
+    normalizeName(`${student.name} ${className(student)} ${student.grade} ${student.group}`).includes(query));
+  byId("pickerCount").textContent = options.length ? `${options.length} options in the current grade and group.`
+    : "No student names match the search in this grade and group.";
+  byId("pickerOptions").replaceChildren(...options.map(student => {
+    const label = el("label");
+    const checkbox = el("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = selected.has(student.key);
+    checkbox.addEventListener("change", () => {
+      if (checkbox.checked) selected.add(student.key);
+      else selected.delete(student.key);
+      renderReport();
+    });
+    label.append(checkbox, el("span", `${student.name} · ${className(student)}`, "name"));
+    return label;
+  }));
+}
+
+function renderReport() {
+  cohort = classScope().filter(student => !selected.size || selected.has(student.key));
+  let improved = 0;
+  let declined = 0;
+  let both = 0;
+  for (const student of cohort) {
+    const keys = criteria.map((_, index) => transitionKey(student, index));
+    const up = keys.includes("No|Yes");
+    const down = keys.includes("Yes|No");
+    improved += Number(up);
+    declined += Number(down);
+    both += Number(up && down);
+  }
+  for (const [id, value] of Object.entries({ matched: cohort.length, improved, declined, both })) {
+    byId(id).textContent = value;
+  }
+  byId("pickerTitle").textContent = selected.size ? `Select students (${selected.size} selected)` : "Select students";
+  byId("clearStudents").disabled = !selected.size;
+  const studentScope = selected.size ? `${cohort.length} of ${selected.size} selected in scope` : "All matched students";
+  const grade = byId("grade").value || "All";
+  const group = byId("group").value || "All";
+  byId("scope").textContent = `Grade ${grade} · Group ${group} · ${studentScope}`;
+  byId("views").hidden = !cohort.length;
+  byId("emptyScope").hidden = !!cohort.length;
+  if (!cohort.length) {
+    activeTransition = null;
+    byId("studentRows").replaceChildren();
+    return;
+  }
+  criterionStats = criteria.map((_, index) => statsFor(cohort, index));
+  const max = Math.max(...criterionStats.map(stats => stats.up));
+  const leaders = criterionStats.filter(stats => stats.up === max).map(stats => criteria[stats.index]);
+  byId("rankSummary").textContent = max ? `Most No → Yes transitions: ${leaders.join(", ")} (${max} ${max === 1 ? "student" : "students"}${leaders.length > 1 ? " each" : ""}).`
+    : "No students moved from No to Yes in this scope.";
+  byId("countHint").textContent = defaultHint;
+  renderCriteria();
+  renderClasses();
+  renderStudents();
+}
+
+const criterionColumns = [
+  ["index", "Criterion"], ["up", "No → Yes"], ["down", "Yes → No"],
+  ["same", "Unchanged recorded"], ["missing", "Any missing"], ["beforeRate", "Before pass rate"],
+  ["afterRate", "After pass rate"], ["delta", "Change (pp)"], ["n", "Paired n"]
+];
+const missingColumns = [["index", "Criterion"], ...transitions.missing.pairs.map(pair => [pair, transitions[pair].label])];
+
+function sortHeaders(id, columns) {
+  const row = el("tr");
+  for (const [key, title] of columns) {
+    const active = sort.key === key;
+    const heading = el("th");
+    heading.scope = "col";
+    if (active) heading.setAttribute("aria-sort", sort.direction === 1 ? "ascending" : "descending");
+    const button = el("button", title + (active ? (sort.direction === 1 ? " ↑" : " ↓") : ""), "sort-button");
+    button.type = "button";
+    button.dataset.sort = key;
+    button.addEventListener("click", () => {
+      sort = { key, direction: active ? -sort.direction : key === "index" ? 1 : -1 };
+      renderCriteria();
+      byId(id).querySelector(`[data-sort="${key}"]`).focus();
+    });
+    heading.append(button);
+    row.append(heading);
+  }
+  byId(id).replaceChildren(row);
+}
+
+function countCell(stats, key, scale) {
+  const { index } = stats;
+  const { label, style } = transitions[key];
+  const count = stats[key];
+  const hint = `${criteria[index]} · ${label} · ${count} of ${cohort.length} matched students`;
+  const button = el("button", count, `count ${style}`);
+  button.type = "button";
+  button.title = hint;
+  button.dataset.transition = key;
+  button.dataset.criterion = index;
+  button.setAttribute("aria-label", hint);
+  button.style.setProperty("--fill", `${scale ? 100 * count / scale : 0}%`);
+  for (const event of ["focus", "mouseenter"]) {
+    button.addEventListener(event, () => { byId("countHint").textContent = hint; });
+  }
+  button.addEventListener("click", () => {
+    activeTransition = isActive(index, key) ? null : { index, key };
+    renderStudents();
+  });
+  const cell = el("td");
+  cell.append(button);
+  return cell;
+}
+
+function isActive(index, key) {
+  return activeTransition?.index === index && activeTransition.key === key;
+}
+
+function syncTransitionButtons() {
+  for (const button of byId("views").querySelectorAll("[data-transition]")) {
+    button.setAttribute("aria-pressed", isActive(Number(button.dataset.criterion), button.dataset.transition));
+  }
+}
+
+function renderCriteria() {
+  sortHeaders("criterionHead", criterionColumns);
+  sortHeaders("missingHead", missingColumns);
+  const ordered = [...criterionStats].sort((a, b) => {
+    const left = a[sort.key];
+    const right = b[sort.key];
+    if (left === right) return a.index - b.index;
+    if (left === null) return 1;
+    if (right === null) return -1;
+    return sort.direction * (left - right);
+  });
+  const changeScale = Math.max(...criterionStats.flatMap(stats => [stats.up, stats.down]));
+  byId("criterionRows").replaceChildren(...ordered.map(stats => {
+    const tr = el("tr");
+    tr.append(rowHeading(criteria[stats.index]));
+    for (const key of ["up", "down", "same", "missing"]) {
+      tr.append(countCell(stats, key, key === "up" || key === "down" ? changeScale : cohort.length));
+    }
+    if (stats.n) {
+      tr.append(el("td", percent(stats.beforeRate)), el("td", percent(stats.afterRate)),
+        el("td", pp(stats.delta), `nowrap ${deltaClass(stats.delta)}`), el("td", stats.n));
+    } else {
+      const empty = el("td", "No comparable pairs", "desc");
+      empty.colSpan = 3;
+      tr.append(empty, el("td", "0"));
+    }
+    return tr;
+  }));
+  byId("missingRows").replaceChildren(...ordered.map(stats => {
+    const tr = el("tr");
+    tr.append(rowHeading(criteria[stats.index]), ...transitions.missing.pairs.map(key => countCell(stats, key, cohort.length)));
+    return tr;
+  }));
+  syncTransitionButtons();
+}
+
+function renderClasses() {
+  const grades = new Map();
+  const classes = new Map();
+  for (const student of cohort) {
+    const classKey = JSON.stringify([student.grade, student.group]);
+    if (!classes.has(classKey)) classes.set(classKey, []);
+    if (!grades.has(student.grade)) grades.set(student.grade, []);
+    classes.get(classKey).push(student);
+    grades.get(student.grade).push(student);
+  }
+  const multiple = classes.size > 1;
+  byId("classLegend").hidden = !multiple;
+  byId("classScroll").hidden = !multiple;
+  byId("classEmpty").hidden = multiple;
+  const rows = [];
+  if (multiple) {
+    for (const grade of [...grades.keys()].sort(collator.compare)) {
+      if (grades.size > 1) rows.push(matrixRow(`Grade ${grade}`, grades.get(grade), true));
+      const inGrade = [...classes.values()].filter(students => students[0].grade === grade);
+      inGrade.sort((a, b) => collator.compare(a[0].group, b[0].group));
+      for (const students of inGrade) rows.push(matrixRow(className(students[0]), students, false));
+    }
+  }
+  byId("classRows").replaceChildren(...rows);
+}
+
+function matrixRow(label, students, subtotal) {
+  const tr = el("tr", undefined, subtotal ? "grade-row" : "");
+  tr.append(rowHeading(label), el("td", students.length));
+  criteria.forEach((criterion, index) => {
+    const stats = statsFor(students, index);
+    const cell = el("td");
+    const style = stats.delta > 0 ? "positive" : stats.delta < 0 ? "negative" : "neutral";
+    const value = el("span", `+${stats.up} / −${stats.down}`, `matrix-cell ${style}`);
+    value.append(el("small", stats.n ? `${pp(stats.delta)} · n=${stats.n}` : "No pairs"));
+    value.title = `${label} · ${criterion} · ${stats.up} No → Yes · ${stats.down} Yes → No · `
+      + (stats.n ? `${percent(stats.beforeRate)} → ${percent(stats.afterRate)} · n=${stats.n}` : "No comparable pairs");
+    cell.append(value);
+    tr.append(cell);
+  });
+  return tr;
+}
+
+function badge(student, index, expanded = false) {
+  const before = student.before.results[index];
+  const after = student.after.results[index];
+  const changed = before !== after;
+  const pair = `${before}|${after}`;
+  const style = pair === "No|Yes" ? "positive" : pair === "Yes|No" ? "negative"
+    : changed ? "unknown" : "neutral";
+  const text = expanded || changed ? `${before} → ${after}` : `${before} (same)`;
+  return el("span", text, `badge ${style}${changed ? " changed" : ""}`);
+}
+
+function studentRow(student) {
+  const row = el("tr");
+  const name = rowHeading(student.name);
+  name.classList.add("name");
+  row.append(name, el("td", student.grade), el("td", student.group));
+  criteria.forEach((_, index) => {
+    const cell = el("td");
+    cell.append(badge(student, index));
+    row.append(cell);
+  });
+  for (const record of [student.before, student.after]) {
+    row.append(el("td", exportedValue(record.total)), el("td", exportedValue(record.percentage)));
+  }
+  const delta = periodDelta(student);
+  row.append(el("td", pp(delta), `nowrap ${deltaClass(delta)}`));
+  return row;
+}
+
+function renderStudents() {
+  syncTransitionButtons();
+  const bar = byId("selectionBar");
+  bar.hidden = !activeTransition;
+  bar.classList.toggle("active", !!activeTransition);
+  let students = cohort;
+  if (activeTransition) {
+    const { index, key } = activeTransition;
+    const { label, pairs } = transitions[key];
+    students = cohort.filter(student => pairs.includes(transitionKey(student, index)));
+    byId("selectionText").textContent = `Student detail filter · ${criteria[index]} · ${label} · ${students.length} of ${cohort.length}`;
+  }
+  byId("studentCount").textContent = students.length
+    ? `${students.length} of ${cohort.length} matched students shown.` : "No students have this transition in the current scope.";
+  const single = students.length === 1 ? students[0] : null;
+  byId("studentSpotlight").hidden = !single;
+  byId("studentStrip").replaceChildren();
+  if (single) {
+    byId("studentName").textContent = `${single.name} · ${className(single)}`;
+    const { before, after } = single;
+    const delta = periodDelta(single);
+    byId("studentPeriod").textContent = `Total Periodo ${exportedValue(before.total)} → ${exportedValue(after.total)} · `
+      + `% Periodo ${exportedValue(before.percentage)} → ${exportedValue(after.percentage)}`
+      + (delta === null ? "" : ` (${pp(delta)})`);
+    byId("studentStrip").replaceChildren(...criteria.map((label, index) => {
+      const item = el("li");
+      item.append(el("strong", label), badge(single, index, true));
+      return item;
+    }));
+  } else {
+    byId("studentName").textContent = "";
+    byId("studentPeriod").textContent = "";
+  }
+  byId("studentScroll").hidden = !students.length;
+  byId("studentRows").replaceChildren(...students.map(studentRow));
+}
+
+for (const id of ["grade", "group"]) {
+  byId(id).addEventListener("change", () => { renderPicker(); renderReport(); });
+}
+byId("search").addEventListener("input", renderPicker);
+byId("openQuality").addEventListener("click", event => {
+  event.preventDefault();
+  byId("quality").open = true;
+  byId("qualityTitle").focus();
+});
+byId("clearStudents").addEventListener("click", () => {
+  selected.clear();
+  renderPicker();
+  renderReport();
+  byId("pickerTitle").focus();
+});
+byId("clearTransition").addEventListener("click", () => {
+  const { index, key } = activeTransition;
+  activeTransition = null;
+  renderStudents();
+  const button = byId("views").querySelector(`[data-criterion="${index}"][data-transition="${key}"]`);
+  (button.getClientRects().length ? button : byId("missingPanel").querySelector("summary")).focus();
+});
+byId("reset").addEventListener("click", () => {
+  for (const id of ["grade", "group", "search"]) byId(id).value = "";
+  selected.clear();
+  activeTransition = null;
+  sort = { ...defaultSort };
+  byId("picker").open = false;
+  byId("missingPanel").open = false;
+  renderPicker();
+  renderReport();
+});
+setHeaders("classHead", ["Class", "Students", ...criteria]);
+setHeaders("studentHead", ["Student Name", "Grade", "Group", ...criteria,
+  "Before Total Periodo", "Before % Periodo", "After Total Periodo", "After % Periodo", "Exported Δ (pp)"]);
+setHeaders("qualityHead", ["Snapshot", "CSV record", "Student Name", "Grade", "Group", "Reason"]);
+initializeReport();
+</script>
+</body>
+</html>

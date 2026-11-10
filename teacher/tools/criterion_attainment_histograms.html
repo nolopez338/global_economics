@@ -1,0 +1,709 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Criterion Attainment</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f2f5f8; --card: #fff; --text: #14253a; --muted: #495d72; --line: #d5dfe8;
+  --navy: #112c47; --blue: #285b9b; --focus: #185bc7;
+  --passed: #14685e; --failed: #a13e27; --missing: #53657b; --plot-height: 164px;
+  font: 15px/1.5 "Segoe UI", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); }
+[hidden] { display: none !important; }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+h1, h2, p { margin: 0; }
+h2 { font-size: 1.15rem; line-height: 1.25; }
+main { max-width: 1510px; padding: 24px clamp(12px, 3vw, 42px) 44px; margin: auto; }
+.hero, .toolbar, .filters, .detail-top, .selection {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px 18px; flex-wrap: wrap;
+}
+.hero {
+  padding: clamp(20px, 3vw, 32px); color: white; background: var(--navy);
+  border-radius: 15px 15px 0 0;
+}
+.eyebrow { color: #a5e1d8; font-size: .74rem; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+h1 { font-size: clamp(1.85rem, 4vw, 2.7rem); line-height: 1.12; margin: 6px 0 8px; }
+.hero p:last-child { color: #d9e8f6; }
+.action {
+  padding: 7px 12px; min-height: 39px; border: 1px solid var(--line);
+  border-radius: 7px; background: white; color: var(--navy); font-weight: 650;
+}
+.action:hover { background: #eaf2fa; }
+.hero .action:focus-visible { outline-color: #a5e1d8; }
+.source, .card {
+  background: var(--card); border: 1px solid var(--line); padding: 14px clamp(15px, 2vw, 23px);
+}
+.source { border-top: 0; border-radius: 0 0 15px 15px; }
+.card { min-width: 0; border-radius: 12px; }
+.file { overflow-wrap: anywhere; min-width: 0; }
+.file strong { margin-right: 7px; }
+.filters { margin: 0; border: 0; padding: 0; min-width: 0; justify-content: flex-start; }
+.filters label { display: inline-flex; align-items: center; gap: 7px; font-weight: 650; }
+select, input[type="search"] {
+  min-height: 39px; padding: 6px 9px; border: 1px solid #9eafbf;
+  border-radius: 6px; color: var(--text); background: white;
+}
+#status, .desc { color: var(--muted); font-size: .89rem; margin-top: 5px; }
+#status.error { color: #8b301f; font-weight: 650; }
+.cards { display: grid; grid-template-columns: 1.06fr 1fr; gap: 15px; }
+#state, #heatmapCard, #studentDetails { margin-top: 15px; }
+#overview { margin: 17px 0 13px; }
+.metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 14px; margin: 0 0 7px; }
+.metrics div { background: #e5edf6; border: 1px solid #cfdeec; border-radius: 9px; padding: 8px 12px; }
+.metrics dt { font-size: .83rem; color: var(--muted); font-weight: 650; }
+.metrics dd { margin: 1px 0 0; font-size: 1.5rem; font-weight: 750; line-height: 1.15; }
+#classSummary { color: var(--muted); font-size: .85rem; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 13px; margin-top: 10px; color: var(--muted); font-size: .79rem; }
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.swatch { width: 12px; height: 12px; border-radius: 2px; }
+.passed { background: var(--passed); }
+.failed { background: var(--failed); }
+.missing { background: var(--missing); }
+.assessed { background: var(--blue); }
+.scroll { overflow: auto; padding: 3px; margin: 4px -3px 0; }
+.plot-layout { display: grid; grid-template-columns: 29px 1fr; gap: 7px; padding: 17px 2px 0 0; }
+#criterionChart .plot-layout { min-width: 386px; }
+#distributionChart .plot-layout { min-width: 420px; }
+.ticks {
+  height: var(--plot-height); display: flex; flex-direction: column; justify-content: space-between;
+  text-align: right; color: var(--muted); font-size: .72rem; line-height: 0;
+}
+.plot { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; position: relative; }
+.plot::before {
+  content: ""; position: absolute; width: 100%; height: var(--plot-height);
+  border-bottom: 1px solid #9fafbf;
+  background: repeating-linear-gradient(to bottom, var(--line) 0 1px, transparent 1px 25%);
+}
+.plot-column { position: relative; min-width: 0; text-align: center; }
+.stack {
+  display: flex; flex-direction: column; justify-content: end;
+  height: var(--plot-height); max-width: 46px; margin: auto;
+}
+.segment {
+  display: block; width: 100%; position: relative; flex: 0 0 auto;
+  border: 0; padding: 0; color: white; font-size: .73rem; font-weight: 700; line-height: 1;
+}
+.segment:hover, .segment[aria-pressed="true"], .heat-cell:hover, .heat-cell[aria-pressed="true"] {
+  box-shadow: inset 0 0 0 2px white, 0 0 0 2px var(--navy); z-index: 1;
+}
+.segment:focus-visible { z-index: 2; }
+.bin {
+  width: 100%; position: relative; border: 0; border-radius: 4px;
+  background: transparent; color: var(--text); padding: 0; font-size: .75rem;
+}
+.bin:hover, .bin[aria-pressed="true"] { background: #dbe9f6a8; box-shadow: inset 0 0 0 1px #577fa7; }
+.bin-plot {
+  height: var(--plot-height); display: flex; flex-direction: column;
+  justify-content: end; align-items: center; font-weight: 750;
+}
+.bin-bar { display: block; width: 78%; max-width: 40px; border-radius: 4px 4px 0 0; flex-shrink: 0; }
+.chart-label { display: block; padding-top: 6px; min-height: 34px; font-size: .73rem; line-height: 1.12; font-weight: 650; }
+.hint { min-height: 2.6em; padding-top: 5px; color: var(--muted); font-size: .82rem; }
+table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: .85rem; font-variant-numeric: tabular-nums; }
+.heatmap { min-width: 610px; border-spacing: 4px; text-align: center; table-layout: fixed; }
+.heatmap th:first-child { width: 51px; }
+.heatmap th { color: var(--muted); }
+.heatmap td { padding: 0; }
+.heat-cell { width: 100%; min-height: 32px; padding: 3px 2px; border: 1px solid transparent; border-radius: 5px; font-weight: 650; }
+.rate-0 { background: #eaf2fa; color: #183751; }
+.rate-1 { background: #c8dff1; color: #183751; }
+.rate-2 { background: #9fc5e6; color: #142e47; }
+.rate-3 { background: #356897; color: white; }
+.rate-4 { background: #204e85; color: white; }
+.rate-none {
+  background: repeating-linear-gradient(135deg, #f7f8fa 0 4px, #e5e9ed 4px 6px);
+  color: #3c4c60; border-color: #a8b6c4;
+}
+.selection {
+  margin-top: 11px; padding: 6px 10px; border: 1px solid #a4bed7;
+  border-radius: 7px; background: #edf5ff; font-weight: 650;
+}
+.search-label { display: grid; gap: 3px; font-size: .85rem; font-weight: 650; }
+.search-label input { width: min(260px, 75vw); }
+#tableCount, #tableEmpty { margin: 9px 0 4px; color: var(--muted); font-size: .85rem; }
+#studentScroll { max-height: 510px; }
+.records { text-align: left; }
+.records th, .records td { border-bottom: 1px solid var(--line); white-space: nowrap; padding: 6px 7px; background: white; }
+.records th { position: sticky; top: 0; z-index: 2; padding: 0; background: #eaf1f8; }
+.records tr > :first-child { position: sticky; left: 0; border-right: 1px solid var(--line); }
+.records th:first-child { z-index: 3; }
+.records td:first-child { min-width: 145px; max-width: min(210px, 48vw); white-space: normal; overflow-wrap: anywhere; }
+.records tr:nth-child(even) td { background: #f6f8fb; }
+.records .active-column { background: #e4effc !important; }
+.sort-button { width: 100%; min-height: 37px; border: 0; background: transparent; color: var(--text); padding: 5px 7px; text-align: left; font-weight: 700; }
+.sort-button:hover { background: #d4e4f5; }
+.sort-button:focus-visible { outline-offset: -3px; }
+.sort-mark { color: var(--muted); margin-left: 3px; }
+.badge { display: inline-block; color: white; border-radius: 4px; padding: 1px 4px; font-size: .76rem; }
+@media (max-width: 1040px) { .cards { grid-template-columns: 1fr; } }
+@media (max-width: 500px) {
+  main { padding-top: 12px; }
+  .metrics { gap: 5px; }
+  .metrics div { padding: 7px; }
+  .metrics dt { font-size: .73rem; }
+}
+@media (forced-colors: active) {
+  .segment, .bin-bar { border: 1px solid ButtonText; }
+  [aria-pressed="true"] { outline: 2px solid Highlight; outline-offset: -2px; }
+}
+</style>
+</head>
+<body>
+<main>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Global Economics · Results explorer</p>
+      <h1>Criterion Attainment</h1>
+      <p>Find criteria that need attention, compare classes, and inspect student records.</p>
+    </div>
+    <button id="loadCSV" class="action" type="button">Open CSV</button>
+    <input id="csvFile" type="file" accept=".csv,text/csv" hidden>
+  </header>
+  <div class="source">
+    <div class="toolbar">
+      <p class="file"><strong>Loaded file</strong><span id="filename">None</span></p>
+      <fieldset class="filters" aria-label="Class filters" id="filters" disabled>
+        <label>Grade <select id="grade"><option value="">All</option></select></label>
+        <label>Group <select id="group"><option value="">All</option></select></label>
+        <button id="reset" class="action" type="button">Reset filters</button>
+      </fieldset>
+    </div>
+    <p id="status" role="status">Files are processed on this device. The dashboard works offline.</p>
+  </div>
+  <section class="card" id="state" aria-labelledby="stateTitle">
+    <h2 id="stateTitle">Open a results CSV</h2>
+    <p class="desc" id="stateText">Choose a unified export or a single-workbook export from an Extracted folder.</p>
+  </section>
+  <section id="overview" aria-label="Filtered class overview" hidden>
+    <dl class="metrics">
+      <div><dt>Students</dt><dd id="studentMetric">0</dd></div>
+      <div><dt>At least one result</dt><dd id="assessedMetric">0</dd></div>
+      <div><dt>All criteria missing</dt><dd id="missingMetric">0</dd></div>
+    </dl>
+    <p id="classSummary" role="status"></p>
+  </section>
+  <div id="results" hidden>
+    <div class="cards">
+      <section class="card" aria-labelledby="criterionTitle">
+        <h2 id="criterionTitle">Results by criterion</h2>
+        <p class="desc">Counts for each criterion. Select a segment to see its students.</p>
+        <div class="legend">
+          <span><i class="swatch passed"></i>Passed (Yes)</span>
+          <span><i class="swatch failed"></i>Failed (No)</span>
+          <span><i class="swatch missing"></i>Missing (blank or NaN)</span>
+        </div>
+        <div id="criterionChart" class="scroll" role="group" aria-label="Stacked student counts for C1 to C10"></div>
+        <p id="criterionHint" class="hint" aria-hidden="true"></p>
+      </section>
+      <section class="card" aria-labelledby="distributionTitle">
+        <h2 id="distributionTitle">Criteria passed per student</h2>
+        <p class="desc">Zero means at least one result was recorded, with no passes.</p>
+        <div class="legend">
+          <span><i class="swatch assessed"></i>At least one result</span>
+          <span><i class="swatch missing"></i>All criteria missing</span>
+        </div>
+        <div id="distributionChart" class="scroll" role="group" aria-label="Distribution of criteria passed"></div>
+        <p id="distributionHint" class="hint" aria-hidden="true"></p>
+      </section>
+    </div>
+    <section class="card" id="heatmapCard" aria-labelledby="heatmapTitle" hidden>
+      <h2 id="heatmapTitle">Class comparison</h2>
+      <p class="desc">Pass rate among assessed students (Yes ÷ recorded results). Select a cell to see its class records for that criterion.</p>
+      <div class="legend">
+        <span><i class="swatch rate-0"></i><i class="swatch rate-1"></i><i class="swatch rate-2"></i><i class="swatch rate-3"></i><i class="swatch rate-4"></i>Lower to higher pass rate</span>
+        <span><i class="swatch rate-none"></i>No assessed students</span>
+      </div>
+      <div class="scroll" tabindex="0" role="region" aria-label="Scrollable class comparison">
+        <table class="heatmap" aria-labelledby="heatmapTitle" id="heatmap"></table>
+      </div>
+      <p id="heatmapHint" class="hint" aria-hidden="true"></p>
+    </section>
+    <section class="card" id="studentDetails" aria-labelledby="studentTitle">
+      <div class="detail-top">
+        <div>
+          <h2 id="studentTitle" tabindex="-1">Student records</h2>
+          <p class="desc">Period totals and percentages are shown as exported. No. is local to the workbook.</p>
+        </div>
+        <label class="search-label">Search records
+          <input id="search" type="search" placeholder="Student name or class" autocomplete="off">
+        </label>
+      </div>
+      <div class="selection" id="selectionPanel" hidden>
+        <p id="selectionText"></p>
+        <button id="clearSelection" class="action" type="button">Clear selection</button>
+      </div>
+      <p id="tableCount" role="status"></p>
+      <div class="scroll" id="studentScroll" tabindex="0" role="region" aria-label="Scrollable student records">
+        <table class="records" aria-labelledby="studentTitle">
+          <thead><tr id="studentHead"></tr></thead>
+          <tbody id="studentRows"></tbody>
+        </table>
+      </div>
+      <p id="tableEmpty" hidden></p>
+    </section>
+  </div>
+</main>
+<script>
+'use strict';
+
+
+const criteria = Array.from({length: 10}, (_, index) => 'C' + (index + 1));
+const outcomes = ['passed', 'failed', 'missing'];
+const resultLabels = {passed: 'Yes', failed: 'No', missing: 'Missing'};
+const segmentLabels = {passed: 'Passed (Yes)', failed: 'Failed (No)', missing: 'Missing'};
+const byId = id => document.getElementById(id);
+const collator = new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'});
+
+let students = [];
+let visibleStudents = [];
+let selection = null;
+let sort = null;
+
+function element(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+// The September parser handles quoted commas, escaped quotes, and a UTF-8 BOM.
+function parseCSV(text) {
+  text = text.replace(/^\uFEFF/, '');
+  const rows = [];
+  let row = [], field = '', quoted = false;
+  for (let index = 0; index < text.length; index++) {
+    const char = text[index];
+    if (quoted) {
+      if (char === '"' && text[index + 1] === '"') {
+        field += '"';
+        index++;
+      } else if (char === '"') {
+        quoted = false;
+      } else {
+        field += char;
+      }
+    } else if (char === '"' && !field) {
+      quoted = true;
+    } else if (char === ',') {
+      row.push(field);
+      field = '';
+    } else if (char === '\n' || char === '\r') {
+      row.push(field);
+      rows.push(row);
+      row = [];
+      field = '';
+      if (char === '\r' && text[index + 1] === '\n') index++;
+    } else {
+      field += char;
+    }
+  }
+  if (quoted) throw new Error('The CSV contains an unterminated quoted field.');
+  if (field || row.length) rows.push([...row, field]);
+  return rows.filter(record => record.some(cell => cell.trim()));
+}
+
+function resultValue(value) {
+  const normalized = value.trim().toLowerCase();
+  if (['yes', 'sí', 'si'].includes(normalized)) return 'passed';
+  if (normalized === 'no') return 'failed';
+  if (normalized === '' || normalized === 'nan') return 'missing';
+  return null;
+}
+
+function readStudents(text) {
+  const rows = parseCSV(text);
+  if (rows.length < 2) throw new Error('The CSV is empty or has no student records.');
+  const headings = rows.shift().map(heading => heading.trim().toLowerCase());
+  const required = ['No.', 'Student Name', 'Group', ...criteria, 'Total Periodo', '% Periodo'];
+  const missing = required.filter(heading => !headings.includes(heading.toLowerCase()));
+  if (missing.length) throw new Error('Missing required column(s) ' + missing.join(', ') + '.');
+  const known = [...required, 'Grade'].map(heading => heading.toLowerCase());
+  const duplicate = known.find(heading => headings.indexOf(heading) !== headings.lastIndexOf(heading));
+  if (duplicate) throw new Error('Duplicate column ' + duplicate + '.');
+  const indices = Object.fromEntries(known.map(heading => [heading, headings.indexOf(heading)]));
+
+  return rows.map((row, index) => {
+    const record = 'student record ' + (index + 1);
+    if (row.length !== headings.length) throw new Error('Incorrect number of fields in ' + record + '.');
+    const cell = heading => row[indices[heading.toLowerCase()]]?.trim() ?? '';
+    const groupField = cell('Group');
+    const classMatch = groupField.match(/^(\d+)\s*([a-z])(?:$|[\s_-])/i);
+    const grade = cell('Grade') || classMatch?.[1];
+    const group = (classMatch?.[2] ?? groupField).toUpperCase();
+    if (indices.grade === -1 && !classMatch) {
+      throw new Error('Missing Grade column. A legacy file must include class codes such as 10A in Group.');
+    }
+    if (!grade || !/^\d+$/.test(grade) || !/^[A-Z]$/.test(group)) {
+      throw new Error('Invalid or missing Grade or Group in ' + record + '.');
+    }
+    if (classMatch && grade !== classMatch[1]) {
+      throw new Error('Grade and the Group class code disagree in ' + record + '.');
+    }
+
+    const results = criteria.map(criterion => {
+      const result = resultValue(cell(criterion));
+      if (!result) throw new Error('Invalid ' + criterion + ' value in ' + record + '. Use Yes, No, blank, or NaN.');
+      return result;
+    });
+    const assessed = results.some(result => result !== 'missing');
+    return {
+      // Keep each exported record. Neither a name nor a workbook number is a unique key.
+      name: cell('Student Name') || 'Unnamed student', number: cell('No.'),
+      grade, group, classCode: grade + group, results,
+      total: cell('Total Periodo'), percent: cell('% Periodo'),
+      passed: assessed ? results.filter(result => result === 'passed').length : null
+    };
+  });
+}
+
+function fillFilter(id, values) {
+  const select = byId(id);
+  select.replaceChildren(new Option('All', ''));
+  [...new Set(values)].sort(collator.compare).forEach(value => select.add(new Option(value, value)));
+}
+
+function showState(title, message) {
+  byId('state').hidden = !title;
+  byId('stateTitle').textContent = title;
+  byId('stateText').textContent = message;
+}
+
+function countResults(records, criterionIndex) {
+  const counts = {passed: 0, failed: 0, missing: 0};
+  records.forEach(student => counts[student.results[criterionIndex]]++);
+  return counts;
+}
+
+function chartControls(id, idleHint) {
+  const hintLine = byId(id + 'Hint');
+  hintLine.textContent = idleHint;
+  return (className, choice, hint, label = hint) => {
+    const button = element('button', className);
+    button.type = 'button';
+    button.dataset.choice = choice.key;
+    button.setAttribute('aria-label', label + '. Show student records.');
+    button.setAttribute('aria-controls', 'studentDetails');
+    button.addEventListener('mouseenter', () => { hintLine.textContent = hint; });
+    button.addEventListener('focus', () => { hintLine.textContent = hint; });
+    button.addEventListener('mouseleave', () => {
+      if (document.activeElement !== button) hintLine.textContent = idleHint;
+    });
+    button.addEventListener('blur', () => {
+      if (!button.matches(':hover')) hintLine.textContent = idleHint;
+    });
+    button.addEventListener('click', () => {
+      selection = choice;
+      byId('search').value = '';
+      renderTable();
+      byId('studentTitle').focus({preventScroll: true});
+      byId('studentDetails').scrollIntoView({block: 'start'});
+    });
+    return button;
+  };
+}
+
+function makePlot(id, maximum) {
+  const step = maximum < 20 ? Math.ceil(maximum / 4) : Math.ceil(maximum / 20) * 5;
+  const layout = element('div', 'plot-layout');
+  const ticks = element('div', 'ticks');
+  ticks.setAttribute('aria-hidden', 'true');
+  for (let tick = 4; tick >= 0; tick--) ticks.append(element('span', '', tick * step));
+  const plot = element('div', 'plot');
+  layout.append(ticks, plot);
+  byId(id + 'Chart').replaceChildren(layout);
+  return {plot, scale: step * 4};
+}
+
+function renderCriterion() {
+  const makeButton = chartControls('criterion', 'Hover or focus a segment for exact counts.');
+  const {plot, scale} = makePlot('criterion', visibleStudents.length);
+  criteria.forEach((criterion, index) => {
+    const counts = countResults(visibleStudents, index);
+    const summary = outcomes.map(result => counts[result] + ' ' + result).join(' · ');
+    const column = element('div', 'plot-column');
+    const stack = element('div', 'stack');
+    for (const result of [...outcomes].reverse()) {
+      const count = counts[result];
+      if (!count) continue;
+      const choice = {
+        key: criterion + '-' + result,
+        label: criterion + ' · ' + segmentLabels[result],
+        criterion: index,
+        matches: student => student.results[index] === result
+      };
+      const hint = choice.label + ' segment · ' + summary;
+      const button = makeButton('segment ' + result, choice, hint);
+      button.style.height = (count / scale * 100) + '%';
+      if (count / scale >= .1) button.textContent = count;
+      stack.append(button);
+    }
+    column.append(stack, element('span', 'chart-label', criterion));
+    plot.append(column);
+  });
+}
+
+function renderDistribution() {
+  const bins = [null, ...Array.from({length: criteria.length + 1}, (_, index) => index)];
+  const counts = bins.map(value => visibleStudents.filter(student => student.passed === value).length);
+  const makeButton = chartControls('distribution', 'Select a bar to see its student records.');
+  const {plot, scale} = makePlot('distribution', Math.max(...counts));
+  bins.forEach((value, index) => {
+    const label = value === null ? 'All missing' : value;
+    const title = value === null ? 'All criteria missing' : value + ' criteria passed';
+    const count = counts[index];
+    const summary = title + ' · ' + count + (count === 1 ? ' student' : ' students');
+    const choice = {
+      key: 'distribution-' + value, label: title,
+      matches: student => student.passed === value
+    };
+    const button = makeButton('bin', choice, summary);
+    const area = element('span', 'bin-plot');
+    const bar = element('span', 'bin-bar ' + (value === null ? 'missing' : 'assessed'));
+    bar.style.height = (count / scale * 100) + '%';
+    area.append(element('span', '', count), bar);
+    button.append(area, element('span', 'chart-label', label));
+    plot.append(button);
+  });
+}
+
+function renderHeatmap(classes) {
+  byId('heatmapCard').hidden = classes.size < 2;
+  const table = byId('heatmap');
+  table.replaceChildren();
+  if (classes.size < 2) return;
+
+  const makeButton = chartControls('heatmap', 'Hover or focus a cell for assessed and missing counts.');
+  const head = table.createTHead().insertRow();
+  for (const label of ['Class', ...criteria]) {
+    const header = element('th', '', label);
+    header.scope = 'col';
+    head.append(header);
+  }
+  const body = table.createTBody();
+  for (const [classCode, records] of classes) {
+    const row = body.insertRow();
+    const header = element('th', '', classCode);
+    header.scope = 'row';
+    row.append(header);
+    criteria.forEach((criterion, index) => {
+      const counts = countResults(records, index);
+      const assessed = counts.passed + counts.failed;
+      const rate = assessed ? counts.passed / assessed * 100 : null;
+      const rateText = rate === null ? 'No assessed students' : (Math.round(rate * 10) / 10) + '% passed';
+      const summary = classCode + ' · ' + criterion + ' · ' + rateText + ' · ' +
+        assessed + ' assessed · ' + counts.missing + ' missing';
+      const choice = {
+        key: classCode + '-' + criterion,
+        label: classCode + ' · ' + criterion + ' · All results',
+        criterion: index, classCode,
+        matches: student => student.classCode === classCode
+      };
+      const shade = rate === null ? 'none' : Math.min(4, Math.floor(rate / 20));
+      const button = makeButton('heat-cell rate-' + shade, choice, summary);
+      button.textContent = rate === null ? '—' : Math.round(rate) + '%';
+      row.insertCell().append(button);
+    });
+  }
+}
+
+
+const tableColumns = [
+  {label: 'Student name', value: student => student.name},
+  {label: 'Grade', value: student => student.grade},
+  {label: 'Group', value: student => student.group},
+  {label: 'No.', value: student => student.number},
+  ...criteria.map((label, index) => ({label, value: student => student.results[index], criterion: index})),
+  {label: 'Total Periodo', value: student => student.total},
+  {label: '% Periodo', value: student => student.percent}
+];
+
+function buildTableHead() {
+  tableColumns.forEach((column, index) => {
+    const header = element('th');
+    header.scope = 'col';
+    const button = element('button', 'sort-button', column.label);
+    button.type = 'button';
+    const mark = element('span', 'sort-mark');
+    mark.setAttribute('aria-hidden', 'true');
+    button.append(mark);
+    button.addEventListener('click', () => {
+      sort = {index, direction: sort?.index === index ? -sort.direction : 1};
+      renderTable();
+    });
+    header.append(button);
+    byId('studentHead').append(header);
+  });
+}
+
+function searchText(value) {
+  return value.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+}
+
+function isActiveCriterion(column) {
+  return column.criterion !== undefined && column.criterion === selection?.criterion;
+}
+
+function renderTable() {
+  const tokens = searchText(byId('search').value).trim().split(/\s+/).filter(Boolean);
+  const selected = selection ? visibleStudents.filter(selection.matches) : visibleStudents;
+  const matches = selected.filter(student => {
+    const text = searchText(student.name + ' ' + student.classCode + ' ' + student.grade + ' ' + student.group);
+    return tokens.every(token => text.includes(token));
+  });
+  if (sort) {
+    const column = tableColumns[sort.index];
+    matches.sort((a, b) => {
+      const left = column.value(a);
+      const right = column.value(b);
+      if (left === right) return 0;
+      if (left === '' || left === 'missing') return 1;
+      if (right === '' || right === 'missing') return -1;
+      const comparison = column.criterion === undefined ? collator.compare(left, right) :
+        outcomes.indexOf(right) - outcomes.indexOf(left);
+      return comparison * sort.direction;
+    });
+  }
+
+  Array.from(byId('studentHead').children).forEach((header, index) => {
+    header.classList.toggle('active-column', isActiveCriterion(tableColumns[index]));
+    const active = sort?.index === index;
+    const ascending = sort?.direction === 1;
+    if (active) header.setAttribute('aria-sort', ascending ? 'ascending' : 'descending');
+    else header.removeAttribute('aria-sort');
+    header.querySelector('.sort-mark').textContent = active ? (ascending ? '↑' : '↓') : '↕';
+  });
+
+  const fragment = document.createDocumentFragment();
+  for (const student of matches) {
+    const row = element('tr');
+    for (const column of tableColumns) {
+      const value = column.value(student);
+      const cell = row.insertCell();
+      if (column.criterion === undefined) {
+        cell.textContent = value || '—';
+      } else {
+        cell.classList.toggle('active-column', isActiveCriterion(column));
+        cell.append(element('span', 'badge ' + value, resultLabels[value]));
+      }
+    }
+    fragment.append(row);
+  }
+  byId('studentRows').replaceChildren(fragment);
+  byId('studentScroll').hidden = !matches.length;
+  byId('tableEmpty').hidden = !!matches.length;
+  byId('tableEmpty').textContent = tokens.length ? 'No student records match this search.' :
+    'No students match this chart selection in the current filters.';
+  byId('tableCount').textContent = matches.length + ' of ' + selected.length +
+    (selected.length === 1 ? ' student record shown' : ' student records shown');
+  byId('selectionPanel').hidden = !selection;
+  byId('selectionText').textContent = selection ? 'Chart selection · ' + selection.label : '';
+  document.querySelectorAll('[data-choice]').forEach(button => {
+    button.setAttribute('aria-pressed', String(button.dataset.choice === selection?.key));
+  });
+}
+
+function render() {
+  const grade = byId('grade').value;
+  const group = byId('group').value;
+  visibleStudents = students.filter(student =>
+    (!grade || student.grade === grade) && (!group || student.group === group));
+  const classes = new Map();
+  for (const student of visibleStudents) {
+    if (!classes.has(student.classCode)) classes.set(student.classCode, []);
+    classes.get(student.classCode).push(student);
+  }
+  const orderedClasses = new Map([...classes].sort(([a], [b]) => collator.compare(a, b)));
+  const missing = visibleStudents.filter(student => student.passed === null).length;
+  byId('studentMetric').textContent = visibleStudents.length;
+  byId('assessedMetric').textContent = visibleStudents.length - missing;
+  byId('missingMetric').textContent = missing;
+  byId('classSummary').textContent = visibleStudents.length + ' of ' + students.length + ' students in view' +
+    (classes.size ? ' · ' + [...orderedClasses.keys()].join(', ') : '');
+  byId('overview').hidden = !students.length;
+  byId('results').hidden = !visibleStudents.length;
+
+  if (!visibleStudents.length) {
+    selection = null;
+    showState('No students match these filters', 'Choose a different grade or group, or reset the filters.');
+    return;
+  }
+  if (selection?.classCode && (classes.size < 2 || !classes.has(selection.classCode))) selection = null;
+  showState('', '');
+  renderCriterion();
+  renderDistribution();
+  renderHeatmap(orderedClasses);
+  renderTable();
+}
+
+async function loadCSVFile(file) {
+  const status = byId('status');
+  const loadButton = byId('loadCSV');
+  loadButton.disabled = true;
+  byId('filters').disabled = true;
+  status.classList.remove('error');
+  status.textContent = 'Reading ' + file.name + '…';
+  try {
+    students = readStudents(await file.text());
+    selection = null;
+    sort = null;
+    byId('search').value = '';
+    fillFilter('grade', students.map(student => student.grade));
+    fillFilter('group', students.map(student => student.group));
+    byId('filename').textContent = file.name;
+    status.textContent = students.length + ' student records loaded.';
+    byId('filters').disabled = false;
+    render();
+  } catch (error) {
+    students = [];
+    visibleStudents = [];
+    selection = null;
+    byId('filename').textContent = 'None';
+    byId('overview').hidden = true;
+    byId('results').hidden = true;
+    byId('studentRows').replaceChildren();
+    status.classList.add('error');
+    status.textContent = 'Could not open ' + file.name + '.';
+    showState('Results unavailable', error.message);
+  } finally {
+    loadButton.disabled = false;
+    loadButton.textContent = students.length ? 'Switch CSV' : 'Open CSV';
+  }
+}
+
+buildTableHead();
+byId('loadCSV').addEventListener('click', () => {
+  const input = byId('csvFile');
+  input.value = '';
+  input.click();
+});
+byId('csvFile').addEventListener('change', event => {
+  const file = event.target.files[0];
+  if (file) loadCSVFile(file);
+});
+byId('grade').addEventListener('change', render);
+byId('group').addEventListener('change', render);
+byId('search').addEventListener('input', renderTable);
+byId('reset').addEventListener('click', () => {
+  byId('grade').value = '';
+  byId('group').value = '';
+  byId('search').value = '';
+  selection = null;
+  render();
+});
+byId('clearSelection').addEventListener('click', () => {
+  const trigger = [...document.querySelectorAll('[data-choice]')].find(button => button.dataset.choice === selection?.key);
+  selection = null;
+  renderTable();
+  (trigger ?? byId('studentTitle')).focus();
+});
+</script>
+</body>
+</html>
+

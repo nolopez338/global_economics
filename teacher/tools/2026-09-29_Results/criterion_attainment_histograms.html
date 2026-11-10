@@ -149,6 +149,7 @@ function readStudents(text){
   const rows=parseCSV(text).filter(row=>row.some(cell=>cell.trim()));
   if(rows.length<2)throw new Error('the CSV is empty or has no student records');
   const headings=rows.shift();
+  const gradeIndex=headings.findIndex(heading=>normalizedHeader(heading)==='grade');
   const groupIndex=headings.findIndex(heading=>normalizedHeader(heading)==='group');
   const nameIndex=headings.findIndex(heading=>normalizedHeader(heading)==='student name');
   if(groupIndex<0)throw new Error('the required “Group” column is missing');
@@ -161,6 +162,7 @@ function readStudents(text){
   const unique=new Map();
   rows.forEach((row,index)=>{
     if(row.length!==headings.length)throw new Error('incorrect number of fields in student record '+(index+1));
+    const grade=gradeIndex>=0?row[gradeIndex].trim():'';
     const group=row[groupIndex].split('-',1)[0].trim();
     const match=group.match(/^(?:\d+\s*)?([A-E])(?=$|[\s_-])/i);
     if(!match)throw new Error('missing or unsupported Group in student record '+(index+1));
@@ -170,14 +172,14 @@ function readStudents(text){
       if(value.trim()&&!result)throw new Error('invalid '+column.criterion+' result in student record '+(index+1)+': '+value);
       return result;
     });
-    // Names are scoped to their normalized group; local row numbers repeat across groups.
+    // Names are scoped to grade and group; older exports include the grade in Group.
     const name=nameIndex>=0?normalizedHeader(row[nameIndex]):'';
-    const identity=name?JSON.stringify([normalizedHeader(group),name]):'row:'+index;
+    const identity=name?JSON.stringify([normalizedHeader(grade),normalizedHeader(group),name]):'row:'+index;
     if(unique.has(identity)){
       if(JSON.stringify(unique.get(identity).results)!==JSON.stringify(results))throw new Error('conflicting duplicate student record: '+row[nameIndex]);
       return;
     }
-    unique.set(identity,{group:match[1].toUpperCase(),sourceGroup:group,name:nameIndex>=0?(row[nameIndex].trim()||'Unnamed student'):'Unnamed student',results});
+    unique.set(identity,{group:match[1].toUpperCase(),sourceGroup:grade+group,name:nameIndex>=0?(row[nameIndex].trim()||'Unnamed student'):'Unnamed student',results});
   });
   return {students:[...unique.values()],columns:detected};
 }
