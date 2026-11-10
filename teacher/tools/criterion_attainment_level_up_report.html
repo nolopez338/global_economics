@@ -10,7 +10,7 @@
   color-scheme: light;
   --bg: #f2f5f8; --card: #fff; --text: #14253a; --muted: #495d72; --line: #d5dfe8;
   --navy: #112c47; --blue: #285b9b; --focus: #185bc7; --pale: #eaf1f8;
-  --up: #146052; --up-bg: #e1f3ed; --down: #963922; --down-bg: #faebe5;
+  --up: #146052; --up-bg: #e1f3ed; --red: #8f2630; --red-bg: #fcebef;
   font: 15px/1.5 "Segoe UI", system-ui, sans-serif;
 }
 * { box-sizing: border-box; }
@@ -44,12 +44,11 @@ a { color: var(--blue); }
 .action:hover:not(:disabled) { background: var(--pale); }
 .desc { color: var(--muted); font-size: .88rem; margin-top: 5px; }
 .toolbar select { margin-left: 4px; }
-.metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; margin: 10px 0 0; }
+.metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin: 10px 0 0; }
 .metrics div { border: 1px solid var(--line); background: var(--pale); border-radius: 8px; padding: 8px 12px; }
 .metrics dt { font-size: .83rem; color: var(--muted); font-weight: 650; }
 .metrics dd { margin: 0; font-size: 1.65rem; font-weight: 750; font-variant-numeric: tabular-nums; }
 .metrics .positive, .positive { background: var(--up-bg); color: var(--up); }
-.metrics .negative, .negative { background: var(--down-bg); color: var(--down); }
 .picker { margin-top: 11px; border: 1px solid var(--line); border-radius: 7px; padding: 7px 10px; }
 summary { color: var(--navy); font-weight: 700; }
 .picker-controls { margin-top: 8px; }
@@ -72,20 +71,25 @@ tbody tr:nth-child(even) { background: #f7f9fc; }
 .comparison :is(th, td):not(:first-child), .missing-table :is(th, td):not(:first-child) { text-align: right; }
 .sort-button { border: 0; background: transparent; padding: 3px 2px; color: var(--navy); font-weight: 700; text-align: inherit; }
 .sort-button:hover { text-decoration: underline; }
-.count {
+.bar {
   width: 100%; min-height: 29px; text-align: right; padding: 2px 7px; border: 1px solid transparent;
   border-radius: 5px; font-weight: 700; position: relative; isolation: isolate;
 }
-.count::before {
+.bar::before {
   content: ""; position: absolute; inset: 0 auto 0 0; width: var(--fill, 0%);
   background: currentColor; opacity: .12; border-radius: 4px; z-index: -1;
 }
 .count:hover, .count[aria-pressed="true"] { border-color: currentColor; }
 .count[aria-pressed="true"] { box-shadow: inset 0 0 0 1px currentColor; }
+.rate-column { width: 15%; }
+.rate-bar { min-width: 76px; white-space: nowrap; }
+.distribution { max-width: 690px; margin-top: 8px; }
+.distribution :is(th, td):last-child { text-align: right; }
+.distribution td:nth-child(2) { width: 62%; }
 .neutral { background: #edf2f8; color: #36536f; }
 .unknown { background: #f1eef8; color: #54446d; }
 .delta-up { color: var(--up); font-weight: 700; }
-.delta-down { color: var(--down); font-weight: 700; }
+.period-decrease { color: var(--red); font-weight: 700; }
 .nowrap { white-space: nowrap; }
 .subpanel { margin-top: 10px; }
 .hint { min-height: 1.5em; margin-top: 6px; color: var(--muted); font-size: .86rem; }
@@ -111,7 +115,9 @@ tbody tr:nth-child(even) { background: #f7f9fc; }
 .students thead th:first-child { z-index: 2; background: var(--pale); }
 .students td { vertical-align: top; }
 .badge { display: inline-block; padding: 2px 4px; border-radius: 4px; white-space: nowrap; font-size: .8rem; }
-.changed { font-weight: 700; }
+.badge-yes { background: #dcf1df; color: #205b2d; }
+.badge-gain { background: #145339; color: white; font-weight: 700; }
+.badge-no { background: var(--red-bg); color: var(--red); }
 .student-strip {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(105px, 1fr));
   gap: 6px; margin: 8px 0 0; padding: 0; list-style: none;
@@ -125,7 +131,6 @@ tbody tr:nth-child(even) { background: #f7f9fc; }
 @media (max-width: 680px) {
   main { padding-top: 12px; }
   .source-grid { grid-template-columns: 1fr; }
-  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .students tr > :first-child { min-width: 125px; max-width: 150px; }
 }
 @media (forced-colors: active) {
@@ -168,7 +173,7 @@ tbody tr:nth-child(even) { background: #f7f9fc; }
         <label>Grade <select id="grade"><option value="">All</option></select></label>
         <label>Group <select id="group"><option value="">All</option></select></label>
         <button type="button" class="action" id="clearStudents">Clear student selection</button>
-        <button type="button" class="action" id="reset" title="Reset filters, student selection, transition and sorting.">Reset report</button>
+        <button type="button" class="action" id="reset" title="Reset all filters and sorting.">Reset report</button>
       </div>
       <details class="picker" id="picker">
         <summary id="pickerTitle">Select students</summary>
@@ -183,8 +188,6 @@ tbody tr:nth-child(even) { background: #f7f9fc; }
       <dl class="metrics">
         <div><dt>Matched students in view</dt><dd id="matched">0</dd></div>
         <div class="positive"><dt>At least one No → Yes</dt><dd id="improved">0</dd></div>
-        <div class="negative"><dt>At least one Yes → No</dt><dd id="declined">0</dd></div>
-        <div><dt>Both types of change</dt><dd id="both">0</dd></div>
       </dl>
     </section>
     <p id="emptyScope" class="card" role="status" hidden>No matched students fit these filters. Change a filter or clear the student selection.</p>
@@ -193,7 +196,7 @@ tbody tr:nth-child(even) { background: #f7f9fc; }
       <section class="card" aria-labelledby="criterionTitle">
         <h2 id="criterionTitle">Change by criterion</h2>
         <p class="desc">Select a column heading to sort. Select a count to show its students in the detail table below.</p>
-        <p class="desc">Paired pass rates use only students with a Yes or No in both snapshots for that criterion. <strong>pp</strong> means percentage points.</p>
+        <p class="desc">Both pass rates use the same valid, recorded pairs. A passed criterion stays passed. Conflicting pairs are excluded and listed in data quality. <strong>pp</strong> means percentage points.</p>
         <p id="rankSummary" class="hint"></p>
         <div class="scroll" tabindex="0" role="region" aria-label="Criterion counts and paired pass rates">
           <table class="comparison" aria-label="Criterion counts and paired pass rates">
@@ -217,9 +220,9 @@ tbody tr:nth-child(even) { background: #f7f9fc; }
         </div>
       </section>
 
-      <section class="card" aria-labelledby="classTitle">
+      <section class="card" id="classView" aria-labelledby="classTitle">
         <h2 id="classTitle">Comparison by grade and class</h2>
-        <p id="classLegend" class="desc">The first line shows gains (+) and losses (−). The second shows the paired pass-rate change and number of comparable pairs.</p>
+        <p id="classLegend" class="desc">The first line shows the number of No → Yes transitions. The second shows the paired pass-rate change and number of comparable pairs.</p>
         <p id="classEmpty" class="desc" hidden>One class is in view. Its results are shown in the criterion table above.</p>
         <div id="classScroll" class="scroll" tabindex="0" role="region" aria-label="Grade and class comparison">
           <table class="matrix" aria-label="Grade and class comparison">
@@ -228,12 +231,27 @@ tbody tr:nth-child(even) { background: #f7f9fc; }
         </div>
       </section>
 
+      <section class="card" aria-labelledby="distributionTitle">
+        <h2 id="distributionTitle">Criteria passed after level-up</h2>
+        <p class="desc">Each matched student is counted once by their recorded Yes results in the After snapshot. Incomplete After records have at least one Missing result.</p>
+        <p class="desc">Select a total to filter Student details. If a transition is selected, students must match both filters. The bars include all students in the selected grade, class, and student scope.</p>
+        <table class="distribution" aria-label="Student counts by recorded criteria passed after level-up">
+          <thead><tr><th scope="col">Recorded Yes</th><th scope="col">Students</th><th scope="col">Incomplete After</th></tr></thead>
+          <tbody id="distributionRows"></tbody>
+        </table>
+        <div class="toolbar">
+          <button type="button" id="clearTotal" class="action" disabled>Clear total filter</button>
+          <a href="#studentTitle">Go to student details</a>
+        </div>
+      </section>
+
       <section class="card" aria-labelledby="studentTitle">
         <h2 id="studentTitle" tabindex="-1">Student details</h2>
-        <p class="desc">Values read Before → After. Changed criteria use an arrow and a highlighted label. Period totals and percentages are the exported values.</p>
+        <p class="desc">Criterion arrows read Before → After. After recorded Yes counts come from the criteria. Period totals and percentages are the exported values.</p>
         <p class="desc" id="studentCount" role="status"></p>
         <div id="studentSpotlight" hidden>
           <h3 id="studentName" class="name"></h3>
+          <p class="desc" id="studentAfter"></p>
           <p class="desc" id="studentPeriod"></p>
           <ul class="student-strip" id="studentStrip"></ul>
         </div>
@@ -248,11 +266,11 @@ tbody tr:nth-child(even) { background: #f7f9fc; }
 
   <details class="card" id="quality" hidden>
     <summary id="qualityTitle">Data quality and match review</summary>
-    <p class="desc">Students match by normalized name within Grade and Group. Repeated keys and rows without a complete identity are excluded. Record numbers are for locating rows in the export.</p>
+    <p class="desc">Students match by normalized name within Grade and Group. Repeated keys and rows without a complete identity are excluded. A conflicting criterion pair is excluded from paired calculations for that criterion. Record numbers are for locating rows in the export.</p>
     <div id="qualitySummary" class="quality-summary"></div>
     <p id="qualityState" class="desc"></p>
-    <div id="qualityScroll" class="scroll quality-records" tabindex="0" role="region" aria-label="Excluded records">
-      <table aria-label="Excluded records">
+    <div id="qualityScroll" class="scroll quality-records" tabindex="0" role="region" aria-label="Excluded records and criterion pairs">
+      <table aria-label="Excluded records and criterion pairs">
         <thead id="qualityHead"></thead><tbody id="qualityRows"></tbody>
       </table>
     </div>
@@ -721,9 +739,9 @@ tbody tr:nth-child(even) { background: #f7f9fc; }
 const criteria = Array.from({ length: 10 }, (_, index) => `C${index + 1}`);
 const required = ["Student Name", "Grade", "Group", ...criteria, "Total Periodo", "% Periodo"];
 const missing = "Missing";
+const conflictingPair = "Yes|No";
 const transitions = {
   up: { label: "No → Yes", style: "positive", pairs: ["No|Yes"] },
-  down: { label: "Yes → No", style: "negative", pairs: ["Yes|No"] },
   same: { label: "Unchanged recorded", style: "neutral", pairs: ["Yes|Yes", "No|No"] },
   missing: { label: "Any missing", style: "unknown", pairs: [
     "Missing|Yes", "Missing|No", "Yes|Missing", "No|Missing", "Missing|Missing"
@@ -741,6 +759,7 @@ const defaultHint = "Focus or hover over a count for its exact value.";
 let sort = { ...defaultSort };
 let comparison = null;
 let activeTransition = null;
+let activeTotal = null;
 let cohort = [];
 let criterionStats = [];
 
@@ -754,13 +773,18 @@ const transitionKey = (student, index) => `${student.before.results[index]}|${st
 const ratio = (yes, total) => total ? (100 * yes / total) : null;
 const percent = value => value === null ? "—" : precision.format(value) + "%";
 const pp = value => value === null ? "—" : `${value > 0 ? "+" : ""}${precision.format(value)} pp`;
-const deltaClass = value => value > 0 ? "delta-up" : value < 0 ? "delta-down" : "";
 
 function el(tag, text, style) {
   const node = document.createElement(tag);
   if (text !== undefined) node.textContent = text;
   if (style) node.className = style;
   return node;
+}
+
+function makeBar(tag, text, style, fill) {
+  const bar = el(tag, text, `bar ${style}`);
+  bar.style.setProperty("--fill", `${fill}%`);
+  return bar;
 }
 
 function rowHeading(text) {
@@ -813,6 +837,7 @@ function readExport(records) {
 function compare(before, after) {
   const keys = new Map();
   const excluded = [];
+  const conflicts = [];
   const students = [];
   const counts = { onlyBefore: 0, onlyAfter: 0, unresolvedBefore: 0, unresolvedAfter: 0 };
   function exclude(rows, side, reason, unresolved) {
@@ -839,24 +864,42 @@ function compare(before, after) {
       exclude(Before, "Before", "No After match", false);
       exclude(After, "After", "No Before match", false);
     } else {
-      const { name, grade, group } = After[0];
-      students.push({ key, name, grade, group, before: Before[0], after: After[0] });
+      const [beforeRow] = Before;
+      const [afterRow] = After;
+      const { name, grade, group, results } = afterRow;
+      const student = {
+        key, name, grade, group, before: beforeRow, after: afterRow,
+        afterPassed: results.filter(value => value === "Yes").length,
+        afterMissing: results.filter(value => value === missing).length
+      };
+      students.push(student);
+      criteria.forEach((criterion, index) => {
+        if (transitionKey(student, index) === conflictingPair) {
+          conflicts.push({
+            row: afterRow, side: "Both", record: `Before ${beforeRow.record} / After ${afterRow.record}`,
+            reason: `${criterion}: After reports No for a previously passed criterion. Pair excluded.`
+          });
+        }
+      });
     }
   }
   students.sort((a, b) => collator.compare(a.name, b.name) || collator.compare(className(a), className(b)));
   excluded.sort((a, b) => a.side.localeCompare(b.side) || a.row.record - b.row.record);
-  return { students, excluded, counts };
+  return { students, excluded, conflicts, counts };
 }
 
 function statsFor(students, index) {
-  const pairs = Object.fromEntries(["Yes|Yes", "No|No", "Yes|No", "No|Yes",
+  const pairs = Object.fromEntries(["Yes|Yes", "No|No", "No|Yes",
     ...transitions.missing.pairs].map(pair => [pair, 0]));
-  for (const student of students) pairs[transitionKey(student, index)]++;
+  for (const student of students) {
+    const pair = transitionKey(student, index);
+    if (pair !== conflictingPair) pairs[pair]++;
+  }
   const counts = Object.fromEntries(Object.entries(transitions).map(([key, { pairs: members }]) =>
     [key, members.reduce((sum, pair) => sum + pairs[pair], 0)]));
-  const n = counts.up + counts.down + counts.same;
-  return { index, ...counts, n, beforeRate: ratio(pairs["Yes|Yes"] + counts.down, n),
-    afterRate: ratio(pairs["Yes|Yes"] + counts.up, n), delta: ratio(counts.up - counts.down, n) };
+  const n = counts.up + counts.same;
+  return { index, ...counts, n, beforeRate: ratio(pairs["Yes|Yes"], n),
+    afterRate: ratio(pairs["Yes|Yes"] + counts.up, n), delta: ratio(counts.up, n) };
 }
 
 function percentageValue(text) {
@@ -898,11 +941,8 @@ function initializeReport() {
   byId("quality").hidden = false;
   byId("qualityJump").hidden = false;
   byId("state").hidden = students.length > 0;
-  byId("report").hidden = students.length === 0;
-  if (!students.length) {
-    byId("quality").open = true;
-    return;
-  }
+  byId("report").hidden = false;
+  if (!students.length) byId("quality").open = true;
   setFilterOptions("grade", students.map(student => student.grade));
   setFilterOptions("group", students.map(student => student.group));
   renderPicker();
@@ -910,7 +950,7 @@ function initializeReport() {
 }
 
 function renderQuality(beforeCount, afterCount) {
-  const { students, counts, excluded } = comparison;
+  const { students, counts, excluded, conflicts } = comparison;
   const summary = byId("qualitySummary");
   const labels = [
     `Before loaded: ${beforeCount}`,
@@ -919,15 +959,16 @@ function renderQuality(beforeCount, afterCount) {
     `Before only: ${counts.onlyBefore}`,
     `After only: ${counts.onlyAfter}`,
     `Unresolved Before records: ${counts.unresolvedBefore}`,
-    `Unresolved After records: ${counts.unresolvedAfter}`
+    `Unresolved After records: ${counts.unresolvedAfter}`,
+    `Excluded conflicting criterion pairs: ${conflicts.length}`
   ];
   summary.replaceChildren(...labels.map(label => el("span", label)));
-  byId("qualityScroll").hidden = !excluded.length;
+  byId("qualityScroll").hidden = !excluded.length && !conflicts.length;
   byId("qualityState").textContent = excluded.length
     ? `${excluded.length} excluded records across both files.` : "Every loaded record matched unambiguously.";
-  byId("qualityRows").replaceChildren(...excluded.map(({ row, side, reason }) => {
+  byId("qualityRows").replaceChildren(...[...excluded, ...conflicts].map(({ row, side, reason, record = row.record }) => {
     const tr = el("tr");
-    tr.append(el("td", side), el("td", row.record), el("td", row.name || "—", "name"),
+    tr.append(el("td", side), el("td", record), el("td", row.name || "—", "name"),
       el("td", row.grade || "—"), el("td", row.group || "—"), el("td", reason));
     return tr;
   }));
@@ -962,33 +1003,17 @@ function renderPicker() {
 
 function renderReport() {
   cohort = classScope().filter(student => !selected.size || selected.has(student.key));
-  let improved = 0;
-  let declined = 0;
-  let both = 0;
-  for (const student of cohort) {
-    const keys = criteria.map((_, index) => transitionKey(student, index));
-    const up = keys.includes("No|Yes");
-    const down = keys.includes("Yes|No");
-    improved += Number(up);
-    declined += Number(down);
-    both += Number(up && down);
-  }
-  for (const [id, value] of Object.entries({ matched: cohort.length, improved, declined, both })) {
-    byId(id).textContent = value;
-  }
+  byId("matched").textContent = cohort.length;
+  byId("improved").textContent = cohort.filter(student =>
+    criteria.some((_, index) => transitionKey(student, index) === "No|Yes")).length;
   byId("pickerTitle").textContent = selected.size ? `Select students (${selected.size} selected)` : "Select students";
   byId("clearStudents").disabled = !selected.size;
   const studentScope = selected.size ? `${cohort.length} of ${selected.size} selected in scope` : "All matched students";
   const grade = byId("grade").value || "All";
   const group = byId("group").value || "All";
   byId("scope").textContent = `Grade ${grade} · Group ${group} · ${studentScope}`;
-  byId("views").hidden = !cohort.length;
-  byId("emptyScope").hidden = !!cohort.length;
-  if (!cohort.length) {
-    activeTransition = null;
-    byId("studentRows").replaceChildren();
-    return;
-  }
+  byId("emptyScope").hidden = !!cohort.length || !comparison.students.length;
+  byId("classView").hidden = !cohort.length;
   criterionStats = criteria.map((_, index) => statsFor(cohort, index));
   const max = Math.max(...criterionStats.map(stats => stats.up));
   const leaders = criterionStats.filter(stats => stats.up === max).map(stats => criteria[stats.index]);
@@ -997,11 +1022,12 @@ function renderReport() {
   byId("countHint").textContent = defaultHint;
   renderCriteria();
   renderClasses();
+  renderDistribution();
   renderStudents();
 }
 
 const criterionColumns = [
-  ["index", "Criterion"], ["up", "No → Yes"], ["down", "Yes → No"],
+  ["index", "Criterion"], ["up", "No → Yes"],
   ["same", "Unchanged recorded"], ["missing", "Any missing"], ["beforeRate", "Before pass rate"],
   ["afterRate", "After pass rate"], ["delta", "Change (pp)"], ["n", "Paired n"]
 ];
@@ -1013,6 +1039,7 @@ function sortHeaders(id, columns) {
     const active = sort.key === key;
     const heading = el("th");
     heading.scope = "col";
+    if (key === "beforeRate" || key === "afterRate") heading.classList.add("rate-column");
     if (active) heading.setAttribute("aria-sort", sort.direction === 1 ? "ascending" : "descending");
     const button = el("button", title + (active ? (sort.direction === 1 ? " ↑" : " ↓") : ""), "sort-button");
     button.type = "button";
@@ -1033,13 +1060,12 @@ function countCell(stats, key, scale) {
   const { label, style } = transitions[key];
   const count = stats[key];
   const hint = `${criteria[index]} · ${label} · ${count} of ${cohort.length} matched students`;
-  const button = el("button", count, `count ${style}`);
+  const button = makeBar("button", count, `count ${style}`, ratio(count, scale) ?? 0);
   button.type = "button";
   button.title = hint;
   button.dataset.transition = key;
   button.dataset.criterion = index;
   button.setAttribute("aria-label", hint);
-  button.style.setProperty("--fill", `${scale ? 100 * count / scale : 0}%`);
   for (const event of ["focus", "mouseenter"]) {
     button.addEventListener(event, () => { byId("countHint").textContent = hint; });
   }
@@ -1073,16 +1099,20 @@ function renderCriteria() {
     if (right === null) return -1;
     return sort.direction * (left - right);
   });
-  const changeScale = Math.max(...criterionStats.flatMap(stats => [stats.up, stats.down]));
+  const changeScale = Math.max(...criterionStats.map(stats => stats.up));
   byId("criterionRows").replaceChildren(...ordered.map(stats => {
     const tr = el("tr");
     tr.append(rowHeading(criteria[stats.index]));
-    for (const key of ["up", "down", "same", "missing"]) {
-      tr.append(countCell(stats, key, key === "up" || key === "down" ? changeScale : cohort.length));
+    for (const key of ["up", "same", "missing"]) {
+      tr.append(countCell(stats, key, key === "up" ? changeScale : cohort.length));
     }
     if (stats.n) {
-      tr.append(el("td", percent(stats.beforeRate)), el("td", percent(stats.afterRate)),
-        el("td", pp(stats.delta), `nowrap ${deltaClass(stats.delta)}`), el("td", stats.n));
+      for (const rate of [stats.beforeRate, stats.afterRate]) {
+        const cell = el("td");
+        cell.append(makeBar("div", percent(rate), "rate-bar neutral", rate));
+        tr.append(cell);
+      }
+      tr.append(el("td", pp(stats.delta), stats.delta > 0 ? "nowrap delta-up" : "nowrap"), el("td", stats.n));
     } else {
       const empty = el("td", "No comparable pairs", "desc");
       empty.colSpan = 3;
@@ -1130,10 +1160,10 @@ function matrixRow(label, students, subtotal) {
   criteria.forEach((criterion, index) => {
     const stats = statsFor(students, index);
     const cell = el("td");
-    const style = stats.delta > 0 ? "positive" : stats.delta < 0 ? "negative" : "neutral";
-    const value = el("span", `+${stats.up} / −${stats.down}`, `matrix-cell ${style}`);
+    const style = stats.up ? "positive" : "neutral";
+    const value = el("span", `+${stats.up}`, `matrix-cell ${style}`);
     value.append(el("small", stats.n ? `${pp(stats.delta)} · n=${stats.n}` : "No pairs"));
-    value.title = `${label} · ${criterion} · ${stats.up} No → Yes · ${stats.down} Yes → No · `
+    value.title = `${label} · ${criterion} · ${stats.up} No → Yes · `
       + (stats.n ? `${percent(stats.beforeRate)} → ${percent(stats.afterRate)} · n=${stats.n}` : "No comparable pairs");
     cell.append(value);
     tr.append(cell);
@@ -1141,15 +1171,49 @@ function matrixRow(label, students, subtotal) {
   return tr;
 }
 
-function badge(student, index, expanded = false) {
+function renderDistribution() {
+  const totals = Array.from({ length: criteria.length + 1 }, () => ({ count: 0, incomplete: 0 }));
+  for (const student of cohort) {
+    const bin = totals[student.afterPassed];
+    bin.count++;
+    if (student.afterMissing) bin.incomplete++;
+  }
+  const scale = Math.max(...totals.map(bin => bin.count));
+  byId("distributionRows").replaceChildren(...totals.map(({ count, incomplete }, total) => {
+    const tr = el("tr");
+    const cell = el("td");
+    const button = makeBar("button", count, "count neutral", ratio(count, scale) ?? 0);
+    button.type = "button";
+    button.dataset.total = total;
+    button.setAttribute("aria-label", `${total} recorded Yes results · ${count} students · ${incomplete} incomplete After`);
+    button.addEventListener("click", () => {
+      activeTotal = activeTotal === total ? null : total;
+      renderStudents();
+    });
+    cell.append(button);
+    tr.append(rowHeading(total), cell, el("td", incomplete));
+    return tr;
+  }));
+}
+
+function badge(student, index) {
   const before = student.before.results[index];
   const after = student.after.results[index];
-  const changed = before !== after;
-  const pair = `${before}|${after}`;
-  const style = pair === "No|Yes" ? "positive" : pair === "Yes|No" ? "negative"
-    : changed ? "unknown" : "neutral";
-  const text = expanded || changed ? `${before} → ${after}` : `${before} (same)`;
-  return el("span", text, `badge ${style}${changed ? " changed" : ""}`);
+  const pair = transitionKey(student, index);
+  if (pair === conflictingPair) return el("span", "Pair excluded", "badge unknown");
+  if (pair === "No|Yes") return el("span", "No → Yes", "badge badge-gain");
+  if (before === after) {
+    if (after === missing) return el("span", missing, "badge unknown");
+    return el("span", `${after} (same)`, after === "Yes" ? "badge badge-yes" : "badge badge-no");
+  }
+  return el("span", `${before} → ${after}`, "badge unknown");
+}
+
+function afterTotalText(student) {
+  const { afterPassed, afterMissing } = student;
+  return afterMissing
+    ? `${afterPassed} of ${criteria.length} · Incomplete (${afterMissing} missing)`
+    : `${afterPassed} of ${criteria.length}`;
 }
 
 function studentRow(student) {
@@ -1157,6 +1221,7 @@ function studentRow(student) {
   const name = rowHeading(student.name);
   name.classList.add("name");
   row.append(name, el("td", student.grade), el("td", student.group));
+  row.append(el("td", afterTotalText(student)));
   criteria.forEach((_, index) => {
     const cell = el("td");
     cell.append(badge(student, index));
@@ -1166,29 +1231,41 @@ function studentRow(student) {
     row.append(el("td", exportedValue(record.total)), el("td", exportedValue(record.percentage)));
   }
   const delta = periodDelta(student);
-  row.append(el("td", pp(delta), `nowrap ${deltaClass(delta)}`));
+  row.append(el("td", pp(delta), `nowrap ${delta > 0 ? "delta-up" : delta < 0 ? "period-decrease" : ""}`));
   return row;
 }
 
 function renderStudents() {
   syncTransitionButtons();
+  for (const button of byId("distributionRows").querySelectorAll("[data-total]")) {
+    button.setAttribute("aria-pressed", activeTotal === Number(button.dataset.total));
+  }
+  byId("clearTotal").disabled = activeTotal === null;
   const bar = byId("selectionBar");
   bar.hidden = !activeTransition;
   bar.classList.toggle("active", !!activeTransition);
   let students = cohort;
+  const filters = [];
   if (activeTransition) {
     const { index, key } = activeTransition;
     const { label, pairs } = transitions[key];
     students = cohort.filter(student => pairs.includes(transitionKey(student, index)));
-    byId("selectionText").textContent = `Student detail filter · ${criteria[index]} · ${label} · ${students.length} of ${cohort.length}`;
+    filters.push(`${criteria[index]} ${label}`);
+    byId("selectionText").textContent = `Transition filter · ${criteria[index]} · ${label}`;
   }
-  byId("studentCount").textContent = students.length
-    ? `${students.length} of ${cohort.length} matched students shown.` : "No students have this transition in the current scope.";
+  if (activeTotal !== null) {
+    students = students.filter(student => student.afterPassed === activeTotal);
+    filters.push(`${activeTotal} recorded Yes after level-up`);
+  }
+  const countText = `${students.length} of ${cohort.length} matched students shown`;
+  byId("studentCount").textContent = filters.length
+    ? `${countText} · ${filters.join(" and ")}.` : `${countText}.`;
   const single = students.length === 1 ? students[0] : null;
   byId("studentSpotlight").hidden = !single;
   byId("studentStrip").replaceChildren();
   if (single) {
     byId("studentName").textContent = `${single.name} · ${className(single)}`;
+    byId("studentAfter").textContent = `After recorded Yes · ${afterTotalText(single)}`;
     const { before, after } = single;
     const delta = periodDelta(single);
     byId("studentPeriod").textContent = `Total Periodo ${exportedValue(before.total)} → ${exportedValue(after.total)} · `
@@ -1196,11 +1273,12 @@ function renderStudents() {
       + (delta === null ? "" : ` (${pp(delta)})`);
     byId("studentStrip").replaceChildren(...criteria.map((label, index) => {
       const item = el("li");
-      item.append(el("strong", label), badge(single, index, true));
+      item.append(el("strong", label), badge(single, index));
       return item;
     }));
   } else {
     byId("studentName").textContent = "";
+    byId("studentAfter").textContent = "";
     byId("studentPeriod").textContent = "";
   }
   byId("studentScroll").hidden = !students.length;
@@ -1229,10 +1307,17 @@ byId("clearTransition").addEventListener("click", () => {
   const button = byId("views").querySelector(`[data-criterion="${index}"][data-transition="${key}"]`);
   (button.getClientRects().length ? button : byId("missingPanel").querySelector("summary")).focus();
 });
+byId("clearTotal").addEventListener("click", () => {
+  const total = activeTotal;
+  activeTotal = null;
+  renderStudents();
+  byId("distributionRows").querySelector(`[data-total="${total}"]`).focus();
+});
 byId("reset").addEventListener("click", () => {
   for (const id of ["grade", "group", "search"]) byId(id).value = "";
   selected.clear();
   activeTransition = null;
+  activeTotal = null;
   sort = { ...defaultSort };
   byId("picker").open = false;
   byId("missingPanel").open = false;
@@ -1240,7 +1325,7 @@ byId("reset").addEventListener("click", () => {
   renderReport();
 });
 setHeaders("classHead", ["Class", "Students", ...criteria]);
-setHeaders("studentHead", ["Student Name", "Grade", "Group", ...criteria,
+setHeaders("studentHead", ["Student Name", "Grade", "Group", "After recorded Yes", ...criteria,
   "Before Total Periodo", "Before % Periodo", "After Total Periodo", "After % Periodo", "Exported Δ (pp)"]);
 setHeaders("qualityHead", ["Snapshot", "CSV record", "Student Name", "Grade", "Group", "Reason"]);
 initializeReport();
