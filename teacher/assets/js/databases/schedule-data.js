@@ -305,7 +305,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C4 Exploration and Activity",
+    "Description": "1st Learning Evidence C1 C2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -318,7 +318,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C1 - C4 Activities",
+    "Description": "C4 Exploration and Activity",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -331,7 +331,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "1st Learning Evidence C1 C2",
+    "Description": "C1 - C4 Activities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -1046,7 +1046,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C4 Exploration and Activity",
+    "Description": "1st Learning Evidence C1 C2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -1059,7 +1059,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "C1 - C4 Activities",
+    "Description": "C4 Exploration and Activity",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -1072,7 +1072,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "1st Learning Evidence C1 C2",
+    "Description": "C1 - C4 Activities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -1774,7 +1774,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C4 Exploration and Activity",
+    "Description": "1st Learning Evidence C1 C2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -1787,7 +1787,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "C1 - C4 Activities",
+    "Description": "C4 Exploration and Activity",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -1800,7 +1800,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "1st Learning Evidence C1 C2",
+    "Description": "C1 - C4 Activities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -2515,7 +2515,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "C4 Exploration and Activity",
+    "Description": "1st Learning Evidence C1 C2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -2528,7 +2528,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 6,
-    "Description": "C1 - C4 Activities",
+    "Description": "C4 Exploration and Activity",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -2541,7 +2541,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 4,
-    "Description": "1st Learning Evidence C1 C2",
+    "Description": "C1 - C4 Activities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -3243,7 +3243,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C4 Exploration and Activity",
+    "Description": "1st Learning Evidence C1 C2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -3256,7 +3256,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "C1 - C4 Activities",
+    "Description": "C4 Exploration and Activity",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -3269,7 +3269,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "1st Learning Evidence C1 C2",
+    "Description": "C1 - C4 Activities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -4348,7 +4348,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C4 Exploration and Activity",
+    "Description": "1st Learning Evidence C1 C2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -4361,7 +4361,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C1 - C4 Activities",
+    "Description": "C4 Exploration and Activity",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -4374,7 +4374,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "1st Learning Evidence C1 C2",
+    "Description": "C1 - C4 Activities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -5089,7 +5089,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 2,
-    "Description": "C4 Exploration and Activity",
+    "Description": "1st Learning Evidence C1 C2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -5102,7 +5102,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C1 - C4 Activities",
+    "Description": "C4 Exploration and Activity",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -5115,7 +5115,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 2,
-    "Description": "1st Learning Evidence C1 C2",
+    "Description": "C1 - C4 Activities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -5817,7 +5817,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C4 Exploration and Activity",
+    "Description": "1st Learning Evidence C1 C2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -5830,7 +5830,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 6,
-    "Description": "C1 - C4 Activities",
+    "Description": "C4 Exploration and Activity",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -5843,7 +5843,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "1st Learning Evidence C1 C2",
+    "Description": "C1 - C4 Activities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -6558,7 +6558,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C4 Exploration and Activity",
+    "Description": "1st Learning Evidence C1 C2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -6571,7 +6571,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "C1 - C4 Activities",
+    "Description": "C4 Exploration and Activity",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -6584,7 +6584,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "1st Learning Evidence C1 C2",
+    "Description": "C1 - C4 Activities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -7286,7 +7286,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C4 Exploration and Activity",
+    "Description": "1st Learning Evidence C1 C2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -7299,7 +7299,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 6,
-    "Description": "C1 - C4 Activities",
+    "Description": "C4 Exploration and Activity",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
@@ -7312,7 +7312,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "1st Learning Evidence C1 C2",
+    "Description": "C1 - C4 Activities",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "-"
