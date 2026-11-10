@@ -26,7 +26,7 @@ Each skill links to its own guide, LaTeX scaffold, and build instructions.
 - [Exam](../.agents/skills/global-economics-exam/SKILL.md) for student assessments with objectives, criteria, scores, and answer space.
 - [Exam Solution](../.agents/skills/global-economics-exam-solution/SKILL.md) for worked scoring keys that follow the source exam.
 - [Home Practice Activities](../.agents/skills/global-economics-home-practice/SKILL.md) for independent, criterion-linked work, including activities delivered on paper.
-- [Print Handout](../.agents/skills/global-economics-print/SKILL.md) for numbered problem contexts followed by a characterization table.
+- [Classroom Activity](../.agents/skills/global-economics-classroom-activity/SKILL.md) for print-ready lessons derived from the corresponding practice activity, with worked, guided, and independent problems for each core family.
 
 The [recursive Windows build](compile_all_tex.bat) runs `latexmk -pdf` from
 each source directory and explicitly includes the four skill scaffolds.

@@ -14,25 +14,232 @@
   <link rel="stylesheet" href="../../../../assets/css/mind_map_probability_visuals.css">
   <link rel="stylesheet" href="../../../../assets/css/mind_map_criteria.css">
   <link rel="stylesheet" href="../../../../assets/css/mind_map_presentation.css">
-  <script src="../../../../assets/js/math-render.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
   <script src="../../../../assets/js/mind_map.js" defer></script>
   <script src="../../../../assets/js/countdown_timer.js" defer></script>
   <script src="../../../../assets/js/mind_map_criteria.js" defer></script>
   <script src="../../../../assets/js/mind_map_presentation.js" defer></script>
   <style>
-    @media screen and (700px < width <= 800px) {
-      .g11-term-outline:not(.is-presenting) .mind-map-card { padding-inline: 1rem; }
-      .g11-term-outline:not(.is-presenting) .mind-map-node { padding-inline: .75rem; }
-      .g11-term-outline:not(.is-presenting) .concept-graphic { padding-inline: .5rem; }
+    .g11-term-outline .distribution-reference,
+    .g11-term-outline .comparison-table {
+      --mind-map-font-table-heading: .95rem;
+      --mind-map-font-table-body: .95rem;
+      margin: .75rem 0 1rem;
     }
-    @media screen and (max-width: 440px) {
+    .g11-term-outline .distribution-reference { text-align: left; }
+    .g11-term-outline.is-presenting :is(.distribution-reference, .comparison-table) {
+      --mind-map-font-table-heading: clamp(.95rem, 1.4vw, 1.2rem);
+      --mind-map-font-table-body: var(--mind-map-font-table-heading);
+      line-height: 1.35;
+    }
+    .g11-term-outline.is-presenting .distribution-reference { margin-bottom: .25rem; }
+    .g11-term-outline.is-presenting .distribution-reference :is(th, td) { padding-block: .35rem; }
+    .g11-term-outline .visual-table caption {
+      margin-bottom: .4rem;
+      color: var(--primary-color-dark);
+      font-size: var(--mind-map-font-table-heading);
+      font-weight: 800;
+      text-align: left;
+    }
+    .distribution-reference :is(th, td):last-child {
+      hyphens: auto;
+      overflow-wrap: anywhere;
+    }
+    .comparison-table tbody td { white-space: nowrap; }
+    .g11-term-outline .mind-map {
+      --mind-map-step-gap: 1.5rem;
+    }
+    .g11-term-outline:not(.is-presenting) .mind-map {
+      --mind-map-axis-gap: 4rem;
+      max-width: 52rem;
+      margin-inline: auto;
+      padding-left: 3.25rem;
+    }
+    .g11-term-outline:not(.is-presenting) .mind-map-step { width: 100%; }
+    .g11-term-outline:not(.is-presenting) .mind-map-step::before {
+      right: auto;
+      left: -3.25rem;
+    }
+    .g11-term-outline:not(.is-presenting) .mind-map-step::after {
+      right: auto;
+      left: calc(-3.25rem + (var(--mind-map-marker-size) - var(--mind-map-connector-width)) / 2);
+    }
+    .g11-term-outline:not(.is-presenting) .mind-map-node::after {
+      right: 100%;
+      left: auto;
+    }
+    body:has(.g11-term-outline.is-presenting) .site-header { display: none; }
+    .mind-map-layout:has(.g11-term-outline.is-presenting) {
+      padding: .4rem clamp(.4rem, 2vw, 1.25rem);
+    }
+    .g11-term-outline.is-presenting {
+      --mind-map-font-presentation-title: clamp(1.65rem, 3.2vw, 3rem);
+      --mind-map-font-presentation-body: clamp(1.05rem, 1.65vw, 1.45rem);
+      gap: .5rem;
+    }
+    .g11-term-outline.is-presenting:not(:fullscreen) {
+      height: min(98svh, 900px);
+      padding: .5rem;
+    }
+    .g11-term-outline.is-presenting .mind-map {
+      padding: .5rem;
+    }
+    .g11-term-outline.is-presenting:not(:fullscreen) .mind-map-step { width: 100%; }
+    .g11-term-outline.is-presenting .mind-map-node {
+      padding: clamp(.65rem, 2vw, 1.25rem);
+      line-height: 1.4;
+    }
+    .g11-term-outline.is-presenting:fullscreen .mind-map {
+      padding: 0;
+    }
+    .g11-term-outline.is-presenting:fullscreen .mind-map-step {
+      padding-top: clamp(.75rem, 3vh, 2rem);
+    }
+    .g11-term-outline.is-presenting:fullscreen .mind-map-node { padding: 0; }
+    .g11-term-outline .mind-map-node > p { margin: 0; }
+
+    .interval-density {
+      margin: .65rem 0 0;
+    }
+    .interval-density > figcaption {
+      margin-bottom: .5rem;
+      color: var(--primary-color-dark);
+      font-weight: 700;
+    }
+    .interval-density-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .65rem;
+    }
+    .interval-density-grid .concept-graphic {
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      padding: .45rem;
+      text-align: center;
+    }
+    .interval-density-grid .concept-graphic figcaption {
+      margin-bottom: .25rem;
+      font-size: .95em;
+      line-height: 1.2;
+    }
+    .g11-term-outline .interval-density-grid .concept-svg {
+      min-width: 0;
+      max-height: clamp(7rem, 16vh, 12rem);
+      margin-top: auto;
+      --mind-map-font-graph-label: 18px;
+    }
+    .g11-term-outline .slide-visual {
+      margin: .75rem 0 0;
+      text-align: center;
+      --mind-map-font-visual-caption: 1em;
+    }
+    .g11-term-outline .slide-visual .concept-svg {
+      width: min(100%, 32rem);
+      min-width: 0;
+      max-height: none;
+      margin-inline: auto;
+      --mind-map-font-graph-label: 16px;
+    }
+    .g11-term-outline .slide-visual .cycle-svg { width: min(100%, 22rem); }
+    .g11-term-outline.is-presenting:not(:fullscreen) .slide-visual .concept-svg {
+      max-height: min(36svh, 19rem);
+    }
+    .g11-term-outline .slide-visual .legend-row {
+      gap: .25rem 1.2rem;
+      font-size: .95em;
+    }
+    .legend-key.normal-key { border-top-style: dashed; }
+    .density-area { fill: #86efac; }
+    .density-guides {
+      fill: none;
+      stroke: #166534;
+      stroke-width: 1.5;
+      stroke-dasharray: 4 2;
+    }
+    :is(.density-axes, .density-line, .normal-line) {
+      fill: none;
+      stroke: #334155;
+    }
+    .density-line { stroke-width: 2; }
+    .normal-line { stroke: #1d4ed8; stroke-width: 2; stroke-dasharray: 5 3; }
+    .graph-label { font-weight: 700; }
+    .comparison-label { margin-top: .25rem; font-weight: 700; }
+
+    .g11-term-outline .investigation-workflow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: .9rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .g11-term-outline .mind-map-node .investigation-workflow li {
+      position: relative;
+      display: grid;
+      place-items: center;
+      margin: 0;
+      padding: .65rem .35rem;
+      border: 1px solid var(--primary-color-border);
+      border-radius: 8px;
+      background: var(--pill-bg);
+      font-size: .9em;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+    .investigation-workflow li:not(:last-child)::after {
+      position: absolute;
+      left: 100%;
+      width: .9rem;
+      color: var(--primary-color-dark);
+      content: "→" / "";
+    }
+
+    @media (max-width: 800px) {
+      .g11-term-outline .investigation-workflow {
+        grid-template-columns: 1fr;
+        gap: .7rem;
+      }
+      .g11-term-outline .mind-map-node .investigation-workflow li { padding-block: .35rem; }
+      .investigation-workflow li:not(:last-child)::after {
+        top: 100%;
+        left: 0;
+        width: 100%;
+        line-height: .7rem;
+        content: "↓" / "";
+      }
+    }
+    @media (max-width: 600px) {
       .g11-term-outline:not(.is-presenting) .mind-map-card { padding-inline: .5rem; }
       .g11-term-outline:not(.is-presenting) .mind-map { padding-inline: 0; }
-      .g11-term-outline:not(.is-presenting) .mind-map-node { padding-inline: .75rem; }
       .g11-term-outline:not(.is-presenting) .mind-map-step::before,
       .g11-term-outline:not(.is-presenting) .mind-map-step::after,
       .g11-term-outline:not(.is-presenting) .mind-map-node::after { display: none; }
+      .g11-term-outline:not(.is-presenting) .mind-map-node { padding-inline: .75rem; }
+    }
+    @media (max-width: 440px) {
+      .g11-term-outline:not(:fullscreen) .presentation-toolbar:not([hidden]) {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+      }
+      .g11-term-outline .presentation-toolbar > * { grid-column: span 2; }
+      .g11-term-outline .presentation-toolbar > :is([data-presentation-fullscreen], [data-presentation-exit]) {
+        grid-column: span 3;
+      }
+      .g11-term-outline .presentation-progress {
+        min-width: 0;
+        order: 0;
+      }
+      .g11-term-outline :is(.distribution-reference, .comparison-table),
+      .g11-term-outline.is-presenting :is(.distribution-reference, .comparison-table) {
+        --mind-map-font-table-heading: .85rem;
+        --mind-map-font-table-body: .85rem;
+      }
+      .g11-term-outline .visual-table :is(th, td) { padding-inline: .2rem; }
+      .g11-term-outline .interval-density-grid { gap: .35rem; }
+      .g11-term-outline .interval-density-grid .concept-graphic { padding: .2rem; }
+    }
+    @media (max-width: 360px) {
+      .g11-term-outline .distribution-reference th { overflow-wrap: anywhere; }
     }
   </style>
 </head>
@@ -41,274 +248,384 @@
   <main class="mind-map-layout">
     <section class="g11-term-outline" data-mind-map-presentation aria-labelledby="term-journey-title">
       <div class="presentation-launch"><button class="presentation-button" type="button" data-presentation-start aria-expanded="false">Start presentation</button></div>
-      <div class="presentation-toolbar" data-presentation-toolbar hidden aria-label="Presentation controls"><button class="presentation-button" type="button" data-presentation-previous>Previous</button><span class="presentation-progress" data-presentation-progress aria-label="Slide progress">1 / 5</span><button class="presentation-button" type="button" data-presentation-next>Next</button><button class="presentation-button" type="button" data-presentation-fullscreen aria-pressed="false">Enter fullscreen</button><button class="presentation-button" type="button" data-presentation-exit>Exit presentation</button></div>
-      <span class="presentation-fullscreen-progress" data-presentation-progress aria-label="Slide progress">1 / 5</span>
-      <div class="mind-map-card"><div class="mind-map-intro"><p class="mind-map-eyebrow">Grade 11 · Term 1 · Interactive outline</p><h2 id="term-journey-title">From continuous models to measured risk</h2><p>Build, test, compare, and integrate probability models in one coherent investigation.</p></div>
-      <ol class="mind-map" data-mind-map aria-label="Grade 11 Term 1 learning sequence"><li class="mind-map-step" data-mind-map-slide data-mind-map-slide-scroll><article class="mind-map-node"><p class="mind-map-step-label">Step <span>1</span></p>
-            <h3>Choose a distribution and find interval probabilities</h3>
-            <section class="mind-map-merged-section">
-              <h4>C1 · Printing Orders</h4>
-              <p><strong>Count.</strong> Orders arrive independently, one at a time, at a constant rate of 2 per hour. The number in one hour is \(\operatorname{Poisson}(2)\), with discrete support \(\{0, 1, 2, \ldots\}\).</p>
-              <p><strong>Measurement.</strong> Poster completion time \(Y\) has continuous support \([10, 30]\) minutes. Its density rises and falls along straight lines with a peak at 18, so use \(\operatorname{Tri}(10, 30, 18)\).</p>
-              <p>The density \(f(y)\) is a height in \(\mathrm{min}^{-1}\). The cumulative probability \(F(y) = P(Y \le y)\) is the area to the left. At the mode, \(F(18) = \frac{1}{2} \times 8 \times \frac{2}{20} = 0.40\), so 40% of poster orders finish within 18 minutes.</p>
-              <p>A general shape can fit several models. For example, a steadily decreasing density could be linear or curved.</p>
-            </section>
-            <section class="mind-map-merged-section">
-              <h4>C2 · Market-stall Setup</h4>
-              <p>Interval probability is area under the density. For a uniform model on \([a, b]\), multiply the interval length within the support by the rectangle’s height \(\frac{1}{b-a}\). For a triangular model, set \(\frac{1}{2} \times (b-a) \times H = 1\) to get peak height \(H = \frac{2}{b-a}\).</p>
-              <figure class="concept-graphic" aria-labelledby="density-caption">
-                <figcaption id="density-caption">Setup time is measured in minutes. The range widens from \([5, 25]\) to \([0, 30]\). The mode stays at 13.</figcaption>
-                <svg class="concept-svg" style="min-width: 0; --mind-map-font-graph-label: 15px" viewBox="0 0 280 136" role="img" aria-labelledby="density-title density-desc">
-                  <title id="density-title">Original and widened triangular setup-time densities</title>
-                  <desc id="density-desc">The dashed original triangle spans 5 to 25 minutes and peaks at 1/10 per minute. The solid widened triangle spans 0 to 30 minutes and peaks at 1/15 per minute. Both peaks are at 13 minutes. The area under the widened density from 9 to 19 minutes is shaded.</desc>
-                  <path d="M92 106 V69.08 L124 52.67 L172 71.49 V106Z" fill="#86efac" stroke="#166534"/>
-                  <path d="M20 106 L124 52.67 L260 106 M12 106 H268" fill="none" stroke="#334155" stroke-width="2"/>
-                  <path d="M60 106 L124 26 L220 106" fill="none" stroke="#475569" stroke-width="2" stroke-dasharray="5 4"/>
-                  <text x="12" y="20">Density</text>
-                  <path d="M170 15 H190" stroke="#475569" stroke-width="2" stroke-dasharray="5 4"/>
-                  <path d="M170 38 H190" stroke="#334155" stroke-width="2"/>
-                  <text x="196" y="20">Original</text>
-                  <text x="196" y="43">Widened</text>
-                  <g text-anchor="middle"><text x="20" y="125">0</text><text x="60" y="125">5</text><text x="92" y="125">9</text><text x="124" y="125">13</text><text x="172" y="125">19</text><text x="220" y="125">25</text><text x="260" y="125">30</text></g>
-                </svg>
-                <p>To find \(P(9 \le S \le 19)\), subtract the two tail triangles from 1. Get each tail height by scaling \(H\) along the straight branch.</p>
-                <p><strong>\([5, 25]\)</strong> · \(H = \frac{2}{20} = \frac{1}{10}\). At 9 and 19, the heights are \(H \times \frac{4}{8}\) and \(H \times \frac{6}{12}\), both \(\frac{1}{20}\). The area is</p>
-                <div class="visual-equation">
-                  \[\begin{aligned}
-                    &1 - \frac{1}{2} \times 4 \times \frac{1}{20} \\
-                    &\quad - \frac{1}{2} \times 6 \times \frac{1}{20} \\
-                    &\quad = \mathbf{0.7500}.
-                  \end{aligned}\]
+      <div class="presentation-toolbar" data-presentation-toolbar hidden aria-label="Presentation controls"><button class="presentation-button" type="button" data-presentation-previous>Previous</button><span class="presentation-progress" data-presentation-progress aria-label="Slide progress">1 / 10</span><button class="presentation-button" type="button" data-presentation-next>Next</button><button class="presentation-button" type="button" data-presentation-fullscreen aria-pressed="false">Enter fullscreen</button><button class="presentation-button" type="button" data-presentation-exit>Exit presentation</button></div>
+      <span class="presentation-fullscreen-progress" data-presentation-progress aria-label="Slide progress">1 / 10</span>
+      <div class="mind-map-card">
+        <div class="mind-map-intro"><p class="mind-map-eyebrow">Grade 11 · Term 1 · Interactive outline</p><h2 id="term-journey-title">From continuous models to measured risk</h2><p>Build, test, compare, and integrate probability models in one coherent investigation.</p></div>
+        <ol class="mind-map" data-mind-map aria-label="Grade 11 Term 1 learning sequence">
+          <li class="mind-map-step" data-mind-map-slide data-mind-map-slide-scroll>
+            <article class="mind-map-node">
+              <h3>C1 · Choosing a distribution</h3>
+              <p>Identify the probability distribution from the context.</p>
+              <table class="visual-table distribution-reference">
+                <caption>Choosing a probability distribution</caption>
+                <thead>
+                  <tr><th scope="col">Type</th><th scope="col">Distribution</th><th scope="col">Typical situation</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Discrete</td><th scope="row">Bernoulli</th><td>One trial with two possible outcomes.</td></tr>
+                  <tr><td>Discrete</td><th scope="row">Binomial</th><td>Counting successes in a fixed number of independent trials with the same probability of success.</td></tr>
+                  <tr><td>Discrete</td><th scope="row">Geometric</th><td>Counting the trials needed to get the first success, including the successful trial.</td></tr>
+                  <tr><td>Discrete</td><th scope="row">Poisson</th><td>Counting events in a fixed interval of time, space, or exposure when events occur independently at a constant average rate.</td></tr>
+                  <tr><td>Continuous</td><th scope="row">Uniform</th><td>A bounded measurement for which equal-length intervals within the range are equally likely.</td></tr>
+                  <tr><td>Continuous</td><th scope="row">Triangular</th><td>A bounded measurement with a practical minimum, maximum, and one most likely value.</td></tr>
+                  <tr><td>Continuous</td><th scope="row">Linear</th><td>A bounded measurement whose density rises or falls at a constant rate across the range.</td></tr>
+                  <tr><td>Continuous</td><th scope="row">Normal</th><td>Measurements clustered around a central value, with observations becoming less common farther away on either side.</td></tr>
+                </tbody>
+              </table>
+              <div class="criterion-control">
+                <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C1" data-criterion-text="Characterises discrete and continuous random variables, identifies suitable distributions and supports, and interprets density and cumulative probability in context." aria-expanded="false" aria-controls="criterion-tooltip-c1">Criterion C1</button>
+                <div class="criterion-overlay" id="criterion-tooltip-c1" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c1-title">
+                  <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
+                  <div class="criterion-dialog" role="document"><div class="criterion-dialog-header"><h2 class="criterion-dialog-title" id="criterion-tooltip-c1-title">Criterion C1</h2><button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criterion C1"><span aria-hidden="true">&times;</span></button></div><div class="criterion-dialog-text" data-criterion-list>Characterises discrete and continuous random variables, identifies suitable distributions and supports, and interprets density and cumulative probability in context.</div></div>
                 </div>
-                <p><strong>\([0, 30]\)</strong> · \(H = \frac{2}{30} = \frac{1}{15}\). The heights become \(H \times \frac{9}{13} = \frac{3}{65}\) and \(H \times \frac{11}{17} = \frac{11}{255}\). The area is</p>
-                <div class="visual-equation">
-                  \[\begin{aligned}
-                    &1 - \frac{1}{2} \times 9 \times \frac{3}{65} \\
-                    &\quad - \frac{1}{2} \times 11 \times \frac{11}{255} \\
-                    &\quad \approx \mathbf{0.5551}.
-                  \end{aligned}\]
+              </div>
+            </article>
+          </li>
+          <li class="mind-map-step" data-mind-map-slide data-mind-map-slide-scroll>
+            <article class="mind-map-node">
+              <h3>C2 · Finding interval probabilities</h3>
+              <p>Find specific probabilities from linear models.</p>
+              <figure class="interval-density">
+                <figcaption>Shaded area = <i>P</i>(<i>a</i> ≤ <i>X</i> ≤ <i>b</i>)</figcaption>
+                <div class="interval-density-grid">
+                  <figure class="concept-graphic">
+                    <figcaption>Uniform</figcaption>
+                    <svg class="concept-svg" viewBox="0 0 224 148" role="img" aria-labelledby="density-uniform-title" aria-describedby="density-uniform-desc">
+                      <title id="density-uniform-title">Uniform distribution</title>
+                      <desc id="density-uniform-desc">The uniform density stays at height 1 from 0 to 1. The area under the density from a = 1/4 to b = 3/4 is shaded.</desc>
+                      <path class="density-area" d="M74 118 V74 H154 V118 Z"/>
+                      <path class="density-guides" d="M74 118 V74 M154 118 V74"/>
+                      <path class="density-axes" d="M34 24 V118 H207 M30 74 H34 M30 30 H34 M74 118 V122 M154 118 V122 M194 118 V122"/>
+                      <path class="density-line" d="M34 74 H194"/>
+                      <text x="34" y="21" text-anchor="middle">f(x)</text>
+                      <text x="211" y="124">x</text>
+                      <g text-anchor="end"><text x="26" y="80">1</text><text x="26" y="36">2</text></g>
+                      <g text-anchor="middle"><text x="34" y="141">0</text><text x="74" y="141">a</text><text x="154" y="141">b</text><text x="194" y="141">1</text></g>
+                    </svg>
+                  </figure>
+                  <figure class="concept-graphic">
+                    <figcaption>Increasing linear</figcaption>
+                    <svg class="concept-svg" viewBox="0 0 224 148" role="img" aria-labelledby="density-increasing-title" aria-describedby="density-increasing-desc">
+                      <title id="density-increasing-title">Linear increasing density</title>
+                      <desc id="density-increasing-desc">The density rises along a straight line from height 0 at x = 0 to height 2 at x = 1. The area under the density from a = 1/4 to b = 3/4 is shaded.</desc>
+                      <path class="density-area" d="M74 118 V96 L154 52 V118 Z"/>
+                      <path class="density-guides" d="M74 118 V96 M154 118 V52"/>
+                      <path class="density-axes" d="M34 24 V118 H207 M30 74 H34 M30 30 H34 M74 118 V122 M154 118 V122 M194 118 V122"/>
+                      <path class="density-line" d="M34 118 L194 30"/>
+                      <text x="34" y="21" text-anchor="middle">f(x)</text>
+                      <text x="211" y="124">x</text>
+                      <g text-anchor="end"><text x="26" y="80">1</text><text x="26" y="36">2</text></g>
+                      <g text-anchor="middle"><text x="34" y="141">0</text><text x="74" y="141">a</text><text x="154" y="141">b</text><text x="194" y="141">1</text></g>
+                    </svg>
+                  </figure>
+                  <figure class="concept-graphic">
+                    <figcaption>Decreasing linear</figcaption>
+                    <svg class="concept-svg" viewBox="0 0 224 148" role="img" aria-labelledby="density-decreasing-title" aria-describedby="density-decreasing-desc">
+                      <title id="density-decreasing-title">Linear decreasing density</title>
+                      <desc id="density-decreasing-desc">The density falls along a straight line from height 2 at x = 0 to height 0 at x = 1. The area under the density from a = 1/4 to b = 3/4 is shaded.</desc>
+                      <path class="density-area" d="M74 118 V52 L154 96 V118 Z"/>
+                      <path class="density-guides" d="M74 118 V52 M154 118 V96"/>
+                      <path class="density-axes" d="M34 24 V118 H207 M30 74 H34 M30 30 H34 M74 118 V122 M154 118 V122 M194 118 V122"/>
+                      <path class="density-line" d="M34 30 L194 118"/>
+                      <text x="34" y="21" text-anchor="middle">f(x)</text>
+                      <text x="211" y="124">x</text>
+                      <g text-anchor="end"><text x="26" y="80">1</text><text x="26" y="36">2</text></g>
+                      <g text-anchor="middle"><text x="34" y="141">0</text><text x="74" y="141">a</text><text x="154" y="141">b</text><text x="194" y="141">1</text></g>
+                    </svg>
+                  </figure>
+                  <figure class="concept-graphic">
+                    <figcaption>Triangular</figcaption>
+                    <svg class="concept-svg" viewBox="0 0 224 148" role="img" aria-labelledby="density-triangular-title" aria-describedby="density-triangular-desc">
+                      <title id="density-triangular-title">Triangular density</title>
+                      <desc id="density-triangular-desc">The density starts and ends at height 0 on the support from 0 to 1 and peaks at height 2 halfway across. The area under the density from a = 1/4 to b = 3/4 is shaded.</desc>
+                      <path class="density-area" d="M74 118 V74 L114 30 L154 74 V118 Z"/>
+                      <path class="density-guides" d="M74 118 V74 M154 118 V74"/>
+                      <path class="density-axes" d="M34 24 V118 H207 M30 74 H34 M30 30 H34 M74 118 V122 M154 118 V122 M194 118 V122"/>
+                      <path class="density-line" d="M34 118 L114 30 L194 118"/>
+                      <text x="34" y="21" text-anchor="middle">f(x)</text>
+                      <text x="211" y="124">x</text>
+                      <g text-anchor="end"><text x="26" y="80">1</text><text x="26" y="36">2</text></g>
+                      <g text-anchor="middle"><text x="34" y="141">0</text><text x="74" y="141">a</text><text x="154" y="141">b</text><text x="194" y="141">1</text></g>
+                    </svg>
+                  </figure>
                 </div>
               </figure>
-            </section>
-            <div class="criterion-control">
-              <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C1" data-criterion-text="Characterises discrete and continuous random variables, identifies suitable distributions and supports, and interprets density and cumulative probability in context." aria-expanded="false" aria-controls="criterion-tooltip-c1">Criterion C1</button>
-              <div class="criterion-overlay" id="criterion-tooltip-c1" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c1-title">
-                <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
-                <div class="criterion-dialog" role="document"><div class="criterion-dialog-header"><h2 class="criterion-dialog-title" id="criterion-tooltip-c1-title">Criterion C1</h2><button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criterion C1"><span aria-hidden="true">&times;</span></button></div><div class="criterion-dialog-text" data-criterion-list>Characterises discrete and continuous random variables, identifies suitable distributions and supports, and interprets density and cumulative probability in context.</div></div>
-              </div>
-            </div>
-            <div class="criterion-control">
-              <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C2" data-criterion-text="Applies uniform and triangular models and constant or piecewise-linear densities to interval probabilities using geometric areas." aria-expanded="false" aria-controls="criterion-tooltip-c2">Criterion C2</button>
-              <div class="criterion-overlay" id="criterion-tooltip-c2" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c2-title">
-                <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
-                <div class="criterion-dialog" role="document"><div class="criterion-dialog-header"><h2 class="criterion-dialog-title" id="criterion-tooltip-c2-title">Criterion C2</h2><button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criterion C2"><span aria-hidden="true">&times;</span></button></div><div class="criterion-dialog-text" data-criterion-list>Applies uniform and triangular models and constant or piecewise-linear densities to interval probabilities using geometric areas.</div></div>
-              </div>
-            </div></article></li>
-<li class="mind-map-step" data-mind-map-slide data-mind-map-slide-scroll><article class="mind-map-node"><p class="mind-map-step-label">Step <span>2</span></p>
-            <h3>Find probabilities in cycles and waiting times</h3>
-            <section class="mind-map-merged-section">
-              <h4>C3 · A Repeating Inspection Cycle</h4>
-              <p>An alarm is equally likely to occur anywhere in a 60-minute cycle. For uniform timing or direction around a circle, divide the selected arc length by the full circumference, or use the equivalent fraction of time or angle.</p>
-              <figure class="concept-graphic" aria-labelledby="cycle-caption">
-                <figcaption id="cycle-caption">The alarm window runs from minute 52 through the restart to minute 11.</figcaption>
-                <svg class="concept-svg" style="min-width: 0; --mind-map-font-graph-label: 15px" viewBox="0 0 200 153" role="img" aria-labelledby="cycle-title cycle-desc">
-                  <title id="cycle-title">Uniform timing around the inspection cycle</title>
-                  <desc id="cycle-desc">A circle represents 60 minutes, with 0 and 60 at the top. Clockwise, the highlighted arc runs from minute 52 on the upper left to the restart, then to minute 11 on the upper right. The two pieces last 8 and 11 minutes.</desc>
-                  <circle cx="100" cy="86" r="55" fill="none" stroke="#94a3b8" stroke-width="4"/>
-                  <path d="M59.13 49.20 A55 55 0 0 1 100 31 A55 55 0 0 1 150.25 63.63" fill="none" stroke="#166534" stroke-width="8"/>
-                  <circle cx="100" cy="31" r="4" fill="#0f172a"/>
-                  <text x="100" y="20" text-anchor="middle">60 = 0</text>
-                  <text x="37" y="48">52</text><text x="160" y="69">11</text>
-                  <text x="100" y="92" text-anchor="middle">60 min</text>
-                </svg>
-                <div class="visual-equation">
-                  \[\begin{aligned}
-                    P &= \frac{(60-52)+11}{60} \\
-                      &= \frac{8+11}{60} \\
-                      &= \frac{19}{60} \approx 0.3167
-                  \end{aligned}\]
+              <div class="criterion-control">
+                <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C2" data-criterion-text="Applies uniform and triangular models and constant or piecewise-linear densities to interval probabilities using geometric areas." aria-expanded="false" aria-controls="criterion-tooltip-c2">Criterion C2</button>
+                <div class="criterion-overlay" id="criterion-tooltip-c2" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c2-title">
+                  <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
+                  <div class="criterion-dialog" role="document"><div class="criterion-dialog-header"><h2 class="criterion-dialog-title" id="criterion-tooltip-c2-title">Criterion C2</h2><button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criterion C2"><span aria-hidden="true">&times;</span></button></div><div class="criterion-dialog-text" data-criterion-list>Applies uniform and triangular models and constant or piecewise-linear densities to interval probabilities using geometric areas.</div></div>
                 </div>
-              </figure>
-            </section>
-            <section class="mind-map-merged-section">
-              <h4>C4 · Exponential waits in both directions</h4>
-              <p>Use an exponential model for the wait to the next event in a constant-rate Poisson process. With time \(t\) in minutes and rate \(\lambda\) per minute, \(P(T > t) = e^{-\lambda t}\).</p>
-              <p><strong>Charging-space Availability · Rate to probability.</strong> At 12 openings per hour, \(\lambda = \frac{12}{60} = \frac{1}{5}\) per minute. For a wait under 3 minutes or over 8 minutes, add the disjoint tails.</p>
-              <div class="visual-equation">
-                \[\begin{aligned}
-                  &P(T \lt 3 \text{ or } T > 8) \\
-                  &\quad = (1 - e^{-3/5}) + e^{-8/5} \\
-                  &\quad \approx 0.6531
-                \end{aligned}\]
               </div>
-              <p><strong>Electronic Receipt Rates · Probability to rate.</strong> In the morning, \(P(T > 10) = 0.40\). Set \(e^{-10\lambda} = 0.40\) and take natural logs. Then \(\lambda = -\frac{\ln(0.40)}{10}\) receipts per minute, or \(60\lambda \approx \mathbf{5.498}\) <strong>receipts per hour</strong>.</p>
-            </section>
-            <div class="criterion-control">
-              <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C3" data-criterion-text="Uses circular geometry and arc proportions to calculate probabilities for uniform timing and directions around a circle." aria-expanded="false" aria-controls="criterion-tooltip-c3">Criterion C3</button>
-              <div class="criterion-overlay" id="criterion-tooltip-c3" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c3-title">
-                <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
-                <div class="criterion-dialog" role="document"><div class="criterion-dialog-header"><h2 class="criterion-dialog-title" id="criterion-tooltip-c3-title">Criterion C3</h2><button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criterion C3"><span aria-hidden="true">&times;</span></button></div><div class="criterion-dialog-text" data-criterion-list>Uses circular geometry and arc proportions to calculate probabilities for uniform timing and directions around a circle.</div></div>
-              </div>
-            </div>
-            <div class="criterion-control">
-              <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C4" data-criterion-text="Applies exponential models to constant-rate waiting times, infers event rates, and assesses model suitability." aria-expanded="false" aria-controls="criterion-tooltip-c4">Criterion C4</button>
-              <div class="criterion-overlay" id="criterion-tooltip-c4" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c4-title">
-                <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
-                <div class="criterion-dialog" role="document"><div class="criterion-dialog-header"><h2 class="criterion-dialog-title" id="criterion-tooltip-c4-title">Criterion C4</h2><button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criterion C4"><span aria-hidden="true">&times;</span></button></div><div class="criterion-dialog-text" data-criterion-list>Applies exponential models to constant-rate waiting times, infers event rates, and assesses model suitability.</div></div>
-              </div>
-            </div></article></li>
-<li class="mind-map-step" data-mind-map-slide data-mind-map-slide-scroll><article class="mind-map-node"><p class="mind-map-step-label">Step <span>3</span></p>
-            <h3>Compare theoretical and sample results</h3>
-            <section class="mind-map-merged-section">
-              <h4>C5 · Two Labelling Stations</h4>
-              <p>Both labelling times are on \([3, 15]\) minutes. Station A has a triangular density rising to a mode of 15. Station B has a uniform density.</p>
-              <figure class="concept-graphic" aria-labelledby="stations-caption">
-                <figcaption id="stations-caption">Theoretical mean and spread at the two stations</figcaption>
-                <table class="visual-table">
-                  <thead><tr><th scope="col">Statistic</th><th scope="col">Station A</th><th scope="col">Station B</th></tr></thead>
-                  <tbody>
-                    <tr><th scope="row">Mean (min)</th><td>\(\frac{3 + 2 \times 15}{3} = 11\)</td><td>\(\frac{3 + 15}{2} = 9\)</td></tr>
-                    <tr><th scope="row">Variance (\(\mathrm{min}^2\))</th><td>\(\frac{(15 - 3)^2}{18} = 8\)</td><td>\(\frac{(15 - 3)^2}{12} = 12\)</td></tr>
-                    <tr><th scope="row">SD (min)</th><td>\(\sqrt{8} \approx 2.828\)</td><td>\(\sqrt{12} \approx 3.464\)</td></tr>
-                  </tbody>
-                </table>
-                <p>Station A takes longer on average and has a smaller standard deviation.</p>
-              </figure>
-            </section>
-            <section class="mind-map-merged-section">
-              <h4>C6 · File Transfers</h4>
-              <p>For \(4 \le X \lt 12\) seconds, add the counts from \([4, 8)\) and \([8, 12)\) to get \(9 + 5 = 14\). The four classes have \(3 + 9 + 5 + 3 = 20\) observations, giving an empirical probability of <strong>\(\frac{14}{20} = 0.70\)</strong>.</p>
-              <p>Against the model probability 0.75, the absolute error is \(\lvert 0.70 - 0.75 \rvert = \mathbf{0.05}\). The percentage error is \(\frac{0.05}{0.75} \times 100\% \approx \mathbf{6.67\%}\). Counts can come from raw data, grouped frequencies, or a histogram.</p>
-            </section>
-            <section class="mind-map-merged-section">
-              <h4>C7 · Courier Routes</h4>
-              <figure class="concept-graphic" aria-labelledby="routes-caption">
-                <figcaption id="routes-caption">Represent each route-time class by its midpoint.</figcaption>
-                <table class="visual-table">
-                  <thead><tr><th scope="col">Class (min)</th><th scope="col">Midpoint</th><th scope="col">Count</th></tr></thead>
-                  <tbody>
-                    <tr><th scope="row">\([8, 12)\)</th><td>10</td><td>2</td></tr>
-                    <tr><th scope="row">\([12, 16)\)</th><td>14</td><td>3</td></tr>
-                    <tr><th scope="row">\([16, 20)\)</th><td>18</td><td>1</td></tr>
-                  </tbody>
-                </table>
-              </figure>
-              <p>With \(n = 6\), the midpoint estimate of the sample mean is</p>
-              <div class="visual-equation">
-                \[\begin{aligned}
-                  \bar{x} &= \frac{2 \times 10 + 3 \times 14 + 18}{6} \\
-                          &= \frac{40}{3} \approx \mathbf{13.333}\,\mathrm{min}.
-                \end{aligned}\]
-              </div>
-              <p>Weight each squared deviation by its count. The sum is</p>
-              <div class="visual-equation">
-                \[\begin{aligned}
-                  &2(10 - \bar{x})^2 + 3(14 - \bar{x})^2 \\
-                  &\quad + (18 - \bar{x})^2 = \frac{136}{3}\,\mathrm{min}^2.
-                \end{aligned}\]
-              </div>
-              <p>Divide by \(n - 1 = 5\) to estimate \(s^2 = \frac{136}{15} \approx \mathbf{9.067}\,\mathrm{min}^2\). Take its square root for \(s \approx \mathbf{3.011}\,\mathrm{min}\).</p>
-              <p>Using the unrounded estimates, the mean differs from 14 min by 0.667 min (4.76%) and the variance differs from 12 \(\mathrm{min}^2\) by 2.933 \(\mathrm{min}^2\) (24.44%). In each case, divide the absolute error by the theoretical value and multiply by 100%.</p>
-            </section>
-            <div class="criterion-control">
-              <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C5" data-criterion-text="Calculates and interprets the mean, variance, and standard deviation of continuous distributions using standard formulas." aria-expanded="false" aria-controls="criterion-tooltip-c5">Criterion C5</button>
-              <div class="criterion-overlay" id="criterion-tooltip-c5" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c5-title">
-                <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
-                <div class="criterion-dialog" role="document"><div class="criterion-dialog-header"><h2 class="criterion-dialog-title" id="criterion-tooltip-c5-title">Criterion C5</h2><button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criterion C5"><span aria-hidden="true">&times;</span></button></div><div class="criterion-dialog-text" data-criterion-list>Calculates and interprets the mean, variance, and standard deviation of continuous distributions using standard formulas.</div></div>
-              </div>
-            </div>
-            <div class="criterion-control">
-              <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C6" data-criterion-text="Estimates interval probabilities using sample relative frequencies and compares them with theoretical probabilities." aria-expanded="false" aria-controls="criterion-tooltip-c6">Criterion C6</button>
-              <div class="criterion-overlay" id="criterion-tooltip-c6" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c6-title">
-                <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
-                <div class="criterion-dialog" role="document"><div class="criterion-dialog-header"><h2 class="criterion-dialog-title" id="criterion-tooltip-c6-title">Criterion C6</h2><button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criterion C6"><span aria-hidden="true">&times;</span></button></div><div class="criterion-dialog-text" data-criterion-list>Estimates interval probabilities using sample relative frequencies and compares them with theoretical probabilities.</div></div>
-              </div>
-            </div>
-            <div class="criterion-control">
-              <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C7" data-criterion-text="Calculates sample means, variances, and standard deviations for different sample sizes and data representations and compares them with theory." aria-expanded="false" aria-controls="criterion-tooltip-c7">Criterion C7</button>
-              <div class="criterion-overlay" id="criterion-tooltip-c7" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c7-title">
-                <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
-                <div class="criterion-dialog" role="document"><div class="criterion-dialog-header"><h2 class="criterion-dialog-title" id="criterion-tooltip-c7-title">Criterion C7</h2><button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criterion C7"><span aria-hidden="true">&times;</span></button></div><div class="criterion-dialog-text" data-criterion-list>Calculates sample means, variances, and standard deviations for different sample sizes and data representations and compares them with theory.</div></div>
-              </div>
-            </div></article></li>
-<li class="mind-map-step" data-mind-map-slide data-mind-map-slide-scroll><article class="mind-map-node"><p class="mind-map-step-label">Step <span>4</span></p>
-            <h3>Read Student’s \(t\) tables and compare models</h3>
-            <section class="mind-map-merged-section">
-              <h4>C8 · From cutoffs to areas and back</h4>
-              <p>For the supplied model \(X = m + aT\), use \(\mathrm{df} = n - 1\). The \(t\) table pairs a positive critical value with its right-tail area. By symmetry, the negative critical value has the same area to its left.</p>
-              <p><strong>Direct · Retail Revenue Alerts.</strong> For \(n = 7\), \(m = 2\) and \(a = 4\), standardise with \(c = \frac{x - m}{a}\). The cutoffs give \(\frac{-5.772 - 2}{4} = -1.943\) and \(\frac{7.76 - 2}{4} = 1.440\). Row 6 gives tail areas 0.05 and 0.10.</p>
-              <figure class="concept-graphic" aria-labelledby="retail-caption">
-                <figcaption id="retail-caption">Add the two alert tails. The alert probability is approximately \(0.05 + 0.10 = 0.15\).</figcaption>
-                <svg class="concept-svg" style="min-width: 0; --mind-map-font-graph-label: 15px" viewBox="0 0 280 76" role="img" aria-labelledby="retail-title retail-desc">
-                  <title id="retail-title">Probability strip for retail revenue alerts</title>
-                  <desc id="retail-desc">The shaded lower tail below the standardised cutoff minus 1.943 has area 0.05. The shaded upper tail above 1.440 has area 0.10. The middle accounts for the remaining 0.85.</desc>
-                  <rect x="20" y="32" width="240" height="14" fill="#e2e8f0" stroke="#475569"/>
-                  <path d="M20 32 H32 V46 H20Z M236 32 H260 V46 H236Z" fill="#166534"/>
-                  <text x="20" y="24">0.05</text><text x="260" y="24" text-anchor="end">0.10</text>
-                  <text x="32" y="65" text-anchor="middle">−1.943</text><text x="236" y="65" text-anchor="middle">1.440</text>
+            </article>
+          </li>
+          <li class="mind-map-step" data-mind-map-slide data-mind-map-slide-scroll>
+            <article class="mind-map-node">
+              <h3>C3 · Probability around a cycle</h3>
+              <p>For uniform timing, the highlighted fraction of the full cycle gives the event’s probability.</p>
+              <figure class="concept-graphic slide-visual">
+                <figcaption>Inspection alarm window</figcaption>
+                <svg class="concept-svg cycle-svg" viewBox="0 0 220 168" role="img" aria-labelledby="cycle-title" aria-describedby="cycle-desc">
+                  <title id="cycle-title">Alarm timing in a 60-minute inspection cycle</title>
+                  <desc id="cycle-desc">The thick clockwise arc runs from minute 52 through the restart at 60, also marked 0, to minute 11. The highlighted fraction is 19 out of 60 minutes.</desc>
+                  <circle cx="110" cy="93" r="55" fill="none" stroke="#94a3b8" stroke-width="4"/>
+                  <path d="M69.13 56.20 A55 55 0 0 1 110 38 A55 55 0 0 1 160.25 70.63" fill="none" stroke="#166534" stroke-width="8"/>
+                  <circle cx="110" cy="38" r="4" fill="#0f172a"/>
+                  <g text-anchor="middle">
+                    <text x="110" y="23" class="graph-label">Restart (60 = 0)</text>
+                    <text x="54" y="50">52</text>
+                    <text x="178" y="73">11</text>
+                    <text x="110" y="87">60 min</text>
+                    <text x="110" y="111" class="graph-label">P = 19/60</text>
+                  </g>
                 </svg>
               </figure>
-              <p><strong>Inverse · Dispatch Time Alerts.</strong> With \(n = 16\), use row 15. The 0.01 lower tail gives \(c_L = -2.602\) by symmetry, and the 0.10 upper tail gives \(c_U = 1.341\). Back-transform with \(x = m + ac\).</p>
-              <div class="visual-equation">
-                \[\begin{aligned}
-                  L &= -2 + 6(-2.602) \\
-                    &\approx -17.61\,\mathrm{min} \\[.4em]
-                  U &= -2 + 6(1.341) \\
-                    &\approx 6.05\,\mathrm{min}
-                \end{aligned}\]
+              <div class="criterion-control">
+                <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C3" data-criterion-text="Uses circular geometry and arc proportions to calculate probabilities for uniform timing and directions around a circle." aria-expanded="false" aria-controls="criterion-tooltip-c3">Criterion C3</button>
+                <div class="criterion-overlay" id="criterion-tooltip-c3" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c3-title">
+                  <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
+                  <div class="criterion-dialog" role="document"><div class="criterion-dialog-header"><h2 class="criterion-dialog-title" id="criterion-tooltip-c3-title">Criterion C3</h2><button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criterion C3"><span aria-hidden="true">&times;</span></button></div><div class="criterion-dialog-text" data-criterion-list>Uses circular geometry and arc proportions to calculate probabilities for uniform timing and directions around a circle.</div></div>
+                </div>
               </div>
-            </section>
-            <section class="mind-map-merged-section">
-              <h4>C9 · Sales Revenue Shortfalls</h4>
-              <p>Compare \(P(X \lt -11.165)\) for \(X_T = -2 + 5T\) and \(X_N = -2 + 5Z\), with \(T\) from the \(t\) model (\(\mathrm{df} = 9\)) and \(Z\) standard normal. Both use the supplied location \(-2\) and the stated approximate standard deviation of 5 as the scale, in thousands of dollars.</p>
-              <figure class="concept-graphic" aria-labelledby="shortfalls-caption">
-                <figcaption id="shortfalls-caption">Table-based comparison of the same shortfall under both models</figcaption>
-                <p>Standardise once to get \(\frac{-11.165 + 2}{5} = -1.833\). Row 9 of the \(t\) table gives a left tail of <strong>0.0500</strong> by symmetry. For normal, round to \(z = -1.83\) and use \(1 - \Phi(1.83)\), which gives \(1 - 0.9664 = \mathbf{0.0336}\).</p>
-                <p>The absolute difference is \(\lvert 0.0500 - 0.0336 \rvert = \mathbf{0.0164}\). Divide by each model’s probability to get the relative differences.</p>
-                <div class="visual-equation">
-                  \[\begin{aligned}
-                    &\frac{0.0164}{0.0500} \times 100\% \\
-                    &\quad = 32.80\%
-                  \end{aligned}\]
-                  relative to \(t\)
-                  \[\begin{aligned}
-                    &\frac{0.0164}{0.0336} \times 100\% \\
-                    &\quad \approx 48.81\%
-                  \end{aligned}\]
-                  relative to normal
+            </article>
+          </li>
+          <li class="mind-map-step" data-mind-map-slide data-mind-map-slide-scroll>
+            <article class="mind-map-node">
+              <h3>C4 · Exponential waiting times</h3>
+              <p>Use the constant event rate to find the probability of a shorter or longer wait.</p>
+              <figure class="concept-graphic slide-visual">
+                <figcaption>Charging-space openings · 12 per hour</figcaption>
+                <svg class="concept-svg" viewBox="0 0 360 194" role="img" aria-labelledby="wait-title" aria-describedby="wait-desc">
+                  <title id="wait-title">Exponential density for the wait until a charging space opens</title>
+                  <desc id="wait-desc">The opening rate is 0.2 per minute. The shaded areas are to the left of 3 minutes and to the right of 8 minutes. An arrow shows the right tail continuing beyond the graph.</desc>
+                  <path class="density-area" d="M42 36 C51.06 46.4 60.13 55.25 69.19 62.95 C78.25 70.66 87.31 77.22 96.38 82.92 V140 H42 Z"/>
+                  <path class="density-area" d="M187 119 C203.11 122.74 219.22 125.49 235.33 127.68 C251.44 129.87 267.56 131.49 283.67 132.77 C299.78 134.06 315.89 135.01 332 135.76 V140 H187 Z"/>
+                  <path class="density-guides" d="M96.38 82.92 V140 M187 119 V140"/>
+                  <path class="density-axes" d="M42 30 V140 H350 M42 140 V145 M96.38 140 V145 M187 140 V145"/>
+                  <path class="density-line" d="M42 36 C58.11 54.49 74.22 68.14 90.33 78.99 C106.44 89.84 122.56 97.84 138.67 104.21 C154.78 110.57 170.89 115.27 187 119 C203.11 122.74 219.22 125.49 235.33 127.68 C251.44 129.87 267.56 131.49 283.67 132.77 C299.78 134.06 315.89 135.01 332 135.76"/>
+                  <path d="M344 136 L333 131 V141 Z" fill="#166534"/>
+                  <text x="10" y="20">Density (min⁻¹)</text>
+                  <text x="68" y="121" text-anchor="middle" class="graph-label">&lt; 3</text>
+                  <text x="257" y="109" text-anchor="middle" class="graph-label">&gt; 8</text>
+                  <path class="density-guides" d="M257 114 V132"/>
+                  <g text-anchor="middle">
+                    <text x="42" y="162">0</text>
+                    <text x="96.38" y="162">3</text>
+                    <text x="187" y="162">8</text>
+                    <text x="187" y="185">Waiting time (min)</text>
+                  </g>
+                </svg>
+              </figure>
+              <div class="criterion-control">
+                <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C4" data-criterion-text="Applies exponential models to constant-rate waiting times, infers event rates, and assesses model suitability." aria-expanded="false" aria-controls="criterion-tooltip-c4">Criterion C4</button>
+                <div class="criterion-overlay" id="criterion-tooltip-c4" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c4-title">
+                  <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
+                  <div class="criterion-dialog" role="document"><div class="criterion-dialog-header"><h2 class="criterion-dialog-title" id="criterion-tooltip-c4-title">Criterion C4</h2><button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criterion C4"><span aria-hidden="true">&times;</span></button></div><div class="criterion-dialog-text" data-criterion-list>Applies exponential models to constant-rate waiting times, infers event rates, and assesses model suitability.</div></div>
+                </div>
+              </div>
+            </article>
+          </li>
+          <li class="mind-map-step" data-mind-map-slide data-mind-map-slide-scroll>
+            <article class="mind-map-node">
+              <h3>C5 · Mean and spread</h3>
+              <p>The mean describes a typical value, while variance and standard deviation describe spread.</p>
+              <table class="visual-table comparison-table">
+                <caption>Labelling times</caption>
+                <thead>
+                  <tr><th scope="col">Statistic</th><th scope="col">Station A<br>Increasing density</th><th scope="col">Station B<br>Uniform density</th></tr>
+                </thead>
+                <tbody>
+                  <tr><th scope="row">Mean</th><td>11 min</td><td>9 min</td></tr>
+                  <tr><th scope="row">Variance</th><td>8 min²</td><td>12 min²</td></tr>
+                  <tr><th scope="row">Standard deviation</th><td>2.828 min</td><td>3.464 min</td></tr>
+                </tbody>
+              </table>
+              <div class="criterion-control">
+                <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C5" data-criterion-text="Calculates and interprets the mean, variance, and standard deviation of continuous distributions using standard formulas." aria-expanded="false" aria-controls="criterion-tooltip-c5">Criterion C5</button>
+                <div class="criterion-overlay" id="criterion-tooltip-c5" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c5-title">
+                  <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
+                  <div class="criterion-dialog" role="document"><div class="criterion-dialog-header"><h2 class="criterion-dialog-title" id="criterion-tooltip-c5-title">Criterion C5</h2><button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criterion C5"><span aria-hidden="true">&times;</span></button></div><div class="criterion-dialog-text" data-criterion-list>Calculates and interprets the mean, variance, and standard deviation of continuous distributions using standard formulas.</div></div>
+                </div>
+              </div>
+            </article>
+          </li>
+          <li class="mind-map-step" data-mind-map-slide data-mind-map-slide-scroll>
+            <article class="mind-map-node">
+              <h3>C6 · Sample probability versus model probability</h3>
+              <p>Use the fraction of observations in an interval to estimate its probability.</p>
+              <figure class="concept-graphic slide-visual">
+                <figcaption>File transfer times</figcaption>
+                <svg class="concept-svg" viewBox="0 0 360 202" role="img" aria-labelledby="transfers-title" aria-describedby="transfers-desc">
+                  <title id="transfers-title">Histogram of 20 file transfer times</title>
+                  <desc id="transfers-desc">The four equal-width bins [0,4), [4,8), [8,12), and [12,16) seconds contain 3, 9, 5, and 3 transfers. A bracket marks the two highlighted middle bins in [4,12).</desc>
+                  <g fill="#e2e8f0" stroke="#334155">
+                    <rect x="36" y="101" width="76" height="30"/>
+                    <rect x="112" y="41" width="76" height="90" class="density-area"/>
+                    <rect x="188" y="81" width="76" height="50" class="density-area"/>
+                    <rect x="264" y="101" width="76" height="30"/>
+                  </g>
+                  <path class="density-axes" d="M36 31 V131 H340"/>
+                  <text x="9" y="19">Count</text>
+                  <g text-anchor="middle" class="graph-label">
+                    <text x="74" y="123">3</text>
+                    <text x="150" y="63">9</text>
+                    <text x="226" y="103">5</text>
+                    <text x="302" y="123">3</text>
+                  </g>
+                  <g text-anchor="middle">
+                    <text x="74" y="152">[0,4)</text>
+                    <text x="150" y="152">[4,8)</text>
+                    <text x="226" y="152">[8,12)</text>
+                    <text x="302" y="152">[12,16)</text>
+                    <text x="188" y="193" class="graph-label">Selected [4,12) seconds</text>
+                  </g>
+                  <path d="M112 159 V169 H264 V159" fill="none" stroke="#166534" stroke-width="2"/>
+                </svg>
+                <div class="comparison-label">Observed 14/20 = 70% · Model 75%</div>
+              </figure>
+              <div class="criterion-control">
+                <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C6" data-criterion-text="Estimates interval probabilities using sample relative frequencies and compares them with theoretical probabilities." aria-expanded="false" aria-controls="criterion-tooltip-c6">Criterion C6</button>
+                <div class="criterion-overlay" id="criterion-tooltip-c6" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c6-title">
+                  <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
+                  <div class="criterion-dialog" role="document"><div class="criterion-dialog-header"><h2 class="criterion-dialog-title" id="criterion-tooltip-c6-title">Criterion C6</h2><button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criterion C6"><span aria-hidden="true">&times;</span></button></div><div class="criterion-dialog-text" data-criterion-list>Estimates interval probabilities using sample relative frequencies and compares them with theoretical probabilities.</div></div>
+                </div>
+              </div>
+            </article>
+          </li>
+          <li class="mind-map-step" data-mind-map-slide data-mind-map-slide-scroll>
+            <article class="mind-map-node">
+              <h3>C7 · Sample statistics versus theory</h3>
+              <p>Use class midpoints to estimate the mean and spread of grouped data.</p>
+              <table class="visual-table comparison-table">
+                <caption>Courier-route times</caption>
+                <thead>
+                  <tr><th scope="col">Statistic</th><th scope="col">Midpoint estimates</th><th scope="col">Theoretical values</th></tr>
+                </thead>
+                <tbody>
+                  <tr><th scope="row">Mean</th><td>13.33 min</td><td>14 min</td></tr>
+                  <tr><th scope="row">Variance</th><td>9.07 min²</td><td>12 min²</td></tr>
+                  <tr><th scope="row">Standard deviation</th><td>3.01 min</td><td>3.46 min</td></tr>
+                </tbody>
+              </table>
+              <div class="criterion-control">
+                <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C7" data-criterion-text="Calculates sample means, variances, and standard deviations for different sample sizes and data representations and compares them with theory." aria-expanded="false" aria-controls="criterion-tooltip-c7">Criterion C7</button>
+                <div class="criterion-overlay" id="criterion-tooltip-c7" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c7-title">
+                  <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
+                  <div class="criterion-dialog" role="document"><div class="criterion-dialog-header"><h2 class="criterion-dialog-title" id="criterion-tooltip-c7-title">Criterion C7</h2><button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criterion C7"><span aria-hidden="true">&times;</span></button></div><div class="criterion-dialog-text" data-criterion-list>Calculates sample means, variances, and standard deviations for different sample sizes and data representations and compares them with theory.</div></div>
+                </div>
+              </div>
+            </article>
+          </li>
+          <li class="mind-map-step" data-mind-map-slide data-mind-map-slide-scroll>
+            <article class="mind-map-node">
+              <h3>C8 · Student’s <i>t</i> cutoffs and areas</h3>
+              <p>Use the degrees-of-freedom row of a <i>t</i> table to go between cutoffs and tail probabilities.</p>
+              <figure class="concept-graphic slide-visual">
+                <figcaption>Retail revenue alerts · <i>t</i> with 6 degrees of freedom</figcaption>
+                <svg class="concept-svg" viewBox="0 0 360 194" role="img" aria-labelledby="alerts-title" aria-describedby="alerts-desc">
+                  <title id="alerts-title">Two alert tails of the Student’s t density with 6 degrees of freedom</title>
+                  <desc id="alerts-desc">The shaded tail left of the standardized cutoff −1.943 has area 0.05. The shaded tail right of 1.440 has area 0.10.</desc>
+                  <path class="density-area" d="M42 138.91 C54.43 138.43 66.86 137.74 79.28 135.65 C91.71 133.55 104.14 130.21 116.57 121.28 V140 H42 Z"/>
+                  <path class="density-area" d="M239.2 103.44 C249.51 116.42 259.82 123.96 270.13 128.58 C280.44 133.21 290.76 135.25 301.07 136.59 C311.38 137.93 321.69 138.51 332 138.91 V140 H239.2 Z"/>
+                  <path class="density-guides" d="M116.57 121.28 V140 M239.2 103.44 V140"/>
+                  <path class="density-axes" d="M42 30 V140 H340 M116.57 140 V145 M187 140 V145 M239.2 140 V145"/>
+                  <path class="density-line" d="M42 138.91 C54.08 138.44 66.17 137.77 78.25 135.82 C90.33 133.87 102.42 130.78 114.5 122.71 C126.58 114.64 138.67 99.83 150.75 79.75 C162.83 59.67 174.92 36.66 187 36.66 C199.08 36.66 211.17 59.67 223.25 79.75 C235.33 99.83 247.42 114.64 259.5 122.71 C271.58 130.78 283.67 133.87 295.75 135.82 C307.83 137.77 319.92 138.44 332 138.91"/>
+                  <g text-anchor="middle">
+                    <text x="79" y="98" class="graph-label">0.05</text>
+                    <text x="293" y="98" class="graph-label">0.10</text>
+                    <text x="116.57" y="162">−1.943</text>
+                    <text x="187" y="162">0</text>
+                    <text x="239.2" y="162">1.440</text>
+                    <text x="187" y="185">Standardized value</text>
+                  </g>
+                  <path class="density-guides" d="M79 103 V138 M293 103 V137"/>
+                  <text x="10" y="20">Density</text>
+                </svg>
+              </figure>
+              <div class="criterion-control">
+                <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C8" data-criterion-text="Uses Student’s t-distribution tables, degrees of freedom, and one-tailed or two-tailed areas to determine critical values, central probabilities, and tail probabilities or probability ranges." aria-expanded="false" aria-controls="criterion-tooltip-c8">Criterion C8</button>
+                <div class="criterion-overlay" id="criterion-tooltip-c8" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c8-title">
+                  <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
+                  <div class="criterion-dialog" role="document"><div class="criterion-dialog-header"><h2 class="criterion-dialog-title" id="criterion-tooltip-c8-title">Criterion C8</h2><button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criterion C8"><span aria-hidden="true">&times;</span></button></div><div class="criterion-dialog-text" data-criterion-list>Uses Student’s t-distribution tables, degrees of freedom, and one-tailed or two-tailed areas to determine critical values, central probabilities, and tail probabilities or probability ranges.</div></div>
+                </div>
+              </div>
+            </article>
+          </li>
+          <li class="mind-map-step" data-mind-map-slide data-mind-map-slide-scroll>
+            <article class="mind-map-node">
+              <h3>C9 · Normal versus Student’s <i>t</i></h3>
+              <p>For a mean, use <i>z</i> with a known population standard deviation and <i>t</i> with a sample estimate.</p>
+              <figure class="concept-graphic slide-visual">
+                <figcaption>Sales-revenue shortfall · Left-tail areas from tables</figcaption>
+                <svg class="concept-svg" viewBox="0 0 360 194" role="img" aria-labelledby="shortfall-title" aria-describedby="shortfall-desc">
+                  <title id="shortfall-title">Standard normal and Student’s t densities on a common axis</title>
+                  <desc id="shortfall-desc">The solid Student’s t curve has 9 degrees of freedom. The dashed curve shows the standard normal. Left of the shared cutoff near −1.833, the table-based areas are 5.00% for Student’s t and 3.36% for the standard normal.</desc>
+                  <path class="density-area" d="M42 139.37 C50.73 139.12 59.46 138.76 68.18 137.94 C76.91 137.11 85.64 135.86 94.37 133.15 C103.1 130.44 111.83 126.21 120.55 118.55 V140 H42 Z"/>
+                  <path class="density-guides" d="M120.55 118.55 V140"/>
+                  <path class="density-axes" d="M42 30 V140 H340 M120.55 140 V145 M187 140 V145"/>
+                  <path class="density-line" d="M42 139.37 C54.08 139.03 66.17 138.54 78.25 136.73 C90.33 134.91 102.42 131.88 114.5 123.34 C126.58 114.79 138.67 98.76 150.75 78.13 C162.83 57.51 174.92 35.23 187 35.23 C199.08 35.23 211.17 57.51 223.25 78.13 C235.33 98.76 247.42 114.79 259.5 123.34 C271.58 131.88 283.67 134.91 295.75 136.73 C307.83 138.54 319.92 139.03 332 139.37"/>
+                  <path class="normal-line" d="M42 139.96 C54.08 139.92 66.17 140 78.25 138.8 C90.33 137.61 102.42 135.14 114.5 125.42 C126.58 115.7 138.67 96.45 150.75 74.67 C162.83 52.89 174.92 32.29 187 32.29 C199.08 32.29 211.17 52.89 223.25 74.67 C235.33 96.45 247.42 115.7 259.5 125.42 C271.58 135.14 283.67 137.61 295.75 138.8 C307.83 140 319.92 139.92 332 139.96"/>
+                  <text x="10" y="20">Density</text>
+                  <g text-anchor="middle">
+                    <text x="120.55" y="162">−1.833</text>
+                    <text x="187" y="162">0</text>
+                    <text x="187" y="185">Standardized value</text>
+                  </g>
+                </svg>
+                <div class="legend-row">
+                  <span><span class="legend-key" style="--key: #334155" aria-hidden="true"></span><i>t</i> (9 df) <strong>5.00%</strong></span>
+                  <span><span class="legend-key normal-key" style="--key: #1d4ed8" aria-hidden="true"></span>Standard normal <strong>3.36%</strong></span>
                 </div>
               </figure>
-              <p>For inverse comparisons, look up each model’s critical values at the same target areas, then back-transform to the original units before calculating differences. For an interval, compare lower endpoints and upper endpoints separately.</p>
-            </section>
-            <div class="criterion-control">
-              <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C8" data-criterion-text="Uses Student’s t-distribution tables, degrees of freedom, and one-tailed or two-tailed areas to determine critical values, central probabilities, and tail probabilities or probability ranges." aria-expanded="false" aria-controls="criterion-tooltip-c8">Criterion C8</button>
-              <div class="criterion-overlay" id="criterion-tooltip-c8" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c8-title">
-                <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
-                <div class="criterion-dialog" role="document"><div class="criterion-dialog-header"><h2 class="criterion-dialog-title" id="criterion-tooltip-c8-title">Criterion C8</h2><button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criterion C8"><span aria-hidden="true">&times;</span></button></div><div class="criterion-dialog-text" data-criterion-list>Uses Student’s t-distribution tables, degrees of freedom, and one-tailed or two-tailed areas to determine critical values, central probabilities, and tail probabilities or probability ranges.</div></div>
+              <div class="criterion-control">
+                <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C9" data-criterion-text="Calculates and compares critical values and probability areas from the standard normal and Student’s t-distributions, selecting and justifying the appropriate distribution according to whether the population standard deviation is known or estimated from the sample." aria-expanded="false" aria-controls="criterion-tooltip-c9">Criterion C9</button>
+                <div class="criterion-overlay" id="criterion-tooltip-c9" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c9-title">
+                  <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
+                  <div class="criterion-dialog" role="document"><div class="criterion-dialog-header"><h2 class="criterion-dialog-title" id="criterion-tooltip-c9-title">Criterion C9</h2><button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criterion C9"><span aria-hidden="true">&times;</span></button></div><div class="criterion-dialog-text" data-criterion-list>Calculates and compares critical values and probability areas from the standard normal and Student’s t-distributions, selecting and justifying the appropriate distribution according to whether the population standard deviation is known or estimated from the sample.</div></div>
+                </div>
               </div>
-            </div>
-            <div class="criterion-control">
-              <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C9" data-criterion-text="Calculates and compares critical values and probability areas from the standard normal and Student’s t-distributions, selecting and justifying the appropriate distribution according to whether the population standard deviation is known or estimated from the sample." aria-expanded="false" aria-controls="criterion-tooltip-c9">Criterion C9</button>
-              <div class="criterion-overlay" id="criterion-tooltip-c9" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c9-title">
-                <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
-                <div class="criterion-dialog" role="document"><div class="criterion-dialog-header"><h2 class="criterion-dialog-title" id="criterion-tooltip-c9-title">Criterion C9</h2><button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criterion C9"><span aria-hidden="true">&times;</span></button></div><div class="criterion-dialog-text" data-criterion-list>Calculates and compares critical values and probability areas from the standard normal and Student’s t-distributions, selecting and justifying the appropriate distribution according to whether the population standard deviation is known or estimated from the sample.</div></div>
+            </article>
+          </li>
+          <li class="mind-map-step" data-mind-map-slide data-mind-map-slide-scroll>
+            <article class="mind-map-node">
+              <h3>C10 · A financial risk investigation</h3>
+              <p>Use a continuous model and real data to answer a financial question and justify your conclusion.</p>
+              <figure class="concept-graphic slide-visual">
+                <ol class="investigation-workflow" role="list" aria-label="Investigation workflow">
+                  <li>Question and real data</li>
+                  <li>Select and justify a model</li>
+                  <li>Simulate and analyse samples</li>
+                  <li>Assess portfolio risk</li>
+                  <li>Conclude with assumptions and limitations</li>
+                </ol>
+              </figure>
+              <div class="criterion-control">
+                <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C10" data-criterion-text="Integrates continuous probability modelling, simulation, sampling analysis, and portfolio-risk measures to investigate an economic or financial question, justifying the selected methods and communicating results, assumptions, limitations, and evidence-based conclusions." aria-expanded="false" aria-controls="criterion-tooltip-c10">Criterion C10</button>
+                <div class="criterion-overlay" id="criterion-tooltip-c10" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c10-title">
+                  <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
+                  <div class="criterion-dialog" role="document"><div class="criterion-dialog-header"><h2 class="criterion-dialog-title" id="criterion-tooltip-c10-title">Criterion C10</h2><button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criterion C10"><span aria-hidden="true">&times;</span></button></div><div class="criterion-dialog-text" data-criterion-list>Integrates continuous probability modelling, simulation, sampling analysis, and portfolio-risk measures to investigate an economic or financial question, justifying the selected methods and communicating results, assumptions, limitations, and evidence-based conclusions.</div></div>
+                </div>
               </div>
-            </div></article></li>
-<li class="mind-map-step" data-mind-map-slide data-mind-map-slide-scroll><article class="mind-map-node"><p class="mind-map-step-label">Step <span>5</span></p><h3>Integrate the methods in a risk investigation</h3><p>Ask whether a 60% bond / 40% equity portfolio meets a return target without excessive volatility. Select continuous return models, simulate outcomes, compare sample evidence with theoretical mean and variance, and use justified \(z\)/\(t\) reasoning. Report assumptions, limitations, and a recommendation supported by both probability and portfolio risk.</p><figure class="concept-graphic" aria-labelledby="portfolio-caption"><figcaption id="portfolio-caption">C10 · From a financial question to an evidence-based recommendation</figcaption><div class="workflow" aria-label="Investigation workflow"><div>Question &amp; data</div><div>Select model</div><div>Simulate &amp; sample</div><div>Measure risk</div><div>Conclude &amp; qualify</div></div>
-              <div class="visual-equation">
-                \[\begin{aligned}
-                  \sigma_p^2 &= w_B^2\sigma_B^2 + w_E^2\sigma_E^2 \\
-                             &\quad + 2w_B w_E \rho_{BE}\sigma_B\sigma_E
-                \end{aligned}\]
-              </div>
-              <table class="visual-table"><thead><tr><th scope="col">Input</th><th scope="col">Bond \(B\)</th><th scope="col">Equity \(E\)</th><th scope="col">Portfolio</th></tr></thead><tbody><tr><th scope="row">Weight</th><td>0.60</td><td>0.40</td><td>1.00</td></tr><tr><th scope="row">Expected return</th><td>4%</td><td>10%</td><td class="theory">6.4%</td></tr><tr><th scope="row">Volatility</th><td>5%</td><td>15%</td><td class="theory">7.22%</td></tr></tbody></table><p><small>Here \(\rho_{BE} = 0.20\) is return correlation; \(w\) is asset weight and \(\sigma\) is return standard deviation. Portfolio variance is 0.00522, so \(\sigma_p = \sqrt{0.00522} \approx 0.0722\). Conclusions remain conditional on stable parameters and a representative sample.</small></p></figure>            <div class="criterion-control">
-              <button class="mind-map-criteria" type="button" data-criterion-trigger data-mind-map-interactive data-criterion-id="C10" data-criterion-text="Integrates continuous probability modelling, simulation, sampling analysis, and portfolio-risk measures to investigate an economic or financial question, justifying the selected methods and communicating results, assumptions, limitations, and evidence-based conclusions." aria-expanded="false" aria-controls="criterion-tooltip-c10">Criterion C10</button>
-              <div class="criterion-overlay" id="criterion-tooltip-c10" data-criterion-tooltip role="dialog" aria-modal="true" aria-labelledby="criterion-tooltip-c10-title">
-                <div class="criterion-backdrop" data-criterion-backdrop aria-hidden="true"></div>
-                <div class="criterion-dialog" role="document"><div class="criterion-dialog-header"><h2 class="criterion-dialog-title" id="criterion-tooltip-c10-title">Criterion C10</h2><button class="presentation-button criterion-close" type="button" data-criterion-close aria-label="Close criterion C10"><span aria-hidden="true">&times;</span></button></div><div class="criterion-dialog-text" data-criterion-list>Integrates continuous probability modelling, simulation, sampling analysis, and portfolio-risk measures to investigate an economic or financial question, justifying the selected methods and communicating results, assumptions, limitations, and evidence-based conclusions.</div></div>
-              </div>
-            </div></article></li>      </ol></div>
+            </article>
+          </li>
+        </ol>
+      </div>
     </section>
   </main>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const outline = document.querySelector(".g11-term-outline");
+      const progress = outline.querySelector(".presentation-progress");
+      const focusPresentation = () => {
+        if (outline.classList.contains("is-presenting") && !document.fullscreenElement &&
+            !document.activeElement?.closest("[data-mind-map-slide], [data-presentation-toolbar]")) {
+          progress.focus({ preventScroll: true });
+        }
+      };
+      outline.querySelector("[data-presentation-start]").addEventListener("click", focusPresentation);
+      document.addEventListener("fullscreenchange", focusPresentation);
+    });
+  </script>
 </body>
 </html>

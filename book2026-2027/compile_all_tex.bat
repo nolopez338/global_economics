@@ -13,7 +13,7 @@ for %%F in (
     "%SKILLS_DIR%\global-economics-exam\assets\template_exam.tex"
     "%SKILLS_DIR%\global-economics-exam-solution\assets\template_exam_solution.tex"
     "%SKILLS_DIR%\global-economics-home-practice\assets\template_home_practice.tex"
-    "%SKILLS_DIR%\global-economics-print\assets\template_print.tex"
+    "%SKILLS_DIR%\global-economics-classroom-activity\assets\template_classroom_activity.tex"
 ) do call :compile "%%~fF"
 
 echo.

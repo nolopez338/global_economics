@@ -5,10 +5,36 @@
 \input{preamble_exams.tex}
 \input{graphs/uniform_linear_probability_distributions.tex}
 
+% Keep each worked solution on one page.
+\newenvironment{CThreeSolution}{%
+	\par\addvspace{\medskipamount}%
+	\noindent\begin{minipage}{\linewidth}%
+		\setlength{\parskip}{6pt}%
+}{%
+	\end{minipage}\par
+}
+
+% Keep each caption and plot together. Compact axis settings apply only to solutions.
+\newcommand{\CThreeSolutionGraph}[4]{%
+	\par\smallskip
+	\noindent\begin{minipage}{\linewidth}
+		\centering\textbf{\small #1}\par
+		\pgfplotsset{every axis post/.append style={
+			height=3.65cm,
+			xlabel={#2},ylabel={#3},
+			xticklabel style={font=\small},
+			yticklabel style={font=\small}
+		}}
+		#4
+	\end{minipage}\par\smallskip
+}
+
+
 % A probability graph for a band split by the displayed cycle cut.
-% Arguments: variable, cycle start, cycle end, pdf formula, first interval,
-% second interval, and vertical maximum.  Tick choices are supplied locally.
-\newcommand{\CThreeWrappedGraph}[9]{%
+% Arguments: variable, cycle start, cycle end, pdf formula, two shaded
+% domains (start:end), vertical maximum, and restart label in math mode.
+% Tick choices are supplied locally.
+\newcommand{\CThreeWrappedGraph}[8]{%
 	\begin{center}
 		\begin{tikzpicture}
 			\pgfmathsetmacro{\cycleA}{#2}
@@ -23,18 +49,23 @@
 				xmin={\cycleA-\cyclePad},
 				xmax={\cycleB+\cyclePad},
 				ymin=0,
-				ymax=#9,
+				ymax=#7,
 				grid=both,
-				samples=240
+				samples=241
 				]
 				\addplot[domain=#2:#3,draw=none,fill=blue!20,fill opacity=0.35]
 				{#4}\closedcycle;
-				\addplot[domain=#5:#6,draw=none,fill=blue!65,fill opacity=0.60]
+				\addplot[domain=#5,draw=none,fill=blue!65,fill opacity=0.60]
 				{#4}\closedcycle;
-				\addplot[domain=#7:#8,draw=none,fill=blue!65,fill opacity=0.60]
+				\addplot[domain=#6,draw=none,fill=blue!65,fill opacity=0.60]
 				{#4}\closedcycle;
 				\addplot[domain=#2:#3,very thick,blue] {#4};
+				\coordinate (cycle left) at (rel axis cs:0.07,1);
+				\coordinate (cycle right) at (rel axis cs:0.93,1);
 			\end{axis}
+			\draw[->,thick] ([yshift=2pt]cycle right)
+				to[bend right=12] node[above,font=\small]{restart: $#8$}
+				([yshift=2pt]cycle left);
 		\end{tikzpicture}
 	\end{center}%
 }
@@ -258,6 +289,7 @@
 	added.
 	\secInicio[sec:c3-intro-method][sec:c3-introduction]
 	
+	\newpage
 	\section{Circular Uniform Distributions}\label{sec:c3-uniform}
 	\SectionProblemsTableOfContents{
 		\SectionProblemLink{sec:c3-uniform-sensor}{Random sensor orientation} \\
@@ -294,78 +326,77 @@
 		\CriterionTask{subsec:c3-uniform-sensor-c}{3.3}{Calculate the alignment-band probability within $\pi/6$ of the reference mark, crossing the cycle cut.}
 	\end{enumerate}
 	
-	\subsubsection*{C3.1 - Construct the periodic pdf.}
-	\phantomsection\label{subsec:c3-uniform-sensor-a}
-	The variable $\Theta$ is orientation in radians, its period is $2\pi$, and
-	its one-cycle support representation is $[0,2\pi)$ with the cut at the
-	reference mark.
-	Controlled equal-arc randomization makes the pdf a rectangle of unknown height
-	$h$.  Its complete-cycle area gives
-	\[
-	1=A_{\text{rectangle}}=(2\pi)h,\qquad h=\frac1{2\pi}.
-	\]
-	Thus, on the chosen cycle,
-	\[
-	f_{\Theta}(\theta)=\frac1{2\pi},\qquad 0\le\theta<2\pi,
-	\]
-	and the complete periodic model is stated by
-	\[
-	f_{\Theta}(\theta+2\pi)=f_{\Theta}(\theta).
-	\]
-	The period is $2\pi$, and the geometric check is
-	$(2\pi)(1/(2\pi))=1$.
-	
-	\subsubsection*{C3.2 - Calculate the clockwise tail.}
-	\phantomsection\label{subsec:c3-uniform-sensor-b}
-	Relative to the cut at $0\equiv2\pi$, the interface-test tail means the
-	clockwise sector $[3\pi/2,2\pi)$.  The shaded region below is one rectangle of
-	width $2\pi-3\pi/2=\pi/2$ and height $1/(2\pi)$:
-	\[
-	\begin{aligned}
-		P\left(\frac{3\pi}{2}\le\Theta<2\pi\right)
-		&=\underbrace{\left(2\pi-\frac{3\pi}{2}\right)
-			\frac1{2\pi}}_{A_{\text{tail rectangle}}}\\
-		&=\frac14=25\%.
-	\end{aligned}
-	\]
-	The probability is valid because it lies between $0$ and $1$.  One quarter of
-	randomized tests are expected in the interface-test sector.
-	\begingroup
-	\pgfplotsset{every axis/.append style={
-			xticklabels={$0$,${\pi}/{6}$,${3\pi}/{2}$,${11\pi}/{6}$,$2\pi\equiv0$},
-			ytick={0,0.159154943},yticklabels={$0$,$1/(2\pi)$}}}
-	\CtwoProbGraph[\theta]{0}{6.283185307}{1/(2*pi)}{4.712388980}{6.283185307}
-	{0,0.523598776,4.712388980,5.759586532,6.283185307}{0.20}
-	\endgroup
-	
-	\subsubsection*{C3.3 - Calculate the wrapped alignment band.}
-	\phantomsection\label{subsec:c3-uniform-sensor-c}
-	The band crosses the cut, so on $[0,2\pi)$ it is
-	\[
-	\left[\frac{11\pi}{6},2\pi\right)
-	\cup\left[0,\frac\pi6\right].
-	\]
-	The graph shades both written pieces.  Each is a rectangle of width $\pi/6$:
-	\[
-	\begin{aligned}
+	\begin{CThreeSolution}
+		\subsubsection*{C3.1 - Construct the periodic pdf.}
+		\label{subsec:c3-uniform-sensor-a}
+		Let $\Theta$ be the app object's clockwise orientation in radians. One full
+		turn has period $2\pi$ rad. Use $[0,2\pi)$, cut at the app's reference mark
+		($0\equiv2\pi$).
+
+		Equal-width arcs are equally likely, so the density is a rectangle of
+		height $h$. Its area over one cycle gives
+		\[
+		1=(2\pi)h \quad\Longrightarrow\quad h=\frac{1}{2\pi}\ \mathrm{rad}^{-1}.
+		\]
+		On the chosen cycle and under periodic extension, respectively,
+		\[
+		f_{\Theta}(\theta)=\frac{1}{2\pi}\quad (0\le\theta<2\pi),
+		\qquad f_{\Theta}(\theta+2\pi)=f_{\Theta}(\theta).
+		\]
+	\end{CThreeSolution}
+
+	\newpage
+	\begin{CThreeSolution}
+		\subsubsection*{C3.2 - Calculate the clockwise tail.}
+		\label{subsec:c3-uniform-sensor-b}
+		Moving clockwise from $3\pi/2$ to the reference mark gives
+		$E=[3\pi/2,2\pi)$ on the displayed cycle.
+		\CThreeSolutionGraph{Interface-test sector up to the cut ($2\pi\equiv0$)}
+		{$\theta$ (rad)}{$f_{\Theta}(\theta)$}{
+			\pgfplotsset{every axis/.append style={
+				xticklabels={$0$,$3\pi/2$,$2\pi$},
+				ytick={0,0.159154943},yticklabels={$0$,$1/(2\pi)$}}}
+			\CtwoProbGraph[\theta]{0}{6.283185307}{1/(2*pi)}{4.712388980}{6.283185307}
+			{0,4.712388980,6.283185307}{0.20}
+		}
+		The shaded rectangle has height $1/(2\pi)$ per radian, so its area is
+		the favourable angular width divided by the full turn.
+		\[
+		P(\Theta\in E)
+		=\left(2\pi-\frac{3\pi}{2}\right)\frac{1}{2\pi}
+		=\frac{\pi/2}{2\pi}=\boxed{\frac14}=25\%.
+		\]
+		One quarter of the app's randomized orientations fall in the interface-test sector.
+	\end{CThreeSolution}
+
+	\begin{CThreeSolution}
+		\subsubsection*{C3.3 - Calculate the wrapped alignment band.}
+		\label{subsec:c3-uniform-sensor-c}
+		The tolerance is $\pi/6$ rad ($30^\circ$) on each side of the reference
+		mark. In radians, the counterclockwise side is $[11\pi/6,2\pi)$ and the
+		clockwise side is $[0,\pi/6]$. Their union is the alignment band.
+		\CThreeSolutionGraph{Two sides of the reference mark ($2\pi\equiv0$)}
+		{$\theta$ (rad)}{$f_{\Theta}(\theta)$}{
+			\pgfplotsset{every axis/.append style={
+				xtick={0,0.523598776,5.759586532,6.283185307},
+				xticklabels={$0$,$\pi/6$,$11\pi/6$,$2\pi$},
+				ytick={0,0.159154943},yticklabels={$0$,$1/(2\pi)$}}}
+			\CThreeWrappedGraph{\theta}{0}{6.283185307}{1/(2*pi)}
+			{0:0.523598776}{5.759586532:6.283185307}{0.20}{2\pi\equiv 0}
+		}
+		Each shaded rectangle is $\pi/6$ rad wide and has height $1/(2\pi)$ per radian.
+		Adding their areas gives the total favourable angular width divided by $2\pi$.
+		\[
 		P(\text{alignment band})
-		&=\underbrace{\frac\pi6\frac1{2\pi}}_{A_1=1/12}
-		+\underbrace{\frac\pi6\frac1{2\pi}}_{A_2=1/12}\\
-		&=\frac16\approx16.7\%.
-	\end{aligned}
-	\]
-	Thus about $16.7\%$ of randomized orientations fall within $\pi/6$ of the
-	reference direction, using both sides of the artificial cut.
-	\begingroup
-	\pgfplotsset{every axis/.append style={
-			xtick={0,0.523598776,4.712388980,5.759586532,6.283185307},
-			xticklabels={$0$,${\pi}/{6}$,${3\pi}/{2}$,${11\pi}/{6}$,$2\pi\equiv0$},
-			ytick={0,0.159154943},yticklabels={$0$,$1/(2\pi)$}}}
-	\CThreeWrappedGraph{\theta}{0}{6.283185307}{1/(2*pi)}
-	{5.759586532}{6.283185307}{0}{0.523598776}{0.20}
-	\endgroup
+		=\frac{\pi}{6}\cdot\frac{1}{2\pi}+\frac{\pi}{6}\cdot\frac{1}{2\pi}
+		=\frac{\pi/6+\pi/6}{2\pi}=\boxed{\frac16}\approx16.7\%.
+		\]
+		About $16.7\%$ of randomized app orientations meet the alignment tolerance.
+	\end{CThreeSolution}
+
 	\secInicio[sec:c3-uniform-sensor][sec:c3-uniform]
 	
+	\newpage
 	\subsection{Random daily system-check time}\label{sec:c3-uniform-check}
 	A student team in Bogot\'a maintains a digital platform for a university
 	project and schedules one automated system check each day.  Let $T$ be the
@@ -392,70 +423,69 @@
 		\CriterionTask{subsec:c3-uniform-check-c}{3.3}{Calculate the overnight band probability from 21:00 through 03:00, crossing midnight.}
 	\end{enumerate}
 	
-	\subsubsection*{C3.1 - Construct the periodic pdf.}
-	\phantomsection\label{subsec:c3-uniform-check-a}
-	The variable $T$ is time of day in hours, its period is $24$ h, and its
-	one-cycle support representation is $[0,24)$ with a midnight cut.
-	Equal-window randomization gives a
-	rectangular pdf of height $h$.  Total area $1$ gives
-	\[
-	1=A_{\text{rectangle}}=(24)h,\qquad h=\frac1{24}.
-	\]
-	On the chosen recording cycle,
-	\[
-	f_T(t)=\frac1{24},\qquad 0\le t<24,
-	\]
-	and its periodic extension is
-	\[
-	f_T(t+24)=f_T(t).
-	\]
-	The period is $24$ h and the rectangular area check is $24(1/24)=1$.
-	
-	\subsubsection*{C3.2 - Calculate the late-cycle tail.}
-	\phantomsection\label{subsec:c3-uniform-check-b}
-	The evening tail is defined relative to the midnight cut as
-	$[18,24)$, moving forward in clock time to the end of the displayed day.  Its
-	shaded shape is a width-$6$ rectangle:
-	\[
-	P(18\le T<24)
-	=\underbrace{(24-18)\frac1{24}}_{A_{\text{tail rectangle}}}
-	=\frac14=25\%.
-	\]
-	Therefore one quarter of randomized daily checks occur from 18:00 to
-	midnight.
-	\begingroup
-	\pgfplotsset{every axis/.append style={
-			xticklabels={$0$,$3$,$18$,$21$,$24\equiv0$},
-			ytick={0,0.041666667},yticklabels={$0$,$1/24$}}}
-	\CtwoProbGraph[t]{0}{24}{1/24}{18}{24}{0,3,18,21,24}{0.052}
-	\endgroup
-	
-	\subsubsection*{C3.3 - Calculate the overnight band.}
-	\phantomsection\label{subsec:c3-uniform-check-c}
-	The time band crosses midnight, so the one-cycle representation is
-	\[
-	[21,24)\cup[0,3].
-	\]
-	The split occurs at the cycle cut.  The shaded event consists of two
-	width-$3$ rectangles:
-	\[
-	\begin{aligned}
-		P(21{:}00\text{ through }03{:}00)
-		&=\underbrace{(24-21)\frac1{24}}_{A_1=1/8}
-		+\underbrace{(3-0)\frac1{24}}_{A_2=1/8}\\
-		&=\frac14=25\%.
-	\end{aligned}
-	\]
-	Thus $25\%$ of the platform's randomized system checks occur in the
-	21:00--03:00 overnight band.
-	\begingroup
-	\pgfplotsset{every axis/.append style={
-			xtick={0,3,18,21,24},xticklabels={$0$,$3$,$18$,$21$,$24\equiv0$},
-			ytick={0,0.041666667},yticklabels={$0$,$1/24$}}}
-	\CThreeWrappedGraph{t}{0}{24}{1/24}{21}{24}{0}{3}{0.052}
-	\endgroup
+	\begin{CThreeSolution}
+		\subsubsection*{C3.1 - Construct the periodic pdf.}
+		\label{subsec:c3-uniform-check-a}
+		Let $T$ be the automated check's time of day in hours. The period is $24$ h.
+		Use $[0,24)$, cut at midnight ($0$ h and $24$ h).
+
+		Equal-length time windows are equally likely, so the density is a rectangle
+		of height $h$. Its area over one day gives
+		\[
+		1=24h \quad\Longrightarrow\quad h=\frac{1}{24}\ \mathrm{h}^{-1}.
+		\]
+		On the chosen cycle and under periodic extension, respectively,
+		\[
+		f_T(t)=\frac{1}{24}\quad (0\le t<24),
+		\qquad f_T(t+24)=f_T(t).
+		\]
+	\end{CThreeSolution}
+
+	\newpage
+	\begin{CThreeSolution}
+		\subsubsection*{C3.2 - Calculate the late-cycle tail.}
+		\label{subsec:c3-uniform-check-b}
+		In hours on $[0,24)$, the evening tail from 18:00 to midnight is $[18,24)$.
+		\CThreeSolutionGraph{Evening window up to midnight ($24\equiv0$)}
+		{$t$ (h)}{$f_T(t)$}{
+			\pgfplotsset{every axis/.append style={
+				xticklabels={$0$,$18$,$24$},
+				ytick={0,0.041666667},yticklabels={$0$,$1/24$}}}
+			\CtwoProbGraph[t]{0}{24}{1/24}{18}{24}{0,18,24}{0.052}
+		}
+		The shaded rectangle is $6$ h wide and $1/24$ per hour high. Its area is
+		the favourable time length divided by $24$ h.
+		\[
+		P(18\le T<24)=(24-18)\frac{1}{24}=\frac{6}{24}=\boxed{\frac14}=25\%.
+		\]
+		One quarter of randomized system checks are expected between 18:00 and midnight.
+	\end{CThreeSolution}
+
+	\begin{CThreeSolution}
+		\subsubsection*{C3.3 - Calculate the overnight band.}
+		\label{subsec:c3-uniform-check-c}
+		On the hour scale, 21:00 is $t=21$ and 03:00 is $t=3$. The overnight
+		window runs from 21:00 to midnight and then from midnight to 03:00,
+		giving $[21,24)\cup[0,3]$.
+		\CThreeSolutionGraph{Three hours on each side of midnight ($24\equiv0$)}
+		{$t$ (h)}{$f_T(t)$}{
+			\pgfplotsset{every axis/.append style={
+				xtick={0,3,21,24},xticklabels={$0$,$3$,$21$,$24$},
+				ytick={0,0.041666667},yticklabels={$0$,$1/24$}}}
+			\CThreeWrappedGraph{t}{0}{24}{1/24}{0:3}{21:24}{0.052}{24\equiv 0}
+		}
+		The shaded rectangles have the same height, $1/24$ per hour. Their combined
+		area is the total favourable time length divided by $24$ h.
+		\[
+		P(\text{overnight band})=(24-21)\frac{1}{24}+(3-0)\frac{1}{24}
+		=\frac{3+3}{24}=\boxed{\frac14}=25\%.
+		\]
+		One quarter of randomized system checks are expected in the 21:00--03:00 window.
+	\end{CThreeSolution}
+
 	\secInicio[sec:c3-uniform-check][sec:c3-uniform]
 	
+	\newpage
 	\subsection{Randomized rotating-device direction}\label{sec:c3-uniform-device}
 	At a university event in Bogot\'a, a motorized camera is used to create
 	$360^\circ$ video clips.  It records its direction $D$ in degrees clockwise from
@@ -483,65 +513,71 @@
 		\CriterionTask{subsec:c3-uniform-device-c}{3.3}{Calculate the backdrop-viewing band probability for the target sector from $120^\circ$ through $210^\circ$.}
 	\end{enumerate}
 	
-	\subsubsection*{C3.1 - Construct the periodic pdf.}
-	\phantomsection\label{subsec:c3-uniform-device-a}
-	The variable $D$ is direction in degrees, its period is $360^\circ$, and its
-	one-cycle support representation is $[0^\circ,360^\circ)$ with a cut at the
-	home mark.
-	Controlled equal-sector randomization gives a rectangular pdf.  If its height
-	is $h$, then
-	\[
-	1=A_{\text{rectangle}}=(360)h,
-	\qquad h=\frac1{360}.
-	\]
-	On one displayed cycle,
-	\[
-	f_D(d)=\frac1{360},\qquad 0\le d<360,
-	\]
-	with density measured per degree.  The periodic extension is
-	\[
-	f_D(d+360^\circ)=f_D(d).
-	\]
-	The period is $360^\circ$, and $360(1/360)=1$ verifies the total area.
-	
-	\subsubsection*{C3.2 - Calculate the directional tail.}
-	\phantomsection\label{subsec:c3-uniform-device-b}
-	The support-cable tail is not an intrinsic right tail of a circle.  In this
-	context it is specifically the clockwise sector $[300^\circ,360^\circ)$ from
-	$300^\circ$ to the home-mark cut.  The shaded rectangle has width $60^\circ$:
-	\[
-	P(300^\circ\le D<360^\circ)
-	=\underbrace{(360-300)\frac1{360}}_{A_{\text{tail rectangle}}}
-	=\frac16\approx16.7\%.
-	\]
-	About $16.7\%$ of randomized camera directions fall in the support-cable
-	sector.
-	\begingroup
-	\pgfplotsset{every axis/.append style={
-			xticklabels={$0^\circ$,$120^\circ$,$210^\circ$,$300^\circ$,$360^\circ\equiv0^\circ$},
-			ytick={0,0.002777778},yticklabels={$0$,$1/360$}}}
-	\CtwoProbGraph[d]{0}{360}{1/360}{300}{360}{0,120,210,300,360}{0.0035}
-	\endgroup
-	
-	\subsubsection*{C3.3 - Calculate the target sector.}
-	\phantomsection\label{subsec:c3-uniform-device-c}
-	The target band $[120^\circ,210^\circ]$ does not cross the cut or a pdf
-	breakpoint.  Its shaded region is one width-$90^\circ$ rectangle:
-	\[
-	P(120^\circ\le D\le210^\circ)
-	=\underbrace{(210-120)\frac1{360}}_{A_{\text{target rectangle}}}
-	=\frac14=25\%.
-	\]
-	The randomized camera frames the backdrop sector in one quarter of inspections,
-	which gives the student team a baseline for expected backdrop coverage.
-	\begingroup
-	\pgfplotsset{every axis/.append style={
-			xticklabels={$0^\circ$,$120^\circ$,$210^\circ$,$300^\circ$,$360^\circ\equiv0^\circ$},
-			ytick={0,0.002777778},yticklabels={$0$,$1/360$}}}
-	\CtwoProbGraph[d]{0}{360}{1/360}{120}{210}{0,120,210,300,360}{0.0035}
-	\endgroup
+	\begin{CThreeSolution}
+		\subsubsection*{C3.1 - Construct the periodic pdf.}
+		\label{subsec:c3-uniform-device-a}
+		Let $D$ be the camera's starting direction in degrees clockwise from its home
+		mark. The period is $360^\circ$. Use $[0^\circ,360^\circ)$, cut at the home mark
+		($0^\circ\equiv360^\circ$).
+
+		The controller gives equal-width sectors equal probabilities, so the density
+		is a rectangle of height $h$. Its area over one turn gives
+		\[
+		1=360h \quad\Longrightarrow\quad h=\frac{1}{360}\text{ per degree}.
+		\]
+		With $d$ measured in degrees, the density on one cycle and its periodic
+		extension are
+		\[
+		f_D(d)=\frac{1}{360}\quad (0\le d<360),
+		\qquad f_D(d+360)=f_D(d).
+		\]
+	\end{CThreeSolution}
+
+	\newpage
+	\begin{CThreeSolution}
+		\subsubsection*{C3.2 - Calculate the directional tail.}
+		\label{subsec:c3-uniform-device-b}
+		The support-cable sector runs clockwise from $300^\circ$ to the home mark.
+		On the chosen cycle it is $[300^\circ,360^\circ)$.
+		\CThreeSolutionGraph{Support-cable sector up to the cut ($360^\circ\equiv0^\circ$)}
+		{$d$ (degrees)}{$f_D(d)$}{
+			\pgfplotsset{every axis/.append style={
+				xticklabels={$0^\circ$,$300^\circ$,$360^\circ$},
+				ytick={0,0.002777778},yticklabels={$0$,$1/360$}}}
+			\CtwoProbGraph[d]{0}{360}{1/360}{300}{360}{0,300,360}{0.0035}
+		}
+		The shaded rectangle has height $1/360$ per degree, so its area is
+		the favourable angular width divided by the full turn.
+		\[
+		P(300^\circ\le D<360^\circ)=(360-300)\frac{1}{360}
+		=\frac{60}{360}=\boxed{\frac16}\approx16.7\%.
+		\]
+		About $16.7\%$ of randomized camera starts point into the support-cable sector.
+	\end{CThreeSolution}
+
+	\begin{CThreeSolution}
+		\subsubsection*{C3.3 - Calculate the target sector.}
+		\label{subsec:c3-uniform-device-c}
+		The backdrop-viewing sector occupies the single interval $[120^\circ,210^\circ]$.
+		\CThreeSolutionGraph{Backdrop-viewing sector within one cycle}
+		{$d$ (degrees)}{$f_D(d)$}{
+			\pgfplotsset{every axis/.append style={
+				xticklabels={$0^\circ$,$120^\circ$,$210^\circ$,$360^\circ$},
+				ytick={0,0.002777778},yticklabels={$0$,$1/360$}}}
+			\CtwoProbGraph[d]{0}{360}{1/360}{120}{210}{0,120,210,360}{0.0035}
+		}
+		The shaded rectangle has height $1/360$ per degree, so its area is
+		the favourable angular width divided by the full turn.
+		\[
+		P(120^\circ\le D\le210^\circ)=(210-120)\frac{1}{360}
+		=\frac{90}{360}=\boxed{\frac14}=25\%.
+		\]
+		One quarter of randomized camera starts point toward the backdrop sector.
+	\end{CThreeSolution}
+
 	\secInicio[sec:c3-uniform-device][sec:c3-uniform]
 	
+	\newpage
 	\section{Circular Triangular Distributions}\label{sec:c3-triangular}
 	\SectionProblemsTableOfContents{
 		\SectionProblemLink{sec:c3-triangular-scanner}{Scanner direction with an interior mode} \\
@@ -579,98 +615,88 @@
 		\CriterionTask{subsec:c3-triangular-scanner-c}{3.3}{Calculate the project-display band probability from $60^\circ$ through $240^\circ$.}
 	\end{enumerate}
 	
-	\subsubsection*{C3.1 - Construct the periodic pdf.}
-	\phantomsection\label{subsec:c3-triangular-scanner-a}
-	The variable $S$ is direction in degrees, the period is $360^\circ$, and its
-	one-cycle support representation is $[0^\circ,360^\circ)$ with its cut at
-	north.  The graph is a
-	triangle with mode $120^\circ$, zero height at the cut, and unknown peak $H$.
-	Total area $1$ gives
-	\[
-	1=A_{\text{triangle}}=\frac12(360)H,\qquad H=\frac1{180}.
-	\]
-	The rising line through $(0,0)$ and $(120,1/180)$ has slope
-	\[
-	\frac{1/180-0}{120-0}=\frac1{21600},
-	\]
-	so its equation is $s/21600$.  The falling line through
-	$(120,1/180)$ and $(360,0)$ has slope $-1/43200$; using $(360,0)$
-	gives $(360-s)/43200$.  Therefore, on one cycle,
-	\[
-	f_S(s)=
-	\begin{cases}
-		\dfrac{s}{21600},&0\le s\le120,\\[2mm]
-		\dfrac{360-s}{43200},&120<s<360.
-	\end{cases}
-	\]
-	Its periodic extension is
-	\[
-	f_S(s+360^\circ)=f_S(s).
-	\]
-	The areas verify the model geometrically:
-	\[
-	\underbrace{\frac12(120)\frac1{180}}_{1/3}
-	+\underbrace{\frac12(240)\frac1{180}}_{2/3}=1.
-	\]
-	
-	\subsubsection*{C3.2 - Calculate the reflective-window tail.}
-	\phantomsection\label{subsec:c3-triangular-scanner-b}
-	Relative to the north cut, this tail is the clockwise sector
-	$[240^\circ,360^\circ)$.  The line equation gives
-	\[
-	f_S(240)=\frac{360-240}{43200}=\frac1{360}.
-	\]
-	The shaded tail is a triangle ending at zero height at the cut, with base
-	$120^\circ$ and height $1/360$:
-	\[
-	P(240^\circ\le S<360^\circ)
-	=\underbrace{\frac12(360-240)\frac1{360}}_{A_{\text{tail triangle}}}
-	=\frac16\approx16.7\%.
-	\]
-	Thus the scanner points toward the reflective-window sector on about $16.7\%$
-	of programmed scans.
-	\begingroup
-	\pgfplotsset{every axis/.append style={
-			xticklabels={$0^\circ$,$60^\circ$,$120^\circ$,$240^\circ$,$360^\circ\equiv0^\circ$},
-			ytick={0,0.002777778,0.005555556},
-			yticklabels={$0$,$1/360$,$1/180$}}}
-	\COneGraph[s]{0}{360}
-	{(x<=120)*(x/21600)+(x>120)*((360-x)/43200)}
-	{240}{360}{0,60,120,240,360}{0.0065}
-	\endgroup
-	
-	\subsubsection*{C3.3 - Calculate the project-display band.}
-	\phantomsection\label{subsec:c3-triangular-scanner-c}
-	The band $[60^\circ,240^\circ]$ crosses the pdf breakpoint at the mode, so it
-	is split at $120^\circ$.  The boundary heights are
-	\[
-	f_S(60)=\frac1{360},\qquad f_S(120)=\frac1{180},
-	\qquad f_S(240)=\frac1{360}.
-	\]
-	The two shaded pieces are trapezoids:
-	\[
-	\begin{aligned}
+	\begin{CThreeSolution}
+		\subsubsection*{C3.1 - Construct the periodic pdf.}
+		\label{subsec:c3-triangular-scanner-a}
+		Let $S$ be the scanner's clockwise direction in degrees from north. Its period
+		is $360^\circ$. Use $[0^\circ,360^\circ)$, cut at north
+		($0^\circ\equiv360^\circ$).
+
+		The density forms a triangle with zero height at the cut and a peak $H$ at
+		$120^\circ$. Its area over one turn gives
+		\[
+		1=\frac12(360)H\quad\Longrightarrow\quad H=\frac{1}{180}\text{ per degree}.
+		\]
+		The rising side starts at zero and has slope $H/120=1/21600$, giving
+		$s/21600$. The falling side ends at zero and has slope
+		$-H/(360-120)=-1/43200$, giving $(360-s)/43200$.
+		With $s$ measured in degrees, the density and its extension are
+		\[
+		f_S(s)=
+		\begin{cases}
+			\dfrac{s}{21600},&0\le s\le120,\\[2mm]
+			\dfrac{360-s}{43200},&120<s<360,
+		\end{cases}
+		\qquad f_S(s+360)=f_S(s).
+		\]
+	\end{CThreeSolution}
+
+	\newpage
+	\begin{CThreeSolution}
+		\subsubsection*{C3.2 - Calculate the reflective-window tail.}
+		\label{subsec:c3-triangular-scanner-b}
+		The reflective-window sector runs clockwise from $240^\circ$ to north,
+		so it is $[240^\circ,360^\circ)$ on the chosen cycle.
+		\CThreeSolutionGraph{The reflective-window tail is a triangle}
+		{$s$ (degrees)}{$f_S(s)$}{
+			\pgfplotsset{every axis/.append style={
+				xticklabels={$0^\circ$,$120^\circ$,$240^\circ$,$360^\circ$},
+				ytick={0,0.002777778,0.005555556},yticklabels={$0$,$1/360$,$1/180$}}}
+			\COneGraph[s]{0}{360}{(x<=120)*(x/21600)+(x>120)*((360-x)/43200)}
+			{240}{360}{0,120,240,360}{0.0065}
+		}
+		The falling branch gives $f_S(240)=(360-240)/43200=1/360$.
+		At $360^\circ\equiv0^\circ$ the height is zero. The shaded triangle has area
+		\[
+		P(240^\circ\le S<360^\circ)=\frac12(360-240)\frac{1}{360}
+		=\boxed{\frac16}\approx16.7\%.
+		\]
+		About $16.7\%$ of programmed scans point toward the reflective-window sector.
+	\end{CThreeSolution}
+
+	\begin{CThreeSolution}
+		\subsubsection*{C3.3 - Calculate the project-display band.}
+		\label{subsec:c3-triangular-scanner-c}
+		The project-display band $[60^\circ,240^\circ]$ crosses the peak at
+		$120^\circ$. Split the band there into $[60^\circ,120^\circ]$ and
+		$[120^\circ,240^\circ]$.
+		\CThreeSolutionGraph{Two trapezoids meet at the $120^\circ$ peak}
+		{$s$ (degrees)}{$f_S(s)$}{
+			\pgfplotsset{every axis/.append style={
+				xticklabels={$0^\circ$,$60^\circ$,$120^\circ$,$240^\circ$,$360^\circ$},
+				after end axis/.code={\draw[dashed,thick] (axis cs:120,0) -- (axis cs:120,1/180);},
+				ytick={0,0.002777778,0.005555556},yticklabels={$0$,$1/360$,$1/180$}}}
+			\COneGraph[s]{0}{360}{(x<=120)*(x/21600)+(x>120)*((360-x)/43200)}
+			{60}{240}{0,60,120,240,360}{0.0065}
+		}
+		The rising and falling branches give the boundary heights.
+		\[
+		f_S(60)=\frac{60}{21600}=\frac1{360},\quad
+		f_S(120)=\frac{120}{21600}=\frac1{180},\quad
+		f_S(240)=\frac{360-240}{43200}=\frac1{360}.
+		\]
+		\[
 		P(60^\circ\le S\le240^\circ)
-		&=\underbrace{\frac12\left(\frac1{360}+\frac1{180}\right)(60)}
-		_{A_1=1/4}\\
-		&\quad+\underbrace{\frac12\left(\frac1{180}+\frac1{360}\right)(120)}
-		_{A_2=1/2}\\
-		&=\frac34=75\%.
-	\end{aligned}
-	\]
-	The project-display band covers three quarters of the programmed scan
-	directions.
-	\begingroup
-	\pgfplotsset{every axis/.append style={
-			xticklabels={$0^\circ$,$60^\circ$,$120^\circ$,$240^\circ$,$360^\circ\equiv0^\circ$},
-			ytick={0,0.002777778,0.005555556},
-			yticklabels={$0$,$1/360$,$1/180$}}}
-	\COneGraph[s]{0}{360}
-	{(x<=120)*(x/21600)+(x>120)*((360-x)/43200)}
-	{60}{240}{0,60,120,240,360}{0.0065}
-	\endgroup
+		=\underbrace{\frac12\left(\frac1{360}+\frac1{180}\right)(120-60)}_{1/4}
+		+\underbrace{\frac12\left(\frac1{180}+\frac1{360}\right)(240-120)}_{1/2}
+		=\boxed{\frac34}=75\%.
+		\]
+		The scanner points toward the project-display area on three quarters of programmed scans.
+	\end{CThreeSolution}
+
 	\secInicio[sec:c3-triangular-scanner][sec:c3-triangular]
 	
+	\newpage
 	\subsection{Daily peak-activity time}\label{sec:c3-triangular-activity}
 	A university study platform records $T$, the time of day at which its daily
 	student activity reaches its peak, in hours on $[0,24)$.  Time of day is
@@ -699,88 +725,85 @@
 		\CriterionTask{subsec:c3-triangular-activity-c}{3.3}{Calculate the daytime-activity band probability from 04:00 through 16:00.}
 	\end{enumerate}
 	
-	\subsubsection*{C3.1 - Construct the periodic pdf.}
-	\phantomsection\label{subsec:c3-triangular-activity-a}
-	The variable $T$ is daily peak-activity time in hours.  Its period is $24$ h,
-	and its one-cycle support representation is $[0,24)$ with the cut at the least
-	likely time, midnight.  The pdf is a triangle with mode $8$ and unknown peak
-	$H$.  Its complete-cycle area
-	gives
-	\[
-	1=A_{\text{triangle}}=\frac12(24)H,\qquad H=\frac1{12}.
-	\]
-	The line from $(0,0)$ to $(8,1/12)$ has slope $1/96$, so the rising equation
-	is $t/96$.  The line from $(8,1/12)$ to $(24,0)$ has slope $-1/192$; through
-	$(24,0)$ its equation is $(24-t)/192$.  On one cycle,
-	\[
-	f_T(t)=
-	\begin{cases}
-		\dfrac{t}{96},&0\le t\le8,\\[2mm]
-		\dfrac{24-t}{192},&8<t<24.
-	\end{cases}
-	\]
-	The periodic extension is
-	\[
-	f_T(t+24)=f_T(t).
-	\]
-	The two triangular pieces have total area
-	\[
-	\underbrace{\frac12(8)\frac1{12}}_{1/3}
-	+\underbrace{\frac12(16)\frac1{12}}_{2/3}=1.
-	\]
-	
-	\subsubsection*{C3.2 - Calculate the late-activity tail.}
-	\phantomsection\label{subsec:c3-triangular-activity-b}
-	The late-cycle tail is defined as $[18,24)$, moving forward in clock time from
-	18:00 to the midnight cut.  Its starting height is
-	\[
-	f_T(18)=\frac{24-18}{192}=\frac1{32}.
-	\]
-	The shaded tail is a triangle of base $6$ h and height $1/32$:
-	\[
-	P(18\le T<24)
-	=\underbrace{\frac12(24-18)\frac1{32}}_{A_{\text{tail triangle}}}
-	=\frac3{32}=9.375\%.
-	\]
-	Therefore about $9.4\%$ of days have a modeled peak late enough to place the daily activity peak after 18:00.
-	\begingroup
-	\pgfplotsset{every axis/.append style={
-			xticklabels={$0$,$4$,$8$,$16$,$18$,$24\equiv0$},
-			ytick={0,0.03125,0.083333333},yticklabels={$0$,$1/32$,$1/12$}}}
-	\COneGraph[t]{0}{24}{(x<=8)*(x/96)+(x>8)*((24-x)/192)}
-	{18}{24}{0,4,8,16,18,24}{0.095}
-	\endgroup
-	
-	\subsubsection*{C3.3 - Calculate the daytime-activity band.}
-	\phantomsection\label{subsec:c3-triangular-activity-c}
-	The band $[4,16]$ crosses the mode at $8$, which is a pdf breakpoint.  Its
-	three required heights are
-	\[
-	f_T(4)=\frac1{24},\qquad f_T(8)=\frac1{12},
-	\qquad f_T(16)=\frac1{24}.
-	\]
-	Splitting the shaded band at $8$ produces two trapezoids:
-	\[
-	\begin{aligned}
+	\begin{CThreeSolution}
+		\subsubsection*{C3.1 - Construct the periodic pdf.}
+		\label{subsec:c3-triangular-activity-a}
+		Let $T$ be the time of the platform's daily activity peak, in hours. Its
+		period is $24$ h. Use $[0,24)$, cut at midnight ($0$ h and $24$ h).
+
+		The density is zero at midnight and has peak height $H$ at 08:00. The
+		triangular area over one day gives
+		\[
+		1=\frac12(24)H\quad\Longrightarrow\quad H=\frac1{12}\ \mathrm{h}^{-1}.
+		\]
+		The rising side starts at zero and has slope $H/8=1/96$, giving $t/96$.
+		The falling side ends at zero and has slope $-H/(24-8)=-1/192$, giving
+		$(24-t)/192$. The density on one cycle and its extension are
+		\[
+		f_T(t)=
+		\begin{cases}
+			\dfrac{t}{96},&0\le t\le8,\\[2mm]
+			\dfrac{24-t}{192},&8<t<24,
+		\end{cases}
+		\qquad f_T(t+24)=f_T(t).
+		\]
+	\end{CThreeSolution}
+
+	\newpage
+	\begin{CThreeSolution}
+		\subsubsection*{C3.2 - Calculate the late-activity tail.}
+		\label{subsec:c3-triangular-activity-b}
+		On the hour scale, 18:00 to the midnight cut is the interval $[18,24)$.
+		\CThreeSolutionGraph{The late-activity tail is a triangle}
+		{$t$ (h)}{$f_T(t)$}{
+			\pgfplotsset{every axis/.append style={
+				xticklabels={$0$,$8$,$18$,$24$},
+				ytick={0,0.03125,0.083333333},yticklabels={$0$,$1/32$,$1/12$}}}
+			\COneGraph[t]{0}{24}{(x<=8)*(x/96)+(x>8)*((24-x)/192)}
+			{18}{24}{0,8,18,24}{0.095}
+		}
+		The falling branch gives $f_T(18)=(24-18)/192=1/32$. At midnight,
+		$24\equiv0$ and the height is zero. The shaded triangle has area
+		\[
+		P(18\le T<24)=\frac12(24-18)\frac1{32}=\boxed{\frac3{32}}=9.375\%.
+		\]
+		The platform model puts the daily peak between 18:00 and midnight on
+		$9.375\%$ of days.
+	\end{CThreeSolution}
+
+	\begin{CThreeSolution}
+		\subsubsection*{C3.3 - Calculate the daytime-activity band.}
+		\label{subsec:c3-triangular-activity-c}
+		The interval from 04:00 to 16:00 is $[4,16]$ in hours. The density changes
+		slope at 08:00, so split the interval into $[4,8]$ and $[8,16]$.
+		\CThreeSolutionGraph{Two trapezoids meet at the 08:00 peak}
+		{$t$ (h)}{$f_T(t)$}{
+			\pgfplotsset{every axis/.append style={
+				xticklabels={$0$,$4$,$8$,$16$,$24$},
+				after end axis/.code={\draw[dashed,thick] (axis cs:8,0) -- (axis cs:8,1/12);},
+				ytick={0,0.041666667,0.083333333},yticklabels={$0$,$1/24$,$1/12$}}}
+			\COneGraph[t]{0}{24}{(x<=8)*(x/96)+(x>8)*((24-x)/192)}
+			{4}{16}{0,4,8,16,24}{0.095}
+		}
+		The rising and falling branches give the boundary heights.
+		\[
+		f_T(4)=\frac{4}{96}=\frac1{24},\quad
+		f_T(8)=\frac{8}{96}=\frac1{12},\quad
+		f_T(16)=\frac{24-16}{192}=\frac1{24}.
+		\]
+		\[
 		P(4\le T\le16)
-		&=\underbrace{\frac12\left(\frac1{24}+\frac1{12}\right)(8-4)}
-		_{A_1=1/4}\\
-		&\quad+\underbrace{\frac12\left(\frac1{12}+\frac1{24}\right)(16-8)}
-		_{A_2=1/2}\\
-		&=\frac34=75\%.
-	\end{aligned}
-	\]
-	Thus the 04:00--16:00 band contains the daily activity peak on $75\%$
-	of modeled days.
-	\begingroup
-	\pgfplotsset{every axis/.append style={
-			xticklabels={$0$,$4$,$8$,$16$,$18$,$24\equiv0$},
-			ytick={0,0.041666667,0.083333333},yticklabels={$0$,$1/24$,$1/12$}}}
-	\COneGraph[t]{0}{24}{(x<=8)*(x/96)+(x>8)*((24-x)/192)}
-	{4}{16}{0,4,8,16,18,24}{0.095}
-	\endgroup
+		=\underbrace{\frac12\left(\frac1{24}+\frac1{12}\right)(8-4)}_{1/4}
+		+\underbrace{\frac12\left(\frac1{12}+\frac1{24}\right)(16-8)}_{1/2}
+		=\boxed{\frac34}=75\%.
+		\]
+		The platform model puts the daily activity peak between 04:00 and 16:00
+		on three quarters of days.
+	\end{CThreeSolution}
+
 	\secInicio[sec:c3-triangular-activity][sec:c3-triangular]
 	
+	\newpage
 	\subsection{Direction with its peak at the cut}\label{sec:c3-triangular-north}
 	At a live-music event, a programmable stage light records its direction $A$ in
 	degrees clockwise from north on $[0^\circ,360^\circ)$.  Direction is periodic,
@@ -810,109 +833,89 @@
 		\CriterionTask{subsec:c3-triangular-north-c}{3.3}{Calculate the stage light's wrapped target-band probability on $[330^\circ,360^\circ)\cup[0^\circ,30^\circ]$.}
 	\end{enumerate}
 	
-	\subsubsection*{C3.1 - Construct the periodic pdf.}
-	\phantomsection\label{subsec:c3-triangular-north-a}
-	The variable $A$ is stage-light direction in degrees, its period is $360^\circ$,
-	and its one-cycle support representation is $[0^\circ,360^\circ)$ with the cut
-	at the physical mode, north.  The unwrapped graph shows a descending triangle on
-	$[0^\circ,180^\circ]$ and an ascending triangle on
-	$[180^\circ,360^\circ)$.  Their endpoint heights both represent the same
-	northward peak $H$.
-	
-	The combined area is $1$:
-	\[
-	1=\underbrace{\frac12(180)H}_{\text{left displayed triangle}}
-	+\underbrace{\frac12(180)H}_{\text{right displayed triangle}}
-	=180H,
-	\qquad H=\frac1{180}.
-	\]
-	The first side has slope $-H/180=-1/32400$ and passes through $(180,0)$,
-	giving $(180-a)/32400$.  The second has slope $1/32400$ and also passes
-	through $(180,0)$, giving $(a-180)/32400$.  On one cycle,
-	\[
-	f_A(a)=
-	\begin{cases}
-		\dfrac{180-a}{32400},&0\le a\le180,\\[2mm]
-		\dfrac{a-180}{32400},&180<a<360.
-	\end{cases}
-	\]
-	The complete model repeats according to
-	\[
-	f_A(a+360^\circ)=f_A(a).
-	\]
-	Each displayed triangle has area $1/2$, so their areas sum to $1$.  The peak
-	at $0^\circ$ and the height approached at $360^\circ$ are one physical peak,
-	not two modes.
-	
-	\subsubsection*{C3.2 - Calculate the upper-end directional tail.}
-	\phantomsection\label{subsec:c3-triangular-north-b}
-	Relative to the north cut, the audience-side tail is the clockwise sector
-	$[300^\circ,360^\circ)$.  Its parallel heights are
-	\[
-	f_A(300)=\frac{120}{32400}=\frac1{270},
-	\qquad f_A(360^-)=\frac1{180}.
-	\]
-	The upper endpoint is excluded from the written cycle, but its approached
-	height completes the geometric edge at the equivalent north direction.  The
-	shaded tail is a trapezoid of width $60^\circ$:
-	\[
-	\begin{aligned}
+	\begin{CThreeSolution}
+		\subsubsection*{C3.1 - Construct the periodic pdf.}
+		\label{subsec:c3-triangular-north-a}
+		Let $A$ be the stage-light direction in degrees clockwise from north.
+		Its period is $360^\circ$. Use $[0^\circ,360^\circ)$, cut at north
+		($0^\circ\equiv360^\circ$).
+
+		The cut splits the physical peak $H$ between the two displayed ends. Each
+		triangle has base $180^\circ$ and meets the other at zero density at south.
+		The total area over one turn gives
+		\[
+		1=\frac12(180)H+\frac12(180)H=180H
+		\quad\Longrightarrow\quad H=\frac1{180}\text{ per degree}.
+		\]
+		Both line segments meet at $(180,0)$. The descending slope is
+		$-H/180=-1/32400$, giving $(180-a)/32400$. The ascending slope is
+		$H/180=1/32400$, giving $(a-180)/32400$.
+		With $a$ measured in degrees, the density and its extension are
+		\[
+		f_A(a)=
+		\begin{cases}
+			\dfrac{180-a}{32400},&0\le a\le180,\\[2mm]
+			\dfrac{a-180}{32400},&180<a<360,
+		\end{cases}
+		\qquad f_A(a+360)=f_A(a).
+		\]
+	\end{CThreeSolution}
+
+	\newpage
+	\begin{CThreeSolution}
+		\subsubsection*{C3.2 - Calculate the upper-end directional tail.}
+		\label{subsec:c3-triangular-north-b}
+		The audience-side sector runs clockwise from $300^\circ$ to the north cut.
+		On the chosen cycle it is $[300^\circ,360^\circ)$.
+		\CThreeSolutionGraph{The audience-side trapezoid ends at north ($360^\circ\equiv0^\circ$)}
+		{$a$ (degrees)}{$f_A(a)$}{
+			\pgfplotsset{every axis/.append style={
+				xticklabels={$0^\circ$,$180^\circ$,$300^\circ$,$360^\circ$},
+				ytick={0,0.003703704,0.005555556},yticklabels={$0$,$1/270$,$1/180$}}}
+			\COneGraph[a]{0}{360}{(x<=180)*((180-x)/32400)+(x>180)*((x-180)/32400)}
+			{300}{360}{0,180,300,360}{0.0065}
+		}
+		On the rising side, $f_A(300)=(300-180)/32400=1/270$ and the height
+		approaches $(360-180)/32400=1/180$ at north. The shaded trapezoid has area
+		\[
 		P(300^\circ\le A<360^\circ)
-		&=\underbrace{\frac12\left(\frac1{270}+\frac1{180}\right)(60)}
-		_{A_{\text{tail trapezoid}}}\\
-		&=\frac5{18}\approx27.8\%.
-	\end{aligned}
-	\]
-	Thus about $27.8\%$ of programmed directions use the audience-side sector.
-	\begingroup
-	\pgfplotsset{every axis/.append style={
-			xticklabels={$0^\circ$,$30^\circ$,$180^\circ$,$300^\circ$,$330^\circ$,
-				$360^\circ\equiv0^\circ$},
-			ytick={0,0.003703704,0.005555556},
-			yticklabels={$0$,$1/270$,$1/180$}}}
-	\COneGraph[a]{0}{360}
-	{(x<=180)*((180-x)/32400)+(x>180)*((x-180)/32400)}
-	{300}{360}{0,30,180,300,330,360}{0.0065}
-	\endgroup
-	
-	\clearpage
-	\subsubsection*{C3.3 - Calculate the wrapped target band.}
-	\phantomsection\label{subsec:c3-triangular-north-c}
-	The physical target cone is continuous around north, but the chosen recording
-	cycle splits it at the cut:
-	\[
-	[330^\circ,360^\circ)\cup[0^\circ,30^\circ].
-	\]
-	The outer boundary heights are equal:
-	\[
-	f_A(330)=\frac{150}{32400}=\frac1{216},
-	\qquad f_A(30)=\frac{150}{32400}=\frac1{216}.
-	\]
-	Each shaded piece is a trapezoid of width $30^\circ$, with heights $1/216$
-	and $1/180$ at its parallel sides:
-	\[
-	\begin{aligned}
-		P(\text{target cone})
-		&=\underbrace{\frac12\left(\frac1{216}+\frac1{180}\right)(30)}
-		_{A_1=11/72}\\
-		&\quad+\underbrace{\frac12\left(\frac1{180}+\frac1{216}\right)(30)}
-		_{A_2=11/72}\\
-		&=\frac{11}{36}\approx30.6\%.
-	\end{aligned}
-	\]
-	The result lies between $0$ and $1$.  About $30.6\%$ of programmed stage-light
-	directions fall within $30^\circ$ of north, using both sides of the cut.
-	\begingroup
-	\pgfplotsset{every axis/.append style={
-			xtick={0,30,180,300,330,360},
-			xticklabels={$0^\circ$,$30^\circ$,$180^\circ$,$300^\circ$,$330^\circ$,
-				$360^\circ\equiv0^\circ$},
-			ytick={0,0.004629630,0.005555556},
-			yticklabels={$0$,$1/216$,$1/180$}}}
-	\CThreeWrappedGraph{a}{0}{360}
-	{(x<=180)*((180-x)/32400)+(x>180)*((x-180)/32400)}
-	{330}{360}{0}{30}{0.0065}
-	\endgroup
+		=\frac12\left(\frac1{270}+\frac1{180}\right)(360-300)
+		=\boxed{\frac5{18}}\approx27.8\%.
+		\]
+		About $27.8\%$ of programmed stage-light directions fall in the audience-side sector.
+	\end{CThreeSolution}
+
+	\begin{CThreeSolution}
+		\subsubsection*{C3.3 - Calculate the wrapped target band.}
+		\label{subsec:c3-triangular-north-c}
+		The target extends $30^\circ$ ($\pi/6$ rad) to each side of north.
+		In degrees, the counterclockwise side is $[330^\circ,360^\circ)$ and
+		the clockwise side is $[0^\circ,30^\circ]$. Their union is the target band.
+		\CThreeSolutionGraph{One trapezoid on each side of north ($360^\circ\equiv0^\circ$)}
+		{$a$ (degrees)}{$f_A(a)$}{
+			\pgfplotsset{every axis/.append style={
+				xtick={0,30,180,330,360},
+				xticklabels={$0^\circ$,$30^\circ$,$180^\circ$,$330^\circ$,$360^\circ$},
+				ytick={0,0.004629630,0.005555556},yticklabels={$0$,$1/216$,$1/180$}}}
+			\CThreeWrappedGraph{a}{0}{360}
+			{(x<=180)*((180-x)/32400)+(x>180)*((x-180)/32400)}
+			{0:30}{330:360}{0.0065}{360^\circ\equiv 0^\circ}
+		}
+		At north, $f_A(0)=f_A(360^-)=1/180$. The other boundary heights are
+		\[
+		f_A(330)=\frac{330-180}{32400}=\frac1{216},
+		\qquad f_A(30)=\frac{180-30}{32400}=\frac1{216}.
+		\]
+		Add the areas of the two $30^\circ$-wide trapezoids.
+		\[
+		P(\text{target band})
+		=\underbrace{\frac12\left(\frac1{216}+\frac1{180}\right)(30)}_{11/72}
+		+\underbrace{\frac12\left(\frac1{180}+\frac1{216}\right)(30)}_{11/72}
+		=\boxed{\frac{11}{36}}\approx30.6\%.
+		\]
+		About $30.6\%$ of programmed stage-light directions are within $30^\circ$ of north.
+	\end{CThreeSolution}
+
 	\secInicio[sec:c3-triangular-north][sec:c3-triangular]
 	
 \end{document}
