@@ -46,9 +46,11 @@
         circle.setAttribute("role", "button");
         circle.tabIndex = 0;
         circle.setAttribute("aria-label", "Exit minimal mode (click or press Enter, Space, or Escape)");
+        circle.setAttribute("aria-describedby", circle === visual ? "block-remaining" : "timer-remaining");
       } else {
         circle.removeAttribute("role");
         circle.removeAttribute("tabindex");
+        circle.removeAttribute("aria-describedby");
         circle.setAttribute("aria-label", circle === visual ? "Current schedule block" : "Countdown timer");
       }
     });
