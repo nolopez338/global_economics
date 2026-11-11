@@ -3,7 +3,7 @@
 % Every PDF student is already listed once in the correct group; no additions
 % or group changes were needed. No listed student is absent from the PDFs.
 % Counts (PDF / this document): A 21/21, B 23/23, C 22/22, D 20/20, E 22/22.
-% Total: 108/108. Existing row order, name forms and C1-C10 layout are retained.
+% Total: 108/108. Existing row order and name forms are retained.
 
 % Review: the three Z filenames below are absent from all five roster PDFs
 % and are not student rows in this document. Their A-E assignment remains
@@ -32,6 +32,7 @@
 \setlength{\RosterTopPadding}{12pt}
 \usepackage[hmargin=0.55in,top=\RosterTopPadding,bottom=\RosterTopPadding]{geometry}
 \usepackage{array}
+\usepackage[table]{xcolor}
 \usepackage{tikz}
 
 % Only paired pages receive a guide, fixed at the physical sheet midpoint.
@@ -55,16 +56,34 @@
 \renewcommand{\familydefault}{\sfdefault}
 \renewcommand{\arraystretch}{0.88}
 \pagestyle{empty}
-\setlength{\tabcolsep}{4pt}
+\setlength{\tabcolsep}{2pt}
 \setlength{\arrayrulewidth}{0.45pt}
+\arrayrulecolor{black}
 
 \newlength{\NameWidth}
 \newlength{\CriterionWidth}
+\newlength{\EvidenceWidth}
 \setlength{\NameWidth}{3in}
+% Fifteen columns: one name, ten criteria, and four evidence columns.
+\setlength{\EvidenceWidth}{24pt}
 \setlength{\CriterionWidth}{%
-  \dimexpr(\textwidth-\NameWidth-22\tabcolsep-12\arrayrulewidth)/10\relax}
+  \dimexpr(\textwidth-\NameWidth-4\EvidenceWidth-30\tabcolsep-16\arrayrulewidth)/10\relax}
 \newcolumntype{N}{>{\raggedright\arraybackslash}p{\NameWidth}}
 \newcolumntype{C}{>{\centering\arraybackslash}p{\CriterionWidth}}
+% Blend the blue column tint with each row shade (multiply by its gray level).
+\definecolor{EvidenceBody}{HTML}{EAF3FA}
+\colorlet{EvidenceShade0}{EvidenceBody}
+\colorlet{EvidenceShade1}{EvidenceBody!95!black}
+\colorlet{EvidenceShade2}{EvidenceBody!90!black}
+\definecolor{EvidenceHeading}{HTML}{C8DEEF}
+\newcolumntype{E}{>{\cellcolor{EvidenceShade\the\RosterRow}\centering\arraybackslash}p{\EvidenceWidth}}
+\newcommand{\AssessmentHeader}[1]{{\scriptsize\bfseries #1}}
+\newcommand{\EvidenceHeader}[1]{\cellcolor{EvidenceHeading}\AssessmentHeader{#1}}
+% Reset the subtle three-row cycle for each roster; headers do not count.
+\definecolor{RosterShade0}{gray}{1.00}
+\definecolor{RosterShade1}{gray}{0.95}
+\definecolor{RosterShade2}{gray}{0.90}
+\newcount\RosterRow
 \newcommand{\RowStrut}{\rule[-4pt]{0pt}{13.5pt}}
 
 \newcommand{\GroupHeading}[1]{%
@@ -74,15 +93,24 @@
 }
 
 \newenvironment{roster}{%
-  \noindent\begin{tabular}{|N|*{10}{C|}}
+  \global\RosterRow=0
+  \noindent\begin{tabular}{|N|C|C|E|C|C|E|C|C|C|E|C|C|C|E|}
     \hline
     \RowStrut\textbf{Student Name}
-      & \textbf{C1} & \textbf{C2} & \textbf{C3} & \textbf{C4} & \textbf{C5}
-      & \textbf{C6} & \textbf{C7} & \textbf{C8} & \textbf{C9} & \textbf{C10} \\
+      & \AssessmentHeader{C1} & \AssessmentHeader{C2} & \EvidenceHeader{LE1.1}
+      & \AssessmentHeader{C3} & \AssessmentHeader{C4} & \EvidenceHeader{LE1.2}
+      & \AssessmentHeader{C5} & \AssessmentHeader{C6} & \AssessmentHeader{C7} & \EvidenceHeader{LE2}
+      & \AssessmentHeader{C8} & \AssessmentHeader{C9} & \AssessmentHeader{C10} & \EvidenceHeader{LE3} \\
     \hline
 }{\end{tabular}\par}
 
-\newcommand{\Student}[1]{\RowStrut#1 & & & & & & & & & & \\ \hline}
+\newcommand{\Student}[1]{%
+  \rowcolor{RosterShade\the\RosterRow}%
+  \RowStrut#1 & & & & & & & & & & & & & & \\
+  \noalign{%
+    \global\advance\RosterRow by 1
+    \ifnum\RosterRow=3 \global\RosterRow=0 \fi
+  }\hline}
 
 \begin{document}
 
