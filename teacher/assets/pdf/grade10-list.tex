@@ -27,8 +27,30 @@
 \documentclass[12pt,letterpaper]{article}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
-\usepackage[hmargin=0.55in,vmargin=0.4in]{geometry}
+% Use the same inset from the top of each physical half-sheet.
+\newlength{\RosterTopPadding}
+\setlength{\RosterTopPadding}{12pt}
+\usepackage[hmargin=0.55in,top=\RosterTopPadding,bottom=\RosterTopPadding]{geometry}
 \usepackage{array}
+\usepackage{tikz}
+
+% Only paired pages receive a guide, fixed at the physical sheet midpoint.
+\newcommand{\CuttingGuide}{%
+  \AddToHookNext{shipout/foreground}{%
+    \begin{tikzpicture}[remember picture,overlay]
+      \draw[dotted,line width=0.3pt]
+        ([xshift=0.55in]current page.west) --
+        ([xshift=-0.55in]current page.east);
+    \end{tikzpicture}%
+  }%
+}
+% A half-sheet-high box gives both headings exactly the same top padding.
+% The shared 12pt inset also leaves room for the longest roster below the cut.
+\newenvironment{upperroster}{%
+  \par\nointerlineskip
+  \vbox to 0.5\paperheight\bgroup
+}{\vfil\egroup\nointerlineskip}
+
 
 \renewcommand{\familydefault}{\sfdefault}
 \renewcommand{\arraystretch}{0.88}
@@ -64,6 +86,8 @@
 
 \begin{document}
 
+\CuttingGuide
+\begin{upperroster}
 \GroupHeading{A}
 \begin{roster}
   \Student{Alvarez Rey Thomas Sebastian}
@@ -89,7 +113,7 @@
   \Student{Tapias Lopez Santiago}
 \end{roster}
 
-\vspace{10pt}
+\end{upperroster}
 
 \GroupHeading{B}
 \begin{roster}
@@ -120,6 +144,8 @@
 
 \newpage
 
+\CuttingGuide
+\begin{upperroster}
 \GroupHeading{C}
 \begin{roster}
   \Student{Ariza Gomez Gabriel Jose}
@@ -146,7 +172,7 @@
   \Student{Rincon Castañeda Tomas Mauricio}
 \end{roster}
 
-\vspace{10pt}
+\end{upperroster}
 
 \GroupHeading{D}
 \begin{roster}
