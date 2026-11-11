@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <title>Subtraction game · Two players</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #101827; color: #f8fafc; --player: #8fc7ff; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100svh; }
+    [hidden] { display: none !important; }
+    button, input { font: inherit; }
+    button { cursor: pointer; min-height: 48px; border: 2px solid #64748b; border-radius: 12px; background: #243247; color: #fff; padding: .65rem 1rem; font-weight: 700; }
+    button:hover:not(:disabled) { background: #34455e; border-color: #fff; }
+    button:focus-visible, input:focus-visible { outline: 4px solid #fff; outline-offset: 4px; }
+    button:disabled { opacity: .28; cursor: not-allowed; }
+    .primary { background: #a9e8cf; border-color: #a9e8cf; color: #102c23; }
+    .primary:hover:not(:disabled) { background: #d0f5e6; }
+    .shell { width: min(1440px, 100%); margin: auto; padding: clamp(16px, 3vw, 40px); }
+    header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+    h1 { margin: 0; font-size: clamp(22px, 3vw, 36px); letter-spacing: -.04em; }
+    header button { font-size: 16px; }
+    .setup { max-width: 680px; margin: clamp(32px, 8vh, 90px) auto; padding: clamp(24px, 4vw, 48px); border: 1px solid #526178; border-radius: 24px; background: #192538; }
+    h2 { font-size: clamp(28px, 4vw, 40px); margin: 0 0 12px; }
+    .hint { color: #c6d1df; font-size: 20px; line-height: 1.5; margin: 0 0 28px; }
+    label { display: block; font-size: 22px; font-weight: 650; margin-top: 24px; }
+    input { display: block; width: 100%; min-width: 0; margin-top: 10px; padding: 12px 16px; font-size: 32px; background: #101827; border: 2px solid #718199; border-radius: 10px; color: #fff; }
+    .error { color: #ffb9b9; font-size: 20px; min-height: 1.5em; margin: 16px 0; }
+    .setup .primary { width: 100%; font-size: 26px; }
+    .board { text-align: center; padding-top: clamp(20px, 4vh, 48px); }
+    .turn { font-weight: 800; font-size: clamp(32px, 4.5vw, 62px); color: var(--player); margin: 0; }
+    .total-label { font-size: 18px; color: #c6d1df; margin: 18px 0 0; }
+    .total { font-size: clamp(100px, var(--total-size, 19vw), 250px); font-weight: 850; line-height: 1.15; letter-spacing: -.055em; margin: 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+    .calculation { min-height: 1.6em; margin: 4px 0 20px; font-size: clamp(26px, 3.2vw, 46px); color: #dbe5f2; overflow-wrap: anywhere; }
+    .moves { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; max-width: 1200px; margin: auto; }
+    .moves button { font-size: clamp(30px, 3.8vw, 52px); min-height: 90px; border-color: var(--player); color: var(--player); }
+    .pager { display: flex; justify-content: center; align-items: center; gap: 16px; flex-wrap: wrap; margin: 18px 0; font-size: 18px; }
+    .controls { display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+    .settings-summary { color: #c6d1df; font-size: 18px; overflow-wrap: anywhere; max-width: 100%; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    @media (max-width: 560px) {
+      .moves { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 8px; }
+      .moves button { min-height: 72px; padding: 8px; }
+      header button { max-width: 120px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <h1>Subtraction game</h1>
+      <button id="fullscreen" type="button" hidden>Fullscreen</button>
+    </header>
+    <section id="setup" class="setup" aria-labelledby="setup-title">
+      <h2 id="setup-title">Two players. Reach zero.</h2>
+      <p class="hint">Take turns subtracting. The player who reaches exactly 0 wins.</p>
+      <form id="settings" novalidate>
+        <label for="starting">Starting number M</label>
+        <input id="starting" name="starting" type="text" inputmode="numeric" pattern="[0-9]+" value="100" aria-describedby="error" autocomplete="off" required>
+        <label for="maximum">Maximum subtraction m</label>
+        <input id="maximum" name="maximum" type="text" inputmode="numeric" pattern="[0-9]+" value="10" aria-describedby="error" autocomplete="off" required>
+        <p id="error" class="error" role="alert"></p>
+        <button class="primary" type="submit">Start game</button>
+      </form>
+    </section>
+    <section id="board" class="board" aria-label="Game board" hidden>
+      <h2 id="turn" class="turn" tabindex="-1">Player 1’s turn</h2>
+      <p class="total-label">Current total</p>
+      <p id="total" class="total">100</p>
+      <p id="calculation" class="calculation" aria-hidden="true">&nbsp;</p>
+      <div id="moves" class="moves" role="group" aria-label="Choose an amount to subtract"></div>
+      <nav id="pager" class="pager" aria-label="Subtraction button pages" hidden>
+        <button id="previous" type="button" aria-label="Previous subtraction buttons">← Previous</button>
+        <span id="range"></span>
+        <button id="next" type="button" aria-label="Next subtraction buttons">Next →</button>
+      </nav>
+      <div class="controls">
+        <span id="summary" class="settings-summary"></span>
+        <button id="restart" type="button">Restart game</button>
+        <button id="change" type="button">Change settings</button>
+      </div>
+    </section>
+    <p id="announcement" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+  </main>
+  <script>
+    'use strict';
+    const $ = id => document.getElementById(id);
+    const pageSize = 40n;
+    let initial = 100n, maximum = 10n, total = 100n, player = 1;
+    let active = false, page = 0n, calculationTimer;
+
+    function renderMoves() {
+      const first = page * pageSize + 1n;
+      const last = maximum < first + pageSize - 1n ? maximum : first + pageSize - 1n;
+      $('moves').replaceChildren();
+      for (let amount = first; amount <= last; amount++) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = `−${amount}`;
+        button.setAttribute('aria-label', `Subtract ${amount}`);
+        button.dataset.amount = String(amount);
+        button.disabled = !active || amount > total;
+        $('moves').append(button);
+      }
+      $('pager').hidden = maximum <= pageSize || !active;
+      $('previous').disabled = page === 0n;
+      $('next').disabled = last >= maximum;
+      $('range').textContent = `${first}–${last} of ${maximum}`;
+    }
+
+    function renderBoard() {
+      $('total').textContent = String(total);
+      // Keep long totals legible without widening the board.
+      $('total').style.setProperty('--total-size', `${Math.min(19, 130 / String(total).length)}vw`);
+      $('board').style.setProperty('--player', player === 1 ? '#8fc7ff' : '#ffd17a');
+      $('turn').textContent = active ? `Player ${player}’s turn` : `Player ${player} wins!`;
+      renderMoves();
+    }
+
+    function startGame() {
+      clearTimeout(calculationTimer);
+      total = initial;
+      player = 1;
+      page = 0n;
+      active = true;
+      $('setup').hidden = true;
+      $('board').hidden = false;
+      $('calculation').textContent = '\u00a0';
+      $('summary').textContent = `Start ${initial} · Subtract 1–${maximum}`;
+      renderBoard();
+      $('announcement').textContent = `New game. Total ${total}. Player 1’s turn.`;
+      $('turn').focus();
+    }
+
+    $('settings').addEventListener('submit', event => {
+      event.preventDefault();
+      for (const [id, name] of [['starting', 'Starting number'], ['maximum', 'Maximum subtraction']]) {
+        const input = $(id);
+        const value = input.value.trim();
+        input.removeAttribute('aria-invalid');
+        if (!/^\d+$/.test(value) || BigInt(value) < 1n) {
+          $('error').textContent = `${name} must be a positive whole number.`;
+          input.setAttribute('aria-invalid', 'true');
+          input.focus();
+          return;
+        }
+      }
+      initial = BigInt($('starting').value.trim());
+      maximum = BigInt($('maximum').value.trim());
+      $('error').textContent = '';
+      startGame();
+    });
+
+    $('moves').addEventListener('click', event => {
+      const button = event.target.closest('button[data-amount]');
+      if (!button || button.disabled || !active) return;
+      const amount = BigInt(button.dataset.amount);
+      if (amount < 1n || amount > maximum || amount > total) return;
+      const calculation = `${total} − ${amount} = ${total - amount}`;
+      total -= amount;
+      active = total !== 0n;
+      if (active) player = 3 - player;
+      clearTimeout(calculationTimer);
+      $('calculation').textContent = calculation;
+      // Return to the first page when the remaining total falls below this page.
+      if (page * pageSize >= total) page = 0n;
+      renderBoard();
+      $('announcement').textContent = `${calculation}. ${$('turn').textContent}`;
+      if (active) {
+        calculationTimer = setTimeout(() => { $('calculation').textContent = '\u00a0'; }, 2800);
+        const nextButton = $('moves').querySelector('button:not(:disabled)');
+        if (nextButton) nextButton.focus();
+      } else {
+        $('turn').focus();
+      }
+    });
+
+    $('restart').addEventListener('click', startGame);
+    $('change').addEventListener('click', () => {
+      active = false;
+      clearTimeout(calculationTimer);
+      $('board').hidden = true;
+      $('setup').hidden = false;
+      $('announcement').textContent = 'Change settings, then start a new game.';
+      $('starting').focus();
+    });
+    function changePage(direction) {
+      const nextPage = page + direction;
+      if (!active || nextPage < 0n || nextPage * pageSize >= maximum) return;
+      page = nextPage;
+      renderMoves();
+      $('moves').querySelector('button').focus();
+    }
+    $('previous').addEventListener('click', () => changePage(-1n));
+    $('next').addEventListener('click', () => changePage(1n));
+    if (document.fullscreenEnabled && document.documentElement.requestFullscreen) {
+      $('fullscreen').hidden = false;
+      $('fullscreen').addEventListener('click', async () => {
+        try {
+          if (document.fullscreenElement) await document.exitFullscreen();
+          else await document.documentElement.requestFullscreen();
+        } catch {
+          $('announcement').textContent = 'Fullscreen is unavailable in this browser.';
+        }
+      });
+      document.addEventListener('fullscreenchange', () => {
+        $('fullscreen').textContent = document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen';
+      });
+    }
+  </script>
+</body>
+</html>

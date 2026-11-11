@@ -1,271 +1,434 @@
 \makeatletter
-\def\input@path{{./}{../../../preamble/}{book2026-2027/preamble/}}
+\def\input@path{{./}{../}{../../}{../../../}{../../../../}{preamble/}{../preamble/}{../../preamble/}{../../../preamble/}{../../../../book2026-2027/preamble/}}
 \makeatother
-\input{preamble.tex}
+\input{preamble_exams.tex}
+\input{graphs/G10_T2_bar_graphs.tex}
 \usepackage{needspace}
-\hypersetup{pdftitle={Grade 10 Term 2 Discrete Probability}}
+\hypersetup{pdftitle={Grade 10 C2: Constructing PMF and CDF Tables and Graphs}}
 \setlength{\emergencystretch}{2em}
-\title{Grade 10, Term 2, Lesson 1, Criterion C2\\Reading and Checking PMFs and CDFs}
-\author{}
-\date{}
+\linespread{1.05}
+\setlength{\parskip}{3pt}
+\title{Grade 10, Term 2, Lesson 1, Criterion C2\\Constructing PMF and CDF Tables and Graphs}
+\author{}\date{}
+% Both task lists and worked stages use the same wording.
+\newcommand{\taskheading}[1]{\textbf{Task #1 --- \ifnum#1=1 PMF table and graph\else CDF table and graph\fi}}
+\newcommand{\problemTasks}[2]{\QuestionsTasks[#1]{
+{2}/{sol:#2-1}/{\taskheading{1}. Write the probability mass function (PMF) as a table and represent it graphically. Define the random variable, its units and support within this task.},
+{2}/{sol:#2-2}/{\taskheading{2}. Write the cumulative distribution function (CDF) as a table and represent it graphically.}}}
+\newcommand{\stage}[2]{\par\smallskip\Needspace{7cm}\subsubsection*{\taskheading{#2}}\label{sol:#1-#2}}
+\pgfplotsset{cTwoCDF/.style={width=\linewidth,height=4cm,
+scale only axis=false,axis lines=left,ymin=-.055,ymax=1.1,
+ytick={0,.25,.5,.75,1},grid=major,grid style={gray!15},
+tick label style={font=\small},label style={font=\small},
+ylabel={$F_X(x)$},clip=false}}
 \begin{document}
 \maketitle
-\setcounter{tocdepth}{1}
-\setcounter{secnumdepth}{2}
-\phantomsection\label{toc}
-\tableofcontents
-\section*{Evaluated criterion}
+\section*{Evaluated criteria}
 \textbf{C2:} Interprets PMFs and CDFs by verifying their defining properties and using them to calculate point, interval, cumulative, and complementary probabilities in financial contexts.
-\section{Introduction}\label{sec:t2-c2-introduction}
-All data in this activity are hypothetical teaching models. Probabilities have no monetary units. Keep exact expressions where useful and round final probabilities to four decimal places.
-\subsection{Individual and accumulated probabilities}
-A school shop counts refunds in an afternoon. Exactly two means one value; at most two includes zero, one and two. The PMF $p_X(x)=P(X=x)$ is read as the probability that X equals x. The CDF $F_X(x)=P(X\leq x)$ is read as the probability that X is at most x. Capital $X$ names the random variable, while $x$ is a value or cutoff. Refund counts have units of refunds; probabilities have no units.
-\textbf{Check.} Does $F_X(2)$ mean exactly two? \emph{Suggested answer:} No. It adds all mass at values at most 2.
 
+\textbf{How to practise.} Attempt both tasks before opening their solution links. Each problem asks for four representations: a PMF table, a discrete PMF graph, a CDF table and a step graph. Verification and contextual explanations belong inside the two solution stages. This activity focuses on constructing the representations described by C2.
+\setcounter{tocdepth}{1}\setcounter{secnumdepth}{2}
+\phantomsection\label{toc}\tableofcontents
+\clearpage
+\section{Introduction}\label{sec:intro}
+A PMF separates numerical results; a CDF accumulates their probabilities from left to right. All data are hypothetical. Amounts are in USD; probabilities have no units. Keep exact fractions or terminating decimals.
+\subsection{Introductory example: a payment fee}\label{prob:payment-intro}
+A shop receives one payment. The customer pays by cash with probability 0.25, debit card with probability 0.45, or credit card with probability 0.30. These are the only payment methods. Cash has no processing fee; either card costs the shop 1 USD. The shop records the processing fee for this payment.
+\problemTasks{sec:intro}{payment-intro}
+\stage{payment-intro}{1}
+$X$ is the processing fee for one payment, in USD. Cash maps to 0; debit and credit both map to 1. Their mutually exclusive probabilities add: $p_X(0)=0.25$ and $p_X(1)=0.45+0.30=0.75$.
+The distinct support is $S_X=\{0,1\}$; $p_X(x)=0$ elsewhere.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering\begin{tabular}{cc}\toprule $x$ (USD) & $p_X(x)$ \\\midrule
+$0$ & $0.25$ \\
+$1$ & $0.75$ \\
+\bottomrule\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering\GTenPMFGraph[width=\linewidth,height=3.5cm,xlabel={$x$ (USD)},ylabel={$p_X(x)$},xstep=1]{0,1}{0.25,0.75}\end{minipage}\par
+\textbf{PMF check.} All listed probabilities are positive and $0.25+0.75=1$. The graph places each mass at its numerical value, with the original spacing.
+\secInicio[prob:payment-intro][sec:intro]\stage{payment-intro}{2}
+$F_X(x)=P(X\leq x)$ adds masses at values no greater than the cutoff. Accumulate in increasing support order: $0.25;\ 0.25+0.75=1$. Below the minimum no mass is included.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering\begin{tabular}{cc}\toprule Cutoff interval & $F_X(x)$ \\\midrule
+$x<0$ & $0$ \\
+$0\leq x<1$ & $0.25$ \\
+$x\geq 1$ & $1$ \\
+\bottomrule\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering\begin{tikzpicture}\begin{axis}[cTwoCDF,height=3.5cm,xmin=-1,xmax=2,xtick={0,1},xlabel={$x$ (USD)}]
+\addplot[blue,thick,<-] coordinates {(-1,0)(0,0)};
+\addplot[blue,thick] coordinates {(0,0.25)(1,0.25)};
+\addplot[blue,thick,->] coordinates {(1,1)(2,1)};
+\addplot[only marks,mark=*,blue,mark size=2pt] coordinates {(0,0.25)(1,1)};
+\addplot[only marks,mark=*,blue,mark options={fill=white},mark size=2pt] coordinates {(0,0)(1,0.25)};
+\end{axis}\end{tikzpicture}\end{minipage}\par
+\textbf{CDF check.} Nonnegative jumps make the CDF nondecreasing. Filled left/open right endpoints give right-continuity. Tails at 0 and 1 give limits 0 and 1, with 1 attained at the maximum. Jumps $0.25,\ 0.75$ match the PMF. The fee is either zero or one dollar; the accumulated height at 0 includes cash payments only.
+\secInicio[prob:payment-intro][sec:intro]
 
-\subsection{Defining properties}
-A PMF is non-negative and its masses total 1. A CDF is non-decreasing: raising the cutoff cannot remove outcomes. It is right-continuous: the value at a jump equals the height immediately to its right. Its limits are 0 as $x\to-\infty$ and 1 as $x\to+\infty$, meaning arbitrarily far left and right. For finite discrete support, it is constant between supported values and jumps by $p_X(x)$ at each value.
-\textbf{Check.} May a CDF decrease from 0.7 to 0.5? \emph{Suggested answer:} No. Cumulative probability cannot decrease.
+\clearpage
+\section{Notation Reference and Practice Procedure}\label{sec:reference}
+\subsection{Notation and graph conventions}
+\begin{center}\begin{tabularx}{.95\linewidth}{lX}\toprule
+Symbol & Meaning \\\midrule
+$X$, $x$ & $X$ is the numerical quantity recorded; $x$ is a possible value or a real cutoff. State the units of $X$. \\
+$S_X$ & Support: distinct values with positive probability. Several outcomes may give the same value. \\
+$p_X(x)=P(X=x)$ & PMF: probability of one numerical value. It is zero outside the support. \\
+$F_X(x)=P(X\leq x)$ & CDF: sum of masses at supported values no greater than $x$. It is defined for every real cutoff. \\
+$F_X(a^-)$ & Height immediately before $a$. The jump $F_X(a)-F_X(a^-)$ equals $p_X(a)$. \\\bottomrule
+\end{tabularx}\end{center}
+PMF graphs use separated bars at numerical values, with heights equal to probabilities. A bar represents mass at one value, not an interval. All horizontal axes retain actual numerical spacing. Probabilities are unitless, even when the variable measures dollars.
 
+A CDF graph has horizontal steps. At each supported value, the filled dot gives the new height and the open dot gives the excluded height below it. Never join jumps with sloping lines or fill the gaps between supported values. Arrows show horizontal tails. For finite support, the CDF reaches 1 at the largest supported value. For infinite support, it can approach 1 without reaching it at any finite cutoff.
+\subsection{The two-task procedure}
+\taskheading{1}. Write the probability mass function (PMF) as a table and represent it graphically. Define the random variable, its units and support. Translate complete outcomes into values. Use independence to multiply within ordered outcomes when justified, and add mutually exclusive outcomes sharing a value. Solve missing or proportional probabilities using total probability 1. Show every finite-support entry and check nonnegativity and total mass.
 
-\subsection{Endpoints}
-At most means $\leq$; less than means $<$; at least means $\geq$; more than means $>$. For integer counts $P(X<3)=F_X(2)$, but for irregular support list the actual included values. A CDF accepts all real cutoffs, including values outside the support.
-\textbf{Check.} For support $\{0,2,5\}$, what does $1<X<5$ contain? \emph{Suggested answer:} Only $X=2$.
+\taskheading{2}. Write the cumulative distribution function (CDF) as a table and represent it graphically. Sort the supported values, then accumulate their PMF probabilities. Give all real-line intervals, including tails. Draw right-continuous steps with correctly included endpoints. Check increasing heights, limits and jumps against the PMF. Interpret the graph in its setting.
 
-\textbf{Check.} What is the complement of $X>2$? \emph{Suggested answer:} $X\leq2$, so $P(X>2)=1-F_X(2)$.
-
-\section{General worked problems}
-\Needspace{14\baselineskip}
-\subsection{Introductory general problem: PMF to CDF}
-A score $X$ has support $\{0,2,5\}$ and masses $0.2,0.5,0.3$.
-
-\textbf{Questions/Tasks}
-\begin{enumerate}
-\item Verify the PMF; construct the complete CDF and graphs; find $P(0<X\leq5)$ and $P(X<5)$.
-\end{enumerate}
-\subsubsection*{Complete worked solution}
-\begin{center}
-\begin{tabular}{llp{0.48\linewidth}}
-\toprule
-Symbol & Value & Meaning in this problem \\ \midrule
-$X$ & $0,2,5$ & Supported score values \\
-$p_X(x)$ & $0.2,0.5,0.3$ & Respective masses; no units \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 1: Define and validate.} $X$ is a score. Its masses are positive and $0.2+0.5+0.3=1$, so the table is valid; no independent-trials model is required.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 2: Accumulate.} $F_X(x)=\sum_{u\leq x}p_X(u)$. The summation sign means add masses at supported values $u$ at most the cutoff $x$.\[F_X(x)=\begin{cases}0,&x<0,\\0.2,&0\leq x<2,\\0.7,&2\leq x<5,\\1,&x\geq 5.\end{cases}\]
-\begin{center}
-\begin{tikzpicture}
-\begin{axis}[width=0.43\linewidth,height=5cm,xmin=-1,xmax=6,ymin=0,ymax=1.1,xtick={0,2,5},xlabel={$x$ (score)},ylabel={$p_X(x)$},title={PMF: individual masses}]
-\addplot+[ycomb,mark=*] coordinates {(0,0.2)(2,0.5)(5,0.3)};
-\end{axis}\end{tikzpicture}\hfill
-\begin{tikzpicture}
-\begin{axis}[width=0.43\linewidth,height=5cm,xmin=-1,xmax=6,ymin=0,ymax=1.1,xtick={0,2,5},xlabel={$x$ (score)},ylabel={$F_X(x)$},title={CDF: accumulated mass}]
-\addplot[blue,thick] coordinates {(-1,0)(0,0)};
-\addplot[blue,thick] coordinates {(0,0.2)(2,0.2)};
-\addplot[blue,thick] coordinates {(2,0.7)(5,0.7)};
-\addplot[blue,thick] coordinates {(5,1)(6,1)};
-\addplot[only marks,mark=*,blue] coordinates {(0,0.2)(2,0.7)(5,1)};
-\addplot[only marks,mark=*,mark options={fill=white},blue] coordinates {(0,0)(2,0.2)(5,0.7)};
-\end{axis}\end{tikzpicture}\end{center}
-Filled dots give included endpoint values; open dots exclude them. Each jump matches a PMF stem. Horizontal tails continue to either side.
-
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 3: Calculate.} $P(0<X\leq5)=p_X(2)+p_X(5)=0.5+0.3=0.8000$. Also $P(X<5)=p_X(0)+p_X(2)=0.2+0.5=0.7000$, whereas $F_X(5)=1$.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 4: Check and interpret.} The CDF is non-decreasing, right-continuous and has limits 0 and 1. The strict upper endpoint excludes the 0.3 mass at 5.
-\end{minipage}\par\medskip
-\subsection{Bridge to the general model}
-Write $F_X(a^-)=P(X<a)$, read as F just to the left of a. Then
-\[P(X=a)=F_X(a)-F_X(a^-),\qquad P(a<X\leq b)=F_X(b)-F_X(a).\]
-For an inclusive lower endpoint, $P(a\leq X\leq b)=F_X(b)-F_X(a^-)$. Also $P(X>a)=1-F_X(a)$. These identities work for irregular supports as well as consecutive integers.
-\Needspace{14\baselineskip}
-\subsection{Advanced general problem: recovering jumps and testing candidates}
-Candidate $H$ is 0 for $x<-1$, 0.25 for $-1\leq x<1$, 0.6 for $1\leq x<4$, and 1 for $x\geq4$. Candidate $J$ agrees except $J(1)=0.25$. Candidate $K$ has successive heights $0,0.7,0.6,1$ on the same intervals.
-
-\textbf{Questions/Tasks}
-\begin{enumerate}
-\item Validate each; recover the PMF of $H$ and calculate $P(-1<X\leq4)$ and $P(X\geq1)$.
-\end{enumerate}
-\subsubsection*{Complete worked solution}
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 1: Define and test.} $X$ is a score. $H$ has increasing heights, right-continuous endpoints and limits 0 and 1. $J$ fails right-continuity at 1: its value 0.25 differs from height 0.6 immediately to its right. $K$ decreases from 0.7 to 0.6, so it is invalid.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 2: Recover the PMF.} $p_X(x)=H(x)-H(x^-)$ gives $0.25-0=0.25$, $0.6-0.25=0.35$, $1-0.6=0.4$ on support $\{-1,1,4\}$.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 3: Calculate.} $P(-1<X\leq4)=H(4)-H(-1)=1-0.25=0.7500$; $P(X\geq1)=1-H(1^-)=1-0.25=0.7500$.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 4: Check and interpret.} The recovered positive masses total 1. Both events contain precisely 1 and 4; their equal probabilities follow from the support.
-\end{minipage}\par\medskip
-\section{Notation reference and practice procedure}
-\begin{center}
-\begin{tabular}{lp{0.72\linewidth}}
-\toprule
-Symbol & Meaning and units \\ \midrule
-$p_X(x)$ & $P(X=x)$: one value \\
-$F_X(x)$ & $P(X\leq x)$: accumulated mass \\
-$F_X(a^-)$ & $P(X<a)$: height before the jump \\
-$1-F_X(a)$ & $P(X>a)$ \\
-\bottomrule
-\end{tabular}
-\end{center}
-\begin{enumerate}
-\item Define the random variable in words and give its units and support.
-\item List parameters and check that the model assumptions match the situation.
-\item Translate ordinary language into an event, paying attention to endpoints.
-\item Write the symbolic formula first, then substitute without rounding intermediate values.
-\item Check bounds, total probability or a complementary calculation; interpret the answer in context.
-\end{enumerate}
-\Needspace{19\baselineskip}
-\section{Foundational contextual practice}\label{sec:t2-c2-foundational}
-\Needspace{14\baselineskip}
-\subsection{Afternoon refunds}
-$X$ counts refunds with masses $0.5,0.3,0.2$ at $0,1,2$.
-
-\textbf{Questions/Tasks}
-\begin{enumerate}
-\item Verify the distribution, give its complete CDF and find $P(X=1)$ and $P(X\leq1)$.
-\end{enumerate}
-\subsubsection*{Complete worked solution}
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 1: Define and check.} $X$ counts refunds per afternoon; support $\{0,1,2\}$. The positive masses total $0.5+0.3+0.2=1$.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 2: Construct.} $F_X(x)=\sum_{u\leq x}p_X(u)$ gives\[F_X(x)=\begin{cases}0,&x<0,\\0.5,&0\leq x<1,\\0.8,&1\leq x<2,\\1,&x\geq 2.\end{cases}\]
-
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 3: Calculate.} $P(X=1)=p_X(1)=0.3000$; $P(X\leq1)=p_X(0)+p_X(1)=0.5+0.3=0.8000$.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 4: Check and interpret.} The CDF has non-negative jumps, right-continuous endpoints and correct tails. At most one includes zero; exactly one does not.
-\end{minipage}\par\medskip
-\secInicio[][sec:t2-c2-foundational]
-\Needspace{14\baselineskip}
-\subsection{Transaction fees}
-A fee $Y$ is $0,2,5$ USD with probabilities $0.4,0.35,0.25$.
-
-\textbf{Questions/Tasks}
-\begin{enumerate}
-\item Find $P(Y<2)$, $P(Y\leq2)$ and $P(1<Y<5)$.
-\end{enumerate}
-\subsubsection*{Complete worked solution}
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 1: Define and validate.} $Y$ is a fee in USD; support $\{0,2,5\}$. Its positive masses total $0.4+0.35+0.25=1$.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 2: Translate.} The events contain respectively $\{0\}$, $\{0,2\}$ and $\{2\}$.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 3: Calculate.} $P(Y<2)=p_Y(0)=0.4000$; $P(Y\leq2)=p_Y(0)+p_Y(2)=0.4+0.35=0.7500$; $P(1<Y<5)=p_Y(2)=0.3500$.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 4: Check and interpret.} The first two answers differ by the 0.35 jump at 2 USD. A cutoff need not be a supported fee.
-\end{minipage}\par\medskip
-\secInicio[][sec:t2-c2-foundational]
-\Needspace{19\baselineskip}
-\section{Intermediate contextual practice}\label{sec:t2-c2-intermediate}
-\Needspace{14\baselineskip}
-\subsection{Late-payment counts}
-A weekly count has CDF 0 for $x<0$, 0.6 for $0\leq x<2$, 0.9 for $2\leq x<3$, and 1 for $x\geq3$.
-
-\textbf{Questions/Tasks}
-\begin{enumerate}
-\item Recover its PMF and find $P(X>0)$ and $P(0<X\leq2)$.
-\end{enumerate}
-\subsubsection*{Complete worked solution}
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 1: Define and check.} $X$ counts late payments; jumps give support $\{0,2,3\}$. The CDF is non-decreasing, right-continuous and has limits 0 and 1.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 2: Recover.} $p_X(x)=F_X(x)-F_X(x^-)$ gives $0.6$, $0.9-0.6=0.3$, $1-0.9=0.1$; these positive masses total 1.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 3: Calculate.} $P(X>0)=1-F_X(0)=1-0.6=0.4000$; $P(0<X\leq2)=F_X(2)-F_X(0)=0.9-0.6=0.3000$.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 4: Interpret.} The first event includes 2 and 3; the second includes only 2. The plateau before 2 shows that 1 has no mass in this simplified model.
-\end{minipage}\par\medskip
-\secInicio[][sec:t2-c2-intermediate]
-\Needspace{14\baselineskip}
-\subsection{Investment gain intervals}
-$G$ takes $-10,0,15,40$ USD with masses $0.2,0.3,0.4,0.1$.
-
-\textbf{Questions/Tasks}
-\begin{enumerate}
-\item Find the probabilities of a loss, a positive gain, $0\leq G<40$, and the value $F_G(14)$.
-\end{enumerate}
-\subsubsection*{Complete worked solution}
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 1: Define and validate.} $G$ is net gain in USD; the four positive masses total 1. Its support is the four listed monetary values.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 2: Translate.} Loss is $G<0$; positive gain is $G>0$. The interval contains 0 and 15.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 3: Calculate.} $P(G<0)=p_G(-10)=0.2000$; $P(G>0)=1-F_G(0)=1-(0.2+0.3)=0.5000$; $P(0\leq G<40)=p_G(0)+p_G(15)=0.3+0.4=0.7000$.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 4: Check and interpret.} $F_G(14)=p_G(-10)+p_G(0)=0.5000$. Positive and non-negative gain differ by the mass at zero.
-\end{minipage}\par\medskip
-\secInicio[][sec:t2-c2-intermediate]
-\Needspace{19\baselineskip}
-\section{Advanced contextual practice}\label{sec:t2-c2-advanced}
-\Needspace{14\baselineskip}
-\subsection{Insurance PMF audit}
-Candidate A has masses $0.6,0.5,-0.1$ at counts $0,1,2$; B has $0.2,0.3,0.3$. The corrected model is $0.6,0.3,0.1$.
-
-\textbf{Questions/Tasks}
-\begin{enumerate}
-\item Reject A and B; find $P(X\geq1)$ and $P(X<2)$ for the correction.
-\end{enumerate}
-\subsubsection*{Complete worked solution}
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 1: Define and audit.} $X$ counts daily claims with corrected support $\{0,1,2\}$. A totals 1 but contains a negative mass; B is non-negative but totals 0.8. Both are invalid.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 2: Validate.} The correction is positive and totals $0.6+0.3+0.1=1$. Its CDF heights are $0,0.6,0.9,1$ on boundaries 0, 1, 2, with closed left endpoints.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 3: Calculate.} $P(X\geq1)=1-P(X<1)=1-p_X(0)=1-0.6=0.4000$; $P(X<2)=p_X(0)+p_X(1)=0.6+0.3=0.9000$.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 4: Check and interpret.} The complement of at least one is zero. A total of 1 alone does not establish a PMF.
-\end{minipage}\par\medskip
-\secInicio[][sec:t2-c2-advanced]
-\Needspace{30\baselineskip}
-\subsection{Account-fee CDF audit}
-Fees can only be 0 or 3 USD. Candidate $H$ is 0 for $y<0$, 0.4 for $0\leq y<3$, and 0.9 for $y\geq3$. Another has heights 0, 0.4, 1 on these intervals but assigns value 0 at $y=0$.
-
-\textbf{Questions/Tasks}
-\begin{enumerate}
-\item Explain both defects, construct a valid CDF retaining mass 0.4 at zero, and find $P(0<Y\leq3)$.
-\end{enumerate}
-\subsubsection*{Complete worked solution}
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 1: Define and diagnose.} $Y$ measures fee in USD. $H$ has limit 0.9 instead of 1 at positive infinity. The other fails right-continuity at zero.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 2: Repair.} $p_Y(3)=1-p_Y(0)=1-0.4=0.6$. \[F_Y(y)=\begin{cases}0,&y<0,\\0.4,&0\leq y<3,\\1,&y\geq3.\end{cases}\]
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 3: Calculate.} $P(0<Y\leq3)=F_Y(3)-F_Y(0)=1-0.4=0.6000$.
-\end{minipage}\par\medskip
-\par\noindent\begin{minipage}{\linewidth}
-\textbf{Step 4: Check and interpret.} The repaired CDF is non-decreasing, right-continuous and has limits 0 and 1. Its jumps total 1; the event is precisely a 3 USD fee.
-\end{minipage}\par\medskip
-\secInicio[][sec:t2-c2-advanced]
-\section{Closing reference: key ideas and common errors}
-A PMF assigns individual masses; a CDF accumulates them. Check non-negativity, total mass, monotonicity, right-continuity and limits. Use actual support for endpoints. Jumps give masses; plateaus add none. In $1-F_X(a)$ equality at $a$ is excluded.
+For countably infinite support, show initial entries and a rule for every remaining value. Label any graph as a finite preview, show continuation and identify omitted probability. Keep the original masses; never rescale the displayed part to total 1.
+\subsection{Common errors to avoid}
+Outcomes and numerical values need not be the same list: group equal values before making the PMF. A negative monetary value can have a positive probability. A CDF is defined between supported values and stays constant there. At a jump, its value is the upper filled point. A finite preview of an infinite model is not its complete distribution.
 \secInicio
+\clearpage
+\section{General Worked Problems}\label{sec:general}
+Build from grouping outcomes to missing probabilities, independent decisions and signed monetary values. Every case below is self-contained and addresses C2 through the same two tasks.
+\SectionProblemsTableOfContents{
+\SectionProblemLink{prob:fees}{School shop processing fees} \\
+\SectionProblemLink{prob:bike}{Bike-rental late fees} \\
+\SectionProblemLink{prob:recycling}{Recycling buyback payments} \\
+\SectionProblemLink{prob:claims}{Daily claims with a missing probability} \\
+\SectionProblemLink{prob:notebooks}{Notebook sales from independent decisions} \\
+\SectionProblemLink{prob:investment}{Signed investment results}
+}
+
+\clearpage
+\subsection{School shop processing fees}\label{prob:fees}
+A school shop receives one payment. Exactly four payment methods are possible: cash (10\%), debit card (20\%), credit card (30\%), or mobile wallet (40\%). The shop pays no processing fee for cash, 1 USD for either type of card, and 2 USD for a mobile wallet. These are the only processing charges. The quantity recorded is the processing fee for this payment.
+\problemTasks{sec:general}{fees}
+\stage{fees}{1}
+$X$ is the processing fee for one school-shop payment, in USD. Cash maps to 0, both cards to 1, and mobile wallet to 2. Thus $p_X(0)=0.1$, $p_X(1)=0.2+0.3=0.5$ and $p_X(2)=0.4$.
+The distinct support is $S_X=\{0,1,2\}$; $p_X(x)=0$ elsewhere.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering\begin{tabular}{cc}\toprule $x$ (USD) & $p_X(x)$ \\\midrule
+$0$ & $0.1$ \\
+$1$ & $0.5$ \\
+$2$ & $0.4$ \\
+\bottomrule\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering\GTenPMFGraph[width=\linewidth,height=4cm,xlabel={$x$ (USD)},ylabel={$p_X(x)$},xstep=1]{0,1,2}{0.1,0.5,0.4}\end{minipage}\par
+\textbf{PMF check.} All listed probabilities are positive and $0.1+0.5+0.4=1$. The graph places each mass at its numerical value, with the original spacing.
+\secInicio[prob:fees][sec:general]\stage{fees}{2}
+$F_X(x)=P(X\leq x)$ adds masses at values no greater than the cutoff. Accumulate in increasing support order: $0.1;\ 0.1+0.5=0.6;\ 0.6+0.4=1$. Below the minimum no mass is included.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering\begin{tabular}{cc}\toprule Cutoff interval & $F_X(x)$ \\\midrule
+$x<0$ & $0$ \\
+$0\leq x<1$ & $0.1$ \\
+$1\leq x<2$ & $0.6$ \\
+$x\geq 2$ & $1$ \\
+\bottomrule\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering\begin{tikzpicture}\begin{axis}[cTwoCDF,xmin=-1,xmax=3,xtick={0,1,2},xlabel={$x$ (USD)}]
+\addplot[blue,thick,<-] coordinates {(-1,0)(0,0)};
+\addplot[blue,thick] coordinates {(0,0.1)(1,0.1)};
+\addplot[blue,thick] coordinates {(1,0.6)(2,0.6)};
+\addplot[blue,thick,->] coordinates {(2,1)(3,1)};
+\addplot[only marks,mark=*,blue,mark size=2pt] coordinates {(0,0.1)(1,0.6)(2,1)};
+\addplot[only marks,mark=*,blue,mark options={fill=white},mark size=2pt] coordinates {(0,0)(1,0.1)(2,0.6)};
+\end{axis}\end{tikzpicture}\end{minipage}\par
+\textbf{CDF check.} Nonnegative jumps make the CDF nondecreasing. Filled left/open right endpoints give right-continuity. Tails at 0 and 1 give limits 0 and 1, with 1 attained at the maximum. Jumps $0.1,\ 0.5,\ 0.4$ match the PMF. The mass at 1 groups both card methods; the CDF at 1 includes cash and both cards.
+\secInicio[prob:fees][sec:general]
+
+\clearpage
+\subsection{Bike-rental late fees}\label{prob:bike}
+A bike rental shop records lateness in whole minutes. A rental ends on time or early with probability 10\%, 1 to 10 minutes late with probability 20\%, 11 to 20 minutes late with probability 30\%, or more than 20 minutes late with probability 40\%. These categories exhaust all returns. The late fee is 0 USD for an on-time or early return, 1 USD for either shorter delay, and 2 USD for a delay over 20 minutes. Record the late fee charged on one return.
+\problemTasks{sec:general}{bike}
+\stage{bike}{1}
+$X$ is the late fee on one bike return, in USD. On-time or early returns map to 0; the 1--10 and 11--20 minute groups both map to 1; longer delays map to 2. Hence $p_X(0)=0.1$, $p_X(1)=0.2+0.3=0.5$, $p_X(2)=0.4$.
+The distinct support is $S_X=\{0,1,2\}$; $p_X(x)=0$ elsewhere.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering\begin{tabular}{cc}\toprule $x$ (USD) & $p_X(x)$ \\\midrule
+$0$ & $0.1$ \\
+$1$ & $0.5$ \\
+$2$ & $0.4$ \\
+\bottomrule\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering\GTenPMFGraph[width=\linewidth,height=4cm,xlabel={$x$ (USD)},ylabel={$p_X(x)$},xstep=1]{0,1,2}{0.1,0.5,0.4}\end{minipage}\par
+\textbf{PMF check.} All listed probabilities are positive and $0.1+0.5+0.4=1$. The graph places each mass at its numerical value, with the original spacing.
+\secInicio[prob:bike][sec:general]\stage{bike}{2}
+$F_X(x)=P(X\leq x)$ adds masses at values no greater than the cutoff. Accumulate in increasing support order: $0.1;\ 0.1+0.5=0.6;\ 0.6+0.4=1$. Below the minimum no mass is included.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering\begin{tabular}{cc}\toprule Cutoff interval & $F_X(x)$ \\\midrule
+$x<0$ & $0$ \\
+$0\leq x<1$ & $0.1$ \\
+$1\leq x<2$ & $0.6$ \\
+$x\geq 2$ & $1$ \\
+\bottomrule\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering\begin{tikzpicture}\begin{axis}[cTwoCDF,xmin=-1,xmax=3,xtick={0,1,2},xlabel={$x$ (USD)}]
+\addplot[blue,thick,<-] coordinates {(-1,0)(0,0)};
+\addplot[blue,thick] coordinates {(0,0.1)(1,0.1)};
+\addplot[blue,thick] coordinates {(1,0.6)(2,0.6)};
+\addplot[blue,thick,->] coordinates {(2,1)(3,1)};
+\addplot[only marks,mark=*,blue,mark size=2pt] coordinates {(0,0.1)(1,0.6)(2,1)};
+\addplot[only marks,mark=*,blue,mark options={fill=white},mark size=2pt] coordinates {(0,0)(1,0.1)(2,0.6)};
+\end{axis}\end{tikzpicture}\end{minipage}\par
+\textbf{CDF check.} Nonnegative jumps make the CDF nondecreasing. Filled left/open right endpoints give right-continuity. Tails at 0 and 1 give limits 0 and 1, with 1 attained at the maximum. Jumps $0.1,\ 0.5,\ 0.4$ match the PMF. Both shorter delays contribute to the same 1 USD fee; the CDF at 1 includes all returns except those over 20 minutes late.
+\secInicio[prob:bike][sec:general]
+
+\clearpage
+\subsection{Recycling buyback payments}\label{prob:recycling}
+At a school recycling drive, each delivery contains exactly one material type: non-recyclable material (10\%), paper (20\%), plastic (30\%), or aluminium (40\%). These are the only delivery types. The recycling centre pays 0 USD for a non-recyclable delivery, 1 USD for either paper or plastic, and 2 USD for aluminium. Record the payment the school receives for one delivery.
+\problemTasks{sec:general}{recycling}
+\stage{recycling}{1}
+$X$ is the payment received for one recycling delivery, in USD. Non-recyclable material maps to 0, paper and plastic both map to 1, and aluminium maps to 2. Thus $p_X(0)=0.1$, $p_X(1)=0.2+0.3=0.5$, $p_X(2)=0.4$.
+The distinct support is $S_X=\{0,1,2\}$; $p_X(x)=0$ elsewhere.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering\begin{tabular}{cc}\toprule $x$ (USD) & $p_X(x)$ \\\midrule
+$0$ & $0.1$ \\
+$1$ & $0.5$ \\
+$2$ & $0.4$ \\
+\bottomrule\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering\GTenPMFGraph[width=\linewidth,height=4cm,xlabel={$x$ (USD)},ylabel={$p_X(x)$},xstep=1]{0,1,2}{0.1,0.5,0.4}\end{minipage}\par
+\textbf{PMF check.} All listed probabilities are positive and $0.1+0.5+0.4=1$. The graph places each mass at its numerical value, with the original spacing.
+\secInicio[prob:recycling][sec:general]\stage{recycling}{2}
+$F_X(x)=P(X\leq x)$ adds masses at values no greater than the cutoff. Accumulate in increasing support order: $0.1;\ 0.1+0.5=0.6;\ 0.6+0.4=1$. Below the minimum no mass is included.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering\begin{tabular}{cc}\toprule Cutoff interval & $F_X(x)$ \\\midrule
+$x<0$ & $0$ \\
+$0\leq x<1$ & $0.1$ \\
+$1\leq x<2$ & $0.6$ \\
+$x\geq 2$ & $1$ \\
+\bottomrule\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering\begin{tikzpicture}\begin{axis}[cTwoCDF,xmin=-1,xmax=3,xtick={0,1,2},xlabel={$x$ (USD)}]
+\addplot[blue,thick,<-] coordinates {(-1,0)(0,0)};
+\addplot[blue,thick] coordinates {(0,0.1)(1,0.1)};
+\addplot[blue,thick] coordinates {(1,0.6)(2,0.6)};
+\addplot[blue,thick,->] coordinates {(2,1)(3,1)};
+\addplot[only marks,mark=*,blue,mark size=2pt] coordinates {(0,0.1)(1,0.6)(2,1)};
+\addplot[only marks,mark=*,blue,mark options={fill=white},mark size=2pt] coordinates {(0,0)(1,0.1)(2,0.6)};
+\end{axis}\end{tikzpicture}\end{minipage}\par
+\textbf{CDF check.} Nonnegative jumps make the CDF nondecreasing. Filled left/open right endpoints give right-continuity. Tails at 0 and 1 give limits 0 and 1, with 1 attained at the maximum. Jumps $0.1,\ 0.5,\ 0.4$ match the PMF. The payment of 1 USD combines two materials; the CDF at 1 includes non-recyclable material, paper and plastic.
+\secInicio[prob:recycling][sec:general]
+
+\clearpage
+\subsection{Daily claims with a missing probability}\label{prob:claims}
+A small insurance policy group is observed for one day. The only possible results are no claims, one claim, or two claims. No claims has probability 0.7; two claims has probability 0.1; one claim has probability q. Exactly one of these three results occurs. Record the number of claims received that day.
+\problemTasks{sec:general}{claims}
+\stage{claims}{1}
+$X$ is the number of claims in one day, in claims. The exhaustive outcomes give $0.7+q+0.1=1$, so $q=0.2$. No claims, one claim and two claims map directly to 0, 1 and 2.
+The distinct support is $S_X=\{0,1,2\}$; $p_X(x)=0$ elsewhere.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering\begin{tabular}{cc}\toprule $x$ (claims) & $p_X(x)$ \\\midrule
+$0$ & $0.7$ \\
+$1$ & $0.2$ \\
+$2$ & $0.1$ \\
+\bottomrule\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering\GTenPMFGraph[width=\linewidth,height=4cm,xlabel={$x$ (claims)},ylabel={$p_X(x)$},xstep=1]{0,1,2}{0.7,0.2,0.1}\end{minipage}\par
+\textbf{PMF check.} All listed probabilities are positive and $0.7+0.2+0.1=1$. The graph places each mass at its numerical value, with the original spacing.
+\secInicio[prob:claims][sec:general]\stage{claims}{2}
+$F_X(x)=P(X\leq x)$ adds masses at values no greater than the cutoff. Accumulate in increasing support order: $0.7;\ 0.7+0.2=0.9;\ 0.9+0.1=1$. Below the minimum no mass is included.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering\begin{tabular}{cc}\toprule Cutoff interval & $F_X(x)$ \\\midrule
+$x<0$ & $0$ \\
+$0\leq x<1$ & $0.7$ \\
+$1\leq x<2$ & $0.9$ \\
+$x\geq 2$ & $1$ \\
+\bottomrule\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering\begin{tikzpicture}\begin{axis}[cTwoCDF,xmin=-1,xmax=3,xtick={0,1,2},xlabel={$x$ (claims)}]
+\addplot[blue,thick,<-] coordinates {(-1,0)(0,0)};
+\addplot[blue,thick] coordinates {(0,0.7)(1,0.7)};
+\addplot[blue,thick] coordinates {(1,0.9)(2,0.9)};
+\addplot[blue,thick,->] coordinates {(2,1)(3,1)};
+\addplot[only marks,mark=*,blue,mark size=2pt] coordinates {(0,0.7)(1,0.9)(2,1)};
+\addplot[only marks,mark=*,blue,mark options={fill=white},mark size=2pt] coordinates {(0,0)(1,0.7)(2,0.9)};
+\end{axis}\end{tikzpicture}\end{minipage}\par
+\textbf{CDF check.} Nonnegative jumps make the CDF nondecreasing. Filled left/open right endpoints give right-continuity. Tails at 0 and 1 give limits 0 and 1, with 1 attained at the maximum. Jumps $0.7,\ 0.2,\ 0.1$ match the PMF. The initial large jump corresponds to days with no claims; the plateau from 1 to 2 includes days with zero or one claim.
+\secInicio[prob:claims][sec:general]
+
+\clearpage
+\subsection{Notebook sales from independent decisions}\label{prob:notebooks}
+A school enterprise offers one 5 USD notebook to each of three visitors. Each visitor either buys one notebook (probability 0.4) or passes (probability 0.6). The three decisions are independent, with the same probabilities for every visitor. No other purchases occur. Record the total notebook revenue from these three visitors.
+\problemTasks{sec:general}{notebooks}
+\stage{notebooks}{1}
+$X$ is the total revenue from the three visitors, in USD. Write B for buying and N for passing, in visitor order. NNN gives 0 USD with probability $0.6^3=0.216$. BNN, NBN and NNB give 5 USD, totaling $3(0.4)(0.6)^2=0.432$. BBN, BNB and NBB give 10 USD, totaling $3(0.4)^2(0.6)=0.288$. BBB gives 15 USD with probability $0.4^3=0.064$. Independence justifies multiplication within each ordered outcome.
+The distinct support is $S_X=\{0,5,10,15\}$; $p_X(x)=0$ elsewhere.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering\begin{tabular}{cc}\toprule $x$ (USD) & $p_X(x)$ \\\midrule
+$0$ & $0.216$ \\
+$5$ & $0.432$ \\
+$10$ & $0.288$ \\
+$15$ & $0.064$ \\
+\bottomrule\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering\GTenPMFGraph[width=\linewidth,height=4cm,xlabel={$x$ (USD)},ylabel={$p_X(x)$},xstep=5]{0,5,10,15}{0.216,0.432,0.288,0.064}\end{minipage}\par
+\textbf{PMF check.} All listed probabilities are positive and $0.216+0.432+0.288+0.064=1$. The graph places each mass at its numerical value, with the original spacing.
+\secInicio[prob:notebooks][sec:general]\stage{notebooks}{2}
+$F_X(x)=P(X\leq x)$ adds masses at values no greater than the cutoff. Accumulate in increasing support order: $0.216;\ 0.216+0.432=0.648;\ 0.648+0.288=0.936;\ 0.936+0.064=1$. Below the minimum no mass is included.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering\begin{tabular}{cc}\toprule Cutoff interval & $F_X(x)$ \\\midrule
+$x<0$ & $0$ \\
+$0\leq x<5$ & $0.216$ \\
+$5\leq x<10$ & $0.648$ \\
+$10\leq x<15$ & $0.936$ \\
+$x\geq 15$ & $1$ \\
+\bottomrule\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering\begin{tikzpicture}\begin{axis}[cTwoCDF,xmin=-2.5,xmax=17.5,xtick={0,5,10,15},xlabel={$x$ (USD)}]
+\addplot[blue,thick,<-] coordinates {(-2.5,0)(0,0)};
+\addplot[blue,thick] coordinates {(0,0.216)(5,0.216)};
+\addplot[blue,thick] coordinates {(5,0.648)(10,0.648)};
+\addplot[blue,thick] coordinates {(10,0.936)(15,0.936)};
+\addplot[blue,thick,->] coordinates {(15,1)(17.5,1)};
+\addplot[only marks,mark=*,blue,mark size=2pt] coordinates {(0,0.216)(5,0.648)(10,0.936)(15,1)};
+\addplot[only marks,mark=*,blue,mark options={fill=white},mark size=2pt] coordinates {(0,0)(5,0.216)(10,0.648)(15,0.936)};
+\end{axis}\end{tikzpicture}\end{minipage}\par
+\textbf{CDF check.} Nonnegative jumps make the CDF nondecreasing. Filled left/open right endpoints give right-continuity. Tails at 0 and 1 give limits 0 and 1, with 1 attained at the maximum. Jumps $0.216,\ 0.432,\ 0.288,\ 0.064$ match the PMF. Revenue changes in steps of 5 USD; the gaps contain no possible revenue. Each CDF jump groups all purchase sequences with that revenue.
+\secInicio[prob:notebooks][sec:general]
+
+\clearpage
+\subsection{Signed investment results}\label{prob:investment}
+At the end of one month, a hypothetical investment has exactly one of three results: a 20 USD loss with probability 0.2, break-even with probability 0.5, or a 30 USD gain with probability q. These exhaust the possible results. Record the signed net gain, treating a loss as negative and break-even as zero.
+\problemTasks{sec:general}{investment}
+\stage{investment}{1}
+$X$ is the signed one-month net gain, in USD. Normalization gives $q=1-0.2-0.5=0.3$. Loss, break-even and gain map respectively to $-20$, 0 and 30. Each amount comes from one outcome; negative gain has a positive probability.
+The distinct support is $S_X=\{-20,0,30\}$; $p_X(x)=0$ elsewhere.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering\begin{tabular}{cc}\toprule $x$ (USD) & $p_X(x)$ \\\midrule
+$-20$ & $0.2$ \\
+$0$ & $0.5$ \\
+$30$ & $0.3$ \\
+\bottomrule\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering\GTenPMFGraph[width=\linewidth,height=4cm,xlabel={$x$ (USD)},ylabel={$p_X(x)$},xstep=10]{-20,0,30}{0.2,0.5,0.3}\end{minipage}\par
+\textbf{PMF check.} All listed probabilities are positive and $0.2+0.5+0.3=1$. The graph places each mass at its numerical value, with the original spacing.
+\secInicio[prob:investment][sec:general]\stage{investment}{2}
+$F_X(x)=P(X\leq x)$ adds masses at values no greater than the cutoff. Accumulate in increasing support order: $0.2;\ 0.2+0.5=0.7;\ 0.7+0.3=1$. Below the minimum no mass is included.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering\begin{tabular}{cc}\toprule Cutoff interval & $F_X(x)$ \\\midrule
+$x<-20$ & $0$ \\
+$-20\leq x<0$ & $0.2$ \\
+$0\leq x<30$ & $0.7$ \\
+$x\geq 30$ & $1$ \\
+\bottomrule\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering\begin{tikzpicture}\begin{axis}[cTwoCDF,xmin=-28.33333333,xmax=38.33333333,xtick={-20,0,30},xlabel={$x$ (USD)}]
+\addplot[blue,thick,<-] coordinates {(-28.33333333,0)(-20,0)};
+\addplot[blue,thick] coordinates {(-20,0.2)(0,0.2)};
+\addplot[blue,thick] coordinates {(0,0.7)(30,0.7)};
+\addplot[blue,thick,->] coordinates {(30,1)(38.33333333,1)};
+\addplot[only marks,mark=*,blue,mark size=2pt] coordinates {(-20,0.2)(0,0.7)(30,1)};
+\addplot[only marks,mark=*,blue,mark options={fill=white},mark size=2pt] coordinates {(-20,0)(0,0.2)(30,0.7)};
+\end{axis}\end{tikzpicture}\end{minipage}\par
+\textbf{CDF check.} Nonnegative jumps make the CDF nondecreasing. Filled left/open right endpoints give right-continuity. Tails at 0 and 1 give limits 0 and 1, with 1 attained at the maximum. Jumps $0.2,\ 0.5,\ 0.3$ match the PMF. The CDF already rises at a negative monetary value. Its level at zero includes both loss and break-even, and it stays constant until 30 USD.
+\secInicio[prob:investment][sec:general]
+\clearpage
+\section{Advanced Problems}\label{sec:advanced}
+Derive probabilities from relative likelihoods or an unbounded stopping experiment before building the same four representations.
+\SectionProblemsTableOfContents{
+\SectionProblemLink{prob:refund}{Promotional refunds} \\
+\SectionProblemLink{prob:prize}{Fundraising draw prizes} \\
+\SectionProblemLink{prob:maintenance}{Equipment maintenance costs} \\ \SectionProblemLink{prob:calls}{Waiting until the first sale}
+}
+
+\clearpage
+\subsection{Promotional refunds}\label{prob:refund}
+A shop offers a promotional refund on one purchase. The refund can only be 0, 2, or 5 USD. A 2 USD refund is twice as likely as no refund, and a 5 USD refund is three times as likely as no refund. These are the only refund amounts. Record the refund paid on this purchase.
+\problemTasks{sec:advanced}{refund}
+\stage{refund}{1}
+$X$ is the promotional refund on one purchase, in USD. Let $a$ be the probability of no refund. The probabilities for refunds of 0, 2 and 5 USD are $a,2a,3a$. Since $a+2a+3a=1$, $a=1/6$. Each refund category maps directly to its monetary amount.
+The distinct support is $S_X=\{0,2,5\}$; $p_X(x)=0$ elsewhere.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering\begin{tabular}{cc}\toprule $x$ (USD) & $p_X(x)$ \\\midrule
+$0$ & $\frac{1}{6}$ \\
+$2$ & $\frac{1}{3}$ \\
+$5$ & $0.5$ \\
+\bottomrule\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering\GTenPMFGraph[width=\linewidth,height=4cm,xlabel={$x$ (USD)},ylabel={$p_X(x)$},xstep=1]{0,2,5}{0.1666666667,0.3333333333,0.5}\end{minipage}\par
+\textbf{PMF check.} All listed probabilities are positive and $\frac{1}{6}+\frac{1}{3}+0.5=1$. The graph places each mass at its numerical value, with the original spacing.
+\secInicio[prob:refund][sec:advanced]\stage{refund}{2}
+$F_X(x)=P(X\leq x)$ adds masses at values no greater than the cutoff. Accumulate in increasing support order: $\frac{1}{6};\ \frac{1}{6}+\frac{1}{3}=0.5;\ 0.5+0.5=1$. Below the minimum no mass is included.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering\begin{tabular}{cc}\toprule Cutoff interval & $F_X(x)$ \\\midrule
+$x<0$ & $0$ \\
+$0\leq x<2$ & $\frac{1}{6}$ \\
+$2\leq x<5$ & $0.5$ \\
+$x\geq 5$ & $1$ \\
+\bottomrule\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering\begin{tikzpicture}\begin{axis}[cTwoCDF,xmin=-1,xmax=6,xtick={0,2,5},xlabel={$x$ (USD)}]
+\addplot[blue,thick,<-] coordinates {(-1,0)(0,0)};
+\addplot[blue,thick] coordinates {(0,0.1666666667)(2,0.1666666667)};
+\addplot[blue,thick] coordinates {(2,0.5)(5,0.5)};
+\addplot[blue,thick,->] coordinates {(5,1)(6,1)};
+\addplot[only marks,mark=*,blue,mark size=2pt] coordinates {(0,0.1666666667)(2,0.5)(5,1)};
+\addplot[only marks,mark=*,blue,mark options={fill=white},mark size=2pt] coordinates {(0,0)(2,0.1666666667)(5,0.5)};
+\end{axis}\end{tikzpicture}\end{minipage}\par
+\textbf{CDF check.} Nonnegative jumps make the CDF nondecreasing. Filled left/open right endpoints give right-continuity. Tails at 0 and 1 give limits 0 and 1, with 1 attained at the maximum. Jumps $\frac{1}{6},\ \frac{1}{3},\ 0.5$ match the PMF. No refund still has probability mass. Between 2 and 5 USD the CDF is flat because no other refund is possible.
+\secInicio[prob:refund][sec:advanced]
+
+\clearpage
+\subsection{Fundraising draw prizes}\label{prob:prize}
+At a school fundraiser, a participant draws one ticket uniformly at random from a box. Every ticket pays either 0, 2, or 5 USD. The box has twice as many 2 USD tickets as no-prize tickets and three times as many 5 USD tickets as no-prize tickets. There are no other ticket types. Only one ticket is drawn. Record the prize paid.
+\problemTasks{sec:advanced}{prize}
+\stage{prize}{1}
+$X$ is the prize payout from the one ticket, in USD. If there are $m$ no-prize tickets, there are $2m$ tickets paying 2 USD and $3m$ paying 5 USD, out of $6m$ tickets. Uniform selection gives $m/(6m)=1/6$, $2m/(6m)=1/3$ and $3m/(6m)=1/2$.
+The distinct support is $S_X=\{0,2,5\}$; $p_X(x)=0$ elsewhere.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering\begin{tabular}{cc}\toprule $x$ (USD) & $p_X(x)$ \\\midrule
+$0$ & $\frac{1}{6}$ \\
+$2$ & $\frac{1}{3}$ \\
+$5$ & $0.5$ \\
+\bottomrule\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering\GTenPMFGraph[width=\linewidth,height=4cm,xlabel={$x$ (USD)},ylabel={$p_X(x)$},xstep=1]{0,2,5}{0.1666666667,0.3333333333,0.5}\end{minipage}\par
+\textbf{PMF check.} All listed probabilities are positive and $\frac{1}{6}+\frac{1}{3}+0.5=1$. The graph places each mass at its numerical value, with the original spacing.
+\secInicio[prob:prize][sec:advanced]\stage{prize}{2}
+$F_X(x)=P(X\leq x)$ adds masses at values no greater than the cutoff. Accumulate in increasing support order: $\frac{1}{6};\ \frac{1}{6}+\frac{1}{3}=0.5;\ 0.5+0.5=1$. Below the minimum no mass is included.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering\begin{tabular}{cc}\toprule Cutoff interval & $F_X(x)$ \\\midrule
+$x<0$ & $0$ \\
+$0\leq x<2$ & $\frac{1}{6}$ \\
+$2\leq x<5$ & $0.5$ \\
+$x\geq 5$ & $1$ \\
+\bottomrule\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering\begin{tikzpicture}\begin{axis}[cTwoCDF,xmin=-1,xmax=6,xtick={0,2,5},xlabel={$x$ (USD)}]
+\addplot[blue,thick,<-] coordinates {(-1,0)(0,0)};
+\addplot[blue,thick] coordinates {(0,0.1666666667)(2,0.1666666667)};
+\addplot[blue,thick] coordinates {(2,0.5)(5,0.5)};
+\addplot[blue,thick,->] coordinates {(5,1)(6,1)};
+\addplot[only marks,mark=*,blue,mark size=2pt] coordinates {(0,0.1666666667)(2,0.5)(5,1)};
+\addplot[only marks,mark=*,blue,mark options={fill=white},mark size=2pt] coordinates {(0,0)(2,0.1666666667)(5,0.5)};
+\end{axis}\end{tikzpicture}\end{minipage}\par
+\textbf{CDF check.} Nonnegative jumps make the CDF nondecreasing. Filled left/open right endpoints give right-continuity. Tails at 0 and 1 give limits 0 and 1, with 1 attained at the maximum. Jumps $\frac{1}{6},\ \frac{1}{3},\ 0.5$ match the PMF. The gap from 2 to 5 USD represents unavailable prizes. A single draw needs no assumption about replacement or independence.
+\secInicio[prob:prize][sec:advanced]
+
+\clearpage
+\subsection{Equipment maintenance costs}\label{prob:maintenance}
+A student printing business sets aside money for printer maintenance. Each inspection produces exactly one result: no repair costing 0 USD, an adjustment costing 2 USD, or a replacement part costing 5 USD. An adjustment is twice as likely as no repair; a replacement is three times as likely as no repair. These are the only results and costs. Record the cost from one inspection.
+\problemTasks{sec:advanced}{maintenance}
+\stage{maintenance}{1}
+$X$ is the maintenance cost from one inspection, in USD. Let $a$ be the probability of no repair. The adjustment and replacement probabilities are $2a$ and $3a$. Their total is $6a=1$, so $a=1/6$. The three results map respectively to costs of 0, 2 and 5 USD.
+The distinct support is $S_X=\{0,2,5\}$; $p_X(x)=0$ elsewhere.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering\begin{tabular}{cc}\toprule $x$ (USD) & $p_X(x)$ \\\midrule
+$0$ & $\frac{1}{6}$ \\
+$2$ & $\frac{1}{3}$ \\
+$5$ & $0.5$ \\
+\bottomrule\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering\GTenPMFGraph[width=\linewidth,height=4cm,xlabel={$x$ (USD)},ylabel={$p_X(x)$},xstep=1]{0,2,5}{0.1666666667,0.3333333333,0.5}\end{minipage}\par
+\textbf{PMF check.} All listed probabilities are positive and $\frac{1}{6}+\frac{1}{3}+0.5=1$. The graph places each mass at its numerical value, with the original spacing.
+\secInicio[prob:maintenance][sec:advanced]\stage{maintenance}{2}
+$F_X(x)=P(X\leq x)$ adds masses at values no greater than the cutoff. Accumulate in increasing support order: $\frac{1}{6};\ \frac{1}{6}+\frac{1}{3}=0.5;\ 0.5+0.5=1$. Below the minimum no mass is included.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering\begin{tabular}{cc}\toprule Cutoff interval & $F_X(x)$ \\\midrule
+$x<0$ & $0$ \\
+$0\leq x<2$ & $\frac{1}{6}$ \\
+$2\leq x<5$ & $0.5$ \\
+$x\geq 5$ & $1$ \\
+\bottomrule\end{tabular}\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering\begin{tikzpicture}\begin{axis}[cTwoCDF,xmin=-1,xmax=6,xtick={0,2,5},xlabel={$x$ (USD)}]
+\addplot[blue,thick,<-] coordinates {(-1,0)(0,0)};
+\addplot[blue,thick] coordinates {(0,0.1666666667)(2,0.1666666667)};
+\addplot[blue,thick] coordinates {(2,0.5)(5,0.5)};
+\addplot[blue,thick,->] coordinates {(5,1)(6,1)};
+\addplot[only marks,mark=*,blue,mark size=2pt] coordinates {(0,0.1666666667)(2,0.5)(5,1)};
+\addplot[only marks,mark=*,blue,mark options={fill=white},mark size=2pt] coordinates {(0,0)(2,0.1666666667)(5,0.5)};
+\end{axis}\end{tikzpicture}\end{minipage}\par
+\textbf{CDF check.} Nonnegative jumps make the CDF nondecreasing. Filled left/open right endpoints give right-continuity. Tails at 0 and 1 give limits 0 and 1, with 1 attained at the maximum. Jumps $\frac{1}{6},\ \frac{1}{3},\ 0.5$ match the PMF. No repair contributes the first jump, even though its cost is zero. The CDF is constant between supported costs.
+\secInicio[prob:maintenance][sec:advanced]
+\clearpage
+\subsection{Waiting until the first sale}\label{prob:calls}
+A student running a school enterprise calls potential customers one at a time until the first sale. Each call independently results in a sale with probability $1/2$ or no sale with probability $1/2$; these are the only two outcomes for each call. The probabilities stay constant. There is no limit on the number of calls allowed. Calling stops immediately at the first sale. Record the number of calls made, including the successful call.
+\problemTasks{sec:advanced}{calls}
+\stage{calls}{1}
+$X$ is the number of calls through the first sale, in calls. Write S for a sale and N for no sale. Complete stopping outcomes are S, NS, NNS, and so on. The sequence with $n-1$ misses followed by S maps to $n$. Independence gives
+\[p_X(n)=(1/2)^{n-1}(1/2)=2^{-n},\qquad n=1,2,\ldots.\]
+Thus $S_X=\{1,2,3,\ldots\}$, and $p_X(x)=0$ otherwise.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering
+\begin{tabular}{cc}\toprule $n$ (calls) & $p_X(n)$ \\\midrule
+1 & $1/2$ \\ 2 & $1/4$ \\ 3 & $1/8$ \\ 4 & $1/16$ \\ 5 & $1/32$ \\
+$n\geq6$, integer & $2^{-n}$ \\\bottomrule\end{tabular}
+\end{minipage}\hfill\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering
+\GTenPMFGraph[width=\linewidth,height=4.5cm,xlabel={$n$ (calls), continuing $6,7,\ldots$},ylabel={$p_X(n)$},tail=1/32]{1,2,3,4,5}{1/2,1/4,1/8,1/16,1/32}
+\par\small PMF finite preview: later calls continue indefinitely. Omitted mass $1/32$; displayed mass $31/32$, without renormalization.
+\end{minipage}\par
+\textbf{PMF check.} Every mass is positive. The geometric sum through $m$ is $\sum_{n=1}^m2^{-n}=1-2^{-m}$, which tends to 1. Never making a sale has probability zero and adds no supported count. Larger call counts correspond to longer runs of misses.
+\secInicio[prob:calls][sec:advanced]
+\clearpage
+\stage{calls}{2}
+$F_X(x)=P(X\leq x)$ accumulates the call-count masses: $1/2$, $1/2+1/4=3/4$, $3/4+1/8=7/8$, and so on. For $n\leq x<n+1$, precisely the first $n$ masses are included, giving $1-2^{-n}$. This table covers every real cutoff.
+\par\noindent\begin{minipage}[t]{.38\linewidth}\vspace{0pt}\centering
+\begin{tabular}{cc}\toprule Cutoff interval & $F_X(x)$ \\\midrule
+$x<1$ & 0 \\
+$1\leq x<2$ & $1/2$ \\
+$2\leq x<3$ & $3/4$ \\
+$3\leq x<4$ & $7/8$ \\
+$4\leq x<5$ & $15/16$ \\
+$5\leq x<6$ & $31/32$ \\
+$n\leq x<n+1$ & $1-2^{-n}$ \\
+\multicolumn{2}{c}{for every integer $n\geq6$} \\\bottomrule
+\end{tabular}\end{minipage}\hfill
+\begin{minipage}[t]{.59\linewidth}\vspace{0pt}\centering
+\begin{tikzpicture}\begin{axis}[cTwoCDF,xmin=0,xmax=6,xtick={1,2,3,4,5},xlabel={$x$ (calls)},height=6cm]
+\addplot[blue,thick,<-] coordinates {(0,0)(1,0)};
+\addplot[blue,thick] coordinates {(1,.5)(2,.5)};
+\addplot[blue,thick] coordinates {(2,.75)(3,.75)};
+\addplot[blue,thick] coordinates {(3,.875)(4,.875)};
+\addplot[blue,thick] coordinates {(4,.9375)(5,.9375)};
+\addplot[blue,thick] coordinates {(5,.96875)(6,.96875)};
+\addplot[only marks,mark=*,blue,mark size=2pt] coordinates {(1,.5)(2,.75)(3,.875)(4,.9375)(5,.96875)};
+\addplot[only marks,mark=*,blue,mark options={fill=white},mark size=2pt] coordinates {(1,0)(2,.5)(3,.75)(4,.875)(5,.9375)};
+\node[anchor=south east,font=\small] at (axis cs:6,1.03) {$\cdots\ \to 1$};
+\end{axis}\end{tikzpicture}
+\par\small CDF finite preview: steps after the fifth jump are omitted; they continue upward toward 1. Missing future jumps total $1/32$. The height $31/32$ applies only on $[5,6)$, not to the entire right tail.
+\end{minipage}\par
+\textbf{CDF check.} The heights increase and left endpoints are included, so the graph is nondecreasing and right-continuous. Below 1 it is zero. As $x\to+\infty$, $n=\lfloor x\rfloor\to\infty$ and $1-2^{-n}\to1$; the CDF never reaches 1 at a finite cutoff. At $n$, the jump is $(1-2^{-n})-(1-2^{-(n-1)})=2^{-n}$, matching the PMF (also at $n=1$, with previous height 0). Each plateau describes completing a sale within the whole number of calls allowed by that cutoff.
+\secInicio[prob:calls][sec:advanced]
 \end{document}
