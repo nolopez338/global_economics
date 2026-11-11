@@ -13,6 +13,9 @@
   const endLabel = document.getElementById("block-end");
   const classView = document.querySelector(".class-view");
   const fullscreenToggle = document.getElementById("fullscreen-toggle");
+  const minimalToggle = document.getElementById("minimal-toggle");
+  const blockRemaining = document.getElementById("block-remaining");
+  const timerRemaining = document.getElementById("timer-remaining");
   const timerToggle = document.getElementById("timer-toggle");
   const timerDialog = document.getElementById("timer-dialog");
   const timerForm = document.getElementById("timer-form");
@@ -31,8 +34,62 @@
     timerVisual.style.setProperty("--progress", position);
     timerVisual.style.setProperty("--progress-turn", String(snapshot.progress));
     timerVisual.classList.toggle("timer-alarm", snapshot.state === "complete");
+    timerRemaining.textContent = window.CountdownTimer.formatTime(snapshot.remainingMs);
   });
   const periodStateClasses = ["period-between-classes", "period-recess", "period-lunch"];
+
+  function setMinimalMode(enabled) {
+    classView.classList.toggle("minimal-mode", enabled);
+    minimalToggle.setAttribute("aria-pressed", String(enabled));
+    [visual, timerVisual].forEach((circle) => {
+      if (enabled) {
+        circle.setAttribute("role", "button");
+        circle.tabIndex = 0;
+        circle.setAttribute("aria-label", "Exit minimal mode (click or press Enter, Space, or Escape)");
+      } else {
+        circle.removeAttribute("role");
+        circle.removeAttribute("tabindex");
+        circle.setAttribute("aria-label", circle === visual ? "Current schedule block" : "Countdown timer");
+      }
+    });
+    if (enabled) {
+      const activeCircle = timerState ? timerVisual : visual;
+      if (!activeCircle.hidden) activeCircle.focus({ preventScroll: true });
+    } else {
+      minimalToggle.focus({ preventScroll: true });
+    }
+  }
+
+  minimalToggle.addEventListener("click", async () => {
+    const enabled = !classView.classList.contains("minimal-mode");
+    // These are separate presentation modes; Min never requests fullscreen.
+    if (enabled && document.fullscreenElement) {
+      try {
+        await document.exitFullscreen();
+      } catch (error) {
+        console.error("Unable to leave fullscreen for minimal mode.", error);
+        return;
+      }
+    }
+    setMinimalMode(enabled);
+  });
+  [visual, timerVisual].forEach((circle) => {
+    circle.addEventListener("click", () => {
+      if (classView.classList.contains("minimal-mode")) setMinimalMode(false);
+    });
+    circle.addEventListener("keydown", (event) => {
+      if (classView.classList.contains("minimal-mode") && (event.key === "Enter" || event.key === " ")) {
+        event.preventDefault();
+        setMinimalMode(false);
+      }
+    });
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && classView.classList.contains("minimal-mode")) {
+      event.preventDefault();
+      setMinimalMode(false);
+    }
+  });
 
   function setPeriodState(state) {
     visual.classList.remove(...periodStateClasses);
@@ -49,6 +106,7 @@
 
   function updateFullscreenControl() {
     const isFullscreen = document.fullscreenElement === classView;
+    if (isFullscreen && classView.classList.contains("minimal-mode")) setMinimalMode(false);
     fullscreenToggle.textContent = isFullscreen ? "Exit Fullscreen" : "Fullscreen";
     fullscreenToggle.setAttribute("aria-pressed", String(isFullscreen));
   }
@@ -188,6 +246,7 @@
     const progress = Math.max(0, Math.min(1, (nowMinutes - start) / (end - start)));
     visual.hidden = false;
     endLabel.textContent = displayTime(end);
+    blockRemaining.textContent = durationText((end - nowMinutes) * 60);
     const position = `${progress * 100}%`;
     visual.style.setProperty("--progress", position);
     visual.style.setProperty("--progress-turn", String(progress));
