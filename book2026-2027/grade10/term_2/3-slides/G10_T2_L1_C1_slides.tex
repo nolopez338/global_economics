@@ -6,6 +6,8 @@
 \makeatother
 \input{graphs/highlights.tex}
 % \GTenHighlightsfalse % Uncomment to disable instructional highlights.
+% Compact markers keep dense notation aligned within the existing layout.
+\tikzset{gten marker/.append style={inner xsep=.6mm,inner ysep=.3mm}}
 
 \definecolor{LessonInk}{HTML}{132A3E}
 \definecolor{LessonTeal}{HTML}{17675E}
@@ -44,8 +46,8 @@
     \GTenHLOutcome{Outcome} & A possible result of the experiment. &
       $\GTenHLOutcome{\omega}$ (one outcome),\newline
       $\GTenHLOutcome{\Omega}$ (sample space). \\
-    \GTenHLProbability{Probability} & The chance of an outcome or event, expressed without units. &
-      $P(\GTenHLOutcome{\omega})$, $P(\GTenHLValue{X}=\GTenHLValue{x})$;\newline
+    \GTenHLProbability{Probability} & Probability expressions and PMF masses, without units. &
+      $\GTenHLProbability{P(\omega)}$, $\GTenHLProbability{p_X(x)}$;\newline
       e.g.\ result: $\GTenHLProbability{0.4}$. \\
     \GTenHLValue{First variable} & The first variable, its numerical values, and any units. &
       $\GTenHLValue{F}$, $\GTenHLValue{X}$; values $\GTenHLValue{f}$, $\GTenHLValue{x}$. \\
@@ -67,7 +69,7 @@
     \begin{tabular}{@{}lcccc@{}}
       \toprule
       \textbf{Outcome} $\GTenHLOutcome{\omega}$ &
-      $P(\GTenHLOutcome{\omega})$ &
+      $\GTenHLProbability{P(\omega)}$ &
       \visible<#1->{$\GTenHLValue{F}(\GTenHLOutcome{\omega})$ (\GTenHLValue{USD})} &
       \visible<#2->{$\GTenHLSecond{E}(\GTenHLOutcome{\omega})$} &
       \visible<#3->{$\GTenHLThird{C}(\GTenHLOutcome{\omega})$} \\
@@ -192,16 +194,16 @@
         \multicolumn{2}{c}{\textbf{Task 1}} &
           \visible<2->{\textbf{Task 2}} \\
         \cmidrule(lr){1-2}\cmidrule(l){3-3}
-        $\GTenHLOutcome{\omega_i}$ & $q_i=P(\{\omega_i\})$ &
-          \visible<2->{$\GTenHLValue{X}(\omega_i)$} \\
+        $\GTenHLOutcome{\omega_i}$ & $\GTenHLProbability{q_i}=\GTenHLProbability{P(\{\omega_i\})}$ &
+          \visible<2->{$\GTenHLValue{X}(\GTenHLOutcome{\omega_i})$} \\
         \midrule
         $\GTenHLOutcome{\omega_1}$ & $\GTenHLProbability{q_1}$ &
-          \visible<2->{$\GTenHLValue{X}(\omega_1)$} \\
+          \visible<2->{$\GTenHLValue{X}(\GTenHLOutcome{\omega_1})$} \\
         $\GTenHLOutcome{\omega_2}$ & $\GTenHLProbability{q_2}$ &
-          \visible<2->{$\GTenHLValue{X}(\omega_2)$} \\
+          \visible<2->{$\GTenHLValue{X}(\GTenHLOutcome{\omega_2})$} \\
         $\vdots$ & $\vdots$ & \visible<2->{$\vdots$} \\
         $\GTenHLOutcome{\omega_n}$ & $\GTenHLProbability{q_n}$ &
-          \visible<2->{$\GTenHLValue{X}(\omega_n)$} \\
+          \visible<2->{$\GTenHLValue{X}(\GTenHLOutcome{\omega_n})$} \\
         \bottomrule
       \end{tabular}
     \end{column}
@@ -211,32 +213,99 @@
       \begin{tabular}{@{}cc@{}}
         \toprule
         \visible<3->{$\GTenHLValue{x_j}$} &
-          \visible<3->{$p_X(x_j)=\displaystyle\sum_{i:\,X(\omega_i)=x_j}q_i$} \\
+          \visible<3->{$\GTenHLProbability{p_X(x_j)}=\displaystyle\sum_{i:\,\GTenHLValue{X}(\GTenHLOutcome{\omega_i})=\GTenHLValue{x_j}}\GTenHLProbability{q_i}$} \\
         \midrule
         \visible<3->{$\GTenHLValue{x_1}$} &
-          \visible<3->{$\sum_{i:\,X(\omega_i)=x_1}\GTenHLProbability{q_i}$} \\
+          \visible<3->{$\sum_{i:\,\GTenHLValue{X}(\GTenHLOutcome{\omega_i})=\GTenHLValue{x_1}}\GTenHLProbability{q_i}$} \\
         \visible<3->{$\vdots$} & \visible<3->{$\vdots$} \\
         \visible<3->{$\GTenHLValue{x_m}$} &
-          \visible<3->{$\sum_{i:\,X(\omega_i)=x_m}\GTenHLProbability{q_i}$} \\
+          \visible<3->{$\sum_{i:\,\GTenHLValue{X}(\GTenHLOutcome{\omega_i})=\GTenHLValue{x_m}}\GTenHLProbability{q_i}$} \\
         \bottomrule
       \end{tabular}
     \end{column}
   \end{columns}
 
   \smallskip
-  \visible<3->{\textbf{Task 2 --- Support:} $S_X=\{x:p_X(x)>0\}$;\quad
+  \visible<3->{\textbf{Task 2 --- Support:} $\GTenHLValue{S_X}=\{\GTenHLValue{x}:\GTenHLProbability{p_X(x)}>0\}$;\quad
     units: \GTenHLValue{[same as $X$]}.}\par
   \smallskip
-  \visible<4->{\textbf{Task 2 --- Checks:} $p_X(x)\geq0$ for every $x$, and
-    $\sum_{x\in S_X}p_X(x)=1$.}\par
+  \visible<4->{\textbf{Task 2 --- Checks:} $\GTenHLProbability{p_X(x)}\geq0$ for every $\GTenHLValue{x}$, and
+    $\sum_{\GTenHLValue{x}\in \GTenHLValue{S_X}}\GTenHLProbability{p_X(x)}=1$.}\par
   \smallskip
-  \visible<5->{\textbf{Task 3:} $A$ = [requested values];\quad
-    $P(\GTenHLValue{X}\in A)=\sum_{x\in S_X\cap A}p_X(x)$.}\par
+  \visible<5->{\textbf{Task 3:} $\GTenHLValue{A}$ = [requested values];\quad
+    $\GTenHLProbability{P(X}\in\GTenHLProbability{ A)}=\sum_{\GTenHLValue{x}\in \GTenHLValue{S_X}\cap \GTenHLValue{A}}\GTenHLProbability{p_X(x)}$.}\par
   \visible<6->{\textbf{Task 3 --- Interpret:} [The chance that \GTenHLValue{[quantity]}
     is in [requested set] is \GTenHLProbability{[result]}.]}
 \end{frame}
 
 \section{School shop}
+
+% Worked counterpart to the general model: eight overlays, one logical frame.
+% All reveals reserve space; the prediction precedes the PMF calculation.
+\begin{frame}[t]{Payment fee: Mapping, PMF and checks}
+  \footnotesize
+  \setlength{\tabcolsep}{3pt}
+  \setlength{\smallskipamount}{1pt}
+  \renewcommand{\arraystretch}{1.0}
+  \only<1>{A school shop wants to understand the payment fee associated with its next
+  sale. Customers use different payment methods, with different fees.
+  Before the next payment arrives, what fees are possible, and how likely is each one?}
+
+  \only<2->{%
+  \visible<3->{\textbf{Task 2:} \ShopFee}
+
+  \smallskip
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{.49\textwidth}
+      \visible<2->{\textbf{Outcome and mapping table}}\par
+      \visible<2->{One row per complete outcome.}\par\smallskip
+      \visible<2->{\begin{tabular}{@{}lcc@{}}
+        \toprule
+        \multicolumn{2}{c}{\textbf{Task 1}} &
+          \visible<3->{\textbf{Task 2}} \\
+        \cmidrule(lr){1-2}\cmidrule(l){3-3}
+        $\GTenHLOutcome{\omega}$ & $\GTenHLProbability{P(\omega)}$ &
+          \visible<3->{$\GTenHLValue{F}(\GTenHLOutcome{\omega})$} \\
+        \midrule
+        \GTenHLOutcome{Cash} & \GTenHLProbability{0.1} &
+          \visible<3->{\GTenHLValue{0}} \\
+        \GTenHLOutcome{Debit card} & \GTenHLProbability{0.2} &
+          \visible<3->{\GTenHLValue{1}} \\
+        \GTenHLOutcome{Credit card} & \GTenHLProbability{0.3} &
+          \visible<3->{\GTenHLValue{1}} \\
+        \GTenHLOutcome{Mobile wallet} & \GTenHLProbability{0.4} &
+          \visible<3->{\GTenHLValue{2}} \\
+        \bottomrule
+      \end{tabular}}
+    \end{column}
+    \begin{column}{.48\textwidth}
+      \visible<4->{\textbf{Task 2: PMF (group equal fees)}}\par
+      \visible<3->{\textbf{Predict.} Which methods share a fee?}\par\smallskip
+      \visible<4->{\begin{tabular}{@{}cc@{}}
+        \toprule
+        $\GTenHLValue{f}$ (\GTenHLValue{USD}) & $\GTenHLProbability{p_F(f)}=\GTenHLProbability{P(F}=\GTenHLProbability{f)}$ \\
+        \midrule
+        \GTenHLValue{0} & $\GTenHLProbability{p_F(0)}=\GTenHLProbability{0.1}$ \\
+        \GTenHLValue{1} & $\GTenHLProbability{p_F(1)}=\GTenHLProbability{0.2}+\GTenHLProbability{0.3}=\GTenHLProbability{0.5}$ \\
+        \GTenHLValue{2} & $\GTenHLProbability{p_F(2)}=\GTenHLProbability{0.4}$ \\
+        \bottomrule
+      \end{tabular}}
+    \end{column}
+  \end{columns}
+
+  \smallskip
+  \visible<4->{\textbf{Task 2 --- Support:} $\GTenHLValue{S_F}=\GTenHLValue{\{0,1,2\}}$;
+    values are measured in \GTenHLValue{USD}.}\par
+  \smallskip
+  \visible<5->{\textbf{Task 2 --- Checks:} All masses are nonnegative;
+    $\GTenHLProbability{0.1}+\GTenHLProbability{0.5}+\GTenHLProbability{0.4}=1$.}\par
+  \smallskip
+  \visible<6->{\textbf{Task 3:} What is the probability of a \GTenHLValue{1 USD} fee?}
+  \visible<7->{$\GTenHLProbability{P(F}=\GTenHLProbability{1)}=\GTenHLProbability{0.5}$.}\par
+  \visible<8->{\textbf{Interpret:} The next payment has a \GTenHLProbability{50\%} chance
+    of carrying a \GTenHLValue{1 USD} fee.}
+  }
+\end{frame}
 
 \begin{frame}[t]{Payment outcomes and their assigned values}
   A school shop receives one payment. The payment method is the
@@ -279,7 +348,7 @@
   \visible<2->{\GTenHLOutcome{Debit card} and \GTenHLOutcome{Credit card}
     are mutually exclusive, so add their probabilities.}
   \[
-    \visible<3->{P(\GTenHLValue{F}=\GTenHLValue{1})
+    \visible<3->{\GTenHLProbability{P(F}=\GTenHLProbability{1)}
       =\GTenHLProbability{0.2}+\GTenHLProbability{0.3}=\GTenHLProbability{0.5}.}
   \]
 \end{frame}
@@ -294,7 +363,7 @@
   \visible<2->{\GTenHLOutcome{Debit card}, \GTenHLOutcome{Credit card}
     and \GTenHLOutcome{Mobile wallet}.}
   \[
-    \visible<3->{P(\GTenHLSecond{E}=\GTenHLSecond{1})
+    \visible<3->{\GTenHLProbability{P(E}=\GTenHLProbability{1)}
       =\GTenHLProbability{0.2}+\GTenHLProbability{0.3}
       +\GTenHLProbability{0.4}=\GTenHLProbability{0.9}.}
   \]
@@ -309,7 +378,7 @@
 
   \visible<2->{\GTenHLOutcome{Debit card} and \GTenHLOutcome{Credit card}.}
   \[
-    \visible<3->{P(\GTenHLThird{C}=\GTenHLThird{1})
+    \visible<3->{\GTenHLProbability{P(C}=\GTenHLProbability{1)}
       =\GTenHLProbability{0.2}+\GTenHLProbability{0.3}=\GTenHLProbability{0.5}.}
   \]
 \end{frame}
@@ -323,7 +392,7 @@
       Fee value $\GTenHLValue{f}$ (\GTenHLValue{USD}) &
       \GTenHLValue{0} & \GTenHLValue{1} & \GTenHLValue{2} \\
       \midrule
-      $P(\GTenHLValue{F}=\GTenHLValue{f})$ &
+      $\GTenHLProbability{P(F}=\GTenHLProbability{f)}$ &
       \GTenHLProbability{0.1} & \GTenHLProbability{0.5} & \GTenHLProbability{0.4} \\
       \bottomrule
     \end{tabular}
@@ -343,13 +412,13 @@
       Electronic-payment value $\GTenHLSecond{e}$ &
       \GTenHLSecond{0} & \GTenHLSecond{1} \\
       \midrule
-      $P(\GTenHLSecond{E}=\GTenHLSecond{e})$ &
+      $\GTenHLProbability{P(E}=\GTenHLProbability{e)}$ &
       \GTenHLProbability{0.1} & \GTenHLProbability{0.9} \\
       \midrule
       Card-payment value $\GTenHLThird{c}$ &
       \GTenHLThird{0} & \GTenHLThird{1} \\
       \midrule
-      $P(\GTenHLThird{C}=\GTenHLThird{c})$ &
+      $\GTenHLProbability{P(C}=\GTenHLProbability{c)}$ &
       \GTenHLProbability{0.5} & \GTenHLProbability{0.5} \\
       \bottomrule
     \end{tabular}
@@ -399,7 +468,7 @@
   \medskip
   \textbf{Predict.} Which factor belongs to each position in \GTenHLOutcome{BNN}?
   \[
-    P(\GTenHLOutcome{\mathrm{BNN}})
+    \GTenHLProbability{P(\mathrm{BNN})}
     \visible<2->{=\GTenHLProbability{0.4}}\,
     \visible<3->{\times\GTenHLProbability{0.6}}\,
     \visible<4->{\times\GTenHLProbability{0.6}}\,
@@ -479,9 +548,9 @@
     are mutually exclusive.}
   \[
     \begin{aligned}
-      \visible<3->{P(\GTenHLValue{X}=\GTenHLValue{1})}
-      &\visible<3->{=P(\GTenHLOutcome{\mathrm{BNN}})+P(\GTenHLOutcome{\mathrm{NBN}})
-        +P(\GTenHLOutcome{\mathrm{NNB}})}\\
+      \visible<3->{\GTenHLProbability{P(X}=\GTenHLProbability{1)}}
+      &\visible<3->{=\GTenHLProbability{P(\mathrm{BNN})}+\GTenHLProbability{P(\mathrm{NBN})}
+        +\GTenHLProbability{P(\mathrm{NNB})}}\\
       &\visible<4->{=\GTenHLProbability{0.144}+\GTenHLProbability{0.144}
         +\GTenHLProbability{0.144}=\GTenHLProbability{0.432}.}
     \end{aligned}
@@ -504,9 +573,9 @@
     The matches are \GTenHLOutcome{BBN}, \GTenHLOutcome{BNB} and \GTenHLOutcome{NBB}.}
   \[
     \begin{aligned}
-      \visible<3->{P(\GTenHLSecond{Y}=\GTenHLSecond{10})}
-      &\visible<3->{=P(\GTenHLOutcome{\mathrm{BBN}})+P(\GTenHLOutcome{\mathrm{BNB}})
-        +P(\GTenHLOutcome{\mathrm{NBB}})}\\
+      \visible<3->{\GTenHLProbability{P(Y}=\GTenHLProbability{10)}}
+      &\visible<3->{=\GTenHLProbability{P(\mathrm{BBN})}+\GTenHLProbability{P(\mathrm{BNB})}
+        +\GTenHLProbability{P(\mathrm{NBB})}}\\
       &\visible<4->{=\GTenHLProbability{0.096}+\GTenHLProbability{0.096}
         +\GTenHLProbability{0.096}}
         \visible<5->{=\GTenHLProbability{0.2880}.}
@@ -528,9 +597,9 @@
     \GTenHLOutcome{BBN}, \GTenHLOutcome{BNB} and \GTenHLOutcome{BBB}.}
   \[
     \begin{aligned}
-      \visible<3->{P(\GTenHLThird{Z}=\GTenHLThird{1})}
-      &\visible<3->{=P(\GTenHLOutcome{\mathrm{BNN}})+P(\GTenHLOutcome{\mathrm{BBN}})
-        +P(\GTenHLOutcome{\mathrm{BNB}})+P(\GTenHLOutcome{\mathrm{BBB}})}\\
+      \visible<3->{\GTenHLProbability{P(Z}=\GTenHLProbability{1)}}
+      &\visible<3->{=\GTenHLProbability{P(\mathrm{BNN})}+\GTenHLProbability{P(\mathrm{BBN})}
+        +\GTenHLProbability{P(\mathrm{BNB})}+\GTenHLProbability{P(\mathrm{BBB})}}\\
       &\visible<4->{=\GTenHLProbability{0.144}+\GTenHLProbability{0.096}
         +\GTenHLProbability{0.096}+\GTenHLProbability{0.064}}
         \visible<5->{=\GTenHLProbability{0.4000}.}
@@ -602,10 +671,10 @@
     \end{tabular}
   \end{center}
 
-  Define $q_i=P(\{\omega_i\})$: the probability of the single outcome $\omega_i$.
+  Define $\GTenHLProbability{q_i}=\GTenHLProbability{P(\{\omega_i\})}$: the probability of the single outcome $\GTenHLOutcome{\omega_i}$.
   \[
-    \visible<2->{q_i\geq0\quad\text{for every }i,
-      \qquad\sum_{i=1}^{n}q_i=1.}
+    \visible<2->{\GTenHLProbability{q_i}\geq0\quad\text{for every }i,
+      \qquad\sum_{i=1}^{n}\GTenHLProbability{q_i}=1.}
   \]
 \end{frame}
 
@@ -618,15 +687,15 @@
   \begin{center}
     \begin{tabular}{@{}lcc@{}}
       \toprule
-      \textbf{Complete outcome} & \textbf{Probability} & $\GTenHLValue{X}(\omega_i)$ \\
+      \textbf{Complete outcome} & \textbf{Probability} & $\GTenHLValue{X}(\GTenHLOutcome{\omega_i})$ \\
       \midrule
       $\GTenHLOutcome{\omega_1}$ & $\GTenHLProbability{q_1}$ &
-        \visible<2->{$X(\omega_1)$} \\
+        \visible<2->{$\GTenHLValue{X}(\GTenHLOutcome{\omega_1})$} \\
       $\GTenHLOutcome{\omega_2}$ & $\GTenHLProbability{q_2}$ &
-        \visible<2->{$X(\omega_2)$} \\
+        \visible<2->{$\GTenHLValue{X}(\GTenHLOutcome{\omega_2})$} \\
       $\vdots$ & $\vdots$ & \visible<2->{$\vdots$} \\
       $\GTenHLOutcome{\omega_n}$ & $\GTenHLProbability{q_n}$ &
-        \visible<2->{$X(\omega_n)$} \\
+        \visible<2->{$\GTenHLValue{X}(\GTenHLOutcome{\omega_n})$} \\
       \bottomrule
     \end{tabular}
   \end{center}
@@ -642,22 +711,22 @@
   \begin{center}
     \begin{tabular}{@{}lc@{}}
       \toprule
-      \textbf{Distinct value} $x$ & $p_X(x)=P(X=x)$ \\
+      \textbf{Distinct value} $\GTenHLValue{x}$ & $\GTenHLProbability{p_X(x)}=\GTenHLProbability{P(X}=\GTenHLProbability{x)}$ \\
       \midrule
-      $\GTenHLValue{x_1}$ & \visible<2->{$\sum_{i:\,X(\omega_i)=x_1}q_i$} \\
+      $\GTenHLValue{x_1}$ & \visible<2->{$\sum_{i:\,\GTenHLValue{X}(\GTenHLOutcome{\omega_i})=\GTenHLValue{x_1}}\GTenHLProbability{q_i}$} \\
       $\vdots$ & \visible<2->{$\vdots$} \\
-      $\GTenHLValue{x_m}$ & \visible<2->{$\sum_{i:\,X(\omega_i)=x_m}q_i$} \\
+      $\GTenHLValue{x_m}$ & \visible<2->{$\sum_{i:\,\GTenHLValue{X}(\GTenHLOutcome{\omega_i})=\GTenHLValue{x_m}}\GTenHLProbability{q_i}$} \\
       \bottomrule
     \end{tabular}
   \end{center}
 
-  \visible<2->{Group: $p_X(x)=\sum_{i:\,X(\omega_i)=x}q_i$.
-    Add all probabilities mapped to $x$.}\par
+  \visible<2->{Group: $\GTenHLProbability{p_X(x)}=\sum_{i:\,\GTenHLValue{X}(\GTenHLOutcome{\omega_i})=\GTenHLValue{x}}\GTenHLProbability{q_i}$.
+    Add all probabilities mapped to $\GTenHLValue{x}$.}\par
   \medskip
-  \visible<3->{Support: $S_X=\{x:p_X(x)>0\}$; state units separately.
-    If every $q_i>0$, include all distinct mapped values.}\par
+  \visible<3->{Support: $\GTenHLValue{S_X}=\{\GTenHLValue{x}:\GTenHLProbability{p_X(x)}>0\}$; state units separately.
+    If every $\GTenHLProbability{q_i}>0$, include all distinct mapped values.}\par
   \medskip
-  \visible<4->{Verify: $p_X(x)\geq0$ and $\sum_{x\in S_X}p_X(x)=1$.}
+  \visible<4->{Verify: $\GTenHLProbability{p_X(x)}\geq0$ and $\sum_{\GTenHLValue{x}\in \GTenHLValue{S_X}}\GTenHLProbability{p_X(x)}=1$.}
 \end{frame}
 
 \begin{frame}[t]{Worked model: Buying a carton of fruit}
@@ -683,7 +752,7 @@
 \begin{frame}[t]{Fruit carton: Mapping, PMF and checks}
   $\GTenHLThird{C}$ is the purchase cost of one carton, in \GTenHLThird{USD}.
 
-  \medskip
+  \smallskip
   \begin{columns}[T,onlytextwidth]
     \begin{column}{.49\textwidth}
       \textbf{Outcome and mapping table}\par\smallskip
@@ -702,9 +771,9 @@
       \textbf{PMF: group equal costs}\par\smallskip
       \begin{tabular}{@{}lc@{}}
         \toprule
-        $\GTenHLThird{c}$ (\GTenHLThird{USD}) & $p_C(c)=P(C=c)$ \\
+        $\GTenHLThird{c}$ (\GTenHLThird{USD}) & $\GTenHLProbability{p_C(c)}=\GTenHLProbability{P(C}=\GTenHLProbability{c)}$ \\
         \midrule
-        \visible<3->{\GTenHLThird{14}} & \visible<3->{$0.28+0.31=\GTenHLProbability{0.59}$} \\
+        \visible<3->{\GTenHLThird{14}} & \visible<3->{$\GTenHLProbability{0.28}+\GTenHLProbability{0.31}=\GTenHLProbability{0.59}$} \\
         \visible<3->{\GTenHLThird{18}} & \visible<3->{\GTenHLProbability{0.19}} \\
         \visible<3->{\GTenHLThird{22}} & \visible<3->{\GTenHLProbability{0.22}} \\
         \bottomrule
@@ -713,7 +782,7 @@
   \end{columns}
 
   \smallskip
-  \visible<3->{Support: $S_C=\GTenHLThird{\{14,18,22\}}$;
+  \visible<3->{Support: $\GTenHLThird{S_C}=\GTenHLThird{\{14,18,22\}}$;
     values are measured in \GTenHLThird{USD}.}
 
   \visible<4->{All masses are nonnegative, and}
@@ -730,10 +799,10 @@
     \item Write the probability calculation.
     \item Interpret it in context; use a percentage when helpful.
   \end{enumerate}
-  For an exact value: $P(X=a)=p_X(a)$.
+  For an exact value: $\GTenHLProbability{P(X}=\GTenHLProbability{a)}=\GTenHLProbability{p_X(a)}$.
   \[
-    \visible<2->{P(\GTenHLThird{C}=\GTenHLThird{14})
-      =p_C(\GTenHLThird{14})=\GTenHLProbability{0.59}.}
+    \visible<2->{\GTenHLProbability{P(C}=\GTenHLProbability{14)}
+      =\GTenHLProbability{p_C(14)}=\GTenHLProbability{0.59}.}
   \]
   \visible<3->{The stall pays exactly \GTenHLThird{14 USD} for the carton
     in \GTenHLProbability{59\%} of these orders.}
@@ -759,15 +828,15 @@
       One row per complete outcome.\par\smallskip
       \begin{tabular}{@{}ccc@{}}
         \toprule
-        $\GTenHLOutcome{\omega_i}$ & $q_i=P(\{\omega_i\})$ & $\GTenHLValue{X}(\omega_i)$ \\
+        $\GTenHLOutcome{\omega_i}$ & $\GTenHLProbability{q_i}=\GTenHLProbability{P(\{\omega_i\})}$ & $\GTenHLValue{X}(\GTenHLOutcome{\omega_i})$ \\
         \midrule
         $\GTenHLOutcome{\omega_1}$ & $\GTenHLProbability{q_1}$ &
-          \visible<2->{$\GTenHLValue{X}(\omega_1)$} \\
+          \visible<2->{$\GTenHLValue{X}(\GTenHLOutcome{\omega_1})$} \\
         $\GTenHLOutcome{\omega_2}$ & $\GTenHLProbability{q_2}$ &
-          \visible<2->{$\GTenHLValue{X}(\omega_2)$} \\
+          \visible<2->{$\GTenHLValue{X}(\GTenHLOutcome{\omega_2})$} \\
         $\vdots$ & $\vdots$ & \visible<2->{$\vdots$} \\
         $\GTenHLOutcome{\omega_n}$ & $\GTenHLProbability{q_n}$ &
-          \visible<2->{$\GTenHLValue{X}(\omega_n)$} \\
+          \visible<2->{$\GTenHLValue{X}(\GTenHLOutcome{\omega_n})$} \\
         \bottomrule
       \end{tabular}
     \end{column}
@@ -776,25 +845,25 @@
       One row per distinct value.\par\smallskip
       \begin{tabular}{@{}cc@{}}
         \toprule
-        $\GTenHLValue{x_j}$ & $p_X(x_j)=\displaystyle\sum_{i:\,X(\omega_i)=x_j}q_i$ \\
+        $\GTenHLValue{x_j}$ & $\GTenHLProbability{p_X(x_j)}=\displaystyle\sum_{i:\,\GTenHLValue{X}(\GTenHLOutcome{\omega_i})=\GTenHLValue{x_j}}\GTenHLProbability{q_i}$ \\
         \midrule
         \visible<3->{$\GTenHLValue{x_1}$} &
-          \visible<3->{$\sum_{i:\,X(\omega_i)=x_1}\GTenHLProbability{q_i}$} \\
+          \visible<3->{$\sum_{i:\,\GTenHLValue{X}(\GTenHLOutcome{\omega_i})=\GTenHLValue{x_1}}\GTenHLProbability{q_i}$} \\
         \visible<3->{$\vdots$} & \visible<3->{$\vdots$} \\
         \visible<3->{$\GTenHLValue{x_m}$} &
-          \visible<3->{$\sum_{i:\,X(\omega_i)=x_m}\GTenHLProbability{q_i}$} \\
+          \visible<3->{$\sum_{i:\,\GTenHLValue{X}(\GTenHLOutcome{\omega_i})=\GTenHLValue{x_m}}\GTenHLProbability{q_i}$} \\
         \bottomrule
       \end{tabular}
     \end{column}
   \end{columns}
 
   \smallskip
-  \visible<3->{Support: $S_X=\{x:p_X(x)>0\}$;\quad
+  \visible<3->{Support: $\GTenHLValue{S_X}=\{\GTenHLValue{x}:\GTenHLProbability{p_X(x)}>0\}$;\quad
     units: \GTenHLValue{[same as $X$]}.}
 
   \medskip
-  \visible<4->{Checks: $p_X(x)\geq0$ for every $x$, and
-    $\sum_{x\in S_X}p_X(x)=1$.}
+  \visible<4->{Checks: $\GTenHLProbability{p_X(x)}\geq0$ for every $\GTenHLValue{x}$, and
+    $\sum_{\GTenHLValue{x}\in \GTenHLValue{S_X}}\GTenHLProbability{p_X(x)}=1$.}
 \end{frame}
 
 \end{document}

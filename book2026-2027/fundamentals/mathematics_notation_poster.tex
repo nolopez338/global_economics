@@ -1,5 +1,5 @@
 \documentclass{article}
-\usepackage[paperwidth=500mm,paperheight=700mm,margin=18mm]{geometry}
+\usepackage[paperwidth=500mm,paperheight=700mm,margin=12mm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{amsmath,amssymb}
@@ -20,9 +20,9 @@
 \newcommand{\TitleFont}{\fontsize{70}{76}\selectfont\bfseries}
 \newcommand{\KickerFont}{\fontsize{28}{34}\selectfont\bfseries}
 \newcommand{\HeadingFont}{\fontsize{36}{42}\selectfont\bfseries}
-\newcommand{\DefinitionFont}{\fontsize{26}{30}\selectfont}
+\newcommand{\DefinitionFont}{\fontsize{26}{28}\selectfont}
 \newcommand{\SymbolFont}{\fontsize{28}{32}\selectfont}
-\newcommand{\ExampleFont}{\fontsize{25}{30}\selectfont}
+\newcommand{\ExampleFont}{\fontsize{25}{27}\selectfont}
 \newcommand{\TableHeadFont}{\fontsize{24}{29}\selectfont\bfseries}
 \newcommand{\FooterFont}{\fontsize{24}{29}\selectfont}
 \DeclareMathSizes{28}{28}{20}{17}
@@ -32,67 +32,84 @@
 \newlength{\SymbolWidth}
 \newlength{\MeaningWidth}
 \newlength{\RowPadding}
-\setlength{\RowPadding}{1.4mm}
-% Examples for mu and sigma use the population data set {3,7}.
+\setlength{\RowPadding}{0.5mm}
+% Keep the 25 pt example type; compact struts give a 27 pt baseline grid.
 % Explicit line breaks keep related examples together inside a cell.
-\newcommand{\exlines}[1]{\begin{tabular}[t]{@{}l@{}}#1\end{tabular}}
+\newcommand{\exlines}[1]{{\renewcommand{\arraystretch}{0.84}%
+  \begin{tabular}[t]{@{}l@{}}#1\end{tabular}}}
 \newcommand{\symrow}[3]{%
-  {\SymbolFont\rule[-3mm]{0pt}{11mm}\ensuremath{\displaystyle #1}}&%
+  {\SymbolFont\rule[-2mm]{0pt}{9mm}\ensuremath{\displaystyle #1}}&%
   {\DefinitionFont #2}&{\ExampleFont #3}\\[\RowPadding]\hline
+}
+% Shared struts align both baselines across cells with different font sizes.
+\newcommand{\pairlines}[3]{%
+  \begin{tabular}[t]{@{}#1@{}}%
+  \rule[-10pt]{0pt}{34pt}#2\\%
+  \rule[-10pt]{0pt}{34pt}#3%
+  \end{tabular}%
+}
+% Arguments: symbols, meanings, then examples (positive before negation).
+\newcommand{\pairedrow}[6]{%
+  {\SymbolFont\pairlines{c}{\ensuremath{\displaystyle #1}}{\ensuremath{\displaystyle #2}}}&%
+  {\DefinitionFont\pairlines{l}{#3}{#4}}&%
+  {\ExampleFont\pairlines{l}{#5}{#6}}\\[\RowPadding]\hline
 }
 \newcommand{\sectionbox}[2]{%
   {\HeadingFont\color{coral}#1\par}%
   \vspace{2mm}{\color{navy}\hrule height 1.2pt}\vspace{2mm}%
   \begingroup
-  \setlength{\SymbolWidth}{.23\linewidth}%
-  \setlength{\MeaningWidth}{.36\linewidth}%
+  \setlength{\SymbolWidth}{.21\linewidth}%
+  \setlength{\MeaningWidth}{.35\linewidth}%
   \setlength{\tabcolsep}{2mm}%
   \renewcommand{\arraystretch}{1}%
   \arrayrulecolor{rulecolor}%
   \begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash\SymbolFont}p{\SymbolWidth}>{\raggedright\arraybackslash\DefinitionFont}p{\MeaningWidth}>{\raggedright\arraybackslash\ExampleFont}X@{}}
-  {\TableHeadFont Symbol}&{\TableHeadFont Meaning}&{\TableHeadFont Example}\\[2mm]\hline
+  {\TableHeadFont Symbol}&{\TableHeadFont Meaning}&{\TableHeadFont Examples}\\[2mm]\hline
   #2
   \end{tabularx}%
-  \endgroup\par\vspace{5mm}%
+  \endgroup\par\vspace{3mm}%
 }
 \begin{document}
+% The wider left column accommodates long definitions; the right starts
+% beside the title so that both columns retain the original type sizes.
+\noindent
+\begin{minipage}[t]{244mm}
 {\KickerFont THE LANGUAGE OF\par}
 \vspace{1mm}
 {\TitleFont\color{coral}MATHEMATICS\par}
-\vspace{5mm}
+\vspace{3mm}
 {\color{navy}\hrule height 2pt}
-\vspace{8mm}
-\noindent
-\begin{minipage}[t]{226mm}
+\vspace{4mm}
 \sectionbox{General notation}{
-\symrow{=}{Equal to}{$2+3=5$}
-\symrow{\neq}{Not equal to}{$2\neq 3$}
-\symrow{\approx}{Approximately equal to}{$\pi\approx 3.14$}
-\symrow{<,\ >}{Less than; greater than}{$2<3;\quad 5>4$}
-\symrow{\leq,\ \geq}{Less than or equal to; greater than or equal to}{\exlines{$2\leq 2$\\$5\geq 4$}}
-\symrow{\pm}{Plus or minus}{$3\pm 1=4\text{ or }2$}
-\symrow{|a|}{Absolute value}{$|-5|=5$}
-\symrow{\sqrt{a}}{Square root}{$\sqrt{9}=3$}
+\pairedrow{=}{\neq}{Equal}{Not equal}{$2+3=5;\quad 4-4=0$}{$2\neq3;\quad -1\neq1$}
+\symrow{\approx}{Approximately}{\exlines{$\pi\approx3.14$\\$\sqrt{2}\approx1.41$}}
+\symrow{<,\ >}{Less than; greater than}{\exlines{$2<3;\quad -1<0$\\$5>4;\quad 0>-2$}}
+\symrow{\leq,\ \geq}{Less than or equal to; greater than or equal to}{\exlines{$2\leq2;\quad -1\leq3$\\$5\geq4;\quad 0\geq0$}}
+\symrow{\pm}{Plus or minus}{\exlines{$3\pm1=4\text{ or }2$\\$-2\pm3=1\text{ or }-5$}}
+\symrow{|a|}{Absolute value}{$|-5|=5;\quad |3|=3$}
+\symrow{\sqrt{a}}{Square root}{$\sqrt{9}=3;\quad\sqrt{\frac14}=\frac12$}
 }
 \sectionbox{Sets and number systems}{
-\symrow{\{a,b,c\}}{Set with three elements}{$\{2,4,6\}$}
-\symrow{\varnothing}{Empty set}{$\{1\}\cap\{2\}=\varnothing$}
-\symrow{\in,\ \notin}{Is an element of; is not an element of}{\exlines{$2\in\{1,2\}$\\$3\notin\{1,2\}$}}
-\symrow{\subseteq}{Is a subset of}{$\{1\}\subseteq\{1,2\}$}
-\symrow{\cup,\ \cap}{Union; intersection}{\exlines{$\{1\}\cup\{2\}=\{1,2\}$\\$\{1,2\}\cap\{2\}=\{2\}$}}
-\symrow{\mathbb N,\ \mathbb Z}{Natural numbers; integers}{$3\in\mathbb N;\quad -2\in\mathbb Z$}
-\symrow{\mathbb Q,\ \mathbb R}{Rational numbers; real numbers}{$\frac12\in\mathbb Q;\quad\sqrt{2}\in\mathbb R$}
-\symrow{(a,b),\ [a,b]}{Open interval; closed interval}{\exlines{$1\notin(1,3)$\\$1\in[1,3]$}}
+\symrow{\{a,b,c\}}{Set with three elements}{$\{2,4,6\};\quad\{-1,0,5\}$}
+\symrow{\varnothing}{Empty set}{\exlines{$\{1\}\cap\{2\}=\varnothing$\\$\{x\in\mathbb R:x^2=-1\}=\varnothing$}}
+\pairedrow{\in}{\notin}{Is element of}{Is not element of}{$2\in\{1,2\};\quad -1\in\mathbb Z$}{$3\notin\{1,2\};\quad \frac12\notin\mathbb Z$}
+\symrow{\subseteq}{Is a subset of}{\exlines{$\{1\}\subseteq\{1,2\}$\\$\mathbb N\subseteq\mathbb Z$}}
+\symrow{\cup,\ \cap}{Union; intersection}{\exlines{$\{1\}\cup\{2\}=\{1,2\}$\\$\varnothing\cup\{0\}=\{0\}$\\$\{1,2\}\cap\{2\}=\{2\}$\\$\{-1\}\cap\{4\}=\varnothing$}}
+\symrow{\mathbb N,\ \mathbb Z}{Natural numbers; integers}{\exlines{$3\in\mathbb N;\quad 8\in\mathbb N$\\$-2\in\mathbb Z;\quad 0\in\mathbb Z$}}
+\symrow{\mathbb Q,\ \mathbb R}{Rational numbers; real numbers}{\exlines{$\frac12\in\mathbb Q;\quad -3\in\mathbb Q$\\$\sqrt2\in\mathbb R;\quad \frac14\in\mathbb R$}}
+\symrow{(a,b),\ [a,b]}{Open interval; closed interval}{\exlines{$1\notin(1,3);\ 0\in(-2,2)$\\$1\in[1,3];\ -2\in[-2,0]$}}
 }
+{\ExampleFont In the implications below, $x\in\mathbb R$.\par}
+\vspace{2mm}
 \sectionbox{Logic}{
-\symrow{\Rightarrow}{Implies}{$x>2\Rightarrow x>1$}
-\symrow{\Leftrightarrow}{If and only if}{$x+1=3\Leftrightarrow x=2$}
-\symrow{\forall}{For every}{$\forall x\in\mathbb R,\ x^2\geq0$}
-\symrow{\exists}{There exists}{$\exists x\in\mathbb Z:\ x+2=0$}
-\symrow{\neg}{Logical negation}{$\neg(2>3)$ is true}
+\symrow{\Rightarrow}{Implies}{\exlines{$x>2\Rightarrow x>1$\\$x=3\Rightarrow x^2=9$}}
+\symrow{\Leftrightarrow}{If and only if}{\exlines{$x+1=3\Leftrightarrow x=2$\\$x^2=0\Leftrightarrow x=0$}}
+\symrow{\forall}{For every}{\exlines{$\forall x\in\mathbb R,\ x^2\geq0$\\$\forall n\in\mathbb Z,\ n+1\in\mathbb Z$}}
+\symrow{\exists}{There exists}{\exlines{$\exists x\in\mathbb Z:\ x+2=0$\\$\exists t\in\mathbb R:\ t^2=2$}}
+\symrow{\neg}{Logical negation}{\exlines{$\neg(2>3)$ is true\\$\neg(4\in\{1,2\})$ is true}}
 }
 \sectionbox{Summation notation}{
-\symrow{\sum_{i=1}^{n}a_i}{Add $a_i$ for each integer $i$ from $1$ to $n$.}{$\sum_{i=1}^{3}2i=2+4+6$}
+\symrow{\sum_{i=1}^{n}a_i}{Add $a_i$ for each integer $i$ from $1$ to $n$.}{\exlines{$\sum_{i=1}^{3}2i=2+4+6$\\$\sum_{i=1}^{2}(i+3)=4+5$}}
 }
 {\DefinitionFont
 In $\sum_{i=1}^{n}a_i$, $i$ is the \textbf{index}, $1$ is the
@@ -101,45 +118,55 @@ In $\sum_{i=1}^{n}a_i$, $i$ is the \textbf{index}, $1$ is the
 \vspace{3mm}
 {\color{coral}\bfseries Worked examples}\par
 \vspace{2mm}
-$\displaystyle\sum_{i=1}^{4}i=1+2+3+4=10$\par
+$\textstyle\sum_{i=1}^{4}i=1+2+3+4=10$\par
 \vspace{3mm}
-$\displaystyle\sum_{k=1}^{3}k^2=1+4+9=14$\par
+$\textstyle\sum_{k=1}^{3}k^2=1+4+9=14$\par
 }
 \end{minipage}\hfill
-\begin{minipage}[t]{226mm}
+\begin{minipage}[t]{220mm}
+% I and II are alternative experiments, not simultaneous assumptions.
+{\ExampleFont
+Alternatives: fair die (I) or fair card draw (II).\par
+I: $A=\{1,3,5\}$, $B=\{1,2\}$.\par
+II: cards 1--4; $A=\{4\}$, $B=\{2,3,4\}$.\par}
+\vspace{3mm}
 \sectionbox{Probability and events}{
-\symrow{\Omega}{Sample space: all possible outcomes}{$\Omega=\{1,2,3,4,5,6\}$}
-\symrow{\omega}{An individual outcome}{$\omega=3\in\Omega$}
-\symrow{A=\{1,3,5\}}{Event shown as a set of outcomes}{$A=\{1,3,5\}$: odd roll}
-\symrow{A\subseteq\Omega}{An event is a subset of the sample space}{$\{1,3,5\}\subseteq\Omega$}
-\symrow{P(A)}{Probability of event $A$}{$P(A)=\frac36=\frac12$}
-\symrow{A^c}{Complement of event $A$}{$A^c=\{2,4,6\}$}
-\symrow{A\cup B}{Event $A$ or $B$ (or both)}{\exlines{$B=\{1,2\}$\\$A\cup B=\{1,2,3,5\}$}}
-\symrow{A\cap B}{Both events $A$ and $B$}{$A\cap B=\{1\}$}
-\symrow{P(A\mid B)}{Probability of $A$ given $B$}{$P(A\mid B)=\frac12$}
+\symrow{\Omega}{Sample space: all possible outcomes}{\exlines{I: $\Omega=\{1,\ldots,6\}$\\II: $\Omega=\{1,2,3,4\}$}}
+\symrow{\omega}{An individual outcome}{\exlines{I: $\omega=3\in\Omega$\\II: $\omega=4\in\Omega$}}
+\symrow{A=\{1,3,5\}}{Event shown as a set of outcomes}{\exlines{I: $A=\{1,3,5\}$: odd\\II: $A=\{4\}$: card 4}}
+\symrow{A\subseteq\Omega}{An event is a subset of the sample space}{\exlines{I: $\{1,3,5\}\subseteq\Omega$\\II: $\{4\}\subseteq\Omega$}}
+\symrow{P(A)}{Probability of event $A$}{\exlines{I: $P(A)=\frac36=\frac12$\\II: $P(A)=\frac14$}}
+\symrow{A^c}{Complement of event $A$}{\exlines{I: $A^c=\{2,4,6\}$\\II: $A^c=\{1,2,3\}$}}
+\symrow{A\cup B}{Event $A$ or $B$ (or both)}{\exlines{I: $A\cup B=\{1,2,3,5\}$\\II: $A\cup B=\{2,3,4\}$}}
+\symrow{A\cap B}{Both events $A$ and $B$}{\exlines{I: $A\cap B=\{1\}$\\II: $A\cap B=\{4\}$}}
+\symrow{P(A\mid B)}{Probability of $A$ given $B$}{\exlines{I: $P(A\mid B)=\frac12$\\II: $P(A\mid B)=\frac13$}}
 }
-{\ExampleFont Probability examples use a fair six-sided die,\par
-$A=\{1,3,5\}$ and $B=\{1,2\}$.\par}
-\vspace{5mm}
+{\ExampleFont Functions: I: $f:\mathbb R\to\mathbb R$, $f(x)=x^2$.\par
+II: $f:[0,\infty)\to\mathbb R$, $f(x)=\sqrt{x}$.\par}
+\vspace{3mm}
 \sectionbox{Function notation}{
-\symrow{f}{Name of a function}{$f(x)=x^2$}
-\symrow{f(x)}{Value of $f$ at input $x$}{$f(3)=3^2=9$}
-\symrow{f:A\to B}{Function from set $A$ to set $B$}{$f:\mathbb R\to\mathbb R,\ f(x)=x^2$}
-\symrow{x\mapsto f(x)}{Input-to-output mapping}{$x\mapsto x^2;\quad 3\mapsto9$}
-\symrow{\operatorname{dom}(f)}{Domain of a function}{$\operatorname{dom}(f)=\mathbb R$}
+\symrow{f}{Name of a function}{\exlines{I: $f(x)=x^2$\\II: $f(x)=\sqrt{x}$}}
+\symrow{f(x)}{Value of $f$ at input $x$}{\exlines{I: $f(3)=3^2=9$\\II: $f(4)=\sqrt4=2$}}
+\symrow{f:A\to B}{Function from set $A$ to set $B$}{\exlines{I: $f:\mathbb R\to\mathbb R$\\II: $f:[0,\infty)\to\mathbb R$}}
+\symrow{x\mapsto f(x)}{Input-to-output mapping}{\exlines{I: $x\mapsto x^2;\quad 3\mapsto9$\\II: $x\mapsto\sqrt{x};\quad 4\mapsto2$}}
+\symrow{\operatorname{dom}(f)}{Domain of a function}{\exlines{I: $\operatorname{dom}(f)=\mathbb R$\\II: $\operatorname{dom}(f)=[0,\infty)$}}
 }
+{\ExampleFont
+Below: triangle angles $(\alpha,\beta,\gamma)$; $\Theta=2\theta$;\par
+$\Delta x=x_2-x_1$; population mean $\mu$ and SD $\sigma$.\par}
+\vspace{2mm}
 \sectionbox{Letters and Greek symbols}{
-\symrow{a,b,c,\ldots}{Common lowercase Latin letters}{$a=2,\ b=3,\ c=a+b$}
-\symrow{A,B,C,\ldots}{Common uppercase Latin letters}{\exlines{$A=\{1\},\ B=\{2\}$\\$C=A\cup B$}}
-\symrow{x,y,z}{Other common Latin letters}{$y=2x,\quad z=x+y$}
-\symrow{\alpha,\ \beta,\ \gamma}{Alpha; beta; gamma}{\exlines{Triangle angles:\\$\alpha+\beta+\gamma=180^\circ$}}
-\symrow{\delta,\ \Delta}{Delta; uppercase delta}{$\delta=0.1;\quad\Delta x=x_2-x_1$}
-\symrow{\theta,\ \Theta}{Theta; uppercase theta}{$\theta=30^\circ;\quad\Theta=2\theta$}
-\symrow{\lambda,\ \Lambda}{Lambda; uppercase lambda}{$\lambda=2;\quad\Lambda=\{1,2\}$}
-\symrow{\mu,\ \sigma,\ \Sigma}{Mu; sigma; uppercase sigma}{\exlines{$\mu=\frac{3+7}{2}=5$\\$\sigma=\sqrt{4}=2$\\$\sum_{i=1}^{3}i=6$}}
-\symrow{\pi,\ \Pi}{Pi; uppercase pi}{\exlines{$\pi\approx3.14$\\$\prod_{j=1}^{3}j=6$}}
-\symrow{\phi,\ \Phi}{Phi; uppercase phi}{$\phi=\frac{1+\sqrt5}{2};\quad\Phi=\phi^2$}
-\symrow{\omega,\ \Omega}{Omega; uppercase omega}{$\Omega=\{H,T\};\quad\omega=H$}
+\symrow{a,b,c,\ldots}{Common lowercase Latin letters}{\exlines{$a=2,\ b=3,\ c=5$\\$a=-1,\ b=4,\ c=3$}}
+\symrow{A,B,C,\ldots}{Common uppercase Latin letters}{\exlines{Here $C=A\cup B$:\\$A=\{1\},\ B=\{2\}$\\$A=\{0,3\},\ B=\{3\}$}}
+\symrow{x,y,z}{Other common Latin letters}{\exlines{$x=2,\ y=4,\ z=6$\\$x=-1,\ y=1,\ z=-2$}}
+% Each line is an independent example unless a shared context is stated.
+\symrow{\alpha,\ \beta,\ \gamma}{Alpha; beta; gamma}{\exlines{$(60^\circ,60^\circ,60^\circ)$\\$(30^\circ,70^\circ,80^\circ)$}}
+\symrow{\delta,\ \Delta}{Delta; uppercase delta}{\exlines{$\delta=0.1;\quad\delta=0.05$\\$\Delta x=5-2=3$\\$\Delta x=1-4=-3$}}
+\symrow{\theta,\ \Theta}{Theta; uppercase theta}{\exlines{$\theta=30^\circ;\quad\Theta=60^\circ$\\$\theta=45^\circ;\quad\Theta=90^\circ$}}
+\symrow{\lambda,\ \Lambda}{Lambda; uppercase lambda}{\exlines{$\lambda=2;\quad\Lambda=\{1,2\}$\\$\lambda=-1;\quad\Lambda=\{0,3,5\}$}}
+\symrow{\mu,\ \sigma,\ \Sigma}{Mu; sigma; uppercase sigma}{\exlines{$\{3,7\}:\ \mu=5,\ \sigma=2$\\$\{2,10\}:\ \mu=6,\ \sigma=4$\\$\sum_{i=1}^{3}i=6;\!\ \sum_{k=1}^{2}k^2=5$}}
+\symrow{\pi,\ \Pi}{Pi; uppercase pi}{\exlines{$\pi\approx3.14$ (constant)\\$\prod_{j=1}^{3}j=6$\\$\prod_{k=1}^{2}(k+2)=12$}}
+\symrow{\omega,\ \Omega}{Omega; uppercase omega}{\exlines{$\Omega=\{0,1\},\ \omega=0$\\$\Omega=\{1,\ldots,6\},\ \omega=5$}}
 }
 \end{minipage}
 \vfill
