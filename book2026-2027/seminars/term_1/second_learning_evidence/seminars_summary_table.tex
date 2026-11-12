@@ -4,14 +4,12 @@
 \usepackage[spanish,es-nodecimaldot]{babel}
 \usepackage{lmodern,microtype}
 \usepackage[a4paper,landscape,margin=1.2cm]{geometry}
-\usepackage{longtable}[=v4.13]
+\usepackage{tikz}
 \usepackage{booktabs,array,xcolor,enumitem}
 \usepackage[unicode,colorlinks=true,urlcolor=blue!45!black]{hyperref}
 \pagestyle{empty}
 \setlength{\parindent}{0pt}
 \setlength{\tabcolsep}{4pt}
-\setlength{\LTpre}{0pt}
-\setlength{\LTpost}{0pt}
 \setlength{\emergencystretch}{2em}
 \renewcommand{\arraystretch}{1.04}
 \newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
@@ -87,21 +85,41 @@
 \setlength{\usablewidth}{\dimexpr\textwidth-8\tabcolsep\relax}
 \newenvironment{compactitems}{\begin{minipage}[t]{\linewidth}\raggedright\begin{itemize}[label=\textbullet,leftmargin=1em,labelsep=.35em,nosep,topsep=0pt,partopsep=0pt,parsep=0pt]}{\end{itemize}\end{minipage}}
 \newcommand{\evid}[2]{(\srclink{#1}, pp.~#2)}
+% Each summary is an indivisible box, including its own header and padding.
+\newsavebox{\summarybox}
+\newenvironment{groupsummary}{%
+  \begin{lrbox}{\summarybox}\begin{minipage}{\textwidth}
+  \vspace*{4mm}
+  \begin{tabular}{@{}L{.05\usablewidth}L{.125\usablewidth}L{.50\usablewidth}L{.13\usablewidth}L{.195\usablewidth}@{}}
+  \toprule
+  \textbf{Grupo} & \textbf{Integrantes} & \textbf{Trabajo C5--C10} & \textbf{Problema} & \textbf{Soluciones} \\
+  \midrule
+  \addlinespace[2mm]
+}{%
+  \addlinespace[3mm]
+  \bottomrule
+  \end{tabular}\par\vspace*{4mm}
+  \end{minipage}\end{lrbox}%
+  \noindent\usebox{\summarybox}\par
+}
+% A 12 mm cutting corridor; the dashed guide is 6 mm from either edge.
+\newcommand{\cuttinggap}{%
+  \par\nointerlineskip\vbox to 12mm{\vfil
+    \hbox{\begin{tikzpicture}
+      \draw[black!35,line width=.3pt,dash pattern=on 2mm off 1.5mm]
+        (0,0) -- (\textwidth,0);
+    \end{tikzpicture}}\vfil}\nointerlineskip
+}
+
 \begin{document}
-\begin{longtable}{@{}L{.05\usablewidth}L{.125\usablewidth}L{.50\usablewidth}L{.13\usablewidth}L{.195\usablewidth}@{}}
-\toprule
-\textbf{Group} & \textbf{Members} & \textbf{Work C5--C10} & \textbf{Problem} & \textbf{Solutions} \\
-\midrule
-\endfirsthead
-\toprule
-\textbf{Group} & \textbf{Members} & \textbf{Work C5--C10} & \textbf{Problem} & \textbf{Solutions} \\
-\midrule
-\endhead
-\bottomrule
-\endfoot
-\bottomrule
-\endlastfoot
-1 & Thomas Sebastián Álvarez Rey; Nicolás Álvarez Ospina; Juan Felipe Ojeda Hurtado. & \begin{compactitems}
+% Explicit page plan: 1--2 / 3 / 4 / 5--6 / 7--8 / 9 / 10 / 11--12 / 13.
+% Longer summaries receive a page of their own; retain 11 pt type throughout.
+\begin{groupsummary}
+1 & \begin{compactitems}
+\item Thomas Sebastián Álvarez Rey
+\item Nicolás Álvarez Ospina
+\item Juan Felipe Ojeda Hurtado
+\end{compactitems} & \begin{compactitems}
 \item \textbf{C5:} Organizaron el recorrido de compra y uso de microondas y tres hallazgos sobre colados, tiempo perdido y falta de regulación. \evid{S01}{1--2}
 \item \textbf{C6:} Compararon filas, presión en debates y extensión de guías, y priorizaron las filas con 9 puntos frente a 7 y 6. \evid{S01}{2--4}
 \item \textbf{C7:} Reformularon el desafío para garantizar turnos equitativos y reducir la espera al comprar alimentos o calentar loncheras. \evid{S01}{4--5}
@@ -112,8 +130,13 @@
 \item Proponen delimitar la fila con supervisión estudiantil y no atender a colados, como posibilidad por explorar. \evid{S01}{7--8}
 \item Proponen una zona independiente de microondas con fichas de tiempo por usuario. \evid{S01}{7}
 \end{compactitems} \\
-\midrule
-2 & Patrik Ayala Palenik; Gabriel Hernando Galán Osorio. & \begin{compactitems}
+\end{groupsummary}
+\cuttinggap
+\begin{groupsummary}
+2 & \begin{compactitems}
+\item Patrik Ayala Palenik
+\item Gabriel Hernando Galán Osorio
+\end{compactitems} & \begin{compactitems}
 \item \textbf{C5:} Reunieron perfiles, esperas de 5 a 9 minutos y observaciones y testimonios sobre filas, colados y conflictos. \evid{S02}{1--2}
 \item \textbf{C6:} Identificaron reducir la espera como necesidad principal; no se identificó una matriz comparativa de oportunidades en los PDF revisados. \evid{S02}{2}; \evid{S03}{1--3}
 \item \textbf{C7:} Revisaron el desafío para reducir la espera y los conflictos por colados de décimo al comprar o reclamar durante el descanso. \evid{S02}{2--3}
@@ -126,8 +149,13 @@
 \item Proponen campaña gráfica de respeto de la fila. \evid{S02}{4}
 \end{compactitems}
 {\footnotesize Fuente complementaria: \srclink{S03}.} \\
-\midrule
-3 & Sebastián González Mojica; Emilio José Barón Romero. & \begin{compactitems}
+\end{groupsummary}
+\clearpage
+\begin{groupsummary}
+3 & \begin{compactitems}
+\item Sebastián González Mojica
+\item Emilio José Barón Romero
+\end{compactitems} & \begin{compactitems}
 \item \textbf{C5:} Organizaron el recorrido del uso de audífonos y cuatro hallazgos sobre ocultamiento, trabajo individual y beneficios percibidos diversos. \evid{S04}{3--4}
 \item \textbf{C6:} Compararon claridad normativa, dinamismo pedagógico y acuerdos tecnológicos, y priorizaron aclarar el uso de audífonos con 9 puntos. \evid{S04}{5--8}
 \item \textbf{C7:} Reformularon el desafío sobre gestionar la concentración en trabajo autónomo manteniendo la comunicación docente. \evid{S05}{2--3}
@@ -137,8 +165,13 @@
 \end{compactitems} & Gestionar la concentración en trabajo autónomo, considerando audífonos, normas y comunicación docente; beneficios de la música no universales. & \begin{compactitems}
 \item No se identificaron soluciones desarrolladas en los PDF revisados; autorregulación y acuerdos en C8 son conocimientos de apoyo. \evid{S04}{1--8}; \evid{S05}{2--6}
 \end{compactitems} \\
-\midrule
-4 & Ana Isabella Colorado Parrado; Lucio Barrero Sánchez. & \begin{compactitems}
+\end{groupsummary}
+\clearpage
+\begin{groupsummary}
+4 & \begin{compactitems}
+\item Ana Isabella Colorado Parrado
+\item Lucio Barrero Sánchez
+\end{compactitems} & \begin{compactitems}
 \item \textbf{C5:} Organizaron diez respuestas, el recorrido del estudiante y hallazgos sobre bienestar y horarios, con una tabla parcialmente legible. \evid{S06}{1--4}
 \item \textbf{C6:} Compararon calidad del sueño y horario estable, y eligieron el horario por 8 a 6, con puntajes parcialmente justificados. \evid{S06}{4--5}
 \item \textbf{C7:} Formularon y revisaron un desafío sobre hábitos de sueño de estudiantes de décimo con mala calidad de descanso. \evid{S06}{6}
@@ -149,8 +182,13 @@
 \item Proponen calcular tiempos de tareas y organizar un horario personal con apagado de pantallas antes de dormir. \evid{S06}{7}
 \item Proponen un planeador de obligaciones con relajación al terminar las tareas. \evid{S06}{8}
 \end{compactitems} \\
-\midrule
-5 & Miguel Ángel Caballero Hernández; Juan Ignacio Rodríguez Rodríguez. & \begin{compactitems}
+\end{groupsummary}
+\clearpage
+\begin{groupsummary}
+5 & \begin{compactitems}
+\item Miguel Ángel Caballero Hernández
+\item Juan Ignacio Rodríguez Rodríguez
+\end{compactitems} & \begin{compactitems}
 \item \textbf{C5:} Organizaron el recorrido de búsqueda y cuatro hallazgos con quince encuestados y registros de observación. \evid{S07}{3--5}
 \item \textbf{C6:} Eligieron clasificación física frente a reducción de hurto o pérdida por 9 a 7, reconociendo que no resolvería desapariciones. \evid{S07}{5--6}
 \item \textbf{C7:} Ajustaron el desafío para facilitar la búsqueda visual y física de pertenencias de Ciclo V sin desordenar la mesa. \evid{S07}{6--7}
@@ -161,8 +199,13 @@
 \item Proponen un inventario virtual en la página del colegio. \evid{S07}{8}
 \item Proponen estudiantes responsables por rotación para ayudar a organizar la mesa. \evid{S07}{8}
 \end{compactitems} \\
-\midrule
-6 & Sebastián Lozano Barreneche; Alejandro Camargo Roldan. & \begin{compactitems}
+\end{groupsummary}
+\cuttinggap
+\begin{groupsummary}
+6 & \begin{compactitems}
+\item Sebastián Lozano Barreneche
+\item Alejandro Camargo Roldan
+\end{compactitems} & \begin{compactitems}
 \item \textbf{C5:} Integraron el recorrido y cinco hallazgos sobre espera, descanso, colados, momento de compra y acceso a dinero o tiquetes. \evid{S08}{9--10}
 \item \textbf{C6:} Priorizaron provisionalmente la cafetería con 7 puntos; las alternativas sobre agua y baños quedaron sin datos. \evid{S08}{11--12}
 \item \textbf{C7:} Reformularon el desafío para comprar durante el descanso sin perderlo ni llegar tarde, sin atribuir toda la demora a la fila. \evid{S08}{13--14}
@@ -173,8 +216,13 @@
 \item Proponen autopedido con carnet, tiquete o efectivo y recogida separada, aún por verificar. \evid{S08}{16, 18}
 \item Proponen pedidos anticipados numerados, conservando la opción de pedir en fila. \evid{S08}{16, 18}
 \end{compactitems} \\
-\midrule
-7 & Pablo José Del Cairo Bolaños; Nicolás Clavijo González. & \begin{compactitems}
+\end{groupsummary}
+\clearpage
+\begin{groupsummary}
+7 & \begin{compactitems}
+\item Pablo José Del Cairo Bolaños
+\item Nicolás Clavijo González
+\end{compactitems} & \begin{compactitems}
 \item \textbf{C5:} Relacionaron usuarios y recorrido de residuos con siete hallazgos y un supuesto, apoyados en observaciones y diez encuestas. \evid{S09}{4--10}
 \item \textbf{C6:} Compararon clasificación, acceso a canecas y limpieza; desempataron dos opciones de 8 puntos a favor de aprender a clasificar por viabilidad. \evid{S09}{11--12}
 \item \textbf{C7:} Delimitaron el desafío a identificar la caneca adecuada para estudiantes de sexto a undécimo en los descansos. \evid{S09}{12}
@@ -185,8 +233,14 @@
 \item Proponen la misma imagen y color en empaque y caneca para guiar la clasificación. \evid{S09}{14}
 \item Proponen guías estudiantiles rotativos por grado, con comentarios semanales del PAE. \evid{S09}{14}
 \end{compactitems} \\
-\midrule
-8 & Andrés Camilo Maldonado Lemus; Carlos Samuel López Castrillón; Thomas Enrique Díaz Garzón. & \begin{compactitems}
+\end{groupsummary}
+\cuttinggap
+\begin{groupsummary}
+8 & \begin{compactitems}
+\item Andrés Camilo Maldonado Lemus
+\item Carlos Samuel López Castrillón
+\item Thomas Enrique Díaz Garzón
+\end{compactitems} & \begin{compactitems}
 \item \textbf{C5:} Organizaron usuarios, recorrido y cuatro hallazgos sobre residuos en graderías a partir de treinta encuestas. \evid{S10}{1--2}; \evid{S11}{1--2}
 \item \textbf{C6:} Compararon recipientes, cultura ciudadana y empaques, y priorizaron acceso a recipientes con 9 puntos, limitado por mantenimiento. \evid{S10}{2--3}
 \item \textbf{C7:} La verificación paginada está pendiente: S12 es un DOCX accesible, sin PDF de esta etapa entre las fuentes enlazadas. \srclink{S12}
@@ -197,8 +251,13 @@
 \item No se identificó un conjunto de soluciones en los PDF; S10 aún no diseña solución y las posibles ideas de S13 siguen pendientes de verificación paginada. \evid{S10}{3}; \evid{S11}{1--2}; \srclink{S13}
 \end{compactitems}
 {\footnotesize C7--C8: \srclink{S12}.} \\
-\midrule
-9 & Sofía Guampe Granados; Nicolás Ospina Ramírez. & \begin{compactitems}
+\end{groupsummary}
+\clearpage
+\begin{groupsummary}
+9 & \begin{compactitems}
+\item Sofía Guampe Granados
+\item Nicolás Ospina Ramírez
+\end{compactitems} & \begin{compactitems}
 \item \textbf{C5:} Organizaron recorrido y cinco hallazgos con quince encuestas y observaciones, reconociendo fechas y mediciones faltantes. \evid{S14}{1--5}
 \item \textbf{C6:} Compararon espera y orden; eligieron provisionalmente reducir la espera del almuerzo, con viabilidad sin datos. \evid{S14}{6--7}
 \item \textbf{C7:} Revisaron el desafío para reducir la espera de bachillerato al comprar o reclamar almuerzo, sin imponer un medio específico. \evid{S14}{8}
@@ -209,8 +268,12 @@
 \item Proponen explorar pedidos anticipados con reclamo diferenciado e información clara, sin exigir aplicación ni salida anticipada. \evid{S14}{10--13}
 \item Proponen turnos por llegada, acuerdos claros y consulta a usuarios. \evid{S14}{11}
 \end{compactitems} \\
-\midrule
-10 & Julián Alejandro Maldonado Baquero. & \begin{compactitems}
+\end{groupsummary}
+\clearpage
+\begin{groupsummary}
+10 & \begin{compactitems}
+\item Julián Alejandro Maldonado Baquero
+\end{compactitems} & \begin{compactitems}
 \item \textbf{C5:} Describió olvidos de materiales y entregas con perspectivas de estudiante y profesor sobre carga académica, prioridades y registro. \evid{S15}{1--2}
 \item \textbf{C6:} Comparó priorizar y anotar tareas; eligió registrar pendientes por 8,5 a 7,5, condicionado a consultar y actualizar las anotaciones. \evid{S15}{2--4}
 \item \textbf{C7:} Formuló un desafío sobre herramientas para evitar olvidos de bachillerato en espacios de estudio, ligado al registro de responsabilidades. \evid{S15}{5}
@@ -221,8 +284,13 @@
 \item Propone un mini tablero visual escolar con pendientes y retiro de actividades cumplidas, útil sin celular. \evid{S15}{7}
 \item Propone chatbot de WhatsApp con recordatorios y enlaces a una web de tareas, materiales y fechas. \evid{S15}{7}
 \end{compactitems} \\
-\midrule
-11 & Santiago Ospina Ramírez; Juan José Méndez Ramos. & \begin{compactitems}
+\end{groupsummary}
+\clearpage
+\begin{groupsummary}
+11 & \begin{compactitems}
+\item Santiago Ospina Ramírez
+\item Juan José Méndez Ramos
+\end{compactitems} & \begin{compactitems}
 \item \textbf{C5:} Organizaron cuatro hallazgos sobre hábitos, coste y oferta con diez observados en una fecha, sin generalización, acciones individuales ni citas textuales. \evid{S16}{1--5, 10--11}
 \item \textbf{C6:} Compararon oferta en cafetería, barreras económicas y alimentación diaria, y priorizaron provisionalmente la primera con datos faltantes. \evid{S16}{5--11}
 \item \textbf{C7:} Delimitaron el desafío al acceso a comida saludable y asequible en cafetería durante los descansos. \evid{S17}{1--3}
@@ -233,8 +301,13 @@
 \item Proponen ampliar el menú saludable, variado y asequible; aceptación no demostrada. \evid{S18}{3, 5--6}
 \item Proponen alternativas menos procesadas y campañas sobre agua y verduras; preferencia específica no documentada. \evid{S18}{3, 5--6}
 \end{compactitems} \\
-\midrule
-12 & Pedro Martín Ramírez Barrero; Santiago Tapias López. & \begin{compactitems}
+\end{groupsummary}
+\cuttinggap
+\begin{groupsummary}
+12 & \begin{compactitems}
+\item Pedro Martín Ramírez Barrero
+\item Santiago Tapias López
+\end{compactitems} & \begin{compactitems}
 \item \textbf{C5:} Organizaron perfiles, testimonios y una comparación de olores, limpieza, daños y necesidades de usuarios de los baños. \evid{S19}{1--3}
 \item \textbf{C6:} Identificaron la necesidad de baños limpios y en buen estado; no se identificó matriz comparativa de oportunidades en el PDF. \evid{S19}{1--4}
 \item \textbf{C7:} Formularon y revisaron el desafío para mejorar limpieza, olores y mantenimiento de baños usados por décimo durante la jornada. \evid{S19}{3}
@@ -245,8 +318,12 @@
 \item Plantean mejorar control y horarios de aseo como posibilidad, sin implementación documentada. \evid{S19}{2--3}
 \item Plantean reparar sanitarios, lavamanos y otras instalaciones deterioradas. \evid{S19}{2}
 \end{compactitems} \\
-\midrule
-13 & Tomás Mauricio Rincón Castañeda. & \begin{compactitems}
+\end{groupsummary}
+\clearpage
+\begin{groupsummary}
+13 & \begin{compactitems}
+\item Tomás Mauricio Rincón Castañeda
+\end{compactitems} & \begin{compactitems}
 \item \textbf{C5:} Integró el recorrido de compra y reclamo con tres hallazgos sobre colados, saturación del personal y pérdida del descanso. \evid{S20}{1--3}
 \item \textbf{C6:} Comparó tres oportunidades e integró orden y prevención de colados con delimitación y acompañamiento, sujetos a permisos y disponibilidad. \evid{S20}{3--5}
 \item \textbf{C7:} Retiró barandas y vigilancia de la pregunta y delimitó el desafío a evitar colados y ordenar compra y reclamo en ambos descansos. \evid{S20}{5}
@@ -257,5 +334,5 @@
 \item Propone canal único demarcado con cintas móviles y monitor en la entrada. \evid{S20}{8}
 \item Propone fila rápida para preempacados con efectivo exacto o ficha física, separada de almuerzos. \evid{S20}{8--10}
 \end{compactitems} \\
-\end{longtable}
+\end{groupsummary}
 \end{document}
