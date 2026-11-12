@@ -1,9 +1,9 @@
 \documentclass{article}
-\usepackage[paperwidth=500mm,paperheight=700mm,margin=12mm]{geometry}
+\usepackage[a4paper,portrait,margin=10.5mm,bottom=12mm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{amsmath,amssymb}
-% Scale large mathematical operators with the poster's math sizes.
+% Use scalable mathematical operators at the reference text sizes.
 \input{omxlmex.fd}
 \DeclareFontShape{OMX}{lmex}{m}{n}{<->lmex10}{}
 \usepackage{xcolor,colortbl}
@@ -15,37 +15,38 @@
 \color{navy}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0pt}
-\setlength{\arrayrulewidth}{0.6pt}
+\setlength{\arrayrulewidth}{0.3pt}
 % Central typography controls, explicitly applied in table cells.
-\newcommand{\TitleFont}{\fontsize{70}{76}\selectfont\bfseries}
-\newcommand{\KickerFont}{\fontsize{28}{34}\selectfont\bfseries}
-\newcommand{\HeadingFont}{\fontsize{36}{42}\selectfont\bfseries}
-\newcommand{\DefinitionFont}{\fontsize{26}{28}\selectfont}
-\newcommand{\SymbolFont}{\fontsize{28}{32}\selectfont}
-\newcommand{\ExampleFont}{\fontsize{25}{27}\selectfont}
-\newcommand{\TableHeadFont}{\fontsize{24}{29}\selectfont\bfseries}
-\newcommand{\FooterFont}{\fontsize{24}{29}\selectfont}
-\DeclareMathSizes{28}{28}{20}{17}
-\DeclareMathSizes{26}{26}{19}{16}
-\DeclareMathSizes{25}{25}{18}{15}
+\newcommand{\TitleFont}{\fontsize{25}{27}\selectfont\bfseries}
+\newcommand{\KickerFont}{\fontsize{10}{12}\selectfont\bfseries}
+\newcommand{\HeadingFont}{\fontsize{12.5}{15}\selectfont\bfseries}
+\newcommand{\DefinitionFont}{\fontsize{9}{10.3}\selectfont}
+\newcommand{\SymbolFont}{\fontsize{10}{11}\selectfont}
+\newcommand{\ExampleFont}{\fontsize{8.8}{10.2}\selectfont}
+\newcommand{\TableHeadFont}{\fontsize{8.5}{10}\selectfont\bfseries}
+\newcommand{\FooterFont}{\fontsize{8.5}{10}\selectfont}
+\DeclareMathSizes{10}{10}{7}{5}
+\DeclareMathSizes{9}{9}{6.5}{5}
+\DeclareMathSizes{8.8}{8.8}{6.3}{5}
 
 \newlength{\SymbolWidth}
 \newlength{\MeaningWidth}
 \newlength{\RowPadding}
-\setlength{\RowPadding}{0.5mm}
-% Keep the 25 pt example type; compact struts give a 27 pt baseline grid.
+\setlength{\RowPadding}{0.25mm}
+% Compact example lines retain readable type at actual A4 print size.
 % Explicit line breaks keep related examples together inside a cell.
-\newcommand{\exlines}[1]{{\renewcommand{\arraystretch}{0.84}%
+\newcommand{\ExampleLineStretch}{1.12}
+\newcommand{\exlines}[1]{{\renewcommand{\arraystretch}{\ExampleLineStretch}%
   \begin{tabular}[t]{@{}l@{}}#1\end{tabular}}}
 \newcommand{\symrow}[3]{%
-  {\SymbolFont\rule[-2mm]{0pt}{9mm}\ensuremath{\displaystyle #1}}&%
+  {\SymbolFont\rule[-0.8mm]{0pt}{3.5mm}\ensuremath{\displaystyle #1}}&%
   {\DefinitionFont #2}&{\ExampleFont #3}\\[\RowPadding]\hline
 }
 % Shared struts align both baselines across cells with different font sizes.
 \newcommand{\pairlines}[3]{%
   \begin{tabular}[t]{@{}#1@{}}%
-  \rule[-10pt]{0pt}{34pt}#2\\%
-  \rule[-10pt]{0pt}{34pt}#3%
+  \rule[-3pt]{0pt}{11pt}#2\\%
+  \rule[-3pt]{0pt}{11pt}#3%
   \end{tabular}%
 }
 % Arguments: symbols, meanings, then examples (positive before negation).
@@ -54,50 +55,70 @@
   {\DefinitionFont\pairlines{l}{#3}{#4}}&%
   {\ExampleFont\pairlines{l}{#5}{#6}}\\[\RowPadding]\hline
 }
-\newcommand{\sectionbox}[2]{%
-  {\HeadingFont\color{coral}#1\par}%
-  \vspace{2mm}{\color{navy}\hrule height 1.2pt}\vspace{2mm}%
+% Compact contexts use the existing palette and the table's example type.
+\newcommand{\examplecontexts}[1]{%
   \begingroup
-  \setlength{\SymbolWidth}{.21\linewidth}%
-  \setlength{\MeaningWidth}{.35\linewidth}%
-  \setlength{\tabcolsep}{2mm}%
+  \setlength{\fboxsep}{0.5mm}%
+  \setlength{\fboxrule}{0.35pt}%
+  \noindent\fcolorbox{coral}{coral!10}{%
+    \begin{minipage}{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}
+      \ExampleFont\color{navy}%
+      \textbf{Example contexts}\par
+      #1\par
+    \end{minipage}}\par
+  \endgroup
+  \vspace{0.7mm}%
+}
+% Optional contexts appear after the heading rule and before the table.
+\newcommand{\sectionbox}[3][]{%
+  {\HeadingFont\color{coral}#2\par}%
+  \vspace{0.7mm}{\color{navy}\hrule height 0.5pt}\vspace{0.7mm}%
+  \if\relax\detokenize{#1}\relax\else\examplecontexts{#1}\fi
+  \begingroup
+  \if\relax\detokenize{#1}\relax\else
+    \setlength{\RowPadding}{0pt}%
+    \renewcommand{\ExampleLineStretch}{1}%
+  \fi
+  \setlength{\SymbolWidth}{.24\linewidth}%
+  \setlength{\MeaningWidth}{.32\linewidth}%
+  \setlength{\tabcolsep}{0.7mm}%
   \renewcommand{\arraystretch}{1}%
   \arrayrulecolor{rulecolor}%
   \begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash\SymbolFont}p{\SymbolWidth}>{\raggedright\arraybackslash\DefinitionFont}p{\MeaningWidth}>{\raggedright\arraybackslash\ExampleFont}X@{}}
-  {\TableHeadFont Symbol}&{\TableHeadFont Meaning}&{\TableHeadFont Examples}\\[2mm]\hline
-  #2
+  {\TableHeadFont Symbol}&{\TableHeadFont Meaning}&{\TableHeadFont Examples}\\[0.7mm]\hline
+  #3
   \end{tabularx}%
-  \endgroup\par\vspace{3mm}%
+  \endgroup\par\vspace{1.3mm}%
 }
-% Dedicated two-column reference; the three-column helpers stay unchanged.
+% Dedicated two-column reference for letter names.
 \newcommand{\letterrow}[2]{%
-  {\SymbolFont\rule[-2mm]{0pt}{9mm}\ensuremath{#1}}&%
+  {\SymbolFont\rule[-0.8mm]{0pt}{3.5mm}\ensuremath{#1}}&%
   {\DefinitionFont #2}\\[\RowPadding]\hline
 }
 \newcommand{\letterreference}[1]{%
   {\HeadingFont\color{coral}Letters and Greek symbols\par}%
-  \vspace{2mm}{\color{navy}\hrule height 1.2pt}\vspace{2mm}%
+  \vspace{0.7mm}{\color{navy}\hrule height 0.5pt}\vspace{0.7mm}%
   \begingroup
-  \setlength{\tabcolsep}{2mm}%
+  \setlength{\tabcolsep}{0.7mm}%
   \renewcommand{\arraystretch}{1}%
   \arrayrulecolor{rulecolor}%
   \begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash\SymbolFont}p{.29\linewidth}>{\raggedright\arraybackslash\DefinitionFont}X@{}}
-  {\TableHeadFont Symbol}&{\TableHeadFont Name / description}\\[2mm]\hline
+  {\TableHeadFont Symbol}&{\TableHeadFont Name / description}\\[0.7mm]\hline
   #1
   \end{tabularx}%
-  \endgroup\par\vspace{3mm}%
+  \endgroup\par\vspace{1.3mm}%
 }
 \begin{document}
-% The wider left column accommodates long definitions; the right starts
-% beside the title so that both columns retain the original type sizes.
+% Relative column widths follow the A4 text block; the right starts beside
+% the title to balance the longer probability and variable references.
 \noindent
-\begin{minipage}[t]{244mm}
+\begin{minipage}[t]{.51\linewidth}
 {\KickerFont THE LANGUAGE OF\par}
 \vspace{1mm}
 {\TitleFont\color{coral}MATHEMATICS\par}
-\vspace{3mm}
-{\color{navy}\hrule height 2pt}
-\vspace{4mm}
+\vspace{1.3mm}
+{\color{navy}\hrule height 0.8pt}
+\vspace{1.8mm}
 \sectionbox{General notation}{
 \pairedrow{=}{\neq}{Equal}{Not equal}{$2+3=5;\quad 4-4=0$}{$2\neq3;\quad -1\neq1$}
 \symrow{\approx}{Approximately}{\exlines{$\pi\approx3.14$\\$\sqrt{2}\approx1.41$}}
@@ -117,32 +138,31 @@
 \symrow{\mathbb Q,\ \mathbb R}{Rational numbers; real numbers}{\exlines{$\frac12\in\mathbb Q;\quad -3\in\mathbb Q$\\$\sqrt2\in\mathbb R;\quad \frac14\in\mathbb R$}}
 \symrow{(a,b),\ [a,b]}{Open interval; closed interval}{\exlines{$1\notin(1,3);\ 0\in(-2,2)$\\$1\in[1,3];\ -2\in[-2,0]$}}
 }
-{\ExampleFont In the implications below, $x\in\mathbb R$.\par}
-\vspace{2mm}
 
 \sectionbox{Summation notation}{
-\symrow{\sum_{i=1}^{n}a_i}{Add $a_i$ for each integer $i$ from $1$ to $n$.}{\exlines{$\sum_{i=1}^{3}2i=2+4+6$\\$\sum_{i=1}^{2}(i+3)=4+5$}}
+\symrow{\sum_{i=1}^{n}a_i}{Add $a_i$ for each integer $i$ from $1$ to $n$.}{\exlines{$\sum_{i=1}^{3}2i=2+4+6$\\[1mm]$\sum_{i=1}^{2}(i+3)=4+5$}}
 }
 {\DefinitionFont
 In $\sum_{i=1}^{n}a_i$, $i$ is the \textbf{index}, $1$ is the
 \textbf{lower bound}, $n$ is the \textbf{upper bound}, and $a_i$ is
  the \textbf{expression being summed}.\par
-\vspace{3mm}
+\vspace{1.3mm}
 {\color{coral}\bfseries Worked examples}\par
-\vspace{2mm}
+\vspace{0.7mm}
 $\textstyle\sum_{i=1}^{4}i=1+2+3+4=10$\par
-\vspace{3mm}
+\vspace{1.3mm}
 $\textstyle\sum_{k=1}^{3}k^2=1+4+9=14$\par
 }
 \end{minipage}\hfill
-\begin{minipage}[t]{220mm}
+\begin{minipage}[t]{.465\linewidth}
 % I and II are alternative experiments, not simultaneous assumptions.
-{\ExampleFont
-Alternatives: fair die (I) or fair card draw (II).\par
-I: $A=\{1,3,5\}$, $B=\{1,2\}$.\par
-II: cards 1--4; $A=\{4\}$, $B=\{2,3,4\}$.\par}
-\vspace{3mm}
-\sectionbox{Probability and events}{
+\sectionbox[{
+	Alternatives: fair die (I) or fair card draw (II).\par
+	I: $A=\{1,3,5\}$, $B=\{1,2\}$.\par
+	II: cards 1--4; $A=\{4\}$, $B=\{2,3,4\}$.\par
+}]{Probability and events}{
+
+
 \symrow{\Omega}{Sample space: all possible outcomes}{\exlines{I: $\Omega=\{1,\ldots,6\}$\\II: $\Omega=\{1,2,3,4\}$}}
 \symrow{\omega}{An individual outcome}{\exlines{I: $\omega=3\in\Omega$\\II: $\omega=4\in\Omega$}}
 \symrow{A=\{1,3,5\}}{Event shown as a set of outcomes}{\exlines{I: $A=\{1,3,5\}$: odd\\II: $A=\{4\}$: card 4}}
@@ -153,10 +173,10 @@ II: cards 1--4; $A=\{4\}$, $B=\{2,3,4\}$.\par}
 \symrow{A\cap B}{Both events $A$ and $B$}{\exlines{I: $A\cap B=\{1\}$\\II: $A\cap B=\{4\}$}}
 \symrow{P(A\mid B)}{Probability of $A$ given $B$}{\exlines{I: $P(A\mid B)=\frac12$\\II: $P(A\mid B)=\frac13$}}
 }
-{\ExampleFont Functions: I: $f:\mathbb R\to\mathbb R$, $f(x)=x^2$.\par
-II: $f:[0,\infty)\to\mathbb R$, $f(x)=\sqrt{x}$.\par}
-\vspace{3mm}
-\sectionbox{Function notation}{
+\sectionbox[{
+Functions: I: $f:\mathbb R\to\mathbb R$, $f(x)=x^2$.\par
+II: $f:[0,\infty)\to\mathbb R$, $f(x)=\sqrt{x}$.\par
+}]{Function notation}{
 \symrow{f}{Name of a function}{\exlines{I: $f(x)=x^2$\\II: $f(x)=\sqrt{x}$}}
 \symrow{f(x)}{Value of $f$ at input $x$}{\exlines{I: $f(3)=3^2=9$\\II: $f(4)=\sqrt4=2$}}
 \symrow{f:A\to B}{Function from set $A$ to set $B$}{\exlines{I: $f:\mathbb R\to\mathbb R$\\II: $f:[0,\infty)\to\mathbb R$}}
@@ -174,33 +194,32 @@ II: $f:[0,\infty)\to\mathbb R$, $f(x)=\sqrt{x}$.\par}
 \letterrow{\mu,\ \sigma}{Mu; sigma}
 \letterrow{\omega,\ \Omega}{Omega; uppercase omega}
 }
+\end{minipage}
+\par\vspace{1.5mm}
 {\HeadingFont\color{coral}Variable Examples\par}
-\vspace{2mm}{\color{navy}\hrule height 1.2pt}\vspace{2mm}
+\vspace{0.7mm}{\color{navy}\hrule height 0.5pt}\vspace{0.7mm}
 {\DefinitionFont
 A variable is a symbol that can represent different values.
 Its allowed values and meaning depend on the context.\par
-\vspace{3mm}
+\vspace{1.3mm}
 {\color{coral}\bfseries Possible values in separate cases}\par
 {\ExampleFont Each choice below is a separate case.\par}
-\vspace{2mm}
+\vspace{0.7mm}
 \textbf{Ordinary numbers:} $x$ can be $-2$, $0$, or $3.5$.\par
-\vspace{2mm}
+\vspace{0.7mm}
 \textbf{Integers:} $n$ can be $1,2,3,\ldots$ when counting objects.\par
-\vspace{2mm}
+\vspace{0.7mm}
 \textbf{Angles:} $\theta$ can be $30^\circ$, $60^\circ$, or $90^\circ$.\par
-\vspace{2mm}
+\vspace{0.7mm}
 \textbf{Sets:} $A$ can be $\{1,2\}$ or $\{0,3,5\}$.\par
-\vspace{2mm}
+\vspace{0.7mm}
 \textbf{Greek letters as numbers:} $\lambda$ can be $-1$, $0$, or $2$.\par
-\vspace{3mm}
+\vspace{1.3mm}
 Letters do not have permanently assigned types. Uppercase
 letters often represent sets, and Greek letters often represent
 angles or numbers, but the context determines their meaning.\par
 }
-\end{minipage}
+
 \vfill
 {\FooterFont Symbols acquire meaning from their mathematical context.\par}
 \end{document}
-
-
-
