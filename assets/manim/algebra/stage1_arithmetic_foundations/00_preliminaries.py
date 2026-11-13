@@ -4,18 +4,19 @@ From the repository root (or use absolute script paths from any directory):
     python -m manim -ql assets/manim/algebra/stage1_arithmetic_foundations/00_preliminaries.py ArithmeticPreliminaries
     python -m manim -qh --fps 60 assets/manim/algebra/stage1_arithmetic_foundations/00_preliminaries.py ArithmeticPreliminaries
 Standalone example (each topic module documents its own command):
-    python -m manim -ql assets/manim/algebra/stage1_arithmetic_foundations/01_adding_subtracting.py AddingSubtracting
+    python -m manim -ql assets/manim/algebra/stage1_arithmetic_foundations/02_adding_subtracting.py AddingSubtracting
 
-Output: San Bartolo/manim_media, resolved from common.py, independently of cwd.
+Final MP4 (repository-relative):
+    ../manim_media/videos/algebra/stage1_arithmetic_foundations/00_preliminaries.mp4
+common.py resolves this destination independently of cwd, for either quality.
 Runtime plan: BEAT_SECONDS and PLANNED_SECONDS in common.py.
 RealNumberProperties contributes 42 seconds, identically standalone and combined.
-SignedMultiplicationAbsoluteValue contributes 40 seconds, standalone and combined.
+SignedMultiplication contributes 70 seconds, standalone and combined.
 OrderOfOperations contributes 26 seconds, identically standalone and combined.
 FractionsDecimals contributes 40 seconds, identically standalone and combined.
 PowersRoots contributes 48 seconds, identically standalone and combined.
 RatiosPercentages contributes 32 seconds, identically standalone and combined.
 No audio or external assets are needed.
-Videos: San Bartolo/manim_media/videos/algebra/stage1.
 """
 
 from pathlib import Path
@@ -31,19 +32,21 @@ from manim import DOWN, UP, FadeIn, Indicate, VGroup
 from assets.manim.algebra.stage1_arithmetic_foundations.common import (
     ArithmeticScene, BLUE, MUTED, OPENING_SECONDS, CLOSING_SECONDS, PLANNED_SECONDS,
 )
-adding_subtracting = import_module("assets.manim.algebra.stage1_arithmetic_foundations.01_adding_subtracting").render_section
-signed_multiplication_absolute_value = import_module("assets.manim.algebra.stage1_arithmetic_foundations.02_signed_multiplication_absolute_value").render_section
-fractions_decimals = import_module("assets.manim.algebra.stage1_arithmetic_foundations.04_fractions_decimals").render_section
-ratios_percentages = import_module("assets.manim.algebra.stage1_arithmetic_foundations.05_ratios_percentages").render_section
-order_of_operations = import_module("assets.manim.algebra.stage1_arithmetic_foundations.07_order_of_operations").render_section
-powers_roots = import_module("assets.manim.algebra.stage1_arithmetic_foundations.06_powers_roots").render_section
-real_number_properties = import_module("assets.manim.algebra.stage1_arithmetic_foundations.03_real_number_properties").render_section
+adding_subtracting = import_module("assets.manim.algebra.stage1_arithmetic_foundations.02_adding_subtracting").render_section
+signed_multiplication = import_module("assets.manim.algebra.stage1_arithmetic_foundations.03_signed_multiplication").render_section
+fractions_decimals = import_module("assets.manim.algebra.stage1_arithmetic_foundations.06_fractions_decimals").render_section
+ratios_percentages = import_module("assets.manim.algebra.stage1_arithmetic_foundations.07_ratios_percentages").render_section
+order_of_operations = import_module("assets.manim.algebra.stage1_arithmetic_foundations.09_order_of_operations").render_section
+powers_roots = import_module("assets.manim.algebra.stage1_arithmetic_foundations.08_powers_roots").render_section
+real_number_properties = import_module("assets.manim.algebra.stage1_arithmetic_foundations.05_real_number_properties").render_section
 
 
 class ArithmeticPreliminaries(ArithmeticScene):
     """Complete video: shared topic sections framed by the original opening/closing."""
 
     video_number = 0
+    source_file = __file__
+    output_identity = "algebra/stage1_arithmetic_foundations/00_preliminaries.mp4"
 
     def construct(self):
         # 0–7: opening, with a wide safe margin for the full Spanish title.
@@ -56,7 +59,7 @@ class ArithmeticPreliminaries(ArithmeticScene):
         self.finish_beat(start, OPENING_SECONDS)
 
         adding_subtracting(self)
-        signed_multiplication_absolute_value(self)
+        signed_multiplication(self)
         real_number_properties(self)
         fractions_decimals(self)
         ratios_percentages(self)

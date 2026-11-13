@@ -1,17 +1,22 @@
 """Shared appearance, layout, animation and explicit clocks (Manim 0.17.3).
 
 Render a topic through its module, or the complete video through 00_preliminaries.py.
-Videos: San Bartolo/manim_media/videos/algebra/stage1.
-The scene numbers are declared in each video module; paths are file-relative.
+Each renderable scene declares a literal output_identity relative to
+../manim_media/videos/. That identity is immutable across source renames.
+Partial movies live in partial_movie_files/<output identity stem>/<quality>/
+<scene name>/ beside the final video; other caches remain in ../manim_media/.
+Paths do not depend on source filenames or the working directory.
 """
 
-from pathlib import Path
+from assets.manim.output_paths import (
+    MEDIA_ROOT, output_destination, partial_movie_directory,
+)
 
 from manim import (
     UP, WHITE, Create, FadeIn, FadeOut, Line, MathTex, Scene, Text, VGroup, config,
 )
 
-config.media_dir = str(Path(__file__).resolve().parents[5] / "manim_media")
+config.media_dir = str(MEDIA_ROOT)
 config.background_color = "#0B1426"
 config.frame_width = 128 / 9
 config.frame_height = 8
@@ -23,8 +28,8 @@ GREEN = "#62D69A"
 
 # Each section owns its incoming transition, including signed multiplication.
 OPENING_SECONDS = 7
-ADDING_SUBTRACTING_SECONDS = 7.65
-SIGNED_MULTIPLICATION_SECONDS = 40
+ADDING_SUBTRACTING_SECONDS = 74
+SIGNED_MULTIPLICATION_SECONDS = 70
 FRACTIONS_SECONDS = 40
 RATIOS_SECONDS = 32
 ORDER_SECONDS = 26
@@ -43,15 +48,13 @@ class ArithmeticScene(Scene):
     stage_number = 1
 
     def __init__(self, *args, **kwargs):
-        config.video_dir = "{media_dir}/videos/algebra/stage1"
-        # Match the source filename so the videos sort in the lesson order.
-        source_name = {
-            0: "preliminaries", 1: "adding_subtracting",
-            2: "signed_multiplication_absolute_value", 3: "real_number_properties",
-            4: "fractions_decimals", 5: "ratios_percentages",
-            6: "powers_roots", 7: "order_of_operations",
-        }[self.video_number]
-        config.output_file = f"{self.video_number:02d}_{source_name}"
+        # Configure at scene initialization, not topic import: the combined
+        # lesson imports standalone sections but owns its own output file.
+        identity = getattr(self, "output_identity", None)
+        destination = output_destination(identity)
+        config.video_dir = str(destination.parent)
+        config.output_file = destination.stem
+        config.partial_movie_dir = str(partial_movie_directory(identity))
         super().__init__(*args, **kwargs)
 
     def setup(self):
@@ -61,7 +64,7 @@ class ArithmeticScene(Scene):
 
     def check_duration(self, expected):
         if abs(self.lesson_seconds - expected) > 1e-6:
-            raise ValueError(f"Duración inesperada: {self.lesson_seconds} != {expected}")
+            raise ValueError(f"DuraciÃ³n inesperada: {self.lesson_seconds} != {expected}")
 
     def words(self, message, size=30, color=WHITE):
         result = Text(message, font="Segoe UI", font_size=size, color=color,
