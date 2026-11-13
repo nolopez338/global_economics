@@ -1,5 +1,5 @@
 \documentclass{article}
-\usepackage[a4paper,portrait,margin=10.5mm,bottom=12mm]{geometry}
+\usepackage[a4paper,portrait,hmargin=10.5mm,top=8mm,bottom=8mm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
 \usepackage{amsmath,amssymb}
@@ -32,28 +32,64 @@
 \newlength{\SymbolWidth}
 \newlength{\MeaningWidth}
 \newlength{\RowPadding}
-\setlength{\RowPadding}{0.25mm}
-% Compact example lines retain readable type at actual A4 print size.
-% Explicit line breaks keep related examples together inside a cell.
-\newcommand{\ExampleLineStretch}{1.12}
-\newcommand{\exlines}[1]{{\renewcommand{\arraystretch}{\ExampleLineStretch}%
-  \begin{tabular}[t]{@{}l@{}}#1\end{tabular}}}
-\newcommand{\symrow}[3]{%
-  {\SymbolFont\rule[-0.8mm]{0pt}{3.5mm}\ensuremath{\displaystyle #1}}&%
-  {\DefinitionFont #2}&{\ExampleFont #3}\\[\RowPadding]\hline
+\setlength{\RowPadding}{0.7mm}
+% Measure the complete cell (including wrapped text and tall mathematics),
+% then reserve the same clearance above and below its actual bounds.
+\newsavebox{\CellContent}
+\newcommand{\paddedcell}[1]{%
+  \sbox{\CellContent}{\begin{minipage}[t]{\linewidth}\raggedright #1\end{minipage}}%
+  \raisebox{0pt}[\dimexpr\ht\CellContent+\RowPadding\relax]%
+    [\dimexpr\dp\CellContent+\RowPadding\relax]{\usebox{\CellContent}}%
 }
-% Shared struts align both baselines across cells with different font sizes.
+% Center only complete symbol rows, using the actual bounds of tall mathematics.
+% Headers and the letter reference retain their original padded-cell layout.
+\newcommand{\centeredcell}[1]{%
+  \sbox{\CellContent}{\begin{minipage}[t]{\linewidth}\raggedright #1\end{minipage}}%
+  \raisebox{\dimexpr(\dp\CellContent-\ht\CellContent)/2\relax}%
+    [\dimexpr(\ht\CellContent+\dp\CellContent)/2+\RowPadding\relax]%
+    [\dimexpr(\ht\CellContent+\dp\CellContent)/2+\RowPadding\relax]%
+    {\usebox{\CellContent}}%
+}
+% Text-style arrays align relations without enlarging fractions or operators.
+% Each r/E pair holds a left-hand side and its relation/right-hand side.
+% E supplies an empty math atom to retain normal spacing before a relation.
+\newcommand{\ExampleLineStretch}{1.12}
+\newcommand{\exmath}[2][r@{}E]{{\renewcommand{\arraystretch}{\ExampleLineStretch}%
+  \ifcsname NC@find@E\endcsname\else\newcolumntype{E}{>{{}}l}\fi%
+  \ensuremath{\begin{array}[t]{@{}#1@{}}#2\end{array}}}}
+\newcommand{\symrow}[3]{%
+  \centeredcell{\centering\SymbolFont\ensuremath{\displaystyle #1}}&%
+  \centeredcell{\DefinitionFont #2}&\centeredcell{\ExampleFont #3}\\\hline
+}
+% Measure each example line so paired symbols and meanings share its baselines,
+% including fractions and wrapped meanings. Spacing settings stay local.
+\newsavebox{\PairFirst}
+\newsavebox{\PairSecond}
+\newcommand{\pairstrut}[1]{\rule[-\dp#1]{0pt}{\dimexpr\ht#1+\dp#1\relax}}
 \newcommand{\pairlines}[3]{%
   \begin{tabular}[t]{@{}#1@{}}%
-  \rule[-3pt]{0pt}{11pt}#2\\%
-  \rule[-3pt]{0pt}{11pt}#3%
+  \pairstrut{\PairFirst}#2\\%
+  \pairstrut{\PairSecond}#3%
   \end{tabular}%
 }
-% Arguments: symbols, meanings, then examples (positive before negation).
+% Paired symbols, meanings, and examples; wide blocks can supply their columns.
 \newcommand{\pairedrow}[6]{%
-  {\SymbolFont\pairlines{c}{\ensuremath{\displaystyle #1}}{\ensuremath{\displaystyle #2}}}&%
-  {\DefinitionFont\pairlines{l}{#3}{#4}}&%
-  {\ExampleFont\pairlines{l}{#5}{#6}}\\[\RowPadding]\hline
+  \pairedrowwithcols{r@{}E@{\quad}r@{}E}{#1}{#2}{#3}{#4}{#5}{#6}}
+\newcommand{\pairedrowwithcols}[7]{%
+  \noalign{\begingroup
+  \renewcommand{\ExampleLineStretch}{1}%
+  \global\setbox\PairFirst=\hbox{\ExampleFont\exmath[#1]{#6}%
+    \DefinitionFont\parbox[t]{\MeaningWidth}{\raggedright #4}}%
+  \global\setbox\PairSecond=\hbox{\ExampleFont\exmath[#1]{#7}%
+    \DefinitionFont\parbox[t]{\MeaningWidth}{\raggedright #5}}%
+  \endgroup}%
+  \paddedcell{\centering\SymbolFont\pairlines{c}{\ensuremath{\displaystyle #2}}{\ensuremath{\displaystyle #3}}}&%
+  \paddedcell{\DefinitionFont\pairlines{l}%
+    {\parbox[t]{\linewidth}{\raggedright #4}}%
+    {\parbox[t]{\linewidth}{\raggedright #5}}}&%
+  \paddedcell{\ExampleFont\renewcommand{\ExampleLineStretch}{1}%
+    \exmath[#1]{%
+    \pairstrut{\PairFirst}#6\\\pairstrut{\PairSecond}#7}}\\\hline
 }
 % Compact contexts use the existing palette and the table's example type.
 \newcommand{\examplecontexts}[1]{%
@@ -72,11 +108,10 @@
 % Optional contexts appear after the heading rule and before the table.
 \newcommand{\sectionbox}[3][]{%
   {\HeadingFont\color{coral}#2\par}%
-  \vspace{0.7mm}{\color{navy}\hrule height 0.5pt}\vspace{0.7mm}%
+  \vspace{0.4mm}{\color{navy}\hrule height 0.5pt}\vspace{0.4mm}%
   \if\relax\detokenize{#1}\relax\else\examplecontexts{#1}\fi
   \begingroup
   \if\relax\detokenize{#1}\relax\else
-    \setlength{\RowPadding}{0pt}%
     \renewcommand{\ExampleLineStretch}{1}%
   \fi
   \setlength{\SymbolWidth}{.24\linewidth}%
@@ -85,62 +120,62 @@
   \renewcommand{\arraystretch}{1}%
   \arrayrulecolor{rulecolor}%
   \begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash\SymbolFont}p{\SymbolWidth}>{\raggedright\arraybackslash\DefinitionFont}p{\MeaningWidth}>{\raggedright\arraybackslash\ExampleFont}X@{}}
-  {\TableHeadFont Symbol}&{\TableHeadFont Meaning}&{\TableHeadFont Examples}\\[0.7mm]\hline
+  \paddedcell{\centering\TableHeadFont Symbol}&\paddedcell{\TableHeadFont Meaning}&\paddedcell{\TableHeadFont Examples}\\\hline
   #3
   \end{tabularx}%
-  \endgroup\par\vspace{1.3mm}%
+  \endgroup\par\vspace{0.8mm}%
 }
 % Dedicated two-column reference for letter names.
 \newcommand{\letterrow}[2]{%
-  {\SymbolFont\rule[-0.8mm]{0pt}{3.5mm}\ensuremath{#1}}&%
-  {\DefinitionFont #2}\\[\RowPadding]\hline
+  \paddedcell{\centering\SymbolFont\ensuremath{#1}}&%
+  \paddedcell{\DefinitionFont #2}\\\hline
 }
 \newcommand{\letterreference}[1]{%
   {\HeadingFont\color{coral}Letters and Greek symbols\par}%
-  \vspace{0.7mm}{\color{navy}\hrule height 0.5pt}\vspace{0.7mm}%
+  \vspace{0.4mm}{\color{navy}\hrule height 0.5pt}\vspace{0.4mm}%
   \begingroup
   \setlength{\tabcolsep}{0.7mm}%
   \renewcommand{\arraystretch}{1}%
   \arrayrulecolor{rulecolor}%
   \begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash\SymbolFont}p{.29\linewidth}>{\raggedright\arraybackslash\DefinitionFont}X@{}}
-  {\TableHeadFont Symbol}&{\TableHeadFont Name / description}\\[0.7mm]\hline
+  \paddedcell{\centering\TableHeadFont Symbol}&\paddedcell{\TableHeadFont Name / description}\\\hline
   #1
   \end{tabularx}%
-  \endgroup\par\vspace{1.3mm}%
+  \endgroup\par\vspace{0.8mm}%
 }
 \begin{document}
 % Relative column widths follow the A4 text block; the right starts beside
 % the title to balance the longer probability and variable references.
 \noindent
 \begin{minipage}[t]{.51\linewidth}
-{\KickerFont THE LANGUAGE OF\par}
-\vspace{1mm}
 {\TitleFont\color{coral}MATHEMATICS\par}
 \vspace{1.3mm}
 {\color{navy}\hrule height 0.8pt}
 \vspace{1.8mm}
 \sectionbox{General notation}{
-\pairedrow{=}{\neq}{Equal}{Not equal}{$2+3=5;\quad 4-4=0$}{$2\neq3;\quad -1\neq1$}
-\symrow{\approx}{Approximately}{\exlines{$\pi\approx3.14$\\$\sqrt{2}\approx1.41$}}
-\symrow{<,\ >}{Less than; greater than}{\exlines{$2<3;\quad -1<0$\\$5>4;\quad 0>-2$}}
-\symrow{\leq,\ \geq}{Less than or equal to; greater than or equal to}{\exlines{$2\leq2;\quad -1\leq3$\\$5\geq4;\quad 0\geq0$}}
-\symrow{\pm}{Plus or minus}{\exlines{$3\pm1=4\text{ or }2$\\$-2\pm3=1\text{ or }-5$}}
+\pairedrow{=}{\neq}{Equal}{Not equal}{2+3&=5;&4-4&=0}{2&\neq3;&-1&\neq1}
+\symrow{\approx}{Approximately}{\exmath{\pi&\approx3.14\\\sqrt{2}&\approx1.41}}
+\pairedrow{<}{>}{Less than}{Greater than}{2&<3;&-1&<0}{5&>4;&0&>-2}
+\pairedrow{\leq}{\geq}{Less than or equal}{Greater than or equal}{2&\leq2;&-1&\leq3}{5&\geq4;&0&\geq0}
+\symrow{\pm}{Plus or minus}{\exmath{3\pm1&=4\text{ or }2\\-2\pm3&=1\text{ or }-5}}
 \symrow{|a|}{Absolute value}{$|-5|=5;\quad |3|=3$}
 \symrow{\sqrt{a}}{Square root}{$\sqrt{9}=3;\quad\sqrt{\frac14}=\frac12$}
 }
 \sectionbox{Sets and number systems}{
 \symrow{\{a,b,c\}}{Set with three elements}{$\{2,4,6\};\quad\{-1,0,5\}$}
-\symrow{\varnothing}{Empty set}{\exlines{$\{1\}\cap\{2\}=\varnothing$\\$\{x\in\mathbb R:x^2=-1\}=\varnothing$}}
-\pairedrow{\in}{\notin}{Is element of}{Is not element of}{$2\in\{1,2\};\quad -1\in\mathbb Z$}{$3\notin\{1,2\};\quad \frac12\notin\mathbb Z$}
-\symrow{\subseteq}{Is a subset of}{\exlines{$\{1\}\subseteq\{1,2\}$\\$\mathbb N\subseteq\mathbb Z$}}
-\symrow{\cup,\ \cap}{Union; intersection}{\exlines{$\{1\}\cup\{2\}=\{1,2\}$\\$\varnothing\cup\{0\}=\{0\}$\\$\{1,2\}\cap\{2\}=\{2\}$\\$\{-1\}\cap\{4\}=\varnothing$}}
-\symrow{\mathbb N,\ \mathbb Z}{Natural numbers; integers}{\exlines{$3\in\mathbb N;\quad 8\in\mathbb N$\\$-2\in\mathbb Z;\quad 0\in\mathbb Z$}}
-\symrow{\mathbb Q,\ \mathbb R}{Rational numbers; real numbers}{\exlines{$\frac12\in\mathbb Q;\quad -3\in\mathbb Q$\\$\sqrt2\in\mathbb R;\quad \frac14\in\mathbb R$}}
-\symrow{(a,b),\ [a,b]}{Open interval; closed interval}{\exlines{$1\notin(1,3);\ 0\in(-2,2)$\\$1\in[1,3];\ -2\in[-2,0]$}}
+\symrow{\varnothing}{Empty set}{\exmath{\{1\}\cap\{2\}&=\varnothing\\\{x\in\mathbb R:x^2=-1\}&=\varnothing}}
+\pairedrow{\in}{\notin}{Is element of}{Is not element of}{2&\in\{1,2\};&-1&\in\mathbb Z}{3&\notin\{1,2\};&\frac12&\notin\mathbb Z}
+\symrow{\subseteq}{Is a subset of}{\exmath{\{1\}&\subseteq\{1,2\}\\\mathbb N&\subseteq\mathbb Z}}
+\pairedrowwithcols{l}{\cup}{\cap}{Union}{Intersection}
+  {\exmath{\{1\}\cup\{2\}&=\{1,2\}\\\varnothing\cup\{0\}&=\{0\}}}
+  {\exmath{\{1,2\}\cap\{2\}&=\{2\}\\\{-1\}\cap\{4\}&=\varnothing}}
+\pairedrow{\mathbb N}{\mathbb Z}{Natural numbers}{Integers}{3&\in\mathbb N;&8&\in\mathbb N}{-2&\in\mathbb Z;&0&\in\mathbb Z}
+\pairedrow{\mathbb Q}{\mathbb R}{Rational numbers}{Real numbers}{\frac12&\in\mathbb Q;&-3&\in\mathbb Q}{\sqrt2&\in\mathbb R;&\frac14&\in\mathbb R}
+\pairedrow{(a,b)}{[a,b]}{Open interval}{Closed interval}{1&\notin(1,3);&0&\in(-2,2)}{1&\in[1,3];&-2&\in[-2,0]}
 }
 
 \sectionbox{Summation notation}{
-\symrow{\sum_{i=1}^{n}a_i}{Add $a_i$ for each integer $i$ from $1$ to $n$.}{\exlines{$\sum_{i=1}^{3}2i=2+4+6$\\[1mm]$\sum_{i=1}^{2}(i+3)=4+5$}}
+\symrow{\sum_{i=1}^{n}a_i}{Add $a_i$ for each integer $i$ from $1$ to $n$.}{\exmath{\sum_{i=1}^{3}2i&=2+4+6\\[1mm]\sum_{i=1}^{2}(i+3)&=4+5}}
 }
 {\DefinitionFont
 In $\sum_{i=1}^{n}a_i$, $i$ is the \textbf{index}, $1$ is the
@@ -158,31 +193,28 @@ $\textstyle\sum_{k=1}^{3}k^2=1+4+9=14$\par
 % I and II are alternative experiments, not simultaneous assumptions.
 \sectionbox[{
 \textbf{I}: fair die \qquad \textbf{II}: two independent fair coin tosses.\par
-$\mathrm{H}$ = heads; $\mathrm{T}$ = tails; letters give the first, then second toss.\par
-II: $A=\{\mathrm{HH}\}$: two heads;\par
-$B=\{\mathrm{HH},\mathrm{HT},\mathrm{TH}\}$: at least one head.\par
+\qquad \qquad \qquad \qquad $\mathrm{H}$ = heads \qquad $\mathrm{T}$ = tails\par
 }]{Probability and events}{
 
 
-\symrow{\Omega}{Sample space: all possible outcomes}{\exlines{I: $\Omega=\{1,\ldots,6\}$\\II: $\Omega=\{\mathrm{HH},\!\mathrm{HT},\!\mathrm{TH},\!\mathrm{TT}\}$}}
-\symrow{\omega}{An individual outcome}{\exlines{I: $\omega=3\in\Omega$\\II: $\omega=\mathrm{HT}\in\Omega$}}
-\symrow{A=\{1,3,5\}}{Event shown as a set of outcomes}{\exlines{I: $A=\{1,3,5\}$: odd\\II: $A=\{\mathrm{HH}\}$: two heads}}
-\symrow{A\subseteq\Omega}{An event is a subset of the sample space}{\exlines{I: $\{1,3,5\}\subseteq\Omega$\\II: $A\subseteq\Omega$}}
-\symrow{P(A)}{Probability of event $A$}{\exlines{I: $P(A)=\frac36=\frac12$\\II: $P(A)=\frac14$}}
-\symrow{A^c}{Complement of event $A$}{\exlines{I: $A^c=\{2,4,6\}$\\II: $A^c=\{\mathrm{HT},\mathrm{TH},\mathrm{TT}\}$}}
-\symrow{A\cup B}{Event $A$ or $B$ (or both)}{\exlines{I: $A\cup B=\{1,2,3,5\}$\\II: $A\cup B\!=\{\mathrm{HH},\!\mathrm{HT},\!\mathrm{TH}\}$}}
-\symrow{A\cap B}{Both events $A$ and $B$}{\exlines{I: $A\cap B=\{1\}$\\II: $A\cap B=\{\mathrm{HH}\}$}}
-\symrow{P(A\mid B)}{Probability of $A$ given $B$}{\exlines{I: $P(A\mid B)=\frac12$\\II: $P(A\mid B)=\frac13$}}
+\symrow{\Omega}{Sample space: all possible outcomes}{\exmath[r@{\:}r@{}E]{\text{I:}&\Omega&=\{1,2,3,4,5,6\}\\\text{II:}&\Omega&=\{\mathrm{HH},\!\mathrm{HT},\!\mathrm{TH},\!\mathrm{TT}\}}}
+\symrow{\omega}{An individual outcome}{\exmath[r@{\:}r@{}E@{}E]{\text{I:}&\omega&=3&{}\in\Omega\\\text{II:}&\omega&=\mathrm{HT}&{}\in\Omega}}
+\symrow{A=\{1,3,5\}}{Event shown as a set of outcomes}{\exmath[r@{\:}r@{}E]{\text{I:}&A&=\{1,3,5\}\text{: odd}\\\text{II:}&A&=\{\mathrm{HH}\}\text{: two heads}}}
+\symrow{A\subseteq\Omega}{An event is a subset of the sample space}{\exmath[r@{\:}r@{}E]{\text{I:}&\{1,3,5\}&\subseteq\Omega\\\text{II:}&A&\subseteq\Omega}}
+\symrow{P(A)}{Probability of event $A$}{\exmath[r@{\:}r@{}E@{}E]{\text{I:}&P(A)&=\frac36&{}=\frac12\\\text{II:}&P(A)&=\frac14&}}
+\symrow{A^c}{Complement of event $A$}{\exmath[r@{\:}r@{}E]{\text{I:}&A^c&=\{2,4,6\}\\\text{II:}&A^c&=\{\mathrm{HT},\mathrm{TH},\mathrm{TT}\}}}
+\symrow{A\cup B}{Event $A$ or $B$ (or both)}{\exmath[r@{\:}r@{}E]{\text{I:}&A\cup B&=\{1,2,3,5\}\\\text{II:}&A\cup B&=\{\mathrm{HH},\!\mathrm{HT},\!\mathrm{TH}\}}}
+\symrow{A\cap B}{Both events $A$ and $B$}{\exmath[r@{\:}r@{}E]{\text{I:}&A\cap B&=\{1\}\\\text{II:}&A\cap B&=\{\mathrm{HH}\}}}
 }
 \sectionbox[{
 \textbf{I}: $f:\mathbb R\to\mathbb R$, $f(x)=x^2$ \qquad 
-\textbf{II}: $f:[0,\infty)\to\mathbb R$, $f(x)=\sqrt{x}$\par
+\textbf{II}: $g:[0,\infty)\to\mathbb R$, $g(x)=\sqrt{x}$\par
 }]{Function notation}{
-\symrow{f}{Name of a function}{\exlines{I: $f(x)=x^2$\\II: $f(x)=\sqrt{x}$}}
-\symrow{f(x)}{Value of $f$ at input $x$}{\exlines{I: $f(3)=3^2=9$\\II: $f(4)=\sqrt4=2$}}
-\symrow{f:A\to B}{Function from set $A$ to set $B$}{\exlines{I: $f:\mathbb R\to\mathbb R$\\II: $f:[0,\infty)\to\mathbb R$}}
-\symrow{x\mapsto f(x)}{Input-to-output mapping}{\exlines{I: $x\mapsto x^2;\quad 3\mapsto9$\\II: $x\mapsto\sqrt{x};\quad 4\mapsto2$}}
-\symrow{\operatorname{dom}(f)}{Domain of a function}{\exlines{I: $\operatorname{dom}(f)=\mathbb R$\\II: $\operatorname{dom}(f)=[0,\infty)$}}
+\symrow{f}{Name of a function}{\exmath[r@{\:}r@{}E]{\text{I:}&f(x)&=x^2\\\text{II:}&g(x)&=\sqrt{x}}}
+\symrow{f(x)}{Value of $f$ at input $x$}{\exmath[r@{\:}r@{}E@{}E]{\text{I:}&f(3)&=3^2&{}=9\\\text{II:}&g(4)&=\sqrt4&{}=2}}
+\symrow{f:A\to B}{Function from set $A$ to set $B$}{\exmath[r@{\:}r@{}E@{}E]{\text{I:}&f&:\mathbb R&\to\mathbb R\\\text{II:}&g&:[0,\infty)&\to\mathbb R}}
+\symrow{x\overset{f}{\mapsto} f(x)}{Input-to-output mapping}{\exmath[r@{\:}r@{}E@{\quad}r@{}E]{\text{I:}&x&\overset{f}{\mapsto} x^2;&3&\overset{f}{\mapsto}9\\\text{II:}&x&\overset{g}{\mapsto}\sqrt{x};&4&\overset{g}{\mapsto}2}}
+\symrow{\operatorname{dom}(f)}{Domain of a function}{\exmath[r@{\:}r@{}E]{\text{I:}&\operatorname{dom}(f)&=\mathbb R\\\text{II:}&\operatorname{dom}(g)&=[0,\infty)}}
 }
 \letterreference{
 \letterrow{a,b,c,\ldots}{Common lowercase Latin letters}

@@ -1,0 +1,268 @@
+\documentclass{article}
+\usepackage[a4paper,portrait,hmargin=10.5mm,top=8mm,bottom=8mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+% Use scalable mathematical operators at the reference text sizes.
+\input{omxlmex.fd}
+\DeclareFontShape{OMX}{lmex}{m}{n}{<->lmex10}{}
+\usepackage{xcolor,colortbl}
+\usepackage{tabularx,array}
+\pagestyle{empty}
+\definecolor{navy}{HTML}{172C3C}
+\definecolor{coral}{HTML}{BF604D}
+\definecolor{rulecolor}{HTML}{A5AFB6}
+\color{navy}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\setlength{\arrayrulewidth}{0.3pt}
+% Central typography controls, explicitly applied in table cells.
+\newcommand{\TitleFont}{\fontsize{25}{27}\selectfont\bfseries}
+\newcommand{\KickerFont}{\fontsize{10}{12}\selectfont\bfseries}
+\newcommand{\HeadingFont}{\fontsize{12.5}{15}\selectfont\bfseries}
+\newcommand{\DefinitionFont}{\fontsize{9}{10.3}\selectfont}
+\newcommand{\SymbolFont}{\fontsize{10}{11}\selectfont}
+\newcommand{\ExampleFont}{\fontsize{8.8}{10.2}\selectfont}
+\newcommand{\TableHeadFont}{\fontsize{8.5}{10}\selectfont\bfseries}
+\newcommand{\FooterFont}{\fontsize{8.5}{10}\selectfont}
+\DeclareMathSizes{10}{10}{7}{5}
+\DeclareMathSizes{9}{9}{6.5}{5}
+\DeclareMathSizes{8.8}{8.8}{6.3}{5}
+
+\newlength{\SymbolWidth}
+\newlength{\MeaningWidth}
+\newlength{\RowPadding}
+\setlength{\RowPadding}{0.7mm}
+% Measure the complete cell (including wrapped text and tall mathematics),
+% then reserve the same clearance above and below its actual bounds.
+\newsavebox{\CellContent}
+\newcommand{\paddedcell}[1]{%
+  \sbox{\CellContent}{\begin{minipage}[t]{\linewidth}\raggedright #1\end{minipage}}%
+  \raisebox{0pt}[\dimexpr\ht\CellContent+\RowPadding\relax]%
+    [\dimexpr\dp\CellContent+\RowPadding\relax]{\usebox{\CellContent}}%
+}
+% Center only complete symbol rows, using the actual bounds of tall mathematics.
+% Headers and the letter reference retain their original padded-cell layout.
+\newcommand{\centeredcell}[1]{%
+  \sbox{\CellContent}{\begin{minipage}[t]{\linewidth}\raggedright #1\end{minipage}}%
+  \raisebox{\dimexpr(\dp\CellContent-\ht\CellContent)/2\relax}%
+    [\dimexpr(\ht\CellContent+\dp\CellContent)/2+\RowPadding\relax]%
+    [\dimexpr(\ht\CellContent+\dp\CellContent)/2+\RowPadding\relax]%
+    {\usebox{\CellContent}}%
+}
+% Text-style arrays align relations without enlarging fractions or operators.
+% Each r/E pair holds a left-hand side and its relation/right-hand side.
+% E supplies an empty math atom to retain normal spacing before a relation.
+\newcommand{\ExampleLineStretch}{1.12}
+\newcommand{\exmath}[2][r@{}E]{{\renewcommand{\arraystretch}{\ExampleLineStretch}%
+  \ifcsname NC@find@E\endcsname\else\newcolumntype{E}{>{{}}l}\fi%
+  \ensuremath{\begin{array}[t]{@{}#1@{}}#2\end{array}}}}
+\newcommand{\symrow}[3]{%
+  \centeredcell{\centering\SymbolFont\ensuremath{\displaystyle #1}}&%
+  \centeredcell{\DefinitionFont #2}&\centeredcell{\ExampleFont #3}\\\hline
+}
+% Measure each example line so paired symbols and meanings share its baselines,
+% including fractions and wrapped meanings. Spacing settings stay local.
+\newsavebox{\PairFirst}
+\newsavebox{\PairSecond}
+\newcommand{\pairstrut}[1]{\rule[-\dp#1]{0pt}{\dimexpr\ht#1+\dp#1\relax}}
+\newcommand{\pairlines}[3]{%
+  \begin{tabular}[t]{@{}#1@{}}%
+  \pairstrut{\PairFirst}#2\\%
+  \pairstrut{\PairSecond}#3%
+  \end{tabular}%
+}
+% Paired symbols, meanings, and examples; wide blocks can supply their columns.
+\newcommand{\pairedrow}[6]{%
+  \pairedrowwithcols{r@{}E@{\quad}r@{}E}{#1}{#2}{#3}{#4}{#5}{#6}}
+\newcommand{\pairedrowwithcols}[7]{%
+  \noalign{\begingroup
+  \renewcommand{\ExampleLineStretch}{1}%
+  \global\setbox\PairFirst=\hbox{\ExampleFont\exmath[#1]{#6}%
+    \DefinitionFont\parbox[t]{\MeaningWidth}{\raggedright #4}}%
+  \global\setbox\PairSecond=\hbox{\ExampleFont\exmath[#1]{#7}%
+    \DefinitionFont\parbox[t]{\MeaningWidth}{\raggedright #5}}%
+  \endgroup}%
+  \paddedcell{\centering\SymbolFont\pairlines{c}{\ensuremath{\displaystyle #2}}{\ensuremath{\displaystyle #3}}}&%
+  \paddedcell{\DefinitionFont\pairlines{l}%
+    {\parbox[t]{\linewidth}{\raggedright #4}}%
+    {\parbox[t]{\linewidth}{\raggedright #5}}}&%
+  \paddedcell{\ExampleFont\renewcommand{\ExampleLineStretch}{1}%
+    \exmath[#1]{%
+    \pairstrut{\PairFirst}#6\\\pairstrut{\PairSecond}#7}}\\\hline
+}
+% Compact contexts use the existing palette and the table's example type.
+\newcommand{\examplecontexts}[1]{%
+  \begingroup
+  \setlength{\fboxsep}{0.5mm}%
+  \setlength{\fboxrule}{0.35pt}%
+  \noindent\fcolorbox{coral}{coral!10}{%
+    \begin{minipage}{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}
+      \ExampleFont\color{navy}%
+      \textbf{Example contexts}\par
+      #1\par
+    \end{minipage}}\par
+  \endgroup
+  \vspace{0.7mm}%
+}
+% Optional contexts appear after the heading rule and before the table.
+\newcommand{\sectionbox}[3][]{%
+  {\HeadingFont\color{coral}#2\par}%
+  \vspace{0.4mm}{\color{navy}\hrule height 0.5pt}\vspace{0.4mm}%
+  \if\relax\detokenize{#1}\relax\else\examplecontexts{#1}\fi
+  \begingroup
+  \if\relax\detokenize{#1}\relax\else
+    \renewcommand{\ExampleLineStretch}{1}%
+  \fi
+  \setlength{\SymbolWidth}{.24\linewidth}%
+  \setlength{\MeaningWidth}{.32\linewidth}%
+  \setlength{\tabcolsep}{0.7mm}%
+  \renewcommand{\arraystretch}{1}%
+  \arrayrulecolor{rulecolor}%
+  \begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash\SymbolFont}p{\SymbolWidth}>{\raggedright\arraybackslash\DefinitionFont}p{\MeaningWidth}>{\raggedright\arraybackslash\ExampleFont}X@{}}
+  \paddedcell{\centering\TableHeadFont Symbol}&\paddedcell{\TableHeadFont Meaning}&\paddedcell{\TableHeadFont Examples}\\\hline
+  #3
+  \end{tabularx}%
+  \endgroup\par\vspace{0.8mm}%
+}
+% Dedicated two-column reference for letter names.
+\newcommand{\letterrow}[2]{%
+  \paddedcell{\centering\SymbolFont\ensuremath{#1}}&%
+  \paddedcell{\DefinitionFont #2}\\\hline
+}
+\newcommand{\letterreference}[1]{%
+  {\HeadingFont\color{coral}Letters and Greek symbols\par}%
+  \vspace{0.4mm}{\color{navy}\hrule height 0.5pt}\vspace{0.4mm}%
+  \begingroup
+  \setlength{\tabcolsep}{0.7mm}%
+  \renewcommand{\arraystretch}{1}%
+  \arrayrulecolor{rulecolor}%
+  \begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash\SymbolFont}p{.29\linewidth}>{\raggedright\arraybackslash\DefinitionFont}X@{}}
+  \paddedcell{\centering\TableHeadFont Symbol}&\paddedcell{\TableHeadFont Name / description}\\\hline
+  #1
+  \end{tabularx}%
+  \endgroup\par\vspace{0.8mm}%
+}
+
+\newcommand{\teachingheading}[1]{%
+  {\HeadingFont\color{coral}#1\par}%
+  \vspace{0.4mm}{\color{navy}\hrule height 0.5pt}\vspace{1.5mm}}
+\newcommand{\teachinglabel}[1]{\vspace{1.8mm}{\DefinitionFont\bfseries\color{coral}#1\par}\vspace{0.7mm}}
+\newcommand{\teachingmath}[1]{\par\vspace{1mm}{\ExampleFont\exmath{#1}\par}\vspace{1mm}}
+\begin{document}
+{\TitleFont\color{coral}MATHEMATICS\hfill\KickerFont POSTER 2\par}
+\vspace{1.3mm}{\color{navy}\hrule height 0.8pt}\vspace{1.8mm}
+{\KickerFont FUNCTIONS, VARIABLES, SEQUENCES AND SUMS\par}\vspace{3mm}
+
+\noindent\begin{minipage}[t]{.49\linewidth}
+\setlength{\RowPadding}{1.85mm}
+\sectionbox[{
+\textbf{I}: $f:\mathbb R\to\mathbb R$, $f(x)=x^2$ \qquad 
+\textbf{II}: $g:[0,\infty)\to\mathbb R$, $g(x)=\sqrt{x}$\par
+}]{Function notation}{
+\symrow{f}{Name of a function}{\exmath[r@{\:}r@{}E]{\text{I:}&f(x)&=x^2\\\text{II:}&g(x)&=\sqrt{x}}}
+\symrow{f(x)}{Value of $f$ at input $x$}{\exmath[r@{\:}r@{}E@{}E]{\text{I:}&f(3)&=3^2&{}=9\\\text{II:}&g(4)&=\sqrt4&{}=2}}
+\symrow{f:A\to B}{Function from set $A$ to set $B$}{\exmath[r@{\:}r@{}E@{}E]{\text{I:}&f&:\mathbb R&\to\mathbb R\\\text{II:}&g&:[0,\infty)&\to\mathbb R}}
+\symrow{x\overset{f}{\mapsto} f(x)}{Input-to-output mapping}{\exmath[r@{\:}r@{}E@{\quad}r@{}E]{\text{I:}&x&\overset{f}{\mapsto} x^2;&3&\overset{f}{\mapsto}9\\\text{II:}&x&\overset{g}{\mapsto}\sqrt{x};&4&\overset{g}{\mapsto}2}}
+\symrow{\operatorname{dom}(f)}{Domain of a function}{\exmath[r@{\:}r@{}E]{\text{I:}&\operatorname{dom}(f)&=\mathbb R\\\text{II:}&\operatorname{dom}(g)&=[0,\infty)}}
+}
+\vspace{2mm}\letterreference{
+\letterrow{a,b,c,\ldots}{Common lowercase Latin letters}
+\letterrow{A,B,C,\ldots}{Common uppercase Latin letters}
+\letterrow{x,y,z}{Other common Latin letters}
+\letterrow{\alpha,\ \beta,\ \gamma}{Alpha; beta; gamma}
+\letterrow{\delta,\ \Delta}{Delta; uppercase delta}
+\letterrow{\theta,\ \Theta}{Theta; uppercase theta}
+\letterrow{\lambda,\ \Lambda}{Lambda; uppercase lambda}
+\letterrow{\mu,\ \sigma}{Mu; sigma}
+\letterrow{\omega,\ \Omega}{Omega; uppercase omega}
+}
+\vspace{2mm}{\HeadingFont\color{coral}Variable Examples\par}
+\vspace{0.7mm}{\color{navy}\hrule height 0.5pt}\vspace{0.7mm}
+{\DefinitionFont
+A variable is a symbol that can represent different values.
+Its allowed values and meaning depend on the context.\par
+\vspace{1.3mm}
+{\color{coral}\bfseries Possible values in separate cases}\par
+{\ExampleFont Each choice below is a separate case.\par}
+\vspace{0.7mm}
+\textbf{Ordinary numbers:} $x$ can be $-2$, $0$, or $3.5$.\par
+\vspace{0.7mm}
+\textbf{Integers:} $n$ can be $1,2,3,\ldots$ when counting objects.\par
+\vspace{0.7mm}
+\textbf{Angles:} $\theta$ can be $30^\circ$, $60^\circ$, or $90^\circ$.\par
+\vspace{0.7mm}
+\textbf{Sets:} $A$ can be $\{1,2\}$ or $\{0,3,5\}$.\par
+\vspace{0.7mm}
+\textbf{Greek letters as numbers:} $\lambda$ can be $-1$, $0$, or $2$.\par
+\vspace{1.3mm}
+Letters do not have permanently assigned types. Uppercase
+letters often represent sets, and Greek letters often represent
+angles or numbers, but the context determines their meaning.\par
+}
+
+
+\end{minipage}\hfill
+\begin{minipage}[t]{.485\linewidth}
+\raggedright
+
+\teachingheading{Lists, sequences and subscripts}
+{\DefinitionFont
+A \textbf{sequence} is an ordered list of terms. A \textbf{series}
+is a sum of terms. Write sequences with parentheses and sets with braces.\par
+\teachinglabel{Terms have positions}
+The terms $a_1,a_2,a_3,\ldots,a_n$ occupy positions $1,2,3,\ldots,n$.
+The notation $a_i$ means \textbf{the term at position $i$}. The subscript
+$i$ is an \textbf{index}, not multiplication or an exponent.\par
+\teachingmath{a_1&=\text{first term}\\a_2&=\text{second term}\\a_n&=\text{term at position }n}
+\teachinglabel{One finite sequence, three forms}
+An explicit list, its indexed terms and an indexed family can describe the same sequence:\par
+\teachingmath{(2,4,6,8)&=(a_1,a_2,a_3,a_4)\\&=(a_i)_{i=1}^{4},\quad a_i=2i.}
+In general, $(a_i)_{i=1}^{n}=(a_1,a_2,\ldots,a_n)$.\par
+\teachinglabel{A rule generates the terms}
+For $a_i=2i$, with $i=1,2,3,4$:\par
+{\ExampleFont\exmath[r@{}E@{\qquad}r@{}E]{
+a_1&=2(1)=2;&a_2&=2(2)=4;\\
+a_3&=2(3)=6;&a_4&=2(4)=8.}\par}
+The resulting sequence is $(2,4,6,8)$.\par
+\teachinglabel{Order and repetitions matter}
+$(2,4)\ne(4,2)$ and $(2,2,4)\ne(2,4)$.\par
+For sets, order and repetition do not matter:\par
+\teachingmath{\{2,4\}&=\{4,2\}=\{2,2,4\}.}
+\teachinglabel{From a sequence to its sum}
+The sum of the terms is $a_1+a_2+\cdots+a_n$.
+Summation notation writes this more compactly.\par
+}
+\vspace{4mm}
+\teachingheading{Summation notation}
+{\DefinitionFont
+\textbf{Read the parts}\par\vspace{1mm}
+\begingroup
+\setlength{\tabcolsep}{1mm}\arrayrulecolor{rulecolor}
+\begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash}m{.25\linewidth}X@{}}
+\centeredcell{\centering\SymbolFont $\displaystyle\sum_{i=1}^{n}a_i$}&
+\centeredcell{\DefinitionFont $\sum$: summation symbol\\
+$i$: index; $1$: lower bound\\
+$n$: upper bound\\
+$a_i$: expression being summed}\\\hline
+\end{tabularx}\endgroup\par\vspace{1.5mm}
+The index runs through consecutive integers from the lower bound to the upper bound, \textbf{inclusive}.\par
+\teachingmath{\sum_{i=1}^{n}a_i&=a_1+a_2+\cdots+a_n.}
+\teachinglabel{Sum the sequence above: $a_i=2i$}
+\teachingmath{\sum_{i=1}^{4}a_i&=\sum_{i=1}^{4}2i\\[1mm]&=2+4+6+8=20.}
+\teachinglabel{Other summands and bounds}
+{\ExampleFont\exmath[r@{\quad}r@{}E]{
+\text{Constant:}&\sum_{i=2}^{4}3&=3+3+3=9.\\[1.5mm]
+\text{Index expression:}&\sum_{i=1}^{2}(i+3)&=4+5=9.\\[1.5mm]
+\text{Squares:}&\sum_{k=1}^{3}k^2&=1+4+9=14.
+}\par}
+\teachinglabel{The index name can change}
+\teachingmath{\sum_{i=1}^{4}i&=\sum_{k=1}^{4}k=1+2+3+4=10.}
+Use the new index name consistently in the bounds and summand.\par
+}
+
+\end{minipage}\par
+\vfill
+{\color{navy}\hrule height 0.5pt}\vspace{1.5mm}
+{\FooterFont Symbols acquire meaning from their mathematical context.\par}
+\end{document}
