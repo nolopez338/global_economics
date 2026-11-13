@@ -1,0 +1,312 @@
+\documentclass{article}
+\usepackage[a4paper,portrait,hmargin=10.5mm,top=8mm,bottom=8mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+% Use scalable mathematical operators at the reference text sizes.
+\input{omxlmex.fd}
+\DeclareFontShape{OMX}{lmex}{m}{n}{<->lmex10}{}
+\usepackage{xcolor,colortbl}
+\usepackage{tabularx,array}
+\pagestyle{empty}
+\definecolor{navy}{HTML}{172C3C}
+\definecolor{coral}{HTML}{BF604D}
+\definecolor{rulecolor}{HTML}{A5AFB6}
+\color{navy}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\setlength{\arrayrulewidth}{0.3pt}
+% Central typography controls, explicitly applied in table cells.
+\newcommand{\TitleFont}{\fontsize{25}{27}\selectfont\bfseries}
+\newcommand{\KickerFont}{\fontsize{10}{12}\selectfont\bfseries}
+\newcommand{\HeadingFont}{\fontsize{12.5}{15}\selectfont\bfseries}
+\newcommand{\DefinitionFont}{\fontsize{9}{10.3}\selectfont}
+\newcommand{\SymbolFont}{\fontsize{10}{11}\selectfont}
+\newcommand{\ExampleFont}{\fontsize{8.8}{10.2}\selectfont}
+\newcommand{\TableHeadFont}{\fontsize{8.5}{10}\selectfont\bfseries}
+\newcommand{\FooterFont}{\fontsize{8.5}{10}\selectfont}
+\DeclareMathSizes{10}{10}{7}{5}
+\DeclareMathSizes{9}{9}{6.5}{5}
+\DeclareMathSizes{8.8}{8.8}{6.3}{5}
+
+\newlength{\SymbolWidth}
+\newlength{\MeaningWidth}
+\newlength{\RowPadding}
+\setlength{\RowPadding}{0.7mm}
+% Measure the complete cell (including wrapped text and tall mathematics),
+% then reserve the same clearance above and below its actual bounds.
+\newsavebox{\CellContent}
+\newcommand{\paddedcell}[1]{%
+  \sbox{\CellContent}{\begin{minipage}[t]{\linewidth}\raggedright #1\end{minipage}}%
+  \raisebox{0pt}[\dimexpr\ht\CellContent+\RowPadding\relax]%
+    [\dimexpr\dp\CellContent+\RowPadding\relax]{\usebox{\CellContent}}%
+}
+% Center only complete symbol rows, using the actual bounds of tall mathematics.
+% Headers and the letter reference retain their original padded-cell layout.
+\newcommand{\centeredcell}[1]{%
+  \sbox{\CellContent}{\begin{minipage}[t]{\linewidth}\raggedright #1\end{minipage}}%
+  \raisebox{\dimexpr(\dp\CellContent-\ht\CellContent)/2\relax}%
+    [\dimexpr(\ht\CellContent+\dp\CellContent)/2+\RowPadding\relax]%
+    [\dimexpr(\ht\CellContent+\dp\CellContent)/2+\RowPadding\relax]%
+    {\usebox{\CellContent}}%
+}
+% Text-style arrays align relations without enlarging fractions or operators.
+% Each r/E pair holds a left-hand side and its relation/right-hand side.
+% E supplies an empty math atom to retain normal spacing before a relation.
+\newcommand{\ExampleLineStretch}{1.12}
+\newcommand{\exmath}[2][r@{}E]{{\renewcommand{\arraystretch}{\ExampleLineStretch}%
+  \ifcsname NC@find@E\endcsname\else\newcolumntype{E}{>{{}}l}\fi%
+  \ensuremath{\begin{array}[t]{@{}#1@{}}#2\end{array}}}}
+\newcommand{\symrow}[3]{%
+  \centeredcell{\centering\SymbolFont\ensuremath{\displaystyle #1}}&%
+  \centeredcell{\DefinitionFont #2}&\centeredcell{\ExampleFont #3}\\\hline
+}
+% Measure each example line so paired symbols and meanings share its baselines,
+% including fractions and wrapped meanings. Spacing settings stay local.
+\newsavebox{\PairFirst}
+\newsavebox{\PairSecond}
+\newcommand{\pairstrut}[1]{\rule[-\dp#1]{0pt}{\dimexpr\ht#1+\dp#1\relax}}
+\newcommand{\pairlines}[3]{%
+  \begin{tabular}[t]{@{}#1@{}}%
+  \pairstrut{\PairFirst}#2\\%
+  \pairstrut{\PairSecond}#3%
+  \end{tabular}%
+}
+% Paired symbols, meanings, and examples; wide blocks can supply their columns.
+\newcommand{\pairedrow}[6]{%
+  \pairedrowwithcols{r@{}E@{\quad}r@{}E}{#1}{#2}{#3}{#4}{#5}{#6}}
+\newcommand{\pairedrowwithcols}[7]{%
+  \noalign{\begingroup
+  \renewcommand{\ExampleLineStretch}{1}%
+  \global\setbox\PairFirst=\hbox{\ExampleFont\exmath[#1]{#6}%
+    \DefinitionFont\parbox[t]{\MeaningWidth}{\raggedright #4}}%
+  \global\setbox\PairSecond=\hbox{\ExampleFont\exmath[#1]{#7}%
+    \DefinitionFont\parbox[t]{\MeaningWidth}{\raggedright #5}}%
+  \endgroup}%
+  \paddedcell{\centering\SymbolFont\pairlines{c}{\ensuremath{\displaystyle #2}}{\ensuremath{\displaystyle #3}}}&%
+  \paddedcell{\DefinitionFont\pairlines{l}%
+    {\parbox[t]{\linewidth}{\raggedright #4}}%
+    {\parbox[t]{\linewidth}{\raggedright #5}}}&%
+  \paddedcell{\ExampleFont\renewcommand{\ExampleLineStretch}{1}%
+    \exmath[#1]{%
+    \pairstrut{\PairFirst}#6\\\pairstrut{\PairSecond}#7}}\\\hline
+}
+% Compact contexts use the existing palette and the table's example type.
+\newcommand{\examplecontexts}[1]{%
+  \begingroup
+  \setlength{\fboxsep}{0.5mm}%
+  \setlength{\fboxrule}{0.35pt}%
+  \noindent\fcolorbox{coral}{coral!10}{%
+    \begin{minipage}{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}
+      \ExampleFont\color{navy}%
+      \textbf{Example contexts}\par
+      #1\par
+    \end{minipage}}\par
+  \endgroup
+  \vspace{0.7mm}%
+}
+% Optional contexts appear after the heading rule and before the table.
+\newcommand{\sectionbox}[3][]{%
+  {\HeadingFont\color{coral}#2\par}%
+  \vspace{0.4mm}{\color{navy}\hrule height 0.5pt}\vspace{0.4mm}%
+  \if\relax\detokenize{#1}\relax\else\examplecontexts{#1}\fi
+  \begingroup
+  \if\relax\detokenize{#1}\relax\else
+    \renewcommand{\ExampleLineStretch}{1}%
+  \fi
+  \setlength{\SymbolWidth}{.24\linewidth}%
+  \setlength{\MeaningWidth}{.32\linewidth}%
+  \setlength{\tabcolsep}{0.7mm}%
+  \renewcommand{\arraystretch}{1}%
+  \arrayrulecolor{rulecolor}%
+  \begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash\SymbolFont}p{\SymbolWidth}>{\raggedright\arraybackslash\DefinitionFont}p{\MeaningWidth}>{\raggedright\arraybackslash\ExampleFont}X@{}}
+  \paddedcell{\centering\TableHeadFont Symbol}&\paddedcell{\TableHeadFont Meaning}&\paddedcell{\TableHeadFont Examples}\\\hline
+  #3
+  \end{tabularx}%
+  \endgroup\par\vspace{0.8mm}%
+}
+% Dedicated two-column reference for letter names.
+\newcommand{\letterrow}[2]{%
+  \paddedcell{\centering\SymbolFont\ensuremath{#1}}&%
+  \paddedcell{\DefinitionFont #2}\\\hline
+}
+\newcommand{\letterreference}[1]{%
+  {\HeadingFont\color{coral}Letters and Greek symbols\par}%
+  \vspace{0.4mm}{\color{navy}\hrule height 0.5pt}\vspace{0.4mm}%
+  \begingroup
+  \setlength{\tabcolsep}{0.7mm}%
+  \renewcommand{\arraystretch}{1}%
+  \arrayrulecolor{rulecolor}%
+  \begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash\SymbolFont}p{.29\linewidth}>{\raggedright\arraybackslash\DefinitionFont}X@{}}
+  \paddedcell{\centering\TableHeadFont Symbol}&\paddedcell{\TableHeadFont Name / description}\\\hline
+  #1
+  \end{tabularx}%
+  \endgroup\par\vspace{0.8mm}%
+}
+
+\newcommand{\teachingheading}[1]{%
+  {\HeadingFont\color{coral}#1\par}%
+  \vspace{0.4mm}{\color{navy}\hrule height 0.5pt}\vspace{1.5mm}}
+\newcommand{\teachinglabel}[1]{\vspace{1.8mm}{\DefinitionFont\bfseries\color{coral}#1\par}\vspace{0.7mm}}
+\newcommand{\teachingmath}[1]{\par\vspace{1mm}{\ExampleFont\exmath{#1}\par}\vspace{1mm}}
+
+\begin{document}
+\begingroup
+{\TitleFont\color{coral}MATHEMATICS\hfill\KickerFont POSTER 1\par}
+\vspace{1.3mm}{\color{navy}\hrule height 0.8pt}\vspace{1.8mm}
+{\KickerFont GENERAL NOTATION, SETS AND PROBABILITY\par}\vspace{3mm}
+\begingroup
+\setlength{\RowPadding}{0.8mm}
+\sectionbox{General notation}{
+\symrow{=,\ \neq}{Equal; not equal}{\exmath{2+3&=5;\quad 2\ne3}}
+\symrow{\approx}{Approximately equal}{\exmath{\pi&\approx3.14;\quad\sqrt2\approx1.41}}
+\pairedrow{<,\ >}{\leq,\ \geq}{Less than; greater than}{Less/greater than or equal to}{2&<3;&5&>4}{2&\leq2;&5&\geq4}
+\symrow{\pm}{Plus or minus: two choices}{\exmath{3\pm1&=4\text{ or }2;\quad -2\pm3=1\text{ or }-5}}
+\symrow{|a|}{Absolute value: distance from $a$ to $0$}{\exmath{|-5|&=5;\quad |3|=3;\quad |0|=0}}
+\symrow{\sqrt a}{Nonnegative square root; for real values, $a\geq0$}{\exmath{\sqrt9&=3\text{ (not }\pm3\text{)};\quad \sqrt{\frac14}=\frac12}}
+\symrow{ab,\ a\cdot b,\ a^n}{Multiplication; $a^n$: $n$ factors of $a$ ($n$ a positive integer)}{\exmath{2x&=2\cdot x;\quad 3^2=3\cdot3=9}}
+}
+\endgroup
+\vspace{2mm}
+\noindent\begin{minipage}[t]{.49\linewidth}
+\setlength{\RowPadding}{0.8mm}
+\sectionbox{Sets and number systems}{
+\symrow{\{a,b,c\}}{Set: order and repetition do not matter.}{$\{2,4\}=\{4,2\}$\\$\{2,2,4\}=\{2,4\}$}
+\pairedrowwithcols{l}{\in}{\notin}{Is an element of}{Is not an element of}{2\in\{1,2\}}{3\notin\{1,2\}}
+\symrow{\{x\in A:p(x)\}}{Set-builder: $x$ in $A$ such that $p(x)$ holds. $:$ or $|$ means ``such that''.}{$\{x\in\mathbb R:x>0\}$\\Positive real numbers}
+\symrow{\varnothing,\ |A|}{Empty set: no elements. $|A|$ counts a finite set's elements.}{$|\varnothing|=0$\\$|\{2,4,6\}|=3$}
+\symrow{A\subseteq B}{Subset: all elements of $A$ are in $B$; may be equal.}{$\{1\}\subseteq\{1,2\}$\\$\{1,2\}\subseteq\{1,2\}$}
+\symrow{A\subsetneq B}{Proper subset: $A\subseteq B$ and $A\ne B$.}{$\{1\}\subsetneq\{1,2\}$}
+\symrow{A\cup B,\ A\cap B}{Union: in either or both. Intersection: in both.}{$\{1,2\}\cup\{2,3\}=\{1,2,3\}$\\$\{1,2\}\cap\{2,3\}=\{2\}$}
+\symrow{A\setminus B}{Set difference: in $A$ but not in $B$.}{$\{1,2\}\setminus\{2,3\}=\{1\}$}
+\symrow{\mathbb N,\ \mathbb Z}{Natural numbers; integers (including $0$ and negatives).}{Here $\mathbb N=\{1,2,3,\ldots\}$.\\Some texts include $0$; check.\\$-2,0,3\in\mathbb Z$}
+\symrow{\mathbb Q,\ \mathbb R}{Rationals: integer ratios $p/q$, $q\ne0$. Reals: the number line.}{$\frac12,-3\in\mathbb Q$\\$\sqrt2,\pi\in\mathbb R$}
+\symrow{\mathbb R\setminus\mathbb Q}{Irrationals: reals that are not rational.}{$\sqrt2,\pi\in\mathbb R\setminus\mathbb Q$}
+\symrow{\mathbb N\subsetneq\mathbb Z}{Number systems nest.}{$\mathbb N\subsetneq\mathbb Z\subsetneq\mathbb Q\subsetneq\mathbb R$}
+\symrow{(a,b),\ [a,b]}{Intervals ($a<b$): parentheses exclude endpoints; brackets include them.}{$x\in(1,3)$: $1<x<3$\\$x\in[1,3]$: $1\leq x\leq3$}
+\symrow{[a,b),\ (a,b]}{Half-open intervals: include just one endpoint.}{$2\in[2,5),\ 5\notin[2,5)$\\$2\notin(2,5],\ 5\in(2,5]$}
+\symrow{\infty,\ -\infty}{Unbounded directions; not reals. Use parentheses at infinity.}{$[0,\infty)=\{x\in\mathbb R:x\geq0\}$}
+}
+{\FooterFont Dots in lists: see Poster 2. Bars mean absolute value for numbers and cardinality for finite sets.\par}
+\end{minipage}\hfill
+\begin{minipage}[t]{.485\linewidth}
+\setlength{\RowPadding}{1.15mm}
+\sectionbox[{\textbf{Fair die:} $\Omega=\{1,2,3,4,5,6\}$.\par
+$A=\{1,3,5\}$ (odd), $B=\{1,2\}$.\par
+Unless stated otherwise, examples below use this die.\par}]{Probability and events}{
+\symrow{\Omega,\ \omega}{Sample space $\Omega$: all possible outcomes. Outcome $\omega$: one result.}{$\omega=3\in\Omega$}
+\symrow{A\subseteq\Omega}{An event is a set of outcomes from the sample space.}{$A=\{1,3,5\}$: odd result}
+\symrow{P(A)}{Probability of $A$; always between $0$ and $1$.}{$0\leq P(A)\leq1$\\$P(\Omega)=1,\ P(\varnothing)=0$}
+\symrow{\dfrac{|A|}{|\Omega|}}{Equals $P(A)$ only for a finite sample space of equally likely outcomes.}{$P(A)=\frac36=\frac12$}
+\symrow{A^c}{Complement: outcomes in $\Omega$ outside $A$.}{$A^c=\{2,4,6\}$\\$P(A^c)=1-P(A)=\frac12$}
+\symrow{A\cup B,\ A\cap B}{Apply set operations (left): $A$ or $B$ (or both); $A$ and $B$.}{$A\cup B=\{1,2,3,5\}$\\$A\cap B=\{1\}$}
+\symrow{A\cap C=\varnothing}{Mutually exclusive events cannot occur together.}{$C=\{2,4,6\}$\\$A\cap C=\varnothing$}
+\symrow{P(A\mid B)}{Conditional probability: chance of $A$ given $B$; requires $P(B)>0$.}{$P(A\mid B)=\frac{P(A\cap B)}{P(B)}$\\$\phantom{P(A\mid B)}=\frac{1/6}{2/6}=\frac12$}
+\symrow{P(A\cap B)}{For independent events, $P(A\cap B)=P(A)P(B)$. If $P(B)>0$, this means $P(A\mid B)=P(A)$.}{New example: two independent fair coin tosses.\\$E$: first is heads; $F$: second is heads.\\$P(E\cap F)=\frac14=\frac12\cdot\frac12$}
+}
+\vspace{1.5mm}
+{\DefinitionFont\textbf{Keep the ideas separate.}\par
+Mutually exclusive events of positive probability are not independent: knowing one occurred rules out the other.\par
+\vspace{2mm}
+The bar in $P(A\mid B)$ means ``given''; the bar in set-builder notation means ``such that''. Context determines the reading.\par}
+\end{minipage}\par
+\vfill
+{\color{navy}\hrule height 0.5pt}\vspace{1.5mm}
+{\FooterFont Symbols acquire meaning from their mathematical context.\par}
+\endgroup
+\newpage
+\begingroup
+{\TitleFont\color{coral}MATHEMATICS\hfill\KickerFont POSTER 2\par}
+\vspace{1.3mm}{\color{navy}\hrule height 0.8pt}\vspace{1.8mm}
+{\KickerFont FUNCTIONS, VARIABLES, SEQUENCES AND SUMS\par}\vspace{3mm}
+\noindent\begin{minipage}[t]{.49\linewidth}
+\setlength{\RowPadding}{1.25mm}
+\sectionbox[{\textbf{Example:} $f:\mathbb R\to\mathbb R$, $f(x)=x^2$.\par
+Set and interval notation: see Poster 1.\par}]{Function notation}{
+\symrow{f}{A function assigns exactly one output to each input in its domain. $f$ is its name.}{$f(x)=x^2$}
+\symrow{f(x)}{Value at input $x$; parentheses mark the argument, not $f$ multiplied by $x$.}{$f(3)=3^2=9$}
+\symrow{f:A\to B}{Domain $A$: allowed inputs. Codomain $B$: declared target set for outputs.}{$f:\mathbb R\to\mathbb R$\\Domain and codomain: $\mathbb R$}
+\symrow{x\mapsto f(x)}{Input-to-output rule; $\to$ above connects sets, $\mapsto$ connects values.}{$x\mapsto x^2;\quad 3\mapsto9$}
+\symrow{\operatorname{dom}(f)}{Domain notation; inputs must belong to this set.}{$\operatorname{dom}(f)=\mathbb R$}
+\symrow{\operatorname{range}(f)}{Range: outputs actually attained; a subset of the codomain.}{$\operatorname{range}(f)=[0,\infty)$\\Negative reals are not outputs.}
+}
+\vspace{1.5mm}
+\letterreference{
+\letterrow{a,b,c;\ x,y,z}{Common lowercase Latin letters}
+\letterrow{A,B,C}{Common uppercase Latin letters}
+\letterrow{\alpha,\ \beta,\ \gamma}{Alpha; beta; gamma}
+\letterrow{\delta,\ \Delta}{Delta; uppercase delta}
+\letterrow{\theta,\ \Theta}{Theta; uppercase theta}
+\letterrow{\lambda,\ \Lambda}{Lambda; uppercase lambda}
+\letterrow{\mu,\ \sigma,\ \Sigma}{Mu; sigma; uppercase sigma}
+\letterrow{\omega,\ \Omega}{Omega; uppercase omega (Poster 1)}
+\letterrow{\pi}{Pi; in these examples, the circle constant $\pi\approx3.14$.}
+}
+{\DefinitionFont Names do not fix meanings. $\Sigma$ is a letter; $\sum$ is the related summation operator (right), not an ordinary variable.\par}
+\vspace{3mm}
+\teachingheading{Variables}
+{\DefinitionFont
+A \textbf{variable} represents values allowed by its context. A \textbf{constant} stays fixed within that context. A letter can serve either role.\par
+\teachinglabel{Separate choices, not simultaneous equalities}
+$x$ might be $-2$, $0$, or $3.5$ in separate cases.\par
+$n\in\mathbb N$ may count objects; $\theta=30^\circ$ may name an angle (${}^\circ$ means degrees).\par
+$A$ may be a set such as $\{1,2\}$; $\lambda$ may be a number such as $2$.\par
+\teachinglabel{State what is fixed and what varies}
+In $y=mx+b$, $x$ is the input and $y$ the output; $m$ and $b$ are fixed for a chosen line.\par
+\vspace{1.5mm}
+Uppercase letters often name sets; Greek letters often name angles or numbers. These are conventions, not permanent types.\par
+}
+\end{minipage}\hfill
+\begin{minipage}[t]{.485\linewidth}
+\raggedright
+\teachingheading{Lists, sequences and subscripts}
+{\DefinitionFont
+A \textbf{sequence} is an ordered list of terms. A \textbf{series} is a sum of sequence terms. Here, parentheses show sequences; braces show sets (Poster 1).\par
+\teachinglabel{Dots omit entries in an established pattern}
+$\ldots$ in lists and $\cdots$ in sums indicate omitted entries following an established pattern. The dots alone do not define a unique rule.\par
+\teachingmath{1,2,3,\ldots,n&\quad\text{ends at }n;\quad n\geq3.\\1,2,3,\ldots&\quad\text{continues indefinitely.}}
+A final term marks a finite list; without a final term, the second example continues without end.\par
+\teachinglabel{A subscript identifies a term}
+In $a_i$, the \textbf{index} $i$ identifies a position or label; it is not multiplication or an exponent.\par
+\teachingmath{a_1&=\text{term at index }1,\\a_n&=\text{term at index }n.}
+Indices often start at $1$, but can start at $0$ or another integer: state the starting point. Subscripts may also label cases: $A_1,A_2$ can name alternatives.\par
+\teachinglabel{Finite and infinite sequences}
+For the rule $a_i=2i$:\par
+\teachingmath{(a_i)_{i=1}^{4}&=(a_1,a_2,a_3,a_4)=(2,4,6,8),\\(a_i)_{i=1}^{\infty}&=(2,4,6,8,\ldots).}
+The first has four terms; the second has no last term. With this rule, $a_3=2(3)=6$.\par
+\teachinglabel{Order and repetitions matter}
+$(2,4)\ne(4,2)$ and $(2,2,4)\ne(2,4)$. Sets behave differently: see Poster 1.\par
+}
+\vspace{3mm}
+\teachingheading{Summation notation}
+{\DefinitionFont
+\begingroup
+\setlength{\tabcolsep}{1mm}\arrayrulecolor{rulecolor}
+\begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash}m{.25\linewidth}X@{}}
+\centeredcell{\centering\SymbolFont $\displaystyle\sum_{i=1}^{n}a_i$}&
+\centeredcell{\DefinitionFont $\sum$: sum the indicated terms\\
+$i$: index; $1$: lower bound\\
+$n$: upper bound\\
+$a_i$: summand (expression summed)}\\\hline
+\end{tabularx}\endgroup\par\vspace{1.5mm}
+The index runs through consecutive integers from the lower bound to the upper bound, \textbf{inclusive}. Here $n$ is a positive integer.\par
+\teachingmath{\sum_{i=1}^{n}a_i&=a_1+a_2+\cdots+a_n.}
+The centered dots follow the same omission convention as the list dots above.\par
+\teachinglabel{One term versus the sum of the first $n$ terms}
+Define $S_n$ as the sum of the first $n$ terms (indexing from $1$):\par
+\teachingmath{S_n&=\sum_{i=1}^{n}a_i.\\a_i=2i:\quad a_4&=8,\qquad S_4=2+4+6+8=20.}
+\teachinglabel{Other summands and bounds}
+{\ExampleFont\exmath[r@{\quad}r@{}E]{
+\text{Constant:}&\sum_{i=2}^{4}3&=3+3+3=9.\\[1.5mm]
+\text{Squares:}&\sum_{k=1}^{3}k^2&=1+4+9=14.
+}\par}
+\teachinglabel{The index name can change}
+\teachingmath{\sum_{i=1}^{4}i&=\sum_{k=1}^{4}k=1+2+3+4=10.}
+Change the index consistently in both the bounds and the summand. The index is local to its sum.\par
+}
+\end{minipage}\par
+\vfill
+{\color{navy}\hrule height 0.5pt}\vspace{1.5mm}
+{\FooterFont Symbols acquire meaning from their mathematical context.\par}
+\endgroup
+\end{document}
