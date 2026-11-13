@@ -1,9 +1,9 @@
 """Recipe scaling and a discount; Manim Community 0.17.3, 32 seconds.
 
 From the repository root (or use absolute script paths from any directory):
-    python -m manim -ql assets/manim/algebra/stage1_arithmetic_foundations/07_ratios_percentages.py RatiosPercentages
+    python -m manim -ql assets/manim/algebra/stage1_arithmetic_foundations/08_ratios_percentages.py RatiosPercentages
     python -m manim -ql assets/manim/algebra/stage1_arithmetic_foundations/00_preliminaries.py ArithmeticPreliminaries
-    python -m manim -qh --fps 60 assets/manim/algebra/stage1_arithmetic_foundations/07_ratios_percentages.py RatiosPercentages
+    python -m manim -qh --fps 60 assets/manim/algebra/stage1_arithmetic_foundations/08_ratios_percentages.py RatiosPercentages
 
 Final MP4 (repository-relative, independent of cwd, for either quality):
     ../manim_media/videos/algebra/stage1_arithmetic_foundations/05_ratios_percentages.mp4

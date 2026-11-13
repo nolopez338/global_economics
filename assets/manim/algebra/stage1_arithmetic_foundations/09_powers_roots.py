@@ -1,7 +1,7 @@
 """Numerical powers and roots recap; Manim Community 0.17.3.
 
 From the repository root (or use absolute script paths from any directory):
-    manim -ql assets/manim/algebra/stage1_arithmetic_foundations/08_powers_roots.py PowersRoots
+    manim -ql assets/manim/algebra/stage1_arithmetic_foundations/09_powers_roots.py PowersRoots
     manim -ql assets/manim/algebra/stage1_arithmetic_foundations/00_preliminaries.py ArithmeticPreliminaries
 
 Final MP4 (repository-relative, independent of cwd):

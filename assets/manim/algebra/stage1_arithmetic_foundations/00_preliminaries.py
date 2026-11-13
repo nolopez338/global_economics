@@ -4,7 +4,7 @@ From the repository root (or use absolute script paths from any directory):
     python -m manim -ql assets/manim/algebra/stage1_arithmetic_foundations/00_preliminaries.py ArithmeticPreliminaries
     python -m manim -qh --fps 60 assets/manim/algebra/stage1_arithmetic_foundations/00_preliminaries.py ArithmeticPreliminaries
 Standalone example (each topic module documents its own command):
-    python -m manim -ql assets/manim/algebra/stage1_arithmetic_foundations/02_adding_subtracting.py AddingSubtracting
+    python -m manim -ql assets/manim/algebra/stage1_arithmetic_foundations/03_adding_subtracting.py AddingSubtracting
 
 Final MP4 (repository-relative):
     ../manim_media/videos/algebra/stage1_arithmetic_foundations/00_preliminaries.mp4

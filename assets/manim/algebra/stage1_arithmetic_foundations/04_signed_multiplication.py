@@ -1,6 +1,6 @@
 """Signed multiplication with synchronized vector panels (Manim CE 0.17.3).
 
-    python -m manim -ql assets/manim/algebra/stage1_arithmetic_foundations/03_signed_multiplication.py SignedMultiplication
+    python -m manim -ql assets/manim/algebra/stage1_arithmetic_foundations/04_signed_multiplication.py SignedMultiplication
     python -m manim -ql assets/manim/algebra/stage1_arithmetic_foundations/00_preliminaries.py ArithmeticPreliminaries
 
 Standalone and combined sections share the 70-second clock in common.py.

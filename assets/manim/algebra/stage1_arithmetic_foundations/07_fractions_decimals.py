@@ -1,7 +1,7 @@
 """Fraction strips and a hundred grid; Manim Community 0.17.3 (40 seconds).
 
 From the repository root:
-    python -m manim -ql assets/manim/algebra/stage1_arithmetic_foundations/06_fractions_decimals.py FractionsDecimals
+    python -m manim -ql assets/manim/algebra/stage1_arithmetic_foundations/07_fractions_decimals.py FractionsDecimals
     python -m manim -ql assets/manim/algebra/stage1_arithmetic_foundations/00_preliminaries.py ArithmeticPreliminaries
 
 Final MP4 (repository-relative, independent of cwd):

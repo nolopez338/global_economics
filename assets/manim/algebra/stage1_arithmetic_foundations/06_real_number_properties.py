@@ -1,7 +1,7 @@
 """Numerical properties; Manim Community 0.17.3, 42 seconds.
 
 From the repository root (absolute script paths also work):
-    python -m manim -ql assets/manim/algebra/stage1_arithmetic_foundations/05_real_number_properties.py RealNumberProperties
+    python -m manim -ql assets/manim/algebra/stage1_arithmetic_foundations/06_real_number_properties.py RealNumberProperties
     python -m manim -ql assets/manim/algebra/stage1_arithmetic_foundations/00_preliminaries.py ArithmeticPreliminaries
 
 Final MP4 (repository-relative, independent of cwd):
