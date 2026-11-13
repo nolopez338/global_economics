@@ -54,9 +54,32 @@
 % Each r/E pair holds a left-hand side and its relation/right-hand side.
 % E supplies an empty math atom to retain normal spacing before a relation.
 \newcommand{\ExampleLineStretch}{1.12}
-\newcommand{\exmath}[2][r@{}E]{{\renewcommand{\arraystretch}{\ExampleLineStretch}%
+% Keep each concept and its explanation in one measured Meaning cell.
+% Paragraphs work in the cell minipages and the paired/triple parboxes alike.
+\newcommand{\meaningexplanation}[1]{\textcolor{gray}{\textit{#1}}}
+\newcommand{\conceptmeaning}[2]{\begingroup
+  % Compact leading preserves the 9pt type; reserve clearance below the block.
+  \setlength{\baselineskip}{9.3pt}%
+  #1\par #2\rule[-1pt]{0pt}{1pt}\par
+  \endgroup}
+\newsavebox{\ExampleContent}
+% A second spacing pass is enabled only in the compact tables.
+\newcommand{\TightExampleSpacing}{}
+\newcommand{\exmath}[2][r@{}E]{\begingroup
+  \renewcommand{\arraystretch}{\ExampleLineStretch}%
   \ifcsname NC@find@E\endcsname\else\newcolumntype{E}{>{{}}l}\fi%
-  \ensuremath{\begin{array}[t]{@{}#1@{}}#2\end{array}}}}
+  \sbox{\ExampleContent}{$\begin{array}[t]{@{}#1@{}}#2\end{array}$}%
+  % Only overwide examples receive a small math-spacing correction.
+  % This preserves the font size, baselines, and all fitting examples.
+  \ifdim\wd\ExampleContent>\linewidth
+    \thickmuskip=4mu\relax\medmuskip=3mu\relax
+    \sbox{\ExampleContent}{$\begin{array}[t]{@{}#1@{}}#2\end{array}$}%
+  \fi
+  \ifdim\wd\ExampleContent>\linewidth
+    \TightExampleSpacing
+    \sbox{\ExampleContent}{$\begin{array}[t]{@{}#1@{}}#2\end{array}$}%
+  \fi
+  \usebox{\ExampleContent}\endgroup}
 \newcommand{\symrow}[3]{%
   \centeredcell{\centering\SymbolFont\ensuremath{\displaystyle #1}}&%
   \centeredcell{\DefinitionFont #2}&\centeredcell{\ExampleFont #3}\\\hline
@@ -65,33 +88,67 @@
 % including fractions and wrapped meanings. Spacing settings stay local.
 \newsavebox{\PairFirst}
 \newsavebox{\PairSecond}
+\newsavebox{\PairThird}
+% Override locally for compact measured rows; other sections retain their spacing.
+\newcommand{\MeasuredLineStretch}{1}
+\newcommand{\measuresymbol}[1]{}
 \newcommand{\pairstrut}[1]{\rule[-\dp#1]{0pt}{\dimexpr\ht#1+\dp#1\relax}}
 \newcommand{\pairlines}[3]{%
+  \renewcommand{\arraystretch}{\MeasuredLineStretch}%
   \begin{tabular}[t]{@{}#1@{}}%
   \pairstrut{\PairFirst}#2\\%
   \pairstrut{\PairSecond}#3%
   \end{tabular}%
+}
+% Three subrows use the same measured struts and cell padding as paired rows.
+\newcommand{\triplelines}[4]{%
+  \renewcommand{\arraystretch}{\MeasuredLineStretch}%
+  \begin{tabular}[t]{@{}#1@{}}%
+  \pairstrut{\PairFirst}#2\\%
+  \pairstrut{\PairSecond}#3\\%
+  \pairstrut{\PairThird}#4%
+  \end{tabular}%
+}
+\newcommand{\triplerow}[9]{%
+  \noalign{\begingroup
+  \renewcommand{\ExampleLineStretch}{\MeasuredLineStretch}%
+  \global\setbox\PairFirst=\hbox{\ExampleFont\exmath{#7}\measuresymbol{#1}%
+    \DefinitionFont\parbox[t]{\MeaningWidth}{\raggedright #4}}%
+  \global\setbox\PairSecond=\hbox{\ExampleFont\exmath{#8}\measuresymbol{#2}%
+    \DefinitionFont\parbox[t]{\MeaningWidth}{\raggedright #5}}%
+  \global\setbox\PairThird=\hbox{\ExampleFont\exmath{#9}\measuresymbol{#3}%
+    \DefinitionFont\parbox[t]{\MeaningWidth}{\raggedright #6}}%
+  \endgroup}%
+  \paddedcell{\centering\SymbolFont\triplelines{c}%
+    {\ensuremath{\displaystyle #1}}{\ensuremath{\displaystyle #2}}{\ensuremath{\displaystyle #3}}}&%
+  \paddedcell{\DefinitionFont\triplelines{l}%
+    {\parbox[t]{\linewidth}{\raggedright #4}}%
+    {\parbox[t]{\linewidth}{\raggedright #5}}%
+    {\parbox[t]{\linewidth}{\raggedright #6}}}&%
+  \paddedcell{\ExampleFont\renewcommand{\ExampleLineStretch}{\MeasuredLineStretch}%
+    \exmath{\pairstrut{\PairFirst}#7\\\pairstrut{\PairSecond}#8\\\pairstrut{\PairThird}#9}}\\\hline
 }
 % Paired symbols, meanings, and examples; wide blocks can supply their columns.
 \newcommand{\pairedrow}[6]{%
   \pairedrowwithcols{r@{}E@{\quad}r@{}E}{#1}{#2}{#3}{#4}{#5}{#6}}
 \newcommand{\pairedrowwithcols}[7]{%
   \noalign{\begingroup
-  \renewcommand{\ExampleLineStretch}{1}%
-  \global\setbox\PairFirst=\hbox{\ExampleFont\exmath[#1]{#6}%
+  \renewcommand{\ExampleLineStretch}{\MeasuredLineStretch}%
+  \global\setbox\PairFirst=\hbox{\ExampleFont\exmath[#1]{#6}\measuresymbol{#2}%
     \DefinitionFont\parbox[t]{\MeaningWidth}{\raggedright #4}}%
-  \global\setbox\PairSecond=\hbox{\ExampleFont\exmath[#1]{#7}%
+  \global\setbox\PairSecond=\hbox{\ExampleFont\exmath[#1]{#7}\measuresymbol{#3}%
     \DefinitionFont\parbox[t]{\MeaningWidth}{\raggedright #5}}%
   \endgroup}%
   \paddedcell{\centering\SymbolFont\pairlines{c}{\ensuremath{\displaystyle #2}}{\ensuremath{\displaystyle #3}}}&%
   \paddedcell{\DefinitionFont\pairlines{l}%
     {\parbox[t]{\linewidth}{\raggedright #4}}%
     {\parbox[t]{\linewidth}{\raggedright #5}}}&%
-  \paddedcell{\ExampleFont\renewcommand{\ExampleLineStretch}{1}%
+  \paddedcell{\ExampleFont\renewcommand{\ExampleLineStretch}{\MeasuredLineStretch}%
     \exmath[#1]{%
     \pairstrut{\PairFirst}#6\\\pairstrut{\PairSecond}#7}}\\\hline
 }
 % Compact contexts use the existing palette and the table's example type.
+\newcommand{\ContextHeading}{Example contexts}
 \newcommand{\examplecontexts}[1]{%
   \begingroup
   \setlength{\fboxsep}{0.5mm}%
@@ -99,13 +156,15 @@
   \noindent\fcolorbox{coral}{coral!10}{%
     \begin{minipage}{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}
       \ExampleFont\color{navy}%
-      \textbf{Example contexts}\par
+      \textbf{\ContextHeading}\par
       #1\par
     \end{minipage}}\par
   \endgroup
   \vspace{0.7mm}%
 }
 % Optional contexts appear after the heading rule and before the table.
+\newcommand{\SymbolColumnFraction}{.24}
+\newcommand{\MeaningColumnFraction}{.32}
 \newcommand{\sectionbox}[3][]{%
   {\HeadingFont\color{coral}#2\par}%
   \vspace{0.4mm}{\color{navy}\hrule height 0.5pt}\vspace{0.4mm}%
@@ -114,8 +173,8 @@
   \if\relax\detokenize{#1}\relax\else
     \renewcommand{\ExampleLineStretch}{1}%
   \fi
-  \setlength{\SymbolWidth}{.24\linewidth}%
-  \setlength{\MeaningWidth}{.32\linewidth}%
+  \setlength{\SymbolWidth}{\SymbolColumnFraction\linewidth}%
+  \setlength{\MeaningWidth}{\MeaningColumnFraction\linewidth}%
   \setlength{\tabcolsep}{0.7mm}%
   \renewcommand{\arraystretch}{1}%
   \arrayrulecolor{rulecolor}%
@@ -126,6 +185,7 @@
   \endgroup\par\vspace{0.8mm}%
 }
 % Dedicated two-column reference for letter names.
+\newlength{\LetterMeaningWidth}
 \newcommand{\letterrow}[2]{%
   \paddedcell{\centering\SymbolFont\ensuremath{#1}}&%
   \paddedcell{\DefinitionFont #2}\\\hline
@@ -135,7 +195,8 @@
   \vspace{0.4mm}{\color{navy}\hrule height 0.5pt}\vspace{0.4mm}%
   \begingroup
   \setlength{\tabcolsep}{0.7mm}%
-  \renewcommand{\arraystretch}{1}%
+  \setlength{\LetterMeaningWidth}{\dimexpr\linewidth-.29\linewidth-2\tabcolsep\relax}%
+  \renewcommand{\arraystretch}{0.8}%
   \arrayrulecolor{rulecolor}%
   \begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash\SymbolFont}p{.29\linewidth}>{\raggedright\arraybackslash\DefinitionFont}X@{}}
   \paddedcell{\centering\TableHeadFont Symbol}&\paddedcell{\TableHeadFont Name / description}\\\hline
@@ -144,71 +205,134 @@
   \endgroup\par\vspace{0.8mm}%
 }
 
-\newcommand{\teachingheading}[1]{%
-  {\HeadingFont\color{coral}#1\par}%
-  \vspace{0.4mm}{\color{navy}\hrule height 0.5pt}\vspace{1.5mm}}
-\newcommand{\teachinglabel}[1]{\vspace{1.8mm}{\DefinitionFont\bfseries\color{coral}#1\par}\vspace{0.7mm}}
-\newcommand{\teachingmath}[1]{\par\vspace{1mm}{\ExampleFont\exmath{#1}\par}\vspace{1mm}}
+% Half-width tables share baseline alignment, with local widths and padding.
+% General notation retains its original complete-row centering and spacing.
+\newcommand{\compacttables}{%
+  \renewcommand{\TightExampleSpacing}{\thinmuskip=0mu\relax\medmuskip=1mu\relax\thickmuskip=1mu\relax}%
+  \renewcommand{\measuresymbol}[1]{\SymbolFont$\displaystyle ##1$}%
+  \setlength{\RowPadding}{0.05mm}%
+  \renewcommand{\MeasuredLineStretch}{0.8}%
+  \renewcommand{\SymbolColumnFraction}{.22}%
+  \renewcommand{\MeaningColumnFraction}{.39}%
+  \renewcommand{\pairedrow}[6]{\pairedrowwithcols{r@{}E}{##1}{##2}{##3}{##4}{##5}{##6}}%
+  \renewcommand{\symrow}[3]{%
+    \paddedcell{\centering\SymbolFont\ensuremath{\displaystyle ##1}}&%
+    \paddedcell{\DefinitionFont ##2}&\paddedcell{\ExampleFont ##3}\\\hline}%
+}
+% Letter names use the same measured subrows as the three-column tables.
+\newcommand{\letterpair}[4]{%
+  \noalign{\global\setbox\PairFirst=\hbox{\SymbolFont$#1$\DefinitionFont\parbox[t]{\LetterMeaningWidth}{\raggedright #3}}%
+    \global\setbox\PairSecond=\hbox{\SymbolFont$#2$\DefinitionFont\parbox[t]{\LetterMeaningWidth}{\raggedright #4}}}%
+  \paddedcell{\centering\SymbolFont\pairlines{c}{$#1$}{$#2$}}&%
+  \paddedcell{\DefinitionFont\pairlines{l}%
+    {\parbox[t]{\linewidth}{\raggedright #3}}%
+    {\parbox[t]{\linewidth}{\raggedright #4}}}\\\hline
+}
+\newcommand{\lettertriple}[6]{%
+  \noalign{\global\setbox\PairFirst=\hbox{\SymbolFont$#1$\DefinitionFont #4}%
+    \global\setbox\PairSecond=\hbox{\SymbolFont$#2$\DefinitionFont #5}%
+    \global\setbox\PairThird=\hbox{\SymbolFont$#3$\DefinitionFont #6}}%
+  \paddedcell{\centering\SymbolFont\triplelines{c}{$#1$}{$#2$}{$#3$}}&%
+  \paddedcell{\DefinitionFont\triplelines{l}{#4}{#5}{#6}}\\\hline
+}
 
 \begin{document}
 \begingroup
 {\TitleFont\color{coral}MATHEMATICS\hfill\KickerFont POSTER 1\par}
 \vspace{1.3mm}{\color{navy}\hrule height 0.8pt}\vspace{1.8mm}
-{\KickerFont GENERAL NOTATION, SETS AND PROBABILITY\par}\vspace{3mm}
+{\KickerFont GENERAL NOTATION, SETS AND PROBABILITY\par}\vspace{2mm}
 \begingroup
-\setlength{\RowPadding}{0.8mm}
+% Local column and row spacing keeps the expanded reference on Poster 1.
+\setlength{\RowPadding}{0.05mm}
+\renewcommand{\MeasuredLineStretch}{0.75}
+\renewcommand{\SymbolColumnFraction}{.23}
+\renewcommand{\MeaningColumnFraction}{.41}
 \sectionbox{General notation}{
-\symrow{=,\ \neq}{Equal; not equal}{\exmath{2+3&=5;\quad 2\ne3}}
-\symrow{\approx}{Approximately equal}{\exmath{\pi&\approx3.14;\quad\sqrt2\approx1.41}}
-\pairedrow{<,\ >}{\leq,\ \geq}{Less than; greater than}{Less/greater than or equal to}{2&<3;&5&>4}{2&\leq2;&5&\geq4}
-\symrow{\pm}{Plus or minus: two choices}{\exmath{3\pm1&=4\text{ or }2;\quad -2\pm3=1\text{ or }-5}}
-\symrow{|a|}{Absolute value: distance from $a$ to $0$}{\exmath{|-5|&=5;\quad |3|=3;\quad |0|=0}}
-\symrow{\sqrt a}{Nonnegative square root; for real values, $a\geq0$}{\exmath{\sqrt9&=3\text{ (not }\pm3\text{)};\quad \sqrt{\frac14}=\frac12}}
-\symrow{ab,\ a\cdot b,\ a^n}{Multiplication; $a^n$: $n$ factors of $a$ ($n$ a positive integer)}{\exmath{2x&=2\cdot x;\quad 3^2=3\cdot3=9}}
+\triplerow{=}{\neq}{\approx}{Equal}{Not equal}{Approximately}
+  {2+3&=5\qquad \qquad 4-1=3}{2&\neq3\qquad \qquad 5+1\neq7}{\pi&\approx3.14\> \> \> \quad \qquad \sqrt2\approx1.41}
+
+\pairedrow{< \qquad \ >}{\nless \qquad \ \ngtr}
+{\qquad Less than \qquad \qquad Greater than}
+{Not Less than \qquad Not Greater than}
+{2&<3 \qquad &5&>4}{2&\nless2 \qquad &4&\ngtr5}
+
+\pairedrow{\leq \qquad \ \geq}{\nleq \qquad  \ngeq}
+{\qquad Less/Greater than or equal to}
+{ Not Less/Greater than or equal to}
+{2&\leq2 \qquad &5&\geq4}{3&\nleq2 \qquad &4&\ngeq5}
+
+\symrow{\pm}{Plus or minus: \meaningexplanation{two choices}}{\exmath{3\pm1&=4\text{ or }2\qquad -2\pm3=1\text{ or }-5}}
+\symrow{ab=a(b)=a\cdot b=a\times b}
+{Multiplication: \\ \meaningexplanation{juxtaposition, parentheses, dot, or cross.}}
+{\exmath{3x&=3\cdot x=3\times x\\
+		2(4)&=2\cdot4=2\times4}}
+
+\symrow{\frac{a}{b}=a/b=a\div b}
+{Division: \\ \meaningexplanation{fraction, slash, or division sign ($b\neq0$).}}
+{\exmath[r@{}E@{}E@{}E]{\frac{12}{3}&=12/3&=12\div3&=4\\
+		\frac{x}{5}&=x/5&=x\div 5&= \frac15 x= 0.2x}}
+\symrow{|a|}{Absolute value: \meaningexplanation{distance from $a$ to $0$}}{\exmath{|-5|&=5 \qquad\quad  |3|=3\qquad\quad  |0|=0}}
+\pairedrowwithcols{r@{}E@{\;}r@{}E}{a^2}{a^3}
+  {Squared; \meaningexplanation{multiply $a$ by itself.}}
+  {Cubed; \meaningexplanation{multiply three factors of $a$.}}
+  {3^2&=3\cdot3=9 &(-2)^2&= (-2)(-2) = 4}
+  {2^3&=2\cdot2\cdot2=8 \quad &(-2)^3&=(-2)(-2)(-2)=-8}
+\pairedrowwithcols{r@{}E}{\sqrt{a}=a^{1/2}}{\sqrt[3]{a}=a^{1/3}}
+  {Square root \quad \>  \meaningexplanation{$a\geq 0$}}
+  {Cube root \qquad \! \meaningexplanation{$a \in \mathbb{R}$}}
+  {\sqrt9&=3\text{ (not }\pm3\text{)}}
+  {\sqrt[3]{-8}&=-2}
+\pairedrowwithcols{r@{}E@{\;}r@{}E}
+	{a^n}{\sqrt[n]{a}=a^{1/n}}
+	{Exponentiation: \meaningexplanation{$n$ factors of $a$} }
+	{$n$th root.}
+	{2^4&=2\cdot2\cdot2\cdot2=16 \quad &(-2)^5&=-32}
+	{\sqrt[4]{16}& = 16^{\frac{1}{4}}=2 \qquad &\sqrt[5]{-32}&=-2 = (-32)^{\frac{1}{5}}}
 }
 \endgroup
-\vspace{2mm}
+\vspace{0mm}
 \noindent\begin{minipage}[t]{.49\linewidth}
-\setlength{\RowPadding}{0.8mm}
+\compacttables
+\renewcommand{\MeaningColumnFraction}{.39}
 \sectionbox{Sets and number systems}{
-\symrow{\{a,b,c\}}{Set: order and repetition do not matter.}{$\{2,4\}=\{4,2\}$\\$\{2,2,4\}=\{2,4\}$}
-\pairedrowwithcols{l}{\in}{\notin}{Is an element of}{Is not an element of}{2\in\{1,2\}}{3\notin\{1,2\}}
-\symrow{\{x\in A:p(x)\}}{Set-builder: $x$ in $A$ such that $p(x)$ holds. $:$ or $|$ means ``such that''.}{$\{x\in\mathbb R:x>0\}$\\Positive real numbers}
-\symrow{\varnothing,\ |A|}{Empty set: no elements. $|A|$ counts a finite set's elements.}{$|\varnothing|=0$\\$|\{2,4,6\}|=3$}
-\symrow{A\subseteq B}{Subset: all elements of $A$ are in $B$; may be equal.}{$\{1\}\subseteq\{1,2\}$\\$\{1,2\}\subseteq\{1,2\}$}
-\symrow{A\subsetneq B}{Proper subset: $A\subseteq B$ and $A\ne B$.}{$\{1\}\subsetneq\{1,2\}$}
-\symrow{A\cup B,\ A\cap B}{Union: in either or both. Intersection: in both.}{$\{1,2\}\cup\{2,3\}=\{1,2,3\}$\\$\{1,2\}\cap\{2,3\}=\{2\}$}
-\symrow{A\setminus B}{Set difference: in $A$ but not in $B$.}{$\{1,2\}\setminus\{2,3\}=\{1\}$}
-\symrow{\mathbb N,\ \mathbb Z}{Natural numbers; integers (including $0$ and negatives).}{Here $\mathbb N=\{1,2,3,\ldots\}$.\\Some texts include $0$; check.\\$-2,0,3\in\mathbb Z$}
-\symrow{\mathbb Q,\ \mathbb R}{Rationals: integer ratios $p/q$, $q\ne0$. Reals: the number line.}{$\frac12,-3\in\mathbb Q$\\$\sqrt2,\pi\in\mathbb R$}
-\symrow{\mathbb R\setminus\mathbb Q}{Irrationals: reals that are not rational.}{$\sqrt2,\pi\in\mathbb R\setminus\mathbb Q$}
-\symrow{\mathbb N\subsetneq\mathbb Z}{Number systems nest.}{$\mathbb N\subsetneq\mathbb Z\subsetneq\mathbb Q\subsetneq\mathbb R$}
-\symrow{(a,b),\ [a,b]}{Intervals ($a<b$): parentheses exclude endpoints; brackets include them.}{$x\in(1,3)$: $1<x<3$\\$x\in[1,3]$: $1\leq x\leq3$}
-\symrow{[a,b),\ (a,b]}{Half-open intervals: include just one endpoint.}{$2\in[2,5),\ 5\notin[2,5)$\\$2\notin(2,5],\ 5\in(2,5]$}
-\symrow{\infty,\ -\infty}{Unbounded directions; not reals. Use parentheses at infinity.}{$[0,\infty)=\{x\in\mathbb R:x\geq0\}$}
+\symrow{\{a,b,c\}}{\conceptmeaning{Set}{\meaningexplanation{Ignores order and repetition.}}}{\exmath{\{2,4\}&=\{4,2\}\\\{2,2,4\}&=\{2,4\}}}
+\pairedrow{\in}{\notin}{Element of}{Not an element of}{2&\in\{1,2\}}{3&\notin\{1,2\}}
+\symrow{\{x:p(x)\}}{\conceptmeaning{Set-builder notation}{\meaningexplanation{$x\in A$ such that $p(x)$ holds.}}}{\exmath[l]{\{x\in\mathbb R:x>0\}\\\text{Positive real numbers}}}
+\pairedrow{\varnothing}{|A|}{\conceptmeaning{Empty set}{\meaningexplanation{No elements.}}}{\conceptmeaning{Cardinality}{\meaningexplanation{Number of elements in finite $A$.}}}{|\varnothing|&=0}{|\{2,4,6\}|&=3}
+\pairedrow{A\subseteq B}{A\subsetneq B}{\conceptmeaning{Subset}{\meaningexplanation{All of $A$ in $B$; may equal $B$.}}}{\conceptmeaning{Proper subset}{\meaningexplanation{$A\subseteq B$, $A\ne B$.}}}{\{1,2\}&\subseteq\{1,2\}}{\{1\}&\subsetneq\{1,2\}}
+\pairedrow{A\cup B}{A\cap B}{\conceptmeaning{Union}{\meaningexplanation{In either or both.}}}{\conceptmeaning{Intersection}{\meaningexplanation{In both.}}}{\{1\}\cup\{2\}&=\{1,2\}}{\{1,2\}\cap\{2\}&=\{2\}}
+\symrow{A\setminus B}{\conceptmeaning{Difference}{\meaningexplanation{In $A$, outside $B$.}}}{\exmath{\{1,2\}\setminus\{2\}&=\{1\}}}
+\pairedrow{\mathbb N}{\mathbb Z}{Naturals}{Integers}{\mathbb N&=\{1,2,3,\ldots\}}{Z&=\{\ldots, -2, -1, 0, 1,2,\ldots\}}
+\pairedrow{\mathbb Q}{\mathbb R}{\conceptmeaning{Rationals}{\meaningexplanation{$p/q$; $p,q\in\mathbb Z$, $q\ne0$.}}}{\conceptmeaning{Reals}{\meaningexplanation{The number line.}}}{\tfrac12,-3&\in\mathbb Q}{\sqrt2,\pi,\tfrac12,-3&\in\mathbb R}
+\symrow{\mathbb R\setminus\mathbb Q}{Irrationals}{\exmath{\sqrt2,\pi&\in\mathbb R\setminus\mathbb Q}}
+\pairedrowwithcols{l@{}E}{(a,b)}{[a,b]}{\conceptmeaning{Open interval}{\meaningexplanation{Excludes endpoints.}}}{\conceptmeaning{Closed interval}{\meaningexplanation{Includes endpoints.}}}{x\in(1,3):&1<x<3}{x\in[1,3]:&1\leq x\leq3}
+\pairedrowwithcols{l@{}E}{[a,b)}{(a,b]}{\conceptmeaning{Half-open interval}{\meaningexplanation{Includes left endpoint only.}}}{\conceptmeaning{Half-open interval}{\meaningexplanation{Includes right endpoint only.}}}{2\in[2,5),&5\notin[2,5)}{2\notin(2,5],&5\in(2,5]}
+\pairedrowwithcols{l}{\infty}{-\infty}{\conceptmeaning{Positive infinity}{\meaningexplanation{Unbounded above.}}}{\conceptmeaning{Negative infinity}{\meaningexplanation{Unbounded below.}}}{[0,\infty)}{(-\infty,0]}
 }
-{\FooterFont Dots in lists: see Poster 2. Bars mean absolute value for numbers and cardinality for finite sets.\par}
+{\FooterFont Intervals assume $a<b$. Infinity is not a real number; use parentheses there. Some texts include $0$ in $\mathbb N$; check the convention. Dots: see Poster 2. Bars: absolute value for numbers, cardinality for finite sets.\par}
 \end{minipage}\hfill
 \begin{minipage}[t]{.485\linewidth}
-\setlength{\RowPadding}{1.15mm}
+\compacttables
 \sectionbox[{\textbf{Fair die:} $\Omega=\{1,2,3,4,5,6\}$.\par
-$A=\{1,3,5\}$ (odd), $B=\{1,2\}$.\par
-Unless stated otherwise, examples below use this die.\par}]{Probability and events}{
-\symrow{\Omega,\ \omega}{Sample space $\Omega$: all possible outcomes. Outcome $\omega$: one result.}{$\omega=3\in\Omega$}
-\symrow{A\subseteq\Omega}{An event is a set of outcomes from the sample space.}{$A=\{1,3,5\}$: odd result}
-\symrow{P(A)}{Probability of $A$; always between $0$ and $1$.}{$0\leq P(A)\leq1$\\$P(\Omega)=1,\ P(\varnothing)=0$}
-\symrow{\dfrac{|A|}{|\Omega|}}{Equals $P(A)$ only for a finite sample space of equally likely outcomes.}{$P(A)=\frac36=\frac12$}
-\symrow{A^c}{Complement: outcomes in $\Omega$ outside $A$.}{$A^c=\{2,4,6\}$\\$P(A^c)=1-P(A)=\frac12$}
-\symrow{A\cup B,\ A\cap B}{Apply set operations (left): $A$ or $B$ (or both); $A$ and $B$.}{$A\cup B=\{1,2,3,5\}$\\$A\cap B=\{1\}$}
-\symrow{A\cap C=\varnothing}{Mutually exclusive events cannot occur together.}{$C=\{2,4,6\}$\\$A\cap C=\varnothing$}
-\symrow{P(A\mid B)}{Conditional probability: chance of $A$ given $B$; requires $P(B)>0$.}{$P(A\mid B)=\frac{P(A\cap B)}{P(B)}$\\$\phantom{P(A\mid B)}=\frac{1/6}{2/6}=\frac12$}
-\symrow{P(A\cap B)}{For independent events, $P(A\cap B)=P(A)P(B)$. If $P(B)>0$, this means $P(A\mid B)=P(A)$.}{New example: two independent fair coin tosses.\\$E$: first is heads; $F$: second is heads.\\$P(E\cap F)=\frac14=\frac12\cdot\frac12$}
+$A=\{1,3,5\}$ (odd), $B=\{1,2\}$, $C=\{2,4,6\}$.\par
+Die examples below use these events.\par
+\textbf{Independent fair coin tosses:} $E$: first is heads; $F$: second is heads.\par}]{Probability and events}{
+\pairedrow{\Omega}{\omega}{\conceptmeaning{Sample space}{\meaningexplanation{All possible outcomes.}}}{\conceptmeaning{Outcome}{\meaningexplanation{One possible result.}}}{\Omega&=\{1,2,3,4,5,6\}}{\omega&=3\in\Omega}
+\symrow{A\subseteq\Omega}{\conceptmeaning{Event}{\meaningexplanation{A set of outcomes.}}}{\exmath{A&=\{1,3,5\}}}
+\symrow{P(A)}{\conceptmeaning{Probability of $A$}{\meaningexplanation{Between $0$ and $1$.}}}{\exmath{0&\leq P(A)\leq1\\P(\Omega)&=1\\P(\varnothing)&=0}}
+\symrow{\dfrac{|A|}{|\Omega|}}{\conceptmeaning{Classical probability}{\meaningexplanation{Equals $P(A)$ for finite, equally likely outcomes only.}}}{\exmath{P(A)&=\tfrac36=\tfrac12}}
+\symrow{A^c}{\conceptmeaning{Complement}{\meaningexplanation{Outcomes in $\Omega$ outside $A$.}}}{\exmath{A^c&=\{2,4,6\}\\P(A^c)&=1-P(A)=\tfrac12}}
+\pairedrow{A\cup B}{A\cap B}{\conceptmeaning{Union of events}{\meaningexplanation{Event $A$ or $B$, or both.}}}{\conceptmeaning{Intersection of events}{\meaningexplanation{Events $A$ and $B$ together.}}}{A\cup B&=\{1,2,3,5\}}{A\cap B&=\{1\}}
+\symrow{A\cap C=\varnothing}{\conceptmeaning{Mutually exclusive}{\meaningexplanation{Cannot occur together.}}}{\exmath{A\cap C&=\varnothing}}
+\symrow{P(A\mid B)}{\conceptmeaning{Conditional probability}{\meaningexplanation{$A$ given $B$; $P(B)>0$.}}}{\exmath{P(A\mid B)&=\tfrac{P(A\cap B)}{P(B)}\\&=\tfrac{1/6}{2/6}=\tfrac12}}
+\symrow{P(E\cap F)}{\conceptmeaning{Independent events}{\meaningexplanation{Multiply their probabilities.}}}{\exmath{P(E\cap F)&=P(E)P(F)\\&=\tfrac12\cdot\tfrac12=\tfrac14}}
+\symrow{P(A\mid B)}{\conceptmeaning{Independence}{\meaningexplanation{Iff this equals $P(A)$; $P(B)>0$.}}}{\exmath{P(E\mid F)&=P(E)=\tfrac12}}
 }
 \vspace{1.5mm}
 {\DefinitionFont\textbf{Keep the ideas separate.}\par
-Mutually exclusive events of positive probability are not independent: knowing one occurred rules out the other.\par
+Mutually exclusive events of positive probability are not independent: one occurring rules out the other.\par
 \vspace{2mm}
-The bar in $P(A\mid B)$ means ``given''; the bar in set-builder notation means ``such that''. Context determines the reading.\par}
+The bar in $P(A\mid B)$ means ``given''; in set-builder notation it means ``such that''. Context determines the reading.\par}
 \end{minipage}\par
 \vfill
 {\color{navy}\hrule height 0.5pt}\vspace{1.5mm}
@@ -218,95 +342,76 @@ The bar in $P(A\mid B)$ means ``given''; the bar in set-builder notation means `
 \begingroup
 {\TitleFont\color{coral}MATHEMATICS\hfill\KickerFont POSTER 2\par}
 \vspace{1.3mm}{\color{navy}\hrule height 0.8pt}\vspace{1.8mm}
-{\KickerFont FUNCTIONS, VARIABLES, SEQUENCES AND SUMS\par}\vspace{3mm}
+{\KickerFont FUNCTIONS, VARIABLES, SEQUENCES AND SUMS\par}\vspace{1mm}
 \noindent\begin{minipage}[t]{.49\linewidth}
-\setlength{\RowPadding}{1.25mm}
+\compacttables
+\renewcommand{\MeaningColumnFraction}{.43}
 \sectionbox[{\textbf{Example:} $f:\mathbb R\to\mathbb R$, $f(x)=x^2$.\par
 Set and interval notation: see Poster 1.\par}]{Function notation}{
-\symrow{f}{A function assigns exactly one output to each input in its domain. $f$ is its name.}{$f(x)=x^2$}
-\symrow{f(x)}{Value at input $x$; parentheses mark the argument, not $f$ multiplied by $x$.}{$f(3)=3^2=9$}
-\symrow{f:A\to B}{Domain $A$: allowed inputs. Codomain $B$: declared target set for outputs.}{$f:\mathbb R\to\mathbb R$\\Domain and codomain: $\mathbb R$}
-\symrow{x\mapsto f(x)}{Input-to-output rule; $\to$ above connects sets, $\mapsto$ connects values.}{$x\mapsto x^2;\quad 3\mapsto9$}
-\symrow{\operatorname{dom}(f)}{Domain notation; inputs must belong to this set.}{$\operatorname{dom}(f)=\mathbb R$}
-\symrow{\operatorname{range}(f)}{Range: outputs actually attained; a subset of the codomain.}{$\operatorname{range}(f)=[0,\infty)$\\Negative reals are not outputs.}
+\symrow{f}{\conceptmeaning{Function}{\meaningexplanation{One output per domain input.}}}{\exmath{f(x)&=x^2}}
+\symrow{f(x)}{\conceptmeaning{Function value}{\meaningexplanation{Value at $x$; parentheses mark input, not multiplication.}}}{\exmath{f(3)&=3^2=9}}
+\symrow{f:A\to B}{\conceptmeaning{Function mapping}{\meaningexplanation{Domain $A$ to codomain $B$.}}}{\exmath[l]{f:\mathbb R\to\mathbb R}}
+\pairedrow{A}{B}{\conceptmeaning{Domain}{\meaningexplanation{Allowed inputs.}}}{\conceptmeaning{Codomain}{\meaningexplanation{Declared output target.}}}{A&=\mathbb R}{B&=\mathbb R}
+\symrow{x\mapsto f(x)}{\conceptmeaning{Mapping rule}{\meaningexplanation{Maps values; $\to$ links sets.}}}{\exmath[r@{}E]{x&\mapsto x^2\\3&\mapsto9}}
+\symrow{\operatorname{dom}(f)}{\conceptmeaning{Domain}{\meaningexplanation{Allowed inputs.}}}{\exmath{\operatorname{dom}(f)&=\mathbb R}}
+\symrow{\operatorname{range}(f)}{\conceptmeaning{Range}{\meaningexplanation{Attained outputs in codomain.}}}{\exmath{\operatorname{range}(f)&=[0,\infty)}\par No negative outputs.}
 }
-\vspace{1.5mm}
+\vspace{0.7mm}
 \letterreference{
 \letterrow{a,b,c;\ x,y,z}{Common lowercase Latin letters}
 \letterrow{A,B,C}{Common uppercase Latin letters}
-\letterrow{\alpha,\ \beta,\ \gamma}{Alpha; beta; gamma}
-\letterrow{\delta,\ \Delta}{Delta; uppercase delta}
-\letterrow{\theta,\ \Theta}{Theta; uppercase theta}
-\letterrow{\lambda,\ \Lambda}{Lambda; uppercase lambda}
-\letterrow{\mu,\ \sigma,\ \Sigma}{Mu; sigma; uppercase sigma}
-\letterrow{\omega,\ \Omega}{Omega; uppercase omega (Poster 1)}
-\letterrow{\pi}{Pi; in these examples, the circle constant $\pi\approx3.14$.}
+\lettertriple{\alpha}{\beta}{\gamma}{Alpha}{Beta}{Gamma}
+\letterpair{\delta}{\Delta}{Delta}{Uppercase delta}
+\letterpair{\theta}{\Theta}{Theta}{Uppercase theta}
+\letterpair{\lambda}{\Lambda}{Lambda}{Uppercase lambda}
+\lettertriple{\mu}{\sigma}{\Sigma}{Mu}{Sigma}{Uppercase sigma}
+\letterpair{\omega}{\Omega}{Omega}{\conceptmeaning{Uppercase omega}{(\meaningexplanation{Poster 1})}}
+\letterrow{\pi}{\conceptmeaning{Pi}{\meaningexplanation{Here, the circle constant $\pi\approx3.14$.}}}
 }
 {\DefinitionFont Names do not fix meanings. $\Sigma$ is a letter; $\sum$ is the related summation operator (right), not an ordinary variable.\par}
-\vspace{3mm}
-\teachingheading{Variables}
-{\DefinitionFont
-A \textbf{variable} represents values allowed by its context. A \textbf{constant} stays fixed within that context. A letter can serve either role.\par
-\teachinglabel{Separate choices, not simultaneous equalities}
-$x$ might be $-2$, $0$, or $3.5$ in separate cases.\par
-$n\in\mathbb N$ may count objects; $\theta=30^\circ$ may name an angle (${}^\circ$ means degrees).\par
-$A$ may be a set such as $\{1,2\}$; $\lambda$ may be a number such as $2$.\par
-\teachinglabel{State what is fixed and what varies}
-In $y=mx+b$, $x$ is the input and $y$ the output; $m$ and $b$ are fixed for a chosen line.\par
-\vspace{1.5mm}
-Uppercase letters often name sets; Greek letters often name angles or numbers. These are conventions, not permanent types.\par
+\vspace{1mm}
+\renewcommand{\ContextHeading}{Letter roles}
+\sectionbox[{Roles depend on context: uppercase often names sets; Greek often names angles or numbers. Conventions are not permanent types.\par}]{Variables}{
+\pairedrowwithcols{l}{x}{m,b}{\conceptmeaning{Variable}{\meaningexplanation{May vary in context.}}}{\conceptmeaning{Constants}{\meaningexplanation{Fixed in context.}}}{x\in\{-2,0,3.5\}}{y=mx+b}
+\pairedrowwithcols{l}{x}{y}{\conceptmeaning{Input variable}{\meaningexplanation{Input for a line.}}}{\conceptmeaning{Output variable}{\meaningexplanation{Output for that line.}}}{y=mx+b}{m,b\text{ fixed}}
+\triplerow{n}{\theta}{A}{\conceptmeaning{Count}{\meaningexplanation{May count objects.}}}{\conceptmeaning{Angle}{\meaningexplanation{May name an angle in degrees (${}^\circ$).}}}{\conceptmeaning{Set name}{\meaningexplanation{May name a set.}}}{n&\in\mathbb N}{\theta&=30^\circ}{A&=\{1,2\}}
+\symrow{\lambda}{\conceptmeaning{Number}{\meaningexplanation{May name a number.}}}{\exmath{\lambda&=2}}
 }
+{\FooterFont A letter may be variable or constant. Values $-2$, $0$, $3.5$ are separate choices for $x$, not simultaneous equalities.\par}
 \end{minipage}\hfill
 \begin{minipage}[t]{.485\linewidth}
-\raggedright
-\teachingheading{Lists, sequences and subscripts}
-{\DefinitionFont
-A \textbf{sequence} is an ordered list of terms. A \textbf{series} is a sum of sequence terms. Here, parentheses show sequences; braces show sets (Poster 1).\par
-\teachinglabel{Dots omit entries in an established pattern}
-$\ldots$ in lists and $\cdots$ in sums indicate omitted entries following an established pattern. The dots alone do not define a unique rule.\par
-\teachingmath{1,2,3,\ldots,n&\quad\text{ends at }n;\quad n\geq3.\\1,2,3,\ldots&\quad\text{continues indefinitely.}}
-A final term marks a finite list; without a final term, the second example continues without end.\par
-\teachinglabel{A subscript identifies a term}
-In $a_i$, the \textbf{index} $i$ identifies a position or label; it is not multiplication or an exponent.\par
-\teachingmath{a_1&=\text{term at index }1,\\a_n&=\text{term at index }n.}
-Indices often start at $1$, but can start at $0$ or another integer: state the starting point. Subscripts may also label cases: $A_1,A_2$ can name alternatives.\par
-\teachinglabel{Finite and infinite sequences}
-For the rule $a_i=2i$:\par
-\teachingmath{(a_i)_{i=1}^{4}&=(a_1,a_2,a_3,a_4)=(2,4,6,8),\\(a_i)_{i=1}^{\infty}&=(2,4,6,8,\ldots).}
-The first has four terms; the second has no last term. With this rule, $a_3=2(3)=6$.\par
-\teachinglabel{Order and repetitions matter}
-$(2,4)\ne(4,2)$ and $(2,2,4)\ne(2,4)$. Sets behave differently: see Poster 1.\par
+\compacttables
+\renewcommand{\SymbolColumnFraction}{.22}
+\renewcommand{\MeaningColumnFraction}{.39}
+\renewcommand{\ContextHeading}{Reading guide}
+\sectionbox[{A \textbf{sequence} is an ordered list of terms; a \textbf{series} is a sum of sequence terms. Here, parentheses show sequences; braces show sets.\par
+\textbf{Sequence examples:} $a_i=2i$, starting at $i=1$.\par}]{Lists, sequences and subscripts}{
+\pairedrowwithcols{l}{\ldots}{\cdots}{\conceptmeaning{Ellipsis}{\meaningexplanation{Omitted list entries.}}}{\conceptmeaning{Centered ellipsis}{\meaningexplanation{Omitted terms in a sum.}}}{1,2,3,\ldots}{a_1+a_2+\cdots+a_n}
+\pairedrowwithcols{l}{1,2,\ldots,n}{1,2,3,\ldots}{\conceptmeaning{Finite list}{\meaningexplanation{Ends at $n$.}}}{\conceptmeaning{Infinite list}{\meaningexplanation{No final term.}}}{1,2,3,\ldots,5\ (n=5)}{1,2,3,4,5,\ldots}
+\symrow{a_i}{\conceptmeaning{Indexed term}{\meaningexplanation{Term at position or label $i$.}}}{\exmath{a_3&=2(3)=6}}
+\pairedrow{a_1}{a_n}{\conceptmeaning{Indexed term}{\meaningexplanation{Term at index $1$.}}}{\conceptmeaning{Indexed term}{\meaningexplanation{Term at index $n$.}}}{a_1&=2}{a_n&=2n}
+\pairedrow{(a_i)_{i=1}^{4}}{(a_i)_{i=1}^{\infty}}{\conceptmeaning{Finite sequence}{\meaningexplanation{Four terms.}}}{\conceptmeaning{Infinite sequence}{\meaningexplanation{No last term.}}}{(a_i)_{i=1}^{4}&=(2,4,6,8)}{(a_i)_{i=1}^{\infty}&=(2,4,6,\ldots)}
+\pairedrowwithcols{l}{(2,4)}{(2,2,4)}{\conceptmeaning{Sequence order}{\meaningexplanation{Order matters.}}}{\conceptmeaning{Sequence repetition}{\meaningexplanation{Repetition matters.}}}{(2,4)\ne(4,2)}{(2,2,4)\ne(2,4)}
+\symrow{A_1,A_2}{\conceptmeaning{Subscript labels}{\meaningexplanation{Subscripts may label cases.}}}{Alternatives $A_1$ and $A_2$.}
 }
-\vspace{3mm}
-\teachingheading{Summation notation}
-{\DefinitionFont
-\begingroup
-\setlength{\tabcolsep}{1mm}\arrayrulecolor{rulecolor}
-\begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash}m{.25\linewidth}X@{}}
-\centeredcell{\centering\SymbolFont $\displaystyle\sum_{i=1}^{n}a_i$}&
-\centeredcell{\DefinitionFont $\sum$: sum the indicated terms\\
-$i$: index; $1$: lower bound\\
-$n$: upper bound\\
-$a_i$: summand (expression summed)}\\\hline
-\end{tabularx}\endgroup\par\vspace{1.5mm}
-The index runs through consecutive integers from the lower bound to the upper bound, \textbf{inclusive}. Here $n$ is a positive integer.\par
-\teachingmath{\sum_{i=1}^{n}a_i&=a_1+a_2+\cdots+a_n.}
-The centered dots follow the same omission convention as the list dots above.\par
-\teachinglabel{One term versus the sum of the first $n$ terms}
-Define $S_n$ as the sum of the first $n$ terms (indexing from $1$):\par
-\teachingmath{S_n&=\sum_{i=1}^{n}a_i.\\a_i=2i:\quad a_4&=8,\qquad S_4=2+4+6+8=20.}
-\teachinglabel{Other summands and bounds}
-{\ExampleFont\exmath[r@{\quad}r@{}E]{
-\text{Constant:}&\sum_{i=2}^{4}3&=3+3+3=9.\\[1.5mm]
-\text{Squares:}&\sum_{k=1}^{3}k^2&=1+4+9=14.
-}\par}
-\teachinglabel{The index name can change}
-\teachingmath{\sum_{i=1}^{4}i&=\sum_{k=1}^{4}k=1+2+3+4=10.}
-Change the index consistently in both the bounds and the summand. The index is local to its sum.\par
+{\FooterFont Dots follow an established pattern; alone they do not define a unique rule. The finite list $1,2,3,\ldots,n$ assumes integer $n\geq3$. An index is not multiplication or an exponent. Indices may start at $1$, $0$, or another integer: state the start. Sets ignore order and repetition (Poster 1).\par}
+\vspace{1mm}
+\renewcommand{\ContextHeading}{Index convention}
+\renewcommand{\SymbolColumnFraction}{.23}
+\renewcommand{\MeaningColumnFraction}{.39}
+\sectionbox[{Indices run through consecutive integers between the bounds, \textbf{inclusive}. Here $n\in\mathbb N$, $n\geq1$, and $a_i=2i$ in the sequence examples.\par}]{Summation notation}{
+\symrow{\displaystyle\sum_{i=1}^{n}a_i}{\conceptmeaning{Summation}{\meaningexplanation{Sum of the indicated terms.}}}{\exmath[l]{a_1+a_2+\cdots+a_n}}
+\pairedrowwithcols{l}{i}{a_i}{\conceptmeaning{Index}{\meaningexplanation{Local to sum.}}}{\conceptmeaning{Summand}{\meaningexplanation{Expression summed.}}}{i=1,2,\ldots,n}{a_i=2i}
+\pairedrowwithcols{l}{1}{n}{\conceptmeaning{Lower bound}{\meaningexplanation{First index.}}}{\conceptmeaning{Upper bound}{\meaningexplanation{Last index.}}}{\text{Start at }i=1.}{\text{End at }i=n.}
+\pairedrow{a_n}{S_n}{\conceptmeaning{Indexed term}{\meaningexplanation{Single term at $n$.}}}{\conceptmeaning{Partial sum}{\meaningexplanation{Sum of first $n$ terms; start at $1$.}}}{a_4&=8}{S_n&=\sum_{i=1}^{n}a_i}
+\symrow{S_4}{\conceptmeaning{Fourth partial sum}{\meaningexplanation{Four terms for $a_i=2i$.}}}{\exmath{S_4&=2+4+6+8=20}}
+\pairedrowwithcols{l}{\displaystyle\sum_{i=2}^{4}3}{\displaystyle\sum_{k=1}^{3}k^2}{\conceptmeaning{Constant sum}{\meaningexplanation{Constant; bounds $2$ to $4$.}}}{\conceptmeaning{Sum of squares}{\meaningexplanation{Squares; bounds $1$ to $3$.}}}{\begin{array}[t]{@{}r@{}l@{}}\sum_{i=2}^{4}3&{}=3+3+3\\&{}=9\end{array}}{\begin{array}[t]{@{}r@{}l@{}}\sum_{k=1}^{3}k^2&{}=1+4+9\\&{}=14\end{array}}
+\symrow{i,\ k}{\conceptmeaning{Index renaming}{\meaningexplanation{Index names may change consistently.}}}{\exmath[l]{\sum_{i=1}^{4}i=\sum_{k=1}^{4}k\\{}=1+2+3+4=10}}
 }
+{\FooterFont Rename the local index in both bounds and summand. Centered dots use the same omission convention as list dots.\par}
 \end{minipage}\par
 \vfill
-{\color{navy}\hrule height 0.5pt}\vspace{1.5mm}
+{\color{navy}\hrule height 0.5pt}\vspace{0.7mm}
 {\FooterFont Symbols acquire meaning from their mathematical context.\par}
 \endgroup
 \end{document}
