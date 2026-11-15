@@ -1,104 +1,171 @@
 \documentclass[12pt,aspectratio=169]{beamer}
 \usepackage[T1]{fontenc}
-\usepackage{array,tabularx}
-
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,array,booktabs,tabularx,tikz}
+% Add language support appropriate to the source, if needed.
+% Keep this preamble inline in every delivered deck.
 \definecolor{GEInk}{HTML}{132A3E}
 \definecolor{GETeal}{HTML}{17675E}
 \definecolor{GEFooter}{HTML}{EAF2F1}
-
 \setbeamercolor{background canvas}{bg=white}
 \setbeamercolor{normal text}{fg=GEInk,bg=white}
 \setbeamercolor{structure}{fg=GETeal}
 \setbeamercolor{frametitle}{fg=GEInk}
-\setbeamercolor{GE footer}{fg=GEInk,bg=GEFooter}
-\setbeamerfont{title}{series=\bfseries}
-\setbeamerfont{frametitle}{series=\bfseries}
-\setbeamerfont{GE footer}{size=\scriptsize}
+\setbeamercolor{GE footer}{fg=GETeal,bg=GEFooter}
+\setbeamerfont{normal text}{family=\sffamily,size=\normalsize}
+\setbeamerfont{title}{size=\huge,series=\bfseries}
+\setbeamerfont{subtitle}{size=\normalsize,series=\bfseries}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{framesubtitle}{size=\normalsize,series=\mdseries}
+\setbeamerfont{GE footer}{size=\footnotesize}
 \setbeamersize{text margin left=9mm,text margin right=9mm}
 \setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}
+\setbeamercovered{invisible}
 \setbeamertemplate{frametitle}{%
-  \vskip0.5em
-  \strut\insertframetitle\strut\par
+  \vskip.5em
+  {\usebeamerfont{frametitle}\strut\insertframetitle\strut\par}%
   \ifx\insertframesubtitle\empty\else
-    {\usebeamerfont{framesubtitle}\usebeamercolor[fg]{framesubtitle}%
-     \strut\insertframesubtitle\strut\par}%
+    {\usebeamerfont{framesubtitle}\strut\insertframesubtitle\strut\par}%
   \fi
+  \vskip.25em
 }
 \setbeamertemplate{footline}{%
-  \begin{beamercolorbox}[wd=\paperwidth,ht=2.7ex,dp=1.1ex,
+  \begin{beamercolorbox}[wd=\paperwidth,ht=3ex,dp=1.3ex,
     leftskip=9mm,rightskip=9mm]{GE footer}%
     \usebeamerfont{GE footer}\insertsectionhead\hfill
-    \insertframenumber\,/\,\inserttotalframenumber
+    \insertframenumber/\inserttotalframenumber
   \end{beamercolorbox}%
 }
-
-% Use short text or math arguments. Put surrounding operators outside the box.
-\makeatletter
-\newcommand{\GEHighlightBox}[2]{{%
-  \setlength{\fboxsep}{1.5pt}%
-  \colorbox{#1}{\color{GEInk}#2}%
-}}
-\newcommand{\GEHighlightMath}[3]{\GEHighlightBox{#1}{$\m@th#2#3$}}
-\newcommand{\GEHighlight}[2]{%
-  \ifmmode
-    \mathpalette{\GEHighlightMath{#1}}{#2}%
-  \else
-    \GEHighlightBox{#1}{#2}%
-  \fi
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{.35em}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.22}
+\AtBeginEnvironment{frame}{\raggedright}
+\addtobeamertemplate{frametitle}{}{%
+  \setlength{\abovedisplayskip}{6pt plus 2pt minus 2pt}%
+  \setlength{\belowdisplayskip}{6pt plus 2pt minus 2pt}%
+  \setlength{\abovedisplayshortskip}{6pt plus 2pt minus 2pt}%
+  \setlength{\belowdisplayshortskip}{6pt plus 2pt minus 2pt}%
 }
-\makeatother
 
-% Replace these illustrative roles, metadata, and frames for each lesson.
-\definecolor{GERevenue}{HTML}{D8EFE9}
-\definecolor{GECost}{HTML}{F7E8D2}
-\title{Revenue, cost, and profit}
-\subtitle{Global Economics}
+% Define source-derived role colors here. No fixed lesson palette.
+% Use \definecolor{MeaningfulRoleName}{HTML}{...} for each used role.
+\tikzset{ge marker/.style={rectangle,rounded corners=1mm,draw=none,
+  fill=#1,fill opacity=.32,text opacity=1,text=GEInk,
+  inner xsep=.6mm,inner ysep=.3mm,outer sep=0pt}}
+\newif\ifGTenHighlights
+\GTenHighlightstrue
+% \GTenHighlightsfalse % Uncomment to disable instructional highlights.
+% Preserve an existing source toggle setting when adapting a deck.
+\makeatletter
+\newcommand{\GEHighlightMath}[2]{%
+  \tikz[baseline=(gehl.base)]\node[ge marker=\GECurrentRole]
+    (gehl) {$\m@th#1#2$};}
+\newcommand{\GEHighlight}[2]{%
+  \ifGTenHighlights
+  \begingroup\def\GECurrentRole{#1}%
+  \ifmmode\mathpalette\GEHighlightMath{#2}%
+  \else\tikz[baseline=(gehl.base)]\node[ge marker=#1](gehl){#2};\fi
+  \endgroup
+  \else#2\fi}
+\makeatother
+% Keep rows, rules, and table structure outside this space-reserving command.
+\newcommand{\GERevealCell}[2]{\leavevmode\visible<#1->{#2}}
+
+% Two complementary source-derived tables; share notation and role macros.
+% Replace placeholders with permitted source content. No fixed topic palette.
+% Detailed reference: split into consecutive opening frames if crowded.
+\newcommand{\GEDetailedNotationReference}{%
+  \begingroup
+  \small
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{.15\linewidth}%
+    >{\raggedright\arraybackslash}p{.17\linewidth}%
+    >{\raggedright\arraybackslash}p{.24\linewidth}%
+    >{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Symbol or notation} & \textbf{Concept} & \textbf{Definition} &
+    \textbf{Meaning in the introductory examples} \\
+    \midrule
+    \GERevealCell{1}{[Notation]} &
+    \GERevealCell{1}{[Concept]} &
+    \GERevealCell{2}{[General definition]} &
+    \GERevealCell{3}{\textbullet\ Example 1: [Meaning here.]}\par
+    \GERevealCell{5}{\textbullet\ Example 2: [Meaning here, if relevant.]} \\
+    % Add relevant rows; keep full row geometry stable on every overlay.
+    % Apply source roles to names, complete notation, and useful values.
+    % Omit irrelevant example bullets; never expose independent-task answers.
+    \bottomrule
+  \end{tabularx}\par
+  \endgroup
+}
+% Concise summary: essential notation and brief meanings, no reveal commands.
+\newcommand{\GEConciseHighlightLegend}{%
+  \begingroup
+  \small
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{.22\linewidth}%
+    >{\raggedright\arraybackslash}p{.22\linewidth}%
+    >{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Symbol or notation} & \textbf{Concept} & \textbf{Brief meaning} \\
+    \midrule
+    {[Notation]} & [Concept] & [Short meaning only.] \\
+    % Reuse opening roles; do not copy definitions or worked calculations.
+    \bottomrule
+  \end{tabularx}\par
+  \endgroup
+}
+
+% Replace neutral metadata using the practice; omit unavailable fields.
+\title{Lesson topic}
+\subtitle{Lesson metadata}
+\author{}
 \date{}
+\newcommand{\GEOfficialCriterion}{} % Insert identifier and verbatim wording.
+\setbeamertemplate{title page}{%
+  \raggedright\vfill
+  {\color{GETeal}\usebeamerfont{subtitle}\insertsubtitle\par}
+  \medskip
+  {\color{GEInk}\usebeamerfont{title}\inserttitle\par}
+  \bigskip
+  {\normalsize\GEOfficialCriterion\par}
+  \vfill
+}
 
 \begin{document}
-
-\section{Learning objective}
+\section{Introduction} % Translate and adapt short section labels as needed.
 \begin{frame}
   \titlepage
-  \centering
-  \textbf{Learning objective}\par\medskip
-  Distinguish revenue from cost and use both to calculate profit.
 \end{frame}
-
-\section{A market stall}
-\begin{frame}[t]{How much did the stall earn after costs?}
-  In this example, a stall takes in 90 thousand COP from sales and
-  spends 60 thousand COP in total. Which amount is revenue, and how much
-  is left after costs?
-
+% Detailed reference begins on logical frame 2, immediately after the title.
+\begin{frame}[t]{Notation reference}
+  % Briefly establish each actual source situation before its interpretation.
+  % These introductory examples do NOT count as the selected full example.
+  \GERevealCell{1}{\textbf{Example 1:} [Brief source situation and quantities.]}
+  \par
+  \GERevealCell{4}{\textbf{Example 2:} [Brief source situation and quantities.]}
   \medskip
-  \renewcommand{\arraystretch}{1.25}
-  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X
-                                     >{\raggedright\arraybackslash}X@{}}
-    \textbf{\GEHighlight{GERevenue}{Revenue}} &
-    \textbf{\GEHighlight{GECost}{Total cost}} \\
-    \hline
-    \visible<2->{Money received from sales} &
-    \visible<2->{Money spent in total} \\
-    \visible<2->{\GEHighlight{GERevenue}{90 thousand COP}} &
-    \visible<2->{\GEHighlight{GECost}{60 thousand COP}}
-  \end{tabularx}
-
-  \visible<3->{%
-    \[
-      \text{Profit (thousand COP)}
-        = \GEHighlight{GERevenue}{90} - \GEHighlight{GECost}{60} = 30
-    \]
-  }
+  \GEDetailedNotationReference
 \end{frame}
+% Add consecutive reference continuation frames here when readability needs it.
+% Retain all four column meanings, semantic roles, and stable cell overlays.
+% Do not shrink an overcrowded reference into one frame.
 
-\section{Summary}
-\begin{frame}[t]{What connects the three amounts?}
-  \[
-    \text{Profit} = \GEHighlight{GERevenue}{\text{Revenue}}
-                   - \GEHighlight{GECost}{\text{Total cost}}
-  \]
-  Express all three amounts in the same units for the same period.
+\section{Lesson}
+\begin{frame}[t]{Lesson content}
+  % Replace this insertion frame with the remaining permitted introduction
+  % and exactly ONE full worked example, across as many frames as needed.
+  % Source permission for tables does not include Section 2's procedures,
+  % unrelated worked examples, or advanced problems. Report missing source
+  % tables/examples; do not invent content unless source revision is authorized.
+  [Source-derived lesson content.]
 \end{frame}
-
+% Any criterion continuation, summary, or final interpretation check precedes
+% the closing legend. See ../references/layout-and-build.md for mechanics.
+\section{Reminder}
+% Final logical frame: concise summary, fully visible, NO progressive reveals.
+\begin{frame}[t]{Highlight legend}
+  \GEConciseHighlightLegend
+\end{frame}
+% Nothing follows the closing legend.
 \end{document}

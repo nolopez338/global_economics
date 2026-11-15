@@ -7,11 +7,75 @@
 \input{omxlmex.fd}
 \DeclareFontShape{OMX}{lmex}{m}{n}{<->lmex10}{}
 \usepackage{xcolor,colortbl}
-\usepackage{tabularx,array}
+\usepackage{tikz}
+\usepackage{tabularx,array,collcell}
+% Text tables use a symmetric minimum row strut around the cell centers.
+% Keep its total height and leave mathematical arrays' internal spacing intact.
+\makeatletter
+\pretocmd{\@mkpream}{%
+  \ifx\@acol\@tabacol
+    \@tempdima=\dimexpr(\ht\@arstrutbox+\dp\@arstrutbox)/2\relax
+    \setbox\@arstrutbox=\hbox{\vrule width0pt height\@tempdima depth\@tempdima}%
+  \fi
+  }{}{\PackageError{notation-posters}{Cannot center table struts}{}}
+\makeatother
 \pagestyle{empty}
 \definecolor{navy}{HTML}{172C3C}
 \definecolor{coral}{HTML}{BF604D}
 \definecolor{rulecolor}{HTML}{A5AFB6}
+% One restrained marker for the specific notation introduced in each row.
+\newif\ifGTenHighlights
+\GTenHighlightstrue
+% \GTenHighlightsfalse % Uncomment to disable instructional highlights.
+% Rounded highlights keep even padding and the current math style.
+% Native symbol metrics preserve spacing and baselines; padding uses surrounding clearance.
+\newcommand{\sequenceindex}[1]{\ifGTenHighlights\mathpalette\sequenceindexbox{#1}\fi#1}
+\newcommand{\sequenceindexbox}[2]{\begingroup
+  % Paint only the background; the original symbol keeps its native math atom,
+  % italic correction, script attachment, and dimensions outside this overlay.
+  \raisebox{0pt}[0pt][0pt]{%
+  \makebox[0pt][l]{\hspace{-1.2pt}\tikz[baseline=(sequenceindex.base)]\node[
+    fill=coral!12,fill opacity=0.65,draw=none,rounded corners=0.8pt,
+    inner xsep=1.2pt,inner ysep=2.2pt,outer sep=0pt,
+    minimum width=0pt,minimum height=0pt
+  ] (sequenceindex) {$\mathsurround=0pt #1\phantom{#2}$};}%
+  }%
+  \endgroup}
+% Keep integral bounds on the native operator, including its italic correction;
+% the shared renderer paints behind the integral sign only.
+\newcommand{\notationintegral}[1]{\mathop{%
+  \mathopen{\ifGTenHighlights\mathpalette\sequenceindexbox{\int}\fi}#1}\nolimits}
+% Highlight the fraction rule alone, using the same renderer and toggle.
+% Keep the native fraction (and its numerator/denominator spacing) intact.
+\newsavebox{\FractionMeasure}
+\newlength{\FractionBarWidth}
+\newlength{\FractionAxis}
+\newlength{\FractionRule}
+\newcommand{\notationfraction}[2]{\mathinner{%
+  \mathopen{\ifGTenHighlights\mathpalette\notationfractionbar{{#1}{#2}}\fi}%
+  \frac{#1}{#2}}}
+\newcommand{\notationfractionbar}[2]{\notationfractionmeasure{#1}#2}
+\newcommand{\notationfractionmeasure}[3]{\begingroup
+  \sbox{\FractionMeasure}{$\mathsurround=0pt #1\frac{#2}{#3}$}%
+  \setlength{\FractionBarWidth}{\dimexpr\wd\FractionMeasure-2\nulldelimiterspace\relax}%
+  \ifx#1\displaystyle
+    \setlength{\FractionAxis}{\fontdimen22\textfont2}%
+    \setlength{\FractionRule}{\fontdimen8\textfont3}%
+  \else\ifx#1\textstyle
+    \setlength{\FractionAxis}{\fontdimen22\textfont2}%
+    \setlength{\FractionRule}{\fontdimen8\textfont3}%
+  \else\ifx#1\scriptstyle
+    \setlength{\FractionAxis}{\fontdimen22\scriptfont2}%
+    \setlength{\FractionRule}{\fontdimen8\scriptfont3}%
+  \else
+    \setlength{\FractionAxis}{\fontdimen22\scriptscriptfont2}%
+    \setlength{\FractionRule}{\fontdimen8\scriptscriptfont3}%
+  \fi\fi\fi
+  \raisebox{\dimexpr\FractionAxis-\FractionRule/2\relax}[0pt][0pt]{%
+    \makebox[0pt][l]{\hspace{\nulldelimiterspace}%
+      \sequenceindexbox{#1}{\rule{\FractionBarWidth}{\FractionRule}}}}%
+  \endgroup}
+
 \color{navy}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0pt}
@@ -36,13 +100,12 @@
 % Measure the complete cell (including wrapped text and tall mathematics),
 % then reserve the same clearance above and below its actual bounds.
 \newsavebox{\CellContent}
-\newcommand{\paddedcell}[1]{%
-  \sbox{\CellContent}{\begin{minipage}[t]{\linewidth}\raggedright #1\end{minipage}}%
-  \raisebox{0pt}[\dimexpr\ht\CellContent+\RowPadding\relax]%
-    [\dimexpr\dp\CellContent+\RowPadding\relax]{\usebox{\CellContent}}%
-}
-% Center only complete symbol rows, using the actual bounds of tall mathematics.
-% Headers and the letter reference retain their original padded-cell layout.
+% All table helpers share the same vertical center and retain local padding.
+\newcommand{\paddedcell}[1]{\centeredcell{#1}}
+\newcommand{\centeredtextcolumn}[1]{p{#1}}
+\newcommand{\contextcell}[1]{%
+  \sbox{\CellContent}{#1}%
+  \raisebox{\dimexpr(\dp\CellContent-\ht\CellContent)/2\relax}{\usebox{\CellContent}}}
 \newcommand{\centeredcell}[1]{%
   \sbox{\CellContent}{\begin{minipage}[t]{\linewidth}\raggedright #1\end{minipage}}%
   \raisebox{\dimexpr(\dp\CellContent-\ht\CellContent)/2\relax}%
@@ -84,68 +147,101 @@
   \centeredcell{\centering\SymbolFont\ensuremath{\displaystyle #1}}&%
   \centeredcell{\DefinitionFont #2}&\centeredcell{\ExampleFont #3}\\\hline
 }
-% Measure each example line so paired symbols and meanings share its baselines,
-% including fractions and wrapped meanings. Spacing settings stay local.
+% Composite rows retain one shared example array for horizontal relation alignment.
+% Measure each logical row separately; center all its cells on that row's axis.
 \newsavebox{\PairFirst}
 \newsavebox{\PairSecond}
 \newsavebox{\PairThird}
-% Override locally for compact measured rows; other sections retain their spacing.
+\newsavebox{\ExampleFirst}
+\newsavebox{\ExampleSecond}
+\newsavebox{\ExampleThird}
+\newsavebox{\CurrentExample}
+\newsavebox{\CurrentRow}
+\newlength{\ExampleWidth}
 \newcommand{\MeasuredLineStretch}{1}
-\newcommand{\measuresymbol}[1]{}
+\newcommand{\subrowcell}[1]{\begingroup
+  \setlength{\RowPadding}{0pt}\centeredcell{#1}\endgroup}
 \newcommand{\pairstrut}[1]{\rule[-\dp#1]{0pt}{\dimexpr\ht#1+\dp#1\relax}}
+\newcommand{\measurelogicalrow}[6]{%
+  \global\setbox#1=\hbox{\ExampleFont\exmath[#3]{#6}}%
+  \global\setbox#2=\hbox{%
+    {\setlength{\linewidth}{\SymbolWidth}\subrowcell{\centering\SymbolFont$\displaystyle #4$}}%
+    {\setlength{\linewidth}{\MeaningWidth}\subrowcell{\DefinitionFont #5}}%
+    \raisebox{\dimexpr(\dp#1-\ht#1)/2\relax}{\usebox{#1}}}%
+}
 \newcommand{\pairlines}[3]{%
-  \renewcommand{\arraystretch}{\MeasuredLineStretch}%
+  \renewcommand{\arraystretch}{0}%
   \begin{tabular}[t]{@{}#1@{}}%
-  \pairstrut{\PairFirst}#2\\%
-  \pairstrut{\PairSecond}#3%
+  \pairstrut{\PairFirst}\subrowcell{#2}\\%
+  \pairstrut{\PairSecond}\subrowcell{#3}%
   \end{tabular}%
 }
-% Three subrows use the same measured struts and cell padding as paired rows.
 \newcommand{\triplelines}[4]{%
-  \renewcommand{\arraystretch}{\MeasuredLineStretch}%
+  \renewcommand{\arraystretch}{0}%
   \begin{tabular}[t]{@{}#1@{}}%
-  \pairstrut{\PairFirst}#2\\%
-  \pairstrut{\PairSecond}#3\\%
-  \pairstrut{\PairThird}#4%
+  \pairstrut{\PairFirst}\subrowcell{#2}\\%
+  \pairstrut{\PairSecond}\subrowcell{#3}\\%
+  \pairstrut{\PairThird}\subrowcell{#4}%
   \end{tabular}%
 }
-\newcommand{\triplerow}[9]{%
-  \noalign{\begingroup
+% Apply one translation to every math column in a logical row, preserving
+% the relative baselines of its relations, fractions, and other mathematics.
+\newcommand{\compositemathcell}[1]{%
+  \pairstrut{\CurrentRow}%
+  \raisebox{\dimexpr(\dp\CurrentExample-\ht\CurrentExample)/2\relax}{\renewcommand{\arraystretch}{\MeasuredLineStretch}$#1$}}
+\newcommand{\compositerelationcell}[1]{\compositemathcell{{}#1}}
+\newcolumntype{R}{>{\collectcell\compositemathcell}r<{\endcollectcell}}
+\newcolumntype{L}{>{\collectcell\compositemathcell}l<{\endcollectcell}}
+\newcolumntype{Q}{>{\collectcell\compositerelationcell}l<{\endcollectcell}}
+\ExplSyntaxOn
+\newcommand{\compositecolumns}[1]{
+  \tl_set:Nn \l_tmpa_tl {#1}
+  \tl_replace_all:Nnn \l_tmpa_tl {r}{R}
+  \tl_replace_all:Nnn \l_tmpa_tl {l}{L}
+  \tl_replace_all:Nnn \l_tmpa_tl {E}{Q}
+  \cs_set:Npx \CompositeColumns {\exp_not:V \l_tmpa_tl}
+}
+\ExplSyntaxOff
+\newcommand{\selectlogicalrow}[2]{%
+  \global\setbox\CurrentRow=\copy#1%
+  \global\setbox\CurrentExample=\copy#2}
+\newcommand{\preparecomposite}{%
   \renewcommand{\ExampleLineStretch}{\MeasuredLineStretch}%
-  \global\setbox\PairFirst=\hbox{\ExampleFont\exmath{#7}\measuresymbol{#1}%
-    \DefinitionFont\parbox[t]{\MeaningWidth}{\raggedright #4}}%
-  \global\setbox\PairSecond=\hbox{\ExampleFont\exmath{#8}\measuresymbol{#2}%
-    \DefinitionFont\parbox[t]{\MeaningWidth}{\raggedright #5}}%
-  \global\setbox\PairThird=\hbox{\ExampleFont\exmath{#9}\measuresymbol{#3}%
-    \DefinitionFont\parbox[t]{\MeaningWidth}{\raggedright #6}}%
+  \setlength{\ExampleWidth}{\dimexpr\linewidth-\SymbolWidth-\MeaningWidth-4\tabcolsep\relax}%
+  \setlength{\linewidth}{\ExampleWidth}}
+\newcommand{\triplerow}[9]{%
+  \noalign{\begingroup\preparecomposite
+    \measurelogicalrow{\ExampleFirst}{\PairFirst}{r@{}E}{#1}{#4}{#7}%
+    \measurelogicalrow{\ExampleSecond}{\PairSecond}{r@{}E}{#2}{#5}{#8}%
+    \measurelogicalrow{\ExampleThird}{\PairThird}{r@{}E}{#3}{#6}{#9}%
   \endgroup}%
   \paddedcell{\centering\SymbolFont\triplelines{c}%
-    {\ensuremath{\displaystyle #1}}{\ensuremath{\displaystyle #2}}{\ensuremath{\displaystyle #3}}}&%
-  \paddedcell{\DefinitionFont\triplelines{l}%
-    {\parbox[t]{\linewidth}{\raggedright #4}}%
-    {\parbox[t]{\linewidth}{\raggedright #5}}%
-    {\parbox[t]{\linewidth}{\raggedright #6}}}&%
-  \paddedcell{\ExampleFont\renewcommand{\ExampleLineStretch}{\MeasuredLineStretch}%
-    \exmath{\pairstrut{\PairFirst}#7\\\pairstrut{\PairSecond}#8\\\pairstrut{\PairThird}#9}}\\\hline
+    {\centering$\displaystyle #1$}{\centering$\displaystyle #2$}{\centering$\displaystyle #3$}}&%
+  \paddedcell{\DefinitionFont\triplelines{l}{#4}{#5}{#6}}&%
+  \paddedcell{\ExampleFont\renewcommand{\ExampleLineStretch}{0}%
+    \selectlogicalrow{\PairFirst}{\ExampleFirst}%
+    \exmath[R@{}Q]{\noalign{\selectlogicalrow{\PairFirst}{\ExampleFirst}}#7\\
+      \noalign{\selectlogicalrow{\PairSecond}{\ExampleSecond}}#8\\
+      \noalign{\selectlogicalrow{\PairThird}{\ExampleThird}}#9}}\\\hline
 }
-% Paired symbols, meanings, and examples; wide blocks can supply their columns.
 \newcommand{\pairedrow}[6]{%
   \pairedrowwithcols{r@{}E@{\quad}r@{}E}{#1}{#2}{#3}{#4}{#5}{#6}}
 \newcommand{\pairedrowwithcols}[7]{%
-  \noalign{\begingroup
-  \renewcommand{\ExampleLineStretch}{\MeasuredLineStretch}%
-  \global\setbox\PairFirst=\hbox{\ExampleFont\exmath[#1]{#6}\measuresymbol{#2}%
-    \DefinitionFont\parbox[t]{\MeaningWidth}{\raggedright #4}}%
-  \global\setbox\PairSecond=\hbox{\ExampleFont\exmath[#1]{#7}\measuresymbol{#3}%
-    \DefinitionFont\parbox[t]{\MeaningWidth}{\raggedright #5}}%
+  \noalign{\begingroup\preparecomposite
+    \measurelogicalrow{\ExampleFirst}{\PairFirst}{#1}{#2}{#4}{#6}%
+    \measurelogicalrow{\ExampleSecond}{\PairSecond}{#1}{#3}{#5}{#7}%
   \endgroup}%
-  \paddedcell{\centering\SymbolFont\pairlines{c}{\ensuremath{\displaystyle #2}}{\ensuremath{\displaystyle #3}}}&%
-  \paddedcell{\DefinitionFont\pairlines{l}%
-    {\parbox[t]{\linewidth}{\raggedright #4}}%
-    {\parbox[t]{\linewidth}{\raggedright #5}}}&%
-  \paddedcell{\ExampleFont\renewcommand{\ExampleLineStretch}{\MeasuredLineStretch}%
-    \exmath[#1]{%
-    \pairstrut{\PairFirst}#6\\\pairstrut{\PairSecond}#7}}\\\hline
+  \paddedcell{\centering\SymbolFont\pairlines{c}{\centering$\displaystyle #2$}{\centering$\displaystyle #3$}}&%
+  \paddedcell{\DefinitionFont\pairlines{l}{#4}{#5}}&%
+  \paddedcell{\ExampleFont\renewcommand{\ExampleLineStretch}{0}%
+    \compositecolumns{#1}%
+    \def\SingleExampleColumn{l}\def\TheseExampleColumns{#1}%
+    \ifx\SingleExampleColumn\TheseExampleColumns
+      \def\FirstExample{{#6}}\def\SecondExample{{#7}}%
+    \else\def\FirstExample{#6}\def\SecondExample{#7}\fi%
+    \selectlogicalrow{\PairFirst}{\ExampleFirst}%
+    \expandafter\exmath\expandafter[\CompositeColumns]{\noalign{\selectlogicalrow{\PairFirst}{\ExampleFirst}}\FirstExample\\
+      \noalign{\selectlogicalrow{\PairSecond}{\ExampleSecond}}\SecondExample}}\\\hline
 }
 % Compact contexts use the existing palette and the table's example type.
 \newcommand{\ContextHeading}{Example contexts}
@@ -156,7 +252,7 @@
   \noindent\fcolorbox{coral}{coral!10}{%
     \begin{minipage}{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}
       \ExampleFont\color{navy}%
-      \textbf{\ContextHeading}\par
+      {\centering\textbf{\ContextHeading}\par}
       #1\par
     \end{minipage}}\par
   \endgroup
@@ -165,24 +261,34 @@
 % Optional contexts appear after the heading rule and before the table.
 \newcommand{\SymbolColumnFraction}{.24}
 \newcommand{\MeaningColumnFraction}{.32}
-\newcommand{\sectionbox}[3][]{%
-  {\HeadingFont\color{coral}#2\par}%
-  \vspace{0.4mm}{\color{navy}\hrule height 0.5pt}\vspace{0.4mm}%
-  \if\relax\detokenize{#1}\relax\else\examplecontexts{#1}\fi
+% A heading always spans the page; parallel tables belong to that section.
+\newcommand{\sectionheading}[1]{%
+  {\HeadingFont\color{coral}#1\par}%
+  \vspace{0.4mm}{\color{navy}\hrule height 0.5pt}\vspace{0.8mm}%
+}
+\newcommand{\notationtable}[1]{%
   \begingroup
-  \if\relax\detokenize{#1}\relax\else
-    \renewcommand{\ExampleLineStretch}{1}%
-  \fi
   \setlength{\SymbolWidth}{\SymbolColumnFraction\linewidth}%
   \setlength{\MeaningWidth}{\MeaningColumnFraction\linewidth}%
-  \setlength{\tabcolsep}{0.7mm}%
+  \setlength{\tabcolsep}{0.5mm}%
   \renewcommand{\arraystretch}{1}%
   \arrayrulecolor{rulecolor}%
   \begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash\SymbolFont}p{\SymbolWidth}>{\raggedright\arraybackslash\DefinitionFont}p{\MeaningWidth}>{\raggedright\arraybackslash\ExampleFont}X@{}}
   \paddedcell{\centering\TableHeadFont Symbol}&\paddedcell{\TableHeadFont Meaning}&\paddedcell{\TableHeadFont Examples}\\\hline
-  #3
+  #1
   \end{tabularx}%
-  \endgroup\par\vspace{0.8mm}%
+  \endgroup
+}
+% Read the complete left table, then the right table, before the next section.
+\newcommand{\paralleltables}[2]{%
+  \noindent\begin{minipage}[t]{.49\linewidth}\vspace{0pt}\notationtable{#1}\end{minipage}\hfill
+  \begin{minipage}[t]{.49\linewidth}\vspace{0pt}\notationtable{#2}\end{minipage}\par
+  \vspace{1mm}%
+}
+\newcommand{\sectionbox}[4][]{%
+  \sectionheading{#2}%
+  \if\relax\detokenize{#1}\relax\else\examplecontexts{#1}\fi
+  \paralleltables{#3}{#4}%
 }
 % Dedicated two-column reference for letter names.
 \newlength{\LetterMeaningWidth}
@@ -191,8 +297,6 @@
   \paddedcell{\DefinitionFont #2}\\\hline
 }
 \newcommand{\letterreference}[1]{%
-  {\HeadingFont\color{coral}Letters and Greek symbols\par}%
-  \vspace{0.4mm}{\color{navy}\hrule height 0.5pt}\vspace{0.4mm}%
   \begingroup
   \setlength{\tabcolsep}{0.7mm}%
   \setlength{\LetterMeaningWidth}{\dimexpr\linewidth-.29\linewidth-2\tabcolsep\relax}%
@@ -205,213 +309,530 @@
   \endgroup\par\vspace{0.8mm}%
 }
 
-% Half-width tables share baseline alignment, with local widths and padding.
-% General notation retains its original complete-row centering and spacing.
+% Parallel tables retain their measured subrows, local widths, and padding.
 \newcommand{\compacttables}{%
   \renewcommand{\TightExampleSpacing}{\thinmuskip=0mu\relax\medmuskip=1mu\relax\thickmuskip=1mu\relax}%
-  \renewcommand{\measuresymbol}[1]{\SymbolFont$\displaystyle ##1$}%
-  \setlength{\RowPadding}{0.05mm}%
-  \renewcommand{\MeasuredLineStretch}{0.8}%
+  \setlength{\RowPadding}{1.5mm}%
+  \renewcommand{\MeasuredLineStretch}{1}%
   \renewcommand{\SymbolColumnFraction}{.22}%
-  \renewcommand{\MeaningColumnFraction}{.39}%
+  \renewcommand{\MeaningColumnFraction}{.35}%
   \renewcommand{\pairedrow}[6]{\pairedrowwithcols{r@{}E}{##1}{##2}{##3}{##4}{##5}{##6}}%
   \renewcommand{\symrow}[3]{%
     \paddedcell{\centering\SymbolFont\ensuremath{\displaystyle ##1}}&%
     \paddedcell{\DefinitionFont ##2}&\paddedcell{\ExampleFont ##3}\\\hline}%
 }
-% Letter names use the same measured subrows as the three-column tables.
+% Letter composites share the same independent centers and outer padding.
+\newcommand{\measureletterrow}[3]{%
+  \global\setbox#1=\hbox{%
+    {\setlength{\linewidth}{.29\linewidth}\subrowcell{\centering\SymbolFont$#2$}}%
+    {\setlength{\linewidth}{\LetterMeaningWidth}\subrowcell{\DefinitionFont #3}}}}
 \newcommand{\letterpair}[4]{%
-  \noalign{\global\setbox\PairFirst=\hbox{\SymbolFont$#1$\DefinitionFont\parbox[t]{\LetterMeaningWidth}{\raggedright #3}}%
-    \global\setbox\PairSecond=\hbox{\SymbolFont$#2$\DefinitionFont\parbox[t]{\LetterMeaningWidth}{\raggedright #4}}}%
-  \paddedcell{\centering\SymbolFont\pairlines{c}{$#1$}{$#2$}}&%
-  \paddedcell{\DefinitionFont\pairlines{l}%
-    {\parbox[t]{\linewidth}{\raggedright #3}}%
-    {\parbox[t]{\linewidth}{\raggedright #4}}}\\\hline
-}
+  \noalign{\measureletterrow{\PairFirst}{#1}{#3}%
+    \measureletterrow{\PairSecond}{#2}{#4}}%
+  \paddedcell{\centering\SymbolFont\pairlines{c}{\centering$#1$}{\centering$#2$}}&%
+  \paddedcell{\DefinitionFont\pairlines{l}{#3}{#4}}\\\hline}
 \newcommand{\lettertriple}[6]{%
-  \noalign{\global\setbox\PairFirst=\hbox{\SymbolFont$#1$\DefinitionFont #4}%
-    \global\setbox\PairSecond=\hbox{\SymbolFont$#2$\DefinitionFont #5}%
-    \global\setbox\PairThird=\hbox{\SymbolFont$#3$\DefinitionFont #6}}%
-  \paddedcell{\centering\SymbolFont\triplelines{c}{$#1$}{$#2$}{$#3$}}&%
-  \paddedcell{\DefinitionFont\triplelines{l}{#4}{#5}{#6}}\\\hline
-}
+  \noalign{\measureletterrow{\PairFirst}{#1}{#4}%
+    \measureletterrow{\PairSecond}{#2}{#5}%
+    \measureletterrow{\PairThird}{#3}{#6}}%
+  \paddedcell{\centering\SymbolFont\triplelines{c}{\centering$#1$}{\centering$#2$}{\centering$#3$}}&%
+  \paddedcell{\DefinitionFont\triplelines{l}{#4}{#5}{#6}}\\\hline}
 
 \begin{document}
 \begingroup
-{\TitleFont\color{coral}MATHEMATICS\hfill\KickerFont POSTER 1\par}
-\vspace{1.3mm}{\color{navy}\hrule height 0.8pt}\vspace{1.8mm}
-{\KickerFont GENERAL NOTATION, SETS AND PROBABILITY\par}\vspace{2mm}
+{\TitleFont\color{coral}MATHEMATICS\hfill\KickerFont PAGE 1\par}
+\vspace{1mm}{\color{navy}\hrule height 0.8pt}\vspace{1mm}
 \begingroup
-% Local column and row spacing keeps the expanded reference on Poster 1.
-\setlength{\RowPadding}{0.05mm}
-\renewcommand{\MeasuredLineStretch}{0.75}
-\renewcommand{\SymbolColumnFraction}{.23}
-\renewcommand{\MeaningColumnFraction}{.41}
-\sectionbox{General notation}{
-\triplerow{=}{\neq}{\approx}{Equal}{Not equal}{Approximately}
-  {2+3&=5\qquad \qquad 4-1=3}{2&\neq3\qquad \qquad 5+1\neq7}{\pi&\approx3.14\> \> \> \quad \qquad \sqrt2\approx1.41}
-
-\pairedrow{< \qquad \ >}{\nless \qquad \ \ngtr}
-{\qquad Less than \qquad \qquad Greater than}
-{Not Less than \qquad Not Greater than}
-{2&<3 \qquad &5&>4}{2&\nless2 \qquad &4&\ngtr5}
-
-\pairedrow{\leq \qquad \ \geq}{\nleq \qquad  \ngeq}
-{\qquad Less/Greater than or equal to}
-{ Not Less/Greater than or equal to}
-{2&\leq2 \qquad &5&\geq4}{3&\nleq2 \qquad &4&\ngeq5}
-
-\symrow{\pm}{Plus or minus: \meaningexplanation{two choices}}{\exmath{3\pm1&=4\text{ or }2\qquad -2\pm3=1\text{ or }-5}}
-\symrow{ab=a(b)=a\cdot b=a\times b}
-{Multiplication: \\ \meaningexplanation{juxtaposition, parentheses, dot, or cross.}}
-{\exmath{3x&=3\cdot x=3\times x\\
-		2(4)&=2\cdot4=2\times4}}
-
-\symrow{\frac{a}{b}=a/b=a\div b}
-{Division: \\ \meaningexplanation{fraction, slash, or division sign ($b\neq0$).}}
-{\exmath[r@{}E@{}E@{}E]{\frac{12}{3}&=12/3&=12\div3&=4\\
-		\frac{x}{5}&=x/5&=x\div 5&= \frac15 x= 0.2x}}
-\symrow{|a|}{Absolute value: \meaningexplanation{distance from $a$ to $0$}}{\exmath{|-5|&=5 \qquad\quad  |3|=3\qquad\quad  |0|=0}}
-\pairedrowwithcols{r@{}E@{\;}r@{}E}{a^2}{a^3}
-  {Squared; \meaningexplanation{multiply $a$ by itself.}}
-  {Cubed; \meaningexplanation{multiply three factors of $a$.}}
-  {3^2&=3\cdot3=9 &(-2)^2&= (-2)(-2) = 4}
-  {2^3&=2\cdot2\cdot2=8 \quad &(-2)^3&=(-2)(-2)(-2)=-8}
-\pairedrowwithcols{r@{}E}{\sqrt{a}=a^{1/2}}{\sqrt[3]{a}=a^{1/3}}
-  {Square root \quad \>  \meaningexplanation{$a\geq 0$}}
-  {Cube root \qquad \! \meaningexplanation{$a \in \mathbb{R}$}}
-  {\sqrt9&=3\text{ (not }\pm3\text{)}}
-  {\sqrt[3]{-8}&=-2}
-\pairedrowwithcols{r@{}E@{\;}r@{}E}
-	{a^n}{\sqrt[n]{a}=a^{1/n}}
-	{Exponentiation: \meaningexplanation{$n$ factors of $a$} }
-	{$n$th root.}
-	{2^4&=2\cdot2\cdot2\cdot2=16 \quad &(-2)^5&=-32}
-	{\sqrt[4]{16}& = 16^{\frac{1}{4}}=2 \qquad &\sqrt[5]{-32}&=-2 = (-32)^{\frac{1}{5}}}
-}
-\endgroup
-\vspace{0mm}
+% General notation uses two independently headed tables in reading order.
+\setlength{\RowPadding}{1.1mm}
+\renewcommand{\MeasuredLineStretch}{1}
+\renewcommand{\SymbolColumnFraction}{.26}
+\renewcommand{\MeaningColumnFraction}{.33}
+{\HeadingFont\color{coral}General notation\par}
+\vspace{0.4mm}{\color{navy}\hrule height 0.5pt}\vspace{0.4mm}
 \noindent\begin{minipage}[t]{.49\linewidth}
-\compacttables
-\renewcommand{\MeaningColumnFraction}{.39}
-\sectionbox{Sets and number systems}{
-\symrow{\{a,b,c\}}{\conceptmeaning{Set}{\meaningexplanation{Ignores order and repetition.}}}{\exmath{\{2,4\}&=\{4,2\}\\\{2,2,4\}&=\{2,4\}}}
-\pairedrow{\in}{\notin}{Element of}{Not an element of}{2&\in\{1,2\}}{3&\notin\{1,2\}}
-\symrow{\{x:p(x)\}}{\conceptmeaning{Set-builder notation}{\meaningexplanation{$x\in A$ such that $p(x)$ holds.}}}{\exmath[l]{\{x\in\mathbb R:x>0\}\\\text{Positive real numbers}}}
-\pairedrow{\varnothing}{|A|}{\conceptmeaning{Empty set}{\meaningexplanation{No elements.}}}{\conceptmeaning{Cardinality}{\meaningexplanation{Number of elements in finite $A$.}}}{|\varnothing|&=0}{|\{2,4,6\}|&=3}
-\pairedrow{A\subseteq B}{A\subsetneq B}{\conceptmeaning{Subset}{\meaningexplanation{All of $A$ in $B$; may equal $B$.}}}{\conceptmeaning{Proper subset}{\meaningexplanation{$A\subseteq B$, $A\ne B$.}}}{\{1,2\}&\subseteq\{1,2\}}{\{1\}&\subsetneq\{1,2\}}
-\pairedrow{A\cup B}{A\cap B}{\conceptmeaning{Union}{\meaningexplanation{In either or both.}}}{\conceptmeaning{Intersection}{\meaningexplanation{In both.}}}{\{1\}\cup\{2\}&=\{1,2\}}{\{1,2\}\cap\{2\}&=\{2\}}
-\symrow{A\setminus B}{\conceptmeaning{Difference}{\meaningexplanation{In $A$, outside $B$.}}}{\exmath{\{1,2\}\setminus\{2\}&=\{1\}}}
-\pairedrow{\mathbb N}{\mathbb Z}{Naturals}{Integers}{\mathbb N&=\{1,2,3,\ldots\}}{Z&=\{\ldots, -2, -1, 0, 1,2,\ldots\}}
-\pairedrow{\mathbb Q}{\mathbb R}{\conceptmeaning{Rationals}{\meaningexplanation{$p/q$; $p,q\in\mathbb Z$, $q\ne0$.}}}{\conceptmeaning{Reals}{\meaningexplanation{The number line.}}}{\tfrac12,-3&\in\mathbb Q}{\sqrt2,\pi,\tfrac12,-3&\in\mathbb R}
-\symrow{\mathbb R\setminus\mathbb Q}{Irrationals}{\exmath{\sqrt2,\pi&\in\mathbb R\setminus\mathbb Q}}
-\pairedrowwithcols{l@{}E}{(a,b)}{[a,b]}{\conceptmeaning{Open interval}{\meaningexplanation{Excludes endpoints.}}}{\conceptmeaning{Closed interval}{\meaningexplanation{Includes endpoints.}}}{x\in(1,3):&1<x<3}{x\in[1,3]:&1\leq x\leq3}
-\pairedrowwithcols{l@{}E}{[a,b)}{(a,b]}{\conceptmeaning{Half-open interval}{\meaningexplanation{Includes left endpoint only.}}}{\conceptmeaning{Half-open interval}{\meaningexplanation{Includes right endpoint only.}}}{2\in[2,5),&5\notin[2,5)}{2\notin(2,5],&5\in(2,5]}
-\pairedrowwithcols{l}{\infty}{-\infty}{\conceptmeaning{Positive infinity}{\meaningexplanation{Unbounded above.}}}{\conceptmeaning{Negative infinity}{\meaningexplanation{Unbounded below.}}}{[0,\infty)}{(-\infty,0]}
+% Balance the shorter left table using cell clearance only.
+\setlength{\RowPadding}{1.25mm}
+\vspace{0pt}
+\notationtable{
+\triplerow{\mathrel{\sequenceindex{\mathord{=}}}}{\mathrel{\sequenceindex{\mathord{\neq}}}}{\mathrel{\sequenceindex{\mathord{\approx}}}}{Equal}{Not equal}{Approximately}
+  {2+3&\mathrel{\sequenceindex{\mathord{=}}}5\quad 4-1=3}{2&\mathrel{\sequenceindex{\mathord{\neq}}}3\quad 5+1\neq7}{3.14&\mathrel{\sequenceindex{\mathord{\approx}}}\pi \quad\>\>\> \sqrt2\approx1.41}
+
+\pairedrow{\mathrel{\sequenceindex{\mathord{<}}} \quad \mathrel{\sequenceindex{\mathord{>}}}}{\mathrel{\sequenceindex{\mathord{\nless}}} \quad \mathrel{\sequenceindex{\mathord{\ngtr}}}}
+{Less | Greater than}
+{Not Less | Greater}
+{2&\mathrel{\sequenceindex{\mathord{<}}}3 & \qquad 5&\mathrel{\sequenceindex{\mathord{>}}}4}{2&\mathrel{\sequenceindex{\mathord{\nless}}}2 &\qquad  4&\mathrel{\sequenceindex{\mathord{\ngtr}}}5}
+
+\pairedrow{\mathrel{\sequenceindex{\mathord{\leq}}} \quad \mathrel{\sequenceindex{\mathord{\geq}}}}{\mathrel{\sequenceindex{\mathord{\nleq}}} \quad \mathrel{\sequenceindex{\mathord{\ngeq}}}}
+{Less | Greater than or equal to}
+{Not Less | Greater than or equal to}
+{2&\mathrel{\sequenceindex{\mathord{\leq}}}2 &\qquad  5&\mathrel{\sequenceindex{\mathord{\geq}}}4}{3&\mathrel{\sequenceindex{\mathord{\nleq}}}2 &\qquad  4&\mathrel{\sequenceindex{\mathord{\ngeq}}}5}
+
+\symrow{\begin{gathered}ab=a(b)\\{}=a\mathbin{\sequenceindex{\cdot}} b=a\mathbin{\sequenceindex{\times}} b\end{gathered}}
+{Multiplication: \\ \meaningexplanation{juxtaposition, parentheses, dot, or cross}}
+{\exmath{3x&=3\mathbin{\sequenceindex{\cdot}} x=3\mathbin{\sequenceindex{\times}} x\\2(4)&=2\cdot4=2\times4}}
+\symrow{\begin{gathered}\notationfraction{a}{b}=a\sequenceindex{/}b\\{}=a\mathbin{\sequenceindex{\div}} b\end{gathered}}
+{Division: \\ \meaningexplanation{fraction, slash, or division sign ($b\neq0$)}}
+{\exmath{\notationfraction{12}{3}&=12\sequenceindex{/}3=12\mathbin{\sequenceindex{\div}}3=4\\\frac{x}{5}&=x/5=x\div5\\& \qquad \quad =\frac15 x \> \> \! =0.2x}}
 }
-{\FooterFont Intervals assume $a<b$. Infinity is not a real number; use parentheses there. Some texts include $0$ in $\mathbb N$; check the convention. Dots: see Poster 2. Bars: absolute value for numbers, cardinality for finite sets.\par}
 \end{minipage}\hfill
 \begin{minipage}[t]{.485\linewidth}
-\compacttables
-\sectionbox[{\textbf{Fair die:} $\Omega=\{1,2,3,4,5,6\}$.\par
-$A=\{1,3,5\}$ (odd), $B=\{1,2\}$, $C=\{2,4,6\}$.\par
-Die examples below use these events.\par
-\textbf{Independent fair coin tosses:} $E$: first is heads; $F$: second is heads.\par}]{Probability and events}{
-\pairedrow{\Omega}{\omega}{\conceptmeaning{Sample space}{\meaningexplanation{All possible outcomes.}}}{\conceptmeaning{Outcome}{\meaningexplanation{One possible result.}}}{\Omega&=\{1,2,3,4,5,6\}}{\omega&=3\in\Omega}
-\symrow{A\subseteq\Omega}{\conceptmeaning{Event}{\meaningexplanation{A set of outcomes.}}}{\exmath{A&=\{1,3,5\}}}
-\symrow{P(A)}{\conceptmeaning{Probability of $A$}{\meaningexplanation{Between $0$ and $1$.}}}{\exmath{0&\leq P(A)\leq1\\P(\Omega)&=1\\P(\varnothing)&=0}}
-\symrow{\dfrac{|A|}{|\Omega|}}{\conceptmeaning{Classical probability}{\meaningexplanation{Equals $P(A)$ for finite, equally likely outcomes only.}}}{\exmath{P(A)&=\tfrac36=\tfrac12}}
-\symrow{A^c}{\conceptmeaning{Complement}{\meaningexplanation{Outcomes in $\Omega$ outside $A$.}}}{\exmath{A^c&=\{2,4,6\}\\P(A^c)&=1-P(A)=\tfrac12}}
-\pairedrow{A\cup B}{A\cap B}{\conceptmeaning{Union of events}{\meaningexplanation{Event $A$ or $B$, or both.}}}{\conceptmeaning{Intersection of events}{\meaningexplanation{Events $A$ and $B$ together.}}}{A\cup B&=\{1,2,3,5\}}{A\cap B&=\{1\}}
-\symrow{A\cap C=\varnothing}{\conceptmeaning{Mutually exclusive}{\meaningexplanation{Cannot occur together.}}}{\exmath{A\cap C&=\varnothing}}
-\symrow{P(A\mid B)}{\conceptmeaning{Conditional probability}{\meaningexplanation{$A$ given $B$; $P(B)>0$.}}}{\exmath{P(A\mid B)&=\tfrac{P(A\cap B)}{P(B)}\\&=\tfrac{1/6}{2/6}=\tfrac12}}
-\symrow{P(E\cap F)}{\conceptmeaning{Independent events}{\meaningexplanation{Multiply their probabilities.}}}{\exmath{P(E\cap F)&=P(E)P(F)\\&=\tfrac12\cdot\tfrac12=\tfrac14}}
-\symrow{P(A\mid B)}{\conceptmeaning{Independence}{\meaningexplanation{Iff this equals $P(A)$; $P(B)>0$.}}}{\exmath{P(E\mid F)&=P(E)=\tfrac12}}
+\vspace{0pt}
+\notationtable{
+\symrow{\mathbin{\sequenceindex{\pm}}}{Plus or minus: \meaningexplanation{two choices}}{\exmath{3\mathbin{\sequenceindex{\pm}}1&=4\text{ or }2\\-2\pm3&=1\text{ or }-5}}
+\symrow{\sequenceindex{|}a\sequenceindex{|}}{Absolute value: \meaningexplanation{distance from $a$ to $0$}}{\exmath{\sequenceindex{|}-5\sequenceindex{|}&=5\\|3|&=3\quad |0|=0}}
+\pairedrowwithcols{l}{a^{\sequenceindex{2}}}{a^{\sequenceindex{3}}}
+  {Squared \par \meaningexplanation{multiply $a$ by itself}}
+  {Cubed \par \meaningexplanation{multiply $a$ 3 times}}
+  {\begin{array}[t]{@{}r@{}l@{}}3^{\sequenceindex{2}}&{}=3\cdot3=9\\(-2)^2&{}=(-2)(-2)=4\end{array}}
+  {\begin{array}[t]{@{}r@{}l@{}}2^{\sequenceindex{3}}&{}=2\cdot2\cdot2=8\\(-2)^3&{}=(-2)(-2)(-2)\\&{}=-8\end{array}}
+\pairedrowwithcols{r@{}E}{\sqrt{a}=a^{\sequenceindex{1/2}}}{\sqrt[\sequenceindex{3}]{a}=a^{\sequenceindex{1/3}}}
+  {Square root \quad \> \meaningexplanation{$a\geq0$}}
+  {Cube root \qquad \! \meaningexplanation{$a\in\mathbb R$}}
+  {\sqrt9&=3\text{ (not }\pm3\text{)}}
+  {\sqrt[\sequenceindex{3}]{-8}&=-2}
+\pairedrowwithcols{l}{a^{\sequenceindex{n}}}{\sqrt[\sequenceindex{n}]{a}=a^{1/n}}
+  {$n$th power}
+  {$n$th root}
+  {\begin{array}[t]{@{}r@{}l@{}}2^{\sequenceindex{4}}&{}=2\cdot2\cdot2\cdot2=16\\(-2)^5&{}=-32\end{array}}
+  {\begin{array}[t]{@{}r@{}l@{}}\sqrt[\sequenceindex{4}]{16}&{}=\> \> \> 16^{\frac14} \quad  =2\\\sqrt[5]{-32}&{}=(-32)^{\frac15}=-2\end{array}}
 }
-\vspace{1.5mm}
-{\DefinitionFont\textbf{Keep the ideas separate.}\par
-Mutually exclusive events of positive probability are not independent: one occurring rules out the other.\par
-\vspace{2mm}
-The bar in $P(A\mid B)$ means ``given''; in set-builder notation it means ``such that''. Context determines the reading.\par}
+\end{minipage}\par\vspace{0mm}
+\endgroup
+\vspace{0mm}
+\compacttables
+\renewcommand{\MeaningColumnFraction}{.35}
+% Shared heading row keeps both titles and their column rules aligned.
+\noindent\begin{minipage}[t]{.49\linewidth}\vspace{0pt}
+\sectionheading{\strut Sets}
+\end{minipage}\hfill
+\begin{minipage}[t]{.49\linewidth}\vspace{0pt}
+\sectionheading{\strut Number systems}
+\end{minipage}\par\nobreak
+\noindent\begin{minipage}[t]{.49\linewidth}\vspace{0pt}
+\renewcommand{\ContextHeading}{Example guide}
+\examplecontexts{$U$: Universal set \quad $U=\{1,2,3,4\}$ \> | \> $A=\{1,2\}$ \> | \> $B=\{2,3\}$}
+% Fit the complement and its note using local cell clearance only.
+\setlength{\RowPadding}{1mm}
+\notationtable{
+\symrow{\mathopen{\sequenceindex{\{}}a,b,c\mathclose{\sequenceindex{\}}}}{\conceptmeaning{Set}{\meaningexplanation{Ignores order and repetition}}}{\exmath{A&=\mathopen{\sequenceindex{\{}}2,1\mathclose{\sequenceindex{\}}}=\{1,2\}\\B&=\{2,3\}=\{2,2,3,3\}}}
+\pairedrow{\mathrel{\sequenceindex{\mathord{\in}}}}{\mathrel{\sequenceindex{\mathord{\notin}}}}{Element of}{Not an element of}{2&\mathrel{\sequenceindex{\mathord{\in}}} A \qquad 2 \in \{2\}}{3&\mathrel{\sequenceindex{\mathord{\notin}}} A \qquad 3 \notin \{2\}}
+\symrow{\{x\mathrel{\sequenceindex{\mathord{:}}}p(x)\}}{\conceptmeaning{Set-builder notation}{\meaningexplanation{Select elements satisfying $p(x)$}}}{\exmath[l]{A=\{x\in U\mathrel{\sequenceindex{\mathord{:}}}x\leq2\}\\B=\{x\in U:1<x<4\}\\\varnothing=\{x\in U:x>4\}}}
+\pairedrow{\sequenceindex{\varnothing}}{\sequenceindex{|}A\sequenceindex{|}}{\conceptmeaning{Empty set}{\meaningexplanation{No elements}}}{\conceptmeaning{Cardinality}{\meaningexplanation{Number of elements}}}{|\sequenceindex{\varnothing}|&=0}{\sequenceindex{|}A\sequenceindex{|}&=2 \qquad |U|=4}
+\pairedrowwithcols{l}{A\mathrel{\sequenceindex{\mathord{\subseteq}}} U}{A\mathrel{\sequenceindex{\mathord{\subset}}} U}{\conceptmeaning{Subset}{\meaningexplanation{Every element included; equality allowed}}}{\conceptmeaning{Proper subset}{\meaningexplanation{Included but not equal}}}{\renewcommand{\arraystretch}{0.8}\begin{array}[t]{@{}l@{}}A\mathrel{\sequenceindex{\mathord{\subseteq}}} A \qquad \>\>\>\> A\subseteq U\\ \\ \{1\}\subseteq\{1,2\}\end{array}}{\renewcommand{\arraystretch}{0.8}\begin{array}[t]{@{}l@{}}\{1\}\mathrel{\sequenceindex{\mathord{\subset}}} A \qquad A\subset U\\ \\ A\subset\{1,2,3\}\end{array}}
+\pairedrow{A\mathbin{\sequenceindex{\cup}} B}{A\mathbin{\sequenceindex{\cap}} B}{\conceptmeaning{Union}{\meaningexplanation{In either or both}}}{\conceptmeaning{Intersection}{\meaningexplanation{In both}}}{A\mathbin{\sequenceindex{\cup}} B&=\{1,2,3\}}{A\mathbin{\sequenceindex{\cap}} B&=\{2\}}
+\symrow{A\mathbin{\sequenceindex{\setminus}} B}{\conceptmeaning{Difference}{\meaningexplanation{In $A$, outside $B$}}}{\quad\>\>\! \exmath{A & \mathbin{\sequenceindex{\setminus}} B=\{1\}} \\ \exmath{\{3,4\} &\setminus \{4\}=\{3\}}}
+\symrow{A^{\sequenceindex{c}} \text{ or } A^{\sequenceindex{\prime}}}{\conceptmeaning{Complement}{\meaningexplanation{In $U$, outside $A$}}}{\exmath{A^{\sequenceindex{c}}&=\{3,4\} \quad\>\>\>\>\>\> \{1\}^c =  \{2,3,4\}\\B^c&=\{1,4\} \quad\>\>\>\>\>\> \{1,2,3\}^c =  \{4\}}}
+}\par\vspace{1mm}
+{\FooterFont \qquad\qquad $2$ is an element of $A$ \qquad | \qquad $\{2\}$ is a subset of $A$\par}
+\end{minipage}\hfill
+\begin{minipage}[t]{.49\linewidth}\vspace{0pt}
+% Transfer three percent of this table from to Meaning.
+\renewcommand{\SymbolColumnFraction}{.19}
+\renewcommand{\MeaningColumnFraction}{.38}
+% Fit the expanded number-system reference without changing typography.
+\setlength{\RowPadding}{1mm}
+\notationtable{
+\pairedrow{\sequenceindex{\mathbb N}}{\sequenceindex{\mathbb Z}}{Naturals}{Integers}{\sequenceindex{\mathbb N}&=\{1,2,3,\ldots\}}{\sequenceindex{\mathbb Z}&=\{\ldots, -2, -1, 0, 1,2,\ldots\}}
+\pairedrow{\sequenceindex{\mathbb Q}}{\sequenceindex{\mathbb R}}{\conceptmeaning{Rationals}{\meaningexplanation{$p/q$; $p,q\in\mathbb Z$, $q\ne0$}}}{\conceptmeaning{Reals}{\meaningexplanation{The number line}}}{\tfrac12,-3&\in\sequenceindex{\mathbb Q}}{\sqrt2,\pi,\tfrac12,-3&\in\sequenceindex{\mathbb R}}
+\symrow{\mathbb R\setminus\mathbb Q}{Irrationals}{\exmath{\sqrt2,\pi&\in\mathbb R\setminus\mathbb Q}}
+\symrow{\sequenceindex{\mathbb C}}{\conceptmeaning{Complex numbers}{\meaningexplanation{$a+bi$; $a,b\in\mathbb R$, $i^2=-1$}}}{\exmath{2+3i&\in\sequenceindex{\mathbb C}}}
+\symrow{\begin{gathered}[t]z=\\r(\cos\theta\\{}+i\sin\theta)\end{gathered}}
+  {\conceptmeaning{Polar form:}{\meaningexplanation{modulus $\sequenceindex{r}=|z|$; argument $\sequenceindex{\theta}$ in radians (for $z\ne0$).}}}
+  {\exmath[l]{1+i=\sqrt{2}(\cos(\pi/4)\\{}+i\sin(\pi/4));\\\sequenceindex{r}=\sqrt2,\quad\sequenceindex{\theta}=\pi/4.}}
+\pairedrow{\mathbb R^{\sequenceindex{2}}}{\mathbb R^{\sequenceindex{3}}}
+  {\conceptmeaning{Real coordinate plane}{\meaningexplanation{Ordered pairs}}}
+  {\conceptmeaning{Real coordinate space}{\meaningexplanation{Ordered triples}}}
+  {(2,-3)&\in\mathbb R^{\sequenceindex{2}}}{(1,0,-2)&\in\mathbb R^{\sequenceindex{3}}}
+\symrow{\mathbb R^{\sequenceindex{+}}}{\conceptmeaning{Positive real numbers}{\meaningexplanation{Excludes zero}}}{\exmath{\mathbb R^{\sequenceindex{+}}&=\{x\in\mathbb R:x>0\}\\&=(0,\infty)}}
+\pairedrowwithcols{l@{}E}{\mathopen{\sequenceindex{(}}a,b\mathclose{\sequenceindex{)}}}{\mathopen{\sequenceindex{[}}a,b\mathclose{\sequenceindex{]}}}{\conceptmeaning{Open interval}{\meaningexplanation{Excludes endpoints}}}{\conceptmeaning{Closed interval}{\meaningexplanation{Includes endpoints}}}{x\in\mathopen{\sequenceindex{(}}1,3\mathclose{\sequenceindex{)}}:&\quad 1<x<3}{x\in\mathopen{\sequenceindex{[}}1,3\mathclose{\sequenceindex{]}}:&\quad 1\leq x\leq3}
+\pairedrowwithcols{l}{\mathopen{\sequenceindex{[}}a,b\mathclose{\sequenceindex{)}}}{\mathopen{\sequenceindex{(}}a,b\mathclose{\sequenceindex{]}}}{\conceptmeaning{Half-open interval}{\meaningexplanation{Includes left endpoint}}}{\conceptmeaning{Half-open interval}{\meaningexplanation{Includes right endpoint}}}{\begin{array}[t]{@{}l@{}}2\in\mathopen{\sequenceindex{[}}2,5\mathclose{\sequenceindex{)}}\\5\notin[2,5)\end{array}}{\begin{array}[t]{@{}l@{}}2\notin\mathopen{\sequenceindex{(}}2,5\mathclose{\sequenceindex{]}}\\5\in(2,5]\end{array}}
+\pairedrowwithcols{l}{\sequenceindex{\infty}}{-\sequenceindex{\infty}}{Positive infinity}{Negative infinity}{[0,\sequenceindex{\infty})}{(-\sequenceindex{\infty},0]}
+}\vspace{1mm}
+{\FooterFont Intervals assume $a<b$. Some texts include $0$ in $\mathbb N$\par}
 \end{minipage}\par
-\vfill
-{\color{navy}\hrule height 0.5pt}\vspace{1.5mm}
-{\FooterFont Symbols acquire meaning from their mathematical context.\par}
+\par\vspace{1mm}
+\compacttables
+\sectionheading{Greek symbols and constants}
+% One alphabetic letter table beside a separate constants table.
+\begingroup
+\setlength{\RowPadding}{0.15mm}
+\setlength{\tabcolsep}{0.7mm}
+\renewcommand{\arraystretch}{0.8}
+\arrayrulecolor{rulecolor}
+\newcommand{\greekentry}[3]{%
+  \paddedcell{\DefinitionFont #1}&%
+  \paddedcell{\centering\SymbolFont\ensuremath{#2}}&%
+  \paddedcell{\centering\SymbolFont\ensuremath{#3}}%
+}
+\newcommand{\greekhead}{%
+  \paddedcell{\TableHeadFont Name}&%
+  \paddedcell{\centering\TableHeadFont Lowercase Symbol}&%
+  \paddedcell{\centering\TableHeadFont Uppercase Symbol}%
+}
+\noindent\begin{minipage}[t]{.49\linewidth}
+\vspace{0pt}
+\setlength{\tabcolsep}{0.25mm}
+\setlength{\RowPadding}{1.3mm}
+% Read down the left group, then the right group: six letters each.
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\centering\arraybackslash}p{.176\linewidth}>{\centering\arraybackslash}p{.176\linewidth}@{\hspace{0.7mm}{\color{lightgray}\vrule width 1.5pt}\hspace{0.7mm}}>{\raggedright\arraybackslash}X>{\centering\arraybackslash}p{.176\linewidth}>{\centering\arraybackslash}p{.176\linewidth}@{}}
+\greekhead&\greekhead\\\hline
+\greekentry{Alpha}{\alpha}{\mathrm A}&\greekentry{Mu}{\mu}{\mathrm M}\\\hline
+\greekentry{Beta}{\beta}{\mathrm B}&\greekentry{Pi}{\pi}{\Pi}\\\hline
+\greekentry{Gamma}{\gamma}{\Gamma}&\greekentry{Rho}{\rho}{\mathrm P}\\\hline
+\greekentry{Delta}{\delta}{\Delta}&\greekentry{Sigma}{\sigma}{\Sigma}\\\hline
+\greekentry{Theta}{\theta}{\Theta}&\greekentry{Phi}{\phi}{\Phi}\\\hline
+\greekentry{Lambda}{\lambda}{\Lambda}&\greekentry{Omega}{\omega}{\Omega}\\\hline
+\end{tabularx}
+\end{minipage}\hfill
+\begin{minipage}[t]{.49\linewidth}
+\vspace{0pt}
+\setlength{\RowPadding}{1.1mm}
+\begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash}p{.16\linewidth}>{\raggedright\arraybackslash}p{.26\linewidth}>{\raggedright\arraybackslash}X@{}}
+\paddedcell{\centering\TableHeadFont Constant}&
+\paddedcell{\TableHeadFont Name}&
+\paddedcell{\TableHeadFont Meaning / Value}\\\hline
+\paddedcell{\centering\SymbolFont $\sequenceindex{\pi}$}&
+\paddedcell{\DefinitionFont Pi}&
+\paddedcell{\DefinitionFont Circle constant\par $\sequenceindex{\pi}=C/d\approx3.14159$\par \meaningexplanation{$C$: circumference; $d$: diameter of the same circle.}}\\\hline
+\paddedcell{\centering\SymbolFont $\sequenceindex{e}$}&
+\paddedcell{\DefinitionFont Euler's number}&
+\paddedcell{\DefinitionFont Base of natural logarithms\par $\sequenceindex{e}\approx2.71828$\par \meaningexplanation{Its natural logarithm is $1$: $\ln e=1$.}}\\\hline
+\paddedcell{\centering\SymbolFont $\sequenceindex{i}$}&
+\paddedcell{\DefinitionFont Imaginary unit}&
+\paddedcell{\DefinitionFont $\sequenceindex{i}^2=-1$\par \meaningexplanation{Forms complex numbers $a+bi$, with $a,b\in\mathbb R$.}}\\\hline
+\end{tabularx}\par\vspace{0.8mm}
+\end{minipage}
+\endgroup
+{\color{navy}\hrule height 0.5pt}\vspace{0.7mm}
 \endgroup
 \newpage
 \begingroup
-{\TitleFont\color{coral}MATHEMATICS\hfill\KickerFont POSTER 2\par}
+{\TitleFont\color{coral}MATHEMATICS\hfill\KickerFont PAGE 2\par}
 \vspace{1.3mm}{\color{navy}\hrule height 0.8pt}\vspace{1.8mm}
-{\KickerFont FUNCTIONS, VARIABLES, SEQUENCES AND SUMS\par}\vspace{1mm}
-\noindent\begin{minipage}[t]{.49\linewidth}
 \compacttables
-\renewcommand{\MeaningColumnFraction}{.43}
-\sectionbox[{\textbf{Example:} $f:\mathbb R\to\mathbb R$, $f(x)=x^2$.\par
-Set and interval notation: see Poster 1.\par}]{Function notation}{
-\symrow{f}{\conceptmeaning{Function}{\meaningexplanation{One output per domain input.}}}{\exmath{f(x)&=x^2}}
-\symrow{f(x)}{\conceptmeaning{Function value}{\meaningexplanation{Value at $x$; parentheses mark input, not multiplication.}}}{\exmath{f(3)&=3^2=9}}
-\symrow{f:A\to B}{\conceptmeaning{Function mapping}{\meaningexplanation{Domain $A$ to codomain $B$.}}}{\exmath[l]{f:\mathbb R\to\mathbb R}}
-\pairedrow{A}{B}{\conceptmeaning{Domain}{\meaningexplanation{Allowed inputs.}}}{\conceptmeaning{Codomain}{\meaningexplanation{Declared output target.}}}{A&=\mathbb R}{B&=\mathbb R}
-\symrow{x\mapsto f(x)}{\conceptmeaning{Mapping rule}{\meaningexplanation{Maps values; $\to$ links sets.}}}{\exmath[r@{}E]{x&\mapsto x^2\\3&\mapsto9}}
-\symrow{\operatorname{dom}(f)}{\conceptmeaning{Domain}{\meaningexplanation{Allowed inputs.}}}{\exmath{\operatorname{dom}(f)&=\mathbb R}}
-\symrow{\operatorname{range}(f)}{\conceptmeaning{Range}{\meaningexplanation{Attained outputs in codomain.}}}{\exmath{\operatorname{range}(f)&=[0,\infty)}\par No negative outputs.}
+\begingroup
+% Compact spacing and balanced columns apply only to this middle poster.
+\setlength{\RowPadding}{1.15mm}
+\renewcommand{\SymbolColumnFraction}{.24}
+\renewcommand{\MeaningColumnFraction}{.38}
+\sectionheading{Function notation}
+\begingroup
+\setlength{\tabcolsep}{0.5mm}
+\setlength{\RowPadding}{0.5mm}
+\renewcommand{\arraystretch}{1}
+\renewcommand{\ExampleLineStretch}{1.02}
+\arrayrulecolor{rulecolor}
+% Separate notation and definitions beside the three original example columns.
+\newcommand{\functionrow}[6]{%
+  \paddedcell{\centering\SymbolFont\ensuremath{\displaystyle #1}}&%
+  \paddedcell{\DefinitionFont\conceptmeaning{#2}{\meaningexplanation{#3}}}&%
+  \paddedcell{\ExampleFont #4}&\paddedcell{\ExampleFont #5}&\paddedcell{\ExampleFont #6}\\\hline}
+\begin{tabularx}{\linewidth}{@{}p{.14\linewidth}p{.22\linewidth}p{.20\linewidth}p{.20\linewidth}X@{}}
+\paddedcell{\centering\TableHeadFont Symbol}&
+\paddedcell{\TableHeadFont Meaning}&
+\paddedcell{\TableHeadFont Square function}&
+\paddedcell{\TableHeadFont Square-root function}&
+\paddedcell{\TableHeadFont Linear function}\\\hline
+\multicolumn{2}{@{}p{\dimexpr.36\linewidth+2\tabcolsep\relax}}{%
+\paddedcell{\ExampleFont $h:D\to K$ assigns exactly one output $h(x)\in K$ to every input $x\in D$ so that $h(x)=y$ \par
+$\to$ connects domain and codomain \par $\mapsto$ connects an input to its output}}&
+\paddedcell{\exmath[r@{\,}c@{\,}l]{f:\mathbb R&\to&\mathbb R\\x&\mapsto&x^2\\f(x)&=&x^2}}&
+\paddedcell{\exmath[r@{\,}c@{\,}l]{g:[0,\infty)&\to&\mathbb R\\x&\mapsto&\sqrt{x}\\g(x)&=&\sqrt{x}}}&
+\paddedcell{\exmath[r@{\,}c@{\,}l]{\beta:\mathbb R&\to&\mathbb R\\x&\mapsto&2x+1\\\beta(x)&=&2x+1}}\\\hline
+\functionrow{h:D\mathrel{\sequenceindex{\mathord{\to}}} K}{Function mapping}{Domain $D$ \quad codomain $K$}
+  {$f:\mathbb R\mathrel{\sequenceindex{\mathord{\to}}}\mathbb R$}
+  {$g:[0,\infty)\mathrel{\sequenceindex{\mathord{\to}}}\mathbb R$}
+  {$\beta:\mathbb R\mathrel{\sequenceindex{\mathord{\to}}}\mathbb R$}
+\functionrow{\mathop{\sequenceindex{\mathord{\operatorname{dom}}}}(h)}{Domain}{Allowed inputs}
+  {$\mathop{\sequenceindex{\mathord{\operatorname{dom}}}}(f)=\mathbb R$}
+  {$\mathop{\sequenceindex{\mathord{\operatorname{dom}}}}(g)=[0,\infty)$}
+  {$\mathop{\sequenceindex{\mathord{\operatorname{dom}}}}(\beta)=\mathbb R$}
+\functionrow{\sequenceindex{K}}{Codomain}{Declared output target}
+  {$\sequenceindex{K}=\mathbb R$}
+  {$\sequenceindex{K}=\mathbb R$}
+  {$\sequenceindex{K}=\mathbb R$}
+\functionrow{x\mathrel{\sequenceindex{\mathord{\mapsto}}} h(x)}{Mapping rule}{$\mapsto$ maps inputs\enspace $\to$ links sets}
+  {\quad\>\!\! $x\mathrel{\sequenceindex{\mathord{\mapsto}}} x^2$}
+  {\quad\>\!\! $x\mathrel{\sequenceindex{\mathord{\mapsto}}}\sqrt{x}$}
+  {\quad\>\!\! $x\mathrel{\sequenceindex{\mathord{\mapsto}}} 2x+1$}
+\functionrow{h\mathopen{\sequenceindex{(}}x\mathclose{\sequenceindex{)}}}{Function value}{Output of function $h$ at value $x$}
+  {$f\mathopen{\sequenceindex{(}}3\mathclose{\sequenceindex{)}}=3^2=9$}
+  {$g\mathopen{\sequenceindex{(}}9\mathclose{\sequenceindex{)}}=\sqrt{9}=3$}
+  {$\beta\mathopen{\sequenceindex{(}}3\mathclose{\sequenceindex{)}}=2(3)+1=7$}
+\functionrow{\mathop{\sequenceindex{\mathord{\operatorname{range}}}}(h)}{Range}{Only attained outputs}
+  {$\mathop{\sequenceindex{\mathord{\operatorname{range}}}}(f)=[0,\infty)$}
+  {$\mathop{\sequenceindex{\mathord{\operatorname{range}}}}(g)=[0,\infty)$}
+  {$\mathop{\sequenceindex{\mathord{\operatorname{range}}}}(\beta)=\mathbb R$}
+\end{tabularx}\par
+\endgroup
+\vspace{2mm}
+\sectionheading{Probability and events}
+\renewcommand{\ContextHeading}{Example contexts}
+\examplecontexts{%
+  \setlength{\tabcolsep}{0.6mm}%
+  \renewcommand{\arraystretch}{1.02}%
+  \begin{minipage}[t]{.49\linewidth}
+  \textbf{Die: one fair die roll}\par
+  A six-sided die\par
+  $\Omega=\{1,2,3,4,5,6\}$\par
+  \begingroup
+  \let\tabularxcolumn\centeredtextcolumn
+  \begin{tabularx}{\linewidth}{@{}>{\collectcell\contextcell}l<{\endcollectcell}>{\collectcell\subrowcell}X<{\endcollectcell}@{}}
+  \textbf{Symbol / event set}&\textbf{Meaning}\\
+  $A=\{1,3,5\}$&Odd result\\
+  $B=\{1,2\}$&Result at most $2$\\
+  $C=\{2,4,6\}$&Even result
+  \end{tabularx}\endgroup
+  \end{minipage}\hfill
+  \begin{minipage}[t]{.49\linewidth}
+  \textbf{Coins: two independent fair tosses}\par
+  $\mathrm H$: heads, $\mathrm T$: tails\par
+  $\Omega=\{\mathrm{HH},\mathrm{HT},\mathrm{TH},\mathrm{TT}\}$\par
+  \begingroup
+  \let\tabularxcolumn\centeredtextcolumn
+  \begin{tabularx}{\linewidth}{@{}>{\collectcell\contextcell}l<{\endcollectcell}>{\collectcell\subrowcell}X<{\endcollectcell}@{}}
+  \textbf{Symbol / event set}&\textbf{Meaning}\\
+  $F=\{\mathrm{HH},\mathrm{HT},\mathrm{TH}\}$&At least one head\\
+  $G=\{\mathrm{HH},\mathrm{TT}\}$&Matching results\\
+  $J=\{\mathrm{TT}\}$&No heads
+  \end{tabularx}\endgroup
+  \end{minipage}\par
 }
-\vspace{0.7mm}
-\letterreference{
-\letterrow{a,b,c;\ x,y,z}{Common lowercase Latin letters}
-\letterrow{A,B,C}{Common uppercase Latin letters}
-\lettertriple{\alpha}{\beta}{\gamma}{Alpha}{Beta}{Gamma}
-\letterpair{\delta}{\Delta}{Delta}{Uppercase delta}
-\letterpair{\theta}{\Theta}{Theta}{Uppercase theta}
-\letterpair{\lambda}{\Lambda}{Lambda}{Uppercase lambda}
-\lettertriple{\mu}{\sigma}{\Sigma}{Mu}{Sigma}{Uppercase sigma}
-\letterpair{\omega}{\Omega}{Omega}{\conceptmeaning{Uppercase omega}{(\meaningexplanation{Poster 1})}}
-\letterrow{\pi}{\conceptmeaning{Pi}{\meaningexplanation{Here, the circle constant $\pi\approx3.14$.}}}
-}
-{\DefinitionFont Names do not fix meanings. $\Sigma$ is a letter; $\sum$ is the related summation operator (right), not an ordinary variable.\par}
-\vspace{1mm}
-\renewcommand{\ContextHeading}{Letter roles}
-\sectionbox[{Roles depend on context: uppercase often names sets; Greek often names angles or numbers. Conventions are not permanent types.\par}]{Variables}{
-\pairedrowwithcols{l}{x}{m,b}{\conceptmeaning{Variable}{\meaningexplanation{May vary in context.}}}{\conceptmeaning{Constants}{\meaningexplanation{Fixed in context.}}}{x\in\{-2,0,3.5\}}{y=mx+b}
-\pairedrowwithcols{l}{x}{y}{\conceptmeaning{Input variable}{\meaningexplanation{Input for a line.}}}{\conceptmeaning{Output variable}{\meaningexplanation{Output for that line.}}}{y=mx+b}{m,b\text{ fixed}}
-\triplerow{n}{\theta}{A}{\conceptmeaning{Count}{\meaningexplanation{May count objects.}}}{\conceptmeaning{Angle}{\meaningexplanation{May name an angle in degrees (${}^\circ$).}}}{\conceptmeaning{Set name}{\meaningexplanation{May name a set.}}}{n&\in\mathbb N}{\theta&=30^\circ}{A&=\{1,2\}}
-\symrow{\lambda}{\conceptmeaning{Number}{\meaningexplanation{May name a number.}}}{\exmath{\lambda&=2}}
-}
-{\FooterFont A letter may be variable or constant. Values $-2$, $0$, $3.5$ are separate choices for $x$, not simultaneous equalities.\par}
-\end{minipage}\hfill
-\begin{minipage}[t]{.485\linewidth}
-\compacttables
-\renewcommand{\SymbolColumnFraction}{.22}
-\renewcommand{\MeaningColumnFraction}{.39}
-\renewcommand{\ContextHeading}{Reading guide}
-\sectionbox[{A \textbf{sequence} is an ordered list of terms; a \textbf{series} is a sum of sequence terms. Here, parentheses show sequences; braces show sets.\par
-\textbf{Sequence examples:} $a_i=2i$, starting at $i=1$.\par}]{Lists, sequences and subscripts}{
-\pairedrowwithcols{l}{\ldots}{\cdots}{\conceptmeaning{Ellipsis}{\meaningexplanation{Omitted list entries.}}}{\conceptmeaning{Centered ellipsis}{\meaningexplanation{Omitted terms in a sum.}}}{1,2,3,\ldots}{a_1+a_2+\cdots+a_n}
-\pairedrowwithcols{l}{1,2,\ldots,n}{1,2,3,\ldots}{\conceptmeaning{Finite list}{\meaningexplanation{Ends at $n$.}}}{\conceptmeaning{Infinite list}{\meaningexplanation{No final term.}}}{1,2,3,\ldots,5\ (n=5)}{1,2,3,4,5,\ldots}
-\symrow{a_i}{\conceptmeaning{Indexed term}{\meaningexplanation{Term at position or label $i$.}}}{\exmath{a_3&=2(3)=6}}
-\pairedrow{a_1}{a_n}{\conceptmeaning{Indexed term}{\meaningexplanation{Term at index $1$.}}}{\conceptmeaning{Indexed term}{\meaningexplanation{Term at index $n$.}}}{a_1&=2}{a_n&=2n}
-\pairedrow{(a_i)_{i=1}^{4}}{(a_i)_{i=1}^{\infty}}{\conceptmeaning{Finite sequence}{\meaningexplanation{Four terms.}}}{\conceptmeaning{Infinite sequence}{\meaningexplanation{No last term.}}}{(a_i)_{i=1}^{4}&=(2,4,6,8)}{(a_i)_{i=1}^{\infty}&=(2,4,6,\ldots)}
-\pairedrowwithcols{l}{(2,4)}{(2,2,4)}{\conceptmeaning{Sequence order}{\meaningexplanation{Order matters.}}}{\conceptmeaning{Sequence repetition}{\meaningexplanation{Repetition matters.}}}{(2,4)\ne(4,2)}{(2,2,4)\ne(2,4)}
-\symrow{A_1,A_2}{\conceptmeaning{Subscript labels}{\meaningexplanation{Subscripts may label cases.}}}{Alternatives $A_1$ and $A_2$.}
-}
-{\FooterFont Dots follow an established pattern; alone they do not define a unique rule. The finite list $1,2,3,\ldots,n$ assumes integer $n\geq3$. An index is not multiplication or an exponent. Indices may start at $1$, $0$, or another integer: state the start. Sets ignore order and repetition (Poster 1).\par}
-\vspace{1mm}
-\renewcommand{\ContextHeading}{Index convention}
-\renewcommand{\SymbolColumnFraction}{.23}
-\renewcommand{\MeaningColumnFraction}{.39}
-\sectionbox[{Indices run through consecutive integers between the bounds, \textbf{inclusive}. Here $n\in\mathbb N$, $n\geq1$, and $a_i=2i$ in the sequence examples.\par}]{Summation notation}{
-\symrow{\displaystyle\sum_{i=1}^{n}a_i}{\conceptmeaning{Summation}{\meaningexplanation{Sum of the indicated terms.}}}{\exmath[l]{a_1+a_2+\cdots+a_n}}
-\pairedrowwithcols{l}{i}{a_i}{\conceptmeaning{Index}{\meaningexplanation{Local to sum.}}}{\conceptmeaning{Summand}{\meaningexplanation{Expression summed.}}}{i=1,2,\ldots,n}{a_i=2i}
-\pairedrowwithcols{l}{1}{n}{\conceptmeaning{Lower bound}{\meaningexplanation{First index.}}}{\conceptmeaning{Upper bound}{\meaningexplanation{Last index.}}}{\text{Start at }i=1.}{\text{End at }i=n.}
-\pairedrow{a_n}{S_n}{\conceptmeaning{Indexed term}{\meaningexplanation{Single term at $n$.}}}{\conceptmeaning{Partial sum}{\meaningexplanation{Sum of first $n$ terms; start at $1$.}}}{a_4&=8}{S_n&=\sum_{i=1}^{n}a_i}
-\symrow{S_4}{\conceptmeaning{Fourth partial sum}{\meaningexplanation{Four terms for $a_i=2i$.}}}{\exmath{S_4&=2+4+6+8=20}}
-\pairedrowwithcols{l}{\displaystyle\sum_{i=2}^{4}3}{\displaystyle\sum_{k=1}^{3}k^2}{\conceptmeaning{Constant sum}{\meaningexplanation{Constant; bounds $2$ to $4$.}}}{\conceptmeaning{Sum of squares}{\meaningexplanation{Squares; bounds $1$ to $3$.}}}{\begin{array}[t]{@{}r@{}l@{}}\sum_{i=2}^{4}3&{}=3+3+3\\&{}=9\end{array}}{\begin{array}[t]{@{}r@{}l@{}}\sum_{k=1}^{3}k^2&{}=1+4+9\\&{}=14\end{array}}
-\symrow{i,\ k}{\conceptmeaning{Index renaming}{\meaningexplanation{Index names may change consistently.}}}{\exmath[l]{\sum_{i=1}^{4}i=\sum_{k=1}^{4}k\\{}=1+2+3+4=10}}
-}
-{\FooterFont Rename the local index in both bounds and summand. Centered dots use the same omission convention as list dots.\par}
-\end{minipage}\par
+\begingroup
+\vspace{-1mm}
+\setlength{\tabcolsep}{0.6mm}
+\setlength{\RowPadding}{0.93mm}
+\renewcommand{\arraystretch}{1}
+\renewcommand{\ExampleLineStretch}{1.02}
+\arrayrulecolor{rulecolor}
+% Separate notation and definitions beside the two original experiment columns.
+\newcommand{\probrow}[5]{%
+  \paddedcell{\centering\SymbolFont\ensuremath{\displaystyle #1}}&%
+  \paddedcell{\DefinitionFont\conceptmeaning{\if\relax\detokenize{#2}\relax\else#2:\fi}{\meaningexplanation{#3}}}&%
+  \paddedcell{\ExampleFont #4}&\paddedcell{\ExampleFont #5}\\\hline}
+\begin{tabularx}{\linewidth}{@{}p{.14\linewidth}p{.30\linewidth}p{.27\linewidth}X@{}}
+\paddedcell{\centering\TableHeadFont Symbol}&
+\paddedcell{\TableHeadFont Meaning}&
+\paddedcell{\TableHeadFont Die examples}&
+\paddedcell{\TableHeadFont Coins examples}\\\hline
+\probrow{\sequenceindex{\Omega}\quad\sequenceindex{\omega}}{Sample space; outcome}{All possible outcomes; one possible result}{$|\sequenceindex{\Omega}|=6$ \qquad $\sequenceindex{\omega}=3\in\Omega$\par \qquad \qquad \quad \> $\omega=6\in\Omega$}{$|\sequenceindex{\Omega}|=4$ \qquad $\sequenceindex{\omega}=\mathrm{HT}\in\Omega$\par \qquad \qquad \quad \> $\omega=\mathrm{HH}\in\Omega$}
+\probrow{\sequenceindex{E}\subseteq\Omega}{Input: event}{A set of outcomes, not a numerical probability}{\exmath[l]{\sequenceindex{E}_1=\{1,4,6\},\quad |E_1|=3\\E_2=\{2,5\},\quad |E_2|=2}}{\exmath[l]{\sequenceindex{E}_1=\{\mathrm{HH},\mathrm{HT}\},\quad |E_1|=2\\E_2=\{\mathrm{HH},\mathrm{TH}\},\quad |E_2|=2}}
+\probrow{\begin{gathered}\sequenceindex{\mathcal P}(\Omega)\\{}=\{E:E\subseteq\Omega\}\end{gathered}}{Power set; domain of $P$}{All subsets of $\Omega$: the events that form the input domain of $P$.}{$|\sequenceindex{\mathcal P}(\Omega)|=2^6=64$; e.g.\par $\varnothing,\Omega,A,B,C,\{1\},A\cap B$}{$|\sequenceindex{\mathcal P}(\Omega)|=2^4=16$; e.g.\par $\varnothing,\Omega,F,G,J,\{\mathrm{HT}\},F\cap G$}
+\probrow{\sequenceindex{P}}{Probability measure}{Function $\sequenceindex{P}:\mathcal P(\Omega)\to[0,1]$, $E\mapsto P(E)$}{\exmath[l@{\quad}l]{\sequenceindex{P}(\varnothing)=0&P(A)=\tfrac12\\P(B)=\tfrac13&P(\{6\})=\tfrac16}}{\exmath[l@{\quad}l]{\sequenceindex{P}(\Omega)=1&P(F)=\tfrac34\\P(G)=\tfrac12&P(\{\mathrm{HT}\})=\tfrac14}}
+\probrow{[0,1]}{Codomain}{Declared numerical target }{$[0,1]$}{$[0,1]$}
+
+\probrow{\sequenceindex{P}(E)}{Output: probability}{A number, unlike the set $\mathcal P(\Omega)$; $P(\varnothing)=0$}{$\sequenceindex{P}(A)=\tfrac12$ \quad $P(B)=\tfrac13$ \quad $P(C)=\tfrac12$}{$\sequenceindex{P}(F)=\tfrac34$ \quad $P(G)=\tfrac12$ \quad $P(J)=\tfrac14$}
+\probrow{\sequenceindex{\text{Range}}(P)}{}{Probabilities attained by events}{$\{0,\tfrac16,\tfrac26,\ldots,1\}$}{$\{0,\tfrac14,\tfrac12,\tfrac34,1\}$}
+\probrow{P(E)=\frac{\sequenceindex{|}E\sequenceindex{|}}{\sequenceindex{|}\Omega\sequenceindex{|}}}{Classical probability}{Equally likely finite outcomes:}{\exmath[l]{A=\{1,3,5\}\\P(A)=\frac{\sequenceindex{|}A\sequenceindex{|}}{\sequenceindex{|}\Omega\sequenceindex{|}}=\tfrac36=\tfrac12}}{\exmath[l]{F=\{\mathrm{HH},\mathrm{HT},\mathrm{TH}\}\\P(F)=\frac{\sequenceindex{|}F\sequenceindex{|}}{\sequenceindex{|}\Omega\sequenceindex{|}}=\tfrac34}}
+\probrow{E^{\sequenceindex{c}}}{Complement}{In $\Omega$, outside $E$; $P(E^c)=1-P(E)$}{\exmath[l@{\quad}l]{A^{\sequenceindex{c}}=C&\{1,2\}^c=\{3,4,5,6\}\\P(A^c)=\tfrac12&P(\{1,2\}^c)=\tfrac46=\tfrac23}}{\exmath[l@{\quad}l]{F^{\sequenceindex{c}}=J&\{\mathrm{HT}\}^c=\{\mathrm{HH},\mathrm{TH},\mathrm{TT}\}\\P(F^c)=\tfrac14&P(\{\mathrm{HT}\}^c)=\tfrac34}}
+\probrow{E_1\mathbin{\sequenceindex{\cup}} E_2}{Union}{Event $E_1$ or $E_2$, or both}{$A\mathbin{\sequenceindex{\cup}} B=A+B=\{1,2,3,5\}$}{$F\mathbin{\sequenceindex{\cup}} G=F+G=\Omega$}
+\probrow{E_1\mathbin{\sequenceindex{\cap}} E_2}{Intersection}{Events $E_1$ and $E_2$ together}{$A\mathbin{\sequenceindex{\cap}} B=AB=\{1\}$}{$F\mathbin{\sequenceindex{\cap}} G=FG=\{\mathrm{HH}\}$}
+\probrow{E_1\cap E_2=\sequenceindex{\varnothing}}{Disjoint}{Mutually exclusive:}{$A\cap C= AC = \sequenceindex{\varnothing}$}{$F\cap J=\sequenceindex{\varnothing}$}
+\probrow{}{Addition for disjoint events}{If $E_1\cap E_2=\varnothing$ \qquad then $P(E_1\cup E_2)=P(E_1)+P(E_2)$}{$P(A\cup C)=\tfrac12+\tfrac12=1$}{$P(F\cup J)=\tfrac34+\tfrac14=1$}
+\paddedcell{\centering\SymbolFont $\displaystyle
+  \begin{gathered}P(E_1\cap E_2)\\{}=P(E_1)P(E_2)\end{gathered}$}&
+\paddedcell{\DefinitionFont\conceptmeaning{Independent events}{%
+  \meaningexplanation{Events $E_1,E_2$ are independent when}\par
+  \meaningexplanation{Independent events do not affect each other’s probabilities.}}}&
+\multicolumn{2}{p{\dimexpr.56\linewidth-4\tabcolsep\relax}@{}}{\paddedcell{\ExampleFont\raggedright
+  \textbf{Coin example: independence}\par
+  \begingroup
+  \let\tabularxcolumn\centeredtextcolumn
+  \begin{tabularx}{\linewidth}{@{}>{\collectcell\contextcell}l<{\endcollectcell}>{\collectcell\subrowcell}X<{\endcollectcell}@{}}
+  \textbf{Symbol}&\textbf{Meaning}\\
+  $E_1=\{\mathrm{HH},\mathrm{HT}\}$&First toss is heads\\
+  $E_2=\{\mathrm{HH},\mathrm{TH}\}$&Second toss is heads\\
+  $E_1\cap E_2=\{\mathrm{HH}\}$&Both tosses are heads\\
+  $P(E_1)=P(E_2)=\tfrac12$&Each event has two of four outcomes\\
+  $P(E_1\cap E_2)=P(E_1)P(E_2)=\tfrac12\cdot\tfrac12=\tfrac14$ \hspace{3mm} &One of four outcomes
+  \end{tabularx}\endgroup
+}}\\\hline
+\end{tabularx}\par
+\endgroup
 \vfill
 {\color{navy}\hrule height 0.5pt}\vspace{0.7mm}
-{\FooterFont Symbols acquire meaning from their mathematical context.\par}
+\endgroup
+\newpage
+{\TitleFont\color{coral}MATHEMATICS\hfill\KickerFont PAGE 3\par}
+\vspace{1.3mm}{\color{navy}\hrule height 0.8pt}\vspace{1.8mm}
+\compacttables
+\sectionheading{Sequences and subscripts}
+\renewcommand{\ContextHeading}{Reading guide}
+\examplecontexts{A \textbf{sequence} is an ordered list of indexed terms. Parentheses show sequences; braces show sets. Here all indices start at $i=1$, and $n\in\mathbb N$, $n\geq1$. Read each row across to compare the three sequences.}
+\begingroup
+\setlength{\tabcolsep}{0.8mm}
+\setlength{\RowPadding}{0.3mm}
+\renewcommand{\arraystretch}{1}
+\arrayrulecolor{rulecolor}
+% Local row helpers serve sequences and partial sums.
+% Concept-only rows leave Symbol empty rather than introduce new notation.
+% Coral marks isolate newly introduced symbols, indices, and bounds.
+% Operands, arguments, repeated arithmetic, and established notation stay unmarked.
+\newcommand{\sequencerow}[6]{%
+  \paddedcell{\centering\SymbolFont\ensuremath{\displaystyle #1}}&%
+  \paddedcell{\DefinitionFont\conceptmeaning{#2}{\meaningexplanation{#3}}}&%
+  \paddedcell{\ExampleFont #4}&\paddedcell{\ExampleFont #5}&\paddedcell{\ExampleFont #6}\\\hline}
+\newcommand{\sequencehead}{%
+  \paddedcell{\centering\TableHeadFont Symbol}&%
+  \paddedcell{\TableHeadFont Meaning}&%
+  \paddedcell{\TableHeadFont Sequence $a$}&%
+  \paddedcell{\TableHeadFont Sequence $b$}&%
+  \paddedcell{\TableHeadFont Sequence $c$}\\\hline}
+\begin{tabularx}{\linewidth}{@{}p{.10\linewidth}p{.18\linewidth}p{.225\linewidth}p{.225\linewidth}X@{}}
+\sequencehead
+\sequencerow{k_{\sequenceindex{i}}=f(\sequenceindex{i})}{Rule and first terms}{Use the rule to find each term.}
+  {\exmath[l]{a_{\sequenceindex{i}}=2\cdot i\\(2\cdot1,2\cdot2,2\cdot3,2\cdot4,\ldots)\\=(2,4,6,8,\ldots)}}
+  {\exmath[l]{b_{\sequenceindex{i}}=2\cdot i-1\\\bigl(2\cdot1-1,2\cdot2-1,\\\phantom{(}2\cdot3-1,2\cdot4-1,\ldots\bigr)\\=(1,3,5,7,\ldots)}}
+  {\exmath[l]{c_{\sequenceindex{i}}=2^{i-1}\\(2^{1-1},2^{2-1},2^{3-1},2^{4-1},\ldots)\\=(1,2,4,8,\ldots)}}
+\sequencerow{k_{\sequenceindex{i}}}{Indexed term}{The subscript gives the position.}
+  {$a_{\sequenceindex{3}}=2(3)=6$}
+  {$b_{\sequenceindex{3}}=2(3)-1=5$}
+  {$c_{\sequenceindex{3}}=2^{3-1}=4$}
+\sequencerow{k_{\sequenceindex{1}},\ k_{\sequenceindex{n}}}{First term; $n$th term}{One term at index $1$ or $n$.}
+  {$a_{\sequenceindex{1}}=2$; $a_{\sequenceindex{n}}=2n$}
+  {$b_{\sequenceindex{1}}=1$; $b_{\sequenceindex{n}}=2n-1$}
+  {$c_{\sequenceindex{1}}=1$; $c_{\sequenceindex{n}}=2^{n-1}$}
+\sequencerow{(k_{i})_{i=1}^{\sequenceindex{4}}}{Finite sequence, etc.}{Four terms; the last index is $4$.}
+  {$(a_{i})_{i=1}^{\sequenceindex{4}}=(2,4,6,8)$}
+  {$(b_{i})_{i=1}^{\sequenceindex{4}}=(1,3,5,7)$}
+  {$(c_{i})_{i=1}^{\sequenceindex{4}}=(1,2,4,8)$}
+\sequencerow{(k_{i})_{i=1}^{\sequenceindex{\infty}}}{Infinite sequence, etc.}{No last term; $\infty$ is not an index.}
+  {$(a_{i})_{i=1}^{\sequenceindex{\infty}}$\par $=(2,4,6,8,\ldots)$}
+  {$(b_{i})_{i=1}^{\sequenceindex{\infty}}$\par $=(1,3,5,7,\ldots)$}
+  {$(c_{i})_{i=1}^{\sequenceindex{\infty}}$\par $=(1,2,4,8,\ldots)$}
+\sequencerow{}{Sequence order}{Swapping distinct terms changes the list.}
+  {$(a_{1},a_{2})\ne(a_{2},a_{1})$\par $(2,4)\ne(4,2)$}
+  {$(b_{1},b_{2})\ne(b_{2},b_{1})$\par $(1,3)\ne(3,1)$}
+  {$(c_{1},c_{2})\ne(c_{2},c_{1})$\par $(1,2)\ne(2,1)$}
+\sequencerow{}{Sequence repetition}{Inserting a repeated entry changes the list.}
+  {$(2,2,4)\ne(2,4)$}
+  {$(1,1,3)\ne(1,3)$}
+  {$(1,1,2)\ne(1,2)$}
+\end{tabularx}\par
+\vspace{0.5mm}
+{\FooterFont An index is not multiplication or an exponent. Sets ignore order and repetition sequences do not.\par}
+\vspace{0.5mm}
+\sectionheading{Summation and partial sums}
+\renewcommand{\ContextHeading}{From terms to their sum}
+\examplecontexts{A \textbf{series} is a sum of sequence terms. The symbol $\mathop{\sequenceindex{\mathord{\sum}}}\displaylimits$ adds the summand as its index runs through consecutive integers between the bounds, \textbf{inclusive}. A partial sum adds finitely many terms.\par
+In $S_{n}^{(\sequenceindex{a})}$, $S_{n}^{(\sequenceindex{b})}$, and $S_{n}^{(\sequenceindex{c})}$, the parenthesized superscripts \textbf{label the sequence being summed; they are not powers}. The subscript $\sequenceindex{n}$ counts the terms when the sum starts at $1$.}
+\begingroup
+\begin{tabularx}{\linewidth}{@{}p{.10\linewidth}p{.2\linewidth}p{.225\linewidth}p{.225\linewidth}X@{}}
+\sequencehead
+\sequencerow{k_{i} = f(i)}{Summand}{Indexed term being added.}
+  {$a_{i}=2i$}
+  {$b_{i}=2i-1$}
+  {$c_{i}=2^{i-1}$}
+\sequencerow{\sum_{\sequenceindex{i}=\sequenceindex{1}}^{\sequenceindex{n}}f(i)}{Bounds and index}{Lower bound $1$ | Upper bound $n,m,l$ local index $i=1,\ldots,n$.}
+  {$\sum_{\sequenceindex{i}=\sequenceindex{1}}^{\sequenceindex{n}}a_{i}$\par\vspace{1.8mm}Start: $a_{1}$ | End: $a_{n}$.}
+  {$\sum_{\sequenceindex{i}=\sequenceindex{1}}^{\sequenceindex{m}}b_{i}$\par\vspace{1.8mm}Start: $b_{1}$ | End: $b_{m}$.}
+  {$\sum_{\sequenceindex{i}=\sequenceindex{1}}^{\sequenceindex{l}}c_{i}$\par\vspace{1.8mm}Start: $c_{1}$ | End: $c_{l}$.}
+\sequencerow{\sequenceindex{S}_{n}}{Partial sum of the first $n$ terms}{Expand from the first to the $n$th, $m$th, $l$th term.}
+  {$\sequenceindex{S}_{n}^{(a)}=\sum_{i=1}^{n}a_{i}$\par\vspace{1.8mm}\qquad\! $=a_{1}+\cdots+a_{n}$}
+  {$\sequenceindex{S}_{n}^{(b)}=\sum_{i=1}^{m}b_{i}$\par\vspace{1.8mm}\qquad\! $=b_{1}+\cdots+b_{m}$}
+  {$\sequenceindex{S}_{n}^{(c)}=\sum_{i=1}^{l}c_{i}$\par\vspace{1.8mm}\qquad\! $=c_{1}+\cdots+c_{l}$}
+\sequencerow{\sequenceindex{a}_{4}\text{ vs }\sequenceindex{S}_{4}}{Fourth term versus fourth partial sum}{One term versus the sum of four terms.}
+  {$\sequenceindex{a}_{4}=8$\par\vspace{1.8mm} $\sequenceindex{S}_{4}^{(a)}=2+4+6+8=20$}
+  {$\sequenceindex{b}_{4}=7$\par\vspace{1.8mm} $\sequenceindex{S}_{4}^{(b)}=1+3+5+7=16$}
+  {$\sequenceindex{c}_{4}=8$\par\vspace{1.8mm} $\sequenceindex{S}_{4}^{(c)}=1+2+4+8=15$}
+\sequencerow{\sequenceindex{i},\sequenceindex{j},\sequenceindex{k}}{Index renaming}{Rename the local index below $\sum$ and in the summand; keep the limits.}
+  {\exmath[l]{S_{4}^{(a)}=\sum_{\sequenceindex{i}=1}^{4}a_{\sequenceindex{i}}=20\\{}\qquad\!=\sum_{\sequenceindex{j}=1}^{4}a_{\sequenceindex{j}}=20\\{}\qquad\!=\sum_{\sequenceindex{k}=1}^{4}a_{\sequenceindex{k}}=20}}
+  {\exmath[l]{S_{4}^{(b)}=\sum_{\sequenceindex{i}=1}^{4}b_{\sequenceindex{i}}=16\\{}\qquad\!=\sum_{\sequenceindex{j}=1}^{4}b_{\sequenceindex{j}}=16\\{}\qquad=\sum_{\sequenceindex{k}=1}^{4}b_{\sequenceindex{k}}=16}}
+  {\exmath[l]{S_{4}^{(c)}=\sum_{\sequenceindex{i}=1}^{4}c_{\sequenceindex{i}}=15\\{}\qquad\!=\sum_{\sequenceindex{j}=1}^{4}c_{\sequenceindex{j}}=15\\{}\qquad\!=\sum_{\sequenceindex{k}=1}^{4}c_{\sequenceindex{k}}=15}}
+\end{tabularx}\par
+\endgroup
+\vspace{0.5mm}
+\sectionheading{Worked summation examples}
+\setlength{\RowPadding}{0.7mm}
+\renewcommand{\SymbolColumnFraction}{.23}
+\renewcommand{\MeaningColumnFraction}{.35}
+\paralleltables{
+\symrow{\displaystyle\sum_{i=\sequenceindex{2}}^{4}3}{\conceptmeaning{Constant sum}{\meaningexplanation{Add $3$ for $i=2,3,4$}}}{\exmath[l]{3+3+3=9}}
+\symrow{\displaystyle\sum_{k=1}^{3}k^{\sequenceindex{2}}}{\conceptmeaning{Sum of squares}{\meaningexplanation{Square $k$ for $k=1,2,3$}}}{\exmath[l]{1^2+2^2+3^2\\{}=1+4+9=14}}
+\symrow{\displaystyle\sum_{j=\sequenceindex{0}}^{3}2^{j}}{\conceptmeaning{Starting at zero}{\meaningexplanation{Powers of $2$; $j=0,1,2,3$}}}{\exmath[l]{2^{0}+2^{1}+2^{2}+2^{3}\\{}=1+2+4+8=15}}
+}{
+\symrow{\displaystyle\sum_{i=\sequenceindex{3}}^{5}i}{\conceptmeaning{Shifted lower bound}{\meaningexplanation{Add $i$ for $i=3,4,5$}}}{\exmath[l]{3+4+5=12}}
+\symrow{\displaystyle\sum_{j=2}^{4}b_{\sequenceindex{j}}}{\conceptmeaning{Sequence terms}{\meaningexplanation{$b_{j}=2j-1$; $j=2,3,4$}}}{\exmath[l]{b_{2}+b_{3}+b_{4}\\{}=3+5+7=15}}
+\symrow{\displaystyle\sum_{k=1}^{4}(2k+1)}{\conceptmeaning{Linear summand}{\meaningexplanation{Bounds $1$ through $4$, inclusive; summand $2k+1$}}}{\exmath[l]{(2(1)+1)+(2(2)+1)\\{}\quad+(2(3)+1)+(2(4)+1)\\{}=3+5+7+9=24}}
+}
+\endgroup
+\vfill
+{\color{navy}\hrule height 0.5pt}\vspace{0.7mm}
+{\FooterFont Symbols acquire meaning from their mathematical context. State the starting index and label the sequence in every partial sum.\par}
+\endgroup
+\newpage
+\begingroup
+{\TitleFont\color{coral}MATHEMATICS\hfill\KickerFont PAGE 4\par}
+\vspace{1.3mm}{\color{navy}\hrule height 0.8pt}\vspace{1.8mm}
+% Calculus uses the same measured cells and type sizes at full page width.
+\setlength{\RowPadding}{1.2mm}
+\renewcommand{\SymbolColumnFraction}{.23}
+\renewcommand{\MeaningColumnFraction}{.39}
+\sectionheading{Limits and approaching values}
+\notationtable{
+\symrow{x\to a}
+  {\conceptmeaning{Approaching a value}{\meaningexplanation{$x$ approaches $a$; this differs from $x=a$.}}}
+  {$x\to2$: inputs get arbitrarily close to $2$.\par $x=2$: the input is exactly $2$.}
+\symrow{\mathop{\sequenceindex{\mathord{\lim}}}\displaylimits_{x\to a}f(x)=L}
+  {\conceptmeaning{Finite limit}{\meaningexplanation{Function values approach $L$ as $x$ approaches $a$ through domain values with $x\ne a$.}}}
+  {\exmath[l]{\mathop{\sequenceindex{\mathord{\lim}}}\displaylimits_{x\to2}x^2=4,\qquad \lim_{x\to1}\frac{x^2-1}{x-1}=2}\par
+   The displayed quotient is undefined at $x=1$.}
+\symrow{\begin{gathered}x\to a^{\sequenceindex{-}}\\x\to a^{\sequenceindex{+}}\end{gathered}}
+  {\conceptmeaning{One-sided approaches}{\meaningexplanation{From smaller ($x<a$) or larger ($x>a$) inputs. The signs do not describe the sign of $f(x)$.}}}
+  {$x\to2^{\sequenceindex{-}}$: approach from below $2$.\par $x\to2^{\sequenceindex{+}}$: approach from above $2$.\par For $f(x)=x^2$, both limits equal $4$.}
+\symrow{\begin{gathered}\lim_{x\to a^{\sequenceindex{-}}}f(x)=L\\\lim_{x\to a^{\sequenceindex{+}}}f(x)=L\end{gathered}}
+  {\conceptmeaning{Two-sided finite limit}{\meaningexplanation{Exists when both one-sided limits exist and agree on the same finite value $L$.}}}
+  {\exmath[l]{\lim_{x\to2^{\sequenceindex{-}}}x^2=4=\lim_{x\to2^{\sequenceindex{+}}}x^2\\\text{so }\lim_{x\to2}x^2=4.}}
+\symrow{\begin{gathered}x\to\sequenceindex{\infty}\\x\to-\infty\end{gathered}}
+  {\conceptmeaning{Inputs without bound}{\meaningexplanation{$x$ grows without bound in the positive or negative direction.}}}
+  {\exmath[l]{\lim_{x\to\sequenceindex{\infty}}\frac1x=0,\qquad \lim_{x\to-\infty}\frac1x=0}}
+\symrow{\begin{gathered}f(x)\to\sequenceindex{\infty}\\f(x)\to-\infty\end{gathered}}
+  {\conceptmeaning{Unbounded function values}{\meaningexplanation{Values grow without bound in either direction; infinity is not a real-number output.}}}
+  {\exmath[l]{\lim_{x\to0^+}\frac1x=\sequenceindex{\infty},\qquad \lim_{x\to0^-}\frac1x=-\infty}}
+\symrow{\lim_{x\to a}f(x)\ \sequenceindex{\text{DNE}}}
+  {\conceptmeaning{Limit does not exist (DNE)}{\meaningexplanation{Unequal one-sided limits prevent a two-sided limit.}}}
+  {$g(x)=|x|/x$ for $x\ne0$:\par
+   \exmath[l]{\lim_{x\to0^-}g(x)=-1\ne1=\lim_{x\to0^+}g(x)}\par
+   Hence $\lim_{x\to0}g(x)$ does not exist.}
+}\par\vspace{1.2mm}
+\sectionheading{Change and derivatives}
+\renewcommand{\ContextHeading}{A derivative is a limit}
+\examplecontexts{\vspace{0.7mm}\par For $y=f(x)$, $\displaystyle f'(a)=\lim_{h\to0}\frac{f(a+h)-f(a)}{h}$, when this finite limit exists; the quotient uses $h\ne0$.\par\vspace{0.7mm}}
+\notationtable{
+\symrow{\sequenceindex{\Delta} x,\quad\sequenceindex{\Delta} y}
+  {\conceptmeaning{Finite changes}{\meaningexplanation{$\Delta x=x_2-x_1$; $\Delta y=f(x_2)-f(x_1)$.}}}
+  {$f(x)=x^2$, from $x=1$ to $x=3$:\par $\sequenceindex{\Delta} x=2$, $\sequenceindex{\Delta} y=9-1=8$.}
+\symrow{\frac{\sequenceindex{\Delta} y}{\sequenceindex{\Delta} x}}
+  {\conceptmeaning{Average rate of change}{\meaningexplanation{Change in output per change in input; $\Delta x\ne0$.}}}
+  {$f(x)=x^2$, from $1$ to $3$:\par $\sequenceindex{\Delta} y/\sequenceindex{\Delta} x=8/2=4$.}
+\symrow{f^{\sequenceindex{\prime}}(x),\quad y^{\sequenceindex{\prime}},\quad\frac{\sequenceindex{d}y}{\sequenceindex{d}x}}
+  {\conceptmeaning{First derivative}{\meaningexplanation{Instantaneous rate when $y=f(x)$. Here $dy/dx$ denotes a derivative.}}}
+  {$y=f(x)=x^2$:\par $f^{\sequenceindex{\prime}}(x)=y^{\sequenceindex{\prime}}=\dfrac{\sequenceindex{d}y}{\sequenceindex{d}x}=2x$.}
+\symrow{\frac{\sequenceindex{d}}{\sequenceindex{d}x},\quad f^{\sequenceindex{\prime}}(a)}
+  {\conceptmeaning{Differentiation; value at a point}{\meaningexplanation{$d/dx$ acts on a function; $f'(a)$ evaluates its derivative at $x=a$.}}}
+  {$\dfrac{\sequenceindex{d}}{\sequenceindex{d}x}(x^2)=2x$;\quad $f^{\sequenceindex{\prime}}(3)=2(3)=6$.}
+\symrow{f^{\sequenceindex{\prime\prime}}(x),\quad\frac{d^{\sequenceindex{2}}y}{dx^{\sequenceindex{2}}}}
+  {\conceptmeaning{Second derivative}{\meaningexplanation{Differentiate the first derivative again.}}}
+  {$y=f(x)=x^2$:\par $f^{\sequenceindex{\prime\prime}}(x)=\dfrac{d^{\sequenceindex{2}}y}{dx^{\sequenceindex{2}}}=2$.}
+}\par\vspace{1.2mm}
+\sectionheading{Integrals and evaluation}
+\notationtable{
+\symrow{\notationintegral{\int} f(x)\,dx}
+  {\conceptmeaning{Indefinite integral}{\meaningexplanation{A family of antiderivatives $F(x)+C$, where $F'=f$ and $C$ is any real constant.}}}
+  {$\displaystyle\notationintegral{\int} 2x\,dx=x^2+C$\par A family of functions, one for each $C$.}
+\symrow{\notationintegral{\int_a^b} f(x)\,dx}
+  {\conceptmeaning{Definite integral}{\meaningexplanation{Signed accumulation from lower bound $a$ to upper bound $b$; $f(x)$ is the integrand.}}}
+  {$\displaystyle\notationintegral{\int_0^2} 2x\,dx=4$\par A numerical value; signed accumulation is not always geometric area.}
+\symrow{F(x)\sequenceindex{\big|}_a^b}
+  {\conceptmeaning{Evaluation at the bounds}{\meaningexplanation{$F(x)\big|_a^b=F(b)-F(a)$. If $f$ is continuous on $[a,b]$ and $F'=f$, this equals $\int_a^b f(x)\,dx$.}}}
+  {$\displaystyle\int_0^2 2x\,dx=x^2\sequenceindex{\big|}_0^2=2^2-0^2=4$.}
+\symrow{\sequenceindex{d}x}
+  {\conceptmeaning{Integration variable}{\meaningexplanation{$dx$ identifies $x$ as the variable of integration.}}}
+  {In $\int_0^2 2x\,\sequenceindex{d}x$: bounds $0$, $2$;\par integrand $2x$; integration variable $x$.}
+}\par
+\vfill
+{\color{navy}\hrule height 0.5pt}\vspace{0.7mm}
+{\FooterFont Limits describe approaching behavior; derivatives describe local change; definite integrals describe signed accumulation.\par}
 \endgroup
 \end{document}

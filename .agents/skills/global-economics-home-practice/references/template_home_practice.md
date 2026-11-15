@@ -16,12 +16,22 @@ $env:TEXINPUTS = 'C:/path/to/repo/book2026-2027/preamble/;'
 
 Keep the title, linked contents, **Evaluated criteria**, and a brief instruction to try each task before opening its solution in the unnumbered front matter. Use `\section` for the four required stages, even for a short activity.
 
-1. **Introduction** — Start with a short, accessible example. Add a quick check about a distinction or a meaningful change where it helps.
-2. **Notation Reference and Practice Procedure** — Summarize the relevant notation, definitions, formulas, or representations, then give reusable steps for choosing an approach, reasoning through the task, and interpreting or checking the result.
+1. **Introduction** — Make the concise highlight legend the first instructional content, with at most a brief heading or one-sentence lead-in before it. Follow it with at least two short, accessible introductory examples that establish the notation, quantities, units, and relationships used later. These are motivating situations, distinct from General Worked Problems. Add a quick check where it helps.
+2. **Notation Reference and Practice Procedure** — Present the detailed notation reference with general definitions and separate contextual meanings in concise example-linked bullets. Follow it with reusable steps for choosing an approach, reasoning through the task, and interpreting or checking the result.
 3. **General Worked Problems** — Use numbered problem subsections with self-contained prompts and criterion-linked worked solutions. Where the topic supports a follow-up, ask how a meaningful change to the initial application affects the reasoning and what the available information supports.
 4. **Advanced Problems** — Build on the same reasoning at the requested level. Ask students to connect ideas, compare cases or representations, or justify a conclusion under more demanding conditions. Use the linked problem pattern here too.
 
 When distinct concepts, methods, or problem families need separate framing, replace the single General Worked Problems section with two or more consecutive `\section{General Worked Problems --- [Descriptive Focus]}` blocks. Give each block its own section label and linked problem list. This is the only split that adds numbered top-level sections. Keep Advanced Problems last and organize all other material within the four stages using subsections. Put requested independent practice in a distinct subsection within the appropriate stage.
+
+## Complementary tables and introductory examples
+
+The scaffold includes separate three-column concise and four-column detailed tables, with labels `tab:highlight-legend` and `tab:notation-reference`. Reuse them and any existing equivalents on reruns. Preserve a single concept–notation–highlight mapping across both; use shared role macros, not duplicated table bodies. [math-legend-highlight](../../math-legend-highlight/SKILL.md) owns that design and navigation; [math-practice-highlights](../../math-practice-highlights/SKILL.md) owns body markup, renderer integration, diagrams, toggles, and validation. Apply the design once, then the markup; do not loop between skills.
+
+Use **Symbol or notation | Concept | Brief meaning** for the concise legend and **Symbol or notation | Concept | Definition | Meaning in the introductory examples** for the detailed reference. Translate these headers and example labels consistently; Spanish equivalents are given in the legend skill's LaTeX reference. The concise legend contains short meanings and essential notation only. Keep derivations and worked calculations out of it. The detailed table separates general definitions from what each symbol represents in actual introductory situations; use concise bullets such as “Example 1: …”, linked to the corresponding example anchor. Include only relevant examples per row.
+
+Replace each introductory-example placeholder with a short motivating situation, enough givens and units to interpret its notation, and an accessible relationship or interpretation. Do not turn these into extra full worked problems. Do not repeat long explanations in table cells. Tables must not expose answers required in later independent tasks. Keep the front matter and numbered top-level stages intact; any introduction index must not displace the first instructional legend.
+
+The scaffold loads the existing renderer once and places the commented disable toggle immediately after it. Define topic-specific role macros as needed, reuse them in tables and body, and preserve any existing toggle setting when adapting an activity. Highlights off must retain all text and notation. Preserve component roles in composite expressions, including substitutions.
 
 ## Navigation
 
@@ -48,3 +58,5 @@ pdflatex -interaction=nonstopmode -halt-on-error -output-directory="$buildDirect
 Repeat until the contents and cross-references resolve and the log has no undefined references, duplicate destinations, or requests to rerun. Inspect the PDF for legible equations, tables, and graphs, and for clipping or awkward page breaks. Follow the contents entries, problem list links, task links, and return arrows to confirm that each lands at the intended heading or contents.
 
 As a final check, compare the source headings with the numbered entries in the compiled contents. Verify Introduction, Notation Reference and Practice Procedure, General Worked Problems, and Advanced Problems in that order, with Advanced Problems last. If the count exceeds four, verify that every extra heading comes from replacing the single General Worked Problems section with consecutive focused groups and that each group has a linked problem list. Confirm that front matter is unnumbered and that any independent practice sits within its stage.
+
+Verify concise legend → at least two introductory examples → detailed reference in Section 2 → practice procedure in the source and PDF. Inspect both table schemas, linked contextual bullets, shared semantic treatments, enabled/disabled highlights, grayscale readability, and no duplicate tables or anchors.

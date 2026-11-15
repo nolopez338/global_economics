@@ -3,7 +3,7 @@
 
   const page = document.getElementById("timer-page");
   if (!page) return;
-  const { periods: schedule, progress: periodProgress } = window.SchoolDayTimer;
+  const { periods: schedule, progress: periodProgress, durationText } = window.SchoolDayTimer;
   const clock = page.querySelector("#live-clock");
   const dateLabel = page.querySelector("#current-date");
   const cycleLabel = page.querySelector("#cycle-label");
@@ -19,14 +19,6 @@
 
   function localDateKey(date) {
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-  }
-
-  function durationText(seconds) {
-    const safe = Math.max(0, Math.ceil(seconds));
-    const hours = Math.floor(safe / 3600);
-    const minutes = Math.floor((safe % 3600) / 60);
-    const remainder = safe % 60;
-    return `${hours ? `${hours}:` : ""}${String(minutes).padStart(hours ? 2 : 1, "0")}:${String(remainder).padStart(2, "0")}`;
   }
 
   function renderSchedule() {

@@ -25,5 +25,44 @@
   function progress(start, end, nowMinutes) {
     return Math.max(0, Math.min(1, (nowMinutes - start) / (end - start)));
   }
-  window.SchoolDayTimer = { periods, progress };
+  function durationText(seconds) {
+    const safe = Math.max(0, Math.ceil(seconds));
+    const hours = Math.floor(safe / 3600);
+    const minutes = Math.floor((safe % 3600) / 60);
+    const remainder = safe % 60;
+    return `${hours ? `${hours}:` : ""}${String(minutes).padStart(hours ? 2 : 1, "0")}:${String(remainder).padStart(2, "0")}`;
+  }
+
+  // Local date fields match the classroom clock, not the calendar's UTC Date API.
+  function countdownAt(now, calendar = window.academicCalendar) {
+    const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    if (now.getDay() === 0 || now.getDay() === 6) {
+      return { label: "Weekend · no school", remaining: "" };
+    }
+    let info;
+    try {
+      info = calendar?.getAcademicDateInfo(dateKey);
+    } catch {
+      // Missing or failed calendar lookups must never produce a countdown.
+    }
+    if (!info || info.isHoliday == null) {
+      return { label: "Calendar unavailable", remaining: "" };
+    }
+    if (info.isHoliday) return { label: "School holiday", remaining: "" };
+    if (!Number.isInteger(info.cycleDay) || info.cycleDay < 1 || info.cycleDay > 6) {
+      return { label: "Not a school day", remaining: "" };
+    }
+    const minutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60 + now.getMilliseconds() / 60000;
+    const current = periods.find(period => minutes >= period.start && minutes < period.end);
+    const upcoming = periods.find(period => minutes < period.start);
+    if (current) {
+      return { label: `${current.name} ends in`, remaining: durationText((current.end - minutes) * 60) };
+    }
+    if (upcoming) {
+      return { label: `${upcoming.name} starts in`, remaining: durationText((upcoming.start - minutes) * 60) };
+    }
+    return { label: "School day ended", remaining: "" };
+  }
+
+  window.SchoolDayTimer = { periods, progress, durationText, countdownAt };
 })();
