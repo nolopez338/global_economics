@@ -4,6 +4,7 @@
   const label = document.getElementById("timer-label");
   const value = document.getElementById("timer-value");
   const toggle = document.getElementById("fullscreen-toggle");
+  const fullscreenIcon = toggle.querySelector("svg path");
   const message = document.getElementById("fullscreen-message");
 
   function update() {
@@ -17,7 +18,12 @@
 
   function syncFullscreen() {
     const active = document.fullscreenElement === page;
-    toggle.textContent = active ? "Exit fullscreen" : "Fullscreen";
+    const name = active ? "Exit fullscreen" : "Enter fullscreen";
+    fullscreenIcon.setAttribute("d", active
+      ? "M3 8h5V3m8 0v5h5M8 21v-5H3m18 0h-5v5"
+      : "M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5");
+    toggle.setAttribute("aria-label", name);
+    toggle.title = name;
     toggle.setAttribute("aria-pressed", String(active));
   }
 

@@ -30,7 +30,7 @@
       background: var(--navy);
     }
     .card {
-      width: 100%; max-width: 1720px; margin: auto;
+      width: 100%; max-width: 1720px; min-width: 0; margin: auto; overflow-wrap: anywhere;
       display: grid; gap: var(--space);
     }
     .page-header { display: grid; grid-template-columns: minmax(0, 1fr) auto;
@@ -41,36 +41,48 @@
       line-height: 1.08; letter-spacing: -.035em; font-weight: 750; }
     .header-tools { display: grid; justify-items: end; gap: .4rem; }
     .class-timer { min-width: 13rem; text-align: right; }
+    .timer-heading { display: flex; align-items: center; justify-content: flex-end; gap: .5rem; }
     .timer-label { margin: 0; color: var(--muted); font-size: 1rem; font-weight: 600; }
     .timer-value { margin: .1rem 0 0; font-size: clamp(1.75rem, 3.8vh, 2.75rem);
       line-height: 1.1; font-weight: 700; font-variant-numeric: tabular-nums; }
     .timer-value[hidden], [hidden] { display: none !important; }
-    .fullscreen-toggle { padding: .35rem .6rem; border: 1px solid #41566d;
+    .fullscreen-toggle { display: inline-flex; align-items: center; justify-content: center;
+      flex: 0 0 auto; padding: .35rem; border: 1px solid #41566d;
       border-radius: .4rem; background: transparent; color: var(--muted);
-      font: inherit; font-size: .8rem; cursor: pointer; }
+      font: inherit; cursor: pointer; }
+    .fullscreen-toggle svg { width: 1rem; height: 1rem; }
     .fullscreen-toggle:hover { background: var(--surface); color: var(--text); }
     .fullscreen-toggle:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
     .fullscreen-message { max-width: 17rem; margin: 0; color: var(--amber); font-size: .8rem; }
     .instructions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space); }
     .desk-column { padding: clamp(1.1rem, 2.6vh, 2rem); border: 1px solid #32495d;
       border-radius: 1rem; background: var(--surface); box-shadow: 0 6px 20px #00000012; }
-    h2 { margin: 0 0 clamp(.8rem, 2vh, 1.4rem); font-size: clamp(1.35rem, 2.9vh, 2rem);
+    h2 { margin: 0 0 clamp(.8rem, 2vh, 1.4rem); font-size: clamp(1.5rem, 3.2vh, 2.15rem);
       line-height: 1.2; letter-spacing: -.02em; }
     .allowed h2, .allowed li::marker { color: var(--teal); }
     .not-allowed { background: #1c283a; }
     .not-allowed h2, .not-allowed li::marker { color: var(--coral); }
     ul { margin: 0; padding-left: 1.2em; display: grid; gap: clamp(.5rem, 1.5vh, 1rem); }
-    li { padding-left: .15em; font-size: clamp(1.2rem, 2.65vh, 1.85rem); line-height: 1.35; font-weight: 500; }
+    li { padding-left: .15em; font-size: clamp(1.35rem, 3vh, 2rem); line-height: 1.35; font-weight: 500; }
     .important { padding: clamp(1rem, 2.3vh, 1.6rem); border: 1px solid #6f6044;
       border-left: 4px solid var(--amber); border-radius: .75rem; background: #292d34;
-      font-size: clamp(1.15rem, 2.4vh, 1.7rem); line-height: 1.4; font-weight: 750; color: var(--amber); }
-    .important p { margin: .55rem 0 0; color: var(--text); font-weight: 500; }
+      font-size: clamp(1.2rem, 2.6vh, 1.8rem); line-height: 1.4; font-weight: 750; color: var(--amber); }
+    .important ul { margin-top: .55rem; gap: .35em; color: var(--text); font-weight: 500; }
+    .important li { font: inherit; }
+    .important li::marker { color: var(--amber); }
+    .instruction-item { display: flex; align-items: center; gap: .6rem; min-width: 0; }
+    .instruction-item > span { min-width: 0; }
+    .instruction-icon { width: 40px; height: 40px; flex: 0 0 40px; object-fit: contain; }
+    .desk-item { display: inline-flex; max-width: 100%; align-items: center; gap: .3rem; vertical-align: middle; }
+    .important mark { padding: 0 .12em; border-radius: .2em;
+      background: rgba(243, 209, 139, .14); color: inherit;
+      -webkit-box-decoration-break: clone; box-decoration-break: clone; }
     .footer { color: var(--muted); text-align: center; font-size: clamp(1rem, 1.8vh, 1.25rem); }
     /* Distribute spare height, while intrinsic content can grow and scroll at text zoom. */
     @media (min-width: 60rem) and (min-height: 38rem) {
       .card { min-height: calc(100vh - 2 * var(--space));
         min-height: calc(100dvh - 2 * var(--space));
-        grid-template-rows: auto minmax(min-content, 1fr) auto auto; }
+        grid-template-rows: auto auto auto auto; align-content: space-between; }
     }
     @media (max-width: 59.99rem) {
       .instructions { grid-template-columns: 1fr; }
@@ -80,8 +92,8 @@
     }
     @media (max-width: 36rem) {
       .page-header { grid-template-columns: 1fr; gap: 1rem; }
-      .header-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; }
-      .class-timer { text-align: left; }
+      .header-tools { min-width: 0; }
+      .timer-label { overflow-wrap: anywhere; }
     }
   </style>
 </head>
@@ -97,10 +109,18 @@
         </div>
         <div class="header-tools">
           <div class="class-timer" aria-label="School day countdown">
-            <p id="timer-label" class="timer-label">Checking school calendar…</p>
+            <div class="timer-heading">
+              <button id="fullscreen-toggle" class="fullscreen-toggle" type="button"
+                aria-label="Enter fullscreen" title="Enter fullscreen" aria-pressed="false" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5" />
+                </svg>
+              </button>
+              <p id="timer-label" class="timer-label">Checking school calendar…</p>
+            </div>
             <p id="timer-value" class="timer-value" role="timer" aria-live="off" hidden></p>
           </div>
-          <button id="fullscreen-toggle" class="fullscreen-toggle" type="button" aria-pressed="false" hidden>Fullscreen</button>
           <p id="fullscreen-message" class="fullscreen-message" role="status" hidden></p>
         </div>
       </header>
@@ -109,31 +129,27 @@
         <section class="desk-column allowed" aria-labelledby="allowed-heading">
           <h2 id="allowed-heading">Allowed on your desk</h2>
           <ul>
-            <li>Pencil case</li>
-            <li>Notebook</li>
-            <li>Calculator</li>
-            <li>A blank sheet of paper collected from the front of the classroom</li>
+            <li class="desk-items"><span class="desk-item"><img class="instruction-icon" src="../assets/png/exam-pencil-case.png" width="40" height="40" alt="">Pencil case</span> | <span class="desk-item"><img class="instruction-icon" src="../assets/png/exam-notebook.png" width="40" height="40" alt="">Notebook</span> | <span class="desk-item"><img class="instruction-icon" src="../assets/png/exam-calculator.png" width="40" height="40" alt="">Calculator</span></li>
+            <li><div class="instruction-item"><img class="instruction-icon" src="../assets/png/exam-blank-paper.png" width="40" height="40" alt=""><span>A blank sheet of paper collected from the front of the classroom</span></div></li>
           </ul>
         </section>
 
         <section class="desk-column not-allowed" aria-labelledby="not-allowed-heading">
           <h2 id="not-allowed-heading">Not allowed on your desk</h2>
           <ul>
-            <li>Backpack &mdash; leave it at the front of the classroom</li>
-            <li>Loose papers, including printed materials</li>
+            <li><div class="instruction-item"><img class="instruction-icon" src="../assets/png/exam-backpack.png" width="40" height="40" alt=""><span>Backpack &mdash; leave it at the front of the classroom</span></div></li>
+            <li><div class="instruction-item"><img class="instruction-icon" src="../assets/png/exam-loose-papers.png" width="40" height="40" alt=""><span>Loose papers, including printed materials</span></div></li>
           </ul>
         </section>
       </div>
 
       <div class="important">
         READ THE INSTRUCTIONS CAREFULLY.
-        <p>In order to begin, at least half of the class must be in the room. All students present must be seated and follow the rules above about what is allowed and not allowed on their desks.</p>
+        <ul>
+          <li><div class="instruction-item"><img class="instruction-icon" src="../assets/png/exam-half-class.png" width="40" height="40" alt=""><span>In order to begin, at least <mark>half of the class</mark> must be in the room.</span></div></li>
+          <li><div class="instruction-item"><img class="instruction-icon" src="../assets/png/exam-seated-students.png" width="40" height="40" alt=""><span>All students present <mark>must be seated</mark> and follow the rules above about what is allowed and not allowed on their desks.</span></div></li>
+        </ul>
       </div>
-
-      <div class="footer">
-        Make sure you're ready before starting.
-      </div>
-
     </section>
   </main>
   <script src="../assets/js/databases/year-calendar-data.js"></script>
