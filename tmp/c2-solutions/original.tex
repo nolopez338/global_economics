@@ -1,0 +1,971 @@
+% One worked example, one guided example and four independent practice
+% problems cover the six core families once each, in source order.
+% Matching guided and independent review solutions are optional.
+\makeatletter
+\def\input@path{{../../../preamble/}}
+\makeatother
+\input{preamble.tex}
+\input{graphs/highlights.tex}
+\GTenHighlightsfalse % Disable instructional highlights throughout this activity.
+\tikzset{gten marker/.append style={inner xsep=.6mm,inner ysep=.3mm}}
+% Local C2 roles follow C1: quantities orange; probabilities in related blues.
+\colorlet{cTwoMassMarker}{GTenHLProbability}
+\definecolor{cTwoCDFMarker}{HTML}{43A5C9}
+\newcommand{\cTwoValue}[1]{\HighlightStroke{GTenHLValue}{#1}}
+\newcommand{\cTwoOutcome}[1]{\HighlightStroke{GTenHLOutcome}{#1}}
+\newcommand{\cTwoMassHL}[1]{\HighlightStroke{cTwoMassMarker}{#1}}
+\newcommand{\cTwoCDFHL}[1]{\HighlightStroke{cTwoCDFMarker}{#1}}
+\colorlet{cTwoMassColor}{blue!75!black}
+\colorlet{cTwoCDFColor}{cyan!65!blue!80!black}
+\colorlet{cTwoGuideColor}{cTwoMassColor!35}
+\ifGTenHighlights\else
+  \colorlet{cTwoMassColor}{black}
+  \colorlet{cTwoCDFColor}{black}
+  \colorlet{cTwoGuideColor}{gray}
+\fi
+\input{graphs/G10_T2_bar_graphs.tex}
+\usepackage{needspace}
+\usepackage{varwidth}
+\geometry{letterpaper,margin=0.25in}
+\pagestyle{empty}
+\linespread{1.04}
+\setlength{\parskip}{4pt}
+\setlength{\tabcolsep}{6pt}
+\setlength{\extrarowheight}{2pt}
+\setlength{\emergencystretch}{2em}
+\hypersetup{pdftitle={Grade 10 C2 Classroom Activity: PMF and CDF Tables and Graphs}}
+\newif\ifprintsolutions
+\printsolutionsfalse % Set \printsolutionstrue to append the complete review solutions.
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+\newcommand{\stageheading}[1]{%
+  \par%
+  \Needspace{6\baselineskip}%
+  \addvspace{.65\baselineskip}{\centering\large\bfseries #1%
+    \par}%
+  \nopagebreak[4]}
+\newcommand{\problemtitle}[2]{%
+  \par%
+  \Needspace{4\baselineskip}%
+  \addvspace{.4\baselineskip}%
+  \noindent{%
+    \setlength{\fboxsep}{2pt}\colorbox{black!10}{%
+      \begin{varwidth}[t]{.75\linewidth}\bfseries\strut #1. #2%
+      \end{varwidth}}}%
+  \par%
+  \nopagebreak[4]}
+\newcommand{\task}[2]{%
+  \par%
+  \noindent\textbf{Task #1 --- \ifnum#1=1 PMF table and graph\else CDF table and graph\fi.} #2%
+  \par}
+\newcommand{\responseline}{%
+  \par%
+  \noindent%
+  \rule{0pt}{1.55em}%
+  \hrulefill%
+  \par}
+\newcommand{\worklines}[1]{\begingroup%
+  \setlength{\parskip}{0pt}%
+  \foreach \i in {1,...,#1}{\responseline}%
+  \endgroup}
+\newcommand{\blankgraph}[1]{%
+  \begin{tikzpicture}%
+    \begin{axis}[width=\linewidth,%
+        height=4.4cm,%
+        axis lines=left,%
+        xmin=0,%
+        xmax=10,%
+        ymin=0,%
+        ymax=1.05,%
+        xtick=\empty,%
+        ytick={0,.25,.5,.75,1},%
+        grid=major,%
+        grid style={gray!20},%
+        xlabel={$x$ (USD)},%
+        ylabel={#1},%
+        tick label style={font=\small},%
+        label style={font=\small}]%
+    \end{axis}%
+  \end{tikzpicture}}
+\newcommand{\blanktable}[1]{%
+  \begin{tabularx}{\linewidth}{|Y|Y|}%
+    \hline #1\\%
+    \hline%
+    \rule{0pt}{.6cm}&\\%
+    \hline%
+    \rule{0pt}{.6cm}&\\%
+    \hline%
+    \rule{0pt}{.6cm}&\\%
+    \hline%
+    \rule{0pt}{.6cm}&\\%
+    \hline%
+    \rule{0pt}{.6cm}&\\%
+    \hline%
+    \rule{0pt}{.6cm}&\\%
+    \hline%
+  \end{tabularx}}
+\pgfplotsset{classCDF/.style={width=\dimexpr\linewidth-6pt\relax,%
+      height=4.15cm,%
+      axis lines=left,%
+      ymin=-.06,%
+      ymax=1.1,%
+      ytick={0,.25,.5,.75,1},%
+      ylabel={$\cTwoCDFHL{F_X(x)}$},%
+      xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})},%
+      grid=major,%
+      grid style={gray!15},%
+      tick label style={font=\small},%
+      label style={font=\small},%
+      clip=false}}
+\begin{document}
+{\centering{\Large\bfseries C2 -- Constructing PMF and CDF Tables and Graphs%
+  \par}
+Global Economics \textbar{} Grade 10 \textbar{} Term 2 \textbar{} Lesson 1%
+\par}
+\textbf{C2:} Interprets PMFs and CDFs by verifying their defining properties and using them to calculate
+point, interval, cumulative, and complementary probabilities in financial contexts.
+
+\vspace{-4mm}
+\stageheading{Equations and basic procedure}
+\noindent%
+\begin{tabularx}{\linewidth}{@{}l l X@{}}%
+  \toprule
+  Symbol or notation & Concept & Brief meaning\\%
+  \midrule
+  $\cTwoValue{X} \>\> | \>\> \cTwoValue{x} \>\> | \>\> \cTwoValue{S_X}$ & \cTwoValue{Quantity} & Variable |
+  Value | Support of the random variable $X$\\
+  $\cTwoOutcome{\omega}$ & \cTwoOutcome{Outcome} & One complete result.\\
+  $\cTwoMassHL{p_X(x) = P(X=x)}$ & \cTwoMassHL{PMF} & The \textbf{Probability Mass Function (PMF)} describes the
+  probability that a discrete random variable $X$ takes a specific value $x$. \\
+  $\cTwoCDFHL{F_X(x)= P(X \leq x)}$ & \cTwoCDFHL{CDF} & The \textbf{Cumulative Distribution Function (CDF)}
+  describes the probability that a random variable $X$ takes a value less than or equal to a specified value
+  $x$.\\%
+  \bottomrule
+\end{tabularx}
+
+\task{1}{Define the random variable clearly stating what it represents and its possible values or
+  \textbf{Support}. Construct a PMF table showing the probability of each possible value, and draw a labeled
+  graph representing the probability distribution. Verify the PMF adds up to 1.}
+\task{2}{Construct a CDF table showing the cumulative probability for each interval of values, including the
+  intervals below the minimum and at or above the maximum possible values. Draw a labeled step graph
+  representing the cumulative distribution, using filled and open points to indicate included and excluded
+  endpoints.}
+
+\stageheading{Worked example} \vspace{-5mm}
+\problemtitle{1}{Museum kiosk payments}
+\begingroup\small
+\textbf{Payment fees.} \textbf{Payment fees.} A customer makes a payment at a museum kiosk using one of four methods: cash, debit
+card, credit card or mobile wallet, with probabilities 0.15, 0.25, 0.35 and 0.25, respectively. The museum
+pays no processing fee for cash payments, a fee of 2 USD for either type of card, and a fee of 4 USD for
+mobile wallet payments. No other processing charges apply. Complete Tasks 1 and 2 to describe the
+processing fee using PMF and CDF tables and graphs. Then use the CDF to find the probability that the fee
+is at most 3 USD and the probability that it is at most 5 USD.
+
+
+\task{1}{Let $\cTwoValue{X}$ be the \cTwoValue{processing fee} for one payment, in \cTwoValue{USD}. The
+  support is $S_X=\{\cTwoValue{0},\cTwoValue{2},\cTwoValue{4}\}$.}
+% Separate top-aligned blocks keep tables and graph at their native text size.
+\par%
+\noindent%
+\begin{minipage}[t]{.28\linewidth}%
+  \vspace{0pt}
+  \small%
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X >{\centering\arraybackslash}p{.31\linewidth}
+    >{\centering\arraybackslash}p{.20\linewidth}@{}}%
+    \toprule
+    Complete outcome & Probability & $\cTwoValue{X}$ (\cTwoValue{USD}) \\ \midrule
+    \cTwoOutcome{Cash} & $\cTwoMassHL{0.15}$ & $\cTwoValue{0}$ \\
+    \cTwoOutcome{Debit card} & $\cTwoMassHL{0.25}$ & $\cTwoValue{2}$ \\
+    \cTwoOutcome{Credit card} & $\cTwoMassHL{0.35}$ & $\cTwoValue{2}$ \\
+    \cTwoOutcome{Wallet} & $\cTwoMassHL{0.25}$ & $\cTwoValue{4}$ \\
+    \bottomrule%
+  \end{tabularx}
+\end{minipage}%
+\hfill%
+\begin{minipage}[t]{.40\linewidth}%
+  \vspace{0pt}
+  \small%
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash}p{.15\linewidth}
+    >{\centering\arraybackslash}p{.19\linewidth} >{\raggedright\arraybackslash}X@{}}%
+    \toprule
+    $\cTwoValue{x}$ (\cTwoValue{USD}) & $\cTwoMassHL{p_X(x)}$ & Probability calculation \\ \midrule
+    $\cTwoValue{0}$ & $\cTwoMassHL{0.15}$ & $P(\text{Cash})=0.15$ \\
+    $\cTwoValue{2}$ & $\cTwoMassHL{0.60}$ & $P(\text{Debit card})$\newline ${}+P(\text{Credit card})$\newline
+    $=0.25+0.35=0.60$ \\
+    $\cTwoValue{4}$ & $\cTwoMassHL{0.25}$ & $P(\text{Wallet})=0.25$ \\
+    \bottomrule%
+  \end{tabularx}
+\end{minipage}%
+\hfill%
+\begin{minipage}[t]{.28\linewidth}%
+  \vspace{0pt}\centering
+  % Draw directly at this column's size so axis labels are not scaled down.
+  \begin{tikzpicture}%
+    \begin{axis}[
+        width=\linewidth,height=4.15cm,axis lines=left,
+        xmin=-1.3,xmax=5.3,ymin=0,ymax=.74,
+        xtick={0,2,4},minor xtick={-1,1,3,5},ytick={0,.1,.2,.3,.4,.5,.6,.7},
+        grid=both,grid style={gray!20},
+        xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})},ylabel={$\cTwoMassHL{p_X(x)}$},
+        tick label style={font=\small},label style={font=\small},
+        scaled ticks=false,clip=false]
+      \draw[black,fill=cTwoMassColor!20] (axis cs:-.55,0) rectangle (axis cs:.55,.15);
+      \draw[black,fill=cTwoMassColor!20] (axis cs:1.45,0) rectangle (axis cs:2.55,.60);
+      \draw[black,fill=cTwoMassColor!20] (axis cs:3.45,0) rectangle (axis cs:4.55,.25);
+      \addplot[only marks,mark=none,nodes near coords,
+        every node near coord/.append style={font=\small},
+        point meta=explicit symbolic] coordinates {(0,.15) [0.15] (2,.60) [0.60] (4,.25) [0.25]};
+    \end{axis}%
+  \end{tikzpicture}
+\end{minipage}%
+\par
+\textbf{PMF check.} All masses are positive and $0.15+0.6+0.25=1$.
+
+\task{2}{}
+\par%
+\noindent%
+\begin{minipage}[t]{.37\linewidth}%
+  \vspace{0pt}\centering
+  \begin{tabular}{cc}%
+    \toprule
+    Cutoff interval & $\cTwoCDFHL{F_X(x)}$ \\ \midrule
+    $x<0$ & $\cTwoCDFHL{0}$ \\
+    $0\leq x<2$ & $\cTwoCDFHL{0.15}$ \\
+    $2\leq x<4$ & $\cTwoCDFHL{0.75}$ \\
+    $x\geq 4$ & $\cTwoCDFHL{1}$ \\
+    \bottomrule%
+  \end{tabular}
+\end{minipage}%
+\hfill%
+\begin{minipage}[t]{.60\linewidth}%
+  \vspace{0pt}\centering
+  \begin{tikzpicture}%
+    \begin{axis}[classCDF,%
+        height=3.5cm,%
+        xmin=-2,%
+        xmax=6,%
+        xtick={0,2,4}]
+      \addplot[cTwoCDFColor,thick,<-] coordinates {(-2,0)(0,0)};
+      \addplot[cTwoCDFColor,thick] coordinates {(0,0.15)(2,0.15)};
+      \addplot[cTwoCDFColor,thick] coordinates {(2,0.75)(4,0.75)};
+      \addplot[cTwoCDFColor,thick,->] coordinates {(4,1)(6,1)};
+      \addplot[only marks,mark=*,cTwoCDFColor,mark size=1.8pt,mark options={fill=white}] coordinates
+        {(0,0)(2,0.15)(4,0.75)};
+      \addplot[only marks,mark=*,cTwoCDFColor,mark size=1.8pt] coordinates {(0,0.15)(2,0.75)(4,1)};
+    \end{axis}%
+  \end{tikzpicture}
+\end{minipage}%
+\par
+
+
+\textbf{Fee at most 3 USD ($F_X(3)$)} Since $2\leq3<4$,
+$P(X\leq3)=F_X(3)=P(X=0)+P(X=2)=0.15+0.60=0.75$.
+Thus, there is a 75\% probability that the museum pays at most 3 USD in processing fees. Although $P(X=3)=0$, the CDF
+includes all fees below 3 USD as well.
+
+\textbf{Fee at most 5 USD ($F_X(5)$)} Since $5\geq4$, use the final row:
+$P(X\leq5)=F_X(5)=0.15+0.60+0.25=1$.
+Thus, there is a 100\% probability that the processing fee is at most 5 USD: as the maximum possible fee is 4 USD.
+\clearpage
+\endgroup
+\vfill
+
+\stageheading{Guided Example} \vspace{-5mm}
+\problemtitle{2}{Kayak returns}
+\begingroup\small
+\textbf{Late fees.}A lakeside rental service charges 24 USD per hour for kayaks. Customers pay in
+advance and agree to a scheduled return time, allowing staff to prepare each
+kayak for the next rental. Late returns may incur an additional fee.
+
+The service allows a five-minute grace period. After that, the total late fee
+is 6 USD for returns up to 15 minutes late, 12 USD for returns more than 15
+but no more than 30 minutes late, and 18 USD for returns more than 30 but no
+more than 45 minutes late. Returns exceeding 45 minutes incur the maximum fee
+of 24 USD, regardless of the delay.
+
+Let $t$ denote the number of minutes past the scheduled return time, measured
+without rounding. Thus, $t\leq 0$ represents an on-time or early return.
+The fees are not cumulative, and no other charges apply.
+
+\textbf{Random variable and units:} \hrulefill 
+
+\textbf{Support:} $S_X=$ \hrulefill
+\par
+
+% Match the worked example: complete outcomes, grouped PMF, then graph.
+% Retain the starter; students complete the fee mapping and grouped masses.
+\par%
+\noindent%
+\begin{minipage}[t]{.28\linewidth}%
+  \vspace{0pt}
+  \small%
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X >{\centering\arraybackslash}p{.31\linewidth}
+    >{\centering\arraybackslash}p{.20\linewidth}@{}}%
+    \toprule
+    Return category ($t$ in min) & Probability & $\cTwoValue{X}$ (\cTwoValue{USD}) \\ \midrule
+    \cTwoOutcome{On time/early: $t\leq0$} & $\cTwoMassHL{0.36}$ & $\cTwoValue{0}$ \\
+    \cTwoOutcome{Grace: $0<t\leq5$} & $\cTwoMassHL{0.14}$ &  \\
+    \cTwoOutcome{$5<t\leq15$} & $\cTwoMassHL{0.18}$ &  \\
+    \cTwoOutcome{$15<t\leq30$} & $\cTwoMassHL{0.12}$ &  \\
+    \cTwoOutcome{$30<t\leq45$} & $\cTwoMassHL{0.08}$ &  \\
+    \cTwoOutcome{$45<t\leq60$} & $\cTwoMassHL{0.07}$ &  \\
+    \cTwoOutcome{$t>60$} & $\cTwoMassHL{0.05}$ &  \\
+    \bottomrule%
+  \end{tabularx}
+\end{minipage}%
+\hfill%
+\begin{minipage}[t]{.40\linewidth}%
+  \vspace{0pt}
+  \small%
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash}p{.15\linewidth}
+    >{\centering\arraybackslash}p{.19\linewidth} >{\raggedright\arraybackslash}X@{}}%
+    \toprule
+    $\cTwoValue{x}$ (\cTwoValue{USD}) & $\cTwoMassHL{p_X(x)}$ & Probability calculation \\ \midrule
+    \rule{0pt}{1.05cm} & & \\
+    \rule{0pt}{1.05cm} & & \\
+    \rule{0pt}{1.05cm} & & \\
+    \rule{0pt}{1.05cm} & & \\
+    \bottomrule%
+  \end{tabularx}
+\end{minipage}%
+\hfill%
+\begin{minipage}[t]{.28\linewidth}%
+  \vspace{0pt}\centering
+  \begin{tikzpicture}%
+    \begin{axis}[
+        width=\linewidth,
+        height=5cm,
+        axis lines=left,
+        xmin=-3,
+        xmax=27,
+        ymin=0,
+        ymax=1.05,
+        xtick={0,6,12,18,24},
+        ytick={0,.25,.5,.75,1},
+        grid=major,
+        grid style={gray!20},
+        xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})},
+        ylabel={$\cTwoMassHL{p_X(x)}$},
+        tick label style={font=\small},
+        label style={font=\small}]
+    \end{axis}%
+  \end{tikzpicture}
+\end{minipage}%
+\par
+\textbf{PMF check.} Verify nonnegative masses and a total of 1.\worklines{1}
+\par
+
+\task{2}{Complete the CDF interval table for every real cutoff and draw its step graph. Then check
+  its defining properties and that its jumps reproduce the PMF.}
+\textbf{Prompt.} Start below the minimum at height 0; add one grouped mass at a time. Include both tails and
+distinguish open and filled endpoints. Keep the horizontal axis in USD, not minutes.
+\par%
+\noindent%
+\begin{minipage}[t]{.37\linewidth}%
+  \vspace{0pt}\centering
+  % Keep the removed rules' thickness as row depth to preserve table spacing.
+  \begin{tabularx}{\linewidth}{|Y|Y|}%
+    \hline
+    Cutoff interval & $F_X(x)$ \\ \hline
+    \rule{0pt}{.7cm} & \\[\arrayrulewidth]
+    \rule{0pt}{.7cm} & \\[\arrayrulewidth]
+    \rule{0pt}{.7cm} & \\[\arrayrulewidth]
+    \rule{0pt}{.7cm} & \\[\arrayrulewidth]
+    \rule{0pt}{.7cm} & \\ \hline
+  \end{tabularx}%
+\end{minipage}%
+\hfill%
+\begin{minipage}[t]{.60\linewidth}%
+  \vspace{0pt}\centering
+  \begin{tikzpicture}%
+    \begin{axis}[classCDF,height=5.2cm,xmin=-3,xmax=27,xtick={0,6,12,18,24}]
+    \end{axis}%
+  \end{tikzpicture}
+\end{minipage}%
+\par
+\textbf{Question 1 --- Fee at most 15 USD ($F_X(15)$).} Use the CDF to find and interpret the probability
+that the additional late fee is at most 15 USD.
+\par
+\textbf{Question 2 --- Fee at most 25 USD ($F_X(25)$).} Use the CDF to find and interpret the probability
+that the additional late fee is at most 25 USD.
+\par
+\endgroup
+\vfill
+\clearpage
+\stageheading{Independent Practice}
+
+\Needspace{16\baselineskip}
+\problemtitle{3}{Workshop scrap buyback}
+\textbf{Uneven buyback payments.} A workshop scrap centre buys one standard-sized bag containing only one
+material type. The exhaustive types are rejected material, paper, cardboard, plastic, steel and aluminium,
+with probabilities .20, .12, .18, .15, .10, .25, respectively. Payments are 0 USD for rejected material, 4 USD
+for either paper or cardboard, 9 USD for either plastic or steel, and 15 USD for aluminium. There are no other
+payments. Record the buyback payment.
+\task{1}{Define $X$, its units and support. Identify the possible complete outcomes, their probabilities and their corresponding values of $X$. Construct a PMF table and a labeled PMF graph. Verify the defining properties of the PMF.}
+\task{2}{Construct a CDF table covering all real cutoffs and a labeled CDF graph. Verify the defining properties of the CDF and that its jumps reproduce the PMF. Determine and interpret $F_X(9)$ in this context.}
+
+\Needspace{16\baselineskip}
+\problemtitle{4}{Delivery loss claims}
+\textbf{Missing probability and capped payout.} A delivery insurer can receive only 0, 1, 2, 3 or 4 claims in
+one day. Their probabilities, in that order, are .15, .20, a missing probability, .20, .10. It pays 5 USD per
+claim, capped at 15 USD in total for the day; it pays the smaller of 5 times the count and 15 USD. There are
+no other payments. Record the daily payout.
+\task{1}{Determine the missing claim-count probability. Define $X$, its units and support. Identify the possible complete outcomes, their probabilities and their corresponding values of $X$. Construct a PMF table and a labeled PMF graph. Verify the defining properties of the PMF.}
+\task{2}{Construct a CDF table covering all real cutoffs and a labeled CDF graph. Verify the defining properties of the CDF and that its jumps reproduce the PMF. Determine and interpret $F_X(10)$ in this context.}
+
+\Needspace{16\baselineskip}
+\problemtitle{5}{Tote bag sales}
+\textbf{Independent purchases and discount.} A school enterprise offers one tote bag to each of three
+visitors. Independently, each buys one with probability 0.3 or passes with probability 0.7, regardless of the
+discount. Each item costs 7 USD. Only if all three buy, subtract a 5 USD discount from the combined bill.
+Otherwise there is no discount. There are no other sales or charges. Record total revenue.
+\task{1}{Define $X$, its units and support. Identify the possible complete outcomes, their probabilities and their corresponding values of $X$. Construct a PMF table and a labeled PMF graph. Verify the defining properties of the PMF.}
+\task{2}{Construct a CDF table covering all real cutoffs and a labeled CDF graph. Verify the defining properties of the CDF and that its jumps reproduce the PMF. Determine and interpret $F_X(14)$ in this context.}
+
+\Needspace{16\baselineskip}
+\problemtitle{6}{Two-stage media fund}
+\textbf{Signed two-stage net results.} A hypothetical classroom fund receives two cash returns. The first is
+17 USD, 0 USD or 7 USD with probabilities .20, .30, .50, respectively. Independently, the second is 0 USD with
+probability 0.4 or 7 USD with probability 0.6. These are all possible returns. A fixed participation cost of 7
+USD is charged once. There are no other receipts or charges. Record the sum of both returns minus the cost; a
+negative net result means a loss.
+\task{1}{Define $X$, its units and support. Identify the possible complete outcomes, their probabilities and their corresponding values of $X$. Construct a PMF table and a labeled PMF graph. Verify the defining properties of the PMF.}
+\task{2}{Construct a CDF table covering all real cutoffs and a labeled CDF graph. Verify the defining properties of the CDF and that its jumps reproduce the PMF. Determine and interpret $F_X(0)$ in this context.}
+
+\ifprintsolutions
+  \clearpage
+  \stageheading{Solutions}
+  \problemtitle{2}{Kayak returns}
+  \begingroup\small
+  \textbf{Late fees.} Use the seven return categories from the Guided Example. The prepaid rental charge
+  is 24 USD per hour. The additional fee is 0 USD through the five-minute grace period, then 6, 12 and
+  18 USD through 15, 30 and 45 minutes late, respectively; after 45 minutes it is capped at 24 USD.
+  \task{1}{Let $X$ be the additional late fee for one completed rental, in USD; exclude the prepaid
+    rental charge. The support is $S_X=\{0,6,12,18,24\}$, with $p_X(x)=0$ elsewhere.
+    Group the on-time/early and grace categories at 0 USD, and both categories after 45 minutes at 24 USD.}
+% Match the worked example: complete outcomes, grouped PMF, then graph.
+% Completed outcome mapping, grouped calculations and PMF graph.
+\par%
+\noindent%
+\begin{minipage}[t]{.28\linewidth}%
+  \vspace{0pt}
+  \small%
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X >{\centering\arraybackslash}p{.31\linewidth}
+    >{\centering\arraybackslash}p{.20\linewidth}@{}}%
+    \toprule
+    Return category ($t$ in min) & Probability & $\cTwoValue{X}$ (\cTwoValue{USD}) \\ \midrule
+    \cTwoOutcome{On time/early: $t\leq0$} & $\cTwoMassHL{0.36}$ & $0$ \\
+    \cTwoOutcome{Grace: $0<t\leq5$} & $\cTwoMassHL{0.14}$ & $0$ \\
+    \cTwoOutcome{$5<t\leq15$} & $\cTwoMassHL{0.18}$ & $6$ \\
+    \cTwoOutcome{$15<t\leq30$} & $\cTwoMassHL{0.12}$ & $12$ \\
+    \cTwoOutcome{$30<t\leq45$} & $\cTwoMassHL{0.08}$ & $18$ \\
+    \cTwoOutcome{$45<t\leq60$} & $\cTwoMassHL{0.07}$ & $24$ \\
+    \cTwoOutcome{$t>60$} & $\cTwoMassHL{0.05}$ & $24$ \\
+    \bottomrule%
+  \end{tabularx}
+\end{minipage}%
+\hfill%
+\begin{minipage}[t]{.40\linewidth}%
+  \vspace{0pt}
+  \small%
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash}p{.15\linewidth}
+    >{\centering\arraybackslash}p{.19\linewidth} >{\raggedright\arraybackslash}X@{}}%
+    \toprule
+    $\cTwoValue{x}$ (\cTwoValue{USD}) & $\cTwoMassHL{p_X(x)}$ & Probability calculation \\ \midrule
+    $0$ & $0.50$ & $0.36+0.14=0.50$ \\
+    $6$ & $0.18$ & $P(5<t\leq15)=0.18$ \\
+    $12$ & $0.12$ & $P(15<t\leq30)=0.12$ \\
+    $18$ & $0.08$ & $P(30<t\leq45)=0.08$ \\
+    $24$ & $0.12$ & $0.07+0.05=0.12$ \\
+    \bottomrule%
+  \end{tabularx}
+\end{minipage}%
+\hfill%
+\begin{minipage}[t]{.28\linewidth}%
+  \vspace{0pt}\centering
+  \begin{tikzpicture}%
+    \begin{axis}[
+        width=\linewidth,
+        height=4.15cm,
+        axis lines=left,
+        xmin=-3,
+        xmax=27,
+        ymin=0,
+        ymax=1.05,
+        xtick={0,6,12,18,24},
+        ytick={0,.25,.5,.75,1},
+        grid=major,
+        grid style={gray!20},
+        xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})},
+        ylabel={$\cTwoMassHL{p_X(x)}$},
+        tick label style={font=\small},
+        label style={font=\small}]
+
+      \addplot[ybar,bar width=8pt,draw=black,fill=cTwoMassColor!20]
+        coordinates {(0,.50)(6,.18)(12,.12)(18,.08)(24,.12)};
+      \addplot[only marks,mark=none,nodes near coords,
+        every node near coord/.append style={font=\scriptsize},
+        point meta=explicit symbolic] coordinates
+        {(0,.50) [0.50] (6,.18) [0.18] (12,.12) [0.12] (18,.08) [0.08] (24,.12) [0.12]};
+    \end{axis}%
+  \end{tikzpicture}
+\end{minipage}%
+\par
+  \textbf{PMF check.} The seven outcome probabilities sum to
+  $0.36+0.14+0.18+0.12+0.08+0.07+0.05=1$.
+  All grouped masses are nonnegative and $0.50+0.18+0.12+0.08+0.12=1$; gaps carry no mass.
+  \task{2}{Accumulate in increasing fee order: $0.50;\ 0.68;\ 0.80;\ 0.88;\ 1$.
+    Each new height adds the next grouped PMF mass.}
+  \par%
+  \noindent%
+  \begin{minipage}[t]{.37\linewidth}%
+    \vspace{0pt}\centering
+    \begin{tabular}{cc}%
+      \toprule
+      Cutoff interval & $\cTwoCDFHL{F_X(x)}$ \\ \midrule
+      $x<0$ & $\cTwoCDFHL{0}$ \\
+      $0\leq x<6$ & $\cTwoCDFHL{0.50}$ \\
+      $6\leq x<12$ & $\cTwoCDFHL{0.68}$ \\
+      $12\leq x<18$ & $\cTwoCDFHL{0.80}$ \\
+      $18\leq x<24$ & $\cTwoCDFHL{0.88}$ \\
+      $x\geq24$ & $\cTwoCDFHL{1}$ \\
+      \bottomrule%
+    \end{tabular}
+  \end{minipage}%
+  \hfill%
+  \begin{minipage}[t]{.60\linewidth}%
+    \vspace{0pt}\centering
+    \begin{tikzpicture}%
+      \begin{axis}[classCDF,xmin=-3,xmax=27,xtick={0,6,12,18,24}]
+        \addplot[cTwoCDFColor,thick,<-] coordinates {(-3,0)(0,0)};
+        \addplot[cTwoCDFColor,thick] coordinates {(0,0.50)(6,0.50)};
+        \addplot[cTwoCDFColor,thick] coordinates {(6,0.68)(12,0.68)};
+        \addplot[cTwoCDFColor,thick] coordinates {(12,0.80)(18,0.80)};
+        \addplot[cTwoCDFColor,thick] coordinates {(18,0.88)(24,0.88)};
+        \addplot[cTwoCDFColor,thick,->] coordinates {(24,1)(27,1)};
+        \addplot[only marks,mark=*,cTwoCDFColor,mark size=1.8pt,mark options={fill=white}] coordinates
+          {(0,0)(6,0.50)(12,0.68)(18,0.80)(24,0.88)};
+        \addplot[only marks,mark=*,cTwoCDFColor,mark size=1.8pt] coordinates
+          {(0,0.50)(6,0.68)(12,0.80)(18,0.88)(24,1)};
+      \end{axis}%
+    \end{tikzpicture}
+  \end{minipage}%
+  \par
+  \textbf{CDF check.} Heights lie in $[0,1]$ and never decrease. Filled left/open right endpoints make the
+  graph right-continuous. Horizontal tails give limits 0 and 1; the CDF reaches 1 at 24 USD. Its jumps,
+  $0.50,\ 0.18,\ 0.12,\ 0.08,\ 0.12$, reproduce the PMF.
+
+  \textbf{Question 1 --- Fee at most 15 USD ($F_X(15)$).} Use the CDF to find and interpret the probability
+  that the additional late fee is at most 15 USD.
+
+  \textbf{Response 1.} Since $12\leq15<18$, use the interval $12\leq x<18$:
+  $P(X\leq15)=F_X(15)=P(X=0)+P(X=6)+P(X=12)=0.50+0.18+0.12=0.80$.
+  There is an 80\% probability that the additional late fee is at most 15 USD, corresponding to a return
+  no more than 30 minutes late, including on-time/early returns. Although $P(X=15)=0$ because 15 USD is
+  not a possible fee, $F_X(15)$ includes all fees below 15 USD as well. It is cumulative, so it is not zero.
+
+  \textbf{Question 2 --- Fee at most 25 USD ($F_X(25)$).} Use the CDF to find and interpret the probability
+  that the additional late fee is at most 25 USD.
+
+  \textbf{Response 2.} Since $25\geq24$, use the final interval $x\geq24$:
+  $P(X\leq25)=F_X(25)=0.50+0.18+0.12+0.08+0.12=1$.
+  There is a 100\% probability that the additional late fee is at most 25 USD: every possible return
+  incurs a fee of at most 24 USD, even after an hour.
+  \endgroup
+  \vfill
+  \clearpage
+  \problemtitle{3}{Workshop scrap buyback}
+  \textbf{Uneven buyback payments.} A workshop scrap centre buys one standard-sized bag containing only one
+  material type. The exhaustive types are rejected material, paper, cardboard, plastic, steel and aluminium,
+  with probabilities .20, .12, .18, .15, .10, .25, respectively. Payments are 0 USD for rejected material, 4 USD
+  for either paper or cardboard, 9 USD for either plastic or steel, and 15 USD for aluminium. There are no other
+  payments. Record the buyback payment.
+  \task{1}{Let $\cTwoValue{X}$ be the buyback payment for one bag, in USD. Paper and cardboard share 4 USD, so
+    their probabilities add to 0.3. Plastic and steel share 9 USD, giving 0.25. Keep the actual gaps 4, 5 and 6
+    USD on both graphs.}
+  \begin{center}
+    \begin{tabular}{ccc}%
+      \toprule
+      Complete outcome & Probability & $\cTwoValue{X}$ (\cTwoValue{USD}) \\ \midrule
+      \cTwoOutcome{Rejected} & $\cTwoMassHL{0.2}$ & $\cTwoValue{0}$ \\
+      \cTwoOutcome{Paper} & $\cTwoMassHL{0.12}$ & $\cTwoValue{4}$ \\
+      \cTwoOutcome{Cardboard} & $\cTwoMassHL{0.18}$ & $\cTwoValue{4}$ \\
+      \cTwoOutcome{Plastic} & $\cTwoMassHL{0.15}$ & $\cTwoValue{9}$ \\
+      \cTwoOutcome{Steel} & $\cTwoMassHL{0.1}$ & $\cTwoValue{9}$ \\
+      \cTwoOutcome{Aluminium} & $\cTwoMassHL{0.25}$ & $\cTwoValue{15}$ \\
+      \bottomrule%
+    \end{tabular}
+  \end{center}
+  $\cTwoValue{S_X}=\cTwoValue{\{0,4,9,15\}}$; $p_X(x)=0$ elsewhere. The grouped PMF is:
+  \par%
+  \noindent%
+  \begin{minipage}[t]{.37\linewidth}%
+    \vspace{0pt}\centering
+    \begin{tabular}{cc}%
+      \toprule
+      $\cTwoValue{x}$ (\cTwoValue{USD}) & $\cTwoMassHL{p_X(x)}$ \\ \midrule
+      $\cTwoValue{0}$ & $\cTwoMassHL{0.2}$ \\
+      $\cTwoValue{4}$ & $\cTwoMassHL{0.3}$ \\
+      $\cTwoValue{9}$ & $\cTwoMassHL{0.25}$ \\
+      $\cTwoValue{15}$ & $\cTwoMassHL{0.25}$ \\
+      \bottomrule%
+    \end{tabular}
+  \end{minipage}%
+  \hfill%
+  \begin{minipage}[t]{.60\linewidth}%
+    \vspace{0pt}\centering
+    \GTenPMFGraph[color=cTwoMassColor!20,%
+      xhighlight=GTenHLValue,%
+      yhighlight=cTwoMassMarker,%
+      width=\linewidth,%
+      height=4.15cm,%
+      xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})},%
+      ylabel={$\cTwoMassHL{p_X(x)}$},%
+      xstep=1]{0,4,9,15}{0.2,0.3,0.25,0.25}
+  \end{minipage}%
+  \par
+  \textbf{PMF check.} All masses are positive and $0.2+0.3+0.25+0.25=1$. The graph uses the actual numerical
+  spacing; gaps carry no mass.
+  \task{2}{Accumulate in increasing support order: $0.2;\ 0.5;\ 0.75;\ 1$. Each new height is the previous
+    height plus the next PMF mass.}
+  \par%
+  \noindent%
+  \begin{minipage}[t]{.37\linewidth}%
+    \vspace{0pt}\centering
+    \begin{tabular}{cc}%
+      \toprule
+      Cutoff interval & $\cTwoCDFHL{F_X(x)}$ \\ \midrule
+      $x<0$ & $\cTwoCDFHL{0}$ \\
+      $0\leq x<4$ & $\cTwoCDFHL{0.2}$ \\
+      $4\leq x<9$ & $\cTwoCDFHL{0.5}$ \\
+      $9\leq x<15$ & $\cTwoCDFHL{0.75}$ \\
+      $x\geq 15$ & $\cTwoCDFHL{1}$ \\
+      \bottomrule%
+    \end{tabular}
+  \end{minipage}%
+  \hfill%
+  \begin{minipage}[t]{.60\linewidth}%
+    \vspace{0pt}\centering
+    \begin{tikzpicture}%
+      \begin{axis}[classCDF,%
+          xmin=-4,%
+          xmax=19,%
+          xtick={0,4,9,15}]
+        \addplot[cTwoCDFColor,thick,<-] coordinates {(-4,0)(0,0)};
+        \addplot[cTwoCDFColor,thick] coordinates {(0,0.2)(4,0.2)};
+        \addplot[cTwoCDFColor,thick] coordinates {(4,0.5)(9,0.5)};
+        \addplot[cTwoCDFColor,thick] coordinates {(9,0.75)(15,0.75)};
+        \addplot[cTwoCDFColor,thick,->] coordinates {(15,1)(19,1)};
+        \addplot[only marks,mark=*,cTwoCDFColor,mark size=1.8pt,mark options={fill=white}] coordinates
+          {(0,0)(4,0.2)(9,0.5)(15,0.75)};
+        \addplot[only marks,mark=*,cTwoCDFColor,mark size=1.8pt] coordinates {(0,0.2)(4,0.5)(9,0.75)(15,1)};
+      \end{axis}%
+    \end{tikzpicture}
+  \end{minipage}%
+  \par
+  \textbf{CDF check.} All heights lie in $[0,1]$ and never decrease. Filled left/open right endpoints make the
+  graph right-continuous. Horizontal tails give limits 0 and 1; the CDF reaches 1 at 15 USD. The jumps, $0.2,\
+    0.3,\ 0.25,\ 0.25$, reproduce the PMF.
+  \textbf{Interpretation.} $F_X(9)=0.75$: the probability that the buyback payment is at most 9 USD (every type
+  except aluminium) is 0.75.
+  \vfill
+  \clearpage
+  \problemtitle{4}{Delivery loss claims}
+  \textbf{Missing probability and capped payout.} A delivery insurer can receive only 0, 1, 2, 3 or 4 claims in
+  one day. Their probabilities, in that order, are .15, .20, a missing probability, .20, .10. It pays 5 USD per
+  claim, capped at 15 USD in total for the day; it pays the smaller of 5 times the count and 15 USD. There are
+  no other payments. Record the daily payout.
+  \task{1}{Let $\cTwoValue{X}$ be the total payout for one day, in USD. The missing probability is
+    $1-(.15+.20+.20+.10)=.35$. Apply $X=\min(5N,15)$ to the claim count $N$: payouts are $0,5,10,15,15$. Four
+    claims would pay 20 USD without the cap. Group the last two categories.}
+  \begin{center}
+    \begin{tabular}{ccc}%
+      \toprule
+      Complete outcome & Probability & $\cTwoValue{X}$ (\cTwoValue{USD}) \\ \midrule
+      \cTwoOutcome{0 claims} & $\cTwoMassHL{0.15}$ & $\cTwoValue{0}$ \\
+      \cTwoOutcome{1 claims} & $\cTwoMassHL{0.2}$ & $\cTwoValue{5}$ \\
+      \cTwoOutcome{2 claims} & $\cTwoMassHL{0.35}$ & $\cTwoValue{10}$ \\
+      \cTwoOutcome{3 claims} & $\cTwoMassHL{0.2}$ & $\cTwoValue{15}$ \\
+      \cTwoOutcome{4 claims} & $\cTwoMassHL{0.1}$ & $\cTwoValue{15}$ \\
+      \bottomrule%
+    \end{tabular}
+  \end{center}
+  $\cTwoValue{S_X}=\cTwoValue{\{0,5,10,15\}}$; $p_X(x)=0$ elsewhere. The grouped PMF is:
+  \par%
+  \noindent%
+  \begin{minipage}[t]{.37\linewidth}%
+    \vspace{0pt}\centering
+    \begin{tabular}{cc}%
+      \toprule
+      $\cTwoValue{x}$ (\cTwoValue{USD}) & $\cTwoMassHL{p_X(x)}$ \\ \midrule
+      $\cTwoValue{0}$ & $\cTwoMassHL{0.15}$ \\
+      $\cTwoValue{5}$ & $\cTwoMassHL{0.2}$ \\
+      $\cTwoValue{10}$ & $\cTwoMassHL{0.35}$ \\
+      $\cTwoValue{15}$ & $\cTwoMassHL{0.3}$ \\
+      \bottomrule%
+    \end{tabular}
+  \end{minipage}%
+  \hfill%
+  \begin{minipage}[t]{.60\linewidth}%
+    \vspace{0pt}\centering
+    \GTenPMFGraph[color=cTwoMassColor!20,%
+      xhighlight=GTenHLValue,%
+      yhighlight=cTwoMassMarker,%
+      width=\linewidth,%
+      height=4.15cm,%
+      xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})},%
+      ylabel={$\cTwoMassHL{p_X(x)}$},%
+      xstep=1]{0,5,10,15}{0.15,0.2,0.35,0.3}
+  \end{minipage}%
+  \par
+  \textbf{PMF check.} All masses are positive and $0.15+0.2+0.35+0.3=1$. The graph uses the actual numerical
+  spacing; gaps carry no mass.
+  \task{2}{Accumulate in increasing support order: $0.15;\ 0.35;\ 0.7;\ 1$. Each new height is the previous
+    height plus the next PMF mass.}
+  \par%
+  \noindent%
+  \begin{minipage}[t]{.37\linewidth}%
+    \vspace{0pt}\centering
+    \begin{tabular}{cc}%
+      \toprule
+      Cutoff interval & $\cTwoCDFHL{F_X(x)}$ \\ \midrule
+      $x<0$ & $\cTwoCDFHL{0}$ \\
+      $0\leq x<5$ & $\cTwoCDFHL{0.15}$ \\
+      $5\leq x<10$ & $\cTwoCDFHL{0.35}$ \\
+      $10\leq x<15$ & $\cTwoCDFHL{0.7}$ \\
+      $x\geq 15$ & $\cTwoCDFHL{1}$ \\
+      \bottomrule%
+    \end{tabular}
+  \end{minipage}%
+  \hfill%
+  \begin{minipage}[t]{.60\linewidth}%
+    \vspace{0pt}\centering
+    \begin{tikzpicture}%
+      \begin{axis}[classCDF,%
+          xmin=-5,%
+          xmax=20,%
+          xtick={0,5,10,15}]
+        \addplot[cTwoCDFColor,thick,<-] coordinates {(-5,0)(0,0)};
+        \addplot[cTwoCDFColor,thick] coordinates {(0,0.15)(5,0.15)};
+        \addplot[cTwoCDFColor,thick] coordinates {(5,0.35)(10,0.35)};
+        \addplot[cTwoCDFColor,thick] coordinates {(10,0.7)(15,0.7)};
+        \addplot[cTwoCDFColor,thick,->] coordinates {(15,1)(20,1)};
+        \addplot[only marks,mark=*,cTwoCDFColor,mark size=1.8pt,mark options={fill=white}] coordinates
+          {(0,0)(5,0.15)(10,0.35)(15,0.7)};
+        \addplot[only marks,mark=*,cTwoCDFColor,mark size=1.8pt] coordinates {(0,0.15)(5,0.35)(10,0.7)(15,1)};
+      \end{axis}%
+    \end{tikzpicture}
+  \end{minipage}%
+  \par
+  \textbf{CDF check.} All heights lie in $[0,1]$ and never decrease. Filled left/open right endpoints make the
+  graph right-continuous. Horizontal tails give limits 0 and 1; the CDF reaches 1 at 15 USD. The jumps, $0.15,\
+    0.2,\ 0.35,\ 0.3$, reproduce the PMF.
+  \textbf{Interpretation.} $F_X(10)=0.7$: the probability that the payout is at most 10 USD (at most two claims)
+  is 0.7.
+  \vfill
+  \clearpage
+  \problemtitle{5}{Tote bag sales}
+  \textbf{Independent purchases and discount.} A school enterprise offers one tote bag to each of three
+  visitors. Independently, each buys one with probability 0.3 or passes with probability 0.7, regardless of the
+  discount. Each item costs 7 USD. Only if all three buy, subtract a 5 USD discount from the combined bill.
+  Otherwise there is no discount. There are no other sales or charges. Record total revenue.
+  \task{1}{Let $\cTwoValue{X}$ be the total revenue from the three visitors, in USD. Use B for buying and N for
+    passing, in visitor order. Multiply within each complete sequence: e.g. $P(\mathrm{BNN})=0.3(0.7)^2=0.147$.
+    The three one-buyer and three two-buyer outcomes each form a group. Only BBB receives the discount:
+    $3(7)-5=16$ USD.}
+  \begin{center}
+    \begin{tabular}{ccc}%
+      \toprule
+      Complete outcome & Probability & $\cTwoValue{X}$ (\cTwoValue{USD}) \\ \midrule
+      \cTwoOutcome{NNN} & $\cTwoMassHL{0.343}$ & $\cTwoValue{0}$ \\
+      \cTwoOutcome{BNN} & $\cTwoMassHL{0.147}$ & $\cTwoValue{7}$ \\
+      \cTwoOutcome{NBN} & $\cTwoMassHL{0.147}$ & $\cTwoValue{7}$ \\
+      \cTwoOutcome{NNB} & $\cTwoMassHL{0.147}$ & $\cTwoValue{7}$ \\
+      \cTwoOutcome{BBN} & $\cTwoMassHL{0.063}$ & $\cTwoValue{14}$ \\
+      \cTwoOutcome{BNB} & $\cTwoMassHL{0.063}$ & $\cTwoValue{14}$ \\
+      \cTwoOutcome{NBB} & $\cTwoMassHL{0.063}$ & $\cTwoValue{14}$ \\
+      \cTwoOutcome{BBB} & $\cTwoMassHL{0.027}$ & $\cTwoValue{16}$ \\
+      \bottomrule%
+    \end{tabular}
+  \end{center}
+  $\cTwoValue{S_X}=\cTwoValue{\{0,7,14,16\}}$; $p_X(x)=0$ elsewhere. The grouped PMF is:
+  \par%
+  \noindent%
+  \begin{minipage}[t]{.37\linewidth}%
+    \vspace{0pt}\centering
+    \begin{tabular}{cc}%
+      \toprule
+      $\cTwoValue{x}$ (\cTwoValue{USD}) & $\cTwoMassHL{p_X(x)}$ \\ \midrule
+      $\cTwoValue{0}$ & $\cTwoMassHL{0.343}$ \\
+      $\cTwoValue{7}$ & $\cTwoMassHL{0.441}$ \\
+      $\cTwoValue{14}$ & $\cTwoMassHL{0.189}$ \\
+      $\cTwoValue{16}$ & $\cTwoMassHL{0.027}$ \\
+      \bottomrule%
+    \end{tabular}
+  \end{minipage}%
+  \hfill%
+  \begin{minipage}[t]{.60\linewidth}%
+    \vspace{0pt}\centering
+    \GTenPMFGraph[color=cTwoMassColor!20,%
+      xhighlight=GTenHLValue,%
+      yhighlight=cTwoMassMarker,%
+      width=\linewidth,%
+      height=4.15cm,%
+      xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})},%
+      ylabel={$\cTwoMassHL{p_X(x)}$},%
+      xstep=1]{0,7,14,16}{0.343,0.441,0.189,0.027}
+  \end{minipage}%
+  \par
+  \textbf{PMF check.} All masses are positive and $0.343+0.441+0.189+0.027=1$. The graph uses the actual
+  numerical spacing; gaps carry no mass.
+  \task{2}{Accumulate in increasing support order: $0.343;\ 0.784;\ 0.973;\ 1$. Each new height is the previous
+    height plus the next PMF mass.}
+  \par%
+  \noindent%
+  \begin{minipage}[t]{.37\linewidth}%
+    \vspace{0pt}\centering
+    \begin{tabular}{cc}%
+      \toprule
+      Cutoff interval & $\cTwoCDFHL{F_X(x)}$ \\ \midrule
+      $x<0$ & $\cTwoCDFHL{0}$ \\
+      $0\leq x<7$ & $\cTwoCDFHL{0.343}$ \\
+      $7\leq x<14$ & $\cTwoCDFHL{0.784}$ \\
+      $14\leq x<16$ & $\cTwoCDFHL{0.973}$ \\
+      $x\geq 16$ & $\cTwoCDFHL{1}$ \\
+      \bottomrule%
+    \end{tabular}
+  \end{minipage}%
+  \hfill%
+  \begin{minipage}[t]{.60\linewidth}%
+    \vspace{0pt}\centering
+    \begin{tikzpicture}%
+      \begin{axis}[classCDF,%
+          xmin=-2,%
+          xmax=18,%
+          xtick={0,7,14,16}]
+        \addplot[cTwoCDFColor,thick,<-] coordinates {(-2,0)(0,0)};
+        \addplot[cTwoCDFColor,thick] coordinates {(0,0.343)(7,0.343)};
+        \addplot[cTwoCDFColor,thick] coordinates {(7,0.784)(14,0.784)};
+        \addplot[cTwoCDFColor,thick] coordinates {(14,0.973)(16,0.973)};
+        \addplot[cTwoCDFColor,thick,->] coordinates {(16,1)(18,1)};
+        \addplot[only marks,mark=*,cTwoCDFColor,mark size=1.8pt,mark options={fill=white}] coordinates
+          {(0,0)(7,0.343)(14,0.784)(16,0.973)};
+        \addplot[only marks,mark=*,cTwoCDFColor,mark size=1.8pt] coordinates {(0,0.343)(7,0.784)(14,0.973)(16,1)};
+      \end{axis}%
+    \end{tikzpicture}
+  \end{minipage}%
+  \par
+  \textbf{CDF check.} All heights lie in $[0,1]$ and never decrease. Filled left/open right endpoints make the
+  graph right-continuous. Horizontal tails give limits 0 and 1; the CDF reaches 1 at 16 USD. The jumps, $0.343,\
+    0.441,\ 0.189,\ 0.027$, reproduce the PMF.
+  \textbf{Interpretation.} $F_X(14)=0.973$: the probability that revenue is at most 14 USD (not all three
+  visitors buy) is 0.973.
+  \vfill
+  \clearpage
+  \problemtitle{6}{Two-stage media fund}
+  \textbf{Signed two-stage net results.} A hypothetical classroom fund receives two cash returns. The first is
+  17 USD, 0 USD or 7 USD with probabilities .20, .30, .50, respectively. Independently, the second is 0 USD with
+  probability 0.4 or 7 USD with probability 0.6. These are all possible returns. A fixed participation cost of 7
+  USD is charged once. There are no other receipts or charges. Record the sum of both returns minus the cost; a
+  negative net result means a loss.
+  \task{1}{Let $\cTwoValue{X}$ be the signed net result after both stages and the cost, in USD. For each ordered
+    pair, multiply independent probabilities, then compute $X=R_1+R_2-7$. For example, $(17,0)$ has probability
+    $.20(0.4)=0.08$ and net result $17+0-7=10$. The pairs $(0,7)$ and $(7,0)$ both break even; group their masses.
+    Subtract the cost only once and sort signed results numerically.}
+  \begin{center}
+    \begin{tabular}{ccc}%
+      \toprule
+      Complete outcome & Probability & $\cTwoValue{X}$ (\cTwoValue{USD}) \\ \midrule
+      \cTwoOutcome{$(17,0)$} & $\cTwoMassHL{0.08}$ & $\cTwoValue{10}$ \\
+      \cTwoOutcome{$(17,7)$} & $\cTwoMassHL{0.12}$ & $\cTwoValue{17}$ \\
+      \cTwoOutcome{$(0,0)$} & $\cTwoMassHL{0.12}$ & $\cTwoValue{-7}$ \\
+      \cTwoOutcome{$(0,7)$} & $\cTwoMassHL{0.18}$ & $\cTwoValue{0}$ \\
+      \cTwoOutcome{$(7,0)$} & $\cTwoMassHL{0.2}$ & $\cTwoValue{0}$ \\
+      \cTwoOutcome{$(7,7)$} & $\cTwoMassHL{0.3}$ & $\cTwoValue{7}$ \\
+      \bottomrule%
+    \end{tabular}
+  \end{center}
+  $\cTwoValue{S_X}=\cTwoValue{\{-7,0,7,10,17\}}$; $p_X(x)=0$ elsewhere. The grouped PMF is:
+  \par%
+  \noindent%
+  \begin{minipage}[t]{.37\linewidth}%
+    \vspace{0pt}\centering
+    \begin{tabular}{cc}%
+      \toprule
+      $\cTwoValue{x}$ (\cTwoValue{USD}) & $\cTwoMassHL{p_X(x)}$ \\ \midrule
+      $\cTwoValue{-7}$ & $\cTwoMassHL{0.12}$ \\
+      $\cTwoValue{0}$ & $\cTwoMassHL{0.38}$ \\
+      $\cTwoValue{7}$ & $\cTwoMassHL{0.3}$ \\
+      $\cTwoValue{10}$ & $\cTwoMassHL{0.08}$ \\
+      $\cTwoValue{17}$ & $\cTwoMassHL{0.12}$ \\
+      \bottomrule%
+    \end{tabular}
+  \end{minipage}%
+  \hfill%
+  \begin{minipage}[t]{.60\linewidth}%
+    \vspace{0pt}\centering
+    \GTenPMFGraph[color=cTwoMassColor!20,%
+      xhighlight=GTenHLValue,%
+      yhighlight=cTwoMassMarker,%
+      width=\linewidth,%
+      height=4.15cm,%
+      xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})},%
+      ylabel={$\cTwoMassHL{p_X(x)}$},%
+      xstep=1]{-7,0,7,10,17}{0.12,0.38,0.3,0.08,0.12}
+  \end{minipage}%
+  \par
+  \textbf{PMF check.} All masses are positive and $0.12+0.38+0.3+0.08+0.12=1$. The graph uses the actual
+  numerical spacing; gaps carry no mass.
+  \task{2}{Accumulate in increasing support order: $0.12;\ 0.5;\ 0.8;\ 0.88;\ 1$. Each new height is the
+    previous height plus the next PMF mass.}
+  \par%
+  \noindent%
+  \begin{minipage}[t]{.37\linewidth}%
+    \vspace{0pt}\centering
+    \begin{tabular}{cc}%
+      \toprule
+      Cutoff interval & $\cTwoCDFHL{F_X(x)}$ \\ \midrule
+      $x<-7$ & $\cTwoCDFHL{0}$ \\
+      $-7\leq x<0$ & $\cTwoCDFHL{0.12}$ \\
+      $0\leq x<7$ & $\cTwoCDFHL{0.5}$ \\
+      $7\leq x<10$ & $\cTwoCDFHL{0.8}$ \\
+      $10\leq x<17$ & $\cTwoCDFHL{0.88}$ \\
+      $x\geq 17$ & $\cTwoCDFHL{1}$ \\
+      \bottomrule%
+    \end{tabular}
+  \end{minipage}%
+  \hfill%
+  \begin{minipage}[t]{.60\linewidth}%
+    \vspace{0pt}\centering
+    \begin{tikzpicture}%
+      \begin{axis}[classCDF,%
+          xmin=-10,%
+          xmax=20,%
+          xtick={-7,0,7,10,17}]
+        \addplot[cTwoCDFColor,thick,<-] coordinates {(-10,0)(-7,0)};
+        \addplot[cTwoCDFColor,thick] coordinates {(-7,0.12)(0,0.12)};
+        \addplot[cTwoCDFColor,thick] coordinates {(0,0.5)(7,0.5)};
+        \addplot[cTwoCDFColor,thick] coordinates {(7,0.8)(10,0.8)};
+        \addplot[cTwoCDFColor,thick] coordinates {(10,0.88)(17,0.88)};
+        \addplot[cTwoCDFColor,thick,->] coordinates {(17,1)(20,1)};
+        \addplot[only marks,mark=*,cTwoCDFColor,mark size=1.8pt,mark options={fill=white}] coordinates
+          {(-7,0)(0,0.12)(7,0.5)(10,0.8)(17,0.88)};
+        \addplot[only marks,mark=*,cTwoCDFColor,mark size=1.8pt] coordinates {(-7,0.12)(0,0.5)(7,0.8)(10,0.88)(17,1)};
+      \end{axis}%
+    \end{tikzpicture}
+  \end{minipage}%
+  \par
+  \textbf{CDF check.} All heights lie in $[0,1]$ and never decrease. Filled left/open right endpoints make the
+  graph right-continuous. Horizontal tails give limits 0 and 1; the CDF reaches 1 at 17 USD. The jumps, $0.12,\
+    0.38,\ 0.3,\ 0.08,\ 0.12$, reproduce the PMF.
+  \textbf{Interpretation.} $F_X(0)=0.5$: the probability that the net result is nonpositive (a loss or
+  break-even) is 0.5.
+  \vfill
+  \clearpage
+\fi
+\end{document}
