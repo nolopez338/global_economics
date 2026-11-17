@@ -153,6 +153,7 @@ const renderScheduleRows = (table, entries) => {
         date: normalizedDate
       });
       const link = document.createElement("a");
+      link.className = "materials-button";
       link.href = `materials.html?${params.toString()}`;
       link.textContent = "Materials";
       link.setAttribute("aria-label", `Open materials for Grade ${entry.Grade}${String(entry.Section).toUpperCase()} on ${normalizedDate}`);
