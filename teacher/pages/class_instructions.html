@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="../../assets/png/icon_calendar.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Class Instructions</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --navy: #0c192b;
+      --surface: #13253a;
+      --text: #f5f2e9;
+      --muted: #b9c7d6;
+      --teal: #91dfce;
+      --coral: #f1aaa3;
+      --amber: #f3d18b;
+      --space: clamp(1rem, 2.4vh, 1.75rem);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--navy); color: var(--text);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .container {
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: var(--space);
+      display: flex;
+      background: var(--navy);
+    }
+    .card {
+      width: 100%; max-width: 1720px; min-width: 0; margin: auto; overflow-wrap: anywhere;
+      display: grid; gap: var(--space);
+    }
+    .page-header { display: grid; grid-template-columns: minmax(0, 1fr) auto;
+      gap: 1.5rem; align-items: center; }
+    .eyebrow { margin-bottom: .5rem; color: var(--muted);
+      font-size: clamp(1rem, 1.7vh, 1.25rem); font-weight: 650; letter-spacing: .08em; }
+    h1 { margin: 0; font-size: clamp(2.4rem, 5.4vh, 4rem);
+      line-height: 1.08; letter-spacing: -.035em; font-weight: 750; }
+    .header-tools { display: grid; justify-items: end; gap: .4rem; }
+    .class-timer { min-width: 13rem; text-align: right; }
+    .timer-heading { display: flex; align-items: center; justify-content: flex-end; gap: .5rem; }
+    .timer-label { margin: 0; color: var(--muted); font-size: 1rem; font-weight: 600; }
+    .timer-value { margin: .1rem 0 0; font-size: clamp(1.75rem, 3.8vh, 2.75rem);
+      line-height: 1.1; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .timer-value[hidden], [hidden] { display: none !important; }
+    .fullscreen-toggle { display: inline-flex; align-items: center; justify-content: center;
+      flex: 0 0 auto; padding: .35rem; border: 1px solid #41566d;
+      border-radius: .4rem; background: transparent; color: var(--muted);
+      font: inherit; cursor: pointer; }
+    .fullscreen-toggle svg { width: 1rem; height: 1rem; }
+    .fullscreen-toggle:hover { background: var(--surface); color: var(--text); }
+    .fullscreen-toggle:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+    .fullscreen-message { max-width: 17rem; margin: 0; color: var(--amber); font-size: .8rem; }
+    .instructions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space); }
+    .desk-column { padding: clamp(1.1rem, 2.6vh, 2rem); border: 1px solid #32495d;
+      border-radius: 1rem; background: var(--surface); box-shadow: 0 6px 20px #00000012; }
+    h2 { margin: 0 0 clamp(.8rem, 2vh, 1.4rem); font-size: clamp(1.5rem, 3.2vh, 2.15rem);
+      line-height: 1.2; letter-spacing: -.02em; }
+    .allowed h2, .allowed li::marker { color: var(--teal); }
+    .not-allowed { background: #1c283a; }
+    .not-allowed h2, .not-allowed li::marker { color: var(--coral); }
+    ul { margin: 0; padding-left: 1.2em; display: grid; gap: clamp(.5rem, 1.5vh, 1rem); }
+    li { padding-left: .15em; font-size: clamp(1.35rem, 3vh, 2rem); line-height: 1.35; font-weight: 500; }
+    .important { padding: clamp(1rem, 2.3vh, 1.6rem); border: 1px solid #6f6044;
+      border-left: 4px solid var(--amber); border-radius: .75rem; background: #292d34;
+      font-size: clamp(1.2rem, 2.6vh, 1.8rem); line-height: 1.4; font-weight: 750; color: var(--amber); }
+    .important ul { margin-top: .55rem; gap: .35em; color: var(--text); font-weight: 500; }
+    .important li { font: inherit; }
+    .important li::marker { color: var(--amber); }
+    .instruction-item { display: flex; align-items: center; gap: .6rem; min-width: 0; }
+    .instruction-item > span { min-width: 0; }
+    .instruction-icon { width: 40px; height: 40px; flex: 0 0 40px; object-fit: contain; }
+    .desk-item { display: inline-flex; max-width: 100%; align-items: center; gap: .3rem; vertical-align: middle; }
+    .important mark { padding: 0 .12em; border-radius: .2em;
+      background: rgba(243, 209, 139, .14); color: inherit;
+      -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+    .footer { color: var(--muted); text-align: center; font-size: clamp(1rem, 1.8vh, 1.25rem); }
+    /* Distribute spare height, while intrinsic content can grow and scroll at text zoom. */
+    @media (min-width: 60rem) and (min-height: 38rem) {
+      .card { min-height: calc(100vh - 2 * var(--space));
+        min-height: calc(100dvh - 2 * var(--space));
+        grid-template-rows: auto auto auto auto; align-content: space-between; }
+    }
+    @media (max-width: 59.99rem) {
+      .instructions { grid-template-columns: 1fr; }
+      .page-header { align-items: start; }
+      h1 { font-size: clamp(2rem, 6vw, 3rem); }
+      .class-timer { min-width: 0; }
+    }
+    @media (max-width: 36rem) {
+      .page-header { grid-template-columns: 1fr; gap: 1rem; }
+      .header-tools { min-width: 0; }
+      .timer-label { overflow-wrap: anywhere; }
+    }
+  </style>
+</head>
+
+<body>
+  <main id="exam-page" class="container">
+    <section class="card">
+
+      <header class="page-header">
+        <div>
+          <div class="eyebrow">In order to begin:</div>
+          <h1>Class Instructions</h1>
+        </div>
+        <div class="header-tools">
+          <div class="class-timer" aria-label="School day countdown">
+            <div class="timer-heading">
+              <button id="fullscreen-toggle" class="fullscreen-toggle" type="button"
+                aria-label="Enter fullscreen" title="Enter fullscreen" aria-pressed="false" hidden>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+                  <path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5" />
+                </svg>
+              </button>
+              <p id="timer-label" class="timer-label">Checking school calendar…</p>
+            </div>
+            <p id="timer-value" class="timer-value" role="timer" aria-live="off" hidden></p>
+          </div>
+          <p id="fullscreen-message" class="fullscreen-message" role="status" hidden></p>
+        </div>
+      </header>
+
+      <div class="instructions">
+        <section class="desk-column allowed" aria-labelledby="allowed-heading">
+          <h2 id="allowed-heading">Allowed on your desk and in the classroom</h2>
+          <ul>
+            <li class="desk-items"><span class="desk-item"><img class="instruction-icon" src="../assets/png/exam-pencil-case.png" width="40" height="40" alt="">Pencil case</span> | <span class="desk-item"><img class="instruction-icon" src="../assets/png/exam-calculator.png" width="40" height="40" alt="">Calculator</span> | <span class="desk-item"><img class="instruction-icon" src="../assets/png/exam-notebook.png" width="40" height="40" alt="">Notebook</span></li>
+            <li class="desk-items"><span class="desk-item"><img class="instruction-icon" src="../assets/png/exam-backpack.png" width="40" height="40" alt="">Backpack</span> | <span class="desk-item"><img class="instruction-icon" src="../assets/png/exam-loose-papers.png" width="40" height="40" alt="">Loose papers</span></li>
+          </ul>
+        </section>
+
+        <section class="desk-column not-allowed" aria-labelledby="not-allowed-heading">
+          <h2 id="not-allowed-heading">Not allowed on your desk or in the classroom</h2>
+          <ul>
+            <li><div class="instruction-item"><img class="instruction-icon" src="../assets/svg/class-food.svg" width="40" height="40" alt=""><span>Food</span></div></li>
+            <li><div class="instruction-item"><img class="instruction-icon" src="../assets/svg/class-cellphone.svg" width="40" height="40" alt=""><span>Cellphones</span></div></li>
+            <li><div class="instruction-item"><img class="instruction-icon" src="../assets/svg/class-card-games.svg" width="40" height="40" alt=""><span>Card games</span></div></li>
+          </ul>
+        </section>
+      </div>
+
+      <div class="important">
+        READ THE INSTRUCTIONS CAREFULLY.
+        <ul>
+          <li><div class="instruction-item"><img class="instruction-icon" src="../assets/svg/class-guide.svg" width="40" height="40" alt=""><span>Take a guide from the front of the room.</span></div></li>
+          <li><div class="instruction-item"><img class="instruction-icon" src="../assets/png/exam-half-class.png" width="40" height="40" alt=""><span>In order to begin, at least <mark>half of the class</mark> must be in the room.</span></div></li>
+          <li><div class="instruction-item"><img class="instruction-icon" src="../assets/png/exam-seated-students.png" width="40" height="40" alt=""><span>All students present <mark>must be seated</mark> and follow the rules above about what is allowed and not allowed on their desks.</span></div></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+  <script src="../assets/js/databases/year-calendar-data.js"></script>
+  <script src="../assets/js/school-day-timer.js"></script>
+  <script src="../assets/js/exam-instructions.js"></script>
+</body>
+</html>
