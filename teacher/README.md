@@ -125,8 +125,8 @@ The school-day timer retains its return link to `../schedule.html`. It loads
 `../assets/css/timer-view.css`, then `../assets/js/databases/year-calendar-data.js`,
 `../assets/js/school-day-timer.js`, and `../assets/js/timer-view.js`. It shows the
 current period, countdown, and daily schedule, with fullscreen and dark-mode
-controls. Both relocated views load the shared favicon from
-`../assets/svg/icon_calendar.svg`; Class View also loads the shared countdown
+controls. Both relocated views use the shared
+[calendar favicon](../assets/svg/icon_calendar.svg). Class View also loads the shared countdown
 stylesheet and controller from `../../assets/css/countdown_timer.css` and
 `../../assets/js/countdown_timer.js`.
 
