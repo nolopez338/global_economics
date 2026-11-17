@@ -6,7 +6,8 @@
 supporting academic-calendar, class-detail, presentation, authoring, and results
 normalization tools. Its main browser entry points are `schedule.html` (the
 standard weekly view), `schedule-teacher.html` (the teacher variant),
-`class_view.html` (a projector/current-period view), and the pages under
+`pages/class_view.html` (a projector/current-period view),
+`pages/timer_view.html` (the school-day timer), and the other pages under
 `pages/`. The directory also retains schedule source/history, an experimental
 browser authoring tool, and a dated set of assessment workbooks plus a command
 line normalizer.
@@ -23,7 +24,6 @@ teacher/
 ├── README.md
 ├── schedule.html
 ├── schedule-teacher.html
-├── class_view.html
 ├── assets/
 │   ├── css/
 │   │   ├── class-view.css
@@ -52,6 +52,8 @@ teacher/
 │   └── schedule.csv
 ├── pages/
 │   ├── class.html
+│   ├── class_view.html
+│   ├── timer_view.html
 │   ├── full_schedule.html
 │   ├── general_calendar.html
 │   ├── magis.html
@@ -103,19 +105,30 @@ links whose back button returns to `schedule-teacher.html`. This differs from
 the richer public/teacher branching implemented in the currently unused
 `principal-schedule.js` described below.
 
-### Projector view: `class_view.html`
+### Projector view: `pages/class_view.html`
 
 Class View is not a section-specific class record. It is a fullscreen-friendly
 display of the current timed block in either weekly schedule. The `origin`
 query parameter selects `schedule.html` or `schedule-teacher.html`; the chosen
-page is loaded into a hidden iframe, and `assets/js/class-view.js` reads the
-rendered timetable rows for the calendar's current cycle day. It displays the
+page is loaded from `../schedule.html` or `../schedule-teacher.html` into a
+hidden iframe, and `assets/js/class-view.js` reads the rendered timetable rows for the calendar's current cycle day. It displays the
 current activity, time remaining, next activity, or an appropriate no-schedule
 state. It also provides a live clock, progress graphic, Fullscreen API control,
 and an independent countdown timer with an optional Web Audio alarm.
 `assets/css/class-view.css` supplies the projector, progress, dialog, responsive,
 and dark-theme presentation. `year-calendar-data.js` supplies the cycle day and
 `theme-toggle.js` supplies persistent dark mode.
+
+### School-day timer: `pages/timer_view.html`
+
+The school-day timer retains its return link to `../schedule.html`. It loads
+`../assets/css/timer-view.css`, then `../assets/js/databases/year-calendar-data.js`,
+`../assets/js/school-day-timer.js`, and `../assets/js/timer-view.js`. It shows the
+current period, countdown, and daily schedule, with fullscreen and dark-mode
+controls. Both relocated views load the shared favicon from
+`../../assets/png/icon_calendar.png`; Class View also loads the shared countdown
+stylesheet and controller from `../../assets/css/countdown_timer.css` and
+`../../assets/js/countdown_timer.js`.
 
 ### Class detail page: `pages/class.html`
 
@@ -232,7 +245,7 @@ it is a diagnostic/generated-artifact view rather than a main entry point.
 - `principal-schedule.css` styles the weekly timetable's collapsible class grid,
   class/activity colors, active cycle-day column, current-time line, responsive
   layout, and dark mode. It is loaded by both weekly HTML files.
-- `class-view.css` is dedicated to `class_view.html`: projector layout, progress
+- `class-view.css` is dedicated to `pages/class_view.html`: projector layout, progress
   display, timer dialog/alarm, fullscreen treatment, and light/dark palettes.
 - `general_calendar.css` is dedicated to `pages/general_calendar.html`: yearly
   month cards, legend and color controls, filters, term/holiday/today markings,
@@ -465,7 +478,7 @@ schedule.html                         schedule-teacher.html
 ├── [data/API] assets/js/year-calendar-data.js
 ├── [controller] assets/js/schedule-teacher.js
 ├── [theme] assets/js/theme-toggle.js
-├── [nav] class_view.html?origin=schedule|schedule-teacher
+├── [nav] pages/class_view.html?origin=schedule|schedule-teacher
 │   ├── assets/css/class-view.css
 │   ├── assets/js/year-calendar-data.js
 │   ├── assets/js/class-view.js
@@ -529,7 +542,7 @@ authoring/schedule.csv
 
 assets/js/year-calendar-data.js
 ├── schedule.html + schedule-teacher.html (active cycle column)
-├── class_view.html (current cycle day)
+├── pages/class_view.html (current cycle day)
 ├── pages/general_calendar.html
 │   ├── assets/css/general_calendar.css
 │   ├── [inline] month/legend/filter renderer + localStorage
