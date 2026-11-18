@@ -22,7 +22,7 @@ def helper(name, new):
     end = reference.index('\n}\n', start)+3
     return reference[start:end].replace('\\'+name, '\\'+new)
 
-helpers = helper('InformationTable','SolutionInformationTable') + '\n' + helper('TaskTwoTable','SolutionTaskTwoTable')
+helpers = helper('InformationTable','SolutionInformationTable').replace('0.07\\linewidth', '0.08\\linewidth').replace('0.19\\linewidth', '0.18\\linewidth') + '\n' + helper('TaskTwoTable','SolutionTaskTwoTable')
 def h(role, text): return '\\Ctwo'+role+'{'+str(text)+'}'
 def m(role,text): return '$'+h(role,text)+'$'
 def num(v): return format(D(v).normalize(),'f')
@@ -96,6 +96,8 @@ for idx,p in enumerate(problems):
         out.append('The mutually exclusive categories total '+math(h('Coverage','219')+'+'+h('Coverage','18')+'+'+h('Coverage','10')+'+'+h('Coverage','3')+'='+h('Coverage','250'))+'. Sum the relevant categories for each level; the denominator is '+m('Coverage','250')+' studies at each level.\n')
     entries = {2:[('90','200-23',177,200),('99','200-5',195,200)],3:[('95','4',4,5)],4:[('90','150-17',133,150),('99','150-3',147,150)],5:[('90','4',4,5),('90','4+5',9,10),('90','4+5+4',13,15),('90','4+5+4+3',16,20)],6:[('90','219',219,250),('95','219+18',237,250),('99','219+18+10',247,250)]}[k]
     for c,calc,count,total in entries:
+        if k==5 and total==20:
+            out.append('\\clearpage\n\\subsubsection*{Task 3 solution (continued). Final coverage and interpretation}\n')
         cov=D(count)/D(total)*100; err=abs(cov-D(c)); exact=(100*count)%total==0
         cv=num(cov) if exact else f'{cov:.2f}'; ev=num(err) if exact else f'{err:.2f}'
         out.append('\\Needspace{10\\baselineskip}\n\\textbf{'+m('Confidence',c+r'\%')+' confidence'+(' -- first '+str(total)+' studies' if k==5 else '')+'}\n')
