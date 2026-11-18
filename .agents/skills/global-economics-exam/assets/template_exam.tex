@@ -1,69 +1,163 @@
+% Reusable exam scaffold: replace bracketed text and symbolic marks before use.
+% Build twice for question references; see the build guide for TEXINPUTS.
 \makeatletter
 \def\input@path{{preamble/}{../preamble/}{../../preamble/}{../../../preamble/}{../../../../book2026-2027/preamble/}}
 \makeatother
-
 \input{preamble_exams}
-
 \graphicspath{{./}{preamble/}{../preamble/}{../../preamble/}{../../../preamble/}{../../../../book2026-2027/preamble/}}
 
+% Assessment-specific settings. Symbolic marks are NOT suggested allocations.
+\setYColumnWidth{0.23}
+\newcommand{\CriterionA}{[ID A]}
+\newcommand{\CriterionB}{[ID B]}
+% Ledger: Q1 A=a+b; Q2 B=c+d; Q3 A=e. Totals: A=a+b+e, B=c+d.
+% Replace all task marks, heading sums and criterion totals consistently.
+
+% Preserve starred/unstarred calls and subtract color-box padding ONCE.
+% Do not reduce linewidth again at individual calls.
+\let\ExamSubsectionBox\SubsectionBox
+\RenewDocumentCommand{\SubsectionBox}{s m}{%
+  \par\Needspace{4\baselineskip}% keep heading with opening prompt
+  \begingroup
+  \setlength{\linewidth}{\dimexpr\linewidth-2\fboxsep\relax}%
+  \IfBooleanTF{#1}{\ExamSubsectionBox*{#2}}{\ExamSubsectionBox{#2}}%
+  \endgroup\nobreak
+}
+% Shared headings use stepcounter, not refstepcounter: capture the automatic
+% number explicitly for score-table references, without manual question IDs.
+\makeatletter
+\newcommand{\QuestionLabel}[1]{%
+  \begingroup\edef\@currentlabel{\arabic{subsectionboxproblem}}%
+  \label{#1}\endgroup
+}
+\makeatother
+\newsavebox{\ScoreTableA}
+\newsavebox{\ScoreTableB}
+\newlength{\ScoreTableGap}
+\setlength{\ScoreTableGap}{1em}
+\newif\ifSeparateActivity
+\SeparateActivitytrue % Optional: set false to omit the reminder.
+
 \begin{document}
-
-% For a named exam or different metadata, use the local header layout in the guide.
-\ExamHeader{[grade]}{[evidence number]}{[exam title]}{[term]}\par
-
-\LearningObjective{[Learning objective.]}{%
-  [Criterion ID] --- [Criterion description.]%
-  % Add \par and another entry for each additional assessed criterion.
-}\par
-
-% Include when students identify their printed copy.
+% Full-width editable metadata. Alternatively use ExamHeader when its fixed
+% teacher/year match the brief. Keep all front matter outside multicols.
+\noindent
+\begin{tabularx}{\textwidth}{|C{2.8cm}|C{\dimexpr\textwidth-5.6cm-6\tabcolsep-4\arrayrulewidth\relax}|C{2.8cm}|}
+\hline
+\centering\vspace{3mm}\includegraphics[width=2.5cm]{logo.png}
+& \CellCenter{\textbf{GLOBAL ECONOMICS}\par
+  \textbf{Grade [grade] -- [assessment designation]}\par
+  \textbf{[Exam title]}\par\textbf{[Teacher]}}
+& \CellCenter{\textbf{[Term]}\par\textbf{[School year]}}\\\hline
+\end{tabularx}\par\smallskip
+\LearningObjective{[Learning objective: observable knowledge and skills.]}{%
+\textbf{\CriterionA}: [Description of the first assessed criterion.]\par
+\textbf{\CriterionB}: [Description of the second assessed criterion.]
+% Add criteria as needed; distinguish separately assessed criteria.
+}\par\smallskip
 \StudentInfo\par
 
 \begin{multicols}{2}
 \raggedcolumns
+\setlength{\parskip}{3pt}
+\SubsectionBox*{Criteria assessment}
+[Assessed criteria and available points per criterion; use the totals below.]
+[Passing thresholds, if applicable; specify this exam's points or cumulative
+points.] [Required procedures and justifications.] [Partial-credit rule.]
+[Penalties, triggers and scope, if applicable.] [Answer location: this sheet
+or identified separate paper; submission requirements.]
+% Assessment-specific policies: remove inapplicable clauses.
 
-% The shared color box adds padding on both sides of its content.
-{\addtolength{\linewidth}{-2\fboxsep}%
- \SubsectionBox*{Criteria assessment}}
-[State what students must show and where to answer.]
-
-% Add the applicable grading and submission policies from the brief.
-
-% Repeat this block with descriptive labels when splitting the matrix.
 \noindent\begin{minipage}{\linewidth}
-  \centering
-  \textbf{Available points}\par\smallskip
-  \begin{tabular}{@{}lc@{}}
-    \toprule
-    \textbf{Question} & \textbf{[Criterion ID]} \\
-    \midrule
-    {[Question number]} & [Points] \\
-    \midrule
-    \textbf{Total} & \textbf{[Criterion total]} \\
-    \bottomrule
-  \end{tabular}
+\centering\small
+\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.05}
+\textbf{Available points}\par\smallskip
+% One bordered table per criterion; include only its scored questions.
+\sbox{\ScoreTableA}{\begin{tabular}{|c|c|}
+\hline\textbf{Question} & \textbf{\CriterionA}\\\hline
+\ref*{q:context} & $a+b$\\\hline
+\ref*{q:short} & $e$\\\hline
+\textbf{Total} & $a+b+e$\\\hline
+\end{tabular}}%
+\sbox{\ScoreTableB}{\begin{tabular}{|c|c|}
+\hline\textbf{Question} & \textbf{\CriterionB}\\\hline
+\ref*{q:ordered} & $c+d$\\\hline
+\textbf{Total} & $c+d$\\\hline
+\end{tabular}}%
+% Measure the pair; automatically stack if it does not fit the column.
+\ifdim\dimexpr\wd\ScoreTableA+\ScoreTableGap+\wd\ScoreTableB\relax>\linewidth
+\usebox{\ScoreTableA}\par\smallskip\usebox{\ScoreTableB}%
+\else
+\usebox{\ScoreTableA}\hspace{\ScoreTableGap}\usebox{\ScoreTableB}%
+\fi
 \end{minipage}\par
+% Repeat in pairs for more criteria. Each individual table must fit linewidth.
+% Split tall tables by labeled question ranges; repeat column headers.
+% Exclude the separate activity from every score table.
 
-% Repeat the question structure as needed. Use a minipage for a short block.
+% LONG QUESTION: no enclosing minipage; permit flow across columns/pages.
+\SubsectionBox{[Contextual question]\score{\CriterionA-\sml{$a+b$}}}
+\QuestionLabel{q:context}
+[Introduce the decision maker, context, alternatives, uncertain outcomes,
+units, assumptions and parameter domains. Define all symbols used below.]
+
+% Keep each short caption/table block together.
 \noindent\begin{minipage}{\linewidth}
-  {\addtolength{\linewidth}{-2\fboxsep}%
-   \SubsectionBox{[Question title] \score{[Criterion ID]-\sml{[Points]}}}}
-  [Give the data, units, assumptions, and task.]
-  % Insert any supporting table or figure here.
-  % For on-sheet work, reserve space here with \vspace{<length>} or ruled lines.
+\small\textbf{[Payoffs in stated units]}\par\smallskip
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\linewidth}{@{}Xcc@{}}
+\toprule Alternative & [State I] & [State II]\\\midrule
+{[Probability, if given]} & $p$ & $1-p$\\
+{[Alternative I]} & $x_{11}$ & $x_{12}$\\
+{[Alternative II]} & $x_{21}$ & $x_{22}$\\\bottomrule
+\end{tabularx}
 \end{minipage}\par
+% Delete probabilities when unavailable; replace symbols with verified data.
+\noindent\begin{minipage}{\linewidth}
+\small\textbf{[Decision statistics]}\par
+[Define each statistic and whether larger or smaller is preferred.]
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\linewidth}{@{}Xccc@{}}
+\toprule Alternative & $T_1$ & $T_2$ & $T_3$\\\midrule
+{[Alternative I]} & $t_{11}$ & $t_{12}$ & $t_{13}$\\
+{[Alternative II]} & $t_{21}$ & $t_{22}$ & $t_{23}$\\\bottomrule
+\end{tabularx}
+\end{minipage}\par
+% Adapt statistics to the topic; check consistency with payoff data.
+[Inline task: calculate or compare using the supplied information.]
+\sscore{\CriterionA-\sml{$a$}}
+[Inline task: interpret, justify or investigate a change; state domains,
+eligibility and tie rules where needed.] \sscore{\CriterionA-\sml{$b$}}
 
-% Alternate question structure for separately scored tasks across criteria.
-% Leave a long question unboxed so it can break between tasks.
-% {\addtolength{\linewidth}{-2\fboxsep}%
-%  \SubsectionBox{[Question title]
-%    \score{[Criterion ID]-\sml{[Points]} \quad [Other criterion ID]-\sml{[Points]}}}}
-% [Introduce the shared givens and assumptions.]
-% \begin{enumerate}[label=(\alph*)]
-%   \item [Task prompt.] \sscore{[Criterion ID]-\sml{[Task points]}}
-%   \item [Task prompt.] \sscore{[Other criterion ID]-\sml{[Task points]}}
-% \end{enumerate}
+% ORDERED TASKS: let longer questions break between tasks.
+\SubsectionBox{[Ordered procedure]\score{\CriterionB-\sml{$c+d$}}}
+\QuestionLabel{q:ordered}
+[Supply self-contained context and data, or explicitly identify shared data
+above. Specify the operation order and any selection or tie rules.]
+\begin{enumerate}[label=(\alph*)]
+\item {[Apply the first stage; show the procedure and intermediate result.]}
+  \sscore{\CriterionB-\sml{$c$}}
+\item {[Apply the remaining stages in order; explain the final result.]}
+  \sscore{\CriterionB-\sml{$d$}}
+\end{enumerate}
+% For mixed criteria list each criterion sum in the heading; enter the question
+% in each relevant score table with only that criterion's share.
 
+% SHORT QUESTION: keep heading, prompt and optional workspace together.
+\noindent\begin{minipage}{\linewidth}
+\SubsectionBox{[Short question]\score{\CriterionA-\sml{$e$}}}
+\QuestionLabel{q:short}
+[Give the complete prompt and any data needed for a brief response.]
+\sscore{\CriterionA-\sml{$e$}}
+% For on-sheet answers add appropriately sized space, e.g. \vspace{15mm}.
+\end{minipage}\par
+\ifSeparateActivity
+\noindent\begin{minipage}{\linewidth}
+\SubsectionBox*{Separate activity reminder (unscored)}
+[Activity title and separately assessed criterion.] [Required deliverable,
+submission location and reference to the activity's own instructions.]
+This reminder carries no points in this exam.
+\end{minipage}\par
+\fi
 \end{multicols}
-
 \end{document}
