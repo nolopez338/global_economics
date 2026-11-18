@@ -7,279 +7,510 @@
 % \GTenHighlightsfalse % Uncomment to disable instructional highlights.
 \input{graphs/specific_highlights.tex}
 
+
+% Local graph facilities: numerical axes; role colors follow the shared toggle.
 \ifGTenHighlights
-    \colorlet{CthreeCentralArea}{CtwoConfidenceColor!55}
+  \colorlet{CthreeSELine}{CtwoSEColor!55!black}
+  \colorlet{CthreeMoELine}{CtwoMoEColor!75!black}
+  \colorlet{CthreeCriticalLine}{CtwoCriticalColor}
+  \colorlet{CthreeConfidenceLine}{CtwoConfidenceColor!50!black}
 \else
-    \colorlet{CthreeCentralArea}{black!25}
+  \colorlet{CthreeSELine}{black}
+  \colorlet{CthreeMoELine}{black}
+  \colorlet{CthreeCriticalLine}{black}
+  \colorlet{CthreeConfidenceLine}{black}
 \fi
+\pgfplotsset{c3axis/.style={width=.89\linewidth,height=6.3cm,
+  axis lines=left,grid=major,major grid style={black!12},
+  tick label style={font=\small},label style={font=\small},
+  scaled ticks=false,unbounded coords=jump,
+  every axis plot/.append style={thick},enlarge x limits=.04,
+  title style={font=\normalsize},clip=true}}
+\newcommand{\CthreeSampleRow}[3]{\CtwoSize{#1}&\CtwoSE{#2}&\CtwoMoE{#3}\\}
+\newcommand{\CthreeConfidenceRow}[3]{\CtwoConfidence{#1}&\CtwoCritical{#2}&\CtwoMoE{#3}\\}
 \usepackage{needspace}
 \usepackage{titling}
 \setlength{\droptitle}{-2em}
 \pretitle{\par\begingroup\centering\LARGE}
 \posttitle{\par\endgroup}
-\preauthor{}\postauthor{}
-\predate{}\postdate{}
+\preauthor{}\postauthor{}\predate{}\postdate{}
 \maketitlehookd{\vspace{-1em}}
 \linespread{1.12}
 \setlength{\parskip}{5pt}
 \newgeometry{margin=0.65in,top=0.55in,bottom=0.65in}
-
 \title{Grade 11 Term 2 Home Practice -- C3\\\large Anatomy of a confidence interval\\[0.25em]
-	\normalsize Global Economics -- 2026--2027}
-\author{}
-\date{}
-
+\normalsize Global Economics -- 2026--2027}
+\author{}\date{}
 \begin{document}
-	\maketitle
-
-	\setcounter{tocdepth}{1}
-	\setcounter{secnumdepth}{2}
-	\phantomsection
-	\label{toc}
-	\tableofcontents
-
-	\section*{Evaluated criteria}
-	\addcontentsline{toc}{section}{Evaluated criteria}
-	\begin{description}
-		\item[\textbf{C3}] Identifies the components of a confidence interval, including point estimate, critical value, standard error, and margin of error, explaining how each component affects precision and reliability.
-	\end{description}
-
-	\textbf{How to practise.} Try each task before opening its blue solution link. Use the arrows to return to the contents, the problem list or the current problem.
-
-	\section{Introduction}
-	\label{sec:c3-introduction}
-
-	\SectionProblemsTableOfContents{
-		\SectionProblemLink{subsec:c3-key-terms}{Key terms and highlight guide} \\
-		\SectionProblemLink{subsec:c3-transport-example}{From transport spending to an interval} \\
-		\SectionProblemLink{subsec:c3-quick-check}{Quick check: centre and width}
-	}
-
-	\noindent\begin{minipage}{\linewidth}
-	\subsection{Key terms and highlight guide}
-	\label{subsec:c3-key-terms}
-
-	A confidence interval combines a sample-based \CtwoPoint{point estimate} with a \CtwoMoE{margin of error} to estimate a \CtwoMean{population mean}. Use the following table as a guide to the components, symbols, and highlights used throughout this document.
-
-	Greens connect sample quantities, and reds connect population quantities. Two blue shades distinguish the confidence level (central area) from its critical value. Separate warm shades distinguish standard error, margin of error, endpoints, and full width; names and symbols identify each quantity even without color.
-
+\maketitle
+\setcounter{tocdepth}{1}\setcounter{secnumdepth}{2}
+\phantomsection\label{toc}\tableofcontents
+\section*{Evaluated criteria}
+\addcontentsline{toc}{section}{Evaluated criteria}
+\begin{description}
+\item[\textbf{C3}] Identifies the components of a confidence interval, including point estimate, critical value, standard error, and margin of error, explaining how each component affects precision and reliability.
+\end{description}
+\textbf{How to practise.} Try each task before opening its blue solution link.
+The arrows return to the contents, problem list and current problem. Construct graphs on graph paper or with graphing software, using numerical axes.
+\clearpage
+\section{Introduction}\label{sec:c3-introduction}
+\subsection{Key terms and highlight guide}\label{subsec:c3-key-terms}
+\phantomsection\label{tab:highlight-legend}
 \PracticeHighlightLegend{G11-T2-C3}
 
-	\secInicio[subsec:c3-key-terms][sec:c3-introduction]
-	\end{minipage}\par
+Greens connect sample quantities; reds connect population quantities. Two blues distinguish \CtwoConfidence{confidence level} from \CtwoCritical{critical value}. Warm shades separate \CtwoSE{standard error}, \CtwoMoE{margin}, \CtwoEndpoint{endpoints} and \CtwoWidth{width}. Symbols and labels preserve these distinctions without color.
 
-	\subsection{From transport spending to an interval}
-	\label{subsec:c3-transport-example}
+\textbf{Opening navigation:} \hyperref[subsec:c3-transport-example]{Example 1: vary sample size};
+\hyperref[subsec:c3-quick-check]{Example 2: vary confidence};
+\hyperref[tab:notation-reference]{detailed notation reference}.
 
-	A survey estimates mean weekly household transport spending at \CtwoPoint{60} thousand COP. A \CtwoMoE{margin of error} of \CtwoMoE{5} thousand COP gives an interval from $\CtwoPoint{60}-\CtwoMoE{5}=\CtwoEndpoint{55}$ to $\CtwoPoint{60}+\CtwoMoE{5}=\CtwoEndpoint{65}$ thousand COP, centred at \CtwoPoint{60} thousand COP.
+\textbf{Model used throughout.} We estimate a population mean from a simple random sample of independent observations (or a negligible fraction of a much larger population). The population standard deviation $\CtwoSD{\sigma}$ is supplied and known, not an estimated sample SD. The population is normal or the sample mean is well approximated by a normal distribution. These assumptions support the two-sided normal intervals below.
 
-	\secInicio[subsec:c3-transport-example][sec:c3-introduction]
+\textbf{Controlled comparisons.} Hold $\CtwoPoint{\bar{x}}$ fixed to isolate changes in width. Actual sample means can change between samples; a new sample need not have the same centre.
+\secInicio[subsec:c3-key-terms][sec:c3-introduction]
+\clearpage
+\subsection{Example 1: sample size and transport spending}\label{subsec:c3-transport-example}
+For weekly household transport spending, suppose the known population SD is \CtwoSD{20} thousand COP. Keep the estimate at \CtwoPoint{60} thousand COP and confidence at \CtwoConfidence{95\%}, so $\CtwoCritical{z^*}=\CtwoCritical{1.960}$.
+With $\CtwoSize{n}=\CtwoSize{100}$, $\CtwoSE{\mathrm{SE}}=\CtwoSD{20}/\sqrt{\CtwoSize{100}}=\CtwoSE{2}$ and $\CtwoMoE{\mathrm{MoE}}=\CtwoCritical{1.960}(\CtwoSE{2})=\CtwoMoE{3.920}$ thousand COP.
+With $\CtwoSize{n}=\CtwoSize{400}$, these become \CtwoSE{1} and \CtwoMoE{1.960} thousand COP. Four times as many households halves both measures of uncertainty, with unchanged confidence.
 
-	\subsection{Quick check: centre and width}
-	\label{subsec:c3-quick-check}
+\subsection{Example 2: confidence and transport spending}\label{subsec:c3-quick-check}
+Use the same known $\CtwoSD{\sigma}=\CtwoSD{20}$ and fixed $\CtwoSize{n}=\CtwoSize{100}$, so $\CtwoSE{\mathrm{SE}}=\CtwoSE{2}$ thousand COP. Raising confidence from \CtwoConfidence{90\%} to \CtwoConfidence{99\%} raises $\CtwoCritical{z^*}$ from \CtwoCritical{1.645} to \CtwoCritical{2.576} and the margin from \CtwoMoE{3.290} to \CtwoMoE{5.152} thousand COP. Keeping the centre at \CtwoPoint{60} gives endpoints \CtwoEndpoint{56.710, 63.290} and \CtwoEndpoint{54.848, 65.152}; full widths are \CtwoWidth{6.580} and \CtwoWidth{10.304} thousand COP.
 
-	If the \CtwoSE{standard error} decreases while the \CtwoPoint{point estimate} and \CtwoConfidence{confidence level} are held fixed, what happens to the centre and the \CtwoWidth{full width}? Explain your prediction using the formulas below.
-
-	\secInicio[subsec:c3-quick-check][sec:c3-introduction]
-
-	\clearpage
-
-	\section{Notation reference and practice procedure}
-
-	This section develops the components introduced in the opening guide through detailed notation and practice steps. Here $\CtwoMoE{\mathrm{MoE}}$ denotes the \CtwoMoE{margin of error}; $\CtwoConfidence{C}$ denotes the \CtwoConfidence{confidence level} as a decimal.
-
+\subsection*{Relationships and critical values}
 \begin{gather*}
-\CtwoMoE{\mathrm{MoE}}=\CtwoCritical{z^*}\times\CtwoSE{\mathrm{SE}},\qquad
-\CtwoWidth{\text{full width}}=2\CtwoMoE{\mathrm{MoE}},\\[4pt]
-\text{interval}=\CtwoPoint{\bar{x}}\pm\CtwoMoE{\mathrm{MoE}}
-=[\CtwoPoint{\bar{x}}-\CtwoMoE{\mathrm{MoE}},\CtwoPoint{\bar{x}}+\CtwoMoE{\mathrm{MoE}}].
+\CtwoSE{\mathrm{SE}}(\CtwoSize{n})=\frac{\CtwoSD{\sigma}}{\sqrt{\CtwoSize{n}}},\qquad
+\CtwoMoE{\mathrm{MoE}}(\CtwoSize{n},\CtwoConfidence{C})=
+\CtwoCritical{z^*}(\CtwoConfidence{C})\frac{\CtwoSD{\sigma}}{\sqrt{\CtwoSize{n}}},\\[3pt]
+\CtwoCritical{z^*}(\CtwoConfidence{C})=\Phi^{-1}\!\left(\frac{1+\CtwoConfidence{C}}{2}\right),\qquad
+\text{interval}=\CtwoPoint{\bar{x}}\pm\CtwoMoE{\mathrm{MoE}},\qquad
+\CtwoWidth{W}=2\CtwoMoE{\mathrm{MoE}}.
 \end{gather*}
+$\Phi(z)$ is the fraction of the standard normal distribution to the left of $z$. Its inverse $\Phi^{-1}(p)$ asks which $z$ has fraction $p$ to its left. Thus the two tails outside $\pm z^*$ each have area $(1-C)/2$. You may use this table without evaluating an inverse function.
 
-\subsection{Notation reference}
-\begingroup
-\setlength{\tabcolsep}{4pt}
-\renewcommand{\arraystretch}{1.18}
-\noindent\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{.17\linewidth}>{\raggedright\arraybackslash}p{.17\linewidth}>{\raggedright\arraybackslash}p{.27\linewidth}>{\raggedright\arraybackslash}X@{}}
-\toprule
-Symbol or notation & Concept & Definition & Meaning in the introductory examples \\
-\midrule
-$\CtwoPoint{\bar{x}}$ & \CtwoPoint{Point estimate} & The \CtwoPoint{sample mean}; it estimates the \CtwoMean{population mean} and sets the interval centre. & \textbullet\ \hyperref[subsec:c3-transport-example]{Transport spending}: \CtwoPoint{60} thousand COP is the estimated mean weekly household spending. \\
-\addlinespace
-$\CtwoCritical{z^*}$ & \CtwoCritical{Critical value} & Unitless normal multiplier chosen so the area from $-\CtwoCritical{z^*}$ to $\CtwoCritical{z^*}$ equals $\CtwoConfidence{C}$. & \textbullet\ \hyperref[subsec:c3-quick-check]{Quick check}: fixed \CtwoConfidence{confidence level} keeps $\CtwoCritical{z^*}$ fixed. No numerical value is supplied. \\
-\addlinespace
-$\CtwoSE{\mathrm{SE}}$ & \CtwoSE{Standard error} & Standard deviation of the \CtwoPoint{sample mean} across repeated samples, or its estimate; in the same units as the mean. & \textbullet\ \hyperref[subsec:c3-quick-check]{Quick check}: this is the quantity that decreases; no numerical value is supplied. \\
-\addlinespace
-$\CtwoMoE{\mathrm{MoE}}=\CtwoCritical{z^*}\times\CtwoSE{\mathrm{SE}}$ & \CtwoMoE{Margin of error} & Distance from the point estimate to either endpoint, in the mean's units. Smaller margins give narrower, more precise intervals. & \textbullet\ \hyperref[subsec:c3-transport-example]{Transport spending}: \CtwoMoE{5} thousand COP is subtracted from and added to the estimate. \\
-\addlinespace
-$\CtwoPoint{\bar{x}}-\CtwoMoE{\mathrm{MoE}}$,\par $\CtwoPoint{\bar{x}}+\CtwoMoE{\mathrm{MoE}}$ & \CtwoEndpoint{Endpoints} & Lower and upper bounds of the interval, in the mean's units. & \textbullet\ \hyperref[subsec:c3-transport-example]{Transport spending}: the lower bound is \CtwoEndpoint{55} and the upper bound is \CtwoEndpoint{65} thousand COP. \\
-\addlinespace
-$2\CtwoMoE{\mathrm{MoE}}$ & \CtwoWidth{Full width} & Distance between endpoints: $2\CtwoCritical{z^*}\times\CtwoSE{\mathrm{SE}}$, in the mean's units. & \textbullet\ \hyperref[subsec:c3-transport-example]{Transport spending}: the span from \CtwoEndpoint{55} to \CtwoEndpoint{65} thousand COP is twice the \CtwoMoE{margin of error}. \\
-\addlinespace
-$\CtwoConfidence{C}$ & \CtwoConfidence{Confidence level} & Nominal long-run coverage under the sampling and normal-model assumptions; expressed here as a decimal central normal area. & \textbullet\ \hyperref[subsec:c3-quick-check]{Quick check}: the level is held fixed; no numerical level is specified. \\
-\bottomrule
-\end{tabularx}
-\endgroup
+\begin{center}\small
+\begin{tabular}{@{}lrrrrr@{}}\toprule
+\CtwoConfidence{Confidence (\%)}&\CtwoConfidence{80}&\CtwoConfidence{85}&\CtwoConfidence{90}&\CtwoConfidence{92}&\CtwoConfidence{95}\\
+\CtwoCritical{Approx. $z^*$}&\CtwoCritical{1.282}&\CtwoCritical{1.440}&\CtwoCritical{1.645}&\CtwoCritical{1.751}&\CtwoCritical{1.960}\\\midrule
+\CtwoConfidence{Confidence (\%)}&\CtwoConfidence{96}&\CtwoConfidence{97}&\CtwoConfidence{98}&\CtwoConfidence{99}&\CtwoConfidence{99.9}\\
+\CtwoCritical{Approx. $z^*$}&\CtwoCritical{2.054}&\CtwoCritical{2.170}&\CtwoCritical{2.326}&\CtwoCritical{2.576}&\CtwoCritical{3.291}\\\bottomrule
+\end{tabular}\end{center}
+\textbf{Rounding policy.} Use the supplied three-decimal critical values consistently for numerical decisions, retain unrounded square roots and intermediate results, and report calculated SE, margins, endpoints and widths to three decimals in the stated monetary unit (exact values may omit trailing zeros). Sample sizes are integers and required minima round upward. Use decimal $C$ in formulas (95\% means 0.95), but percentage labels on confidence axes.
+\secInicio[subsec:c3-quick-check][sec:c3-introduction]
+\clearpage
+\section{Notation Reference and Practice Procedure}\label{sec:notation-and-procedure}
+\subsection{Notation reference}\label{tab:notation-reference}
+\begingroup\small\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.25}
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{.16\linewidth}>{\raggedright\arraybackslash}p{.20\linewidth}>{\raggedright\arraybackslash}p{.26\linewidth}>{\raggedright\arraybackslash}p{.31\linewidth}@{}}
+\toprule Symbol or notation & Concept & Definition & Meaning in the introductory examples\\\midrule\endfirsthead
+\toprule Symbol or notation & Concept & Definition & Meaning in the introductory examples\\\midrule\endhead
+$\CtwoSize{n}$ & \CtwoSize{Sample size} & Positive integer count of observations. & \textbullet\ \hyperref[subsec:c3-transport-example]{Example 1}: \CtwoSize{100} or \CtwoSize{400} households.\\
+$\CtwoSD{\sigma}$ & \CtwoSD{Population SD} & Known SD of individual observations; same units as the mean. & \textbullet\ \hyperref[subsec:c3-transport-example]{Example 1}: \CtwoSD{20} thousand COP of household variability.\\
+$\CtwoSE{\mathrm{SE}}$ & \CtwoSE{Standard error} & SD of sample means across repeated samples: $\CtwoSD{\sigma}/\sqrt{\CtwoSize{n}}$. & \textbullet\ \hyperref[subsec:c3-transport-example]{Example 1}: \CtwoSE{2} becomes \CtwoSE{1} thousand COP.\\
+$\CtwoConfidence{C}$ & \CtwoConfidence{Confidence level} & Procedure's nominal long-run coverage under the model; $0<C<1$. & \textbullet\ \hyperref[subsec:c3-quick-check]{Example 2}: \CtwoConfidence{0.90} becomes \CtwoConfidence{0.99}.\\
+$\CtwoCritical{z^*}$ & \CtwoCritical{Critical value} & Positive, unitless normal cutoff with central area $\CtwoConfidence{C}$. & \textbullet\ \hyperref[subsec:c3-quick-check]{Example 2}: \CtwoCritical{1.645} becomes \CtwoCritical{2.576}.\\
+$\CtwoMoE{\mathrm{MoE}}$ & \CtwoMoE{Margin of error} & $\CtwoCritical{z^*}\times\CtwoSE{\mathrm{SE}}$; distance from centre to bound. & \textbullet\ \hyperref[subsec:c3-quick-check]{Example 2}: \CtwoMoE{3.290} or \CtwoMoE{5.152} thousand COP.\\
+$\CtwoPoint{\bar{x}}$ & \CtwoPoint{Point estimate} & Sample mean estimating the fixed population mean $\CtwoMean{\mu}$. & \textbullet\ \hyperref[subsec:c3-transport-example]{Example 1}: fixed \CtwoPoint{60} thousand COP centre.\\
+$\CtwoEndpoint{L},\ \CtwoEndpoint{U}$ & \CtwoEndpoint{Endpoints} & $\CtwoEndpoint{L}=\CtwoPoint{\bar{x}}-\CtwoMoE{\mathrm{MoE}}$; $\CtwoEndpoint{U}=\CtwoPoint{\bar{x}}+\CtwoMoE{\mathrm{MoE}}$. & \textbullet\ \hyperref[subsec:c3-quick-check]{Example 2}: \CtwoEndpoint{56.710, 63.290} thousand COP at \CtwoConfidence{90\%}.\\
+$\CtwoWidth{W}$ & \CtwoWidth{Full width} & $\CtwoEndpoint{U}-\CtwoEndpoint{L}=2\CtwoMoE{\mathrm{MoE}}$; same units as the mean. & \textbullet\ \hyperref[subsec:c3-quick-check]{Example 2}: \CtwoWidth{6.580} becomes \CtwoWidth{10.304} thousand COP.\\
+$\Phi,\ \Phi^{-1}$ & Normal probability and inverse & $\Phi(z)=P(Z\le z)$ for standard normal $Z$; inverse returns the cutoff. & \textbullet\ \hyperref[subsec:c3-quick-check]{Example 2}: higher central area requires a larger cutoff.\\
+\bottomrule\end{longtable}\endgroup
+\secInicio[][sec:c3-introduction]
+\clearpage
+\subsection{Reusable graphing procedure}
+These steps guide every investigation; they are not extra tasks in a problem.
+\begin{enumerate}[leftmargin=*,itemsep=7pt]
+\item Identify the population mean, units and model assumptions. Record what varies and what stays fixed. Distinguish individual variability $\CtwoSD{\sigma}$ from uncertainty in the mean $\CtwoSE{\mathrm{SE}}$.
+\item For varying $\CtwoSize{n}$ use $\CtwoSE{\mathrm{SE}}=\CtwoSD{\sigma}/\sqrt{\CtwoSize{n}}$ and $\CtwoMoE{\mathrm{MoE}}=\CtwoCritical{z^*}\CtwoSE{\mathrm{SE}}$. For varying $\CtwoConfidence{C}$, keep SE fixed and choose $\CtwoCritical{z^*}$ from the table.
+\item Calculate without premature rounding. Organize a supporting table of $n$, SE and MoE, or $C$, $z^*$ and MoE. A row supplies coordinates for all three relevant graphs.
+\item \textbf{Axis convention: A vs B always means A vertically and B horizontally.} Label both axes, with units or \% where appropriate. Select numerical domains and scales that show every point; the confidence range 80--100\% keeps 99\% and 99.9\% distinguishable. Use real spacing, not category positions.
+\item Plot accurate coordinates. In these solutions, filled circles are values from the tables; smooth solid curves use the stated model. Sample size is integer: the continuous $n$ curve is only a visual guide between feasible integer values.
+\item Check shape and context. At fixed confidence, MoE vs SE is a line through the origin of slope $z^*$. At fixed SE, $z^*$ vs MoE is a line through the origin of slope $1/\mathrm{SE}$. Confidence vs either is nonlinear:
+\[
+\CtwoConfidence{C}=2\Phi(\CtwoCritical{z^*})-1,
+\qquad \CtwoConfidence{C}=2\Phi(\CtwoMoE{\mathrm{MoE}}/\CtwoSE{\mathrm{SE}})-1.
+\]
+These smooth confidence curves use the normal-distribution relationship, not straight joins of rounded table entries. Points can lie very slightly off the curve because the supplied $z^*$ values are rounded. On a percentage vertical axis the plotted value is $100C$.
+\end{enumerate}
+\textbf{Reading coverage.} A 95\% procedure captures the fixed population mean in about 95\% of repeated samples under its assumptions. This is nominal long-run coverage, not a probability assigned to the fixed mean after an interval has been observed. Smaller width means greater precision; coverage and precision are different properties.
+\secInicio[][sec:notation-and-procedure]
+\clearpage
+\section{General Worked Problems}\label{sec:general-worked}
+\SectionProblemsTableOfContents{
+\SectionProblemLink{prob:c3-1}{Household grocery spending (C3)}\\
+\SectionProblemLink{prob:c3-2}{Two estimates of average freight cost (C3)}}
+\subsection{Household grocery spending (C3)}\label{prob:c3-1}
+An analyst estimates the mean weekly grocery bill for households in a district.
+The known population SD is $\sigma=30$ thousand COP; assume the sampling and normal-model conditions in the Introduction. For controlled comparisons hold the sample mean at $\bar{x}=84$ thousand COP.
+The baseline $n=100$ gives $\mathrm{SE}=30/\sqrt{100}=3$ thousand COP.
+\QuestionsTasks[sec:general-worked]{
+{3}/{sol:c3-1-a}/{\textbf{Task 1 --- Sample-size graphs.} Hold $\sigma=30$ thousand COP and confidence at 95\% ($z^*=1.960$). Investigate integer sample sizes from 25 to 1600, using at least these seven values: 25, 50, 100, 200, 400, 900, 1600. Calculate SE and MoE in a supporting table, then construct SE vs $n$, MoE vs $n$, and MoE vs SE with labeled numerical axes and units.},
+{3}/{sol:c3-1-b}/{\textbf{Task 2 --- Confidence graphs.} Fix $n=100$ and $\sigma=30$ thousand COP. For all ten supplied confidence levels (80\%, 85\%, 90\%, 92\%, 95\%, 96\%, 97\%, 98\%, 99\%, 99.9\%), calculate a supporting table containing $C$, $z^*$ and MoE. Construct confidence level vs MoE, critical value vs MoE, and confidence level vs critical value. Use percentages on confidence axes and actual numerical spacing; distinguish plotted table points from theoretical curves.}
+}
+\clearpage
+\subsubsection*{Worked solution: Task 1 --- Sample-size graphs}\label{sol:c3-1-a}
+The \CtwoSD{population SD} is $\CtwoSD{30}$ thousand COP; \CtwoConfidence{95\%} fixes $\CtwoCritical{z^*}=\CtwoCritical{1.960}$. Therefore
+\[
+\CtwoSE{\mathrm{SE}}(\CtwoSize{n})=\frac{\CtwoSD{30}}{\sqrt{\CtwoSize{n}}},\qquad
+\CtwoMoE{\mathrm{MoE}}(\CtwoSize{n})=\CtwoCritical{1.960}\frac{\CtwoSD{30}}{\sqrt{\CtwoSize{n}}}.
+\]
+For example, at $\CtwoSize{n}=\CtwoSize{400}$, $\CtwoSE{\mathrm{SE}}=\CtwoSD{30}/\sqrt{\CtwoSize{400}}=\CtwoSE{1.500}$ and $\CtwoMoE{\mathrm{MoE}}=\CtwoCritical{1.960}(\CtwoSE{1.500})=\CtwoMoE{2.940}$ thousand COP. Every row uses the same formulas, retaining the square root until the final rounding.
+\begin{center}\begin{tabular}{@{}rrr@{}}\toprule
+$\CtwoSize{n}$ & $\CtwoSE{\mathrm{SE}}$ (thousand COP) & $\CtwoMoE{\mathrm{MoE}}$ (thousand COP)\\\midrule
+\CthreeSampleRow{25}{6.000}{11.760}
+\CthreeSampleRow{50}{4.243}{8.316}
+\CthreeSampleRow{100}{3.000}{5.880}
+\CthreeSampleRow{200}{2.121}{4.158}
+\CthreeSampleRow{400}{1.500}{2.940}
+\CthreeSampleRow{900}{1.000}{1.960}
+\CthreeSampleRow{1600}{0.750}{1.470}
+\bottomrule\end{tabular}\end{center}
+The baseline $\CtwoSize{100}$, $\CtwoSize{400}$ and $\CtwoSize{1600}$ rows give the $n$, $4n$ and $16n$ comparisons. Circles show the tabulated sample sizes; the curve guides the eye between integer designs.
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[c3axis,title={Standard error vs sample size},xlabel={$\CtwoSize{n}$ (sampled units)},ylabel={$\CtwoSE{\mathrm{SE}}$ (thousand COP)},xmin=0,xmax=1648,ymin=0,ymax=6.78,xtick={0,100,400,800,1600}]
+\addplot[CthreeSELine,domain=25:1600,samples=160] {30/sqrt(x)};
+\addplot[only marks,mark=*,mark size=2.2pt,CthreeSELine] coordinates {(25.0000000,6.0000000) (50.0000000,4.2426407) (100.0000000,3.0000000) (200.0000000,2.1213203) (400.0000000,1.5000000) (900.0000000,1.0000000) (1600.0000000,0.7500000)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
 
-		\subsection{Practice procedure}
-		\begin{enumerate}[nosep,leftmargin=*]
-			\item Identify the target mean, \CtwoPoint{sample mean}, \CtwoConfidence{confidence level}, matching $\CtwoCritical{z^*}$ and supplied $\CtwoSE{\mathrm{SE}}$.
-			\item Find $\CtwoMoE{\mathrm{MoE}}$. Subtract and add $\CtwoMoE{\mathrm{MoE}}$ to find the \CtwoEndpoint{endpoints}. Check that the estimate, $\CtwoSE{\mathrm{SE}}$, $\CtwoMoE{\mathrm{MoE}}$, \CtwoEndpoint{endpoints} and \CtwoWidth{width} share the same units.
-			\item Compare estimates for the centres, products $\CtwoCritical{z^*}\CtwoSE{\mathrm{SE}}$ for the \CtwoMoE{margins of error}; the \CtwoWidth{full widths} are $2\CtwoCritical{z^*}\CtwoSE{\mathrm{SE}}$, so comparing these products also compares full widths, and \CtwoConfidence{confidence levels} for nominal long-run coverage. Under the sampling and normal-model assumptions, a \CtwoConfidence{95\%} procedure captures the fixed \CtwoMean{population mean} in about \CtwoConfidence{95\%} of repeated samples.
-		\end{enumerate}
+\secInicio[prob:c3-1][sec:general-worked]
+\clearpage
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[c3axis,title={Margin of error vs sample size},xlabel={$\CtwoSize{n}$ (sampled units)},ylabel={$\CtwoMoE{\mathrm{MoE}}$ (thousand COP)},xmin=0,xmax=1648,ymin=0,ymax=13.2888,xtick={0,100,400,800,1600}]
+\addplot[CthreeMoELine,domain=25:1600,samples=160] {1.960*30/sqrt(x)};
+\addplot[only marks,mark=*,mark size=2.2pt,CthreeMoELine] coordinates {(25.0000000,11.7600000) (50.0000000,8.3155757) (100.0000000,5.8800000) (200.0000000,4.1577879) (400.0000000,2.9400000) (900.0000000,1.9600000) (1600.0000000,1.4700000)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
 
-	\clearpage
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[c3axis,title={Margin of error vs standard error},xlabel={$\CtwoSE{\mathrm{SE}}$ (thousand COP)},ylabel={$\CtwoMoE{\mathrm{MoE}}$ (thousand COP)},xmin=0,xmax=6.6,ymin=0,ymax=13.2888]
+\addplot[CthreeMoELine,domain=0:6.42,samples=160] {1.960*x};
+\addplot[only marks,mark=*,mark size=2.2pt,CthreeMoELine] coordinates {(6.0000000,11.7600000) (4.2426407,8.3155757) (3.0000000,5.8800000) (2.1213203,4.1577879) (1.5000000,2.9400000) (1.0000000,1.9600000) (0.7500000,1.4700000)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
 
-	\section{General Worked Problems}
-	\label{sec:general-worked}
+The first two graphs fall and flatten; the third has slope $\CtwoCritical{1.960}$. Both axes in the third graph use thousand COP, so its slope is unitless. The origin belongs to the linear relationship; it is approached as $n$ grows, not reached by a finite sample.
+\secInicio[prob:c3-1][sec:general-worked]
+\clearpage
+\subsubsection*{Worked solution: Task 2 --- Confidence graphs}\label{sol:c3-1-b}
+Now $\CtwoSize{n}=\CtwoSize{100}$ and $\CtwoSD{\sigma}=\CtwoSD{30}$ thousand COP are fixed, giving $\CtwoSE{\mathrm{SE}}=\CtwoSE{3}$ thousand COP. For each confidence setting,
+\[
+\CtwoMoE{\mathrm{MoE}}=\CtwoCritical{z^*}\times\CtwoSE{3}.
+\]
+For example, $\CtwoConfidence{C}=\CtwoConfidence{0.99}$ uses $\CtwoCritical{z^*}=\CtwoCritical{2.576}$, so $\CtwoMoE{\mathrm{MoE}}=\CtwoCritical{2.576}(\CtwoSE{3})=\CtwoMoE{7.728}$ thousand COP.
+\begin{center}\begin{tabular}{@{}rrr@{}}\toprule
+$\CtwoConfidence{C}$ (decimal; graph as \%) & $\CtwoCritical{z^*}$ & $\CtwoMoE{\mathrm{MoE}}$ (thousand COP)\\\midrule
+\CthreeConfidenceRow{0.800}{1.282}{3.846}
+\CthreeConfidenceRow{0.850}{1.440}{4.320}
+\CthreeConfidenceRow{0.900}{1.645}{4.935}
+\CthreeConfidenceRow{0.920}{1.751}{5.253}
+\CthreeConfidenceRow{0.950}{1.960}{5.880}
+\CthreeConfidenceRow{0.960}{2.054}{6.162}
+\CthreeConfidenceRow{0.970}{2.170}{6.510}
+\CthreeConfidenceRow{0.980}{2.326}{6.978}
+\CthreeConfidenceRow{0.990}{2.576}{7.728}
+\CthreeConfidenceRow{0.999}{3.291}{9.873}
+\bottomrule\end{tabular}\end{center}
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[c3axis,title={Confidence level vs margin of error},xlabel={$\CtwoMoE{\mathrm{MoE}}$ (thousand COP)},ylabel={$\CtwoConfidence{C}$ (\%)},xmin=3.54,xmax=10.26,ymin=79,ymax=100.7,ytick={80,85,90,95,99.9},yticklabels={80,85,90,95,99.9}]
+\addplot[CthreeConfidenceLine] coordinates {(3.6000000,76.9860660) (3.6366667,77.4572673) (3.6733333,77.9215388) (3.7100000,78.3789141) (3.7466667,78.8294284) (3.7833333,79.2731182) (3.8200000,79.7100217) (3.8566667,80.1401784) (3.8933333,80.5636292) (3.9300000,80.9804164) (3.9666667,81.3905837) (4.0033333,81.7941757) (4.0400000,82.1912388) (4.0766667,82.5818200) (4.1133333,82.9659678) (4.1500000,83.3437318) (4.1866667,83.7151626) (4.2233333,84.0803117) (4.2600000,84.4392319) (4.2966667,84.7919766) (4.3333333,85.1386004) (4.3700000,85.4791585) (4.4066667,85.8137071) (4.4433333,86.1423032) (4.4800000,86.4650046) (4.5166667,86.7818695) (4.5533333,87.0929571) (4.5900000,87.3983271) (4.6266667,87.6980398) (4.6633333,87.9921561) (4.7000000,88.2807374) (4.7366667,88.5638455) (4.7733333,88.8415428) (4.8100000,89.1138919) (4.8466667,89.3809560) (4.8833333,89.6427986) (4.9200000,89.8994833) (4.9566667,90.1510742) (4.9933333,90.3976355) (5.0300000,90.6392318) (5.0666667,90.8759275) (5.1033333,91.1077875) (5.1400000,91.3348767) (5.1766667,91.5572599) (5.2133333,91.7750022) (5.2500000,91.9881686) (5.2866667,92.1968241) (5.3233333,92.4010336) (5.3600000,92.6008620) (5.3966667,92.7963741) (5.4333333,92.9876346) (5.4700000,93.1747079) (5.5066667,93.3576585) (5.5433333,93.5365503) (5.5800000,93.7114474) (5.6166667,93.8824134) (5.6533333,94.0495117) (5.6900000,94.2128054) (5.7266667,94.3723573) (5.7633333,94.5282299) (5.8000000,94.6804852) (5.8366667,94.8291850) (5.8733333,94.9743906) (5.9100000,95.1161629) (5.9466667,95.2545625) (5.9833333,95.3896494) (6.0200000,95.5214832) (6.0566667,95.6501231) (6.0933333,95.7756275) (6.1300000,95.8980548) (6.1666667,96.0174625) (6.2033333,96.1339076) (6.2400000,96.2474467) (6.2766667,96.3581358) (6.3133333,96.4660304) (6.3500000,96.5711852) (6.3866667,96.6736546) (6.4233333,96.7734921) (6.4600000,96.8707509) (6.4966667,96.9654834) (6.5333333,97.0577415) (6.5700000,97.1475763) (6.6066667,97.2350385) (6.6433333,97.3201780) (6.6800000,97.4030440) (6.7166667,97.4836853) (6.7533333,97.5621499) (6.7900000,97.6384851) (6.8266667,97.7127376) (6.8633333,97.7849534) (6.9000000,97.8551780) (6.9366667,97.9234560) (6.9733333,97.9898314) (7.0100000,98.0543477) (7.0466667,98.1170475) (7.0833333,98.1779729) (7.1200000,98.2371653) (7.1566667,98.2946654) (7.1933333,98.3505131) (7.2300000,98.4047479) (7.2666667,98.4574086) (7.3033333,98.5085331) (7.3400000,98.5581588) (7.3766667,98.6063226) (7.4133333,98.6530604) (7.4500000,98.6984077) (7.4866667,98.7423994) (7.5233333,98.7850695) (7.5600000,98.8264517) (7.5966667,98.8665787) (7.6333333,98.9054828) (7.6700000,98.9431957) (7.7066667,98.9797484) (7.7433333,99.0151712) (7.7800000,99.0494940) (7.8166667,99.0827460) (7.8533333,99.1149558) (7.8900000,99.1461513) (7.9266667,99.1763600) (7.9633333,99.2056088) (8.0000000,99.2339239) (8.0366667,99.2613310) (8.0733333,99.2878553) (8.1100000,99.3135213) (8.1466667,99.3383533) (8.1833333,99.3623745) (8.2200000,99.3856082) (8.2566667,99.4080766) (8.2933333,99.4298018) (8.3300000,99.4508053) (8.3666667,99.4711079) (8.4033333,99.4907302) (8.4400000,99.5096920) (8.4766667,99.5280130) (8.5133333,99.5457120) (8.5500000,99.5628077) (8.5866667,99.5793182) (8.6233333,99.5952610) (8.6600000,99.6106535) (8.6966667,99.6255124) (8.7333333,99.6398541) (8.7700000,99.6536944) (8.8066667,99.6670490) (8.8433333,99.6799329) (8.8800000,99.6923610) (8.9166667,99.7043474) (8.9533333,99.7159062) (8.9900000,99.7270510) (9.0266667,99.7377950) (9.0633333,99.7481511) (9.1000000,99.7581317) (9.1366667,99.7677491) (9.1733333,99.7770151) (9.2100000,99.7859412) (9.2466667,99.7945386) (9.2833333,99.8028181) (9.3200000,99.8107904) (9.3566667,99.8184656) (9.3933333,99.8258537) (9.4300000,99.8329645) (9.4666667,99.8398072) (9.5033333,99.8463911) (9.5400000,99.8527249) (9.5766667,99.8588173) (9.6133333,99.8646766) (9.6500000,99.8703108) (9.6866667,99.8757278) (9.7233333,99.8809352) (9.7600000,99.8859404) (9.7966667,99.8907504) (9.8333333,99.8953723) (9.8700000,99.8998126) (9.9066667,99.9040780) (9.9433333,99.9081746) (9.9800000,99.9121086) (10.0166667,99.9158858) (10.0533333,99.9195120) (10.0900000,99.9229927) (10.1266667,99.9263332) (10.1633333,99.9295387) (10.2000000,99.9326141)};
+\addplot[only marks,mark=*,mark size=2.2pt,CthreeConfidenceLine] coordinates {(3.8460000,80.0000000) (4.3200000,85.0000000) (4.9350000,90.0000000) (5.2530000,92.0000000) (5.8800000,95.0000000) (6.1620000,96.0000000) (6.5100000,97.0000000) (6.9780000,98.0000000) (7.7280000,99.0000000) (9.8730000,99.9000000)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
 
-	\SectionProblemsTableOfContents{
-		\SectionProblemLink{prob:c3-1}{Household grocery spending (C3)} \\
-		\SectionProblemLink{prob:c3-2}{Two estimates of average freight cost (C3)}
-	}
+The horizontal coordinates are margins, not confidence categories. The 99.9\% point is at the far right; circles use rounded cutoffs and the smooth curve uses the normal model.
+\secInicio[prob:c3-1][sec:general-worked]
+\clearpage
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[c3axis,title={Critical value vs margin of error},xlabel={$\CtwoMoE{\mathrm{MoE}}$ (thousand COP)},ylabel={$\CtwoCritical{z^*}$ (unitless)},xmin=0,xmax=10.5,ymin=0,ymax=3.6]
+\addplot[CthreeCriticalLine,domain=0:10.2,samples=160] {x/3};
+\addplot[only marks,mark=*,mark size=2.2pt,CthreeCriticalLine] coordinates {(3.8460000,1.2820000) (4.3200000,1.4400000) (4.9350000,1.6450000) (5.2530000,1.7510000) (5.8800000,1.9600000) (6.1620000,2.0540000) (6.5100000,2.1700000) (6.9780000,2.3260000) (7.7280000,2.5760000) (9.8730000,3.2910000)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
 
-	\subsection{Household grocery spending (C3)}
-	\label{prob:c3-1}
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[c3axis,title={Confidence level vs critical value},xlabel={$\CtwoCritical{z^*}$ (unitless)},ylabel={$\CtwoConfidence{C}$ (\%)},xmin=1.18,xmax=3.42,ymin=79,ymax=100.7,ytick={80,85,90,95,99.9},yticklabels={80,85,90,95,99.9}]
+\addplot[CthreeConfidenceLine] coordinates {(1.2000000,76.9860660) (1.2122222,77.4572673) (1.2244444,77.9215388) (1.2366667,78.3789141) (1.2488889,78.8294284) (1.2611111,79.2731182) (1.2733333,79.7100217) (1.2855556,80.1401784) (1.2977778,80.5636292) (1.3100000,80.9804164) (1.3222222,81.3905837) (1.3344444,81.7941757) (1.3466667,82.1912388) (1.3588889,82.5818200) (1.3711111,82.9659678) (1.3833333,83.3437318) (1.3955556,83.7151626) (1.4077778,84.0803117) (1.4200000,84.4392319) (1.4322222,84.7919766) (1.4444444,85.1386004) (1.4566667,85.4791585) (1.4688889,85.8137071) (1.4811111,86.1423032) (1.4933333,86.4650046) (1.5055556,86.7818695) (1.5177778,87.0929571) (1.5300000,87.3983271) (1.5422222,87.6980398) (1.5544444,87.9921561) (1.5666667,88.2807374) (1.5788889,88.5638455) (1.5911111,88.8415428) (1.6033333,89.1138919) (1.6155556,89.3809560) (1.6277778,89.6427986) (1.6400000,89.8994833) (1.6522222,90.1510742) (1.6644444,90.3976355) (1.6766667,90.6392318) (1.6888889,90.8759275) (1.7011111,91.1077875) (1.7133333,91.3348767) (1.7255556,91.5572599) (1.7377778,91.7750022) (1.7500000,91.9881686) (1.7622222,92.1968241) (1.7744444,92.4010336) (1.7866667,92.6008620) (1.7988889,92.7963741) (1.8111111,92.9876346) (1.8233333,93.1747079) (1.8355556,93.3576585) (1.8477778,93.5365503) (1.8600000,93.7114474) (1.8722222,93.8824134) (1.8844444,94.0495117) (1.8966667,94.2128054) (1.9088889,94.3723573) (1.9211111,94.5282299) (1.9333333,94.6804852) (1.9455556,94.8291850) (1.9577778,94.9743906) (1.9700000,95.1161629) (1.9822222,95.2545625) (1.9944444,95.3896494) (2.0066667,95.5214832) (2.0188889,95.6501231) (2.0311111,95.7756275) (2.0433333,95.8980548) (2.0555556,96.0174625) (2.0677778,96.1339076) (2.0800000,96.2474467) (2.0922222,96.3581358) (2.1044444,96.4660304) (2.1166667,96.5711852) (2.1288889,96.6736546) (2.1411111,96.7734921) (2.1533333,96.8707509) (2.1655556,96.9654834) (2.1777778,97.0577415) (2.1900000,97.1475763) (2.2022222,97.2350385) (2.2144444,97.3201780) (2.2266667,97.4030440) (2.2388889,97.4836853) (2.2511111,97.5621499) (2.2633333,97.6384851) (2.2755556,97.7127376) (2.2877778,97.7849534) (2.3000000,97.8551780) (2.3122222,97.9234560) (2.3244444,97.9898314) (2.3366667,98.0543477) (2.3488889,98.1170475) (2.3611111,98.1779729) (2.3733333,98.2371653) (2.3855556,98.2946654) (2.3977778,98.3505131) (2.4100000,98.4047479) (2.4222222,98.4574086) (2.4344444,98.5085331) (2.4466667,98.5581588) (2.4588889,98.6063226) (2.4711111,98.6530604) (2.4833333,98.6984077) (2.4955556,98.7423994) (2.5077778,98.7850695) (2.5200000,98.8264517) (2.5322222,98.8665787) (2.5444444,98.9054828) (2.5566667,98.9431957) (2.5688889,98.9797484) (2.5811111,99.0151712) (2.5933333,99.0494940) (2.6055556,99.0827460) (2.6177778,99.1149558) (2.6300000,99.1461513) (2.6422222,99.1763600) (2.6544444,99.2056088) (2.6666667,99.2339239) (2.6788889,99.2613310) (2.6911111,99.2878553) (2.7033333,99.3135213) (2.7155556,99.3383533) (2.7277778,99.3623745) (2.7400000,99.3856082) (2.7522222,99.4080766) (2.7644444,99.4298018) (2.7766667,99.4508053) (2.7888889,99.4711079) (2.8011111,99.4907302) (2.8133333,99.5096920) (2.8255556,99.5280130) (2.8377778,99.5457120) (2.8500000,99.5628077) (2.8622222,99.5793182) (2.8744444,99.5952610) (2.8866667,99.6106535) (2.8988889,99.6255124) (2.9111111,99.6398541) (2.9233333,99.6536944) (2.9355556,99.6670490) (2.9477778,99.6799329) (2.9600000,99.6923610) (2.9722222,99.7043474) (2.9844444,99.7159062) (2.9966667,99.7270510) (3.0088889,99.7377950) (3.0211111,99.7481511) (3.0333333,99.7581317) (3.0455556,99.7677491) (3.0577778,99.7770151) (3.0700000,99.7859412) (3.0822222,99.7945386) (3.0944444,99.8028181) (3.1066667,99.8107904) (3.1188889,99.8184656) (3.1311111,99.8258537) (3.1433333,99.8329645) (3.1555556,99.8398072) (3.1677778,99.8463911) (3.1800000,99.8527249) (3.1922222,99.8588173) (3.2044444,99.8646766) (3.2166667,99.8703108) (3.2288889,99.8757278) (3.2411111,99.8809352) (3.2533333,99.8859404) (3.2655556,99.8907504) (3.2777778,99.8953723) (3.2900000,99.8998126) (3.3022222,99.9040780) (3.3144444,99.9081746) (3.3266667,99.9121086) (3.3388889,99.9158858) (3.3511111,99.9195120) (3.3633333,99.9229927) (3.3755556,99.9263332) (3.3877778,99.9295387) (3.4000000,99.9326141)};
+\addplot[only marks,mark=*,mark size=2.2pt,CthreeConfidenceLine] coordinates {(1.2820000,80.0000000) (1.4400000,85.0000000) (1.6450000,90.0000000) (1.7510000,92.0000000) (1.9600000,95.0000000) (2.0540000,96.0000000) (2.1700000,97.0000000) (2.3260000,98.0000000) (2.5760000,99.0000000) (3.2910000,99.9000000)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
 
-	An analyst estimates the mean weekly grocery bill for households in a district. The random sample mean is 84 thousand COP and the standard error of the sample mean is 3 thousand COP. A two-sided 95\% normal interval uses $z^*=1.96$. A two-sided 90\% interval uses $z^*=1.645$.
+The straight line passes through the origin with slope $1/\CtwoSE{3}$ per thousand COP; confidence follows $100[2\Phi(z^*)-1]$, a nonlinear curve.
+\secInicio[prob:c3-1][sec:general-worked]
+\Needspace{8\baselineskip}
+\subsubsection*{Results in context}
+For weekly grocery spending, at fixed \CtwoConfidence{95\%} confidence, $\CtwoSize{n}=\CtwoSize{100},\CtwoSize{400},\CtwoSize{1600}$ gives SE values \CtwoSE{3.000}, \CtwoSE{1.500}, \CtwoSE{0.750} and margins \CtwoMoE{5.880}, \CtwoMoE{2.940}, \CtwoMoE{1.470} thousand COP. Quadrupling $n$ halves both, with diminishing returns per extra observation. MoE vs SE is a line of slope \CtwoCritical{1.960}. At the fixed centre \CtwoPoint{84}, the $n=100$ interval $[\CtwoEndpoint{78.120},\CtwoEndpoint{89.880}]$ has width \CtwoWidth{11.760} thousand COP; at $n=400$, endpoints move inward to $[\CtwoEndpoint{81.060},\CtwoEndpoint{86.940}]$ and width halves to \CtwoWidth{5.880}. Precision improves with unchanged nominal coverage.
 
-	\QuestionsTasks[sec:general-worked]{
-		{3}/{sol:c3-1-a}/
-		{Write the interval in the form estimate $\pm$ critical value $\times$ standard error. Identify all four components, including the margin of error, and explain what each contributes. Sketch the standard normal curve and mark the central area associated with the critical value.},
-		{3}/{sol:c3-1-b}/
-		{Recalculate the margin of error for 90\% confidence using the same data. Explain what happens to the centre, width and long-run coverage.}
-	}
+At fixed $\CtwoSize{n}=\CtwoSize{100}$, SE instead stays \CtwoSE{3.000} thousand COP. Raising confidence from \CtwoConfidence{90\%} to \CtwoConfidence{99\%} increases $z^*$ from \CtwoCritical{1.645} to \CtwoCritical{2.576} and MoE from \CtwoMoE{4.935} to \CtwoMoE{7.728} thousand COP. Width rises from \CtwoWidth{9.870} to \CtwoWidth{15.456}; endpoints move outward, the centre stays fixed and precision falls. Critical value vs MoE is linear with slope $1/\mathrm{SE}$; both confidence graphs are nonlinear, approaching 100\% increasingly slowly. The gain from 90\% to 99\% is the procedure's nominal long-run coverage of the fixed economic mean under the sampling and model assumptions.
+\secInicio[prob:c3-1][sec:general-worked]
+\clearpage
+\subsection{Two estimates of average freight cost (C3)}\label{prob:c3-2}
+A logistics analyst estimates mean freight cost per container on a route. The original designs A and B have SE values of 8 and 4 USD respectively; they correspond here to samples of 100 and 400 containers from the same population.
+The known population SD is $\sigma=80$ USD; assume the sampling and normal-model conditions in the Introduction. For controlled comparisons hold the sample mean at $\bar{x}=250$ USD.
+The baseline $n=100$ gives $\mathrm{SE}=80/\sqrt{100}=8$ USD.
+\QuestionsTasks[sec:general-worked]{
+{3}/{sol:c3-2-a}/{\textbf{Task 1 --- Sample-size graphs.} Hold $\sigma=80$ USD and confidence at 95\% ($z^*=1.960$). Investigate integer sample sizes from 25 to 1600, using at least these seven values: 25, 50, 100, 200, 400, 900, 1600. Calculate SE and MoE in a supporting table, then construct SE vs $n$, MoE vs $n$, and MoE vs SE with labeled numerical axes and units.},
+{3}/{sol:c3-2-b}/{\textbf{Task 2 --- Confidence graphs.} Fix $n=100$ and $\sigma=80$ USD. For all ten supplied confidence levels (80\%, 85\%, 90\%, 92\%, 95\%, 96\%, 97\%, 98\%, 99\%, 99.9\%), calculate a supporting table containing $C$, $z^*$ and MoE. Construct confidence level vs MoE, critical value vs MoE, and confidence level vs critical value. Use percentages on confidence axes and actual numerical spacing; distinguish plotted table points from theoretical curves.}
+}
+\clearpage
+\subsubsection*{Worked solution: Task 1 --- Sample-size graphs}\label{sol:c3-2-a}
+The \CtwoSD{population SD} is $\CtwoSD{80}$ USD; \CtwoConfidence{95\%} fixes $\CtwoCritical{z^*}=\CtwoCritical{1.960}$. Therefore
+\[
+\CtwoSE{\mathrm{SE}}(\CtwoSize{n})=\frac{\CtwoSD{80}}{\sqrt{\CtwoSize{n}}},\qquad
+\CtwoMoE{\mathrm{MoE}}(\CtwoSize{n})=\CtwoCritical{1.960}\frac{\CtwoSD{80}}{\sqrt{\CtwoSize{n}}}.
+\]
+For example, at $\CtwoSize{n}=\CtwoSize{400}$, $\CtwoSE{\mathrm{SE}}=\CtwoSD{80}/\sqrt{\CtwoSize{400}}=\CtwoSE{4.000}$ and $\CtwoMoE{\mathrm{MoE}}=\CtwoCritical{1.960}(\CtwoSE{4.000})=\CtwoMoE{7.840}$ USD. Every row uses the same formulas, retaining the square root until the final rounding.
+\begin{center}\begin{tabular}{@{}rrr@{}}\toprule
+$\CtwoSize{n}$ & $\CtwoSE{\mathrm{SE}}$ (USD) & $\CtwoMoE{\mathrm{MoE}}$ (USD)\\\midrule
+\CthreeSampleRow{25}{16.000}{31.360}
+\CthreeSampleRow{50}{11.314}{22.175}
+\CthreeSampleRow{100}{8.000}{15.680}
+\CthreeSampleRow{200}{5.657}{11.087}
+\CthreeSampleRow{400}{4.000}{7.840}
+\CthreeSampleRow{900}{2.667}{5.227}
+\CthreeSampleRow{1600}{2.000}{3.920}
+\bottomrule\end{tabular}\end{center}
+The baseline $\CtwoSize{100}$, $\CtwoSize{400}$ and $\CtwoSize{1600}$ rows give the $n$, $4n$ and $16n$ comparisons. Circles show the tabulated sample sizes; the curve guides the eye between integer designs.
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[c3axis,title={Standard error vs sample size},xlabel={$\CtwoSize{n}$ (sampled units)},ylabel={$\CtwoSE{\mathrm{SE}}$ (USD)},xmin=0,xmax=1648,ymin=0,ymax=18.08,xtick={0,100,400,800,1600}]
+\addplot[CthreeSELine,domain=25:1600,samples=160] {80/sqrt(x)};
+\addplot[only marks,mark=*,mark size=2.2pt,CthreeSELine] coordinates {(25.0000000,16.0000000) (50.0000000,11.3137085) (100.0000000,8.0000000) (200.0000000,5.6568542) (400.0000000,4.0000000) (900.0000000,2.6666667) (1600.0000000,2.0000000)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
 
-	\Needspace{14\baselineskip}
-	\subsubsection*{C3 -- Identify the components and their roles}
-	\label{sol:c3-1-a}
+\secInicio[prob:c3-2][sec:general-worked]
+\clearpage
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[c3axis,title={Margin of error vs sample size},xlabel={$\CtwoSize{n}$ (sampled units)},ylabel={$\CtwoMoE{\mathrm{MoE}}$ (USD)},xmin=0,xmax=1648,ymin=0,ymax=35.4368,xtick={0,100,400,800,1600}]
+\addplot[CthreeMoELine,domain=25:1600,samples=160] {1.960*80/sqrt(x)};
+\addplot[only marks,mark=*,mark size=2.2pt,CthreeMoELine] coordinates {(25.0000000,31.3600000) (50.0000000,22.1748687) (100.0000000,15.6800000) (200.0000000,11.0874343) (400.0000000,7.8400000) (900.0000000,5.2266667) (1600.0000000,3.9200000)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
 
-	\noindent
-	\begin{minipage}[t]{0.46\linewidth}
-		\vspace{0pt}
-		\centering
-		\begin{tikzpicture}
-			\begin{axis}[width=\linewidth,height=4.5cm,axis lines=left,
-				xmin=-3.6,xmax=3.6,ymin=0,ymax=0.45,
-				xlabel={$z$},ylabel={$\phi(z)$},xtick={-1.96,0,1.96},
-				xticklabels={$-\CtwoCritical{1.96}$,$0$,$\CtwoCritical{1.96}$},ytick=\empty]
-				\addplot[draw=none,fill=CthreeCentralArea,domain=-1.96:1.96,samples=85]
-				{exp(-x^2/2)/sqrt(2*pi)} \closedcycle;
-				\addplot[black,thick,domain=-3.6:3.6,samples=125] {exp(-x^2/2)/sqrt(2*pi)};
-				\addplot[black,dashed] coordinates {(-1.96,0) (-1.96,0.05844)};
-				\addplot[black,dashed] coordinates {(1.96,0) (1.96,0.05844)};
-				\node at (axis cs:0,0.18) {$\CtwoConfidence{0.95}$};
-			\end{axis}
-		\end{tikzpicture}
-	\end{minipage}
-	\hfill
-	\begin{minipage}[t]{0.50\linewidth}
-		\vspace{0pt}
-		The \textbf{\CtwoPoint{point estimate}} of \CtwoPoint{84} thousand COP sets the centre. The \textbf{\CtwoSE{standard error}} of \CtwoSE{3} thousand COP measures how much the \CtwoPoint{sample mean} typically varies across samples. The unitless \textbf{\CtwoCritical{critical value}} $\CtwoCritical{1.96}$ gives a \CtwoConfidence{central area} of about $\CtwoConfidence{0.95}$, with about $0.025$ in each tail.
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[c3axis,title={Margin of error vs standard error},xlabel={$\CtwoSE{\mathrm{SE}}$ (USD)},ylabel={$\CtwoMoE{\mathrm{MoE}}$ (USD)},xmin=0,xmax=17.6,ymin=0,ymax=35.4368]
+\addplot[CthreeMoELine,domain=0:17.12,samples=160] {1.960*x};
+\addplot[only marks,mark=*,mark size=2.2pt,CthreeMoELine] coordinates {(16.0000000,31.3600000) (11.3137085,22.1748687) (8.0000000,15.6800000) (5.6568542,11.0874343) (4.0000000,7.8400000) (2.6666667,5.2266667) (2.0000000,3.9200000)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
 
-		The \textbf{\CtwoMoE{margin of error}} is $\CtwoMoE{\mathrm{MoE}}=\CtwoCritical{1.96}(\CtwoSE{3})=\CtwoMoE{5.88}$ thousand COP, the distance from the centre to each endpoint.
-	\end{minipage}
+The first two graphs fall and flatten; the third has slope $\CtwoCritical{1.960}$. Both axes in the third graph use USD, so its slope is unitless. The origin belongs to the linear relationship; it is approached as $n$ grows, not reached by a finite sample.
+\secInicio[prob:c3-2][sec:general-worked]
+\clearpage
+\subsubsection*{Worked solution: Task 2 --- Confidence graphs}\label{sol:c3-2-b}
+Now $\CtwoSize{n}=\CtwoSize{100}$ and $\CtwoSD{\sigma}=\CtwoSD{80}$ USD are fixed, giving $\CtwoSE{\mathrm{SE}}=\CtwoSE{8}$ USD. For each confidence setting,
+\[
+\CtwoMoE{\mathrm{MoE}}=\CtwoCritical{z^*}\times\CtwoSE{8}.
+\]
+For example, $\CtwoConfidence{C}=\CtwoConfidence{0.99}$ uses $\CtwoCritical{z^*}=\CtwoCritical{2.576}$, so $\CtwoMoE{\mathrm{MoE}}=\CtwoCritical{2.576}(\CtwoSE{8})=\CtwoMoE{20.608}$ USD.
+\begin{center}\begin{tabular}{@{}rrr@{}}\toprule
+$\CtwoConfidence{C}$ (decimal; graph as \%) & $\CtwoCritical{z^*}$ & $\CtwoMoE{\mathrm{MoE}}$ (USD)\\\midrule
+\CthreeConfidenceRow{0.800}{1.282}{10.256}
+\CthreeConfidenceRow{0.850}{1.440}{11.520}
+\CthreeConfidenceRow{0.900}{1.645}{13.160}
+\CthreeConfidenceRow{0.920}{1.751}{14.008}
+\CthreeConfidenceRow{0.950}{1.960}{15.680}
+\CthreeConfidenceRow{0.960}{2.054}{16.432}
+\CthreeConfidenceRow{0.970}{2.170}{17.360}
+\CthreeConfidenceRow{0.980}{2.326}{18.608}
+\CthreeConfidenceRow{0.990}{2.576}{20.608}
+\CthreeConfidenceRow{0.999}{3.291}{26.328}
+\bottomrule\end{tabular}\end{center}
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[c3axis,title={Confidence level vs margin of error},xlabel={$\CtwoMoE{\mathrm{MoE}}$ (USD)},ylabel={$\CtwoConfidence{C}$ (\%)},xmin=9.44,xmax=27.36,ymin=79,ymax=100.7,ytick={80,85,90,95,99.9},yticklabels={80,85,90,95,99.9}]
+\addplot[CthreeConfidenceLine] coordinates {(9.6000000,76.9860660) (9.6977778,77.4572673) (9.7955556,77.9215388) (9.8933333,78.3789141) (9.9911111,78.8294284) (10.0888889,79.2731182) (10.1866667,79.7100217) (10.2844444,80.1401784) (10.3822222,80.5636292) (10.4800000,80.9804164) (10.5777778,81.3905837) (10.6755556,81.7941757) (10.7733333,82.1912388) (10.8711111,82.5818200) (10.9688889,82.9659678) (11.0666667,83.3437318) (11.1644444,83.7151626) (11.2622222,84.0803117) (11.3600000,84.4392319) (11.4577778,84.7919766) (11.5555556,85.1386004) (11.6533333,85.4791585) (11.7511111,85.8137071) (11.8488889,86.1423032) (11.9466667,86.4650046) (12.0444444,86.7818695) (12.1422222,87.0929571) (12.2400000,87.3983271) (12.3377778,87.6980398) (12.4355556,87.9921561) (12.5333333,88.2807374) (12.6311111,88.5638455) (12.7288889,88.8415428) (12.8266667,89.1138919) (12.9244444,89.3809560) (13.0222222,89.6427986) (13.1200000,89.8994833) (13.2177778,90.1510742) (13.3155556,90.3976355) (13.4133333,90.6392318) (13.5111111,90.8759275) (13.6088889,91.1077875) (13.7066667,91.3348767) (13.8044444,91.5572599) (13.9022222,91.7750022) (14.0000000,91.9881686) (14.0977778,92.1968241) (14.1955556,92.4010336) (14.2933333,92.6008620) (14.3911111,92.7963741) (14.4888889,92.9876346) (14.5866667,93.1747079) (14.6844444,93.3576585) (14.7822222,93.5365503) (14.8800000,93.7114474) (14.9777778,93.8824134) (15.0755556,94.0495117) (15.1733333,94.2128054) (15.2711111,94.3723573) (15.3688889,94.5282299) (15.4666667,94.6804852) (15.5644444,94.8291850) (15.6622222,94.9743906) (15.7600000,95.1161629) (15.8577778,95.2545625) (15.9555556,95.3896494) (16.0533333,95.5214832) (16.1511111,95.6501231) (16.2488889,95.7756275) (16.3466667,95.8980548) (16.4444444,96.0174625) (16.5422222,96.1339076) (16.6400000,96.2474467) (16.7377778,96.3581358) (16.8355556,96.4660304) (16.9333333,96.5711852) (17.0311111,96.6736546) (17.1288889,96.7734921) (17.2266667,96.8707509) (17.3244444,96.9654834) (17.4222222,97.0577415) (17.5200000,97.1475763) (17.6177778,97.2350385) (17.7155556,97.3201780) (17.8133333,97.4030440) (17.9111111,97.4836853) (18.0088889,97.5621499) (18.1066667,97.6384851) (18.2044444,97.7127376) (18.3022222,97.7849534) (18.4000000,97.8551780) (18.4977778,97.9234560) (18.5955556,97.9898314) (18.6933333,98.0543477) (18.7911111,98.1170475) (18.8888889,98.1779729) (18.9866667,98.2371653) (19.0844444,98.2946654) (19.1822222,98.3505131) (19.2800000,98.4047479) (19.3777778,98.4574086) (19.4755556,98.5085331) (19.5733333,98.5581588) (19.6711111,98.6063226) (19.7688889,98.6530604) (19.8666667,98.6984077) (19.9644444,98.7423994) (20.0622222,98.7850695) (20.1600000,98.8264517) (20.2577778,98.8665787) (20.3555556,98.9054828) (20.4533333,98.9431957) (20.5511111,98.9797484) (20.6488889,99.0151712) (20.7466667,99.0494940) (20.8444444,99.0827460) (20.9422222,99.1149558) (21.0400000,99.1461513) (21.1377778,99.1763600) (21.2355556,99.2056088) (21.3333333,99.2339239) (21.4311111,99.2613310) (21.5288889,99.2878553) (21.6266667,99.3135213) (21.7244444,99.3383533) (21.8222222,99.3623745) (21.9200000,99.3856082) (22.0177778,99.4080766) (22.1155556,99.4298018) (22.2133333,99.4508053) (22.3111111,99.4711079) (22.4088889,99.4907302) (22.5066667,99.5096920) (22.6044444,99.5280130) (22.7022222,99.5457120) (22.8000000,99.5628077) (22.8977778,99.5793182) (22.9955556,99.5952610) (23.0933333,99.6106535) (23.1911111,99.6255124) (23.2888889,99.6398541) (23.3866667,99.6536944) (23.4844444,99.6670490) (23.5822222,99.6799329) (23.6800000,99.6923610) (23.7777778,99.7043474) (23.8755556,99.7159062) (23.9733333,99.7270510) (24.0711111,99.7377950) (24.1688889,99.7481511) (24.2666667,99.7581317) (24.3644444,99.7677491) (24.4622222,99.7770151) (24.5600000,99.7859412) (24.6577778,99.7945386) (24.7555556,99.8028181) (24.8533333,99.8107904) (24.9511111,99.8184656) (25.0488889,99.8258537) (25.1466667,99.8329645) (25.2444444,99.8398072) (25.3422222,99.8463911) (25.4400000,99.8527249) (25.5377778,99.8588173) (25.6355556,99.8646766) (25.7333333,99.8703108) (25.8311111,99.8757278) (25.9288889,99.8809352) (26.0266667,99.8859404) (26.1244444,99.8907504) (26.2222222,99.8953723) (26.3200000,99.8998126) (26.4177778,99.9040780) (26.5155556,99.9081746) (26.6133333,99.9121086) (26.7111111,99.9158858) (26.8088889,99.9195120) (26.9066667,99.9229927) (27.0044444,99.9263332) (27.1022222,99.9295387) (27.2000000,99.9326141)};
+\addplot[only marks,mark=*,mark size=2.2pt,CthreeConfidenceLine] coordinates {(10.2560000,80.0000000) (11.5200000,85.0000000) (13.1600000,90.0000000) (14.0080000,92.0000000) (15.6800000,95.0000000) (16.4320000,96.0000000) (17.3600000,97.0000000) (18.6080000,98.0000000) (20.6080000,99.0000000) (26.3280000,99.9000000)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
 
-	The \CtwoConfidence{95\%} interval for the district's mean weekly grocery bill is
-	\[
-	\CtwoPoint{84}\pm \CtwoCritical{1.96}(\CtwoSE{3})=[\CtwoPoint{84}-\CtwoMoE{5.88},\;\CtwoPoint{84}+\CtwoMoE{5.88}]=[\CtwoEndpoint{78.12},\;\CtwoEndpoint{89.88}]
-	\quad\text{thousand COP}.
-	\]
+The horizontal coordinates are margins, not confidence categories. The 99.9\% point is at the far right; circles use rounded cutoffs and the smooth curve uses the normal model.
+\secInicio[prob:c3-2][sec:general-worked]
+\clearpage
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[c3axis,title={Critical value vs margin of error},xlabel={$\CtwoMoE{\mathrm{MoE}}$ (USD)},ylabel={$\CtwoCritical{z^*}$ (unitless)},xmin=0,xmax=28,ymin=0,ymax=3.6]
+\addplot[CthreeCriticalLine,domain=0:27.2,samples=160] {x/8};
+\addplot[only marks,mark=*,mark size=2.2pt,CthreeCriticalLine] coordinates {(10.2560000,1.2820000) (11.5200000,1.4400000) (13.1600000,1.6450000) (14.0080000,1.7510000) (15.6800000,1.9600000) (16.4320000,2.0540000) (17.3600000,2.1700000) (18.6080000,2.3260000) (20.6080000,2.5760000) (26.3280000,3.2910000)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
 
-	\secInicio[prob:c3-1][sec:general-worked]
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[c3axis,title={Confidence level vs critical value},xlabel={$\CtwoCritical{z^*}$ (unitless)},ylabel={$\CtwoConfidence{C}$ (\%)},xmin=1.18,xmax=3.42,ymin=79,ymax=100.7,ytick={80,85,90,95,99.9},yticklabels={80,85,90,95,99.9}]
+\addplot[CthreeConfidenceLine] coordinates {(1.2000000,76.9860660) (1.2122222,77.4572673) (1.2244444,77.9215388) (1.2366667,78.3789141) (1.2488889,78.8294284) (1.2611111,79.2731182) (1.2733333,79.7100217) (1.2855556,80.1401784) (1.2977778,80.5636292) (1.3100000,80.9804164) (1.3222222,81.3905837) (1.3344444,81.7941757) (1.3466667,82.1912388) (1.3588889,82.5818200) (1.3711111,82.9659678) (1.3833333,83.3437318) (1.3955556,83.7151626) (1.4077778,84.0803117) (1.4200000,84.4392319) (1.4322222,84.7919766) (1.4444444,85.1386004) (1.4566667,85.4791585) (1.4688889,85.8137071) (1.4811111,86.1423032) (1.4933333,86.4650046) (1.5055556,86.7818695) (1.5177778,87.0929571) (1.5300000,87.3983271) (1.5422222,87.6980398) (1.5544444,87.9921561) (1.5666667,88.2807374) (1.5788889,88.5638455) (1.5911111,88.8415428) (1.6033333,89.1138919) (1.6155556,89.3809560) (1.6277778,89.6427986) (1.6400000,89.8994833) (1.6522222,90.1510742) (1.6644444,90.3976355) (1.6766667,90.6392318) (1.6888889,90.8759275) (1.7011111,91.1077875) (1.7133333,91.3348767) (1.7255556,91.5572599) (1.7377778,91.7750022) (1.7500000,91.9881686) (1.7622222,92.1968241) (1.7744444,92.4010336) (1.7866667,92.6008620) (1.7988889,92.7963741) (1.8111111,92.9876346) (1.8233333,93.1747079) (1.8355556,93.3576585) (1.8477778,93.5365503) (1.8600000,93.7114474) (1.8722222,93.8824134) (1.8844444,94.0495117) (1.8966667,94.2128054) (1.9088889,94.3723573) (1.9211111,94.5282299) (1.9333333,94.6804852) (1.9455556,94.8291850) (1.9577778,94.9743906) (1.9700000,95.1161629) (1.9822222,95.2545625) (1.9944444,95.3896494) (2.0066667,95.5214832) (2.0188889,95.6501231) (2.0311111,95.7756275) (2.0433333,95.8980548) (2.0555556,96.0174625) (2.0677778,96.1339076) (2.0800000,96.2474467) (2.0922222,96.3581358) (2.1044444,96.4660304) (2.1166667,96.5711852) (2.1288889,96.6736546) (2.1411111,96.7734921) (2.1533333,96.8707509) (2.1655556,96.9654834) (2.1777778,97.0577415) (2.1900000,97.1475763) (2.2022222,97.2350385) (2.2144444,97.3201780) (2.2266667,97.4030440) (2.2388889,97.4836853) (2.2511111,97.5621499) (2.2633333,97.6384851) (2.2755556,97.7127376) (2.2877778,97.7849534) (2.3000000,97.8551780) (2.3122222,97.9234560) (2.3244444,97.9898314) (2.3366667,98.0543477) (2.3488889,98.1170475) (2.3611111,98.1779729) (2.3733333,98.2371653) (2.3855556,98.2946654) (2.3977778,98.3505131) (2.4100000,98.4047479) (2.4222222,98.4574086) (2.4344444,98.5085331) (2.4466667,98.5581588) (2.4588889,98.6063226) (2.4711111,98.6530604) (2.4833333,98.6984077) (2.4955556,98.7423994) (2.5077778,98.7850695) (2.5200000,98.8264517) (2.5322222,98.8665787) (2.5444444,98.9054828) (2.5566667,98.9431957) (2.5688889,98.9797484) (2.5811111,99.0151712) (2.5933333,99.0494940) (2.6055556,99.0827460) (2.6177778,99.1149558) (2.6300000,99.1461513) (2.6422222,99.1763600) (2.6544444,99.2056088) (2.6666667,99.2339239) (2.6788889,99.2613310) (2.6911111,99.2878553) (2.7033333,99.3135213) (2.7155556,99.3383533) (2.7277778,99.3623745) (2.7400000,99.3856082) (2.7522222,99.4080766) (2.7644444,99.4298018) (2.7766667,99.4508053) (2.7888889,99.4711079) (2.8011111,99.4907302) (2.8133333,99.5096920) (2.8255556,99.5280130) (2.8377778,99.5457120) (2.8500000,99.5628077) (2.8622222,99.5793182) (2.8744444,99.5952610) (2.8866667,99.6106535) (2.8988889,99.6255124) (2.9111111,99.6398541) (2.9233333,99.6536944) (2.9355556,99.6670490) (2.9477778,99.6799329) (2.9600000,99.6923610) (2.9722222,99.7043474) (2.9844444,99.7159062) (2.9966667,99.7270510) (3.0088889,99.7377950) (3.0211111,99.7481511) (3.0333333,99.7581317) (3.0455556,99.7677491) (3.0577778,99.7770151) (3.0700000,99.7859412) (3.0822222,99.7945386) (3.0944444,99.8028181) (3.1066667,99.8107904) (3.1188889,99.8184656) (3.1311111,99.8258537) (3.1433333,99.8329645) (3.1555556,99.8398072) (3.1677778,99.8463911) (3.1800000,99.8527249) (3.1922222,99.8588173) (3.2044444,99.8646766) (3.2166667,99.8703108) (3.2288889,99.8757278) (3.2411111,99.8809352) (3.2533333,99.8859404) (3.2655556,99.8907504) (3.2777778,99.8953723) (3.2900000,99.8998126) (3.3022222,99.9040780) (3.3144444,99.9081746) (3.3266667,99.9121086) (3.3388889,99.9158858) (3.3511111,99.9195120) (3.3633333,99.9229927) (3.3755556,99.9263332) (3.3877778,99.9295387) (3.4000000,99.9326141)};
+\addplot[only marks,mark=*,mark size=2.2pt,CthreeConfidenceLine] coordinates {(1.2820000,80.0000000) (1.4400000,85.0000000) (1.6450000,90.0000000) (1.7510000,92.0000000) (1.9600000,95.0000000) (2.0540000,96.0000000) (2.1700000,97.0000000) (2.3260000,98.0000000) (2.5760000,99.0000000) (3.2910000,99.9000000)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
 
-	\Needspace{5\baselineskip}
-	\subsubsection*{C3 -- Separate confidence from precision}
-	\label{sol:c3-1-b}
+The straight line passes through the origin with slope $1/\CtwoSE{8}$ per USD; confidence follows $100[2\Phi(z^*)-1]$, a nonlinear curve.
+\secInicio[prob:c3-2][sec:general-worked]
+\Needspace{8\baselineskip}
+\subsubsection*{Results in context}
+For freight cost per container, at fixed \CtwoConfidence{95\%} confidence, $\CtwoSize{n}=\CtwoSize{100},\CtwoSize{400},\CtwoSize{1600}$ gives SE values \CtwoSE{8.000}, \CtwoSE{4.000}, \CtwoSE{2.000} and margins \CtwoMoE{15.680}, \CtwoMoE{7.840}, \CtwoMoE{3.920} USD. Quadrupling $n$ halves both, with diminishing returns per extra observation. MoE vs SE is a line of slope \CtwoCritical{1.960}. At the fixed centre \CtwoPoint{250}, the $n=100$ interval $[\CtwoEndpoint{234.320},\CtwoEndpoint{265.680}]$ has width \CtwoWidth{31.360} USD; at $n=400$, endpoints move inward to $[\CtwoEndpoint{242.160},\CtwoEndpoint{257.840}]$ and width halves to \CtwoWidth{15.680}. Precision improves with unchanged nominal coverage.
 
-	With the same sample, the centre stays at \CtwoPoint{84} thousand COP and $\CtwoSE{\mathrm{SE}}$ stays at \CtwoSE{3} thousand COP. At \CtwoConfidence{90\%} confidence, the smaller \CtwoCritical{critical value} gives $\CtwoMoE{\mathrm{MoE}}=\CtwoCritical{1.645}(\CtwoSE{3})=\CtwoMoE{4.935}$ thousand COP and the interval $\CtwoPoint{84}\pm\CtwoMoE{4.935}=[\CtwoEndpoint{79.065},\,\CtwoEndpoint{88.935}]$ thousand COP. The \CtwoWidth{width} drops from $2(\CtwoMoE{5.88})=\CtwoWidth{11.76}$ to $2(\CtwoMoE{4.935})=\CtwoWidth{9.87}$ thousand COP. The narrower interval gives a more precise estimate of the mean grocery bill, while the procedure's nominal long-run coverage drops from \CtwoConfidence{95\%} to \CtwoConfidence{90\%}.
+At fixed $\CtwoSize{n}=\CtwoSize{100}$, SE instead stays \CtwoSE{8.000} USD. Raising confidence from \CtwoConfidence{90\%} to \CtwoConfidence{99\%} increases $z^*$ from \CtwoCritical{1.645} to \CtwoCritical{2.576} and MoE from \CtwoMoE{13.160} to \CtwoMoE{20.608} USD. Width rises from \CtwoWidth{26.320} to \CtwoWidth{41.216}; endpoints move outward, the centre stays fixed and precision falls. Critical value vs MoE is linear with slope $1/\mathrm{SE}$; both confidence graphs are nonlinear, approaching 100\% increasingly slowly. The gain from 90\% to 99\% is the procedure's nominal long-run coverage of the fixed economic mean under the sampling and model assumptions.
+\secInicio[prob:c3-2][sec:general-worked]
+\clearpage
 
-	\secInicio[prob:c3-1][sec:general-worked]
+\section{Advanced Problems}\label{sec:advanced}
+\SectionProblemsTableOfContents{
+\SectionProblemLink{prob:c3-4}{A. Preserve precision while increasing confidence (C3)}\\
+\SectionProblemLink{prob:c3-3}{B. Monthly electricity costs for small shops (C3)}\\
+\SectionProblemLink{prob:c3-5}{C. Choose a feasible survey design (C3)}}
+\subsection{A. Preserve precision while increasing confidence (C3)}\label{prob:c3-4}
+A district grocery survey uses $n_{\rm old}=100$, known $\sigma=30$ thousand COP and 95\% confidence. The analyst wants 99\% confidence with no increase in margin. Both designs use the normal model and independent random sampling; use the supplied critical values consistently. For comparing endpoints hold $\bar{x}=84$ thousand COP.
+\QuestionsTasks[sec:advanced]{
+{3}/{sol:c3-4}/{Find the minimum integer sample size for the higher-confidence design. Derive a rule comparing the old and new sample sizes, use it to choose the design, and verify minimality by checking the margins at your chosen integer and at the preceding integer.}}
+\subsubsection*{Worked solution: preserve the margin}\label{sol:c3-4}
+For the same known $\CtwoSD{\sigma}$, the requirement is
+\begin{align*}
+\CtwoCritical{z^*_{\rm new}}\frac{\CtwoSD{\sigma}}{\sqrt{\CtwoSize{n_{\rm new}}}}
+&\le \CtwoCritical{z^*_{\rm old}}\frac{\CtwoSD{\sigma}}{\sqrt{\CtwoSize{n_{\rm old}}}},\\
+\sqrt{\frac{\CtwoSize{n_{\rm new}}}{\CtwoSize{n_{\rm old}}}}
+&\ge\frac{\CtwoCritical{z^*_{\rm new}}}{\CtwoCritical{z^*_{\rm old}}},\\
+\CtwoSize{n_{\rm new}}&\ge\CtwoSize{n_{\rm old}}\left(\frac{\CtwoCritical{z^*_{\rm new}}}{\CtwoCritical{z^*_{\rm old}}}\right)^2
+=\CtwoSize{100}\left(\frac{\CtwoCritical{2.576}}{\CtwoCritical{1.960}}\right)^2=172.734694\ldots.
+\end{align*}
+All quantities are positive, so rearranging and squaring preserve the inequality. The squared critical-value ratio is the sample-size multiplier required to offset the confidence increase. Round upward to $\CtwoSize{n_{\rm new}}=\CtwoSize{173}$.
+\secInicio[prob:c3-4][sec:advanced]
+\clearpage
+\subsubsection*{Verification of the minimum integer design}
+\begin{center}\begin{tabular}{@{}lrrrr@{}}\toprule
+Design & $\CtwoSize{n}$ & $\CtwoConfidence{C}$ & $\CtwoSE{\mathrm{SE}}$ & $\CtwoMoE{\mathrm{MoE}}$\\\midrule
+Old & \CtwoSize{100}&\CtwoConfidence{95\%}&\CtwoSE{3.000}&\CtwoMoE{5.880}\\
+Preceding integer & \CtwoSize{172}&\CtwoConfidence{99\%}&\CtwoSE{2.287}&\CtwoMoE{5.893}\\
+Chosen design & \CtwoSize{173}&\CtwoConfidence{99\%}&\CtwoSE{2.281}&\CtwoMoE{5.875}\\\bottomrule
+\end{tabular}\end{center}
+SE and MoE are in thousand COP. Using unrounded intermediate values,
+\[
+\frac{\CtwoCritical{2.576}\times\CtwoSD{30}}{\sqrt{\CtwoSize{173}}}=5.8754896\ldots\le5.880,
+\qquad
+\frac{\CtwoCritical{2.576}\times\CtwoSD{30}}{\sqrt{\CtwoSize{172}}}=5.8925448\ldots>5.880.
+\]
+Margin decreases as $n$ increases, so every smaller integer also fails. The rounded values in the table are for display; the decision uses the full calculations above.
+\subsubsection*{Results in context}
+Sampling \CtwoSize{73} additional households allows nominal coverage to rise from \CtwoConfidence{95\%} to \CtwoConfidence{99\%} without sacrificing precision. The smaller SE offsets the larger critical value. At the fixed \CtwoPoint{84} centre, the new endpoints are \CtwoEndpoint{78.125, 89.875} thousand COP, with width \CtwoWidth{11.751}, compared with \CtwoEndpoint{78.120, 89.880} and width \CtwoWidth{11.760}. Coverage remains a long-run property under the stated model.
+\secInicio[prob:c3-4][sec:advanced]
+\clearpage
+\subsection{B. Monthly electricity costs for small shops (C3)}\label{prob:c3-3}
+A business association estimates the town's mean monthly electricity cost per small shop. Known $\sigma=100$ thousand COP describes individual shops. Design A samples 100 shops at 95\% confidence; design B samples 400 shops at 99\% confidence. Samples are random and independent from a much larger population, and the sample mean is approximately normal. Hold both comparison means at 120 thousand COP.
+\QuestionsTasks[sec:advanced]{
+{3}/{sol:c3-3}/{Investigate which design produces the narrower interval when both sample size and confidence change. Calculate SE, MoE, endpoints and full width for each design. Plot both MoE vs $n$ curves on common numerical axes, mark the designs, and determine the integer sample-size threshold above which the 99\% design beats design A's precision.}}
+\subsubsection*{Worked solution: competing design effects}\label{sol:c3-3}
+The model uses $\CtwoSE{\mathrm{SE}}=\CtwoSD{100}/\sqrt{\CtwoSize{n}}$ thousand COP and $\CtwoMoE{\mathrm{MoE}}=\CtwoCritical{z^*}\CtwoSE{\mathrm{SE}}$. Hence
+\begin{align*}
+\text{A: }\CtwoSE{\mathrm{SE}_A}&=\CtwoSD{100}/\sqrt{\CtwoSize{100}}=\CtwoSE{10},&
+\CtwoMoE{\mathrm{MoE}_A}&=\CtwoCritical{1.960}(\CtwoSE{10})=\CtwoMoE{19.600},\\
+\text{B: }\CtwoSE{\mathrm{SE}_B}&=\CtwoSD{100}/\sqrt{\CtwoSize{400}}=\CtwoSE{5},&
+\CtwoMoE{\mathrm{MoE}_B}&=\CtwoCritical{2.576}(\CtwoSE{5})=\CtwoMoE{12.880}.
+\end{align*}
+\begin{center}\begin{tabular}{@{}lrrr@{}}\toprule
+Design & Lower endpoint & Upper endpoint & Full width\\\midrule
+A & \CtwoEndpoint{100.400}&\CtwoEndpoint{139.600}&\CtwoWidth{39.200}\\
+B & \CtwoEndpoint{107.120}&\CtwoEndpoint{132.880}&\CtwoWidth{25.760}\\\bottomrule
+\end{tabular}\end{center}
+All amounts are thousand COP per shop per month. For example, B's endpoints are $\CtwoPoint{120}\pm\CtwoMoE{12.880}$ and its full width is $2(\CtwoMoE{12.880})=\CtwoWidth{25.760}$.
+The margin ratio separates the opposing effects:
+\[
+\frac{\CtwoMoE{\mathrm{MoE}_B}}{\CtwoMoE{\mathrm{MoE}_A}}
+=\frac{\CtwoCritical{2.576}}{\CtwoCritical{1.960}}\sqrt{\frac{\CtwoSize{100}}{\CtwoSize{400}}}
+=1.314286\ldots\times0.5=0.657143\ldots<1.
+\]
+For any 99\% design to beat A, $2.576(100)/\sqrt{n}<19.600$, or $n>172.734694\ldots$. Thus the first strictly narrower integer design is $\CtwoSize{173}$. At $n=172$ its margin is 19.642; at $n=173$ it is 19.585 thousand COP.
+\secInicio[prob:c3-3][sec:advanced]
+\clearpage
+\subsubsection*{Common graph: competing electricity survey designs}
+\begin{center}\begin{tikzpicture}
+\begin{axis}[c3axis,height=9cm,xmin=75,xmax=450,ymin=0,ymax=32,
+ xlabel={$\CtwoSize{n}$ (shops)},ylabel={$\CtwoMoE{\mathrm{MoE}}$ (thousand COP)},
+ legend style={at={(.98,.98)},anchor=north east,font=\small}]
+\addplot[CthreeMoELine,domain=75:450,samples=160] {196/sqrt(x)};\addlegendentry{95\% curve}
+\addplot[CthreeCriticalLine,dashed,domain=75:450,samples=160] {257.6/sqrt(x)};\addlegendentry{99\% curve}
+\addplot[black,densely dotted,domain=75:450] {19.6};\addlegendentry{A's margin: 19.600}
+\addplot[only marks,mark=*,CthreeMoELine,mark size=3pt] coordinates {(100,19.6)};
+\node[anchor=south west] at (axis cs:100,19.6) {A $(100,19.600)$};
+\addplot[only marks,mark=square*,CthreeCriticalLine,mark size=3pt] coordinates {(400,12.88)};
+\node[anchor=north east] at (axis cs:400,12.88) {B $(400,12.880)$};
+\draw[dotted] (axis cs:172.734694,0)--(axis cs:172.734694,19.6);
+\node[anchor=south west,font=\small] at (axis cs:180,3) {Crossing near $n=172.735$};
+\end{axis}\end{tikzpicture}\end{center}
+At each fixed $n$ the 99\% curve lies above the 95\% curve. B lies farther right, where its 99\% margin is below A's horizontal reference line. Solid and dashed curves are model relationships; the two large markers are the proposed designs.
+\subsubsection*{Results in context}
+B's larger sample halves SE from \CtwoSE{10} to \CtwoSE{5} thousand COP, while its higher confidence raises the multiplier from \CtwoCritical{1.960} to \CtwoCritical{2.576}. The reduction in SE dominates: B's margin is about 65.7\% of A's. At the common \CtwoPoint{120} centre, B's endpoints move inward to \CtwoEndpoint{107.120, 132.880}; width falls from \CtwoWidth{39.200} to \CtwoWidth{25.760} thousand COP. The association gains precision and raises nominal long-run coverage from \CtwoConfidence{95\%} to \CtwoConfidence{99\%} under the sampling and model assumptions. Higher confidence widens intervals when SE is fixed; it need not do so when sample size also increases.
+\secInicio[prob:c3-3][sec:advanced]
+\clearpage
+\subsection{C. Choose a feasible survey design (C3)}\label{prob:c3-5}
+A city estimates mean weekly household spending at local markets. Known population SD is $\sigma=40$ thousand COP. A survey costs 15,000 COP per household, with a sampling-only budget of 6,000,000 COP and no fixed costs. The target is MoE $\le4.500$ thousand COP. Use independent random sampling from a much larger population and the normal model. For displaying intervals, hold the comparison mean at 75 thousand COP.
+\QuestionsTasks[sec:advanced]{
+{3}/{sol:c3-5}/{Determine the highest feasible confidence level among the ten supplied levels and a feasible integer sample size. Use the budget, inequalities and a numerical graph to establish feasibility and show why the next higher listed confidence level cannot meet the target within the budget.}}
+\subsubsection*{Worked solution: confidence under a sampling budget}\label{sol:c3-5}
+The cap is $\CtwoSize{n}\le6{,}000{,}000/15{,}000=\CtwoSize{400}$ households. For each confidence level the smallest possible margin under the cap occurs at $\CtwoSize{n}=\CtwoSize{400}$, where $\CtwoSE{\mathrm{SE}}=\CtwoSD{40}/\sqrt{\CtwoSize{400}}=\CtwoSE{2}$ thousand COP. The target therefore requires
+\[
+\CtwoCritical{z^*}\times\CtwoSE{2}\le\CtwoMoE{4.500}
+\quad\Longleftrightarrow\quad\CtwoCritical{z^*}\le2.250.
+\]
+\begin{center}\begin{tabular}{@{}rrrl@{}}\toprule
+$\CtwoConfidence{C}$ (\%) & $\CtwoCritical{z^*}$ & $\CtwoMoE{\mathrm{MoE}}$ (thousand COP) & Feasible at $n=400$?\\\midrule
+\CtwoConfidence{80}&\CtwoCritical{1.282}&\CtwoMoE{2.564}&Yes\\
+\CtwoConfidence{85}&\CtwoCritical{1.440}&\CtwoMoE{2.880}&Yes\\
+\CtwoConfidence{90}&\CtwoCritical{1.645}&\CtwoMoE{3.290}&Yes\\
+\CtwoConfidence{92}&\CtwoCritical{1.751}&\CtwoMoE{3.502}&Yes\\
+\CtwoConfidence{95}&\CtwoCritical{1.960}&\CtwoMoE{3.920}&Yes\\
+\CtwoConfidence{96}&\CtwoCritical{2.054}&\CtwoMoE{4.108}&Yes\\
+\CtwoConfidence{97}&\CtwoCritical{2.170}&\CtwoMoE{4.340}&Yes\\
+\CtwoConfidence{98}&\CtwoCritical{2.326}&\CtwoMoE{4.652}&No\\
+\CtwoConfidence{99}&\CtwoCritical{2.576}&\CtwoMoE{5.152}&No\\
+\CtwoConfidence{99.9}&\CtwoCritical{3.291}&\CtwoMoE{6.582}&No\\
+\bottomrule\end{tabular}\end{center}
+The largest listed cutoff below 2.250 is $\CtwoCritical{2.170}$, corresponding to \CtwoConfidence{97\%}. At that level the minimum size satisfies
+\[
+\CtwoSize{n}\ge\left(\frac{\CtwoCritical{2.170}\times\CtwoSD{40}}{\CtwoMoE{4.500}}\right)^2
+=372.061235\ldots,
+\quad\text{so }\CtwoSize{n_{\min}}=\CtwoSize{373}.
+\]
+A 373-household survey costs 5,595,000 COP and gives MoE $2.170(40)/\sqrt{373}=4.494334\ldots$ thousand COP; at $n=372$ the margin is $4.500370\ldots$, just above target. A 400-household survey also works, with margin \CtwoMoE{4.340} thousand COP.
+The next listed confidence, \CtwoConfidence{98\%}, needs $n\ge(2.326(40)/4.500)^2=427.478598\ldots$, hence at least \CtwoSize{428} households, costing 6,420,000 COP. Even at the cap its margin is \CtwoMoE{4.652}, so no affordable sample size can meet the target. Still higher levels have larger cutoffs and also fail.
+\secInicio[prob:c3-5][sec:advanced]
+\clearpage
+\subsubsection*{Decision graph at the sample-size cap}
+\begin{center}
+\begin{tikzpicture}
+\begin{axis}[c3axis,title={Confidence level vs best affordable margin},xlabel={$\CtwoMoE{\mathrm{MoE}}$ (thousand COP)},ylabel={$\CtwoConfidence{C}$ (\%)},height=9cm,xmin=2.35,xmax=6.85,ymin=79,ymax=100.7,ytick={80,85,90,95,97,99.9},yticklabels={80,85,90,95,97,99.9}]
+\addplot[CthreeConfidenceLine] coordinates {(2.4000000,76.9860660) (2.4244444,77.4572673) (2.4488889,77.9215388) (2.4733333,78.3789141) (2.4977778,78.8294284) (2.5222222,79.2731182) (2.5466667,79.7100217) (2.5711111,80.1401784) (2.5955556,80.5636292) (2.6200000,80.9804164) (2.6444444,81.3905837) (2.6688889,81.7941757) (2.6933333,82.1912388) (2.7177778,82.5818200) (2.7422222,82.9659678) (2.7666667,83.3437318) (2.7911111,83.7151626) (2.8155556,84.0803117) (2.8400000,84.4392319) (2.8644444,84.7919766) (2.8888889,85.1386004) (2.9133333,85.4791585) (2.9377778,85.8137071) (2.9622222,86.1423032) (2.9866667,86.4650046) (3.0111111,86.7818695) (3.0355556,87.0929571) (3.0600000,87.3983271) (3.0844444,87.6980398) (3.1088889,87.9921561) (3.1333333,88.2807374) (3.1577778,88.5638455) (3.1822222,88.8415428) (3.2066667,89.1138919) (3.2311111,89.3809560) (3.2555556,89.6427986) (3.2800000,89.8994833) (3.3044444,90.1510742) (3.3288889,90.3976355) (3.3533333,90.6392318) (3.3777778,90.8759275) (3.4022222,91.1077875) (3.4266667,91.3348767) (3.4511111,91.5572599) (3.4755556,91.7750022) (3.5000000,91.9881686) (3.5244444,92.1968241) (3.5488889,92.4010336) (3.5733333,92.6008620) (3.5977778,92.7963741) (3.6222222,92.9876346) (3.6466667,93.1747079) (3.6711111,93.3576585) (3.6955556,93.5365503) (3.7200000,93.7114474) (3.7444444,93.8824134) (3.7688889,94.0495117) (3.7933333,94.2128054) (3.8177778,94.3723573) (3.8422222,94.5282299) (3.8666667,94.6804852) (3.8911111,94.8291850) (3.9155556,94.9743906) (3.9400000,95.1161629) (3.9644444,95.2545625) (3.9888889,95.3896494) (4.0133333,95.5214832) (4.0377778,95.6501231) (4.0622222,95.7756275) (4.0866667,95.8980548) (4.1111111,96.0174625) (4.1355556,96.1339076) (4.1600000,96.2474467) (4.1844444,96.3581358) (4.2088889,96.4660304) (4.2333333,96.5711852) (4.2577778,96.6736546) (4.2822222,96.7734921) (4.3066667,96.8707509) (4.3311111,96.9654834) (4.3555556,97.0577415) (4.3800000,97.1475763) (4.4044444,97.2350385) (4.4288889,97.3201780) (4.4533333,97.4030440) (4.4777778,97.4836853) (4.5022222,97.5621499) (4.5266667,97.6384851) (4.5511111,97.7127376) (4.5755556,97.7849534) (4.6000000,97.8551780) (4.6244444,97.9234560) (4.6488889,97.9898314) (4.6733333,98.0543477) (4.6977778,98.1170475) (4.7222222,98.1779729) (4.7466667,98.2371653) (4.7711111,98.2946654) (4.7955556,98.3505131) (4.8200000,98.4047479) (4.8444444,98.4574086) (4.8688889,98.5085331) (4.8933333,98.5581588) (4.9177778,98.6063226) (4.9422222,98.6530604) (4.9666667,98.6984077) (4.9911111,98.7423994) (5.0155556,98.7850695) (5.0400000,98.8264517) (5.0644444,98.8665787) (5.0888889,98.9054828) (5.1133333,98.9431957) (5.1377778,98.9797484) (5.1622222,99.0151712) (5.1866667,99.0494940) (5.2111111,99.0827460) (5.2355556,99.1149558) (5.2600000,99.1461513) (5.2844444,99.1763600) (5.3088889,99.2056088) (5.3333333,99.2339239) (5.3577778,99.2613310) (5.3822222,99.2878553) (5.4066667,99.3135213) (5.4311111,99.3383533) (5.4555556,99.3623745) (5.4800000,99.3856082) (5.5044444,99.4080766) (5.5288889,99.4298018) (5.5533333,99.4508053) (5.5777778,99.4711079) (5.6022222,99.4907302) (5.6266667,99.5096920) (5.6511111,99.5280130) (5.6755556,99.5457120) (5.7000000,99.5628077) (5.7244444,99.5793182) (5.7488889,99.5952610) (5.7733333,99.6106535) (5.7977778,99.6255124) (5.8222222,99.6398541) (5.8466667,99.6536944) (5.8711111,99.6670490) (5.8955556,99.6799329) (5.9200000,99.6923610) (5.9444444,99.7043474) (5.9688889,99.7159062) (5.9933333,99.7270510) (6.0177778,99.7377950) (6.0422222,99.7481511) (6.0666667,99.7581317) (6.0911111,99.7677491) (6.1155556,99.7770151) (6.1400000,99.7859412) (6.1644444,99.7945386) (6.1888889,99.8028181) (6.2133333,99.8107904) (6.2377778,99.8184656) (6.2622222,99.8258537) (6.2866667,99.8329645) (6.3111111,99.8398072) (6.3355556,99.8463911) (6.3600000,99.8527249) (6.3844444,99.8588173) (6.4088889,99.8646766) (6.4333333,99.8703108) (6.4577778,99.8757278) (6.4822222,99.8809352) (6.5066667,99.8859404) (6.5311111,99.8907504) (6.5555556,99.8953723) (6.5800000,99.8998126) (6.6044444,99.9040780) (6.6288889,99.9081746) (6.6533333,99.9121086) (6.6777778,99.9158858) (6.7022222,99.9195120) (6.7266667,99.9229927) (6.7511111,99.9263332) (6.7755556,99.9295387) (6.8000000,99.9326141)};
+\draw[black,dashed] (axis cs:4.5,79)--(axis cs:4.5,100.5);
+\node[anchor=north west,font=\small] at (axis cs:4.5,86) {Target MoE $=4.500$};
+\node[anchor=south east,font=\small] at (axis cs:4.34,97) {97\% feasible};
+\node[anchor=north west,font=\small] at (axis cs:4.652,98) {98\% fails};
 
-	\clearpage
+\addplot[only marks,mark=*,mark size=2.2pt,CthreeConfidenceLine] coordinates {(2.5640000,80.0000000) (2.8800000,85.0000000) (3.2900000,90.0000000) (3.5020000,92.0000000) (3.9200000,95.0000000) (4.1080000,96.0000000) (4.3400000,97.0000000) (4.6520000,98.0000000) (5.1520000,99.0000000) (6.5820000,99.9000000)};
+\end{axis}
+\end{tikzpicture}
+\end{center}
 
-	\subsection{Two estimates of average freight cost (C3)}
-	\label{prob:c3-2}
-
-	Two simple random samples estimate the mean freight cost per container on a route. Both sample means are 250 USD. Sample A gives $\mathrm{SE}=8$ USD and sample B gives $\mathrm{SE}=4$ USD. Both use the two-sided critical value $z^*=1.96$ for 95\% confidence.
-
-	\QuestionsTasks[sec:general-worked]{
-		{3}/{sol:c3-2-a}/
-		{Find both margins and widths. Identify which components stay fixed, and explain whether the smaller standard error changes nominal coverage.},
-		{3}/{sol:c3-2-b}/
-		{Suppose sample B's point estimate had been 254 USD and its SE still 4 USD. Give the new interval and describe how it changes.}
-	}
-
-	\Needspace{5\baselineskip}
-	\subsubsection*{C3 -- Explain the effect of a smaller standard error}
-	\label{sol:c3-2-a}
-
-	Both samples have a \CtwoPoint{point estimate} of \CtwoPoint{250} USD and a \CtwoCritical{critical value} of \CtwoCritical{1.96}. All amounts below are in USD per container.
-	\begin{align*}
-		\text{A:}\quad \CtwoMoE{\mathrm{MoE}_A}&=\CtwoCritical{1.96}(\CtwoSE{8})=\CtwoMoE{15.68}, &
-		\CtwoPoint{250}\pm\CtwoMoE{15.68}&=[\CtwoEndpoint{234.32},\,\CtwoEndpoint{265.68}], &
-		2\CtwoMoE{\mathrm{MoE}_A}&=\CtwoWidth{31.36}.\\
-		\text{B:}\quad \CtwoMoE{\mathrm{MoE}_B}&=\CtwoCritical{1.96}(\CtwoSE{4})=\CtwoMoE{7.84}, &
-		\CtwoPoint{250}\pm\CtwoMoE{7.84}&=[\CtwoEndpoint{242.16},\,\CtwoEndpoint{257.84}], &
-		2\CtwoMoE{\mathrm{MoE}_B}&=\CtwoWidth{15.68}.
-	\end{align*}
-	Halving the \CtwoSE{standard error} halves the \CtwoMoE{margin} and \CtwoWidth{width}. Sample B gives a more precise interval for the mean freight cost, with the same centre. Both procedures target \CtwoConfidence{95\%} long-run coverage under their sampling and model assumptions.
-
-	\secInicio[prob:c3-2][sec:general-worked]
-
-	\Needspace{5\baselineskip}
-	\subsubsection*{C3 -- Explain the effect of moving the point estimate}
-	\label{sol:c3-2-b}
-
-	The same $\CtwoCritical{z^*}$ and $\CtwoSE{\mathrm{SE}}$ give $\CtwoMoE{\mathrm{MoE}}=\CtwoCritical{1.96}(\CtwoSE{4})=\CtwoMoE{7.84}$ USD. With the higher estimated mean freight cost, the new interval is $\CtwoPoint{254}\pm\CtwoMoE{7.84}=[\CtwoEndpoint{246.16},\,\CtwoEndpoint{261.84}]$ USD per container. Both \CtwoEndpoint{endpoints} move up by 4 USD with the centre. The \CtwoWidth{width} stays at \CtwoWidth{15.68} USD, so precision is unchanged, and the procedure still targets \CtwoConfidence{95\%} coverage.
-
-	\smallskip
-	\secInicio[prob:c3-2][sec:general-worked]
-
-	\clearpage
-
-	\section{Advanced Problems}
-	\label{sec:advanced}
-
-	\SectionProblemsTableOfContents{
-		\SectionProblemLink{prob:c3-3}{Monthly electricity costs for small shops (C3)}
-	}
-
-	\subsection{Monthly electricity costs for small shops (C3)}
-	\label{prob:c3-3}
-
-	A business association uses two random samples to estimate the same population mean, the monthly electricity cost per small shop in a town. Both samples give a mean of 120 thousand COP. For their two-sided normal intervals, the analysts report the following inputs.
-
-	\begin{center}
-		\begin{tabular}{@{}lccc@{}}
-			\toprule
-			Sample & Confidence level & Critical value $z^*$ & $\mathrm{SE}$ (thousand COP) \\
-			\midrule
-			A & 95\% & 1.96 & 10 \\
-			B & 99\% & 2.576 & 5 \\
-			\bottomrule
-		\end{tabular}
-	\end{center}
-
-	\QuestionsTasks[sec:advanced]{
-		{3}/{sol:c3-3}/
-		{Predict which interval will be narrower. Calculate both margins of error, intervals and full widths. Use $z^*\mathrm{SE}$ to explain how B's smaller standard error and larger critical value work against each other. Compare the centres, precision and nominal long-run coverage.}
-	}
-
-	\Needspace{9\baselineskip}
-	\subsubsection*{C3 -- Compare intervals when two inputs change}
-	\label{sol:c3-3}
-
-	Predict that B will be narrower. Its \CtwoSE{standard error} is half as large, while its \CtwoCritical{critical value} is less than twice as large. Since $\CtwoMoE{\mathrm{MoE}}=\CtwoCritical{z^*}\times \CtwoSE{\mathrm{SE}}$, the product for B is smaller. All amounts below are in thousand COP per shop per month.
-	\begin{align*}
-		\text{A:}\quad \CtwoMoE{\mathrm{MoE}_A}&=\CtwoCritical{1.96}(\CtwoSE{10})=\CtwoMoE{19.60}, &
-		\CtwoPoint{120}\pm\CtwoMoE{19.60}&=[\CtwoEndpoint{100.40},\,\CtwoEndpoint{139.60}], &
-		2\CtwoMoE{\mathrm{MoE}_A}&=\CtwoWidth{39.20}.\\
-		\text{B:}\quad \CtwoMoE{\mathrm{MoE}_B}&=\CtwoCritical{2.576}(\CtwoSE{5})=\CtwoMoE{12.88}, &
-		\CtwoPoint{120}\pm\CtwoMoE{12.88}&=[\CtwoEndpoint{107.12},\,\CtwoEndpoint{132.88}], &
-		2\CtwoMoE{\mathrm{MoE}_B}&=\CtwoWidth{25.76}.
-	\end{align*}
-	Both intervals are centred at \CtwoPoint{120} thousand COP. B gives a more precise estimate of the mean monthly electricity cost because its interval is narrower. Coverage describes how often the procedure captures the \CtwoMean{population mean} across repeated samples. Under the sampling and normal-model assumptions, B targets \CtwoConfidence{99\%} and A targets \CtwoConfidence{95\%}.
-
-	\secInicio[prob:c3-3][sec:advanced]
-
+Circles are the ten listed choices at $n=400$. The curve is the continuous normal-model relationship; it does not add extra choices to the decision. Affordable margins meeting the target lie on or to the left of the vertical line. Lower $n$ would move every fixed-confidence choice rightward.
+\subsubsection*{Results in context}
+The highest listed feasible confidence is \CtwoConfidence{97\%}. Sampling \CtwoSize{373} households is the least expensive design at that level; its interval centred at \CtwoPoint{75} is $[\CtwoEndpoint{70.506},\CtwoEndpoint{79.494}]$ thousand COP with full width \CtwoWidth{8.989}. Spending the full budget on \CtwoSize{400} households improves the margin to \CtwoMoE{4.340} and width to \CtwoWidth{8.680}, with endpoints \CtwoEndpoint{70.660, 79.340}. The next listed level, \CtwoConfidence{98\%}, would require \CtwoSize{428} households and exceed the budget. Here the confidence gain is limited by the available reduction in SE; nominal coverage and monetary precision must both satisfy the city's design constraints under the stated assumptions.
+\secInicio[prob:c3-5][sec:advanced]
 \end{document}

@@ -1,0 +1,409 @@
+% Mathematical source: ../1-practice_activities/G11_T2_L1_C2_practice.tex
+% User override: one worked, one guided, eight independent problems (1--10).
+\makeatletter
+\def\input@path{{../../../preamble/}}
+\makeatother
+\input{preamble.tex}
+\usepackage{needspace}
+\usepackage{varwidth}
+\geometry{letterpaper,margin=0.25in}
+\pagestyle{empty}
+\linespread{1.04}
+\setlength{\parskip}{4pt}
+\raggedbottom
+\newcommand{\stageheading}[1]{\par\addvspace{0.5\baselineskip}{\centering\large\bfseries #1\par}\nopagebreak[4]}
+
+\newcommand{\problemtitle}[2]{\par\Needspace{4\baselineskip}\addvspace{.4\baselineskip}\noindent\textbf{#1. #2}\par\nopagebreak[4]}
+\newcommand{\workspace}[1]{\par\vspace{#1}}
+\newcommand{\task}[2]{\par\Needspace{3\baselineskip}\textbf{Task #1 -- #2}}
+\newcommand{\InformationTask}{\textbf{Task 1 -- Identify and organize the information; calculate SE.} In independent practice, use four columns: \textbf{Symbol}, \textbf{Concept}, \textbf{Type}, and \textbf{Meaning in context}. The examples use two side-by-side three-column tables, with the categories as section titles instead of a Type column. Arrange three contiguous groups in this order: \textbf{Population parameters} ($\mu$, $\mu_{\rm sim}$, $\sigma$); \textbf{Sample statistics} ($\bar{x}$, $n$, $\mathrm{SE}$); \textbf{Procedure Settings} ($C$, $\alpha$, $\alpha/2$, $z^*$).}
+\newcommand{\IntervalTask}{\textbf{Task 2 -- Calculate MoE and state the interval.} In independent practice and the worked example, use four columns: \textbf{Symbol}, \textbf{Concept}, \textbf{Calculation}, and \textbf{Result and meaning in context}. In the guided example, combine the last two columns as \textbf{Calculation, Result and meaning in context}. Show formulas and substitutions, then results with units and brief context. Use rows for the point estimate, margin of error, confidence interval, and full width. In independent practice, also use separate endpoint rows. In the examples, include endpoint calculations in the confidence-interval row. Group by confidence level; give the shared point estimate once. Keep all calculated endpoint digits. Calculate the full width as $W=U-L=2\mathrm{MoE}$.}
+\newcommand{\CoverageTask}{\textbf{Task 3 -- Calculate observed coverage and its absolute error relative to the confidence level. Interpret the results in context and explain the difference.} For each confidence level, show the covering count, denominator, coverage, and absolute error separately, and give a separate interpretation. Report error in percentage points.}
+
+\newcommand{\InformationTable}[1]{%
+    \par
+    \begingroup
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \renewcommand{\arraystretch}{1.16}
+    \noindent
+    \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.10\linewidth}>{\raggedright\arraybackslash}p{0.24\linewidth}>{\raggedright\arraybackslash}p{0.24\linewidth}>{\raggedright\arraybackslash}X@{}}
+        \toprule
+        \textbf{Symbol} & \textbf{Concept} & \textbf{Type} & \textbf{In context...} \\
+        \midrule
+        #1
+        \bottomrule
+    \end{tabularx}\par
+    \vspace{2mm}
+    \endgroup
+}
+
+% Each confidence-level block stays together; repeat headings in every block.
+\newcommand{\EstimationTable}[1]{%
+    \par
+    \begingroup
+    \setlength{\tabcolsep}{4pt}
+    \renewcommand{\arraystretch}{1.18}
+    \noindent
+    \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.095\linewidth}>{\raggedright\arraybackslash}p{0.17\linewidth}>{\raggedright\arraybackslash}p{0.27\linewidth}>{\raggedright\arraybackslash}X@{}}
+        \toprule
+        \textbf{Symbol} & \textbf{Concept} & \textbf{Calculation} & \textbf{Result and meaning in context} \\
+        \midrule
+        #1
+        \bottomrule
+    \end{tabularx}\par
+    \vspace{2mm}
+    \endgroup
+}
+
+
+% Dedicated example tables; independent-practice macros remain unchanged.
+\newcommand{\ExampleInformationTable}[1]{%
+    \par
+    \begingroup
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \renewcommand{\arraystretch}{1.16}
+    \noindent\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{.14\linewidth}|>{\raggedright\arraybackslash}p{.32\linewidth}|>{\raggedright\arraybackslash}X|}
+        \hline
+        \textbf{Symbol} & \textbf{Concept} & \textbf{In context...} \\ \hline
+        #1
+    \end{tabularx}\par
+    \endgroup
+}
+\newcommand{\GuidedEstimationTable}[1]{%
+    \par
+    \begingroup
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \renewcommand{\arraystretch}{1.16}
+    \noindent\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{.1\linewidth}|>{\raggedright\arraybackslash}p{.2\linewidth}|>{\raggedright\arraybackslash}X|}
+        \hline
+        \textbf{Symbol} & \textbf{Concept} & \textbf{Calculation, Result and meaning in context} \\ \hline
+        #1
+    \end{tabularx}\par
+    \endgroup
+}
+\newcommand{\GuidedConfidenceTable}[1]{%
+    \GuidedEstimationTable{
+        \multicolumn{3}{|l|}{\textbf{#1 confidence}}\\ \hline
+        $\mathrm{MoE}$ & Margin of error & \\[10pt] \hline
+        $[L,U]$ & Confidence interval & \\[10pt] \hline
+        $W$ & Full width & \\[10pt] \hline
+    }
+}
+
+\newcommand{\BlankInformationTable}{
+\InformationTable{
+$\mu$&Population mean&Population parameters&\\[23pt]
+$\mu_{\rm sim}$&Simulation population mean&&\\[18pt]
+$\sigma$&Population standard deviation&&\\[18pt]\midrule
+$\bar{x}$&Sample mean&Sample statistics&\\[18pt]
+$n$&Sample size&&\\[18pt]
+$\mathrm{SE}$&Standard error&&\\[27pt]\midrule
+$C$&Confidence level&Procedure Settings&\\[18pt]
+$\alpha$&Significance level&&\\[18pt]
+$\alpha/2$&Tail area&&\\[18pt]
+$z^*$&Critical value&&\\[18pt]}}
+\begin{document}
+{\centering{\Large\bfseries C2 -- Point and interval estimation\par}
+Global Economics \textbar{} Grade 11 \textbar{} Term 2 \textbar{} Lesson 1\par}
+\textbf{C2:} Compare point and interval estimation and interpret confidence through long-run coverage, distinguishing this from the probability that a particular calculated interval contains the parameter.
+
+\stageheading{Equations and basic procedure}
+Assume independent random observations, known $\sigma$, and normally distributed $\bar{x}$ (exact for normal populations). Estimate fixed, unknown $\mu$ with $\bar{x}$. Normal simulations use stated fixed means and the original $\sigma$ and $n$. A simulated interval covers the fixed simulation mean when $L\leq\mu_{\rm sim}\leq U$. No sample SD $s$ is provided or needed.
+
+\begingroup
+\small
+\setlength{\tabcolsep}{3pt}
+\setlength{\extrarowheight}{0pt}
+\setlength{\parskip}{0pt}
+\renewcommand{\arraystretch}{1}
+\noindent\begin{minipage}[t]{.49\linewidth}
+\vspace{0pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{.21\linewidth}>{\raggedright\arraybackslash}p{.34\linewidth}>{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Symbol} & \textbf{Concept} & \textbf{Formula} \\
+\midrule
+$C$ & Confidence level & \\
+$z^*$ & Critical value & \\
+$\mathrm{SE}$ & Standard error & $\mathrm{SE}=\frac{\sigma}{\sqrt n}$ \\
+$\mathrm{MoE}$ & Margin of error & $\mathrm{MoE}=z^*\mathrm{SE}$ \\
+$L$ & Lower endpoint & $L=\bar{x}-\mathrm{MoE}$ \\
+$U$ & Upper endpoint & $U=\bar{x}+\mathrm{MoE}$ \\
+\bottomrule
+\end{tabularx}\par
+\end{minipage}\hfill
+\begin{minipage}[t]{.49\linewidth}
+\vspace{0pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{.21\linewidth}>{\raggedright\arraybackslash}p{.34\linewidth}>{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Symbol} & \textbf{Concept} & \textbf{Formula} \\
+\midrule
+$W$ & Full width & $W=U-L=2\mathrm{MoE}$ \\
+$\alpha$ & Significance level & $\alpha=1-C$ \\
+$\alpha/2$ & Each tail's area & $\frac{\alpha}{2}=\frac{1-C}{2}$ \\
+$N_{\rm cover}(C)$ & Covering count & \\
+$N(C)$ & Total interval count & \\
+$\mathrm{Cov}(C)$ & Observed coverage & $\frac{N_{\rm cover}(C)}{N(C)}\times100\%$ \\
+\bottomrule
+\end{tabularx}\par
+\end{minipage}\par
+\endgroup
+\noindent\begin{minipage}[t]{0.68\linewidth}
+\vspace{0pt}
+\[
+\begin{aligned}
+\mathrm{Cov}(C)&=\frac{N_{\rm cover}(C)}{N(C)}\times100\%,\\
+E_{\rm abs}(C)&=|\mathrm{Cov}(C)-C|.
+\end{aligned}
+\]
+Use coverage and confidence as percentages in these formulas; report absolute error in percentage points. Compare coverage with the confidence level, not the interval endpoints. For tail-area calculations, use $C$ as a proportion.
+\end{minipage}\hfill
+\begin{minipage}[t]{0.30\linewidth}
+\vspace{0pt}
+\centering
+\small
+\textbf{Two-sided confidence levels and standard normal critical values}\par
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\raggedleft\arraybackslash}X@{}}\toprule
+Confidence level $C$ & Critical value $z^*$\\\midrule
+90\% & 1.645\\
+95\% & 1.960\\
+99\% & 2.576\\
+99.5\% & 2.807\\
+99.9\% & 3.291\\
+\bottomrule
+\end{tabularx}
+\end{minipage}\par
+
+
+
+\vspace{-4mm}
+
+\stageheading{General assessment tasks}
+
+\InformationTask
+
+\IntervalTask
+
+\CoverageTask
+
+\stageheading{Worked example}
+\vspace{-7mm}
+
+\problemtitle{1}{Investigate the cycling interval}
+\noindent\begin{minipage}[t]{0.60\linewidth}
+\vspace{0pt}
+A random sample of 49 cycling trips had an average duration of 40 minutes. The average duration of all trips in the population represented by this sample is unknown. The known population standard deviation of individual trip durations is 14 minutes. The confidence level for the report is 95\%.
+
+In a separate illustrative simulation, five fresh independent samples of 49 trips were drawn from a normal population with known fixed mean $\mu_{\rm sim}=41$ minutes and population SD 14 minutes. Each sample uses the same 95\% procedure.
+\end{minipage}\hfill
+\begin{minipage}[t]{0.38\linewidth}
+\vspace{0pt}
+\centering
+\begin{tabular}{@{}rrrr@{}}\toprule
+Sample&$\bar{x}$ (min)& $L$(min)&$U$ (min)\\\midrule
+1&40&36.08&43.92\\
+2&42&38.08&45.92\\
+3&45&41.08&48.92\\
+4&38&34.08&41.92\\
+5&41&37.08&44.92\\\bottomrule
+\end{tabular}
+\end{minipage}\par
+
+\vspace{-3mm}
+\subsubsection*{Task 1 solution}
+\par\noindent\begin{minipage}[t]{.49\linewidth}
+\vspace{-4mm}
+\ExampleInformationTable{
+\multicolumn{3}{|l|}{\textbf{Population parameters}}\\ \hline
+$\mu$&Population mean&The average duration of all cycling trips\\ \hline
+$\mu_{\rm sim}$&Simulation population mean&41 minutes\\ \hline
+$\sigma$&Population standard deviation&14 minutes\\ \hline
+\multicolumn{3}{|l|}{\textbf{Sample statistics}}\\ \hline
+$\bar{x}$&Sample mean&40 minutes\\ \hline
+$n$&Sample size&49 trips\\ \hline
+$\mathrm{SE}$&Standard error&2 minutes\\ \hline}
+\end{minipage}\hfill
+\begin{minipage}[t]{.49\linewidth}
+\vspace{0pt}
+\ExampleInformationTable{
+\multicolumn{3}{|l|}{\textbf{Procedure Settings}}\\ \hline
+$C$&Confidence level&95\%\\ \hline
+$\alpha$&Significance level&0.05\\ \hline
+$\alpha/2$&Tail area&0.025\\ \hline
+$z^*$&Critical value&1.960\\ \hline}
+\end{minipage}\par
+Calculate the standard error: $\mathrm{SE}=\sigma/\sqrt n=14/\sqrt{49}=2$ minutes. This is the spread of means across repeated independent samples of 49 trips.
+\vspace{-3mm}
+\subsubsection*{Task 2 solution}
+
+\GuidedEstimationTable{
+$\bar{x}$ & Point estimate & $\bar{x}=\dfrac{\sum x_i}{n}$; given sample mean\par 40 minutes: Mean cycling-trip duration\\[6pt] \hline
+}
+\par\smallskip
+\GuidedEstimationTable{
+\multicolumn{3}{|l|}{\textbf{95\% confidence}}\\ \hline
+$\mathrm{MoE}$ & Margin of error & $\mathrm{MoE}=z^*\mathrm{SE}=1.960(2)=3.92$ minutes\par Uncertainty in mean duration\\[6pt] \hline
+$[L,U]$ & Confidence interval & $L=40-3.92=36.08$ minutes \par $U=40+3.92=43.92$ minutes\par
+$[\bar{x}-\mathrm{MoE},\bar{x}+\mathrm{MoE}] =[40-3.92,40+3.92]$\par
+ $[36.08,43.92]$ minutes\par Plausible mean durations\\[6pt] \hline
+$W$ & Full width & $W=U-L=2\mathrm{MoE}$\par $=43.92-36.08=2(3.92)=7.84$ minutes\par Precision of mean-duration estimate\\[6pt] \hline
+}
+We are 95\% confident that the population mean cycling-trip duration is in the range of plausible values under the model.
+
+Check the centre: $(36.08+43.92)/2=40$ minutes. The simulation intervals have the same 7.84-minute width, but their centres follow their fresh sample means. With the same sample and SE, higher confidence increases $z^*$, MoE, and width while preserving the centre, so the wider interval contains the narrower one. Increasing $n$ with other settings fixed reduces SE and width.
+
+\vspace{-3mm}
+\subsubsection*{Task 3 solution}
+\vspace{-3mm}
+The fixed simulation mean is 41 minutes. Samples 1, 2, 4, and 5 cover it because their endpoints satisfy $L\leq41\leq U$. Sample 3 misses: its lower endpoint, 41.08, exceeds 41.
+\par 95\%: $N_{\rm cover}(95\%)=4$; $N(95\%)=5$; $\mathrm{Cov}(95\%)=\dfrac45\times100\%=80\%$.
+\par $E_{\rm abs}(95\%)=|\mathrm{Cov}(95\%)-95|=|80-95|=15$ percentage points.
+
+Four of the five simulated cycling-trip intervals contain the fixed simulation mean of 41 minutes, so observed coverage is 80\%, which is 15 percentage points below the 95\% confidence level. The covering count varies randomly across finite runs; with only five intervals, observed coverage changes in steps of 20 percentage points and need not equal 95\%. Over many fresh samples under the model, about 95\% of intervals made by this procedure cover the fixed population mean. Each calculated interval either covers or misses; confidence does not describe the proportion of individual trip durations in the interval.
+
+
+\stageheading{Guided Example}
+\vspace{-6mm}
+\problemtitle{2}{Two reports on weekly printing costs}
+A random sample of 100 school offices in a district had an average weekly printing cost of 86 thousand COP. The average weekly cost for all offices in the district is unknown. The known population standard deviation of individual offices' weekly costs is 32 thousand COP. Two reports, at 90\% and 99\% confidence, concern this same sample.
+
+In a separate, completed repeated-sampling study, 200 fresh independent samples of 100 offices were drawn from a normal population with a fixed known average weekly cost of 88 thousand COP and a population standard deviation of 32 thousand COP. Both confidence intervals were constructed from each sample. The 90\% intervals missed the known mean 23 times, and the 99\% intervals missed it 5 times.
+
+\textbf{Reporting requirement.} Keep all calculated endpoint digits.
+
+
+\task{1}{Identify and organize the information; calculate SE.}
+\par\noindent\begin{minipage}[t]{.49\linewidth}
+\vspace{0pt}
+\ExampleInformationTable{
+\multicolumn{3}{|l|}{\textbf{Population parameters}}\\ \hline
+$\mu$&Population mean&District mean weekly printing cost:\par\\[10pt] \hline
+$\mu_{\rm sim}$&Simulation population mean&\\[16pt] \hline
+$\sigma$&Population standard deviation&\\[16pt] \hline
+\multicolumn{3}{|l|}{\textbf{Sample statistics}}\\ \hline
+$\bar{x}$&Sample mean&\\[10pt] \hline
+$n$&Sample size&\\[10pt] \hline
+$\mathrm{SE}$&Standard error&\\[10pt] \hline}
+\end{minipage}\hfill
+\begin{minipage}[t]{.49\linewidth}
+\vspace{0pt}
+\ExampleInformationTable{
+\multicolumn{3}{|l|}{\textbf{Procedure Settings}}\\ \hline
+$C$&Confidence level&90\%: \par 99\%: \\[16pt] \hline
+$\alpha$&Significance level&90\%: \par 99\%: \\[16pt] \hline
+$\alpha/2$&Tail area&90\%: \par 99\%: \\[16pt] \hline
+$z^*$&Critical value&90\%: \par 99\%: \\[16pt] \hline}
+\end{minipage}\par
+Calculate $\mathrm{SE}=\sigma/\sqrt n=32/\sqrt{100}=$ \rule{.7in}{.3pt}. Units and meaning: \rule{1.8in}{.3pt}.
+
+\task{2}{Calculate MoE and state the interval.}
+\GuidedEstimationTable{
+$\bar{x}$ & Shared point estimate & \\[10pt] \hline
+}
+\par\smallskip
+\noindent\begin{minipage}[t]{.49\linewidth}
+\vspace{0pt}
+\GuidedConfidenceTable{90\%}
+\end{minipage}\hfill
+\begin{minipage}[t]{.49\linewidth}
+\vspace{0pt}
+\GuidedConfidenceTable{99\%}
+\end{minipage}\par
+
+\problemtitle{2}{Weekly printing costs -- coverage}
+\task{3}{Calculate observed coverage and its absolute error relative to the confidence level. Interpret the results in context and explain the difference.}
+\par For each level, complete the calculations and interpret both results for intervals estimating the fixed mean weekly printing cost of 88 thousand COP.
+\par\noindent\begin{minipage}[t]{0.70\linewidth}
+\vspace{0pt}
+\par 90\%: $N_{\rm cover}=200-23=$ \rule{.5in}{.3pt}; $N=$ \rule{.4in}{.3pt}; $\mathrm{Cov}=$ \rule{1in}{.3pt}.
+\par $E_{\rm abs}=|\mathrm{Cov}-90|=$ \rule{.7in}{.3pt} percentage points. 
+\par 99\%: $N_{\rm cover}=200-5=$ \rule{.5in}{.3pt}; $N=$ \rule{.4in}{.3pt}; $\mathrm{Cov}=$ \rule{1in}{.3pt}.
+\par $E_{\rm abs}=|\mathrm{Cov}-99|=$ \rule{.7in}{.3pt} percentage points. 
+\end{minipage}\hfill
+\begin{minipage}[t]{0.28\linewidth}
+\vspace{0pt}
+\par Reflect on why the finite covering counts can vary even when the confidence levels stay fixed.
+\end{minipage}\par
+
+
+\stageheading{Independent Practice}
+Complete the following three tasks for each problem (3--6).
+
+\task{1}{Identify and organize the information; calculate SE.}
+\task{2}{Calculate MoE and state the interval.}
+\task{3}{Calculate observed coverage and its absolute error relative to the confidence level. Interpret the results in context and explain the difference.}
+
+\problemtitle{3}{Repeated estimates of locker rental charges}
+\noindent\begin{minipage}[t]{0.76\linewidth}
+\vspace{0pt}
+A random sample of 64 customers at a sports centre had an average weekly locker rental charge of 72 thousand COP. The average weekly charge for all customers at the centre is unknown. The known population standard deviation of individual customers' charges is 20 thousand COP. The confidence level for the report is 95\%.
+
+In a separate, completed repeated-sampling study, five fresh independent samples of 64 customers were drawn from a normal population with a fixed known average charge of 70 thousand COP and the same population standard deviation as the original population. A 95\% confidence interval was constructed from each sample. Endpoints in thousand COP:
+\end{minipage}\hfill
+\begin{minipage}[t]{0.22\linewidth}
+\vspace{0pt}
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\linewidth}{@{}l>{\raggedleft\arraybackslash}X>{\raggedleft\arraybackslash}X@{}}
+	\toprule
+	Sample & Lower endpoint & Upper endpoint \\
+	\midrule
+	1 & 64.1 & 73.9 \\
+	2 & 67.1 & 76.9 \\
+	3 & 70.1 & 79.9 \\
+	4 & 63.1 & 72.9 \\
+	5 & 65.1 & 74.9 \\
+	\bottomrule
+\end{tabularx}
+\end{minipage}\par
+\problemtitle{4}{Two reports on monthly pet-care spending}
+A random sample of 144 registered households in a district had an average monthly pet-care expenditure of 145 thousand COP. The average monthly expenditure for all registered households in the district is unknown. The known population standard deviation of individual households' monthly spending is 42 thousand COP. Two reports, at 90\% and 99\% confidence, concern this same sample.
+
+In a separate, completed repeated-sampling study, 150 fresh independent samples of 144 households were drawn from a normal population with a fixed known average expenditure of 148 thousand COP and the same population standard deviation as the original population. Both confidence intervals were constructed from each sample. The 90\% intervals missed the known mean 17 times, and the 99\% intervals missed it 3 times.
+
+\problemtitle{5}{Clinic waiting times in a simulation}
+\noindent\begin{minipage}[t]{0.83\linewidth}
+\vspace{0pt}
+A random sample of 49 appointments at a clinic in a specified month had an average waiting time of 26 minutes. The average waiting time for all appointments at the clinic that month is unknown. The known population standard deviation of individual appointment waiting times is 14 minutes. The confidence level for the report is 90\%.
+
+In a separate, completed repeated-sampling study, 20 fresh independent samples of 49 appointments were drawn from a normal population with a fixed known average waiting time of 27 minutes and the same population standard deviation as the original population. A 90\% confidence interval was constructed from each sample. The table groups the counts of intervals containing the known mean by generation order.
+\end{minipage}\hfill
+\begin{minipage}[t]{0.15\linewidth}
+\vspace{0pt}
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\raggedleft\arraybackslash}X@{}}\toprule
+Samples in order & Covering intervals\\\midrule
+1--5 & 4\\
+6--10 & 5\\
+11--15 & 4\\
+16--20 & 3\\
+\bottomrule\end{tabularx}
+\end{minipage}\par
+
+\problemtitle{6}{Three confidence levels for library processing times}
+\noindent\begin{minipage}[t]{0.70\linewidth}
+\vspace{0pt}
+A random sample of 100 books returned to a library during one month had an average processing time of 24 minutes. The average processing time for all books returned to the library that month is unknown. The known population standard deviation of individual books' processing times is 15 minutes. Three reports, at 90\%, 95\%, and 99\% confidence, concern this same sample.
+
+In a separate, completed repeated-sampling study, 250 fresh independent samples of 100 books were drawn from a normal population with a fixed known average processing time of 25 minutes and the same population standard deviation as the original population. All three confidence intervals were constructed around each sample's own average. The categories below are mutually exclusive, and each sample appears once.
+\end{minipage}\hfill
+\begin{minipage}[t]{0.28\linewidth}
+\vspace{0pt}
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xr@{}}\toprule
+Intervals containing the fixed simulation mean & Samples\\\midrule
+All three & 219\\
+Only 95\% and 99\% & 18\\
+Only 99\% & 10\\
+None & 3\\
+\bottomrule\end{tabularx}
+\end{minipage}\par
+
+\end{document}

@@ -16,13 +16,56 @@
 \pagestyle{empty}
 \linespread{1.04}
 \setlength{\parskip}{4pt}
-\setlength{\tabcolsep}{6pt}
-\setlength{\extrarowheight}{2pt}
+\raggedbottom
 
 \newif\ifprintsolutions
 \printsolutionsfalse % Set \printsolutionstrue to include the review pages.
 
-\newcolumntype{Y}{>{\centering\arraybackslash}X}
+% Exactly TWO table-style families. All helpers size to local \linewidth.
+% Family 1: plain opening notation/formula reference, never a highlight legend.
+% Adapt widths or use full width for the topic's actual definitions and formulas.
+\newcommand{\NotationReferenceTable}[1]{%
+    \par\begingroup
+    \small
+    \setlength{\tabcolsep}{3pt}
+    \setlength{\extrarowheight}{0pt}
+    \setlength{\parskip}{0pt}
+    \renewcommand{\arraystretch}{1}
+    \noindent\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{.21\linewidth}>{\raggedright\arraybackslash}p{.34\linewidth}>{\raggedright\arraybackslash}X@{}}
+        \toprule
+        \textbf{Symbol} & \textbf{Concept} & \textbf{Formula} \\
+        \midrule
+        #1
+        \bottomrule
+    \end{tabularx}\par
+    \endgroup
+}
+% Family 2: all instructional/problem tables, including optional review tables.
+% Width variants below are the SAME ruled family; adapt column count if needed.
+% Body rows end with \\ \hline. Keep group/case headings short or wrap them.
+\newcommand{\ClassroomRuledTable}[4]{%
+    \par\begingroup
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \setlength{\extrarowheight}{0pt}
+    \setlength{\parskip}{0pt}
+    \renewcommand{\arraystretch}{1.16}
+    \noindent\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{#1}|>{\raggedright\arraybackslash}p{#2}|>{\raggedright\arraybackslash}X|}
+        \hline
+        #3 \\ \hline
+        #4
+    \end{tabularx}\par
+    \endgroup
+}
+\newcommand{\InformationTable}[1]{%
+    \ClassroomRuledTable{.14\linewidth}{.32\linewidth}
+        {\textbf{Symbol} & \textbf{Concept} & \textbf{In context...}}{#1}%
+}
+\NewDocumentCommand{\CalculationTable}{O{.10\linewidth} O{.20\linewidth} +m}{%
+    \ClassroomRuledTable{#1}{#2}
+        {\textbf{Symbol} & \textbf{Concept} & \textbf{Calculation, result, and meaning in context}}{#3}%
+}
+\newcommand{\TableGroup}[1]{\multicolumn{3}{|l|}{\textbf{#1}}\\ \hline}
 \newcommand{\stageheading}[1]{%
     \par\Needspace{6\baselineskip}\addvspace{0.65\baselineskip}%
     {\centering\large\bfseries #1\par}\nopagebreak[4]
@@ -37,7 +80,7 @@
 }
 \newcommand{\task}[2]{\par\noindent\textbf{#1} #2\par}
 \newcommand{\responseline}{\par\noindent\rule{0pt}{1.55em}\hrulefill\par}
-\newcommand{\workspace}[1]{\par\noindent\rule{0pt}{#1}\par}
+\newcommand{\workspace}[1]{\par\noindent\rule{0pt}{#1}\par\nopagebreak[4]}
 
 \begin{document}
 
@@ -48,37 +91,101 @@
 \textbf{[Criterion code]} [Criterion statement.]
 
 \stageheading{Equations and basic procedure}
-[Notation, rules, ordered steps, and checks.]
+[Conditions, ordered procedure, and checks for the actual topic.]\par
+% Replace illustrative symbols/relations with actual topic content. Preserve all
+% needed definitions and formulas; no unnecessary gaps between filled rows.
+\noindent\begin{minipage}[t]{.49\linewidth}
+\vspace{0pt}
+\NotationReferenceTable{
+    $a$ & First quantity & [Definition and units] \\
+    $b$ & Second quantity & [Definition and units] \\
+}
+\end{minipage}\hfill
+\begin{minipage}[t]{.49\linewidth}
+\vspace{0pt}
+\NotationReferenceTable{
+    $T$ & Total & $T=a+b$ \\
+    $d$ & Difference & $d=a-b$ \\
+}
+\end{minipage}\par
 
 % Exactly one fully solved worked example, with clear step-by-step reasoning.
 \stageheading{Worked example}
 \problemtitle{1}{[Worked problem title]}{Type A}
-[Context, givens, units, and constraints.]
-\par\noindent
-\begin{minipage}[t]{0.48\linewidth}
-    \task{Task 1.}{[Explain the method, substitution, and intermediate calculations.]}
-
-    \begin{tabularx}{\linewidth}{@{}lY@{}}
-        \toprule
-        {[Data heading]} & [Result and units] \\
-        \midrule
-        {[Given value]} & [Calculated value] \\
-        \bottomrule
-    \end{tabularx}
-\end{minipage}%
-\hfill
-\begin{minipage}[t]{0.48\linewidth}
-    \task{Task 2.}{[Explain all remaining steps, verify the result, and give the final answer and interpretation in plain mathematics.]}
+[Context, units, and constraints. Illustrative givens: two quantities of 12 and
+8 units. Replace this entire example with a complete source-aligned problem.]
+\task{Task 1.}{Organize the information in the two ruled tables. Classifications
+appear as group headings; the columns are Symbol, Concept, and In context...}
+\noindent\begin{minipage}[t]{.49\linewidth}
+\vspace{0pt}
+\InformationTable{
+    \TableGroup{Given quantities}
+    $a$ & First quantity & 12 units in the first part of the context. \\ \hline
+    $b$ & Second quantity & 8 units in the second part of the context. \\ \hline
+}
+\end{minipage}\hfill
+\begin{minipage}[t]{.49\linewidth}
+\vspace{0pt}
+\InformationTable{
+    \TableGroup{Derived quantities}
+    $T$ & Total & Combined quantity, in the same units. \\ \hline
+    $d$ & Difference & Excess of the first quantity over the second, in units. \\ \hline
+}
 \end{minipage}\par
+\task{Task 2.}{Calculate and interpret. In the broad third column, show the
+formula, numerical substitution, result with units, and contextual meaning.}
+\CalculationTable{
+    \TableGroup{Combined quantities}
+    $T$ & Total & $T=a+b=12+8=20$ units.\par
+      Together the two parts account for 20 units. \\ \hline
+    $d$ & Difference & $d=a-b=12-8=4$ units.\par
+      The first part exceeds the second by 4 units. \\ \hline
+}
+Check immediately below the table: $T-b=20-8=12=a$ and
+$d+b=4+8=12=a$. Both recover the first quantity, and all values use the
+same units. [Add every further step, check, and interpretation required by
+the actual source problem; consolidation must not omit reasoning.]
 
 % Exactly one guided example; resize workspace for each actual task.
 \stageheading{Guided Example}
 \problemtitle{2}{[Guided problem title]}{Type A}
-[Fresh context, givens, units, and constraints.]
-\task{Task 1.}{[Structured prompt or starter calculation; leave key reasoning to students.]}
+[Fresh context, givens, units, and constraints. Illustrative structure: two
+cases share a first quantity of 15 units; second quantities are 6 and 9 units.
+Replace with the actual topic's givens and case structure.]
+\task{Task 1.}{Record the shared quantity once. Complete its units and meaning.}
+\InformationTable{
+    \TableGroup{Shared information}
+    $a$ & First quantity & 15 \rule{.6in}{.3pt}. Meaning: \\[18pt] \hline
+}
+% Reserve this measured prompt+case-table block; resize for actual content.
+% Break at a task boundary instead of separating the prompt from its tables.
+\Needspace{20\baselineskip}
+\task{Task 2.}{Complete each case below. Use formula, substitution, result with
+units, then meaning in the third column. Check each result below the tables.}
+% Repeat headings in separate case blocks. Gaps are adjustable writing space,
+% not universal heights. Leave key reasoning and final answers for students.
+\noindent\begin{minipage}[t]{.49\linewidth}
+\vspace{0pt}
+% Widen short columns locally so headings fit at half width without shrinking.
+\CalculationTable[.14\linewidth][.24\linewidth]{
+    \TableGroup{Case A}
+    $b$ & Second quantity & 6 units. [Contextual meaning.] \\ \hline
+    $T$ & Total & $T=a+b=15+6=$ \\[48pt] \hline
+    $d$ & Difference & \\[48pt] \hline
+}
+\end{minipage}\hfill
+\begin{minipage}[t]{.49\linewidth}
+\vspace{0pt}
+\CalculationTable[.14\linewidth][.24\linewidth]{
+    \TableGroup{Case B}
+    $b$ & Second quantity & 9 units. [Contextual meaning.] \\ \hline
+    $T$ & Total & \\[48pt] \hline
+    $d$ & Difference & \\[48pt] \hline
+}
+\end{minipage}\par
+\task{Check and interpret.}{[Prompts for verification and comparing the cases;
+leave the key reasoning and final interpretation to students.]}
 \workspace{4\baselineskip}
-\task{Task 2.}{[Structured prompts for the remaining steps, check, and final interpretation.]}
-\workspace{5\baselineskip}
 \responseline
 
 % Exactly five UNSOLVED independent exercises with appropriate workspace.
@@ -86,6 +193,9 @@
 % Independent exercises 4--5 (problems 6--7): slightly greater challenge,
 % always within the same topic and assessment criterion.
 \stageheading{Independent Practice}
+% Reserves below fit these placeholder prompts plus workspace and response line.
+% Remeasure for actual tasks; allow longer problems to break at task boundaries.
+\Needspace{17\baselineskip}
 \problemtitle{3}{[First independent problem title]}{Type A}
 [Fresh context, givens, units, and constraints.]
 \task{Task 1.}{[First task with fewer hints.]}
@@ -93,6 +203,7 @@
 \workspace{6\baselineskip}
 \responseline
 
+\Needspace{17\baselineskip}
 \problemtitle{4}{[Second independent problem title]}{Type A}
 [Fresh context, givens, units, and constraints.]
 \task{Task 1.}{[First task with fewer hints.]}
@@ -100,6 +211,7 @@
 \workspace{6\baselineskip}
 \responseline
 
+\Needspace{17\baselineskip}
 \problemtitle{5}{[Third independent problem title]}{[Family label]}
 [Fresh context, givens, units, and constraints; consolidate core skills.]
 \task{Task 1.}{[Core task with fewer hints; leave unsolved.]}
@@ -107,6 +219,7 @@
 \workspace{6\baselineskip}
 \responseline
 
+\Needspace{19\baselineskip}
 \problemtitle{6}{[Fourth independent problem title]}{[Family label]}
 [Fresh context, givens, units, and constraints; slightly more challenging within the same topic and criterion.]
 \task{Task 1.}{[Modestly more demanding application of the core skills; leave unsolved.]}
@@ -114,6 +227,7 @@
 \workspace{8\baselineskip}
 \responseline
 
+\Needspace{19\baselineskip}
 \problemtitle{7}{[Fifth independent problem title]}{[Family label]}
 [Fresh context, givens, units, and constraints; slightly more challenging within the same topic and criterion.]
 \task{Task 1.}{[Modestly more demanding application of the core skills; leave unsolved.]}

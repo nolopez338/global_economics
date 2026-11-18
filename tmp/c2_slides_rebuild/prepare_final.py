@@ -1,0 +1,12 @@
+from pathlib import Path
+p=Path('book2026-2027/grade11/term_2/3-slides/G11_T2_L1_C2_slides.tex')
+s=p.read_text(encoding='utf8')
+s=s.replace(r'$\CtwoEndpoint{U_i}$}.',r'$\CtwoEndpoint{U_i}$.}')
+s=s.replace(r'$\CtwoEndpoint{U_i}$}.',r'$\CtwoEndpoint{U_i}$.}')
+s=s.replace(r'\CtwoEndpoint{U_i}$}.',r'\CtwoEndpoint{U_i}$.}')
+s=s.replace(r'@{}p{.10\linewidth}p{.18\linewidth}X@{}',r'@{}>{\raggedright\arraybackslash}p{.10\linewidth}>{\raggedright\arraybackslash}p{.18\linewidth}>{\raggedright\arraybackslash}X@{}')
+p.write_text(s,encoding='utf8')
+Path('tmp/c2_slides_rebuild/next.tex').write_text(s,encoding='utf8')
+handout=s.replace('[12pt,aspectratio=169]','[handout,12pt,aspectratio=169]')
+Path('tmp/c2_slides_rebuild/enabled_check.tex').write_text(handout,encoding='utf8')
+Path('tmp/c2_slides_rebuild/disabled_check.tex').write_text(handout.replace('% \\GTenHighlightsfalse % Uncomment','\\GTenHighlightsfalse % Uncomment'),encoding='utf8')

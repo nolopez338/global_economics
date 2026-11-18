@@ -1,0 +1,16 @@
+from pathlib import Path
+p=Path('book2026-2027/grade11/term_2/3-slides/G11_T2_L1_C2_slides.tex')
+s=p.read_text(encoding='utf8')
+s=s.replace(r'\fontsize{10}{10.8}',r'\fontsize{9.5}{10}')
+s=s.replace(r'\fontsize{10}{10.6}',r'\fontsize{9.5}{10}')
+s=s.replace(r'#5}\\\midrule',r'#5}\\[1pt]').replace(r'#5}}\\\midrule',r'#5}}\\[1pt]')
+s=s.replace(r'@{}p{.22\linewidth}p{.37\linewidth}X@{}',r'@{}>{\raggedright\arraybackslash}p{.23\linewidth}>{\raggedright\arraybackslash}p{.38\linewidth}>{\raggedright\arraybackslash}X@{}')
+s=s.replace(r'\textbf{In context...}',r'\textbf{In context...}')
+s=s.replace(r'\begin{minipage}[t][1.35cm][t]',r'\fontsize{10}{11}\selectfont\setlength{\parskip}{0pt}\begin{minipage}[t][1.2cm][t]')
+s=s.replace(r'\end{minipage}'+'\n'+r'\begin{minipage}[t][.45cm]',r'\end{minipage}\par'+'\n'+r'\begin{minipage}[t][.45cm]')
+s=s.replace(r'\InfoTables\smallskip',r'\InfoTables\smallskip')
+# Width interpretation paragraph needs a genuine paragraph break after the table.
+s=s.replace(r'\end{tabularx}\R{6}',r'\end{tabularx}\par\smallskip\R{6}')
+p.write_text(s,encoding='utf8')
+Path('tmp/c2_slides_rebuild/lesson.tex').write_text(s,encoding='utf8')
+Path('tmp/c2_slides_rebuild/handout.tex').write_text(s.replace('[12pt,aspectratio=169]','[handout,12pt,aspectratio=169]'),encoding='utf8')

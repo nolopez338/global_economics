@@ -42,40 +42,65 @@ tick label style={font=\small},label style={font=\small},
 ylabel={$\cTwoCDFHL{F_X(x)}$},clip=false}}
 
 % Local supplementary representations; shared bar graph macros are unchanged.
-\pgfplotsset{cTwoCombined/.style={width=.98\linewidth,height=9cm,
+\pgfplotsset{cTwoCombined/.style={width=.86\linewidth,height=4.8cm,scale only axis,
 every axis plot/.append style={forget plot},axis lines=left,x axis line style={->},ymin=-.035,ymax=1.13,
-ytick={0,.25,.5,.75,1},ylabel={Probability},grid=major,
+ytick={0,.25,.5,.75,1},grid=major,
 grid style={gray!15},tick label style={font=\small},
 label style={font=\small},clip=false,
-legend style={at={(.5,-.2)},anchor=north,legend columns=3,
+legend style={at={(.5,-.27)},anchor=north,legend columns=2,
 font=\footnotesize,draw=none,cells={anchor=west}},
 },cTwoMass/.style={cTwoMassColor,thick},
-cTwoPhantom/.style={cTwoGuideColor,densely dashed,line width=1.5pt},
+cTwoPhantom/.style={cTwoGuideColor,densely dashed,line width=.9pt},
 cTwoStep/.style={cTwoCDFColor,thick},
 cTwoIncluded/.style={only marks,mark=*,cTwoCDFColor,mark size=1.1pt},
 cTwoExcluded/.style={only marks,mark=*,cTwoCDFColor,
 mark options={fill=white},mark size=1.1pt}}
 % Arguments: supported value, exact mass, cumulative height immediately before it.
 % Only a vertical translation is applied: upper height = lower height + mass.
+% Coordinates are saved inside their own axes, then joined after both axes end.
+\usetikzlibrary{backgrounds,calc}
+\tikzset{cTwoCorrespondence/.style={gray!70,line width=.25pt,-{Stealth[length=3.5pt,width=3pt]}}}
+\newcommand{\cTwoCorrespondence}[1]{%
+\begingroup
+% Maximum sideways bow in physical units, independent of the axis scales.
+\def\cTwoCorrespondenceBow{3mm}%
+% Quadratic Bezier with midpoint control shifted by twice the bow;
+% its equivalent cubic controls lie at 1/3 and 2/3, shifted by 4/3 of it.
+\pgfmathsetlengthmacro{\cTwoControlOffset}{4/3*\cTwoCorrespondenceBow}%
+% Paint behind the stems and markers, even though both axes are already defined.
+\begin{pgfonlayer}{background}
+\draw[cTwoCorrespondence] (cTwoMassMid-#1)
+  .. controls ([xshift=\cTwoControlOffset]$(cTwoMassMid-#1)!1/3!(cTwoShadowMid-#1)$)
+          and ([xshift=\cTwoControlOffset]$(cTwoMassMid-#1)!2/3!(cTwoShadowMid-#1)$)
+  .. (cTwoShadowMid-#1);
+\end{pgfonlayer}%
+\endgroup}
 \newcommand{\cTwoPhantom}[3]{%
+\coordinate (cTwoShadowMid-#1) at (axis cs:#1,{#3+(#2)/2});
 \addplot[cTwoPhantom] coordinates {(#1,#3)(#1,{#3+#2})};
 \addplot[only marks,mark=*,cTwoGuideColor,mark size=1.8pt]
 coordinates {(#1,{#3+#2})};}
 \newcommand{\cTwoMass}[2]{%
+\coordinate (cTwoMassMid-#1) at (axis cs:#1,{(#2)/2});
 \addplot[cTwoMass] coordinates {(#1,0)(#1,#2)};
 \addplot[only marks,mark=*,cTwoMassColor,mark size=1.5pt]
 coordinates {(#1,#2)};}
 \newcommand{\cTwoConnectionReading}{%
-\textbf{How to read the overlay.} Blue PMF stems show isolated masses at the
-listed values; their vertical segments do not assign positive probability
-to every point along a segment. Each pale dashed stem is the same mass
-translated vertically from $0$ to $\cTwoCDFHL{F_X(a^-)}$, without moving its horizontal
-coordinate or changing its length. Its top is $\cTwoCDFHL{F_X(a)}$, so
-$\cTwoCDFHL{F_X(a)}-\cTwoCDFHL{F_X(a^-)}=\cTwoMassHL{p_X(a)}$. These guides are neither extra masses nor extra
-CDF values at the cutoff. Blue CDF filled points give the CDF values; blue CDF open
-points exclude the lower heights. At the smallest support value the
-translation is zero: the pale copy lies behind the blue PMF stem. Pale top
-dots lie behind the blue endpoint markers, which take visual priority.}
+\textbf{How to read the stacked graphs.} The top graph shows the CDF and pale
+dashed PMF shadows; the bottom graph shows the original blue PMF stems.
+The plotting areas have identical horizontal limits, support ticks, numerical
+spacing, widths and vertical scales. Stems show isolated masses, not positive
+probability at every point along a segment. Each shadow represents a jump size:
+it translates the mass vertically from $0$ to $\cTwoCDFHL{F_X(a^-)}$, keeping
+its horizontal coordinate and physical length. Its top is $\cTwoCDFHL{F_X(a)}$, so
+$\cTwoCDFHL{F_X(a)}-\cTwoCDFHL{F_X(a^-)}=\cTwoMassHL{p_X(a)}$.
+Thin upward, parabolically curved arrows show correspondence from each bottom stem's midpoint
+$(a,p_X(a)/2)$ to its top shadow's midpoint $(a,F_X(a^-)+p_X(a)/2)$,
+including the smallest support value, where $F_X(a^-)=0$.
+Their curved paths indicate correspondence, not additional probability values.
+Shadows are neither extra masses nor extra CDF values at the cutoff.
+CDF filled points give the included values; open points exclude the lower
+heights. Pale shadow top dots sit behind the CDF endpoint markers.}
 
 \begin{document}
 \maketitle
@@ -85,7 +110,7 @@ dots lie behind the blue endpoint markers, which take visual priority.}
 \textbf{How to practise.} Attempt both tasks before opening their solution links. Each problem asks for four representations: a PMF table, a discrete PMF graph, a CDF table and a step graph. Verification and contextual explanations belong inside the two solution stages. This activity focuses on constructing the representations described by C2.
 \setcounter{tocdepth}{1}\setcounter{secnumdepth}{2}
 \phantomsection\label{toc}\tableofcontents
-\clearpage
+
 \section{Introduction}\label{sec:intro}
 \subsection*{Highlight legend}
 \phantomsection\label{tab:highlight-legend}
@@ -96,10 +121,10 @@ dots lie behind the blue endpoint markers, which take visual priority.}
 \toprule
 \textbf{Symbol or notation} & \textbf{Concept} & \textbf{Brief meaning} \\
 \midrule
-$\cTwoValue{X} \> | \> \cTwoValue{x} \> | \> \cTwoValue{S_X}$ & \cTwoValue{Quantity} & Variable | Value | Support of the variable $X$. \\
+$\cTwoValue{X} \> | \> \cTwoValue{x} \> | \> \cTwoValue{S_X}$ & \cTwoValue{Quantity} & Variable | Value | Support of the variable $\cTwoValue{X}$. \\
 $\cTwoOutcome{\omega}$ & \cTwoOutcome{Outcome} & One complete result. \\
-$\cTwoMassHL{p_X(x)}=\cTwoMassHL{P}(\cTwoValue{X}=\cTwoValue{x})$ & \cTwoMassHL{PMF} & The \textbf{Probability Mass Function (PMF)} describes the probability that a discrete random variable $X$ takes a specific value $x$. \\
-$\cTwoCDFHL{F_X(x)}=\cTwoCDFHL{P}(\cTwoValue{X}\leq\cTwoValue{x})$ & \cTwoCDFHL{CDF} & The \textbf{Cumulative Distribution Function (CDF)} describes the probability that a random variable $X$ takes a value less than or equal to a specified value $x$. \\
+$\cTwoMassHL{p_X(x)}=\cTwoMassHL{P}(\cTwoValue{X}=\cTwoValue{x})$ & \cTwoMassHL{PMF} & The \textbf{Probability Mass Function (PMF)} describes the probability that a discrete random variable $\cTwoValue{X}$ takes a specific value $\cTwoValue{x}$. \\
+$\cTwoCDFHL{F_X(x)}=\cTwoCDFHL{P}(\cTwoValue{X}\leq\cTwoValue{x})$ & \cTwoCDFHL{CDF} & The \textbf{Cumulative Distribution Function (CDF)} describes the probability that a random variable $\cTwoValue{X}$ takes a value less than or equal to a specified value $\cTwoValue{x}$. \\
 \bottomrule
 \end{tabularx}
 \endgroup
@@ -184,13 +209,15 @@ $1$, a jump of $1-0.25=0.75=\cTwoMassHL{p_X(1)}$.
 \secInicio[prob:payment-intro][sec:intro]
 \clearpage
 \subsection*{Connecting the PMF and CDF}
-\textbf{Same distribution, two representations.}
-\begin{center}\begin{tikzpicture}
-\begin{axis}[cTwoCombined,xmin=-1,xmax=2,xtick={0,1},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})}]
+\textbf{Same distribution: CDF above, PMF below.}
+\begin{center}\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}
+\pgfplotsset{cTwoSupport/.style={xmin=-1,xmax=2,xtick={0,1},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})}}}
+\begin{axis}[cTwoCombined,cTwoSupport,name=cTwoTop,anchor=south west,
+xticklabel style={fill=white,inner sep=1pt},xlabel style={fill=white,inner sep=2pt},
+ylabel={$\cTwoCDFHL{F_X(x)}$},yticklabel={$\cTwoCDFHL{\pgfmathprintnumber{\tick}}$}]
 \cTwoPhantom{0}{.25}{0}
 \cTwoPhantom{1}{.75}{1/4}
-\cTwoMass{0}{.25}
-\cTwoMass{1}{.75}
 \addplot[cTwoStep,<-] coordinates {(-1,0)(0,0)};
 \addplot[cTwoStep] coordinates {(0,1/4)(1,1/4)};
 \addplot[cTwoStep,->] coordinates {(1,1)(2,1)};
@@ -198,10 +225,20 @@ $1$, a jump of $1-0.25=0.75=\cTwoMassHL{p_X(1)}$.
 \addplot[cTwoIncluded] coordinates {(0,1/4)(1,1)};
 \node[anchor=east,xshift=-9pt,font=\footnotesize,fill=white,inner sep=2pt] (jumpLabel) at (axis cs:1,5/8) {jump height = $p_X(1)$};
 \draw[gray,thin] (jumpLabel.east) -- (axis cs:1,5/8);
-\addlegendimage{cTwoMass,mark=*}\addlegendentry{PMF stems}
-\addlegendimage{cTwoStep}\addlegendentry{CDF steps}
-\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Translated PMF stems}
-\end{axis}\end{tikzpicture}\end{center}
+\end{axis}
+\begin{axis}[cTwoCombined,cTwoSupport,at={(cTwoTop.south west)},
+anchor=north west,yshift=-1.65cm,ylabel={$\cTwoMassHL{p_X(x)}$},
+yticklabel={$\cTwoMassHL{\pgfmathprintnumber{\tick}}$}]
+\cTwoMass{0}{.25}
+\cTwoMass{1}{.75}
+\addlegendimage{cTwoStep}\addlegendentry{Top: CDF steps}
+\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Top: PMF shadows (jump sizes)}
+\addlegendimage{cTwoMass,mark=*}\addlegendentry{Bottom: PMF stems}
+\addlegendimage{cTwoCorrespondence}\addlegendentry{Midpoint correspondence}
+\end{axis}
+\cTwoCorrespondence{0}
+\cTwoCorrespondence{1}
+\end{tikzpicture}\end{minipage}\end{center}
 \cTwoConnectionReading
 \par\smallskip At $a=1$ USD, the cumulative increase is $\cTwoCDFHL{1}-\cTwoCDFHL{0.25}=\cTwoMassHL{0.75}=\cTwoMassHL{p_X(1)}$. The 1 USD fee adds the probability of both card methods.
 \ifGTenHighlights\else\par\vspace{3mm}\fi
@@ -301,15 +338,16 @@ $x\geq 2$ & $\cTwoCDFHL{1}$ \\
 \secInicio[prob:fees][sec:general]
 \clearpage
 \subsection*{Connecting the PMF and CDF}
-\textbf{Same distribution, two representations.}
-\begin{center}\begin{tikzpicture}
-\begin{axis}[cTwoCombined,xmin=-1,xmax=3,xtick={0,1,2},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})}]
+\textbf{Same distribution: CDF above, PMF below.}
+\begin{center}\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}
+\pgfplotsset{cTwoSupport/.style={xmin=-1,xmax=3,xtick={0,1,2},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})}}}
+\begin{axis}[cTwoCombined,cTwoSupport,name=cTwoTop,anchor=south west,
+xticklabel style={fill=white,inner sep=1pt},xlabel style={fill=white,inner sep=2pt},
+ylabel={$\cTwoCDFHL{F_X(x)}$},yticklabel={$\cTwoCDFHL{\pgfmathprintnumber{\tick}}$}]
 \cTwoPhantom{0}{.1}{0}
 \cTwoPhantom{1}{.5}{1/10}
 \cTwoPhantom{2}{.4}{3/5}
-\cTwoMass{0}{.1}
-\cTwoMass{1}{.5}
-\cTwoMass{2}{.4}
 \addplot[cTwoStep,<-] coordinates {(-1,0)(0,0)};
 \addplot[cTwoStep] coordinates {(0,1/10)(1,1/10)};
 \addplot[cTwoStep] coordinates {(1,3/5)(2,3/5)};
@@ -318,10 +356,22 @@ $x\geq 2$ & $\cTwoCDFHL{1}$ \\
 \addplot[cTwoIncluded] coordinates {(0,1/10)(1,3/5)(2,1)};
 \node[anchor=east,xshift=-9pt,font=\footnotesize,fill=white,inner sep=2pt] (jumpLabel) at (axis cs:1,7/20) {jump height = $p_X(1)$};
 \draw[gray,thin] (jumpLabel.east) -- (axis cs:1,7/20);
-\addlegendimage{cTwoMass,mark=*}\addlegendentry{PMF stems}
-\addlegendimage{cTwoStep}\addlegendentry{CDF steps}
-\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Translated PMF stems}
-\end{axis}\end{tikzpicture}\end{center}
+\end{axis}
+\begin{axis}[cTwoCombined,cTwoSupport,at={(cTwoTop.south west)},
+anchor=north west,yshift=-1.65cm,ylabel={$\cTwoMassHL{p_X(x)}$},
+yticklabel={$\cTwoMassHL{\pgfmathprintnumber{\tick}}$}]
+\cTwoMass{0}{.1}
+\cTwoMass{1}{.5}
+\cTwoMass{2}{.4}
+\addlegendimage{cTwoStep}\addlegendentry{Top: CDF steps}
+\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Top: PMF shadows (jump sizes)}
+\addlegendimage{cTwoMass,mark=*}\addlegendentry{Bottom: PMF stems}
+\addlegendimage{cTwoCorrespondence}\addlegendentry{Midpoint correspondence}
+\end{axis}
+\cTwoCorrespondence{0}
+\cTwoCorrespondence{1}
+\cTwoCorrespondence{2}
+\end{tikzpicture}\end{minipage}\end{center}
 \cTwoConnectionReading
 \par\smallskip At $a=1$ USD, the cumulative increase is $\cTwoCDFHL{0.6}-\cTwoCDFHL{0.1}=\cTwoMassHL{0.5}=\cTwoMassHL{p_X(1)}$. Both card methods supply the mass at 1 USD.
 \ifGTenHighlights\else\par\vspace{3mm}\fi
@@ -369,15 +419,16 @@ $x\geq 2$ & $\cTwoCDFHL{1}$ \\
 \secInicio[prob:bike][sec:general]
 \clearpage
 \subsection*{Connecting the PMF and CDF}
-\textbf{Same distribution, two representations.}
-\begin{center}\begin{tikzpicture}
-\begin{axis}[cTwoCombined,xmin=-1,xmax=3,xtick={0,1,2},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})}]
+\textbf{Same distribution: CDF above, PMF below.}
+\begin{center}\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}
+\pgfplotsset{cTwoSupport/.style={xmin=-1,xmax=3,xtick={0,1,2},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})}}}
+\begin{axis}[cTwoCombined,cTwoSupport,name=cTwoTop,anchor=south west,
+xticklabel style={fill=white,inner sep=1pt},xlabel style={fill=white,inner sep=2pt},
+ylabel={$\cTwoCDFHL{F_X(x)}$},yticklabel={$\cTwoCDFHL{\pgfmathprintnumber{\tick}}$}]
 \cTwoPhantom{0}{.1}{0}
 \cTwoPhantom{1}{.5}{1/10}
 \cTwoPhantom{2}{.4}{3/5}
-\cTwoMass{0}{.1}
-\cTwoMass{1}{.5}
-\cTwoMass{2}{.4}
 \addplot[cTwoStep,<-] coordinates {(-1,0)(0,0)};
 \addplot[cTwoStep] coordinates {(0,1/10)(1,1/10)};
 \addplot[cTwoStep] coordinates {(1,3/5)(2,3/5)};
@@ -386,10 +437,22 @@ $x\geq 2$ & $\cTwoCDFHL{1}$ \\
 \addplot[cTwoIncluded] coordinates {(0,1/10)(1,3/5)(2,1)};
 \node[anchor=east,xshift=-9pt,font=\footnotesize,fill=white,inner sep=2pt] (jumpLabel) at (axis cs:1,7/20) {jump height = $p_X(1)$};
 \draw[gray,thin] (jumpLabel.east) -- (axis cs:1,7/20);
-\addlegendimage{cTwoMass,mark=*}\addlegendentry{PMF stems}
-\addlegendimage{cTwoStep}\addlegendentry{CDF steps}
-\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Translated PMF stems}
-\end{axis}\end{tikzpicture}\end{center}
+\end{axis}
+\begin{axis}[cTwoCombined,cTwoSupport,at={(cTwoTop.south west)},
+anchor=north west,yshift=-1.65cm,ylabel={$\cTwoMassHL{p_X(x)}$},
+yticklabel={$\cTwoMassHL{\pgfmathprintnumber{\tick}}$}]
+\cTwoMass{0}{.1}
+\cTwoMass{1}{.5}
+\cTwoMass{2}{.4}
+\addlegendimage{cTwoStep}\addlegendentry{Top: CDF steps}
+\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Top: PMF shadows (jump sizes)}
+\addlegendimage{cTwoMass,mark=*}\addlegendentry{Bottom: PMF stems}
+\addlegendimage{cTwoCorrespondence}\addlegendentry{Midpoint correspondence}
+\end{axis}
+\cTwoCorrespondence{0}
+\cTwoCorrespondence{1}
+\cTwoCorrespondence{2}
+\end{tikzpicture}\end{minipage}\end{center}
 \cTwoConnectionReading
 \par\smallskip At $a=1$ USD, the cumulative increase is $\cTwoCDFHL{0.6}-\cTwoCDFHL{0.1}=\cTwoMassHL{0.5}=\cTwoMassHL{p_X(1)}$. The two shorter delay categories together add probability 0.5 at the 1 USD fee.
 \ifGTenHighlights\else\par\vspace{3mm}\fi
@@ -447,17 +510,17 @@ $x\geq 9$ & $\cTwoCDFHL{1}$ \\
 \secInicio[prob:recycling][sec:general]
 \clearpage
 \subsection*{Connecting the PMF and CDF}
-\textbf{Same distribution, two representations.}
-\begin{center}\begin{tikzpicture}
-\begin{axis}[cTwoCombined,xmin=-1,xmax=10,xtick={0,2,5,9},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})}]
+\textbf{Same distribution: CDF above, PMF below.}
+\begin{center}\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}
+\pgfplotsset{cTwoSupport/.style={xmin=-1,xmax=10,xtick={0,2,5,9},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})}}}
+\begin{axis}[cTwoCombined,cTwoSupport,name=cTwoTop,anchor=south west,
+xticklabel style={fill=white,inner sep=1pt},xlabel style={fill=white,inner sep=2pt},
+ylabel={$\cTwoCDFHL{F_X(x)}$},yticklabel={$\cTwoCDFHL{\pgfmathprintnumber{\tick}}$}]
 \cTwoPhantom{0}{.1}{0}
 \cTwoPhantom{2}{.35}{1/10}
 \cTwoPhantom{5}{.35}{9/20}
 \cTwoPhantom{9}{.2}{4/5}
-\cTwoMass{0}{.1}
-\cTwoMass{2}{.35}
-\cTwoMass{5}{.35}
-\cTwoMass{9}{.2}
 \addplot[cTwoStep,<-] coordinates {(-1,0)(0,0)};
 \addplot[cTwoStep] coordinates {(0,1/10)(2,1/10)};
 \addplot[cTwoStep] coordinates {(2,9/20)(5,9/20)};
@@ -467,10 +530,24 @@ $x\geq 9$ & $\cTwoCDFHL{1}$ \\
 \addplot[cTwoIncluded] coordinates {(0,1/10)(2,9/20)(5,4/5)(9,1)};
 \node[anchor=east,xshift=-9pt,font=\footnotesize,fill=white,inner sep=2pt] (jumpLabel) at (axis cs:5,5/8) {jump height = $p_X(5)$};
 \draw[gray,thin] (jumpLabel.east) -- (axis cs:5,5/8);
-\addlegendimage{cTwoMass,mark=*}\addlegendentry{PMF stems}
-\addlegendimage{cTwoStep}\addlegendentry{CDF steps}
-\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Translated PMF stems}
-\end{axis}\end{tikzpicture}\end{center}
+\end{axis}
+\begin{axis}[cTwoCombined,cTwoSupport,at={(cTwoTop.south west)},
+anchor=north west,yshift=-1.65cm,ylabel={$\cTwoMassHL{p_X(x)}$},
+yticklabel={$\cTwoMassHL{\pgfmathprintnumber{\tick}}$}]
+\cTwoMass{0}{.1}
+\cTwoMass{2}{.35}
+\cTwoMass{5}{.35}
+\cTwoMass{9}{.2}
+\addlegendimage{cTwoStep}\addlegendentry{Top: CDF steps}
+\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Top: PMF shadows (jump sizes)}
+\addlegendimage{cTwoMass,mark=*}\addlegendentry{Bottom: PMF stems}
+\addlegendimage{cTwoCorrespondence}\addlegendentry{Midpoint correspondence}
+\end{axis}
+\cTwoCorrespondence{0}
+\cTwoCorrespondence{2}
+\cTwoCorrespondence{5}
+\cTwoCorrespondence{9}
+\end{tikzpicture}\end{minipage}\end{center}
 \cTwoConnectionReading
 \par\smallskip At $a=5$ USD, the cumulative increase is $\cTwoCDFHL{0.8}-\cTwoCDFHL{0.45}=\cTwoMassHL{0.35}=\cTwoMassHL{p_X(5)}$. Plastic and steel together supply the mass at 5 USD. The unequal horizontal gaps are unchanged.
 \ifGTenHighlights\else\par\vspace{3mm}\fi
@@ -527,17 +604,17 @@ $x\geq 6$ & $\cTwoCDFHL{1}$ \\
 \secInicio[prob:claims][sec:general]
 \clearpage
 \subsection*{Connecting the PMF and CDF}
-\textbf{Same distribution, two representations.}
-\begin{center}\begin{tikzpicture}
-\begin{axis}[cTwoCombined,xmin=-2,xmax=8,xtick={0,2,4,6},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})}]
+\textbf{Same distribution: CDF above, PMF below.}
+\begin{center}\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}
+\pgfplotsset{cTwoSupport/.style={xmin=-2,xmax=8,xtick={0,2,4,6},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})}}}
+\begin{axis}[cTwoCombined,cTwoSupport,name=cTwoTop,anchor=south west,
+xticklabel style={fill=white,inner sep=1pt},xlabel style={fill=white,inner sep=2pt},
+ylabel={$\cTwoCDFHL{F_X(x)}$},yticklabel={$\cTwoCDFHL{\pgfmathprintnumber{\tick}}$}]
 \cTwoPhantom{0}{.25}{0}
 \cTwoPhantom{2}{.2}{1/4}
 \cTwoPhantom{4}{.3}{9/20}
 \cTwoPhantom{6}{.25}{3/4}
-\cTwoMass{0}{.25}
-\cTwoMass{2}{.2}
-\cTwoMass{4}{.3}
-\cTwoMass{6}{.25}
 \addplot[cTwoStep,<-] coordinates {(-2,0)(0,0)};
 \addplot[cTwoStep] coordinates {(0,1/4)(2,1/4)};
 \addplot[cTwoStep] coordinates {(2,9/20)(4,9/20)};
@@ -547,10 +624,24 @@ $x\geq 6$ & $\cTwoCDFHL{1}$ \\
 \addplot[cTwoIncluded] coordinates {(0,1/4)(2,9/20)(4,3/4)(6,1)};
 \node[anchor=east,xshift=-9pt,font=\footnotesize,fill=white,inner sep=2pt] (jumpLabel) at (axis cs:4,3/5) {jump height = $p_X(4)$};
 \draw[gray,thin] (jumpLabel.east) -- (axis cs:4,3/5);
-\addlegendimage{cTwoMass,mark=*}\addlegendentry{PMF stems}
-\addlegendimage{cTwoStep}\addlegendentry{CDF steps}
-\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Translated PMF stems}
-\end{axis}\end{tikzpicture}\end{center}
+\end{axis}
+\begin{axis}[cTwoCombined,cTwoSupport,at={(cTwoTop.south west)},
+anchor=north west,yshift=-1.65cm,ylabel={$\cTwoMassHL{p_X(x)}$},
+yticklabel={$\cTwoMassHL{\pgfmathprintnumber{\tick}}$}]
+\cTwoMass{0}{.25}
+\cTwoMass{2}{.2}
+\cTwoMass{4}{.3}
+\cTwoMass{6}{.25}
+\addlegendimage{cTwoStep}\addlegendentry{Top: CDF steps}
+\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Top: PMF shadows (jump sizes)}
+\addlegendimage{cTwoMass,mark=*}\addlegendentry{Bottom: PMF stems}
+\addlegendimage{cTwoCorrespondence}\addlegendentry{Midpoint correspondence}
+\end{axis}
+\cTwoCorrespondence{0}
+\cTwoCorrespondence{2}
+\cTwoCorrespondence{4}
+\cTwoCorrespondence{6}
+\end{tikzpicture}\end{minipage}\end{center}
 \cTwoConnectionReading
 \par\smallskip At $a=4$ USD, the cumulative increase is $\cTwoCDFHL{0.75}-\cTwoCDFHL{0.45}=\cTwoMassHL{0.30}=\cTwoMassHL{p_X(4)}$. Two claims supply the mass at 4 USD; the final jump at 6 groups three and four claims.
 \ifGTenHighlights\else\par\vspace{3mm}\fi
@@ -623,17 +714,17 @@ $x\geq 12$ & $\cTwoCDFHL{1}$ \\
 \secInicio[prob:notebooks][sec:general]
 \clearpage
 \subsection*{Connecting the PMF and CDF}
-\textbf{Same distribution, two representations.}
-\begin{center}\begin{tikzpicture}
-\begin{axis}[cTwoCombined,xmin=-2,xmax=14,xtick={0,5,10,12},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})}]
+\textbf{Same distribution: CDF above, PMF below.}
+\begin{center}\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}
+\pgfplotsset{cTwoSupport/.style={xmin=-2,xmax=14,xtick={0,5,10,12},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})}}}
+\begin{axis}[cTwoCombined,cTwoSupport,name=cTwoTop,anchor=south west,
+xticklabel style={fill=white,inner sep=1pt},xlabel style={fill=white,inner sep=2pt},
+ylabel={$\cTwoCDFHL{F_X(x)}$},yticklabel={$\cTwoCDFHL{\pgfmathprintnumber{\tick}}$}]
 \cTwoPhantom{0}{.125}{0}
 \cTwoPhantom{5}{.375}{1/8}
 \cTwoPhantom{10}{.375}{1/2}
 \cTwoPhantom{12}{.125}{7/8}
-\cTwoMass{0}{.125}
-\cTwoMass{5}{.375}
-\cTwoMass{10}{.375}
-\cTwoMass{12}{.125}
 \addplot[cTwoStep,<-] coordinates {(-2,0)(0,0)};
 \addplot[cTwoStep] coordinates {(0,1/8)(5,1/8)};
 \addplot[cTwoStep] coordinates {(5,1/2)(10,1/2)};
@@ -643,10 +734,24 @@ $x\geq 12$ & $\cTwoCDFHL{1}$ \\
 \addplot[cTwoIncluded] coordinates {(0,1/8)(5,1/2)(10,7/8)(12,1)};
 \node[anchor=east,xshift=-9pt,font=\footnotesize,fill=white,inner sep=2pt] (jumpLabel) at (axis cs:10,11/16) {jump height = $p_X(10)$};
 \draw[gray,thin] (jumpLabel.east) -- (axis cs:10,11/16);
-\addlegendimage{cTwoMass,mark=*}\addlegendentry{PMF stems}
-\addlegendimage{cTwoStep}\addlegendentry{CDF steps}
-\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Translated PMF stems}
-\end{axis}\end{tikzpicture}\end{center}
+\end{axis}
+\begin{axis}[cTwoCombined,cTwoSupport,at={(cTwoTop.south west)},
+anchor=north west,yshift=-1.65cm,ylabel={$\cTwoMassHL{p_X(x)}$},
+yticklabel={$\cTwoMassHL{\pgfmathprintnumber{\tick}}$}]
+\cTwoMass{0}{.125}
+\cTwoMass{5}{.375}
+\cTwoMass{10}{.375}
+\cTwoMass{12}{.125}
+\addlegendimage{cTwoStep}\addlegendentry{Top: CDF steps}
+\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Top: PMF shadows (jump sizes)}
+\addlegendimage{cTwoMass,mark=*}\addlegendentry{Bottom: PMF stems}
+\addlegendimage{cTwoCorrespondence}\addlegendentry{Midpoint correspondence}
+\end{axis}
+\cTwoCorrespondence{0}
+\cTwoCorrespondence{5}
+\cTwoCorrespondence{10}
+\cTwoCorrespondence{12}
+\end{tikzpicture}\end{minipage}\end{center}
 \cTwoConnectionReading
 \par\smallskip At $a=10$ USD, the cumulative increase is $\cTwoCDFHL{0.875}-\cTwoCDFHL{0.5}=\cTwoMassHL{0.375}=\cTwoMassHL{p_X(10)}$. Exactly two buyers supply the mass at 10 USD; the discount keeps the final support gap at 2 USD.
 \ifGTenHighlights\else\par\vspace{3mm}\fi
@@ -720,19 +825,18 @@ $x\geq 10$ & $\cTwoCDFHL{1}$ \\
 \secInicio[prob:investment][sec:general]
 \clearpage
 \subsection*{Connecting the PMF and CDF}
-\textbf{Same distribution, two representations.}
-\begin{center}\begin{tikzpicture}
-\begin{axis}[cTwoCombined,xmin=-6,xmax=12,xtick={-4,0,4,6,10},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})}]
+\textbf{Same distribution: CDF above, PMF below.}
+\begin{center}\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}
+\pgfplotsset{cTwoSupport/.style={xmin=-6,xmax=12,xtick={-4,0,4,6,10},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})}}}
+\begin{axis}[cTwoCombined,cTwoSupport,name=cTwoTop,anchor=south west,
+xticklabel style={fill=white,inner sep=1pt},xlabel style={fill=white,inner sep=2pt},
+ylabel={$\cTwoCDFHL{F_X(x)}$},yticklabel={$\cTwoCDFHL{\pgfmathprintnumber{\tick}}$}]
 \cTwoPhantom{-4}{.12}{0}
 \cTwoPhantom{0}{.38}{3/25}
 \cTwoPhantom{4}{.2}{1/2}
 \cTwoPhantom{6}{.18}{7/10}
 \cTwoPhantom{10}{.12}{22/25}
-\cTwoMass{-4}{.12}
-\cTwoMass{0}{.38}
-\cTwoMass{4}{.2}
-\cTwoMass{6}{.18}
-\cTwoMass{10}{.12}
 \addplot[cTwoStep,<-] coordinates {(-6,0)(-4,0)};
 \addplot[cTwoStep] coordinates {(-4,3/25)(0,3/25)};
 \addplot[cTwoStep] coordinates {(0,1/2)(4,1/2)};
@@ -743,10 +847,26 @@ $x\geq 10$ & $\cTwoCDFHL{1}$ \\
 \addplot[cTwoIncluded] coordinates {(-4,3/25)(0,1/2)(4,7/10)(6,22/25)(10,1)};
 \node[anchor=west,xshift=9pt,font=\footnotesize,fill=white,inner sep=2pt] (jumpLabel) at (axis cs:0,31/100) {jump height = $p_X(0)$};
 \draw[gray,thin] (jumpLabel.west) -- (axis cs:0,31/100);
-\addlegendimage{cTwoMass,mark=*}\addlegendentry{PMF stems}
-\addlegendimage{cTwoStep}\addlegendentry{CDF steps}
-\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Translated PMF stems}
-\end{axis}\end{tikzpicture}\end{center}
+\end{axis}
+\begin{axis}[cTwoCombined,cTwoSupport,at={(cTwoTop.south west)},
+anchor=north west,yshift=-1.65cm,ylabel={$\cTwoMassHL{p_X(x)}$},
+yticklabel={$\cTwoMassHL{\pgfmathprintnumber{\tick}}$}]
+\cTwoMass{-4}{.12}
+\cTwoMass{0}{.38}
+\cTwoMass{4}{.2}
+\cTwoMass{6}{.18}
+\cTwoMass{10}{.12}
+\addlegendimage{cTwoStep}\addlegendentry{Top: CDF steps}
+\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Top: PMF shadows (jump sizes)}
+\addlegendimage{cTwoMass,mark=*}\addlegendentry{Bottom: PMF stems}
+\addlegendimage{cTwoCorrespondence}\addlegendentry{Midpoint correspondence}
+\end{axis}
+\cTwoCorrespondence{-4}
+\cTwoCorrespondence{0}
+\cTwoCorrespondence{4}
+\cTwoCorrespondence{6}
+\cTwoCorrespondence{10}
+\end{tikzpicture}\end{minipage}\end{center}
 \cTwoConnectionReading
 \par\smallskip At $a=0$ USD, the cumulative increase is $\cTwoCDFHL{0.50}-\cTwoCDFHL{0.12}=\cTwoMassHL{0.38}=\cTwoMassHL{p_X(0)}$. The jump at zero adds both break-even outcomes. The negative support value $-4$ retains its positive mass 0.12.
 \ifGTenHighlights\else\par\vspace{3mm}\fi
@@ -803,15 +923,16 @@ $x\geq 5$ & $\cTwoCDFHL{1}$ \\
 \secInicio[prob:refund][sec:advanced]
 \clearpage
 \subsection*{Connecting the PMF and CDF}
-\textbf{Same distribution, two representations.}
-\begin{center}\begin{tikzpicture}
-\begin{axis}[cTwoCombined,xmin=-1,xmax=6,xtick={0,2,5},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})}]
+\textbf{Same distribution: CDF above, PMF below.}
+\begin{center}\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}
+\pgfplotsset{cTwoSupport/.style={xmin=-1,xmax=6,xtick={0,2,5},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})}}}
+\begin{axis}[cTwoCombined,cTwoSupport,name=cTwoTop,anchor=south west,
+xticklabel style={fill=white,inner sep=1pt},xlabel style={fill=white,inner sep=2pt},
+ylabel={$\cTwoCDFHL{F_X(x)}$},yticklabel={$\cTwoCDFHL{\pgfmathprintnumber{\tick}}$}]
 \cTwoPhantom{0}{1/6}{0}
 \cTwoPhantom{2}{1/3}{1/6}
 \cTwoPhantom{5}{1/2}{1/2}
-\cTwoMass{0}{1/6}
-\cTwoMass{2}{1/3}
-\cTwoMass{5}{1/2}
 \addplot[cTwoStep,<-] coordinates {(-1,0)(0,0)};
 \addplot[cTwoStep] coordinates {(0,1/6)(2,1/6)};
 \addplot[cTwoStep] coordinates {(2,1/2)(5,1/2)};
@@ -820,10 +941,22 @@ $x\geq 5$ & $\cTwoCDFHL{1}$ \\
 \addplot[cTwoIncluded] coordinates {(0,1/6)(2,1/2)(5,1)};
 \node[anchor=west,xshift=9pt,font=\footnotesize,fill=white,inner sep=2pt] (jumpLabel) at (axis cs:2,1/3) {jump height = $p_X(2)$};
 \draw[gray,thin] (jumpLabel.west) -- (axis cs:2,1/3);
-\addlegendimage{cTwoMass,mark=*}\addlegendentry{PMF stems}
-\addlegendimage{cTwoStep}\addlegendentry{CDF steps}
-\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Translated PMF stems}
-\end{axis}\end{tikzpicture}\end{center}
+\end{axis}
+\begin{axis}[cTwoCombined,cTwoSupport,at={(cTwoTop.south west)},
+anchor=north west,yshift=-1.65cm,ylabel={$\cTwoMassHL{p_X(x)}$},
+yticklabel={$\cTwoMassHL{\pgfmathprintnumber{\tick}}$}]
+\cTwoMass{0}{1/6}
+\cTwoMass{2}{1/3}
+\cTwoMass{5}{1/2}
+\addlegendimage{cTwoStep}\addlegendentry{Top: CDF steps}
+\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Top: PMF shadows (jump sizes)}
+\addlegendimage{cTwoMass,mark=*}\addlegendentry{Bottom: PMF stems}
+\addlegendimage{cTwoCorrespondence}\addlegendentry{Midpoint correspondence}
+\end{axis}
+\cTwoCorrespondence{0}
+\cTwoCorrespondence{2}
+\cTwoCorrespondence{5}
+\end{tikzpicture}\end{minipage}\end{center}
 \cTwoConnectionReading
 \par\smallskip At $a=2$ USD, the cumulative increase is $\cTwoCDFHL{\frac12}-\cTwoCDFHL{\frac16}=\cTwoMassHL{\frac13}=\cTwoMassHL{p_X(2)}$. The 2 USD refund adds twice the mass of no refund.
 \ifGTenHighlights\else\par\vspace{3mm}\fi
@@ -934,19 +1067,18 @@ $x\geq10$ & $\cTwoCDFHL{1}$ \\\bottomrule\end{tabular}
 \secInicio[prob:prize][sec:advanced]
 \clearpage
 \subsection*{Connecting the PMF and CDF}
-\textbf{Same distribution, two representations.}
-\begin{center}\begin{tikzpicture}
-\begin{axis}[cTwoCombined,xmin=-1,xmax=11,xtick={0,2,4,5,10},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})}]
+\textbf{Same distribution: CDF above, PMF below.}
+\begin{center}\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}
+\pgfplotsset{cTwoSupport/.style={xmin=-1,xmax=11,xtick={0,2,4,5,10},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})}}}
+\begin{axis}[cTwoCombined,cTwoSupport,name=cTwoTop,anchor=south west,
+xticklabel style={fill=white,inner sep=1pt},xlabel style={fill=white,inner sep=2pt},
+ylabel={$\cTwoCDFHL{F_X(x)}$},yticklabel={$\cTwoCDFHL{\pgfmathprintnumber{\tick}}$}]
 \cTwoPhantom{0}{1/35}{0}
 \cTwoPhantom{2}{6/35}{1/35}
 \cTwoPhantom{4}{3/35}{1/5}
 \cTwoPhantom{5}{6/35}{2/7}
 \cTwoPhantom{10}{19/35}{16/35}
-\cTwoMass{0}{1/35}
-\cTwoMass{2}{6/35}
-\cTwoMass{4}{3/35}
-\cTwoMass{5}{6/35}
-\cTwoMass{10}{19/35}
 \addplot[cTwoStep,<-] coordinates {(-1,0)(0,0)};
 \addplot[cTwoStep] coordinates {(0,1/35)(2,1/35)};
 \addplot[cTwoStep] coordinates {(2,1/5)(4,1/5)};
@@ -957,10 +1089,26 @@ $x\geq10$ & $\cTwoCDFHL{1}$ \\\bottomrule\end{tabular}
 \addplot[cTwoIncluded] coordinates {(0,1/35)(2,1/5)(4,2/7)(5,16/35)(10,1)};
 \node[anchor=east,xshift=-9pt,font=\footnotesize,fill=white,inner sep=2pt] (jumpLabel) at (axis cs:10,51/70) {jump height = $p_X(10)$};
 \draw[gray,thin] (jumpLabel.east) -- (axis cs:10,51/70);
-\addlegendimage{cTwoMass,mark=*}\addlegendentry{PMF stems}
-\addlegendimage{cTwoStep}\addlegendentry{CDF steps}
-\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Translated PMF stems}
-\end{axis}\end{tikzpicture}\end{center}
+\end{axis}
+\begin{axis}[cTwoCombined,cTwoSupport,at={(cTwoTop.south west)},
+anchor=north west,yshift=-1.65cm,ylabel={$\cTwoMassHL{p_X(x)}$},
+yticklabel={$\cTwoMassHL{\pgfmathprintnumber{\tick}}$}]
+\cTwoMass{0}{1/35}
+\cTwoMass{2}{6/35}
+\cTwoMass{4}{3/35}
+\cTwoMass{5}{6/35}
+\cTwoMass{10}{19/35}
+\addlegendimage{cTwoStep}\addlegendentry{Top: CDF steps}
+\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Top: PMF shadows (jump sizes)}
+\addlegendimage{cTwoMass,mark=*}\addlegendentry{Bottom: PMF stems}
+\addlegendimage{cTwoCorrespondence}\addlegendentry{Midpoint correspondence}
+\end{axis}
+\cTwoCorrespondence{0}
+\cTwoCorrespondence{2}
+\cTwoCorrespondence{4}
+\cTwoCorrespondence{5}
+\cTwoCorrespondence{10}
+\end{tikzpicture}\end{minipage}\end{center}
 \cTwoConnectionReading
 \par\smallskip At $a=10$ USD, the cumulative increase is $\cTwoCDFHL{1}-\cTwoCDFHL{\frac{16}{35}}=\cTwoMassHL{\frac{19}{35}}=\cTwoMassHL{p_X(10)}$. The jump at 10 USD combines all four capped compositions.
 \ifGTenHighlights\else\par\vspace{3mm}\fi
@@ -1080,21 +1228,19 @@ agreeing with the accumulated PMF. The cap makes $\cTwoCDFHL{F_X(6)}=\cTwoCDFHL{
 \secInicio[prob:maintenance][sec:advanced]
 \clearpage
 \subsection*{Connecting the PMF and CDF}
-\textbf{Same distribution, two representations.}
-\begin{center}\begin{tikzpicture}
-\begin{axis}[cTwoCombined,xmin=-1,xmax=7,xtick={0,1,3,4,5,6},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})}]
+\textbf{Same distribution: CDF above, PMF below.}
+\begin{center}\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}
+\pgfplotsset{cTwoSupport/.style={xmin=-1,xmax=7,xtick={0,1,3,4,5,6},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})}}}
+\begin{axis}[cTwoCombined,cTwoSupport,name=cTwoTop,anchor=south west,
+xticklabel style={fill=white,inner sep=1pt},xlabel style={fill=white,inner sep=2pt},
+ylabel={$\cTwoCDFHL{F_X(x)}$},yticklabel={$\cTwoCDFHL{\pgfmathprintnumber{\tick}}$}]
 \cTwoPhantom{0}{28/128}{0}
 \cTwoPhantom{1}{27/128}{7/32}
 \cTwoPhantom{3}{9/128}{55/128}
 \cTwoPhantom{4}{9/128}{1/2}
 \cTwoPhantom{5}{1/128}{73/128}
 \cTwoPhantom{6}{54/128}{37/64}
-\cTwoMass{0}{28/128}
-\cTwoMass{1}{27/128}
-\cTwoMass{3}{9/128}
-\cTwoMass{4}{9/128}
-\cTwoMass{5}{1/128}
-\cTwoMass{6}{54/128}
 \addplot[cTwoStep,<-] coordinates {(-1,0)(0,0)};
 \addplot[cTwoStep] coordinates {(0,7/32)(1,7/32)};
 \addplot[cTwoStep] coordinates {(1,55/128)(3,55/128)};
@@ -1106,10 +1252,28 @@ agreeing with the accumulated PMF. The cap makes $\cTwoCDFHL{F_X(6)}=\cTwoCDFHL{
 \addplot[cTwoIncluded] coordinates {(0,7/32)(1,55/128)(3,1/2)(4,73/128)(5,37/64)(6,1)};
 \node[anchor=east,xshift=-9pt,font=\footnotesize,fill=white,inner sep=2pt] (jumpLabel) at (axis cs:6,101/128) {jump height = $p_X(6)$};
 \draw[gray,thin] (jumpLabel.east) -- (axis cs:6,101/128);
-\addlegendimage{cTwoMass,mark=*}\addlegendentry{PMF stems}
-\addlegendimage{cTwoStep}\addlegendentry{CDF steps}
-\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Translated PMF stems}
-\end{axis}\end{tikzpicture}\end{center}
+\end{axis}
+\begin{axis}[cTwoCombined,cTwoSupport,at={(cTwoTop.south west)},
+anchor=north west,yshift=-1.65cm,ylabel={$\cTwoMassHL{p_X(x)}$},
+yticklabel={$\cTwoMassHL{\pgfmathprintnumber{\tick}}$}]
+\cTwoMass{0}{28/128}
+\cTwoMass{1}{27/128}
+\cTwoMass{3}{9/128}
+\cTwoMass{4}{9/128}
+\cTwoMass{5}{1/128}
+\cTwoMass{6}{54/128}
+\addlegendimage{cTwoStep}\addlegendentry{Top: CDF steps}
+\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Top: PMF shadows (jump sizes)}
+\addlegendimage{cTwoMass,mark=*}\addlegendentry{Bottom: PMF stems}
+\addlegendimage{cTwoCorrespondence}\addlegendentry{Midpoint correspondence}
+\end{axis}
+\cTwoCorrespondence{0}
+\cTwoCorrespondence{1}
+\cTwoCorrespondence{3}
+\cTwoCorrespondence{4}
+\cTwoCorrespondence{5}
+\cTwoCorrespondence{6}
+\end{tikzpicture}\end{minipage}\end{center}
 \cTwoConnectionReading
 \par\smallskip At $a=6$ USD, the cumulative increase is $\cTwoCDFHL{1}-\cTwoCDFHL{\frac{74}{128}}=\cTwoMassHL{\frac{54}{128}}=\cTwoMassHL{p_X(6)}$. The cap groups harsh-day outcomes at 6 USD. There is no stem or jump at 2 USD; the small jump at 5 is exactly $1/128$.
 \ifGTenHighlights\else\par\vspace{3mm}\fi
@@ -1231,8 +1395,12 @@ $m\leq x<m+1$ & $\cTwoCDFHL{1-R_m}$ \\
 \clearpage
 \subsection*{Connecting the PMF and CDF}
 \textbf{Finite preview: calls 3 through 10.}
-\begin{center}\begin{tikzpicture}
-\begin{axis}[cTwoCombined,xmin=2,xmax=11,xtick={3,4,5,6,7,8,9,10},xlabel={$\cTwoValue{x}$ (\cTwoValue{calls})}]
+\begin{center}\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}
+\pgfplotsset{cTwoSupport/.style={xmin=2,xmax=11,xtick={3,4,5,6,7,8,9,10},xlabel={$\cTwoValue{x}$ (\cTwoValue{calls})}}}
+\begin{axis}[cTwoCombined,cTwoSupport,name=cTwoTop,anchor=south west,
+xticklabel style={fill=white,inner sep=1pt},xlabel style={fill=white,inner sep=2pt},
+ylabel={$\cTwoCDFHL{F_X(x)}$},yticklabel={$\cTwoCDFHL{\pgfmathprintnumber{\tick}}$}]
 \cTwoPhantom{3}{1/8}{0}
 \cTwoPhantom{4}{1/8}{1/8}
 \cTwoPhantom{5}{3/32}{1/4}
@@ -1241,14 +1409,6 @@ $m\leq x<m+1$ & $\cTwoCDFHL{1-R_m}$ \\
 \cTwoPhantom{8}{1/16}{63/128}
 \cTwoPhantom{9}{7/128}{71/128}
 \cTwoPhantom{10}{49/1024}{39/64}
-\cTwoMass{3}{1/8}
-\cTwoMass{4}{1/8}
-\cTwoMass{5}{3/32}
-\cTwoMass{6}{5/64}
-\cTwoMass{7}{9/128}
-\cTwoMass{8}{1/16}
-\cTwoMass{9}{7/128}
-\cTwoMass{10}{49/1024}
 \addplot[cTwoStep,<-] coordinates {(2,0)(3,0)};
 \addplot[cTwoStep] coordinates {(3,1/8)(4,1/8)};
 \addplot[cTwoStep] coordinates {(4,1/4)(5,1/4)};
@@ -1263,10 +1423,32 @@ $m\leq x<m+1$ & $\cTwoCDFHL{1-R_m}$ \\
 \node[anchor=west,xshift=9pt,font=\footnotesize,fill=white,inner sep=2pt] (jumpLabel) at (axis cs:5,19/64) {jump height = $p_X(5)$};
 \draw[gray,thin] (jumpLabel.west) -- (axis cs:5,19/64);
 \node[font=\small,anchor=east] at (axis cs:10.8,.94) {later jumps continue toward 1};
-\addlegendimage{cTwoMass,mark=*}\addlegendentry{PMF stems}
-\addlegendimage{cTwoStep}\addlegendentry{CDF steps}
-\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Translated PMF stems}
-\end{axis}\end{tikzpicture}\end{center}
+\end{axis}
+\begin{axis}[cTwoCombined,cTwoSupport,at={(cTwoTop.south west)},
+anchor=north west,yshift=-1.65cm,ylabel={$\cTwoMassHL{p_X(x)}$},
+yticklabel={$\cTwoMassHL{\pgfmathprintnumber{\tick}}$}]
+\cTwoMass{3}{1/8}
+\cTwoMass{4}{1/8}
+\cTwoMass{5}{3/32}
+\cTwoMass{6}{5/64}
+\cTwoMass{7}{9/128}
+\cTwoMass{8}{1/16}
+\cTwoMass{9}{7/128}
+\cTwoMass{10}{49/1024}
+\addlegendimage{cTwoStep}\addlegendentry{Top: CDF steps}
+\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Top: PMF shadows (jump sizes)}
+\addlegendimage{cTwoMass,mark=*}\addlegendentry{Bottom: PMF stems}
+\addlegendimage{cTwoCorrespondence}\addlegendentry{Midpoint correspondence}
+\end{axis}
+\cTwoCorrespondence{3}
+\cTwoCorrespondence{4}
+\cTwoCorrespondence{5}
+\cTwoCorrespondence{6}
+\cTwoCorrespondence{7}
+\cTwoCorrespondence{8}
+\cTwoCorrespondence{9}
+\cTwoCorrespondence{10}
+\end{tikzpicture}\end{minipage}\end{center}
 \cTwoConnectionReading
 \par\smallskip At $a=5$ calls, the cumulative increase is $\cTwoCDFHL{\frac{11}{32}}-\cTwoCDFHL{\frac14}=\cTwoMassHL{\frac3{32}}=\cTwoMassHL{p_X(5)}$. Completion on call 5 adds probability $3/32$ to the probability of completion by call 4.
 \par\textbf{Beyond the preview.} Both representations display exactly the supported values $3,\ldots,10$. The omitted mass is $351/1024$ at $11,12,\ldots$; none of the displayed masses is renormalized. The last plateau is only $[10,11)$, with an open endpoint at 11: the next jump is omitted, not zero. Later stems follow $c_{n-1}/2^n$ and later CDF steps follow $1-R_n$, increasing toward 1 without reaching it at a finite cutoff. There is no constant right tail.
@@ -1389,21 +1571,19 @@ $x\geq5$ & $\cTwoCDFHL{1}$ \\\bottomrule
 \secInicio[prob:reserve][sec:advanced]
 \clearpage
 \subsection*{Connecting the PMF and CDF}
-\textbf{Same distribution, two representations.}
-\begin{center}\begin{tikzpicture}
-\begin{axis}[cTwoCombined,xmin=-1,xmax=6,xtick={0,1,2,3,4,5},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})},cTwoIncluded/.append style={mark size=.35pt},cTwoExcluded/.append style={mark size=.35pt}]
+\textbf{Same distribution: CDF above, PMF below.}
+\begin{center}\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}
+\pgfplotsset{cTwoSupport/.style={xmin=-1,xmax=6,xtick={0,1,2,3,4,5},xlabel={$\cTwoValue{x}$ (\cTwoValue{USD})},cTwoIncluded/.append style={mark size=.35pt},cTwoExcluded/.append style={mark size=.35pt}}}
+\begin{axis}[cTwoCombined,cTwoSupport,name=cTwoTop,anchor=south west,
+xticklabel style={fill=white,inner sep=1pt},xlabel style={fill=white,inner sep=2pt},
+ylabel={$\cTwoCDFHL{F_X(x)}$},yticklabel={$\cTwoCDFHL{\pgfmathprintnumber{\tick}}$}]
 \cTwoPhantom{0}{42/252}{0}
 \cTwoPhantom{1}{90/252}{1/6}
 \cTwoPhantom{2}{75/252}{11/21}
 \cTwoPhantom{3}{35/252}{23/28}
 \cTwoPhantom{4}{9/252}{121/126}
 \cTwoPhantom{5}{1/252}{251/252}
-\cTwoMass{0}{42/252}
-\cTwoMass{1}{90/252}
-\cTwoMass{2}{75/252}
-\cTwoMass{3}{35/252}
-\cTwoMass{4}{9/252}
-\cTwoMass{5}{1/252}
 \addplot[cTwoStep,<-] coordinates {(-1,0)(0,0)};
 \addplot[cTwoStep] coordinates {(0,1/6)(1,1/6)};
 \addplot[cTwoStep] coordinates {(1,11/21)(2,11/21)};
@@ -1415,10 +1595,28 @@ $x\geq5$ & $\cTwoCDFHL{1}$ \\\bottomrule
 \addplot[cTwoIncluded] coordinates {(0,1/6)(1,11/21)(2,23/28)(3,121/126)(4,251/252)(5,1)};
 \node[anchor=west,xshift=9pt,font=\footnotesize,fill=white,inner sep=2pt] (jumpLabel) at (axis cs:2,113/168) {jump height = $p_X(2)$};
 \draw[gray,thin] (jumpLabel.west) -- (axis cs:2,113/168);
-\addlegendimage{cTwoMass,mark=*}\addlegendentry{PMF stems}
-\addlegendimage{cTwoStep}\addlegendentry{CDF steps}
-\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Translated PMF stems}
-\end{axis}\end{tikzpicture}\end{center}
+\end{axis}
+\begin{axis}[cTwoCombined,cTwoSupport,at={(cTwoTop.south west)},
+anchor=north west,yshift=-1.65cm,ylabel={$\cTwoMassHL{p_X(x)}$},
+yticklabel={$\cTwoMassHL{\pgfmathprintnumber{\tick}}$}]
+\cTwoMass{0}{42/252}
+\cTwoMass{1}{90/252}
+\cTwoMass{2}{75/252}
+\cTwoMass{3}{35/252}
+\cTwoMass{4}{9/252}
+\cTwoMass{5}{1/252}
+\addlegendimage{cTwoStep}\addlegendentry{Top: CDF steps}
+\addlegendimage{cTwoPhantom,mark=*}\addlegendentry{Top: PMF shadows (jump sizes)}
+\addlegendimage{cTwoMass,mark=*}\addlegendentry{Bottom: PMF stems}
+\addlegendimage{cTwoCorrespondence}\addlegendentry{Midpoint correspondence}
+\end{axis}
+\cTwoCorrespondence{0}
+\cTwoCorrespondence{1}
+\cTwoCorrespondence{2}
+\cTwoCorrespondence{3}
+\cTwoCorrespondence{4}
+\cTwoCorrespondence{5}
+\end{tikzpicture}\end{minipage}\end{center}
 \cTwoConnectionReading
 \par\smallskip At $a=2$ USD, the cumulative increase is $\cTwoCDFHL{\frac{207}{252}}-\cTwoCDFHL{\frac{132}{252}}=\cTwoMassHL{\frac{75}{252}}=\cTwoMassHL{p_X(2)}$. Orders needing exactly 2 USD supply this increase. The final stem and jump remain $1/252$; the magnified CDF detail above resolves its two endpoints.
 \ifGTenHighlights\else\par\vspace{3mm}\fi
