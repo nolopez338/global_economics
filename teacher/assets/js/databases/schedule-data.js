@@ -266,10 +266,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "C1",
+    "Description": "C1: Characterise discrete financial random variables",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1"
+    "Summary": "C1: Characterise discrete financial random variables"
   },
   {
     "Grade": 10,
@@ -279,10 +279,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C2",
+    "Description": "No Class - Report Card revision.",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "No Class - Report Card revision."
   },
   {
     "Grade": 10,
@@ -292,10 +292,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C3 + C1C2 mock",
+    "Description": "C2: Calculate probabilities using PMFs and CDFs",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3 + C1C2 mock"
+    "Summary": "C2: Calculate probabilities using PMFs and CDFs"
   },
   {
     "Grade": 10,
@@ -305,10 +305,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C1C2 exam",
+    "Description": "C3: Model binary outcomes with Bernoulli distributions\nC1C2 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1C2 exam"
+    "Summary": "C3: Model binary outcomes with Bernoulli distributions\nC1C2 Mock"
   },
   {
     "Grade": 10,
@@ -318,10 +318,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C4",
+    "Description": "C1C2 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "C1C2 exam"
   },
   {
     "Grade": 10,
@@ -331,10 +331,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C3C4 mock",
+    "Description": "C4: Calculate fixed-trial probabilities using binomial distributions",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3C4 mock"
+    "Summary": "C4: Calculate fixed-trial probabilities using binomial distributions"
   },
   {
     "Grade": 10,
@@ -344,10 +344,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "C3C4 exam",
+    "Description": "C3C4 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3C4 exam"
+    "Summary": "C3C4 mock"
   },
   {
     "Grade": 10,
@@ -357,10 +357,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 1,
-    "Description": "C5",
+    "Description": "C3C4 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C5"
+    "Summary": "C3C4 exam"
   },
   {
     "Grade": 10,
@@ -370,10 +370,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C6",
+    "Description": "C5: Model first-success waiting times geometrically",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C6"
+    "Summary": "C5: Model first-success waiting times geometrically"
   },
   {
     "Grade": 10,
@@ -383,10 +383,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C7 + C5C6C7 mock",
+    "Description": "C6: Model trials until multiple successes",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C7 + C5C6C7 mock"
+    "Summary": "C6: Model trials until multiple successes"
   },
   {
     "Grade": 10,
@@ -396,10 +396,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C5C6C7 exam",
+    "Description": "C7: Model rare events using Poisson distributions\nC5C6C7 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C5C6C7 exam"
+    "Summary": "C7: Model rare events using Poisson distributions\nC5C6C7 Mock"
   },
   {
     "Grade": 10,
@@ -409,10 +409,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "C8",
+    "Description": "C5C6C7 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C8"
+    "Summary": "C5C6C7 exam"
   },
   {
     "Grade": 10,
@@ -422,10 +422,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "C9",
+    "Description": "C8: Quantify expected returns and variance",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C9"
+    "Summary": "C8: Quantify expected returns and variance"
   },
   {
     "Grade": 10,
@@ -435,10 +435,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 1,
-    "Description": "C10 + C8C9C10 mock",
+    "Description": "C9: Select appropriate discrete probability models",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C10 + C8C9C10 mock"
+    "Summary": "C9: Select appropriate discrete probability models"
   },
   {
     "Grade": 10,
@@ -448,10 +448,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 3,
-    "Description": "C8C9C10 exam",
+    "Description": "C10: Evaluate portfolio investments through risk–return comparisons\nC8C9C10 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C8C9C10 exam"
+    "Summary": "C10: Evaluate portfolio investments through risk–return comparisons\nC8C9C10 Mock"
   },
   {
     "Grade": 10,
@@ -461,10 +461,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
+    "Description": "C8C9C10 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1-C7 catch-up"
+    "Summary": "C8C9C10 exam"
   },
   {
     "Grade": 10,
@@ -474,10 +474,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "Extra Class",
+    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "Extra Class"
+    "Summary": "C1-C7 catch-up"
   },
   {
     "Grade": 10,
@@ -1007,10 +1007,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 4,
-    "Description": "C1",
+    "Description": "C1: Characterise discrete financial random variables",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1"
+    "Summary": "C1: Characterise discrete financial random variables"
   },
   {
     "Grade": 10,
@@ -1020,10 +1020,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C2",
+    "Description": "C2: Calculate probabilities using PMFs and CDFs",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "C2: Calculate probabilities using PMFs and CDFs"
   },
   {
     "Grade": 10,
@@ -1033,10 +1033,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 4,
-    "Description": "C3 + C1C2 mock",
+    "Description": "C3: Model binary outcomes with Bernoulli distributions\nC1C2 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3 + C1C2 mock"
+    "Summary": "C3: Model binary outcomes with Bernoulli distributions\nC1C2 Mock"
   },
   {
     "Grade": 10,
@@ -1059,10 +1059,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "C4",
+    "Description": "C4: Calculate fixed-trial probabilities using binomial distributions",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "C4: Calculate fixed-trial probabilities using binomial distributions"
   },
   {
     "Grade": 10,
@@ -1098,10 +1098,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C5",
+    "Description": "C5: Model first-success waiting times geometrically",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C5"
+    "Summary": "C5: Model first-success waiting times geometrically"
   },
   {
     "Grade": 10,
@@ -1111,10 +1111,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 4,
-    "Description": "C6",
+    "Description": "C6: Model trials until multiple successes",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C6"
+    "Summary": "C6: Model trials until multiple successes"
   },
   {
     "Grade": 10,
@@ -1124,10 +1124,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C7 + C5C6C7 mock",
+    "Description": "C7: Model rare events using Poisson distributions\nC5C6C7 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C7 + C5C6C7 mock"
+    "Summary": "C7: Model rare events using Poisson distributions\nC5C6C7 Mock"
   },
   {
     "Grade": 10,
@@ -1150,10 +1150,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "C8",
+    "Description": "C8: Quantify expected returns and variance",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C8"
+    "Summary": "C8: Quantify expected returns and variance"
   },
   {
     "Grade": 10,
@@ -1163,10 +1163,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 4,
-    "Description": "C9",
+    "Description": "C9: Select appropriate discrete probability models",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C9"
+    "Summary": "C9: Select appropriate discrete probability models"
   },
   {
     "Grade": 10,
@@ -1176,10 +1176,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 3,
-    "Description": "C10 + C8C9C10 mock",
+    "Description": "C10: Evaluate portfolio investments through risk–return comparisons\nC8C9C10 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C10 + C8C9C10 mock"
+    "Summary": "C10: Evaluate portfolio investments through risk–return comparisons\nC8C9C10 Mock"
   },
   {
     "Grade": 10,
@@ -1735,10 +1735,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 5,
-    "Description": "C1",
+    "Description": "C1: Characterise discrete financial random variables",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1"
+    "Summary": "C1: Characterise discrete financial random variables"
   },
   {
     "Grade": 10,
@@ -1748,10 +1748,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C2",
+    "Description": "C2: Calculate probabilities using PMFs and CDFs",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "C2: Calculate probabilities using PMFs and CDFs"
   },
   {
     "Grade": 10,
@@ -1761,10 +1761,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "C3 + C1C2 mock",
+    "Description": "C3: Model binary outcomes with Bernoulli distributions\nC1C2 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3 + C1C2 mock"
+    "Summary": "C3: Model binary outcomes with Bernoulli distributions\nC1C2 Mock"
   },
   {
     "Grade": 10,
@@ -1787,10 +1787,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "C4",
+    "Description": "C4: Calculate fixed-trial probabilities using binomial distributions",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "C4: Calculate fixed-trial probabilities using binomial distributions"
   },
   {
     "Grade": 10,
@@ -1826,10 +1826,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 1,
-    "Description": "C5",
+    "Description": "C5: Model first-success waiting times geometrically",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C5"
+    "Summary": "C5: Model first-success waiting times geometrically"
   },
   {
     "Grade": 10,
@@ -1839,10 +1839,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "C6",
+    "Description": "C6: Model trials until multiple successes",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C6"
+    "Summary": "C6: Model trials until multiple successes"
   },
   {
     "Grade": 10,
@@ -1852,10 +1852,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C7 + C5C6C7 mock",
+    "Description": "C7: Model rare events using Poisson distributions\nC5C6C7 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C7 + C5C6C7 mock"
+    "Summary": "C7: Model rare events using Poisson distributions\nC5C6C7 Mock"
   },
   {
     "Grade": 10,
@@ -1878,10 +1878,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "C8",
+    "Description": "C8: Quantify expected returns and variance",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C8"
+    "Summary": "C8: Quantify expected returns and variance"
   },
   {
     "Grade": 10,
@@ -1891,10 +1891,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 5,
-    "Description": "C9",
+    "Description": "C9: Select appropriate discrete probability models",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C9"
+    "Summary": "C9: Select appropriate discrete probability models"
   },
   {
     "Grade": 10,
@@ -1904,10 +1904,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 1,
-    "Description": "C10 + C8C9C10 mock",
+    "Description": "C10: Evaluate portfolio investments through risk–return comparisons\nC8C9C10 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C10 + C8C9C10 mock"
+    "Summary": "C10: Evaluate portfolio investments through risk–return comparisons\nC8C9C10 Mock"
   },
   {
     "Grade": 10,
@@ -2476,10 +2476,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 6,
-    "Description": "C1",
+    "Description": "C1: Characterise discrete financial random variables",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1"
+    "Summary": "C1: Characterise discrete financial random variables"
   },
   {
     "Grade": 10,
@@ -2489,10 +2489,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 4,
-    "Description": "C2",
+    "Description": "C2: Calculate probabilities using PMFs and CDFs",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "C2: Calculate probabilities using PMFs and CDFs"
   },
   {
     "Grade": 10,
@@ -2502,10 +2502,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "C3 + C1C2 mock",
+    "Description": "C3: Model binary outcomes with Bernoulli distributions\nC1C2 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3 + C1C2 mock"
+    "Summary": "C3: Model binary outcomes with Bernoulli distributions\nC1C2 Mock"
   },
   {
     "Grade": 10,
@@ -2528,10 +2528,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 6,
-    "Description": "C4",
+    "Description": "C4: Calculate fixed-trial probabilities using binomial distributions",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "C4: Calculate fixed-trial probabilities using binomial distributions"
   },
   {
     "Grade": 10,
@@ -2567,10 +2567,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 4,
-    "Description": "C5",
+    "Description": "C5: Model first-success waiting times geometrically",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C5"
+    "Summary": "C5: Model first-success waiting times geometrically"
   },
   {
     "Grade": 10,
@@ -2580,10 +2580,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "C6",
+    "Description": "C6: Model trials until multiple successes",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C6"
+    "Summary": "C6: Model trials until multiple successes"
   },
   {
     "Grade": 10,
@@ -2593,10 +2593,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "C7 + C5C6C7 mock",
+    "Description": "C7: Model rare events using Poisson distributions\nC5C6C7 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C7 + C5C6C7 mock"
+    "Summary": "C7: Model rare events using Poisson distributions\nC5C6C7 Mock"
   },
   {
     "Grade": 10,
@@ -2619,10 +2619,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 4,
-    "Description": "C8",
+    "Description": "C8: Quantify expected returns and variance",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C8"
+    "Summary": "C8: Quantify expected returns and variance"
   },
   {
     "Grade": 10,
@@ -2632,10 +2632,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 6,
-    "Description": "C9",
+    "Description": "C9: Select appropriate discrete probability models",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C9"
+    "Summary": "C9: Select appropriate discrete probability models"
   },
   {
     "Grade": 10,
@@ -2645,10 +2645,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 4,
-    "Description": "C10 + C8C9C10 mock",
+    "Description": "C10: Evaluate portfolio investments through risk–return comparisons\nC8C9C10 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C10 + C8C9C10 mock"
+    "Summary": "C10: Evaluate portfolio investments through risk–return comparisons\nC8C9C10 Mock"
   },
   {
     "Grade": 10,
@@ -3204,10 +3204,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 5,
-    "Description": "C1",
+    "Description": "C1: Characterise discrete financial random variables",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1"
+    "Summary": "C1: Characterise discrete financial random variables"
   },
   {
     "Grade": 10,
@@ -3217,10 +3217,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C2",
+    "Description": "C2: Calculate probabilities using PMFs and CDFs",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "C2: Calculate probabilities using PMFs and CDFs"
   },
   {
     "Grade": 10,
@@ -3230,10 +3230,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "C3 + C1C2 mock",
+    "Description": "C3: Model binary outcomes with Bernoulli distributions\nC1C2 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3 + C1C2 mock"
+    "Summary": "C3: Model binary outcomes with Bernoulli distributions\nC1C2 Mock"
   },
   {
     "Grade": 10,
@@ -3256,10 +3256,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "C4",
+    "Description": "C4: Calculate fixed-trial probabilities using binomial distributions",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "C4: Calculate fixed-trial probabilities using binomial distributions"
   },
   {
     "Grade": 10,
@@ -3295,10 +3295,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 1,
-    "Description": "C5",
+    "Description": "C5: Model first-success waiting times geometrically",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C5"
+    "Summary": "C5: Model first-success waiting times geometrically"
   },
   {
     "Grade": 10,
@@ -3308,10 +3308,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "C6",
+    "Description": "C6: Model trials until multiple successes",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C6"
+    "Summary": "C6: Model trials until multiple successes"
   },
   {
     "Grade": 10,
@@ -3321,10 +3321,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C7 + C5C6C7 mock",
+    "Description": "C7: Model rare events using Poisson distributions\nC5C6C7 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C7 + C5C6C7 mock"
+    "Summary": "C7: Model rare events using Poisson distributions\nC5C6C7 Mock"
   },
   {
     "Grade": 10,
@@ -3347,10 +3347,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "C8",
+    "Description": "C8: Quantify expected returns and variance",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C8"
+    "Summary": "C8: Quantify expected returns and variance"
   },
   {
     "Grade": 10,
@@ -3360,10 +3360,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 5,
-    "Description": "C9",
+    "Description": "C9: Select appropriate discrete probability models",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C9"
+    "Summary": "C9: Select appropriate discrete probability models"
   },
   {
     "Grade": 10,
@@ -3373,10 +3373,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 1,
-    "Description": "C10 + C8C9C10 mock",
+    "Description": "C10: Evaluate portfolio investments through risk–return comparisons\nC8C9C10 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C10 + C8C9C10 mock"
+    "Summary": "C10: Evaluate portfolio investments through risk–return comparisons\nC8C9C10 Mock"
   },
   {
     "Grade": 10,
@@ -4309,10 +4309,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "C1",
+    "Description": "C1: Distinguish population parameters from sample statistics",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1"
+    "Summary": "C1: Distinguish population parameters from sample statistics"
   },
   {
     "Grade": 11,
@@ -4322,10 +4322,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C2",
+    "Description": "No Class - Godchildren meeting",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "No Class - Godchildren meeting"
   },
   {
     "Grade": 11,
@@ -4335,10 +4335,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C3 + C1C2 mock",
+    "Description": "C2: Interpret estimates and long-run confidence coverage",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3 + C1C2 mock"
+    "Summary": "C2: Interpret estimates and long-run confidence coverage"
   },
   {
     "Grade": 11,
@@ -4348,10 +4348,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C1C2 exam",
+    "Description": "C3: Explain confidence interval components and precision\nC1C2 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1C2 exam"
+    "Summary": "C3: Explain confidence interval components and precision\nC1C2 Mock"
   },
   {
     "Grade": 11,
@@ -4361,10 +4361,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C4",
+    "Description": "C1C2 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "C1C2 exam"
   },
   {
     "Grade": 11,
@@ -4374,10 +4374,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C3C4 mock",
+    "Description": "C4: Estimate means with known population variance",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3C4 mock"
+    "Summary": "C4: Estimate means with known population variance"
   },
   {
     "Grade": 11,
@@ -4387,10 +4387,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "C3C4 exam",
+    "Description": "C3C4 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3C4 exam"
+    "Summary": "C3C4 mock"
   },
   {
     "Grade": 11,
@@ -4400,10 +4400,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 1,
-    "Description": "C5",
+    "Description": "C3C4 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C5"
+    "Summary": "C3C4 exam"
   },
   {
     "Grade": 11,
@@ -4413,10 +4413,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C6",
+    "Description": "C5: Construct confidence intervals for population proportions",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C6"
+    "Summary": "C5: Construct confidence intervals for population proportions"
   },
   {
     "Grade": 11,
@@ -4426,10 +4426,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C7 + C5C6C7 mock",
+    "Description": "C6: Determine sample sizes for specified precision",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C7 + C5C6C7 mock"
+    "Summary": "C6: Determine sample sizes for specified precision"
   },
   {
     "Grade": 11,
@@ -4439,10 +4439,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C5C6C7 exam",
+    "Description": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C5C6C7 exam"
+    "Summary": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock"
   },
   {
     "Grade": 11,
@@ -4452,10 +4452,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "C8",
+    "Description": "C5C6C7 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C8"
+    "Summary": "C5C6C7 exam"
   },
   {
     "Grade": 11,
@@ -4465,10 +4465,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "C9",
+    "Description": "C8: Estimate means using Student’s t-distribution",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C9"
+    "Summary": "C8: Estimate means using Student’s t-distribution"
   },
   {
     "Grade": 11,
@@ -4478,10 +4478,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 1,
-    "Description": "C10 + C8C9C10 mock",
+    "Description": "C9: Evaluate sampling assumptions and inference limitations",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C10 + C8C9C10 mock"
+    "Summary": "C9: Evaluate sampling assumptions and inference limitations"
   },
   {
     "Grade": 11,
@@ -4491,10 +4491,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 3,
-    "Description": "C8C9C10 exam",
+    "Description": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C8C9C10 exam"
+    "Summary": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock"
   },
   {
     "Grade": 11,
@@ -4504,10 +4504,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
+    "Description": "C8C9C10 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1-C7 catch-up"
+    "Summary": "C8C9C10 exam"
   },
   {
     "Grade": 11,
@@ -4517,10 +4517,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "Extra Class",
+    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "Extra Class"
+    "Summary": "C1-C7 catch-up"
   },
   {
     "Grade": 11,
@@ -5050,10 +5050,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "C1",
+    "Description": "C1: Distinguish population parameters from sample statistics",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1"
+    "Summary": "C1: Distinguish population parameters from sample statistics"
   },
   {
     "Grade": 11,
@@ -5063,10 +5063,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 2,
-    "Description": "C2",
+    "Description": "C2: Interpret estimates and long-run confidence coverage",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "C2: Interpret estimates and long-run confidence coverage"
   },
   {
     "Grade": 11,
@@ -5076,10 +5076,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C3 + C1C2 mock",
+    "Description": "C3: Explain confidence interval components and precision\nC1C2 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3 + C1C2 mock"
+    "Summary": "C3: Explain confidence interval components and precision\nC1C2 Mock"
   },
   {
     "Grade": 11,
@@ -5102,10 +5102,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C4",
+    "Description": "C4: Estimate means with known population variance",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "C4: Estimate means with known population variance"
   },
   {
     "Grade": 11,
@@ -5141,10 +5141,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 2,
-    "Description": "C5",
+    "Description": "C5: Construct confidence intervals for population proportions",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C5"
+    "Summary": "C5: Construct confidence intervals for population proportions"
   },
   {
     "Grade": 11,
@@ -5154,10 +5154,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C6",
+    "Description": "C6: Determine sample sizes for specified precision",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C6"
+    "Summary": "C6: Determine sample sizes for specified precision"
   },
   {
     "Grade": 11,
@@ -5167,10 +5167,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 2,
-    "Description": "C7 + C5C6C7 mock",
+    "Description": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C7 + C5C6C7 mock"
+    "Summary": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock"
   },
   {
     "Grade": 11,
@@ -5193,10 +5193,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 2,
-    "Description": "C8",
+    "Description": "C8: Estimate means using Student’s t-distribution",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C8"
+    "Summary": "C8: Estimate means using Student’s t-distribution"
   },
   {
     "Grade": 11,
@@ -5206,10 +5206,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "C9",
+    "Description": "C9: Evaluate sampling assumptions and inference limitations",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C9"
+    "Summary": "C9: Evaluate sampling assumptions and inference limitations"
   },
   {
     "Grade": 11,
@@ -5219,10 +5219,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 2,
-    "Description": "C10 + C8C9C10 mock",
+    "Description": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C10 + C8C9C10 mock"
+    "Summary": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock"
   },
   {
     "Grade": 11,
@@ -5778,10 +5778,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 6,
-    "Description": "C1",
+    "Description": "C1: Distinguish population parameters from sample statistics",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1"
+    "Summary": "C1: Distinguish population parameters from sample statistics"
   },
   {
     "Grade": 11,
@@ -5791,10 +5791,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C2",
+    "Description": "C2: Interpret estimates and long-run confidence coverage",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "C2: Interpret estimates and long-run confidence coverage"
   },
   {
     "Grade": 11,
@@ -5804,10 +5804,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "C3 + C1C2 mock",
+    "Description": "C3: Explain confidence interval components and precision\nC1C2 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3 + C1C2 mock"
+    "Summary": "C3: Explain confidence interval components and precision\nC1C2 Mock"
   },
   {
     "Grade": 11,
@@ -5830,10 +5830,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 6,
-    "Description": "C4",
+    "Description": "C4: Estimate means with known population variance",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "C4: Estimate means with known population variance"
   },
   {
     "Grade": 11,
@@ -5869,10 +5869,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 1,
-    "Description": "C5",
+    "Description": "C5: Construct confidence intervals for population proportions",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C5"
+    "Summary": "C5: Construct confidence intervals for population proportions"
   },
   {
     "Grade": 11,
@@ -5882,10 +5882,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "C6",
+    "Description": "C6: Determine sample sizes for specified precision",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C6"
+    "Summary": "C6: Determine sample sizes for specified precision"
   },
   {
     "Grade": 11,
@@ -5895,10 +5895,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C7 + C5C6C7 mock",
+    "Description": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C7 + C5C6C7 mock"
+    "Summary": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock"
   },
   {
     "Grade": 11,
@@ -5921,10 +5921,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "C8",
+    "Description": "C8: Estimate means using Student’s t-distribution",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C8"
+    "Summary": "C8: Estimate means using Student’s t-distribution"
   },
   {
     "Grade": 11,
@@ -5934,10 +5934,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 6,
-    "Description": "C9",
+    "Description": "C9: Evaluate sampling assumptions and inference limitations",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C9"
+    "Summary": "C9: Evaluate sampling assumptions and inference limitations"
   },
   {
     "Grade": 11,
@@ -5947,10 +5947,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 1,
-    "Description": "C10 + C8C9C10 mock",
+    "Description": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C10 + C8C9C10 mock"
+    "Summary": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock"
   },
   {
     "Grade": 11,
@@ -6519,10 +6519,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 5,
-    "Description": "C1",
+    "Description": "C1: Distinguish population parameters from sample statistics",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1"
+    "Summary": "C1: Distinguish population parameters from sample statistics"
   },
   {
     "Grade": 11,
@@ -6532,10 +6532,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C2",
+    "Description": "C2: Interpret estimates and long-run confidence coverage",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "C2: Interpret estimates and long-run confidence coverage"
   },
   {
     "Grade": 11,
@@ -6545,10 +6545,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "C3 + C1C2 mock",
+    "Description": "C3: Explain confidence interval components and precision\nC1C2 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3 + C1C2 mock"
+    "Summary": "C3: Explain confidence interval components and precision\nC1C2 Mock"
   },
   {
     "Grade": 11,
@@ -6571,10 +6571,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "C4",
+    "Description": "C4: Estimate means with known population variance",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "C4: Estimate means with known population variance"
   },
   {
     "Grade": 11,
@@ -6610,10 +6610,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C5",
+    "Description": "C5: Construct confidence intervals for population proportions",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C5"
+    "Summary": "C5: Construct confidence intervals for population proportions"
   },
   {
     "Grade": 11,
@@ -6623,10 +6623,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "C6",
+    "Description": "C6: Determine sample sizes for specified precision",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C6"
+    "Summary": "C6: Determine sample sizes for specified precision"
   },
   {
     "Grade": 11,
@@ -6636,10 +6636,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C7 + C5C6C7 mock",
+    "Description": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C7 + C5C6C7 mock"
+    "Summary": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock"
   },
   {
     "Grade": 11,
@@ -6662,10 +6662,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "C8",
+    "Description": "C8: Estimate means using Student’s t-distribution",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C8"
+    "Summary": "C8: Estimate means using Student’s t-distribution"
   },
   {
     "Grade": 11,
@@ -6675,10 +6675,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 5,
-    "Description": "C9",
+    "Description": "C9: Evaluate sampling assumptions and inference limitations",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C9"
+    "Summary": "C9: Evaluate sampling assumptions and inference limitations"
   },
   {
     "Grade": 11,
@@ -6688,10 +6688,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 3,
-    "Description": "C10 + C8C9C10 mock",
+    "Description": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C10 + C8C9C10 mock"
+    "Summary": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock"
   },
   {
     "Grade": 11,
@@ -7247,10 +7247,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 6,
-    "Description": "C1",
+    "Description": "C1: Distinguish population parameters from sample statistics",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1"
+    "Summary": "C1: Distinguish population parameters from sample statistics"
   },
   {
     "Grade": 11,
@@ -7260,10 +7260,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C2",
+    "Description": "C2: Interpret estimates and long-run confidence coverage",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2"
+    "Summary": "C2: Interpret estimates and long-run confidence coverage"
   },
   {
     "Grade": 11,
@@ -7273,10 +7273,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "C3 + C1C2 mock",
+    "Description": "C3: Explain confidence interval components and precision\nC1C2 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3 + C1C2 mock"
+    "Summary": "C3: Explain confidence interval components and precision\nC1C2 Mock"
   },
   {
     "Grade": 11,
@@ -7299,10 +7299,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 6,
-    "Description": "C4",
+    "Description": "C4: Estimate means with known population variance",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4"
+    "Summary": "C4: Estimate means with known population variance"
   },
   {
     "Grade": 11,
@@ -7338,10 +7338,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 1,
-    "Description": "C5",
+    "Description": "C5: Construct confidence intervals for population proportions",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C5"
+    "Summary": "C5: Construct confidence intervals for population proportions"
   },
   {
     "Grade": 11,
@@ -7351,10 +7351,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "C6",
+    "Description": "C6: Determine sample sizes for specified precision",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C6"
+    "Summary": "C6: Determine sample sizes for specified precision"
   },
   {
     "Grade": 11,
@@ -7364,10 +7364,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C7 + C5C6C7 mock",
+    "Description": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C7 + C5C6C7 mock"
+    "Summary": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock"
   },
   {
     "Grade": 11,
@@ -7390,10 +7390,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "C8",
+    "Description": "C8: Estimate means using Student’s t-distribution",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C8"
+    "Summary": "C8: Estimate means using Student’s t-distribution"
   },
   {
     "Grade": 11,
@@ -7403,10 +7403,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 6,
-    "Description": "C9",
+    "Description": "C9: Evaluate sampling assumptions and inference limitations",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C9"
+    "Summary": "C9: Evaluate sampling assumptions and inference limitations"
   },
   {
     "Grade": 11,
@@ -7416,10 +7416,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 1,
-    "Description": "C10 + C8C9C10 mock",
+    "Description": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C10 + C8C9C10 mock"
+    "Summary": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock"
   },
   {
     "Grade": 11,
