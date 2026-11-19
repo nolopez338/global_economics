@@ -10,7 +10,8 @@
     Object.freeze({ value: "slides", label: "Slides" }),
     Object.freeze({ value: "classroom-activities", label: "Classroom activities" }),
     Object.freeze({ value: "practice-activities", label: "Practice activities" }),
-    Object.freeze({ value: "extra-resources", label: "Extra resources" })
+    Object.freeze({ value: "extra-resources", label: "Extra resources" }),
+    Object.freeze({ value: "mock-practices", label: "Mock practices" })
   ]);
   var CATEGORY_VALUES = Object.freeze(CATEGORIES.map(function (category) { return category.value; }));
   var MATERIAL_FIELDS = ["Acronym", "Name", "Hyperlink", "Category"];
@@ -24,7 +25,8 @@
     "Slides": ["slide"],
     "Classroom activities": ["classroom activity"],
     "Practice activities": ["practice activity"],
-    "Extra resources": ["extra resource", "class material"]
+    "Extra resources": ["extra resource", "class material"],
+    "Mock practices": ["mock practice"]
   });
 
   function normalizeUserFacingLabel(value) {

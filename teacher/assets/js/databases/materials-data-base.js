@@ -1,14 +1,16 @@
 /*
-  Purpose:
-  Manually maintained date-independent materials catalog. This file is authoritative.
-  materials-data-base.js is the date-independent master catalog; materials-data.js is the dated, section-specific schedule that assigns those materials to actual class dates.
+  Manually maintained date-independent master catalog. Edit records directly;
+  schedule generation must never overwrite this file.
+  Term 2: sequential classes 1–20 for Grades 10 and 11. Assessment classes,
+  including class 16 and the class 17 catch-up, intentionally have no links.
+  Grade 10 C10 targets are placeholders following the surrounding L3 convention:
+  1-practice_activities/G10_T2_L3_C10_practice_activity.pdf,
+  3-slides/G10_T2_L3_C10_slides.pdf,
+  2-class_activities/G10_T2_L3_C10_classroom_activity.pdf.
+  Mock targets intentionally use G{grade}_T2_L{evidence}_C{criteria}_exam.pdf
+  and _exam_solution.pdf under the verified term_2/4-learning_evidences/ folder.
+  Evidence 1 is split into C1C2 and C3C4; these permitted placeholders may 404.
 */
-
-// Edit records directly; schedule generation must never overwrite this file.
-// Term 2 Google references stay in their class slots.
-// Review the Grade 11 Term 2 first evidence exam and practice resources before linking them to either session.
-// G11_T2_L1_exam.tex covers C1 through C5, across both sessions.
-
 window.MATERIALS_DATA_BASE = [
   {
     "Grade": 10,
@@ -292,9 +294,15 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "1",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
+        "Acronym": "T1O",
+        "Name": "Term 1 outline",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-outline.html",
+        "Category": "extra-resources"
+      },
+      {
+        "Acronym": "T2O",
+        "Name": "Term 2 outline",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term2/g10-t2-outline.html",
         "Category": "extra-resources"
       }
     ]
@@ -305,10 +313,22 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "2",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C1P",
+        "Name": "C1 practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/1-practice_activities/G10_T2_L1_C1_practice_activity.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C1S",
+        "Name": "C1 slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/3-slides/G10_T2_L1_C1_slides.pdf",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "C1A",
+        "Name": "C1 classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/2-class_activities/G10_T2_L1_C1_classroom_activity.pdf",
+        "Category": "classroom-activities"
       }
     ]
   },
@@ -318,10 +338,22 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "3",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C2P",
+        "Name": "C2 practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/1-practice_activities/G10_T2_L1_C2_practice_activity.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C2S",
+        "Name": "C2 slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/3-slides/G10_T2_L1_C2_slides.pdf",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "C2A",
+        "Name": "C2 classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/2-class_activities/G10_T2_L1_C2_classroom_activity.pdf",
+        "Category": "classroom-activities"
       }
     ]
   },
@@ -331,10 +363,34 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "4",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C3P",
+        "Name": "C3 practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/1-practice_activities/G10_T2_L1_C3_practice_activity.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C3S",
+        "Name": "C3 slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/3-slides/G10_T2_L1_C3_slides.pdf",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "C3A",
+        "Name": "C3 classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/2-class_activities/G10_T2_L1_C3_classroom_activity.pdf",
+        "Category": "classroom-activities"
+      },
+      {
+        "Acronym": "ME",
+        "Name": "C1 & C2 mock exam",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/4-learning_evidences/G10_T2_L1_C1C2_exam.pdf",
+        "Category": "mock-practices"
+      },
+      {
+        "Acronym": "MS",
+        "Name": "C1 & C2 mock solution",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/4-learning_evidences/G10_T2_L1_C1C2_exam_solution.pdf",
+        "Category": "mock-practices"
       }
     ]
   },
@@ -342,14 +398,7 @@ window.MATERIALS_DATA_BASE = [
     "Grade": 10,
     "Term": 2,
     "Class #": "5",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 10,
@@ -357,10 +406,22 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "6",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C4P",
+        "Name": "C4 practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/1-practice_activities/G10_T2_L1_C4_practice_activity.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C4S",
+        "Name": "C4 slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/3-slides/G10_T2_L1_C4_slides.pdf",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "C4A",
+        "Name": "C4 classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/2-class_activities/G10_T2_L1_C4_classroom_activity.pdf",
+        "Category": "classroom-activities"
       }
     ]
   },
@@ -370,10 +431,16 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "7",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "ME",
+        "Name": "C3 & C4 mock exam",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/4-learning_evidences/G10_T2_L1_C3C4_exam.pdf",
+        "Category": "mock-practices"
+      },
+      {
+        "Acronym": "MS",
+        "Name": "C3 & C4 mock solution",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/4-learning_evidences/G10_T2_L1_C3C4_exam_solution.pdf",
+        "Category": "mock-practices"
       }
     ]
   },
@@ -381,14 +448,7 @@ window.MATERIALS_DATA_BASE = [
     "Grade": 10,
     "Term": 2,
     "Class #": "8",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 10,
@@ -396,10 +456,22 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "9",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C5P",
+        "Name": "C5 practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/1-practice_activities/G10_T2_L2_C5_practice_activity.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C5S",
+        "Name": "C5 slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/3-slides/G10_T2_L2_C5_slides.pdf",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "C5A",
+        "Name": "C5 classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/2-class_activities/G10_T2_L2_C5_classroom_activity.pdf",
+        "Category": "classroom-activities"
       }
     ]
   },
@@ -409,10 +481,22 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "10",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C6P",
+        "Name": "C6 practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/1-practice_activities/G10_T2_L2_C6_practice_activity.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C6S",
+        "Name": "C6 slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/3-slides/G10_T2_L2_C6_slides.pdf",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "C6A",
+        "Name": "C6 classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/2-class_activities/G10_T2_L2_C6_classroom_activity.pdf",
+        "Category": "classroom-activities"
       }
     ]
   },
@@ -422,10 +506,34 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "11",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C7P",
+        "Name": "C7 practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/1-practice_activities/G10_T2_L2_C7_practice_activity.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C7S",
+        "Name": "C7 slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/3-slides/G10_T2_L2_C7_slides.pdf",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "C7A",
+        "Name": "C7 classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/2-class_activities/G10_T2_L2_C7_classroom_activity.pdf",
+        "Category": "classroom-activities"
+      },
+      {
+        "Acronym": "ME",
+        "Name": "C5 & C6 & C7 mock exam",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/4-learning_evidences/G10_T2_L2_C5C6C7_exam.pdf",
+        "Category": "mock-practices"
+      },
+      {
+        "Acronym": "MS",
+        "Name": "C5 & C6 & C7 mock solution",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/4-learning_evidences/G10_T2_L2_C5C6C7_exam_solution.pdf",
+        "Category": "mock-practices"
       }
     ]
   },
@@ -433,14 +541,7 @@ window.MATERIALS_DATA_BASE = [
     "Grade": 10,
     "Term": 2,
     "Class #": "12",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 10,
@@ -448,10 +549,22 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "13",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C8P",
+        "Name": "C8 practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/1-practice_activities/G10_T2_L3_C8_practice_activity.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C8S",
+        "Name": "C8 slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/3-slides/G10_T2_L3_C8_slides.pdf",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "C8A",
+        "Name": "C8 classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/2-class_activities/G10_T2_L3_C8_classroom_activity.pdf",
+        "Category": "classroom-activities"
       }
     ]
   },
@@ -461,10 +574,22 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "14",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C9P",
+        "Name": "C9 practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/1-practice_activities/G10_T2_L3_C9_practice_activity.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C9S",
+        "Name": "C9 slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/3-slides/G10_T2_L3_C9_slides.pdf",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "C9A",
+        "Name": "C9 classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/2-class_activities/G10_T2_L3_C9_classroom_activity.pdf",
+        "Category": "classroom-activities"
       }
     ]
   },
@@ -474,10 +599,34 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "15",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C10P",
+        "Name": "C10 practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/1-practice_activities/G10_T2_L3_C10_practice_activity.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C10S",
+        "Name": "C10 slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/3-slides/G10_T2_L3_C10_slides.pdf",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "C10A",
+        "Name": "C10 classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/2-class_activities/G10_T2_L3_C10_classroom_activity.pdf",
+        "Category": "classroom-activities"
+      },
+      {
+        "Acronym": "ME",
+        "Name": "C8 & C9 & C10 mock exam",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/4-learning_evidences/G10_T2_L3_C8C9C10_exam.pdf",
+        "Category": "mock-practices"
+      },
+      {
+        "Acronym": "MS",
+        "Name": "C8 & C9 & C10 mock solution",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/4-learning_evidences/G10_T2_L3_C8C9C10_exam_solution.pdf",
+        "Category": "mock-practices"
       }
     ]
   },
@@ -485,66 +634,31 @@ window.MATERIALS_DATA_BASE = [
     "Grade": 10,
     "Term": 2,
     "Class #": "16",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 10,
     "Term": 2,
     "Class #": "17",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 10,
     "Term": 2,
     "Class #": "18",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 10,
     "Term": 2,
     "Class #": "19",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 10,
     "Term": 2,
     "Class #": "20",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 10,
@@ -1080,9 +1194,15 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "1",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
+        "Acronym": "T1O",
+        "Name": "Term 1 outline",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade11/src/pages/term1/g11-t1-outline.html",
+        "Category": "extra-resources"
+      },
+      {
+        "Acronym": "T2O",
+        "Name": "Term 2 outline",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade11/src/pages/term2/g11-t2-outline.html",
         "Category": "extra-resources"
       }
     ]
@@ -1093,10 +1213,22 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "2",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C1P",
+        "Name": "C1 practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/1-practice_activities/G11_T2_L1_C1_practice.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C1S",
+        "Name": "C1 slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/3-slides/G11_T2_L1_C1_slides.pdf",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "C1A",
+        "Name": "C1 classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/2-class_activities/G11_T2_L1_C1_classroom_activity.pdf",
+        "Category": "classroom-activities"
       }
     ]
   },
@@ -1106,10 +1238,22 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "3",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C2P",
+        "Name": "C2 practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/1-practice_activities/G11_T2_L1_C2_practice.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C2S",
+        "Name": "C2 slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/3-slides/G11_T2_L1_C2_slides.pdf",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "C2A",
+        "Name": "C2 classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/2-class_activities/G11_T2_L1_C2_classroom_activity.pdf",
+        "Category": "classroom-activities"
       }
     ]
   },
@@ -1119,10 +1263,34 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "4",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C3P",
+        "Name": "C3 practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/1-practice_activities/G11_T2_L1_C3_practice.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C3S",
+        "Name": "C3 slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/3-slides/G11_T2_L1_C3_slides.pdf",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "C3A",
+        "Name": "C3 classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/2-class_activities/G11_T2_L1_C3_classroom_activity.pdf",
+        "Category": "classroom-activities"
+      },
+      {
+        "Acronym": "ME",
+        "Name": "C1 & C2 mock exam",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/4-learning_evidences/G11_T2_L1_C1C2_exam.pdf",
+        "Category": "mock-practices"
+      },
+      {
+        "Acronym": "MS",
+        "Name": "C1 & C2 mock solution",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/4-learning_evidences/G11_T2_L1_C1C2_exam_solution.pdf",
+        "Category": "mock-practices"
       }
     ]
   },
@@ -1130,14 +1298,7 @@ window.MATERIALS_DATA_BASE = [
     "Grade": 11,
     "Term": 2,
     "Class #": "5",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 11,
@@ -1145,10 +1306,22 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "6",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C4P",
+        "Name": "C4 practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/1-practice_activities/G11_T2_L1_C4_practice.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C4S",
+        "Name": "C4 slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/3-slides/G11_T2_L1_C4_slides.pdf",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "C4A",
+        "Name": "C4 classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/2-class_activities/G11_T2_L1_C4_classroom_activity.pdf",
+        "Category": "classroom-activities"
       }
     ]
   },
@@ -1158,10 +1331,16 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "7",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "ME",
+        "Name": "C3 & C4 mock exam",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/4-learning_evidences/G11_T2_L1_C3C4_exam.pdf",
+        "Category": "mock-practices"
+      },
+      {
+        "Acronym": "MS",
+        "Name": "C3 & C4 mock solution",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/4-learning_evidences/G11_T2_L1_C3C4_exam_solution.pdf",
+        "Category": "mock-practices"
       }
     ]
   },
@@ -1169,14 +1348,7 @@ window.MATERIALS_DATA_BASE = [
     "Grade": 11,
     "Term": 2,
     "Class #": "8",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 11,
@@ -1184,10 +1356,22 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "9",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C5P",
+        "Name": "C5 practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/1-practice_activities/G11_T2_L2_C5_practice.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C5S",
+        "Name": "C5 slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/3-slides/G11_T2_L2_C5_slides.pdf",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "C5A",
+        "Name": "C5 classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/2-class_activities/G11_T2_L2_C5_classroom_activity.pdf",
+        "Category": "classroom-activities"
       }
     ]
   },
@@ -1197,10 +1381,22 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "10",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C6P",
+        "Name": "C6 practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/1-practice_activities/G11_T2_L2_C6_practice.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C6S",
+        "Name": "C6 slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/3-slides/G11_T2_L2_C6_slides.pdf",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "C6A",
+        "Name": "C6 classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/2-class_activities/G11_T2_L2_C6_classroom_activity.pdf",
+        "Category": "classroom-activities"
       }
     ]
   },
@@ -1210,10 +1406,34 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "11",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C7P",
+        "Name": "C7 practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/1-practice_activities/G11_T2_L2_C7_practice.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C7S",
+        "Name": "C7 slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/3-slides/G11_T2_L2_C7_slides.pdf",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "C7A",
+        "Name": "C7 classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/2-class_activities/G11_T2_L2_C7_classroom_activity.pdf",
+        "Category": "classroom-activities"
+      },
+      {
+        "Acronym": "ME",
+        "Name": "C5 & C6 & C7 mock exam",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/4-learning_evidences/G11_T2_L2_C5C6C7_exam.pdf",
+        "Category": "mock-practices"
+      },
+      {
+        "Acronym": "MS",
+        "Name": "C5 & C6 & C7 mock solution",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/4-learning_evidences/G11_T2_L2_C5C6C7_exam_solution.pdf",
+        "Category": "mock-practices"
       }
     ]
   },
@@ -1221,14 +1441,7 @@ window.MATERIALS_DATA_BASE = [
     "Grade": 11,
     "Term": 2,
     "Class #": "12",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 11,
@@ -1236,10 +1449,22 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "13",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C8P",
+        "Name": "C8 practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/1-practice_activities/G11_T2_L3_C8_practice.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C8S",
+        "Name": "C8 slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/3-slides/G11_T2_L3_C8_slides.pdf",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "C8A",
+        "Name": "C8 classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/2-class_activities/G11_T2_L3_C8_classroom_activity.pdf",
+        "Category": "classroom-activities"
       }
     ]
   },
@@ -1249,10 +1474,22 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "14",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C9P",
+        "Name": "C9 practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/1-practice_activities/G11_T2_L3_C9_practice.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C9S",
+        "Name": "C9 slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/3-slides/G11_T2_L3_C9_slides.pdf",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "C9A",
+        "Name": "C9 classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/2-class_activities/G11_T2_L3_C9_classroom_activity.pdf",
+        "Category": "classroom-activities"
       }
     ]
   },
@@ -1262,10 +1499,34 @@ window.MATERIALS_DATA_BASE = [
     "Class #": "15",
     "Materials": [
       {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
+        "Acronym": "C10P",
+        "Name": "C10 practice activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/1-practice_activities/G11_T2_L3_C10_practice.pdf",
+        "Category": "practice-activities"
+      },
+      {
+        "Acronym": "C10S",
+        "Name": "C10 slides",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/3-slides/G11_T2_L3_C10_slides.pdf",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "C10A",
+        "Name": "C10 classroom activity",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/2-class_activities/G11_T2_L3_C10_classroom_activity.pdf",
+        "Category": "classroom-activities"
+      },
+      {
+        "Acronym": "ME",
+        "Name": "C8 & C9 & C10 mock exam",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/4-learning_evidences/G11_T2_L3_C8C9C10_exam.pdf",
+        "Category": "mock-practices"
+      },
+      {
+        "Acronym": "MS",
+        "Name": "C8 & C9 & C10 mock solution",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade11/term_2/4-learning_evidences/G11_T2_L3_C8C9C10_exam_solution.pdf",
+        "Category": "mock-practices"
       }
     ]
   },
@@ -1273,66 +1534,31 @@ window.MATERIALS_DATA_BASE = [
     "Grade": 11,
     "Term": 2,
     "Class #": "16",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 11,
     "Term": 2,
     "Class #": "17",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 11,
     "Term": 2,
     "Class #": "18",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 11,
     "Term": 2,
     "Class #": "19",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 11,
     "Term": 2,
     "Class #": "20",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 11,
