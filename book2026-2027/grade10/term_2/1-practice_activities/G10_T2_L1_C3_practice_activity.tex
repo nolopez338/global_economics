@@ -4,12 +4,23 @@
 \input{preamble_exams.tex}
 \input{graphs/highlights.tex}
 % \GTenHighlightsfalse % Uncomment to disable instructional highlights.
+\input{graphs/specific_highlights.tex}
+\CoordinatedTermTwoPalette
 % Local semantic roles: indicator, success probability, complementary probability,
-% and monetary consequence. Shared rendering and toggle remain authoritative.
+% monetary consequence, and expected monetary value. Shared rendering and toggle remain authoritative.
 \newcommand{\Indicator}[1]{\GTenHLValue{#1}}
 \newcommand{\SuccessProb}[1]{\GTenHLProbability{#1}}
-\newcommand{\FailureProb}[1]{\GTenHLParameter{#1}}
+\newcommand{\FailureProb}[1]{\HLComplementProbability{#1}}
 \newcommand{\Money}[1]{\GTenHLSecond{#1}}
+\newcommand{\ExpectedValue}[1]{\HLExpectedValue{#1}}
+% Dark inks from the marker families keep graph strokes and text readable.
+\ifGTenHighlights
+  \colorlet{CThreeExpectedInk}{ExpectedValueColor!55!black}
+  \colorlet{CThreeProbabilityInk}{GTenHLProbability!50!black}
+\else
+  \colorlet{CThreeExpectedInk}{black}
+  \colorlet{CThreeProbabilityInk}{black}
+\fi
 \usepackage{needspace}
 \hypersetup{pdftitle={Grade 10 Term 2 Discrete Probability}}
 \setlength{\emergencystretch}{2em}
@@ -22,16 +33,17 @@
  width=.86\linewidth,height=5.3cm,xmin=0,xmax=1,
  ymin={min(#2,#3)-.15*abs(#3-#2)},
  ymax={max(#2,#3)+.15*abs(#3-#2)},
- axis lines=left,xlabel={Probability $p=P(E)$},
- ylabel={Expected net profit (USD)},grid=major,
- title={$\mathbb E[Y_{#1}]$: individual break-even analysis},
+ axis lines=left,xlabel={\textcolor{CThreeProbabilityInk}{Probability $p=P(E)$}},
+ ylabel={\textcolor{CThreeExpectedInk}{Expected net profit (USD)}},
+ yticklabel style={text=CThreeExpectedInk}, xticklabel style={text=CThreeProbabilityInk},grid=major,
+ title={$\textcolor{CThreeExpectedInk}{\mathbb E}[\Money{Y_{#1}}]$: individual break-even analysis},
  xtick={0,1},extra x ticks={#4},extra x tick labels={$p_{#1}^*=#4$},
- extra x tick style={tick label style={font=\small}},
+ extra x tick style={tick label style={font=\small,text=CThreeProbabilityInk}},
  legend style={at={(.5,-.35)},anchor=north,legend columns=3,font=\small}]
-\addplot[black,thick,domain=0:1,samples=2]{#2+(#3-#2)*x};
-\addlegendentry{$\mathbb E[Y_{#1}]$}
+\addplot[CThreeExpectedInk,thick,domain=0:1,samples=2]{#2+(#3-#2)*x};
+\addlegendentry{$\textcolor{CThreeExpectedInk}{\mathbb E}[\Money{Y_{#1}}]$}
 \addplot[black,dashed,domain=0:1,samples=2]{0};\addlegendentry{Zero}
-\addplot[black,dotted,forget plot] coordinates {(#4,0) (#4,{min(#2,#3)-.15*abs(#3-#2)})};
+\addplot[CThreeProbabilityInk,thick,dotted,forget plot] coordinates {(#4,0) (#4,{min(#2,#3)-.15*abs(#3-#2)})};
 \addplot[black,only marks,mark=*] coordinates {(#4,0)};
 \addlegendentry{Break-even}
 \end{axis}\end{tikzpicture}}
@@ -50,7 +62,7 @@ Use the return arrows for the contents, the problem, and its problem list.
 All data are hypothetical teaching models. Keep exact expressions where useful;
 use exact break-even probabilities and decimals only as approximations. Monetary amounts are in USD.
 Each monetary variable has one strictly positive and one strictly negative payoff.
-Analyse the sign of each expected value separately, using its own zero threshold.
+Analyse the sign of each \ExpectedValue{expected value} separately, using its own zero threshold.
 All variables in a problem are functions of the same $X$; separate analyses do
 not imply statistical independence.
 
@@ -58,16 +70,7 @@ not imply statistical independence.
 \clearpage\section{Introduction}\label{sec:t2-c3-introduction}
 \subsection*{Highlight legend}
 \phantomsection\label{tab:highlight-legend}
-\begin{tabularx}{\linewidth}{@{}p{.25\linewidth}p{.25\linewidth}X@{}}
-\toprule
-\textbf{Symbol or notation}&\textbf{Concept}&\textbf{Brief meaning}\\\midrule
-$\Indicator{X}$ & \Indicator{Indicator} & Unitless label of an event: 0 or 1.\\
-$\SuccessProb{p}=P(X=1)$ & \SuccessProb{Success probability} & Chance of the state labelled 1.\\
-$\FailureProb{1-p}=P(X=0)$ & \FailureProb{Failure probability} & Chance of the complementary state.\\
-$\Money{Y}=f(\Indicator{X})$ & \Money{Monetary consequence} & State-dependent amount, in USD.\\
-$\Money{Y_i}=f_i(\Indicator{X})$ & \Money{Monetary payoff} & State-dependent net profit for rule $f_i$.\\
-\bottomrule
-\end{tabularx}
+\PracticeHighlightLegend{G10-T2-C3-coordinated}
 
 The two probability treatments distinguish an event from its complement within
 the same model. Labels and units preserve meaning without color.
@@ -95,26 +98,26 @@ and 1 from its positive value onward.
 \needspace{25\baselineskip}\paragraph{$Y_1$: its own break-even threshold.}
 With both payoffs fixed and only $p\in[0,1]$ varying,
 \[
-\mathbb E[Y_1]=p(60)+(1-p)(-20)=-20+80p\ \text{USD};
-\qquad \mathbb E[Y_1]=0\iff 80p=20\iff p_1^*=\frac{1}{4}.
+\ExpectedValue{\mathbb E}[\Money{Y_1}]=\SuccessProb{p}(\Money{60})+(\FailureProb{1-p})(\Money{-20})=\Money{-20}+\Money{80}\SuccessProb{p}\ \text{USD};
+\qquad \ExpectedValue{\mathbb E}[\Money{Y_1}]=\ExpectedValue{0}\iff 80p=20\iff p_1^*=\frac{1}{4}.
 \]
-Solving $\mathbb E[Y_1]>0$ gives $p\in(\frac{1}{4},1]$ (expected net gain).
-Solving $\mathbb E[Y_1]<0$ gives $p\in[0,\frac{1}{4})$ (expected net loss).
-At $p=\frac{1}{4}$ the expectation is zero (break-even).
-Initially, $\mathbb E[Y_1]=60(\frac{2}{5})+(-20)(\frac{3}{5})=12$ USD:
-an expected net gain of 12 USD per stated period.
+Solving $\ExpectedValue{\mathbb E}[\Money{Y_1}]>0$ gives $p\in(\frac{1}{4},1]$ (\ExpectedValue{expected net gain}).
+Solving $\ExpectedValue{\mathbb E}[\Money{Y_1}]<0$ gives $p\in[0,\frac{1}{4})$ (\ExpectedValue{expected net loss}).
+At $p=\frac{1}{4}$ the \ExpectedValue{expectation} is \ExpectedValue{zero} (break-even).
+Initially, $\ExpectedValue{\mathbb E}[\Money{Y_1}]=\Money{60}(\SuccessProb{\frac{2}{5}})+\Money{(-20)}(\FailureProb{\frac{3}{5}})=\ExpectedValue{12\,\text{USD}}$:
+an \ExpectedValue{expected net gain} of \ExpectedValue{12 USD} per stated period.
 \begin{center}\BreakEvenGraph{1}{-20}{60}{1/4}\end{center}
 \needspace{25\baselineskip}\paragraph{$Y_2$: its own break-even threshold.}
 With both payoffs fixed and only $p\in[0,1]$ varying,
 \[
-\mathbb E[Y_2]=p(120)+(1-p)(-40)=-40+160p\ \text{USD};
-\qquad \mathbb E[Y_2]=0\iff 160p=40\iff p_2^*=\frac{1}{4}.
+\ExpectedValue{\mathbb E}[\Money{Y_2}]=\SuccessProb{p}(\Money{120})+(\FailureProb{1-p})(\Money{-40})=\Money{-40}+\Money{160}\SuccessProb{p}\ \text{USD};
+\qquad \ExpectedValue{\mathbb E}[\Money{Y_2}]=\ExpectedValue{0}\iff 160p=40\iff p_2^*=\frac{1}{4}.
 \]
-Solving $\mathbb E[Y_2]>0$ gives $p\in(\frac{1}{4},1]$ (expected net gain).
-Solving $\mathbb E[Y_2]<0$ gives $p\in[0,\frac{1}{4})$ (expected net loss).
-At $p=\frac{1}{4}$ the expectation is zero (break-even).
-Initially, $\mathbb E[Y_2]=120(\frac{2}{5})+(-40)(\frac{3}{5})=24$ USD:
-an expected net gain of 24 USD per stated period.
+Solving $\ExpectedValue{\mathbb E}[\Money{Y_2}]>0$ gives $p\in(\frac{1}{4},1]$ (\ExpectedValue{expected net gain}).
+Solving $\ExpectedValue{\mathbb E}[\Money{Y_2}]<0$ gives $p\in[0,\frac{1}{4})$ (\ExpectedValue{expected net loss}).
+At $p=\frac{1}{4}$ the \ExpectedValue{expectation} is \ExpectedValue{zero} (break-even).
+Initially, $\ExpectedValue{\mathbb E}[\Money{Y_2}]=\Money{120}(\SuccessProb{\frac{2}{5}})+\Money{(-40)}(\FailureProb{\frac{3}{5}})=\ExpectedValue{24\,\text{USD}}$:
+an \ExpectedValue{expected net gain} of \ExpectedValue{24 USD} per stated period.
 \begin{center}\BreakEvenGraph{2}{-40}{120}{1/4}\end{center}
 
 \clearpage
@@ -139,26 +142,26 @@ $\{Y_i<0\}=\{X=1\}=E$, so $P(Y_i<0)=p=0.1$ initially.
 \needspace{25\baselineskip}\paragraph{$Y_1$: its own break-even threshold.}
 With both payoffs fixed and only $p\in[0,1]$ varying,
 \[
-\mathbb E[Y_1]=p(-20)+(1-p)(100)=100-120p\ \text{USD};
-\qquad \mathbb E[Y_1]=0\iff -120p=-100\iff p_1^*=\frac{5}{6}.
+\ExpectedValue{\mathbb E}[\Money{Y_1}]=\SuccessProb{p}(\Money{-20})+(\FailureProb{1-p})(\Money{100})=\Money{100}-\Money{120}\SuccessProb{p}\ \text{USD};
+\qquad \ExpectedValue{\mathbb E}[\Money{Y_1}]=\ExpectedValue{0}\iff -120p=-100\iff p_1^*=\frac{5}{6}.
 \]
-Solving $\mathbb E[Y_1]>0$ gives $p\in[0,\frac{5}{6})$ (expected net gain).
-Solving $\mathbb E[Y_1]<0$ gives $p\in(\frac{5}{6},1]$ (expected net loss).
-At $p=\frac{5}{6}$ the expectation is zero (break-even).
-Initially, $\mathbb E[Y_1]=-20(\frac{1}{10})+(100)(\frac{9}{10})=88$ USD:
-an expected net gain of 88 USD per stated period.
+Solving $\ExpectedValue{\mathbb E}[\Money{Y_1}]>0$ gives $p\in[0,\frac{5}{6})$ (\ExpectedValue{expected net gain}).
+Solving $\ExpectedValue{\mathbb E}[\Money{Y_1}]<0$ gives $p\in(\frac{5}{6},1]$ (\ExpectedValue{expected net loss}).
+At $p=\frac{5}{6}$ the \ExpectedValue{expectation} is \ExpectedValue{zero} (break-even).
+Initially, $\ExpectedValue{\mathbb E}[\Money{Y_1}]=\Money{-20}(\SuccessProb{\frac{1}{10}})+\Money{(100)}(\FailureProb{\frac{9}{10}})=\ExpectedValue{88\,\text{USD}}$:
+an \ExpectedValue{expected net gain} of \ExpectedValue{88 USD} per stated period.
 \begin{center}\BreakEvenGraph{1}{100}{-20}{5/6}\end{center}
 \needspace{25\baselineskip}\paragraph{$Y_2$: its own break-even threshold.}
 With both payoffs fixed and only $p\in[0,1]$ varying,
 \[
-\mathbb E[Y_2]=p(-10)+(1-p)(60)=60-70p\ \text{USD};
-\qquad \mathbb E[Y_2]=0\iff -70p=-60\iff p_2^*=\frac{6}{7}.
+\ExpectedValue{\mathbb E}[\Money{Y_2}]=\SuccessProb{p}(\Money{-10})+(\FailureProb{1-p})(\Money{60})=\Money{60}-\Money{70}\SuccessProb{p}\ \text{USD};
+\qquad \ExpectedValue{\mathbb E}[\Money{Y_2}]=\ExpectedValue{0}\iff -70p=-60\iff p_2^*=\frac{6}{7}.
 \]
-Solving $\mathbb E[Y_2]>0$ gives $p\in[0,\frac{6}{7})$ (expected net gain).
-Solving $\mathbb E[Y_2]<0$ gives $p\in(\frac{6}{7},1]$ (expected net loss).
-At $p=\frac{6}{7}$ the expectation is zero (break-even).
-Initially, $\mathbb E[Y_2]=-10(\frac{1}{10})+(60)(\frac{9}{10})=53$ USD:
-an expected net gain of 53 USD per stated period.
+Solving $\ExpectedValue{\mathbb E}[\Money{Y_2}]>0$ gives $p\in[0,\frac{6}{7})$ (\ExpectedValue{expected net gain}).
+Solving $\ExpectedValue{\mathbb E}[\Money{Y_2}]<0$ gives $p\in(\frac{6}{7},1]$ (\ExpectedValue{expected net loss}).
+At $p=\frac{6}{7}$ the \ExpectedValue{expectation} is \ExpectedValue{zero} (break-even).
+Initially, $\ExpectedValue{\mathbb E}[\Money{Y_2}]=\Money{-10}(\SuccessProb{\frac{1}{10}})+\Money{(60)}(\FailureProb{\frac{9}{10}})=\ExpectedValue{53\,\text{USD}}$:
+an \ExpectedValue{expected net gain} of \ExpectedValue{53 USD} per stated period.
 \begin{center}\BreakEvenGraph{2}{60}{-10}{6/7}\end{center}
 
 \subsection{Binary models and distributions}
@@ -210,9 +213,9 @@ $F_X(t)$, $F_{Y_i}(t)$ & CDF & $F_X(t)=P(X\leq t)$; $F_{Y_i}(t)=P(Y_i\leq t)$. R
 \textbullet\ \hyperref[ex:intro-two]{Example 2}: $F_{Y_1}(0)=0.1$. Threshold $t$ is in USD for money.\\
 $\{Y_i<0\}$ & Monetary event & Evaluate $f_i(0)$ and $f_i(1)$ to find the corresponding indicator event. &
 \textbullet\ \hyperref[ex:intro-one]{Example 1}: $\{Y_2<0\}=\{X=0\}$.\\
-$\mathbb E[Y_i]$ & Expected monetary value & $p f_i(1)+(1-p)f_i(0)$; in USD. &
-\textbullet\ \hyperref[ex:intro-one]{Example 1}: $\mathbb E[Y_1]=-20+80p$ USD.\\
-$p_i^*$ & Individual break-even probability & Solve $\mathbb E[Y_i]=0$; then solve each strict sign inequality on $[0,1]$. &
+$\ExpectedValue{\mathbb E}[\Money{Y_i}]$ & \ExpectedValue{Expected monetary}\par\ExpectedValue{value} & $\SuccessProb{p}\Money{f_i(1)}+(\FailureProb{1-p})\Money{f_i(0)}$; in USD. &
+\textbullet\ \hyperref[ex:intro-one]{Example 1}: $\ExpectedValue{\mathbb E}[\Money{Y_1}]=\Money{-20}+\Money{80}\SuccessProb{p}$ USD.\\
+$p_i^*$ & Individual break-even probability & Solve $\ExpectedValue{\mathbb E}[\Money{Y_i}]=\ExpectedValue{0}$; then solve each strict sign inequality on $[0,1]$. &
 \textbullet\ \hyperref[ex:intro-two]{Example 2}: $p_1^*=5/6$, $p_2^*=6/7$.\\
 \bottomrule
 \end{longtable}\endgroup
@@ -249,20 +252,20 @@ At endpoints, zero-mass potential values create no jump.
 \item Translate monetary events into events involving $X$ and add the
 appropriate masses. Check units, signs, total mass 1 and right continuity.
 \end{enumerate}
-\textbf{Task 2 --- Analyse the sign of each expected value separately.}
+\textbf{Task 2 --- Analyse the sign of each \ExpectedValue{expected value} separately.}
 \begin{enumerate}
 \item For one $Y_i$ at a time, hold its two state payoffs fixed and vary only $p\in[0,1]$.
-\item Derive $\mathbb E[Y_i]=p f_i(1)+(1-p)f_i(0)=f_i(0)+[f_i(1)-f_i(0)]p$, in USD.
-\item Solve $\mathbb E[Y_i]=0$ exactly:
+\item Derive $\ExpectedValue{\mathbb E}[\Money{Y_i}]=\SuccessProb{p}\Money{f_i(1)}+(\FailureProb{1-p})\Money{f_i(0)}=f_i(0)+[f_i(1)-f_i(0)]p$, in USD.
+\item Solve $\ExpectedValue{\mathbb E}[\Money{Y_i}]=\ExpectedValue{0}$ exactly:
 \[
 p_i^*=\frac{-f_i(0)}{f_i(1)-f_i(0)}\in(0,1).
 \]
-\item Solve $\mathbb E[Y_i]>0$ and $\mathbb E[Y_i]<0$ separately.
+\item Solve $\ExpectedValue{\mathbb E}[\Money{Y_i}]>0$ and $\ExpectedValue{\mathbb E}[\Money{Y_i}]<0$ separately.
 If $f_i(1)>f_i(0)$, gain occurs on $(p_i^*,1]$ and loss on $[0,p_i^*)$.
 If $f_i(1)<f_i(0)$, gain occurs on $[0,p_i^*)$ and loss on $(p_i^*,1]$.
 In both cases, equality holds only at $p_i^*$; include the applicable endpoints 0 and 1.
-\item Interpret positive expectation as expected net gain, negative expectation
-as expected net loss, and zero as break-even. Substitute the initial $p$ and interpret its value in USD per stated period.
+\item Interpret positive \ExpectedValue{expectation} as \ExpectedValue{expected net gain}, negative \ExpectedValue{expectation}
+as \ExpectedValue{expected net loss}, and zero as break-even. Substitute the initial $p$ and interpret its value in USD per stated period.
 \item Draw a separately labelled graph for this $Y_i$: its expected-value line,
 the horizontal zero line and its own exact break-even probability. The line joins
 $f_i(0)$ at $p=0$ to $f_i(1)$ at $p=1$. Repeat every step for each remaining variable.
@@ -272,7 +275,7 @@ Separate analysis does not assert independence: all $Y_i$ use the same $X$.
 \secInicio[][sec:t2-c3-introduction]
 \clearpage
 \section{General Worked Problems}\label{sec:t2-c3-general}
-Each problem applies C3 through one Bernoulli model and analyses each monetary expectation against zero separately.
+Each problem applies C3 through one Bernoulli model and analyses each monetary \ExpectedValue{expectation} against zero separately.
 \SectionProblemsTableOfContents{\SectionProblemLink{prob:c3-inventory}{Clothing inventory for one weekend}\\
 \SectionProblemLink{prob:c3-coffee}{Coffee-shop service strategy}\\
 \SectionProblemLink{prob:c3-energy}{Renewable-energy sales contract}\\
@@ -332,37 +335,37 @@ All monetary variables are functions of the same $X$; separate analyses do not a
 \secInicio[prob:c3-inventory][sec:t2-c3-general]
 \clearpage\subsubsection*{Task 2 --- Worked solution}\label{sol:c3-inventory-decision}
 Keep the event, its complement and the indicator from Task 1.
-The table records fixed state payoffs; the analysis of each row uses only its own expectation.
+The table records fixed state payoffs; the analysis of each row uses only its own \ExpectedValue{expectation}.
 \begin{center}\begin{tabular}{lrrl}\toprule
-Variable & $f_i(0)$ (USD) & $f_i(1)$ (USD) & $\mathbb E[Y_i]$ (USD)\\\midrule
-$Y_1$ & $\Money{-40}$ & $\Money{80}$ & $\Money{-40+120p}$\\
-$Y_2$ & $\Money{-20}$ & $\Money{180}$ & $\Money{-20+200p}$\\
+Variable & $f_i(0)$ (USD) & $f_i(1)$ (USD) & $\ExpectedValue{\mathbb E}[\Money{Y_i}]$ (USD)\\\midrule
+$Y_1$ & $\Money{-40}$ & $\Money{80}$ & $\Money{-40}+\Money{120}\SuccessProb{p}$\\
+$Y_2$ & $\Money{-20}$ & $\Money{180}$ & $\Money{-20}+\Money{200}\SuccessProb{p}$\\
 \bottomrule\end{tabular}\end{center}
 \paragraph{$Y_1$: individual sensitivity analysis.}
 Hold $f_1(0)=\Money{-40}$ and $f_1(1)=\Money{80}$ USD fixed;
 vary only $p=P(E)\in[0,1]$.
 \begin{align*}
-\mathbb E[Y_1]&=p f_1(1)+(1-p)f_1(0)\\
- &=p(80)+(1-p)(-40)=-40+120p\quad\text{USD},\\
-\mathbb E[Y_1]&=0\iff 120p=40\iff p=p_1^*=\frac{1}{3}.
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=\SuccessProb{p}\Money{f_1(1)}+(\FailureProb{1-p})\Money{f_1(0)}\\
+ &=\SuccessProb{p}(\Money{80})+(\FailureProb{1-p})(\Money{-40})=\Money{-40}+\Money{120}\SuccessProb{p}\quad\text{USD},\\
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=\ExpectedValue{0}\iff 120p=40\iff p=p_1^*=\frac{1}{3}.
 \end{align*}
 Solve the two strict inequalities separately, within $0\leq p\leq1$:
 \[
 \begin{aligned}
-\mathbb E[Y_1]>0&\iff 120p>40\iff p>\frac{1}{3}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]>0&\iff 120p>40\iff p>\frac{1}{3}
  &&\Longrightarrow p\in (\frac{1}{3},1],\\
-\mathbb E[Y_1]<0&\iff 120p<40\iff p<\frac{1}{3}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]<0&\iff 120p<40\iff p<\frac{1}{3}
  &&\Longrightarrow p\in [0,\frac{1}{3}).
 \end{aligned}
 \]
-The positive interval means expected net gain; the negative interval means
-expected net loss. At $p=\frac{1}{3}$, expected net profit is zero: break-even.
+The positive interval means \ExpectedValue{expected net gain}; the negative interval means
+\ExpectedValue{expected net loss}. At $p=\frac{1}{3}$, \ExpectedValue{expected net profit} is \ExpectedValue{zero}: break-even.
 At the initially supplied $p=\frac{2}{5}$,
 \[
-\mathbb E[Y_1]=80\left(\frac{2}{5}\right)+(-40)\left(\frac{3}{5}\right)
- =\Money{8}\quad\text{USD}.
+\ExpectedValue{\mathbb E}[\Money{Y_1}]=\Money{80}\left(\SuccessProb{\frac{2}{5}}\right)+(\Money{-40})\left(\FailureProb{\frac{3}{5}}\right)
+ =\ExpectedValue{8\quad\text{USD}}.
 \]
-This is expected net gain of 8 USD per stated observation period, in the long-run average.
+This is \ExpectedValue{expected net gain} of \ExpectedValue{8 USD} per stated observation period, in the long-run average.
 \begin{center}\BreakEvenGraph{1}{-40}{80}{1/3}\end{center}
 The line joins $(0,-40)$ and $(1,80)$; the marked zero is $p_1^*=\frac{1}{3}$.
 \clearpage
@@ -370,27 +373,27 @@ The line joins $(0,-40)$ and $(1,80)$; the marked zero is $p_1^*=\frac{1}{3}$.
 Hold $f_2(0)=\Money{-20}$ and $f_2(1)=\Money{180}$ USD fixed;
 vary only $p=P(E)\in[0,1]$.
 \begin{align*}
-\mathbb E[Y_2]&=p f_2(1)+(1-p)f_2(0)\\
- &=p(180)+(1-p)(-20)=-20+200p\quad\text{USD},\\
-\mathbb E[Y_2]&=0\iff 200p=20\iff p=p_2^*=\frac{1}{10}.
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=\SuccessProb{p}\Money{f_2(1)}+(\FailureProb{1-p})\Money{f_2(0)}\\
+ &=\SuccessProb{p}(\Money{180})+(\FailureProb{1-p})(\Money{-20})=\Money{-20}+\Money{200}\SuccessProb{p}\quad\text{USD},\\
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=\ExpectedValue{0}\iff 200p=20\iff p=p_2^*=\frac{1}{10}.
 \end{align*}
 Solve the two strict inequalities separately, within $0\leq p\leq1$:
 \[
 \begin{aligned}
-\mathbb E[Y_2]>0&\iff 200p>20\iff p>\frac{1}{10}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]>0&\iff 200p>20\iff p>\frac{1}{10}
  &&\Longrightarrow p\in (\frac{1}{10},1],\\
-\mathbb E[Y_2]<0&\iff 200p<20\iff p<\frac{1}{10}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]<0&\iff 200p<20\iff p<\frac{1}{10}
  &&\Longrightarrow p\in [0,\frac{1}{10}).
 \end{aligned}
 \]
-The positive interval means expected net gain; the negative interval means
-expected net loss. At $p=\frac{1}{10}$, expected net profit is zero: break-even.
+The positive interval means \ExpectedValue{expected net gain}; the negative interval means
+\ExpectedValue{expected net loss}. At $p=\frac{1}{10}$, \ExpectedValue{expected net profit} is \ExpectedValue{zero}: break-even.
 At the initially supplied $p=\frac{2}{5}$,
 \[
-\mathbb E[Y_2]=180\left(\frac{2}{5}\right)+(-20)\left(\frac{3}{5}\right)
- =\Money{60}\quad\text{USD}.
+\ExpectedValue{\mathbb E}[\Money{Y_2}]=\Money{180}\left(\SuccessProb{\frac{2}{5}}\right)+(\Money{-20})\left(\FailureProb{\frac{3}{5}}\right)
+ =\ExpectedValue{60\quad\text{USD}}.
 \]
-This is expected net gain of 60 USD per stated observation period, in the long-run average.
+This is \ExpectedValue{expected net gain} of \ExpectedValue{60 USD} per stated observation period, in the long-run average.
 \begin{center}\BreakEvenGraph{2}{-20}{180}{1/10}\end{center}
 The line joins $(0,-20)$ and $(1,180)$; the marked zero is $p_2^*=\frac{1}{10}$.
 \secInicio[prob:c3-inventory][sec:t2-c3-general]
@@ -450,37 +453,37 @@ All monetary variables are functions of the same $X$; separate analyses do not a
 \secInicio[prob:c3-coffee][sec:t2-c3-general]
 \clearpage\subsubsection*{Task 2 --- Worked solution}\label{sol:c3-coffee-decision}
 Keep the event, its complement and the indicator from Task 1.
-The table records fixed state payoffs; the analysis of each row uses only its own expectation.
+The table records fixed state payoffs; the analysis of each row uses only its own \ExpectedValue{expectation}.
 \begin{center}\begin{tabular}{lrrl}\toprule
-Variable & $f_i(0)$ (USD) & $f_i(1)$ (USD) & $\mathbb E[Y_i]$ (USD)\\\midrule
-$Y_1$ & $\Money{-40}$ & $\Money{100}$ & $\Money{-40+140p}$\\
-$Y_2$ & $\Money{100}$ & $\Money{-20}$ & $\Money{100-120p}$\\
+Variable & $f_i(0)$ (USD) & $f_i(1)$ (USD) & $\ExpectedValue{\mathbb E}[\Money{Y_i}]$ (USD)\\\midrule
+$Y_1$ & $\Money{-40}$ & $\Money{100}$ & $\Money{-40}+\Money{140}\SuccessProb{p}$\\
+$Y_2$ & $\Money{100}$ & $\Money{-20}$ & $\Money{100}-\Money{120}\SuccessProb{p}$\\
 \bottomrule\end{tabular}\end{center}
 \paragraph{$Y_1$: individual sensitivity analysis.}
 Hold $f_1(0)=\Money{-40}$ and $f_1(1)=\Money{100}$ USD fixed;
 vary only $p=P(E)\in[0,1]$.
 \begin{align*}
-\mathbb E[Y_1]&=p f_1(1)+(1-p)f_1(0)\\
- &=p(100)+(1-p)(-40)=-40+140p\quad\text{USD},\\
-\mathbb E[Y_1]&=0\iff 140p=40\iff p=p_1^*=\frac{2}{7}.
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=\SuccessProb{p}\Money{f_1(1)}+(\FailureProb{1-p})\Money{f_1(0)}\\
+ &=\SuccessProb{p}(\Money{100})+(\FailureProb{1-p})(\Money{-40})=\Money{-40}+\Money{140}\SuccessProb{p}\quad\text{USD},\\
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=\ExpectedValue{0}\iff 140p=40\iff p=p_1^*=\frac{2}{7}.
 \end{align*}
 Solve the two strict inequalities separately, within $0\leq p\leq1$:
 \[
 \begin{aligned}
-\mathbb E[Y_1]>0&\iff 140p>40\iff p>\frac{2}{7}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]>0&\iff 140p>40\iff p>\frac{2}{7}
  &&\Longrightarrow p\in (\frac{2}{7},1],\\
-\mathbb E[Y_1]<0&\iff 140p<40\iff p<\frac{2}{7}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]<0&\iff 140p<40\iff p<\frac{2}{7}
  &&\Longrightarrow p\in [0,\frac{2}{7}).
 \end{aligned}
 \]
-The positive interval means expected net gain; the negative interval means
-expected net loss. At $p=\frac{2}{7}$, expected net profit is zero: break-even.
+The positive interval means \ExpectedValue{expected net gain}; the negative interval means
+\ExpectedValue{expected net loss}. At $p=\frac{2}{7}$, \ExpectedValue{expected net profit} is \ExpectedValue{zero}: break-even.
 At the initially supplied $p=\frac{1}{2}$,
 \[
-\mathbb E[Y_1]=100\left(\frac{1}{2}\right)+(-40)\left(\frac{1}{2}\right)
- =\Money{30}\quad\text{USD}.
+\ExpectedValue{\mathbb E}[\Money{Y_1}]=\Money{100}\left(\SuccessProb{\frac{1}{2}}\right)+(\Money{-40})\left(\FailureProb{\frac{1}{2}}\right)
+ =\ExpectedValue{30\quad\text{USD}}.
 \]
-This is expected net gain of 30 USD per stated observation period, in the long-run average.
+This is \ExpectedValue{expected net gain} of \ExpectedValue{30 USD} per stated observation period, in the long-run average.
 \begin{center}\BreakEvenGraph{1}{-40}{100}{2/7}\end{center}
 The line joins $(0,-40)$ and $(1,100)$; the marked zero is $p_1^*=\frac{2}{7}$.
 \clearpage
@@ -488,27 +491,27 @@ The line joins $(0,-40)$ and $(1,100)$; the marked zero is $p_1^*=\frac{2}{7}$.
 Hold $f_2(0)=\Money{100}$ and $f_2(1)=\Money{-20}$ USD fixed;
 vary only $p=P(E)\in[0,1]$.
 \begin{align*}
-\mathbb E[Y_2]&=p f_2(1)+(1-p)f_2(0)\\
- &=p(-20)+(1-p)(100)=100-120p\quad\text{USD},\\
-\mathbb E[Y_2]&=0\iff -120p=-100\iff p=p_2^*=\frac{5}{6}.
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=\SuccessProb{p}\Money{f_2(1)}+(\FailureProb{1-p})\Money{f_2(0)}\\
+ &=\SuccessProb{p}(\Money{-20})+(\FailureProb{1-p})(\Money{100})=\Money{100}-\Money{120}\SuccessProb{p}\quad\text{USD},\\
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=\ExpectedValue{0}\iff -120p=-100\iff p=p_2^*=\frac{5}{6}.
 \end{align*}
 Solve the two strict inequalities separately, within $0\leq p\leq1$:
 \[
 \begin{aligned}
-\mathbb E[Y_2]>0&\iff -120p>-100\iff p<\frac{5}{6}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]>0&\iff -120p>-100\iff p<\frac{5}{6}
  &&\Longrightarrow p\in [0,\frac{5}{6}),\\
-\mathbb E[Y_2]<0&\iff -120p<-100\iff p>\frac{5}{6}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]<0&\iff -120p<-100\iff p>\frac{5}{6}
  &&\Longrightarrow p\in (\frac{5}{6},1].
 \end{aligned}
 \]
-The positive interval means expected net gain; the negative interval means
-expected net loss. At $p=\frac{5}{6}$, expected net profit is zero: break-even.
+The positive interval means \ExpectedValue{expected net gain}; the negative interval means
+\ExpectedValue{expected net loss}. At $p=\frac{5}{6}$, \ExpectedValue{expected net profit} is \ExpectedValue{zero}: break-even.
 At the initially supplied $p=\frac{1}{2}$,
 \[
-\mathbb E[Y_2]=-20\left(\frac{1}{2}\right)+(100)\left(\frac{1}{2}\right)
- =\Money{40}\quad\text{USD}.
+\ExpectedValue{\mathbb E}[\Money{Y_2}]=\Money{-20}\left(\SuccessProb{\frac{1}{2}}\right)+(\Money{100})\left(\FailureProb{\frac{1}{2}}\right)
+ =\ExpectedValue{40\quad\text{USD}}.
 \]
-This is expected net gain of 40 USD per stated observation period, in the long-run average.
+This is \ExpectedValue{expected net gain} of \ExpectedValue{40 USD} per stated observation period, in the long-run average.
 \begin{center}\BreakEvenGraph{2}{100}{-20}{5/6}\end{center}
 The line joins $(0,100)$ and $(1,-20)$; the marked zero is $p_2^*=\frac{5}{6}$.
 \secInicio[prob:c3-coffee][sec:t2-c3-general]
@@ -568,35 +571,35 @@ All monetary variables are functions of the same $X$; separate analyses do not a
 \secInicio[prob:c3-energy][sec:t2-c3-general]
 \clearpage\subsubsection*{Task 2 --- Worked solution}\label{sol:c3-energy-decision}
 Keep the event, its complement and the indicator from Task 1.
-The table records fixed state payoffs; the analysis of each row uses only its own expectation.
+The table records fixed state payoffs; the analysis of each row uses only its own \ExpectedValue{expectation}.
 \begin{center}\begin{tabular}{lrrl}\toprule
-Variable & $f_i(0)$ (USD) & $f_i(1)$ (USD) & $\mathbb E[Y_i]$ (USD)\\\midrule
-$Y_1$ & $\Money{-30}$ & $\Money{90}$ & $\Money{-30+120p}$\\
-$Y_2$ & $\Money{-60}$ & $\Money{60}$ & $\Money{-60+120p}$\\
+Variable & $f_i(0)$ (USD) & $f_i(1)$ (USD) & $\ExpectedValue{\mathbb E}[\Money{Y_i}]$ (USD)\\\midrule
+$Y_1$ & $\Money{-30}$ & $\Money{90}$ & $\Money{-30}+\Money{120}\SuccessProb{p}$\\
+$Y_2$ & $\Money{-60}$ & $\Money{60}$ & $\Money{-60}+\Money{120}\SuccessProb{p}$\\
 \bottomrule\end{tabular}\end{center}
 \paragraph{$Y_1$: individual sensitivity analysis.}
 Hold $f_1(0)=\Money{-30}$ and $f_1(1)=\Money{90}$ USD fixed;
 vary only $p=P(E)\in[0,1]$.
 \begin{align*}
-\mathbb E[Y_1]&=p f_1(1)+(1-p)f_1(0)\\
- &=p(90)+(1-p)(-30)=-30+120p\quad\text{USD},\\
-\mathbb E[Y_1]&=0\iff 120p=30\iff p=p_1^*=\frac{1}{4}.
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=\SuccessProb{p}\Money{f_1(1)}+(\FailureProb{1-p})\Money{f_1(0)}\\
+ &=\SuccessProb{p}(\Money{90})+(\FailureProb{1-p})(\Money{-30})=\Money{-30}+\Money{120}\SuccessProb{p}\quad\text{USD},\\
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=\ExpectedValue{0}\iff 120p=30\iff p=p_1^*=\frac{1}{4}.
 \end{align*}
 Solve the two strict inequalities separately, within $0\leq p\leq1$:
 \[
 \begin{aligned}
-\mathbb E[Y_1]>0&\iff 120p>30\iff p>\frac{1}{4}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]>0&\iff 120p>30\iff p>\frac{1}{4}
  &&\Longrightarrow p\in (\frac{1}{4},1],\\
-\mathbb E[Y_1]<0&\iff 120p<30\iff p<\frac{1}{4}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]<0&\iff 120p<30\iff p<\frac{1}{4}
  &&\Longrightarrow p\in [0,\frac{1}{4}).
 \end{aligned}
 \]
-The positive interval means expected net gain; the negative interval means
-expected net loss. At $p=\frac{1}{4}$, expected net profit is zero: break-even.
+The positive interval means \ExpectedValue{expected net gain}; the negative interval means
+\ExpectedValue{expected net loss}. At $p=\frac{1}{4}$, \ExpectedValue{expected net profit} is \ExpectedValue{zero}: break-even.
 At the initially supplied $p=\frac{1}{4}$,
 \[
-\mathbb E[Y_1]=90\left(\frac{1}{4}\right)+(-30)\left(\frac{3}{4}\right)
- =\Money{0}\quad\text{USD}.
+\ExpectedValue{\mathbb E}[\Money{Y_1}]=\Money{90}\left(\SuccessProb{\frac{1}{4}}\right)+(\Money{-30})\left(\FailureProb{\frac{3}{4}}\right)
+ =\ExpectedValue{0\quad\text{USD}}.
 \]
 This is break-even at the initial probability.
 \begin{center}\BreakEvenGraph{1}{-30}{90}{1/4}\end{center}
@@ -606,27 +609,27 @@ The line joins $(0,-30)$ and $(1,90)$; the marked zero is $p_1^*=\frac{1}{4}$.
 Hold $f_2(0)=\Money{-60}$ and $f_2(1)=\Money{60}$ USD fixed;
 vary only $p=P(E)\in[0,1]$.
 \begin{align*}
-\mathbb E[Y_2]&=p f_2(1)+(1-p)f_2(0)\\
- &=p(60)+(1-p)(-60)=-60+120p\quad\text{USD},\\
-\mathbb E[Y_2]&=0\iff 120p=60\iff p=p_2^*=\frac{1}{2}.
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=\SuccessProb{p}\Money{f_2(1)}+(\FailureProb{1-p})\Money{f_2(0)}\\
+ &=\SuccessProb{p}(\Money{60})+(\FailureProb{1-p})(\Money{-60})=\Money{-60}+\Money{120}\SuccessProb{p}\quad\text{USD},\\
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=\ExpectedValue{0}\iff 120p=60\iff p=p_2^*=\frac{1}{2}.
 \end{align*}
 Solve the two strict inequalities separately, within $0\leq p\leq1$:
 \[
 \begin{aligned}
-\mathbb E[Y_2]>0&\iff 120p>60\iff p>\frac{1}{2}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]>0&\iff 120p>60\iff p>\frac{1}{2}
  &&\Longrightarrow p\in (\frac{1}{2},1],\\
-\mathbb E[Y_2]<0&\iff 120p<60\iff p<\frac{1}{2}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]<0&\iff 120p<60\iff p<\frac{1}{2}
  &&\Longrightarrow p\in [0,\frac{1}{2}).
 \end{aligned}
 \]
-The positive interval means expected net gain; the negative interval means
-expected net loss. At $p=\frac{1}{2}$, expected net profit is zero: break-even.
+The positive interval means \ExpectedValue{expected net gain}; the negative interval means
+\ExpectedValue{expected net loss}. At $p=\frac{1}{2}$, \ExpectedValue{expected net profit} is \ExpectedValue{zero}: break-even.
 At the initially supplied $p=\frac{1}{4}$,
 \[
-\mathbb E[Y_2]=60\left(\frac{1}{4}\right)+(-60)\left(\frac{3}{4}\right)
- =\Money{-30}\quad\text{USD}.
+\ExpectedValue{\mathbb E}[\Money{Y_2}]=\Money{60}\left(\SuccessProb{\frac{1}{4}}\right)+(\Money{-60})\left(\FailureProb{\frac{3}{4}}\right)
+ =\ExpectedValue{-30\quad\text{USD}}.
 \]
-This is expected net loss of 30 USD per stated observation period, in the long-run average.
+This is \ExpectedValue{expected net loss} of \ExpectedValue{30 USD} per stated observation period, in the long-run average.
 \begin{center}\BreakEvenGraph{2}{-60}{60}{1/2}\end{center}
 The line joins $(0,-60)$ and $(1,60)$; the marked zero is $p_2^*=\frac{1}{2}$.
 \secInicio[prob:c3-energy][sec:t2-c3-general]
@@ -686,37 +689,37 @@ All monetary variables are functions of the same $X$; separate analyses do not a
 \secInicio[prob:c3-manufacturing][sec:t2-c3-general]
 \clearpage\subsubsection*{Task 2 --- Worked solution}\label{sol:c3-manufacturing-decision}
 Keep the event, its complement and the indicator from Task 1.
-The table records fixed state payoffs; the analysis of each row uses only its own expectation.
+The table records fixed state payoffs; the analysis of each row uses only its own \ExpectedValue{expectation}.
 \begin{center}\begin{tabular}{lrrl}\toprule
-Variable & $f_i(0)$ (USD) & $f_i(1)$ (USD) & $\mathbb E[Y_i]$ (USD)\\\midrule
-$Y_1$ & $\Money{-100}$ & $\Money{200}$ & $\Money{-100+300p}$\\
-$Y_2$ & $\Money{-100}$ & $\Money{500}$ & $\Money{-100+600p}$\\
+Variable & $f_i(0)$ (USD) & $f_i(1)$ (USD) & $\ExpectedValue{\mathbb E}[\Money{Y_i}]$ (USD)\\\midrule
+$Y_1$ & $\Money{-100}$ & $\Money{200}$ & $\Money{-100}+\Money{300}\SuccessProb{p}$\\
+$Y_2$ & $\Money{-100}$ & $\Money{500}$ & $\Money{-100}+\Money{600}\SuccessProb{p}$\\
 \bottomrule\end{tabular}\end{center}
 \paragraph{$Y_1$: individual sensitivity analysis.}
 Hold $f_1(0)=\Money{-100}$ and $f_1(1)=\Money{200}$ USD fixed;
 vary only $p=P(E)\in[0,1]$.
 \begin{align*}
-\mathbb E[Y_1]&=p f_1(1)+(1-p)f_1(0)\\
- &=p(200)+(1-p)(-100)=-100+300p\quad\text{USD},\\
-\mathbb E[Y_1]&=0\iff 300p=100\iff p=p_1^*=\frac{1}{3}.
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=\SuccessProb{p}\Money{f_1(1)}+(\FailureProb{1-p})\Money{f_1(0)}\\
+ &=\SuccessProb{p}(\Money{200})+(\FailureProb{1-p})(\Money{-100})=\Money{-100}+\Money{300}\SuccessProb{p}\quad\text{USD},\\
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=\ExpectedValue{0}\iff 300p=100\iff p=p_1^*=\frac{1}{3}.
 \end{align*}
 Solve the two strict inequalities separately, within $0\leq p\leq1$:
 \[
 \begin{aligned}
-\mathbb E[Y_1]>0&\iff 300p>100\iff p>\frac{1}{3}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]>0&\iff 300p>100\iff p>\frac{1}{3}
  &&\Longrightarrow p\in (\frac{1}{3},1],\\
-\mathbb E[Y_1]<0&\iff 300p<100\iff p<\frac{1}{3}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]<0&\iff 300p<100\iff p<\frac{1}{3}
  &&\Longrightarrow p\in [0,\frac{1}{3}).
 \end{aligned}
 \]
-The positive interval means expected net gain; the negative interval means
-expected net loss. At $p=\frac{1}{3}$, expected net profit is zero: break-even.
+The positive interval means \ExpectedValue{expected net gain}; the negative interval means
+\ExpectedValue{expected net loss}. At $p=\frac{1}{3}$, \ExpectedValue{expected net profit} is \ExpectedValue{zero}: break-even.
 At the initially supplied $p=\frac{3}{5}$,
 \[
-\mathbb E[Y_1]=200\left(\frac{3}{5}\right)+(-100)\left(\frac{2}{5}\right)
- =\Money{80}\quad\text{USD}.
+\ExpectedValue{\mathbb E}[\Money{Y_1}]=\Money{200}\left(\SuccessProb{\frac{3}{5}}\right)+(\Money{-100})\left(\FailureProb{\frac{2}{5}}\right)
+ =\ExpectedValue{80\quad\text{USD}}.
 \]
-This is expected net gain of 80 USD per stated observation period, in the long-run average.
+This is \ExpectedValue{expected net gain} of \ExpectedValue{80 USD} per stated observation period, in the long-run average.
 \begin{center}\BreakEvenGraph{1}{-100}{200}{1/3}\end{center}
 The line joins $(0,-100)$ and $(1,200)$; the marked zero is $p_1^*=\frac{1}{3}$.
 \clearpage
@@ -724,33 +727,33 @@ The line joins $(0,-100)$ and $(1,200)$; the marked zero is $p_1^*=\frac{1}{3}$.
 Hold $f_2(0)=\Money{-100}$ and $f_2(1)=\Money{500}$ USD fixed;
 vary only $p=P(E)\in[0,1]$.
 \begin{align*}
-\mathbb E[Y_2]&=p f_2(1)+(1-p)f_2(0)\\
- &=p(500)+(1-p)(-100)=-100+600p\quad\text{USD},\\
-\mathbb E[Y_2]&=0\iff 600p=100\iff p=p_2^*=\frac{1}{6}.
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=\SuccessProb{p}\Money{f_2(1)}+(\FailureProb{1-p})\Money{f_2(0)}\\
+ &=\SuccessProb{p}(\Money{500})+(\FailureProb{1-p})(\Money{-100})=\Money{-100}+\Money{600}\SuccessProb{p}\quad\text{USD},\\
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=\ExpectedValue{0}\iff 600p=100\iff p=p_2^*=\frac{1}{6}.
 \end{align*}
 Solve the two strict inequalities separately, within $0\leq p\leq1$:
 \[
 \begin{aligned}
-\mathbb E[Y_2]>0&\iff 600p>100\iff p>\frac{1}{6}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]>0&\iff 600p>100\iff p>\frac{1}{6}
  &&\Longrightarrow p\in (\frac{1}{6},1],\\
-\mathbb E[Y_2]<0&\iff 600p<100\iff p<\frac{1}{6}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]<0&\iff 600p<100\iff p<\frac{1}{6}
  &&\Longrightarrow p\in [0,\frac{1}{6}).
 \end{aligned}
 \]
-The positive interval means expected net gain; the negative interval means
-expected net loss. At $p=\frac{1}{6}$, expected net profit is zero: break-even.
+The positive interval means \ExpectedValue{expected net gain}; the negative interval means
+\ExpectedValue{expected net loss}. At $p=\frac{1}{6}$, \ExpectedValue{expected net profit} is \ExpectedValue{zero}: break-even.
 At the initially supplied $p=\frac{3}{5}$,
 \[
-\mathbb E[Y_2]=500\left(\frac{3}{5}\right)+(-100)\left(\frac{2}{5}\right)
- =\Money{260}\quad\text{USD}.
+\ExpectedValue{\mathbb E}[\Money{Y_2}]=\Money{500}\left(\SuccessProb{\frac{3}{5}}\right)+(\Money{-100})\left(\FailureProb{\frac{2}{5}}\right)
+ =\ExpectedValue{260\quad\text{USD}}.
 \]
-This is expected net gain of 260 USD per stated observation period, in the long-run average.
+This is \ExpectedValue{expected net gain} of \ExpectedValue{260 USD} per stated observation period, in the long-run average.
 \begin{center}\BreakEvenGraph{2}{-100}{500}{1/6}\end{center}
 The line joins $(0,-100)$ and $(1,500)$; the marked zero is $p_2^*=\frac{1}{6}$.
 \secInicio[prob:c3-manufacturing][sec:t2-c3-general]
 \clearpage
 \section{Advanced Problems}\label{sec:t2-c3-advanced}
-Each problem applies C3 through one Bernoulli model and analyses each monetary expectation against zero separately.
+Each problem applies C3 through one Bernoulli model and analyses each monetary \ExpectedValue{expectation} against zero separately.
 \SectionProblemsTableOfContents{\SectionProblemLink{prob:c3-restaurant}{Restaurant capacity: three alternatives, two states}\\
 \SectionProblemLink{prob:c3-agriculture}{Agricultural planting: three individual break-even thresholds}}
 \subsection{Restaurant capacity: three alternatives, two states}\label{prob:c3-restaurant}
@@ -825,38 +828,38 @@ All monetary variables are functions of the same $X$; separate analyses do not a
 \secInicio[prob:c3-restaurant][sec:t2-c3-advanced]
 \clearpage\subsubsection*{Task 2 --- Worked solution}\label{sol:c3-restaurant-decision}
 Keep the event, its complement and the indicator from Task 1.
-The table records fixed state payoffs; the analysis of each row uses only its own expectation.
+The table records fixed state payoffs; the analysis of each row uses only its own \ExpectedValue{expectation}.
 \begin{center}\begin{tabular}{lrrl}\toprule
-Variable & $f_i(0)$ (USD) & $f_i(1)$ (USD) & $\mathbb E[Y_i]$ (USD)\\\midrule
-$Y_1$ & $\Money{-80}$ & $\Money{100}$ & $\Money{-80+180p}$\\
-$Y_2$ & $\Money{-20}$ & $\Money{220}$ & $\Money{-20+240p}$\\
-$Y_3$ & $\Money{-100}$ & $\Money{400}$ & $\Money{-100+500p}$\\
+Variable & $f_i(0)$ (USD) & $f_i(1)$ (USD) & $\ExpectedValue{\mathbb E}[\Money{Y_i}]$ (USD)\\\midrule
+$Y_1$ & $\Money{-80}$ & $\Money{100}$ & $\Money{-80}+\Money{180}\SuccessProb{p}$\\
+$Y_2$ & $\Money{-20}$ & $\Money{220}$ & $\Money{-20}+\Money{240}\SuccessProb{p}$\\
+$Y_3$ & $\Money{-100}$ & $\Money{400}$ & $\Money{-100}+\Money{500}\SuccessProb{p}$\\
 \bottomrule\end{tabular}\end{center}
 \paragraph{$Y_1$: individual sensitivity analysis.}
 Hold $f_1(0)=\Money{-80}$ and $f_1(1)=\Money{100}$ USD fixed;
 vary only $p=P(E)\in[0,1]$.
 \begin{align*}
-\mathbb E[Y_1]&=p f_1(1)+(1-p)f_1(0)\\
- &=p(100)+(1-p)(-80)=-80+180p\quad\text{USD},\\
-\mathbb E[Y_1]&=0\iff 180p=80\iff p=p_1^*=\frac{4}{9}.
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=\SuccessProb{p}\Money{f_1(1)}+(\FailureProb{1-p})\Money{f_1(0)}\\
+ &=\SuccessProb{p}(\Money{100})+(\FailureProb{1-p})(\Money{-80})=\Money{-80}+\Money{180}\SuccessProb{p}\quad\text{USD},\\
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=\ExpectedValue{0}\iff 180p=80\iff p=p_1^*=\frac{4}{9}.
 \end{align*}
 Solve the two strict inequalities separately, within $0\leq p\leq1$:
 \[
 \begin{aligned}
-\mathbb E[Y_1]>0&\iff 180p>80\iff p>\frac{4}{9}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]>0&\iff 180p>80\iff p>\frac{4}{9}
  &&\Longrightarrow p\in (\frac{4}{9},1],\\
-\mathbb E[Y_1]<0&\iff 180p<80\iff p<\frac{4}{9}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]<0&\iff 180p<80\iff p<\frac{4}{9}
  &&\Longrightarrow p\in [0,\frac{4}{9}).
 \end{aligned}
 \]
-The positive interval means expected net gain; the negative interval means
-expected net loss. At $p=\frac{4}{9}$, expected net profit is zero: break-even.
+The positive interval means \ExpectedValue{expected net gain}; the negative interval means
+\ExpectedValue{expected net loss}. At $p=\frac{4}{9}$, \ExpectedValue{expected net profit} is \ExpectedValue{zero}: break-even.
 At the initially supplied $p=\frac{9}{25}$,
 \[
-\mathbb E[Y_1]=100\left(\frac{9}{25}\right)+(-80)\left(\frac{16}{25}\right)
- =\Money{\frac{-76}{5}}\quad\text{USD}.
+\ExpectedValue{\mathbb E}[\Money{Y_1}]=\Money{100}\left(\SuccessProb{\frac{9}{25}}\right)+(\Money{-80})\left(\FailureProb{\frac{16}{25}}\right)
+ =\ExpectedValue{\frac{-76}{5}\quad\text{USD}}.
 \]
-This is expected net loss of $\frac{76}{5}$ USD per stated observation period, in the long-run average.
+This is \ExpectedValue{expected net loss} of $\ExpectedValue{\frac{76}{5}\,\text{USD}}$ per stated observation period, in the long-run average.
 \begin{center}\BreakEvenGraph{1}{-80}{100}{4/9}\end{center}
 The line joins $(0,-80)$ and $(1,100)$; the marked zero is $p_1^*=\frac{4}{9}$.
 \clearpage
@@ -864,27 +867,27 @@ The line joins $(0,-80)$ and $(1,100)$; the marked zero is $p_1^*=\frac{4}{9}$.
 Hold $f_2(0)=\Money{-20}$ and $f_2(1)=\Money{220}$ USD fixed;
 vary only $p=P(E)\in[0,1]$.
 \begin{align*}
-\mathbb E[Y_2]&=p f_2(1)+(1-p)f_2(0)\\
- &=p(220)+(1-p)(-20)=-20+240p\quad\text{USD},\\
-\mathbb E[Y_2]&=0\iff 240p=20\iff p=p_2^*=\frac{1}{12}.
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=\SuccessProb{p}\Money{f_2(1)}+(\FailureProb{1-p})\Money{f_2(0)}\\
+ &=\SuccessProb{p}(\Money{220})+(\FailureProb{1-p})(\Money{-20})=\Money{-20}+\Money{240}\SuccessProb{p}\quad\text{USD},\\
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=\ExpectedValue{0}\iff 240p=20\iff p=p_2^*=\frac{1}{12}.
 \end{align*}
 Solve the two strict inequalities separately, within $0\leq p\leq1$:
 \[
 \begin{aligned}
-\mathbb E[Y_2]>0&\iff 240p>20\iff p>\frac{1}{12}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]>0&\iff 240p>20\iff p>\frac{1}{12}
  &&\Longrightarrow p\in (\frac{1}{12},1],\\
-\mathbb E[Y_2]<0&\iff 240p<20\iff p<\frac{1}{12}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]<0&\iff 240p<20\iff p<\frac{1}{12}
  &&\Longrightarrow p\in [0,\frac{1}{12}).
 \end{aligned}
 \]
-The positive interval means expected net gain; the negative interval means
-expected net loss. At $p=\frac{1}{12}$, expected net profit is zero: break-even.
+The positive interval means \ExpectedValue{expected net gain}; the negative interval means
+\ExpectedValue{expected net loss}. At $p=\frac{1}{12}$, \ExpectedValue{expected net profit} is \ExpectedValue{zero}: break-even.
 At the initially supplied $p=\frac{9}{25}$,
 \[
-\mathbb E[Y_2]=220\left(\frac{9}{25}\right)+(-20)\left(\frac{16}{25}\right)
- =\Money{\frac{332}{5}}\quad\text{USD}.
+\ExpectedValue{\mathbb E}[\Money{Y_2}]=\Money{220}\left(\SuccessProb{\frac{9}{25}}\right)+(\Money{-20})\left(\FailureProb{\frac{16}{25}}\right)
+ =\ExpectedValue{\frac{332}{5}\quad\text{USD}}.
 \]
-This is expected net gain of $\frac{332}{5}$ USD per stated observation period, in the long-run average.
+This is \ExpectedValue{expected net gain} of $\ExpectedValue{\frac{332}{5}\,\text{USD}}$ per stated observation period, in the long-run average.
 \begin{center}\BreakEvenGraph{2}{-20}{220}{1/12}\end{center}
 The line joins $(0,-20)$ and $(1,220)$; the marked zero is $p_2^*=\frac{1}{12}$.
 \clearpage
@@ -892,27 +895,27 @@ The line joins $(0,-20)$ and $(1,220)$; the marked zero is $p_2^*=\frac{1}{12}$.
 Hold $f_3(0)=\Money{-100}$ and $f_3(1)=\Money{400}$ USD fixed;
 vary only $p=P(E)\in[0,1]$.
 \begin{align*}
-\mathbb E[Y_3]&=p f_3(1)+(1-p)f_3(0)\\
- &=p(400)+(1-p)(-100)=-100+500p\quad\text{USD},\\
-\mathbb E[Y_3]&=0\iff 500p=100\iff p=p_3^*=\frac{1}{5}.
+\ExpectedValue{\mathbb E}[\Money{Y_3}]&=\SuccessProb{p}\Money{f_3(1)}+(\FailureProb{1-p})\Money{f_3(0)}\\
+ &=\SuccessProb{p}(\Money{400})+(\FailureProb{1-p})(\Money{-100})=\Money{-100}+\Money{500}\SuccessProb{p}\quad\text{USD},\\
+\ExpectedValue{\mathbb E}[\Money{Y_3}]&=\ExpectedValue{0}\iff 500p=100\iff p=p_3^*=\frac{1}{5}.
 \end{align*}
 Solve the two strict inequalities separately, within $0\leq p\leq1$:
 \[
 \begin{aligned}
-\mathbb E[Y_3]>0&\iff 500p>100\iff p>\frac{1}{5}
+\ExpectedValue{\mathbb E}[\Money{Y_3}]>0&\iff 500p>100\iff p>\frac{1}{5}
  &&\Longrightarrow p\in (\frac{1}{5},1],\\
-\mathbb E[Y_3]<0&\iff 500p<100\iff p<\frac{1}{5}
+\ExpectedValue{\mathbb E}[\Money{Y_3}]<0&\iff 500p<100\iff p<\frac{1}{5}
  &&\Longrightarrow p\in [0,\frac{1}{5}).
 \end{aligned}
 \]
-The positive interval means expected net gain; the negative interval means
-expected net loss. At $p=\frac{1}{5}$, expected net profit is zero: break-even.
+The positive interval means \ExpectedValue{expected net gain}; the negative interval means
+\ExpectedValue{expected net loss}. At $p=\frac{1}{5}$, \ExpectedValue{expected net profit} is \ExpectedValue{zero}: break-even.
 At the initially supplied $p=\frac{9}{25}$,
 \[
-\mathbb E[Y_3]=400\left(\frac{9}{25}\right)+(-100)\left(\frac{16}{25}\right)
- =\Money{80}\quad\text{USD}.
+\ExpectedValue{\mathbb E}[\Money{Y_3}]=\Money{400}\left(\SuccessProb{\frac{9}{25}}\right)+(\Money{-100})\left(\FailureProb{\frac{16}{25}}\right)
+ =\ExpectedValue{80\quad\text{USD}}.
 \]
-This is expected net gain of 80 USD per stated observation period, in the long-run average.
+This is \ExpectedValue{expected net gain} of \ExpectedValue{80 USD} per stated observation period, in the long-run average.
 \begin{center}\BreakEvenGraph{3}{-100}{400}{1/5}\end{center}
 The line joins $(0,-100)$ and $(1,400)$; the marked zero is $p_3^*=\frac{1}{5}$.
 \secInicio[prob:c3-restaurant][sec:t2-c3-advanced]
@@ -989,38 +992,38 @@ All monetary variables are functions of the same $X$; separate analyses do not a
 \secInicio[prob:c3-agriculture][sec:t2-c3-advanced]
 \clearpage\subsubsection*{Task 2 --- Worked solution}\label{sol:c3-agriculture-decision}
 Keep the event, its complement and the indicator from Task 1.
-The table records fixed state payoffs; the analysis of each row uses only its own expectation.
+The table records fixed state payoffs; the analysis of each row uses only its own \ExpectedValue{expectation}.
 \begin{center}\begin{tabular}{lrrl}\toprule
-Variable & $f_i(0)$ (USD) & $f_i(1)$ (USD) & $\mathbb E[Y_i]$ (USD)\\\midrule
-$Y_1$ & $\Money{-70}$ & $\Money{90}$ & $\Money{-70+160p}$\\
-$Y_2$ & $\Money{-30}$ & $\Money{190}$ & $\Money{-30+220p}$\\
-$Y_3$ & $\Money{-150}$ & $\Money{150}$ & $\Money{-150+300p}$\\
+Variable & $f_i(0)$ (USD) & $f_i(1)$ (USD) & $\ExpectedValue{\mathbb E}[\Money{Y_i}]$ (USD)\\\midrule
+$Y_1$ & $\Money{-70}$ & $\Money{90}$ & $\Money{-70}+\Money{160}\SuccessProb{p}$\\
+$Y_2$ & $\Money{-30}$ & $\Money{190}$ & $\Money{-30}+\Money{220}\SuccessProb{p}$\\
+$Y_3$ & $\Money{-150}$ & $\Money{150}$ & $\Money{-150}+\Money{300}\SuccessProb{p}$\\
 \bottomrule\end{tabular}\end{center}
 \paragraph{$Y_1$: individual sensitivity analysis.}
 Hold $f_1(0)=\Money{-70}$ and $f_1(1)=\Money{90}$ USD fixed;
 vary only $p=P(E)\in[0,1]$.
 \begin{align*}
-\mathbb E[Y_1]&=p f_1(1)+(1-p)f_1(0)\\
- &=p(90)+(1-p)(-70)=-70+160p\quad\text{USD},\\
-\mathbb E[Y_1]&=0\iff 160p=70\iff p=p_1^*=\frac{7}{16}.
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=\SuccessProb{p}\Money{f_1(1)}+(\FailureProb{1-p})\Money{f_1(0)}\\
+ &=\SuccessProb{p}(\Money{90})+(\FailureProb{1-p})(\Money{-70})=\Money{-70}+\Money{160}\SuccessProb{p}\quad\text{USD},\\
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=\ExpectedValue{0}\iff 160p=70\iff p=p_1^*=\frac{7}{16}.
 \end{align*}
 Solve the two strict inequalities separately, within $0\leq p\leq1$:
 \[
 \begin{aligned}
-\mathbb E[Y_1]>0&\iff 160p>70\iff p>\frac{7}{16}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]>0&\iff 160p>70\iff p>\frac{7}{16}
  &&\Longrightarrow p\in (\frac{7}{16},1],\\
-\mathbb E[Y_1]<0&\iff 160p<70\iff p<\frac{7}{16}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]<0&\iff 160p<70\iff p<\frac{7}{16}
  &&\Longrightarrow p\in [0,\frac{7}{16}).
 \end{aligned}
 \]
-The positive interval means expected net gain; the negative interval means
-expected net loss. At $p=\frac{7}{16}$, expected net profit is zero: break-even.
+The positive interval means \ExpectedValue{expected net gain}; the negative interval means
+\ExpectedValue{expected net loss}. At $p=\frac{7}{16}$, \ExpectedValue{expected net profit} is \ExpectedValue{zero}: break-even.
 At the initially supplied $p=\frac{1}{2}$,
 \[
-\mathbb E[Y_1]=90\left(\frac{1}{2}\right)+(-70)\left(\frac{1}{2}\right)
- =\Money{10}\quad\text{USD}.
+\ExpectedValue{\mathbb E}[\Money{Y_1}]=\Money{90}\left(\SuccessProb{\frac{1}{2}}\right)+(\Money{-70})\left(\FailureProb{\frac{1}{2}}\right)
+ =\ExpectedValue{10\quad\text{USD}}.
 \]
-This is expected net gain of 10 USD per stated observation period, in the long-run average.
+This is \ExpectedValue{expected net gain} of \ExpectedValue{10 USD} per stated observation period, in the long-run average.
 \begin{center}\BreakEvenGraph{1}{-70}{90}{7/16}\end{center}
 The line joins $(0,-70)$ and $(1,90)$; the marked zero is $p_1^*=\frac{7}{16}$.
 \clearpage
@@ -1028,27 +1031,27 @@ The line joins $(0,-70)$ and $(1,90)$; the marked zero is $p_1^*=\frac{7}{16}$.
 Hold $f_2(0)=\Money{-30}$ and $f_2(1)=\Money{190}$ USD fixed;
 vary only $p=P(E)\in[0,1]$.
 \begin{align*}
-\mathbb E[Y_2]&=p f_2(1)+(1-p)f_2(0)\\
- &=p(190)+(1-p)(-30)=-30+220p\quad\text{USD},\\
-\mathbb E[Y_2]&=0\iff 220p=30\iff p=p_2^*=\frac{3}{22}.
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=\SuccessProb{p}\Money{f_2(1)}+(\FailureProb{1-p})\Money{f_2(0)}\\
+ &=\SuccessProb{p}(\Money{190})+(\FailureProb{1-p})(\Money{-30})=\Money{-30}+\Money{220}\SuccessProb{p}\quad\text{USD},\\
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=\ExpectedValue{0}\iff 220p=30\iff p=p_2^*=\frac{3}{22}.
 \end{align*}
 Solve the two strict inequalities separately, within $0\leq p\leq1$:
 \[
 \begin{aligned}
-\mathbb E[Y_2]>0&\iff 220p>30\iff p>\frac{3}{22}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]>0&\iff 220p>30\iff p>\frac{3}{22}
  &&\Longrightarrow p\in (\frac{3}{22},1],\\
-\mathbb E[Y_2]<0&\iff 220p<30\iff p<\frac{3}{22}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]<0&\iff 220p<30\iff p<\frac{3}{22}
  &&\Longrightarrow p\in [0,\frac{3}{22}).
 \end{aligned}
 \]
-The positive interval means expected net gain; the negative interval means
-expected net loss. At $p=\frac{3}{22}$, expected net profit is zero: break-even.
+The positive interval means \ExpectedValue{expected net gain}; the negative interval means
+\ExpectedValue{expected net loss}. At $p=\frac{3}{22}$, \ExpectedValue{expected net profit} is \ExpectedValue{zero}: break-even.
 At the initially supplied $p=\frac{1}{2}$,
 \[
-\mathbb E[Y_2]=190\left(\frac{1}{2}\right)+(-30)\left(\frac{1}{2}\right)
- =\Money{80}\quad\text{USD}.
+\ExpectedValue{\mathbb E}[\Money{Y_2}]=\Money{190}\left(\SuccessProb{\frac{1}{2}}\right)+(\Money{-30})\left(\FailureProb{\frac{1}{2}}\right)
+ =\ExpectedValue{80\quad\text{USD}}.
 \]
-This is expected net gain of 80 USD per stated observation period, in the long-run average.
+This is \ExpectedValue{expected net gain} of \ExpectedValue{80 USD} per stated observation period, in the long-run average.
 \begin{center}\BreakEvenGraph{2}{-30}{190}{3/22}\end{center}
 The line joins $(0,-30)$ and $(1,190)$; the marked zero is $p_2^*=\frac{3}{22}$.
 \clearpage
@@ -1056,25 +1059,25 @@ The line joins $(0,-30)$ and $(1,190)$; the marked zero is $p_2^*=\frac{3}{22}$.
 Hold $f_3(0)=\Money{-150}$ and $f_3(1)=\Money{150}$ USD fixed;
 vary only $p=P(E)\in[0,1]$.
 \begin{align*}
-\mathbb E[Y_3]&=p f_3(1)+(1-p)f_3(0)\\
- &=p(150)+(1-p)(-150)=-150+300p\quad\text{USD},\\
-\mathbb E[Y_3]&=0\iff 300p=150\iff p=p_3^*=\frac{1}{2}.
+\ExpectedValue{\mathbb E}[\Money{Y_3}]&=\SuccessProb{p}\Money{f_3(1)}+(\FailureProb{1-p})\Money{f_3(0)}\\
+ &=\SuccessProb{p}(\Money{150})+(\FailureProb{1-p})(\Money{-150})=\Money{-150}+\Money{300}\SuccessProb{p}\quad\text{USD},\\
+\ExpectedValue{\mathbb E}[\Money{Y_3}]&=\ExpectedValue{0}\iff 300p=150\iff p=p_3^*=\frac{1}{2}.
 \end{align*}
 Solve the two strict inequalities separately, within $0\leq p\leq1$:
 \[
 \begin{aligned}
-\mathbb E[Y_3]>0&\iff 300p>150\iff p>\frac{1}{2}
+\ExpectedValue{\mathbb E}[\Money{Y_3}]>0&\iff 300p>150\iff p>\frac{1}{2}
  &&\Longrightarrow p\in (\frac{1}{2},1],\\
-\mathbb E[Y_3]<0&\iff 300p<150\iff p<\frac{1}{2}
+\ExpectedValue{\mathbb E}[\Money{Y_3}]<0&\iff 300p<150\iff p<\frac{1}{2}
  &&\Longrightarrow p\in [0,\frac{1}{2}).
 \end{aligned}
 \]
-The positive interval means expected net gain; the negative interval means
-expected net loss. At $p=\frac{1}{2}$, expected net profit is zero: break-even.
+The positive interval means \ExpectedValue{expected net gain}; the negative interval means
+\ExpectedValue{expected net loss}. At $p=\frac{1}{2}$, \ExpectedValue{expected net profit} is \ExpectedValue{zero}: break-even.
 At the initially supplied $p=\frac{1}{2}$,
 \[
-\mathbb E[Y_3]=150\left(\frac{1}{2}\right)+(-150)\left(\frac{1}{2}\right)
- =\Money{0}\quad\text{USD}.
+\ExpectedValue{\mathbb E}[\Money{Y_3}]=\Money{150}\left(\SuccessProb{\frac{1}{2}}\right)+(\Money{-150})\left(\FailureProb{\frac{1}{2}}\right)
+ =\ExpectedValue{0\quad\text{USD}}.
 \]
 This is break-even at the initial probability.
 \begin{center}\BreakEvenGraph{3}{-150}{150}{1/2}\end{center}
@@ -1090,11 +1093,11 @@ $Y_i=f_i(0)+[f_i(1)-f_i(0)]X$.
 Use supports with positive probability; omit zero-mass values at $p=0,1$.
 Distinguish the transformation, PMF and CDF; sort amounts numerically for CDFs.
 For each $Y_i$ separately, keep both payoffs fixed, vary only $p\in[0,1]$,
-derive its expectation, solve its own zero equation and both strict inequalities,
-and include the applicable interval endpoints. Positive expectation is expected
-net gain, negative is expected net loss and zero is break-even. Evaluate the initial
+derive its \ExpectedValue{expectation}, solve its own zero equation and both strict inequalities,
+and include the applicable interval endpoints. Positive \ExpectedValue{expectation} is expected
+net gain, negative is \ExpectedValue{expected net loss} and zero is break-even. Evaluate the initial
 probability and provide a separate labelled graph with the zero line and exact root.
 Separate analyses do not imply independence: all variables share $X$.
-An expected value is a long-run average, not a guarantee of realized profit.
+An \ExpectedValue{expected value} is a long-run average, not a guarantee of realized profit.
 \secInicio[][sec:t2-c3-advanced]
 \end{document}
