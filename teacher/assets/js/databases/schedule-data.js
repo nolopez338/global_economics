@@ -253,10 +253,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "Introduction and Outline",
+    "Description": "Term 1 outline + Term 2 outline",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "T1 + T2 outlines"
   },
   {
     "Grade": 10,
@@ -266,10 +266,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "C1 Exploration and Activity",
+    "Description": "C1",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1"
   },
   {
     "Grade": 10,
@@ -279,10 +279,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C2 Exploration and Activity",
+    "Description": "C2",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C2"
   },
   {
     "Grade": 10,
@@ -292,10 +292,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C3 Exploration and Activity",
+    "Description": "C3 + C1C2 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3 + C1C2 mock"
   },
   {
     "Grade": 10,
@@ -305,10 +305,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "1st Learning Evidence C1 C2",
+    "Description": "C1C2 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1C2 exam"
   },
   {
     "Grade": 10,
@@ -318,10 +318,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C4 Exploration and Activity",
+    "Description": "C4",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C4"
   },
   {
     "Grade": 10,
@@ -331,10 +331,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C1 - C4 Activities",
+    "Description": "C3C4 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3C4 mock"
   },
   {
     "Grade": 10,
@@ -344,10 +344,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "1st Learning Evidence C3 C4",
+    "Description": "C3C4 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3C4 exam"
   },
   {
     "Grade": 10,
@@ -357,10 +357,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 1,
-    "Description": "C5 Exploration and Activity",
+    "Description": "C5",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5"
   },
   {
     "Grade": 10,
@@ -370,10 +370,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C6 Exploration and Activity",
+    "Description": "C6",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C6"
   },
   {
     "Grade": 10,
@@ -383,10 +383,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C7 Exploration and Activity",
+    "Description": "C7 + C5C6C7 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C7 + C5C6C7 mock"
   },
   {
     "Grade": 10,
@@ -396,10 +396,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C5 - C7 Activities",
+    "Description": "C5C6C7 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5C6C7 exam"
   },
   {
     "Grade": 10,
@@ -409,10 +409,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "2nd Learning Evidence",
+    "Description": "C8",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C8"
   },
   {
     "Grade": 10,
@@ -422,10 +422,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "C8 Exploration and Activity",
+    "Description": "C9",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C9"
   },
   {
     "Grade": 10,
@@ -435,10 +435,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 1,
-    "Description": "C9 Exploration and Activity",
+    "Description": "C10 + C8C9C10 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C10 + C8C9C10 mock"
   },
   {
     "Grade": 10,
@@ -448,10 +448,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 3,
-    "Description": "C8 - C10 Activities",
+    "Description": "C8C9C10 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C8C9C10 exam"
   },
   {
     "Grade": 10,
@@ -461,10 +461,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "3rd Learning Evidence",
+    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1-C7 catch-up"
   },
   {
     "Grade": 10,
@@ -474,10 +474,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "Catch Up Session",
+    "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 10,
@@ -490,7 +490,7 @@ window.SCHEDULE_DATA = [
     "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 10,
@@ -503,7 +503,7 @@ window.SCHEDULE_DATA = [
     "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 10,
@@ -994,10 +994,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "Introduction and Outline",
+    "Description": "Term 1 outline + Term 2 outline",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "T1 + T2 outlines"
   },
   {
     "Grade": 10,
@@ -1007,10 +1007,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 4,
-    "Description": "C1 Exploration and Activity",
+    "Description": "C1",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1"
   },
   {
     "Grade": 10,
@@ -1020,10 +1020,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C2 Exploration and Activity",
+    "Description": "C2",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C2"
   },
   {
     "Grade": 10,
@@ -1033,10 +1033,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 4,
-    "Description": "C3 Exploration and Activity",
+    "Description": "C3 + C1C2 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3 + C1C2 mock"
   },
   {
     "Grade": 10,
@@ -1046,10 +1046,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "1st Learning Evidence C1 C2",
+    "Description": "C1C2 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1C2 exam"
   },
   {
     "Grade": 10,
@@ -1059,10 +1059,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "C4 Exploration and Activity",
+    "Description": "C4",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C4"
   },
   {
     "Grade": 10,
@@ -1072,10 +1072,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "C1 - C4 Activities",
+    "Description": "C3C4 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3C4 mock"
   },
   {
     "Grade": 10,
@@ -1085,10 +1085,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 4,
-    "Description": "1st Learning Evidence C3 C4",
+    "Description": "C3C4 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3C4 exam"
   },
   {
     "Grade": 10,
@@ -1098,10 +1098,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C5 Exploration and Activity",
+    "Description": "C5",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5"
   },
   {
     "Grade": 10,
@@ -1111,10 +1111,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 4,
-    "Description": "C6 Exploration and Activity",
+    "Description": "C6",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C6"
   },
   {
     "Grade": 10,
@@ -1124,10 +1124,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C7 Exploration and Activity",
+    "Description": "C7 + C5C6C7 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C7 + C5C6C7 mock"
   },
   {
     "Grade": 10,
@@ -1137,10 +1137,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "C5 - C7 Activities",
+    "Description": "C5C6C7 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5C6C7 exam"
   },
   {
     "Grade": 10,
@@ -1150,10 +1150,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "2nd Learning Evidence",
+    "Description": "C8",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C8"
   },
   {
     "Grade": 10,
@@ -1163,10 +1163,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 4,
-    "Description": "C8 Exploration and Activity",
+    "Description": "C9",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C9"
   },
   {
     "Grade": 10,
@@ -1176,10 +1176,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 3,
-    "Description": "C9 Exploration and Activity",
+    "Description": "C10 + C8C9C10 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C10 + C8C9C10 mock"
   },
   {
     "Grade": 10,
@@ -1189,10 +1189,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 4,
-    "Description": "C8 - C10 Activities",
+    "Description": "C8C9C10 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C8C9C10 exam"
   },
   {
     "Grade": 10,
@@ -1202,10 +1202,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "3rd Learning Evidence",
+    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1-C7 catch-up"
   },
   {
     "Grade": 10,
@@ -1215,10 +1215,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 4,
-    "Description": "Catch Up Session",
+    "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 10,
@@ -1231,7 +1231,7 @@ window.SCHEDULE_DATA = [
     "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 10,
@@ -1244,7 +1244,7 @@ window.SCHEDULE_DATA = [
     "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 10,
@@ -1722,10 +1722,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "Introduction and Outline",
+    "Description": "Term 1 outline + Term 2 outline",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "T1 + T2 outlines"
   },
   {
     "Grade": 10,
@@ -1735,10 +1735,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 5,
-    "Description": "C1 Exploration and Activity",
+    "Description": "C1",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1"
   },
   {
     "Grade": 10,
@@ -1748,10 +1748,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C2 Exploration and Activity",
+    "Description": "C2",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C2"
   },
   {
     "Grade": 10,
@@ -1761,10 +1761,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "C3 Exploration and Activity",
+    "Description": "C3 + C1C2 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3 + C1C2 mock"
   },
   {
     "Grade": 10,
@@ -1774,10 +1774,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "1st Learning Evidence C1 C2",
+    "Description": "C1C2 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1C2 exam"
   },
   {
     "Grade": 10,
@@ -1787,10 +1787,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "C4 Exploration and Activity",
+    "Description": "C4",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C4"
   },
   {
     "Grade": 10,
@@ -1800,10 +1800,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C1 - C4 Activities",
+    "Description": "C3C4 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3C4 mock"
   },
   {
     "Grade": 10,
@@ -1813,10 +1813,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 5,
-    "Description": "1st Learning Evidence C3 C4",
+    "Description": "C3C4 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3C4 exam"
   },
   {
     "Grade": 10,
@@ -1826,10 +1826,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 1,
-    "Description": "C5 Exploration and Activity",
+    "Description": "C5",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5"
   },
   {
     "Grade": 10,
@@ -1839,10 +1839,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "C6 Exploration and Activity",
+    "Description": "C6",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C6"
   },
   {
     "Grade": 10,
@@ -1852,10 +1852,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C7 Exploration and Activity",
+    "Description": "C7 + C5C6C7 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C7 + C5C6C7 mock"
   },
   {
     "Grade": 10,
@@ -1865,10 +1865,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "C5 - C7 Activities",
+    "Description": "C5C6C7 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5C6C7 exam"
   },
   {
     "Grade": 10,
@@ -1878,10 +1878,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "2nd Learning Evidence",
+    "Description": "C8",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C8"
   },
   {
     "Grade": 10,
@@ -1891,10 +1891,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 5,
-    "Description": "C8 Exploration and Activity",
+    "Description": "C9",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C9"
   },
   {
     "Grade": 10,
@@ -1904,10 +1904,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 1,
-    "Description": "C9 Exploration and Activity",
+    "Description": "C10 + C8C9C10 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C10 + C8C9C10 mock"
   },
   {
     "Grade": 10,
@@ -1917,10 +1917,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 5,
-    "Description": "C8 - C10 Activities",
+    "Description": "C8C9C10 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C8C9C10 exam"
   },
   {
     "Grade": 10,
@@ -1930,10 +1930,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "3rd Learning Evidence",
+    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1-C7 catch-up"
   },
   {
     "Grade": 10,
@@ -1943,10 +1943,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 5,
-    "Description": "Catch Up Session",
+    "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 10,
@@ -1959,7 +1959,7 @@ window.SCHEDULE_DATA = [
     "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 10,
@@ -1972,7 +1972,7 @@ window.SCHEDULE_DATA = [
     "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 10,
@@ -2463,10 +2463,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 4,
-    "Description": "Introduction and Outline",
+    "Description": "Term 1 outline + Term 2 outline",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "T1 + T2 outlines"
   },
   {
     "Grade": 10,
@@ -2476,10 +2476,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 6,
-    "Description": "C1 Exploration and Activity",
+    "Description": "C1",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1"
   },
   {
     "Grade": 10,
@@ -2489,10 +2489,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 4,
-    "Description": "C2 Exploration and Activity",
+    "Description": "C2",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C2"
   },
   {
     "Grade": 10,
@@ -2502,10 +2502,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "C3 Exploration and Activity",
+    "Description": "C3 + C1C2 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3 + C1C2 mock"
   },
   {
     "Grade": 10,
@@ -2515,10 +2515,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "1st Learning Evidence C1 C2",
+    "Description": "C1C2 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1C2 exam"
   },
   {
     "Grade": 10,
@@ -2528,10 +2528,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 6,
-    "Description": "C4 Exploration and Activity",
+    "Description": "C4",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C4"
   },
   {
     "Grade": 10,
@@ -2541,10 +2541,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 4,
-    "Description": "C1 - C4 Activities",
+    "Description": "C3C4 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3C4 mock"
   },
   {
     "Grade": 10,
@@ -2554,10 +2554,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 6,
-    "Description": "1st Learning Evidence C3 C4",
+    "Description": "C3C4 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3C4 exam"
   },
   {
     "Grade": 10,
@@ -2567,10 +2567,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 4,
-    "Description": "C5 Exploration and Activity",
+    "Description": "C5",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5"
   },
   {
     "Grade": 10,
@@ -2580,10 +2580,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "C6 Exploration and Activity",
+    "Description": "C6",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C6"
   },
   {
     "Grade": 10,
@@ -2593,10 +2593,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "C7 Exploration and Activity",
+    "Description": "C7 + C5C6C7 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C7 + C5C6C7 mock"
   },
   {
     "Grade": 10,
@@ -2606,10 +2606,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 6,
-    "Description": "C5 - C7 Activities",
+    "Description": "C5C6C7 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5C6C7 exam"
   },
   {
     "Grade": 10,
@@ -2619,10 +2619,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 4,
-    "Description": "2nd Learning Evidence",
+    "Description": "C8",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C8"
   },
   {
     "Grade": 10,
@@ -2632,10 +2632,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 6,
-    "Description": "C8 Exploration and Activity",
+    "Description": "C9",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C9"
   },
   {
     "Grade": 10,
@@ -2645,10 +2645,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 4,
-    "Description": "C9 Exploration and Activity",
+    "Description": "C10 + C8C9C10 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C10 + C8C9C10 mock"
   },
   {
     "Grade": 10,
@@ -2658,10 +2658,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 6,
-    "Description": "C8 - C10 Activities",
+    "Description": "C8C9C10 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C8C9C10 exam"
   },
   {
     "Grade": 10,
@@ -2671,10 +2671,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 4,
-    "Description": "3rd Learning Evidence",
+    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1-C7 catch-up"
   },
   {
     "Grade": 10,
@@ -2684,10 +2684,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 6,
-    "Description": "Catch Up Session",
+    "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 10,
@@ -2700,7 +2700,7 @@ window.SCHEDULE_DATA = [
     "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 10,
@@ -2713,7 +2713,7 @@ window.SCHEDULE_DATA = [
     "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 10,
@@ -3191,10 +3191,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "Introduction and Outline",
+    "Description": "Term 1 outline + Term 2 outline",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "T1 + T2 outlines"
   },
   {
     "Grade": 10,
@@ -3204,10 +3204,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 5,
-    "Description": "C1 Exploration and Activity",
+    "Description": "C1",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1"
   },
   {
     "Grade": 10,
@@ -3217,10 +3217,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C2 Exploration and Activity",
+    "Description": "C2",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C2"
   },
   {
     "Grade": 10,
@@ -3230,10 +3230,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "C3 Exploration and Activity",
+    "Description": "C3 + C1C2 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3 + C1C2 mock"
   },
   {
     "Grade": 10,
@@ -3243,10 +3243,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "1st Learning Evidence C1 C2",
+    "Description": "C1C2 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1C2 exam"
   },
   {
     "Grade": 10,
@@ -3256,10 +3256,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "C4 Exploration and Activity",
+    "Description": "C4",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C4"
   },
   {
     "Grade": 10,
@@ -3269,10 +3269,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C1 - C4 Activities",
+    "Description": "C3C4 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3C4 mock"
   },
   {
     "Grade": 10,
@@ -3282,10 +3282,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 5,
-    "Description": "1st Learning Evidence C3 C4",
+    "Description": "C3C4 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3C4 exam"
   },
   {
     "Grade": 10,
@@ -3295,10 +3295,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 1,
-    "Description": "C5 Exploration and Activity",
+    "Description": "C5",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5"
   },
   {
     "Grade": 10,
@@ -3308,10 +3308,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "C6 Exploration and Activity",
+    "Description": "C6",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C6"
   },
   {
     "Grade": 10,
@@ -3321,10 +3321,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C7 Exploration and Activity",
+    "Description": "C7 + C5C6C7 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C7 + C5C6C7 mock"
   },
   {
     "Grade": 10,
@@ -3334,10 +3334,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "C5 - C7 Activities",
+    "Description": "C5C6C7 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5C6C7 exam"
   },
   {
     "Grade": 10,
@@ -3347,10 +3347,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "2nd Learning Evidence",
+    "Description": "C8",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C8"
   },
   {
     "Grade": 10,
@@ -3360,10 +3360,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 5,
-    "Description": "C8 Exploration and Activity",
+    "Description": "C9",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C9"
   },
   {
     "Grade": 10,
@@ -3373,10 +3373,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 1,
-    "Description": "C9 Exploration and Activity",
+    "Description": "C10 + C8C9C10 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C10 + C8C9C10 mock"
   },
   {
     "Grade": 10,
@@ -3386,10 +3386,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 5,
-    "Description": "C8 - C10 Activities",
+    "Description": "C8C9C10 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C8C9C10 exam"
   },
   {
     "Grade": 10,
@@ -3399,10 +3399,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "3rd Learning Evidence",
+    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1-C7 catch-up"
   },
   {
     "Grade": 10,
@@ -3412,10 +3412,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 5,
-    "Description": "Catch Up Session",
+    "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 10,
@@ -3428,7 +3428,7 @@ window.SCHEDULE_DATA = [
     "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 10,
@@ -3441,7 +3441,7 @@ window.SCHEDULE_DATA = [
     "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 10,
@@ -4296,10 +4296,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "Introduction and Outline",
+    "Description": "Term 1 outline + Term 2 outline",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "T1 + T2 outlines"
   },
   {
     "Grade": 11,
@@ -4309,10 +4309,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "C1 Exploration and Activity",
+    "Description": "C1",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1"
   },
   {
     "Grade": 11,
@@ -4322,10 +4322,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C2 Exploration and Activity",
+    "Description": "C2",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C2"
   },
   {
     "Grade": 11,
@@ -4335,10 +4335,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C3 Exploration and Activity",
+    "Description": "C3 + C1C2 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3 + C1C2 mock"
   },
   {
     "Grade": 11,
@@ -4348,10 +4348,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "1st Learning Evidence C1 C2",
+    "Description": "C1C2 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1C2 exam"
   },
   {
     "Grade": 11,
@@ -4361,10 +4361,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C4 Exploration and Activity",
+    "Description": "C4",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C4"
   },
   {
     "Grade": 11,
@@ -4374,10 +4374,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C1 - C4 Activities",
+    "Description": "C3C4 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3C4 mock"
   },
   {
     "Grade": 11,
@@ -4387,10 +4387,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "1st Learning Evidence C3 C4",
+    "Description": "C3C4 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3C4 exam"
   },
   {
     "Grade": 11,
@@ -4400,10 +4400,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 1,
-    "Description": "C5 Exploration and Activity",
+    "Description": "C5",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5"
   },
   {
     "Grade": 11,
@@ -4413,10 +4413,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C6 Exploration and Activity",
+    "Description": "C6",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C6"
   },
   {
     "Grade": 11,
@@ -4426,10 +4426,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C7 Exploration and Activity",
+    "Description": "C7 + C5C6C7 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C7 + C5C6C7 mock"
   },
   {
     "Grade": 11,
@@ -4439,10 +4439,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C5 - C7 Activities",
+    "Description": "C5C6C7 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5C6C7 exam"
   },
   {
     "Grade": 11,
@@ -4452,10 +4452,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "2nd Learning Evidence",
+    "Description": "C8",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C8"
   },
   {
     "Grade": 11,
@@ -4465,10 +4465,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "C8 Exploration and Activity",
+    "Description": "C9",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C9"
   },
   {
     "Grade": 11,
@@ -4478,10 +4478,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 1,
-    "Description": "C9 Exploration and Activity",
+    "Description": "C10 + C8C9C10 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C10 + C8C9C10 mock"
   },
   {
     "Grade": 11,
@@ -4491,10 +4491,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 3,
-    "Description": "C8 - C10 Activities",
+    "Description": "C8C9C10 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C8C9C10 exam"
   },
   {
     "Grade": 11,
@@ -4504,10 +4504,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "3rd Learning Evidence",
+    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1-C7 catch-up"
   },
   {
     "Grade": 11,
@@ -4517,10 +4517,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "Catch Up Session",
+    "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 11,
@@ -4533,7 +4533,7 @@ window.SCHEDULE_DATA = [
     "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 11,
@@ -4546,7 +4546,7 @@ window.SCHEDULE_DATA = [
     "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 11,
@@ -5037,10 +5037,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 2,
-    "Description": "Introduction and Outline",
+    "Description": "Term 1 outline + Term 2 outline",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "T1 + T2 outlines"
   },
   {
     "Grade": 11,
@@ -5050,10 +5050,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "C1 Exploration and Activity",
+    "Description": "C1",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1"
   },
   {
     "Grade": 11,
@@ -5063,10 +5063,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 2,
-    "Description": "C2 Exploration and Activity",
+    "Description": "C2",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C2"
   },
   {
     "Grade": 11,
@@ -5076,10 +5076,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C3 Exploration and Activity",
+    "Description": "C3 + C1C2 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3 + C1C2 mock"
   },
   {
     "Grade": 11,
@@ -5089,10 +5089,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 2,
-    "Description": "1st Learning Evidence C1 C2",
+    "Description": "C1C2 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1C2 exam"
   },
   {
     "Grade": 11,
@@ -5102,10 +5102,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C4 Exploration and Activity",
+    "Description": "C4",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C4"
   },
   {
     "Grade": 11,
@@ -5115,10 +5115,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 2,
-    "Description": "C1 - C4 Activities",
+    "Description": "C3C4 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3C4 mock"
   },
   {
     "Grade": 11,
@@ -5128,10 +5128,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "1st Learning Evidence C3 C4",
+    "Description": "C3C4 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3C4 exam"
   },
   {
     "Grade": 11,
@@ -5141,10 +5141,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 2,
-    "Description": "C5 Exploration and Activity",
+    "Description": "C5",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5"
   },
   {
     "Grade": 11,
@@ -5154,10 +5154,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C6 Exploration and Activity",
+    "Description": "C6",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C6"
   },
   {
     "Grade": 11,
@@ -5167,10 +5167,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 2,
-    "Description": "C7 Exploration and Activity",
+    "Description": "C7 + C5C6C7 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C7 + C5C6C7 mock"
   },
   {
     "Grade": 11,
@@ -5180,10 +5180,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C5 - C7 Activities",
+    "Description": "C5C6C7 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5C6C7 exam"
   },
   {
     "Grade": 11,
@@ -5193,10 +5193,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 2,
-    "Description": "2nd Learning Evidence",
+    "Description": "C8",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C8"
   },
   {
     "Grade": 11,
@@ -5206,10 +5206,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "C8 Exploration and Activity",
+    "Description": "C9",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C9"
   },
   {
     "Grade": 11,
@@ -5219,10 +5219,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 2,
-    "Description": "C9 Exploration and Activity",
+    "Description": "C10 + C8C9C10 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C10 + C8C9C10 mock"
   },
   {
     "Grade": 11,
@@ -5232,10 +5232,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 3,
-    "Description": "C8 - C10 Activities",
+    "Description": "C8C9C10 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C8C9C10 exam"
   },
   {
     "Grade": 11,
@@ -5245,10 +5245,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 2,
-    "Description": "3rd Learning Evidence",
+    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1-C7 catch-up"
   },
   {
     "Grade": 11,
@@ -5258,10 +5258,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "Catch Up Session",
+    "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 11,
@@ -5274,7 +5274,7 @@ window.SCHEDULE_DATA = [
     "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 11,
@@ -5287,7 +5287,7 @@ window.SCHEDULE_DATA = [
     "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 11,
@@ -5765,10 +5765,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "Introduction and Outline",
+    "Description": "Term 1 outline + Term 2 outline",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "T1 + T2 outlines"
   },
   {
     "Grade": 11,
@@ -5778,10 +5778,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 6,
-    "Description": "C1 Exploration and Activity",
+    "Description": "C1",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1"
   },
   {
     "Grade": 11,
@@ -5791,10 +5791,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C2 Exploration and Activity",
+    "Description": "C2",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C2"
   },
   {
     "Grade": 11,
@@ -5804,10 +5804,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "C3 Exploration and Activity",
+    "Description": "C3 + C1C2 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3 + C1C2 mock"
   },
   {
     "Grade": 11,
@@ -5817,10 +5817,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "1st Learning Evidence C1 C2",
+    "Description": "C1C2 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1C2 exam"
   },
   {
     "Grade": 11,
@@ -5830,10 +5830,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 6,
-    "Description": "C4 Exploration and Activity",
+    "Description": "C4",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C4"
   },
   {
     "Grade": 11,
@@ -5843,10 +5843,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C1 - C4 Activities",
+    "Description": "C3C4 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3C4 mock"
   },
   {
     "Grade": 11,
@@ -5856,10 +5856,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 6,
-    "Description": "1st Learning Evidence C3 C4",
+    "Description": "C3C4 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3C4 exam"
   },
   {
     "Grade": 11,
@@ -5869,10 +5869,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 1,
-    "Description": "C5 Exploration and Activity",
+    "Description": "C5",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5"
   },
   {
     "Grade": 11,
@@ -5882,10 +5882,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "C6 Exploration and Activity",
+    "Description": "C6",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C6"
   },
   {
     "Grade": 11,
@@ -5895,10 +5895,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C7 Exploration and Activity",
+    "Description": "C7 + C5C6C7 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C7 + C5C6C7 mock"
   },
   {
     "Grade": 11,
@@ -5908,10 +5908,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 6,
-    "Description": "C5 - C7 Activities",
+    "Description": "C5C6C7 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5C6C7 exam"
   },
   {
     "Grade": 11,
@@ -5921,10 +5921,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "2nd Learning Evidence",
+    "Description": "C8",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C8"
   },
   {
     "Grade": 11,
@@ -5934,10 +5934,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 6,
-    "Description": "C8 Exploration and Activity",
+    "Description": "C9",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C9"
   },
   {
     "Grade": 11,
@@ -5947,10 +5947,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 1,
-    "Description": "C9 Exploration and Activity",
+    "Description": "C10 + C8C9C10 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C10 + C8C9C10 mock"
   },
   {
     "Grade": 11,
@@ -5960,10 +5960,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 6,
-    "Description": "C8 - C10 Activities",
+    "Description": "C8C9C10 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C8C9C10 exam"
   },
   {
     "Grade": 11,
@@ -5973,10 +5973,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "3rd Learning Evidence",
+    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1-C7 catch-up"
   },
   {
     "Grade": 11,
@@ -5986,10 +5986,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 6,
-    "Description": "Catch Up Session",
+    "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 11,
@@ -6002,7 +6002,7 @@ window.SCHEDULE_DATA = [
     "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 11,
@@ -6015,7 +6015,7 @@ window.SCHEDULE_DATA = [
     "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 11,
@@ -6506,10 +6506,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "Introduction and Outline",
+    "Description": "Term 1 outline + Term 2 outline",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "T1 + T2 outlines"
   },
   {
     "Grade": 11,
@@ -6519,10 +6519,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 5,
-    "Description": "C1 Exploration and Activity",
+    "Description": "C1",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1"
   },
   {
     "Grade": 11,
@@ -6532,10 +6532,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C2 Exploration and Activity",
+    "Description": "C2",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C2"
   },
   {
     "Grade": 11,
@@ -6545,10 +6545,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "C3 Exploration and Activity",
+    "Description": "C3 + C1C2 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3 + C1C2 mock"
   },
   {
     "Grade": 11,
@@ -6558,10 +6558,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "1st Learning Evidence C1 C2",
+    "Description": "C1C2 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1C2 exam"
   },
   {
     "Grade": 11,
@@ -6571,10 +6571,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "C4 Exploration and Activity",
+    "Description": "C4",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C4"
   },
   {
     "Grade": 11,
@@ -6584,10 +6584,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "C1 - C4 Activities",
+    "Description": "C3C4 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3C4 mock"
   },
   {
     "Grade": 11,
@@ -6597,10 +6597,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 5,
-    "Description": "1st Learning Evidence C3 C4",
+    "Description": "C3C4 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3C4 exam"
   },
   {
     "Grade": 11,
@@ -6610,10 +6610,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C5 Exploration and Activity",
+    "Description": "C5",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5"
   },
   {
     "Grade": 11,
@@ -6623,10 +6623,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "C6 Exploration and Activity",
+    "Description": "C6",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C6"
   },
   {
     "Grade": 11,
@@ -6636,10 +6636,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C7 Exploration and Activity",
+    "Description": "C7 + C5C6C7 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C7 + C5C6C7 mock"
   },
   {
     "Grade": 11,
@@ -6649,10 +6649,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "C5 - C7 Activities",
+    "Description": "C5C6C7 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5C6C7 exam"
   },
   {
     "Grade": 11,
@@ -6662,10 +6662,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 3,
-    "Description": "2nd Learning Evidence",
+    "Description": "C8",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C8"
   },
   {
     "Grade": 11,
@@ -6675,10 +6675,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 5,
-    "Description": "C8 Exploration and Activity",
+    "Description": "C9",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C9"
   },
   {
     "Grade": 11,
@@ -6688,10 +6688,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 3,
-    "Description": "C9 Exploration and Activity",
+    "Description": "C10 + C8C9C10 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C10 + C8C9C10 mock"
   },
   {
     "Grade": 11,
@@ -6701,10 +6701,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 5,
-    "Description": "C8 - C10 Activities",
+    "Description": "C8C9C10 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C8C9C10 exam"
   },
   {
     "Grade": 11,
@@ -6714,10 +6714,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "3rd Learning Evidence",
+    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1-C7 catch-up"
   },
   {
     "Grade": 11,
@@ -6727,10 +6727,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 5,
-    "Description": "Catch Up Session",
+    "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 11,
@@ -6743,7 +6743,7 @@ window.SCHEDULE_DATA = [
     "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 11,
@@ -6756,7 +6756,7 @@ window.SCHEDULE_DATA = [
     "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 11,
@@ -7234,10 +7234,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "Introduction and Outline",
+    "Description": "Term 1 outline + Term 2 outline",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "T1 + T2 outlines"
   },
   {
     "Grade": 11,
@@ -7247,10 +7247,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 6,
-    "Description": "C1 Exploration and Activity",
+    "Description": "C1",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1"
   },
   {
     "Grade": 11,
@@ -7260,10 +7260,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C2 Exploration and Activity",
+    "Description": "C2",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C2"
   },
   {
     "Grade": 11,
@@ -7273,10 +7273,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "C3 Exploration and Activity",
+    "Description": "C3 + C1C2 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3 + C1C2 mock"
   },
   {
     "Grade": 11,
@@ -7286,10 +7286,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "1st Learning Evidence C1 C2",
+    "Description": "C1C2 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1C2 exam"
   },
   {
     "Grade": 11,
@@ -7299,10 +7299,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 6,
-    "Description": "C4 Exploration and Activity",
+    "Description": "C4",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C4"
   },
   {
     "Grade": 11,
@@ -7312,10 +7312,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C1 - C4 Activities",
+    "Description": "C3C4 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3C4 mock"
   },
   {
     "Grade": 11,
@@ -7325,10 +7325,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 6,
-    "Description": "1st Learning Evidence C3 C4",
+    "Description": "C3C4 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3C4 exam"
   },
   {
     "Grade": 11,
@@ -7338,10 +7338,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 1,
-    "Description": "C5 Exploration and Activity",
+    "Description": "C5",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5"
   },
   {
     "Grade": 11,
@@ -7351,10 +7351,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "C6 Exploration and Activity",
+    "Description": "C6",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C6"
   },
   {
     "Grade": 11,
@@ -7364,10 +7364,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C7 Exploration and Activity",
+    "Description": "C7 + C5C6C7 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C7 + C5C6C7 mock"
   },
   {
     "Grade": 11,
@@ -7377,10 +7377,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 6,
-    "Description": "C5 - C7 Activities",
+    "Description": "C5C6C7 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5C6C7 exam"
   },
   {
     "Grade": 11,
@@ -7390,10 +7390,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "2nd Learning Evidence",
+    "Description": "C8",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C8"
   },
   {
     "Grade": 11,
@@ -7403,10 +7403,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 6,
-    "Description": "C8 Exploration and Activity",
+    "Description": "C9",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C9"
   },
   {
     "Grade": 11,
@@ -7416,10 +7416,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 1,
-    "Description": "C9 Exploration and Activity",
+    "Description": "C10 + C8C9C10 mock",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C10 + C8C9C10 mock"
   },
   {
     "Grade": 11,
@@ -7429,10 +7429,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 6,
-    "Description": "C8 - C10 Activities",
+    "Description": "C8C9C10 exam",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C8C9C10 exam"
   },
   {
     "Grade": 11,
@@ -7442,10 +7442,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "3rd Learning Evidence",
+    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1-C7 catch-up"
   },
   {
     "Grade": 11,
@@ -7455,10 +7455,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 6,
-    "Description": "Catch Up Session",
+    "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 11,
@@ -7471,7 +7471,7 @@ window.SCHEDULE_DATA = [
     "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 11,
@@ -7484,7 +7484,7 @@ window.SCHEDULE_DATA = [
     "Description": "Extra Class",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Extra Class"
   },
   {
     "Grade": 11,
