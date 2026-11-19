@@ -305,7 +305,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C3: Model binary outcomes with Bernoulli distributions\nC1C2 Mock",
+    "Description": "C3: Model binary outcomes with Bernoulli distributions\nC1 C2: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3: Model binary outcomes with Bernoulli distributions\nC1C2 Mock"
@@ -318,7 +318,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C1C2 exam",
+    "Description": "C1 C2: 1st Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1C2 exam"
@@ -344,7 +344,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "C3C4 mock",
+    "Description": "C3 C4: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3C4 mock"
@@ -357,7 +357,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 1,
-    "Description": "C3C4 exam",
+    "Description": "C3 C4: 1st Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3C4 exam"
@@ -396,7 +396,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C7: Model rare events using Poisson distributions\nC5C6C7 Mock",
+    "Description": "C7: Model rare events using Poisson distributions\nC5 C6 C7: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7: Model rare events using Poisson distributions\nC5C6C7 Mock"
@@ -409,7 +409,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "C5C6C7 exam",
+    "Description": "C5 C6 C7: 2nd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5C6C7 exam"
@@ -448,7 +448,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 3,
-    "Description": "C10: Evaluate portfolio investments through risk–return comparisons\nC8C9C10 Mock",
+    "Description": "C10: Evaluate portfolio investments through risk–return comparisons\nC8 C9 C10: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C10: Evaluate portfolio investments through risk–return comparisons\nC8C9C10 Mock"
@@ -461,7 +461,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C8C9C10 exam",
+    "Description": "C8 C9 C10: 3rd Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8C9C10 exam"
@@ -474,7 +474,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
+    "Description": "C1 - C7 : 3rd Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1-C7 catch-up"
@@ -1033,7 +1033,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 4,
-    "Description": "C3: Model binary outcomes with Bernoulli distributions\nC1C2 Mock",
+    "Description": "C3: Model binary outcomes with Bernoulli distributions\nC1 C2: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3: Model binary outcomes with Bernoulli distributions\nC1C2 Mock"
@@ -1046,7 +1046,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C1C2 exam",
+    "Description": "C1 C2: 1st Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1C2 exam"
@@ -1072,7 +1072,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "C3C4 mock",
+    "Description": "C3 C4: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3C4 mock"
@@ -1085,7 +1085,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 4,
-    "Description": "C3C4 exam",
+    "Description": "C3 C4: 1st Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3C4 exam"
@@ -1124,7 +1124,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C7: Model rare events using Poisson distributions\nC5C6C7 Mock",
+    "Description": "C7: Model rare events using Poisson distributions\nC5 C6 C7: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7: Model rare events using Poisson distributions\nC5C6C7 Mock"
@@ -1137,7 +1137,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "C5C6C7 exam",
+    "Description": "C5 C6 C7: 2nd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5C6C7 exam"
@@ -1176,7 +1176,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 3,
-    "Description": "C10: Evaluate portfolio investments through risk–return comparisons\nC8C9C10 Mock",
+    "Description": "C10: Evaluate portfolio investments through risk–return comparisons\nC8 C9 C10: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C10: Evaluate portfolio investments through risk–return comparisons\nC8C9C10 Mock"
@@ -1189,7 +1189,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 4,
-    "Description": "C8C9C10 exam",
+    "Description": "C8 C9 C10: 3rd Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8C9C10 exam"
@@ -1202,7 +1202,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
+    "Description": "C1 - C7 : 3rd Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1-C7 catch-up"
@@ -1761,7 +1761,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "C3: Model binary outcomes with Bernoulli distributions\nC1C2 Mock",
+    "Description": "C3: Model binary outcomes with Bernoulli distributions\nC1 C2: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3: Model binary outcomes with Bernoulli distributions\nC1C2 Mock"
@@ -1774,7 +1774,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C1C2 exam",
+    "Description": "C1 C2: 1st Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1C2 exam"
@@ -1800,7 +1800,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C3C4 mock",
+    "Description": "C3 C4: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3C4 mock"
@@ -1813,7 +1813,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 5,
-    "Description": "C3C4 exam",
+    "Description": "C3 C4: 1st Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3C4 exam"
@@ -1852,7 +1852,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C7: Model rare events using Poisson distributions\nC5C6C7 Mock",
+    "Description": "C7: Model rare events using Poisson distributions\nC5 C6 C7: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7: Model rare events using Poisson distributions\nC5C6C7 Mock"
@@ -1865,7 +1865,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "C5C6C7 exam",
+    "Description": "C5 C6 C7: 2nd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5C6C7 exam"
@@ -1904,7 +1904,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 1,
-    "Description": "C10: Evaluate portfolio investments through risk–return comparisons\nC8C9C10 Mock",
+    "Description": "C10: Evaluate portfolio investments through risk–return comparisons\nC8 C9 C10: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C10: Evaluate portfolio investments through risk–return comparisons\nC8C9C10 Mock"
@@ -1917,7 +1917,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 5,
-    "Description": "C8C9C10 exam",
+    "Description": "C8 C9 C10: 3rd Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8C9C10 exam"
@@ -1930,7 +1930,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
+    "Description": "C1 - C7 : 3rd Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1-C7 catch-up"
@@ -2502,7 +2502,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "C3: Model binary outcomes with Bernoulli distributions\nC1C2 Mock",
+    "Description": "C3: Model binary outcomes with Bernoulli distributions\nC1 C2: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3: Model binary outcomes with Bernoulli distributions\nC1C2 Mock"
@@ -2515,7 +2515,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "C1C2 exam",
+    "Description": "C1 C2: 1st Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1C2 exam"
@@ -2541,7 +2541,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 4,
-    "Description": "C3C4 mock",
+    "Description": "C3 C4: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3C4 mock"
@@ -2554,7 +2554,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 6,
-    "Description": "C3C4 exam",
+    "Description": "C3 C4: 1st Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3C4 exam"
@@ -2593,7 +2593,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "C7: Model rare events using Poisson distributions\nC5C6C7 Mock",
+    "Description": "C7: Model rare events using Poisson distributions\nC5 C6 C7: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7: Model rare events using Poisson distributions\nC5C6C7 Mock"
@@ -2606,7 +2606,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 6,
-    "Description": "C5C6C7 exam",
+    "Description": "C5 C6 C7: 2nd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5C6C7 exam"
@@ -2645,7 +2645,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 4,
-    "Description": "C10: Evaluate portfolio investments through risk–return comparisons\nC8C9C10 Mock",
+    "Description": "C10: Evaluate portfolio investments through risk–return comparisons\nC8 C9 C10: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C10: Evaluate portfolio investments through risk–return comparisons\nC8C9C10 Mock"
@@ -2658,7 +2658,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 6,
-    "Description": "C8C9C10 exam",
+    "Description": "C8 C9 C10: 3rd Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8C9C10 exam"
@@ -2671,7 +2671,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 4,
-    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
+    "Description": "C1 - C7 : 3rd Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1-C7 catch-up"
@@ -3230,7 +3230,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "C3: Model binary outcomes with Bernoulli distributions\nC1C2 Mock",
+    "Description": "C3: Model binary outcomes with Bernoulli distributions\nC1 C2: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3: Model binary outcomes with Bernoulli distributions\nC1C2 Mock"
@@ -3243,7 +3243,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C1C2 exam",
+    "Description": "C1 C2: 1st Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1C2 exam"
@@ -3269,7 +3269,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C3C4 mock",
+    "Description": "C3 C4: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3C4 mock"
@@ -3282,7 +3282,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 5,
-    "Description": "C3C4 exam",
+    "Description": "C3 C4: 1st Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3C4 exam"
@@ -3321,7 +3321,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C7: Model rare events using Poisson distributions\nC5C6C7 Mock",
+    "Description": "C7: Model rare events using Poisson distributions\nC5 C6 C7: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7: Model rare events using Poisson distributions\nC5C6C7 Mock"
@@ -3334,7 +3334,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "C5C6C7 exam",
+    "Description": "C5 C6 C7: 2nd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5C6C7 exam"
@@ -3373,7 +3373,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 1,
-    "Description": "C10: Evaluate portfolio investments through risk–return comparisons\nC8C9C10 Mock",
+    "Description": "C10: Evaluate portfolio investments through risk–return comparisons\nC8 C9 C10: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C10: Evaluate portfolio investments through risk–return comparisons\nC8C9C10 Mock"
@@ -3386,7 +3386,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 5,
-    "Description": "C8C9C10 exam",
+    "Description": "C8 C9 C10: 3rd Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8C9C10 exam"
@@ -3399,7 +3399,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
+    "Description": "C1 - C7 : 3rd Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1-C7 catch-up"
@@ -4348,7 +4348,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C3: Explain confidence interval components and precision\nC1C2 Mock",
+    "Description": "C3: Explain confidence interval components and precision\nC1 C2: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3: Explain confidence interval components and precision\nC1C2 Mock"
@@ -4361,7 +4361,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C1C2 exam",
+    "Description": "C1 C2: 1st Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1C2 exam"
@@ -4387,7 +4387,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "C3C4 mock",
+    "Description": "C3 C4: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3C4 mock"
@@ -4400,7 +4400,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 1,
-    "Description": "C3C4 exam",
+    "Description": "C3 C4: 1st Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3C4 exam"
@@ -4439,7 +4439,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock",
+    "Description": "C7: Analyse confidence and precision trade-offs\nC5 C6 C7: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock"
@@ -4452,7 +4452,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "C5C6C7 exam",
+    "Description": "C5 C6 C7: 2nd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5C6C7 exam"
@@ -4491,7 +4491,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 3,
-    "Description": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock",
+    "Description": "C10: Investigate economic questions using confidence intervals\nC8 C9 C10: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock"
@@ -4504,7 +4504,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C8C9C10 exam",
+    "Description": "C8 C9 C10: 3rd Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8C9C10 exam"
@@ -4517,7 +4517,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
+    "Description": "C1 - C7 : 3rd Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1-C7 catch-up"
@@ -5076,7 +5076,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "C3: Explain confidence interval components and precision\nC1C2 Mock",
+    "Description": "C3: Explain confidence interval components and precision\nC1 C2: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3: Explain confidence interval components and precision\nC1C2 Mock"
@@ -5089,7 +5089,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 2,
-    "Description": "C1C2 exam",
+    "Description": "C1 C2: 1st Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1C2 exam"
@@ -5115,7 +5115,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 2,
-    "Description": "C3C4 mock",
+    "Description": "C3 C4: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3C4 mock"
@@ -5128,7 +5128,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "C3C4 exam",
+    "Description": "C3 C4: 1st Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3C4 exam"
@@ -5167,7 +5167,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 2,
-    "Description": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock",
+    "Description": "C7: Analyse confidence and precision trade-offs\nC5 C6 C7: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock"
@@ -5180,7 +5180,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C5C6C7 exam",
+    "Description": "C5 C6 C7: 2nd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5C6C7 exam"
@@ -5219,7 +5219,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 2,
-    "Description": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock",
+    "Description": "C10: Investigate economic questions using confidence intervals\nC8 C9 C10: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock"
@@ -5232,7 +5232,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 3,
-    "Description": "C8C9C10 exam",
+    "Description": "C8 C9 C10: 3rd Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8C9C10 exam"
@@ -5245,7 +5245,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 2,
-    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
+    "Description": "C1 - C7 : 3rd Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1-C7 catch-up"
@@ -5804,7 +5804,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "C3: Explain confidence interval components and precision\nC1C2 Mock",
+    "Description": "C3: Explain confidence interval components and precision\nC1 C2: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3: Explain confidence interval components and precision\nC1C2 Mock"
@@ -5817,7 +5817,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C1C2 exam",
+    "Description": "C1 C2: 1st Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1C2 exam"
@@ -5843,7 +5843,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C3C4 mock",
+    "Description": "C3 C4: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3C4 mock"
@@ -5856,7 +5856,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 6,
-    "Description": "C3C4 exam",
+    "Description": "C3 C4: 1st Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3C4 exam"
@@ -5895,7 +5895,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock",
+    "Description": "C7: Analyse confidence and precision trade-offs\nC5 C6 C7: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock"
@@ -5908,7 +5908,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 6,
-    "Description": "C5C6C7 exam",
+    "Description": "C5 C6 C7: 2nd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5C6C7 exam"
@@ -5947,7 +5947,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 1,
-    "Description": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock",
+    "Description": "C10: Investigate economic questions using confidence intervals\nC8 C9 C10: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock"
@@ -5960,7 +5960,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 6,
-    "Description": "C8C9C10 exam",
+    "Description": "C8 C9 C10: 3rd Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8C9C10 exam"
@@ -5973,7 +5973,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
+    "Description": "C1 - C7 : 3rd Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1-C7 catch-up"
@@ -6545,7 +6545,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 5,
-    "Description": "C3: Explain confidence interval components and precision\nC1C2 Mock",
+    "Description": "C3: Explain confidence interval components and precision\nC1 C2: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3: Explain confidence interval components and precision\nC1C2 Mock"
@@ -6558,7 +6558,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C1C2 exam",
+    "Description": "C1 C2: 1st Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1C2 exam"
@@ -6584,7 +6584,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "C3C4 mock",
+    "Description": "C3 C4: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3C4 mock"
@@ -6597,7 +6597,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 5,
-    "Description": "C3C4 exam",
+    "Description": "C3 C4: 1st Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3C4 exam"
@@ -6636,7 +6636,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 3,
-    "Description": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock",
+    "Description": "C7: Analyse confidence and precision trade-offs\nC5 C6 C7: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock"
@@ -6649,7 +6649,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 5,
-    "Description": "C5C6C7 exam",
+    "Description": "C5 C6 C7: 2nd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5C6C7 exam"
@@ -6688,7 +6688,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 3,
-    "Description": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock",
+    "Description": "C10: Investigate economic questions using confidence intervals\nC8 C9 C10: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock"
@@ -6701,7 +6701,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 5,
-    "Description": "C8C9C10 exam",
+    "Description": "C8 C9 C10: 3rd Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8C9C10 exam"
@@ -6714,7 +6714,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 3,
-    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
+    "Description": "C1 - C7 : 3rd Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1-C7 catch-up"
@@ -7273,7 +7273,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "C3: Explain confidence interval components and precision\nC1C2 Mock",
+    "Description": "C3: Explain confidence interval components and precision\nC1 C2: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3: Explain confidence interval components and precision\nC1C2 Mock"
@@ -7286,7 +7286,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C1C2 exam",
+    "Description": "C1 C2: 1st Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1C2 exam"
@@ -7312,7 +7312,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C3C4 mock",
+    "Description": "C3 C4: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3C4 mock"
@@ -7325,7 +7325,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 6,
-    "Description": "C3C4 exam",
+    "Description": "C3 C4: 1st Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C3C4 exam"
@@ -7364,7 +7364,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock",
+    "Description": "C7: Analyse confidence and precision trade-offs\nC5 C6 C7: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock"
@@ -7377,7 +7377,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 6,
-    "Description": "C5C6C7 exam",
+    "Description": "C5 C6 C7: 2nd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C5C6C7 exam"
@@ -7416,7 +7416,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 1,
-    "Description": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock",
+    "Description": "C10: Investigate economic questions using confidence intervals\nC8 C9 C10: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock"
@@ -7429,7 +7429,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 6,
-    "Description": "C8C9C10 exam",
+    "Description": "C8 C9 C10: 3rd Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C8C9C10 exam"
@@ -7442,7 +7442,7 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C1C2C3C4C5C6C7 catch-up assessment",
+    "Description": "C1 - C7 : 3rd Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
     "Summary": "C1-C7 catch-up"
