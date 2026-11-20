@@ -1,0 +1,2 @@
+from pathlib import Path
+p=Path('book2026-2027/preamble/graphs/specific_highlights.md');s=p.read_text(encoding='utf8');s=s.replace('The final two rows are kept together with a no-break penalty.','Entries place a no-break penalty before the last selected catalog entry. If that entry has role `context` and is omitted, this does not guarantee that the last two printed rows remain together.');p.write_bytes(s.replace('\n','\r\n').encode('utf8'))

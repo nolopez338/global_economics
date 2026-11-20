@@ -14,7 +14,7 @@ Use `\PracticeHighlightLegend{key}` to print a registered legend. An unknown key
 | `G10-T2-C1-C2-C3-C4-C5-C6-C7-C8-C9` | Compact “Reading the markers.” paragraph covering the same six roles. |
 | `G10-T2-C8` | Four-row “Symbol or notation” / “Concept” / “Brief meaning” table for primary and transformed variables, expected value, and expected value of squared values. |
 | `G11-T2-C1` | Side-by-side Sample and Population tables, each headed “Symbol or notation”, “Concept”, and “Brief meaning”. |
-| `G11-T2-C1-slides` | Two-column “Sample (green)” / “Population (red)” table: groups, means, standard deviations, then proportions. |
+| `G11-T2-C1-slides` | Two-column “Sample (green)” / “Population (red)” table: groups, means, standard deviations, variances, then proportions. |
 | `G11-T2-C2` | “Terms and symbols” / “Meaning in context” table with sample size, population SD, significance level, and observed coverage; applies a local orange interval palette. |
 | `G11-T2-C3` | Three-column “Symbol or notation” / “Concept” / “Brief meaning” table with nine explicit rows, using the default palette. |
 
@@ -41,7 +41,7 @@ The shared role comments specify that an unknown probability mass or constant re
 
 ### Expected value and the C8 legend
 
-The shared `\HLExpectedValue{fragment}` wrapper calls `\HighlightStroke{ExpectedValueColor}{fragment}`. `ExpectedValueColor` has base hex `#6500A8` (deep violet); it uses the same `0.32` background fill opacity, fully opaque text, and highlight toggle as the other roles. It is distinct from outcome lavender and from the legacy coral population-mean default; the coordinated population-mean alias below reuses this violet.
+The shared `\HLExpectedValue{fragment}` wrapper calls `\HighlightStroke{ExpectedValueColor}{fragment}`. `ExpectedValueColor` has base hex `#6500A8` (deep violet); it uses the same `0.32` background fill opacity, fully opaque text, and highlight toggle as the other roles. It is distinct from outcome lavender and from the coral population-mean color. The coordinated palette changes expectation to gold, while leaving population mean coral.
 
 The `G10-T2-C8` legend groups `\tabcolsep=4pt` and has four rows in this order:
 
@@ -56,19 +56,20 @@ The role also supports $\mathbb{E}[\cdot]$ notation and numerical expectation re
 
 ## Grade 11 C1: sample and population
 
-The legacy practice key uses green sample roles and red population roles. The slides variant pairs the same groups and measures but omits the separate size rows.
+The legacy practice key uses green sample roles and red population roles. The slides variant pairs the same groups and measures but omits the separate size rows. Both variants include variance.
 
 | Concept | Sample notation and meaning | Sample color / base hex | Population notation and meaning | Population color / base hex |
 |---|---|---|---|---|
-| Group | $X,\ X_i$: selected units. | `G11T2C1Sample` / `#173B17` | $\mathcal{P}$: all units in scope. | `G11T2C1Population` / `#75162B` |
+| Group | $X,\ X_i$: selected units. | `G11T2C1SampleGroup` / `#56A86B` | $\mathcal{P}$: all units in scope. | `G11T2C1Population` / `#75162B` |
 | Size | $n$: number selected. | `G11T2C1Sample` / `#173B17` | $N$: number in scope. | `G11T2C1Population` / `#75162B` |
 | Mean | $\bar{x}$: sample mean. | `G11T2C1SampleMean` / `#9BDD36` | $\mu$: population mean. | `G11T2C1PopulationMean` / `#FF765C` |
 | Standard deviation | $s$: sample standard deviation. | `G11T2C1SampleSD` / `#189338` | $\sigma$: population standard deviation. | `G11T2C1PopulationSD` / `#E42134` |
+| Variance | $s^2$: squared sample spread. | `G11T2C1SampleVariance` / `#6B8E23` | $\sigma^2$: squared population spread. | `G11T2C1PopulationVariance` / `#B54A45` |
 | Proportion | $\hat{p}$: fraction meeting a condition in the sample. | `G11T2C1SampleProportion` / `#23B895` | $p$: fraction meeting a condition in the population. | `G11T2C1PopulationProportion` / `#D74383` |
 
 The practice legend groups its layout settings (`\small`, `\tabcolsep=3pt`, and `\arraystretch=1.18`) and places each table in a minipage of `0.49\linewidth`.
 
-The slide helpers are `\GradeElevenCOneLegendGroups`, `\GradeElevenCOneLegendMeans`, `\GradeElevenCOneLegendDeviations`, and `\GradeElevenCOneLegendProportions`, assembled by `\GradeElevenCOneLegendTable`, which accepts four row-helper commands in the desired order. Each row helper accepts a reveal-step argument. `\PracticeHighlightLegendCell{step}{content}` displays all content by default; slides may redefine it locally. The table passes steps 2, 3, 4, and 5 to its four row helpers.
+The slide helpers are `\GradeElevenCOneLegendGroups`, `\GradeElevenCOneLegendMeans`, `\GradeElevenCOneLegendDeviations`, `\GradeElevenCOneLegendVariances`, and `\GradeElevenCOneLegendProportions`, assembled by `\GradeElevenCOneLegendTable`, which accepts four row-helper commands in the desired order. Each row helper accepts a reveal-step argument. `\PracticeHighlightLegendCell{step}{content}` displays all content by default; slides may redefine it locally. The table passes steps 2, 3, 4, and 5 to its four arguments and inserts the variance helper at step 4 before proportions.
 
 ## Grade 11 C2 and C3: confidence intervals
 
@@ -114,13 +115,13 @@ C2 calls `\CtwoLegendInterval[1]` and locally redefines the mean, interval, and 
 
 The `-coordinated` keys below are opt-in, three-column concise legends. They do not replace the seven legacy keys above. The legacy C1 slide helpers and their reveal steps remain unchanged; no coordinated slide variant is registered. The general keys are catalogs, rather than required opening tables for every activity. G10 C10 has no source: **source not found; legend pending**, with no registered student-facing key. G11 C8 covers demonstrated t intervals for means; the existing assessed wording about proportions still needs author review.
 
-`\CoordinatedLegendTable{rows}` uses a non-floating `longtable`, with repeated headers, a continuation footer, whole-row page breaks, `\tabcolsep=4pt` and `\arraystretch=1.18`. Its paragraph columns are 32%, 25%, and the remaining 43% minus four column spacings. It preserves the document's type size and locally compacts marker padding to 0.6 mm horizontally / 0.3 mm vertically, without changing body markers. It requires the article preamble's `longtable`; it is not a Beamer layout. Each registry entry groups the table settings, notation specializations and `\CoordinatedTermTwoPalette`. The final two rows are kept together with a no-break penalty. There are no reveal overlays in these new tables.
+`\CoordinatedLegendTable{rows}` uses a non-floating `longtable`, with repeated headers, a continuation footer, whole-row page breaks, `\tabcolsep=4pt` and `\arraystretch=1.18`. Its paragraph columns are 32%, 25%, and the remaining 43% minus four column spacings. It preserves the document's type size and retains the shared marker padding. Practice-local padding overrides apply when selected by the caller. It requires the article preamble's `longtable`; it is not a Beamer layout. Each registry entry groups the table settings, notation specializations and `\CoordinatedTermTwoPalette`. Entries place a no-break penalty before the last selected catalog entry. If that entry has role `context` and is omitted, this does not guarantee that the last two printed rows remain together. There are no reveal overlays in these new tables.
 
-`\CoordinatedLegendEntry{grade}{entry ID}` dispatches to shared `coordinatedrow@<grade>@<entry>` data. `\CoordinatedLegendRow{role ID}{notation}{styled concept}{brief meaning}` emits the three cells; its first argument records the semantic binding. Concept words are wrapped separately so they can reflow. Notation comes from `coordinatednotation@<grade>@<entry>`, locally specialized by criterion entries. Definitions and concepts are shared with the catalogs. Detailed notation references retain separate table bodies and example interpretations.
+`\CoordinatedLegendEntry{grade}{entry ID}` dispatches to shared `coordinatedrow@<grade>@<entry>` data. `\CoordinatedLegendRow{role ID}{notation}{styled concept}{brief meaning}` emits the three cells; its first argument records the semantic binding. Rows with role `context` are omitted by `\CoordinatedOmitRow`; all other rows use `\CoordinatedPrintRow`. Catalog data below include these unprinted reference entries, while the selection lists show only effective printed rows. Concept words are wrapped separately so they can reflow. Notation comes from `coordinatednotation@<grade>@<entry>`, locally specialized by criterion entries. Definitions and concepts are shared with the catalogs. Detailed notation references retain separate table bodies and example interpretations.
 
 ### Palette scope and aliases
 
-`\CoordinatedTermTwoPalette` creates no group; its lifetime is controlled by its caller. It maps `G11T2C1PopulationMean` to `ExpectedValueColor`, `G11T2C1PopulationProportion` to `GTenHLProbability`, `CtwoEndpointColor` to `MathHLBoundsColor`, and `CtwoWidthColor` to `MathHLWidthColor`. Consequently existing raw color calls and `\CtwoMean`, `\CtwoEndpoint` and `\CtwoWidth` follow the selected palette. Loading the registry alone does not opt legacy callers into these changes. The original `\CtwoPracticeIntervalPalette` remains available.
+`\CoordinatedTermTwoPalette` creates no group; its lifetime is controlled by its caller. It maps `ExpectedValueColor` to `MathHLExpectedValueColor` (gold `#D6A52A`), `CtwoEndpointColor` to `MathHLBoundsColor`, and `CtwoWidthColor` to `MathHLWidthColor`. Population means and population proportions retain their coral and pink defaults; no probability, success, complement, confidence or variance color is overridden. Existing expectation, endpoint and width calls follow the selected palette. Loading the registry alone does not opt legacy callers into these changes. The original `\CtwoPracticeIntervalPalette` remains available.
 
 The palette also provides the one-argument `\CtwoError` forwarding alias to `\HLCoverageError` only when that name is undefined. This opt-in definition avoids a duplicate with independently defined classroom commands. Canonical aliases are ordinary one-argument forwarding commands or direct `\HighlightStroke` calls, rather than frozen `\let` copies. `\CoordinatedRole{stable role ID}{fragment}` dispatches to the corresponding wrapper. `\HLMathContext` returns its argument without a fill.
 
@@ -130,14 +131,17 @@ New color identifiers are defined at registry load time; these are additional co
 |---|---|
 | `MathHLCumulativeColor` | HTML `43A5C9` |
 | `CtwoErrorColor` | HTML `28AFA2` |
-| `MathHLComplementColor` | `GTenHLProbability!65!CtwoCriticalColor` |
-| `MathHLPopulationVarianceColor` | `G11T2C1PopulationSD!55!white` |
-| `MathHLSampleVarianceColor` | `G11T2C1SampleSD!55!white` |
+| `MathHLSuccessColor` | `GTenHLProbability!65!CtwoCriticalColor` (xcolor HTML conversion `6495DD`) |
+| `MathHLComplementColor` | `G11T2C1PopulationProportion` (`#D74383`) |
+| `MathHLPopulationVarianceColor` | `G11T2C1PopulationVariance` (`#B54A45`) |
+| `MathHLSampleVarianceColor` | `G11T2C1SampleVariance` (`#6B8E23`) |
+| `MathHLExpectedValueColor` | HTML `D6A52A` |
+| `MathHLPoissonMeanColor` | HTML `D95F50` |
 | `MathHLTailColor` | `CtwoConfidenceColor!55!CtwoCriticalColor` |
 | `MathHLBoundsColor` | `CtwoMoEColor!45!white` |
 | `MathHLWidthColor` | `CtwoMoEColor!45!black` |
 
-The base colors referenced by these mixes are listed above. Mixes are captured by `\colorlet` at definition time, before the renderer's 0.32 fill opacity; they are not final displayed hex values. Population mean and expectation share violet only under this opt-in mapping; the legacy population-mean default remains coral. Names, definitions, units and notation distinguish concepts sharing hues, including sample groups/design counts and outcomes/observed coverage.
+The base colors referenced by these mixes are listed above. Mixes are captured by `\colorlet` at definition time, before the renderer's 0.32 fill opacity; they are not final displayed hex values. Population mean stays coral (`#FF765C`); expectation is violet by default and gold under the opt-in palette. Poisson interval mean has its own coral identifier (`#D95F50`). Names, definitions, units and notation distinguish concepts sharing hues, including sample groups/design counts and outcomes/observed coverage.
 
 | Stable role | Canonical wrapper | Effective color identifier |
 |---|---|---|
@@ -146,17 +150,21 @@ The base colors referenced by these mixes are listed above. Mixes are captured b
 | `quantity.primary` | `\GTenHLValue` | `GTenHLValue` |
 | `quantity.secondary` | `\GTenHLSecond` | `GTenHLSecond` |
 | `quantity.tertiary` | `\GTenHLThird` | `GTenHLThird` |
-| `probability` | `\HLPopulationProportion` | `GTenHLProbability` |
+| `probability` | `\HLProbability` (forwards to `\GTenHLProbability`) | `GTenHLProbability` (`#86BFF0`) |
+| `probability.success` | `\HLSuccessProbability` | `MathHLSuccessColor` |
+| `proportion.population` | `\HLPopulationProportion` | `G11T2C1PopulationProportion` (`#D74383`) |
 | `unknown` | `\GTenHLParameter` | `GTenHLParameter` |
 | `probability.complement` | `\HLComplementProbability` | `MathHLComplementColor` |
 | `cumulative` | `\HLCumulativeProbability` | `MathHLCumulativeColor` |
 | `count.design` | `\HLObservationCount` | `G11T2C1Sample` |
 | `model.control` | `\HLModelControl` | `GTenHLParameter` |
-| `expectation` | `\HLPopulationMean` | `ExpectedValueColor` |
+| `expectation` | `\HLExpectedValue` | `ExpectedValueColor` |
+| `mean.population` | `\HLPopulationMean` | `G11T2C1PopulationMean` |
+| `mean.poisson` | `\HLPoissonMean` | `MathHLPoissonMeanColor` |
 | `variance.population` | `\HLPopulationVariance` | `MathHLPopulationVarianceColor` |
 | `sd.population` | `\HLPopulationSD` | `G11T2C1PopulationSD` |
 | `context` | `\HLMathContext` | `No fill; identity` |
-| `group.sample` | `\HLSampleGroup` | `G11T2C1Sample` |
+| `group.sample` | `\HLSampleGroup` | `G11T2C1SampleGroup` (`#56A86B`) |
 | `group.population` | `\HLPopulationGroup` | `G11T2C1Population` |
 | `mean.sample` | `\HLSampleMean` | `G11T2C1SampleMean` |
 | `sd.sample` | `\HLSampleSD` | `G11T2C1SampleSD` |
@@ -174,7 +182,7 @@ The base colors referenced by these mixes are listed above. Mixes are captured b
 
 ### Catalog entries
 
-Row order is the order printed by each general key. Shared IDs do not make unlike objects identical: nominal confidence, tail area, finite-run coverage, theoretical area, individual spread, standard error, margin, bounds and full width retain separate definitions.
+Catalog order follows the source data; `context` entries are reference-only and do not print. Effective printed selections appear below. Shared IDs do not make unlike objects identical: nominal confidence, tail area, finite-run coverage, theoretical area, individual spread, standard error, margin, bounds and full width retain separate definitions.
 
 Grade 10:
 
@@ -193,16 +201,17 @@ Grade 10:
 | `cum` / `cumulative` | $F_X(a)$, $F_X(a^-)$; $P(X\leq a)$ | Cumulative probability: Chance up to a cutoff; the left limit excludes the cutoff. |
 | `cutoff` / `quantity.primary` | $a$, $b$, $m$, $\lfloor x\rfloor$ | Cutoff and integer part: A boundary in the variable's units; specify included endpoints. |
 | `aux` / `context` | $K,a,b,c$; $a_m,b_m,c_m$; $N_k,b_j,R_m$ | Auxiliary counts and states: Problem-defined counts, recurrence states, balances or survival quantities. |
-| `p` / `probability` | $p=P(X=1)$ | Success probability: Chance of the specified state labelled 1, between 0 and 1. |
+| `p` / `probability.success` | $p=P(X=1)$ | Success probability: Chance of the specified state labelled 1, between 0 and 1. |
 | `q` / `probability.complement` | $1-p$ | Complement probability: Chance of the complementary state labelled 0. |
-| `expected` / `expectation` | $E(X)$, $\mathbb E[Y_i]$, $\mu$ | Expected value or model mean: Probability-weighted average, in original units. |
-| `break` / `probability` | $p_i^*$ | Individual break-even probability: Probability at which the specified expected net payoff is zero. |
+| `expected` / `expectation` | $E(X)$, $\mathbb E[Y_i]$ | Expected value: Probability-weighted average, in original units. |
+| `meanpop` / `mean.population` | $\mu$ | Population or model mean: Mean of the population or specified model, in original units. |
+| `break` / `probability.success` | $p_i^*$ | Individual break-even probability: Probability at which the specified expected net payoff is zero. |
 | `transform` / `context` | $a,b$; $f_i(0),f_i(1)$ | Transformation inputs: Scale, fixed addition or state payoffs, with required units. |
 | `size` / `count.design` | $n$ | Observation count: Fixed trial count or sample size; a positive integer. |
 | `wait` / `quantity.primary` | $T$, $t$; $F=T-1$ or $F=T-r$ | Trials and failures: Total trials include the final success; failures exclude successes. |
 | `target` / `model.control` | $r$ | Success target: Fixed number of successes required before stopping. |
 | `rate` / `context` | $\mathrm{rate}$, $\mathrm{exposure}$ | Rate and exposure: Events per exposure unit and length of the observation window. |
-| `lambda` / `expectation` | $\lambda$ | Poisson interval mean: Expected count for the selected exposure. |
+| `lambda` / `mean.poisson` | $\lambda$ | Poisson interval mean: Expected count for the selected exposure. |
 | `secondmoment` / `expectation` | $E(X^2)$, $[E(X)]^2$ | Second moment and squared mean: Average of squares; square of the average. Both use squared units. |
 | `variance` / `variance.population` | $\operatorname{Var}(X)$, $\sigma_X^2$ | Variance: Mean squared deviation from the mean; squared units. |
 | `sd` / `sd.population` | $\sigma_X$, $\sigma$ | Population or model standard deviation: Spread of individual values, in original units. |
@@ -215,11 +224,11 @@ Grade 11:
 | `population` / `group.population` | $\mathcal P$, $N$ | Population and size: All units in the stated scope; their total number. |
 | `size` / `count.design` | $n$ | Observation count: Fixed trial count or sample size; a positive integer. |
 | `obs` / `quantity.primary` | $y_j$, $x_i$ | Observation: Measured value on one selected unit, with the response's units. |
-| `meanpop` / `expectation` | $\mu$, $\mu_{\rm sim}$ | Population mean: Fixed mean of the defined population; simulation mean is supplied separately. |
+| `meanpop` / `mean.population` | $\mu$, $\mu_{\rm sim}$ | Population mean: Fixed mean of the defined population; simulation mean is supplied separately. |
 | `meansample` / `mean.sample` | $\bar x$, $\bar x_i$ | Sample mean and point estimate: Average of one sample; estimates its population mean. |
 | `sd` / `sd.population` | $\sigma_X$, $\sigma$ | Population or model standard deviation: Spread of individual values, in original units. |
 | `sdsample` / `sd.sample` | $s$, $s_i$ | Sample standard deviation: Spread of sample observations, in response units. |
-| `proppop` / `probability` | $p$ | Population proportion: Fraction of all units meeting the condition; unitless. |
+| `proppop` / `proportion.population` | $p$ | Population proportion: Fraction of all units meeting the condition; unitless. |
 | `propsample` / `proportion.sample` | $\hat p=x/n$ | Sample proportion: Observed success fraction among selected units; unitless. |
 | `se` / `standard.error` | $\mathrm{SE}$, $\widehat{SE}$ | Standard error: Spread of a statistic across samples, or its estimate. |
 | `confidence` / `confidence` | $C$ | Confidence level: Chosen nominal long-run coverage under the model; decimal in formulas. |
@@ -239,7 +248,7 @@ Grade 11:
 | `variance` / `variance.population` | $\operatorname{Var}(X)$, $\sigma_X^2$ | Variance: Mean squared deviation from the mean; squared units. |
 | `fraction` / `context` | $n/N$ | Sampling fraction: Share of the finite population selected; check design conditions. |
 | `successcount` / `count.design` | $x$; $n\hat p$, $n(1-\hat p)$ | Observed outcome counts: Success and other-outcome counts within a sample. |
-| `planning` / `probability` | $p_0$ | Planning proportion: Pilot or conservative input; not a null-hypothesis value here. |
+| `planning` / `proportion.population` | $p_0$ | Planning proportion: Pilot or conservative input; not a null-hypothesis value here. |
 | `precisionplan` / `count.design` | $n_{\min}$, $E(n)$ | Sample-size plan: Minimum usable integer count and its achieved margin. |
 | `df` / `model.control` | $df=n-1$ | Degrees of freedom: Reference index for the one-sample t procedure. |
 | `varsample` / `variance.sample` | $s^2$ | Sample variance: Squared sample spread; use the specified divisor. |
@@ -249,34 +258,42 @@ Grade 11:
 
 Each list below is the exact printed row order. Notation and meaning variants change only the indicated cells inside that legend’s group. All other cells resolve to the catalog data above. `\CoordinatedSampleMeaning` defaults to the whole-draw index explanation; C9/C10 specialize it to selected units under the stated design. `\CoordinatedPopulationMeanMeaning` includes the separately supplied simulation mean by default; criterion groups without that supplied quantity use only the fixed population mean and response units.
 
-- `G10-T2-C1-C2-C3-C4-C5-C6-C7-C8-C9-coordinated`: `outcome`, `event`, `variable`, `support`, `second`, `third`, `mass`, `unknown`, `ops`, `assume`, `cum`, `cutoff`, `aux`, `p`, `q`, `expected`, `break`, `transform`, `size`, `wait`, `target`, `rate`, `lambda`, `secondmoment`, `variance`, `sd`.
-- `G11-T2-C1-C2-C3-C4-C5-C6-C7-C8-C9-C10-coordinated`: `sample`, `population`, `size`, `obs`, `meanpop`, `meansample`, `sd`, `sdsample`, `proppop`, `propsample`, `se`, `confidence`, `tail`, `critical`, `margin`, `bounds`, `width`, `reported`, `reportedwidth`, `coverage`, `error`, `normal`, `shape`, `theoretical`, `budget`, `variance`, `fraction`, `successcount`, `planning`, `precisionplan`, `df`, `varsample`, `ops`.
-- `G10-T2-C1-coordinated`: `outcome`, `event`, `variable`, `support`, `second`, `third`, `mass`, `unknown`, `ops`, `assume`. Notation: `variable`: $X$, $x$, $F$; $X(\omega)$; `second`: $Y$, $y$, $E$; `third`: $Z$, $z$, $C$; `event`: $A$; `unknown`: $k$, $q$, $c$; `mass`: $P(\omega)$, $p_X(x)$; `ops`: $\sum$.
-- `G10-T2-C2-coordinated`: `outcome`, `event`, `variable`, `support`, `mass`, `cum`, `unknown`, `cutoff`, `ops`, `assume`, `aux`. Notation: `variable`: $X$, $x$; `mass`: $p_X(x)$; `ops`: $\sum$, $\binom nk$, $n!$; `event`: $\{X\leqa\}$.
-- `G10-T2-C3-coordinated`: `event`, `variable`, `support`, `p`, `q`, `second`, `mass`, `cum`, `expected`, `break`, `transform`. Notation: `variable`: $X$, $x$; `second`: $Y_i=f_i(X)$; `transform`: $f_i(0),f_i(1)$; `event`: $E$, $E^c$; `mass`: $m_X(x)$, $m_{Y_i}(y)$; `cum`: $F_X(t)$, $F_{Y_i}(t)$; `expected`: $\mathbb E[Y_i]$.
-- `G10-T2-C4-coordinated`: `variable`, `support`, `second`, `p`, `q`, `size`, `mass`, `cum`, `cutoff`, `ops`, `assume`. Notation: `variable`: $X$, $x$; `second`: $Y$; `mass`: $P(X=k)$; `cum`: $P(X\leq b)$; `cutoff`: $a$, $b$, $k$; `ops`: $\sum$, $\binom nk$, $n!$, $\sim$; `p`: $p$.
-- `G10-T2-C5-coordinated`: `wait`, `support`, `p`, `q`, `second`, `mass`, `cum`, `cutoff`, `event`, `assume`. Notation: `second`: $C$; `support`: $S_T$; `wait`: $T$, $t$; $F=T-1$; `mass`: $P(T=t)$; `cum`: $P(T\leq t)$; `event`: $A$, $B$; `cutoff`: $m$; `p`: $p$.
-- `G10-T2-C6-coordinated`: `wait`, `support`, `p`, `q`, `target`, `second`, `mass`, `cum`, `size`, `cutoff`, `ops`, `assume`. Notation: `second`: $C$; `support`: $S_T$; `wait`: $T$, $t$; $F=T-r$; `mass`: $P(T=t)$; `cum`: $P(T\leq t)$; `cutoff`: $m$; `ops`: $\sum$, $\binom nk$, $n!$, $\sim$; `p`: $p$.
-- `G10-T2-C7-coordinated`: `variable`, `support`, `mass`, `cum`, `cutoff`, `rate`, `lambda`, `second`, `ops`, `assume`. Notation: `variable`: $X$, $k$; `second`: $L$; `mass`: $P(X=k)$; `cum`: $P(X\leq b)$; `cutoff`: $a$, $b$, $k$; `ops`: $\sum$, $k!$, $e$, $\sim$; `assume`: Constant rate, independent interval counts, isolated events.
-- `G10-T2-C8-coordinated`: `variable`, `support`, `second`, `mass`, `expected`, `secondmoment`, `variance`, `sd`, `transform`, `ops`. Notation: `variable`: $X$, $x$; `second`: $Y$; `transform`: $a,b$; `expected`: $E(X)$, $E(Y)$, $\mu$; `ops`: $\sum_x$; `mass`: $p_X(x)$.
-- `G10-T2-C9-coordinated`: `event`, `variable`, `support`, `wait`, `second`, `p`, `q`, `size`, `target`, `mass`, `cum`, `rate`, `lambda`, `ops`, `assume`. Notation: `variable`: $X$, $x$; `second`: $L$; `p`: $p$; `mass`: $P(X=k)$, $P(T=t)$; `event`: $\{X\geqa\}$.
-- `G11-T2-C1-coordinated`: `sample`, `population`, `size`, `obs`, `meanpop`, `meansample`, `sd`, `sdsample`, `proppop`, `propsample`. Notation: `sd`: $\sigma$; `sdsample`: $s$; `meanpop`: $\mu$; `obs`: $y_j$. Meanings: `\CoordinatedPopulationMeanMeaning`: Fixed mean of the defined population, in the response's units..
-- `G11-T2-C2-coordinated`: `meanpop`, `meansample`, `sd`, `size`, `sdsample`, `se`, `confidence`, `tail`, `critical`, `margin`, `bounds`, `width`, `reported`, `reportedwidth`, `coverage`, `error`, `normal`, `obs`, `shape`. Notation: `sd`: $\sigma$; `sdsample`: $s$; `meansample`: $\bar x$; `critical`: $z^*$; `margin`: $\mathrm{MoE}$; `se`: $\mathrm{SE}$; `obs`: $x_i$.
-- `G11-T2-C3-coordinated`: `meanpop`, `meansample`, `sd`, `size`, `se`, `confidence`, `tail`, `critical`, `margin`, `bounds`, `width`, `normal`, `theoretical`, `budget`, `shape`. Notation: `sd`: $\sigma$; `meanpop`: $\mu$; `meansample`: $\bar x$; `critical`: $z^*$; `margin`: $\mathrm{MoE}$; `se`: $\mathrm{SE}$. Meanings: `\CoordinatedPopulationMeanMeaning`: Fixed mean of the defined population, in the response's units..
-- `G11-T2-C4-coordinated`: `meanpop`, `meansample`, `variance`, `sd`, `size`, `population`, `se`, `confidence`, `tail`, `critical`, `margin`, `bounds`, `normal`, `fraction`, `shape`, `budget`. Notation: `sd`: $\sigma$; `meanpop`: $\mu$; `meansample`: $\bar x$; `critical`: $z^*$; `margin`: $E$; `se`: $\mathrm{SE}$; `population`: Population; $N$; `bounds`: Confidence interval; $L$, $U$; `variance`: $\sigma^2$; `normal`: $P(Z\leq z)$. Meanings: `\CoordinatedPopulationMeanMeaning`: Fixed mean of the defined population, in the response's units..
-- `G11-T2-C5-coordinated`: `proppop`, `propsample`, `successcount`, `size`, `population`, `se`, `confidence`, `critical`, `margin`, `bounds`, `fraction`, `shape`, `budget`. Notation: `critical`: $z^*$; `margin`: $E$; `se`: $\widehat{SE}$; `population`: Population; $N$; `bounds`: Confidence interval; $L$, $U$; `propsample`: $\hat p$.
-- `G11-T2-C6-coordinated`: `meanpop`, `sd`, `proppop`, `planning`, `size`, `precisionplan`, `population`, `confidence`, `critical`, `margin`, `fraction`, `shape`, `budget`. Notation: `sd`: $\sigma$; `meanpop`: $\mu$; `critical`: $z^*$; `margin`: $E$, $E_{\rm target}$; `population`: Population; $N$. Meanings: `\CoordinatedPopulationMeanMeaning`: Fixed mean of the defined population, in the response's units..
-- `G11-T2-C7-coordinated`: `proppop`, `propsample`, `successcount`, `size`, `population`, `se`, `confidence`, `critical`, `margin`, `bounds`, `width`, `fraction`, `shape`. Notation: `critical`: $z^*$; `margin`: $E$; `se`: $\widehat{SE}$; `population`: Population; $N$; `bounds`: Confidence interval; $L$, $U$; `propsample`: $\hat p$.
-- `G11-T2-C8-coordinated`: `meanpop`, `meansample`, `sd`, `sdsample`, `size`, `population`, `se`, `confidence`, `tail`, `critical`, `margin`, `bounds`, `df`, `fraction`, `shape`, `budget`. Notation: `sd`: $\sigma$; `sdsample`: $s$; `meanpop`: $\mu$; `meansample`: $\bar x$; `critical`: $t^*$, $z^*$; `margin`: $E$; `se`: $\widehat{SE}$; `population`: Population; $N$; `bounds`: Confidence interval; $L$, $U$. Meanings: `\CoordinatedPopulationMeanMeaning`: Fixed mean of the defined population, in the response's units..
-- `G11-T2-C9-coordinated`: `sample`, `population`, `size`, `meansample`, `sdsample`, `propsample`, `successcount`, `fraction`, `shape`, `budget`. Notation: `sdsample`: $s$; `meansample`: $\bar x$; `sample`: Selected sample; `population`: Population; $N$; `propsample`: $\hat p$. Meanings: `\CoordinatedSampleMeaning`: Selected units drawn under the stated sampling design..
-- `G11-T2-C10-coordinated`: `sample`, `population`, `size`, `obs`, `meanpop`, `meansample`, `sdsample`, `varsample`, `se`, `confidence`, `critical`, `margin`, `bounds`, `df`, `precisionplan`, `fraction`, `shape`, `budget`, `ops`. Notation: `sdsample`: $s$; `meanpop`: $\mu$; `meansample`: $\bar x$; `critical`: $z^*$, $t^*$; `margin`: $E$; `se`: $\widehat{SE}$; `obs`: $x_i$; `sample`: Selected sample; `population`: Population; $N$; `bounds`: Confidence interval; $L$, $U$; `precisionplan`: $n$; achieved $E$; `ops`: $\sum x_i$, $\sum x_i^2$. Meanings: `\CoordinatedSampleMeaning`: Selected units drawn under the stated sampling design.; `\CoordinatedPopulationMeanMeaning`: Fixed mean of the defined population, in the response's units..
+- `G10-T2-C1-C2-C3-C4-C5-C6-C7-C8-C9-coordinated`: `outcome`, `event`, `variable`, `support`, `second`, `third`, `mass`, `unknown`, `cum`, `cutoff`, `p`, `q`, `expected`, `meanpop`, `break`, `size`, `wait`, `target`, `lambda`, `secondmoment`, `variance`, `sd`.
+- `G11-T2-C1-C2-C3-C4-C5-C6-C7-C8-C9-C10-coordinated`: `sample`, `population`, `size`, `obs`, `meanpop`, `meansample`, `sd`, `sdsample`, `proppop`, `propsample`, `se`, `confidence`, `tail`, `critical`, `margin`, `bounds`, `width`, `reported`, `reportedwidth`, `coverage`, `error`, `normal`, `theoretical`, `variance`, `successcount`, `planning`, `precisionplan`, `df`, `varsample`.
+- `G10-T2-C1-coordinated`: `outcome`, `event`, `variable`, `support`, `second`, `third`, `mass`, `unknown`. Notation: `variable`: $X$, $x$, $F$; $X(\omega)$; `second`: $Y$, $y$, $E$; `third`: $Z$, $z$, $C$; `event`: $A$; `unknown`: $k$, $q$, $c$; `mass`: $P(\omega)$, $p_X(x)$; `ops`: $\sum$.
+- `G10-T2-C2-coordinated`: `outcome`, `event`, `variable`, `support`, `mass`, `cum`, `unknown`, `cutoff`. Notation: `variable`: $X$, $x$; `mass`: $p_X(x)$; `ops`: $\sum$, $\binom nk$, $n!$; `event`: $\{X\leqa\}$.
+- `G10-T2-C3-coordinated`: `event`, `variable`, `support`, `p`, `q`, `second`, `mass`, `cum`, `expected`, `break`. Notation: `variable`: $X$, $x$; `second`: $Y_i=f_i(X)$; `transform`: $f_i(0),f_i(1)$; `event`: $E$, $E^c$; `mass`: $m_X(x)$, $m_{Y_i}(y)$; `cum`: $F_X(t)$, $F_{Y_i}(t)$; `expected`: $\mathbb E[Y_i]$.
+- `G10-T2-C4-coordinated`: `variable`, `support`, `second`, `p`, `q`, `size`, `mass`, `cum`, `cutoff`. Notation: `variable`: $X$, $x$; `second`: $Y$; `mass`: $P(X=k)$; `cum`: $P(X\leq b)$; `cutoff`: $a$, $b$, $k$; `ops`: $\sum$, $\binom nk$, $n!$, $\sim$; `p`: $p$.
+- `G10-T2-C5-coordinated`: `wait`, `support`, `p`, `q`, `second`, `mass`, `cum`, `cutoff`, `event`. Notation: `second`: $C$; `support`: $S_T$; `wait`: $T$, $t$; $F=T-1$; `mass`: $P(T=t)$; `cum`: $P(T\leq t)$; `event`: $A$, $B$; `cutoff`: $m$; `p`: $p$.
+- `G10-T2-C6-coordinated`: `wait`, `support`, `p`, `q`, `target`, `second`, `mass`, `cum`, `size`, `cutoff`. Notation: `second`: $C$; `support`: $S_T$; `wait`: $T$, $t$; $F=T-r$; `mass`: $P(T=t)$; `cum`: $P(T\leq t)$; `cutoff`: $m$; `ops`: $\sum$, $\binom nk$, $n!$, $\sim$; `p`: $p$.
+- `G10-T2-C7-coordinated`: `variable`, `support`, `mass`, `cum`, `cutoff`, `lambda`, `second`. Notation: `variable`: $X$, $k$; `second`: $L$; `mass`: $P(X=k)$; `cum`: $P(X\leq b)$; `cutoff`: $a$, $b$, $k$; `ops`: $\sum$, $k!$, $e$, $\sim$; `assume`: Constant rate, independent interval counts, isolated events.
+- `G10-T2-C8-coordinated`: `variable`, `support`, `second`, `mass`, `expected`, `meanpop`, `secondmoment`, `variance`, `sd`. Notation: `variable`: $X$, $x$; `second`: $Y$; `transform`: $a,b$; `expected`: $E(X)$, $E(Y)$; `meanpop`: $\mu$; `ops`: $\sum_x$; `mass`: $p_X(x)$.
+- `G10-T2-C9-coordinated`: `event`, `variable`, `support`, `wait`, `second`, `p`, `q`, `size`, `target`, `mass`, `cum`, `lambda`. Notation: `variable`: $X$, $x$; `second`: $L$; `p`: $p$; `mass`: $P(X=k)$, $P(T=t)$; `event`: $\{X\geqa\}$.
+- `G11-T2-C1-coordinated`: `sample`, `population`, `size`, `obs`, `meanpop`, `meansample`, `sd`, `sdsample`, `variance`, `varsample`, `proppop`, `propsample`. Notation: `sd`: $\sigma$; `sdsample`: $s$; `meanpop`: $\mu$; `obs`: $y_j$. Meanings: `\CoordinatedPopulationMeanMeaning`: Fixed mean of the defined population, in the response's units..
+- `G11-T2-C2-coordinated`: `meanpop`, `meansample`, `sd`, `size`, `sdsample`, `se`, `confidence`, `tail`, `critical`, `margin`, `bounds`, `width`, `reported`, `reportedwidth`, `coverage`, `error`, `normal`, `obs`. Notation: `sd`: $\sigma$; `sdsample`: $s$; `meansample`: $\bar x$; `critical`: $z^*$; `margin`: $\mathrm{MoE}$; `se`: $\mathrm{SE}$; `obs`: $x_i$.
+- `G11-T2-C3-coordinated`: `meanpop`, `meansample`, `sd`, `size`, `se`, `confidence`, `tail`, `critical`, `margin`, `bounds`, `width`, `normal`, `theoretical`. Notation: `sd`: $\sigma$; `meanpop`: $\mu$; `meansample`: $\bar x$; `critical`: $z^*$; `margin`: $\mathrm{MoE}$; `se`: $\mathrm{SE}$. Meanings: `\CoordinatedPopulationMeanMeaning`: Fixed mean of the defined population, in the response's units..
+- `G11-T2-C4-coordinated`: `meanpop`, `meansample`, `variance`, `sd`, `size`, `population`, `se`, `confidence`, `tail`, `critical`, `margin`, `bounds`, `normal`. Notation: `sd`: $\sigma$; `meanpop`: $\mu$; `meansample`: $\bar x$; `critical`: $z^*$; `margin`: $E$; `se`: $\mathrm{SE}$; `population`: Population; $N$; `bounds`: Confidence interval; $L$, $U$; `variance`: $\sigma^2$; `normal`: $P(Z\leq z)$. Meanings: `\CoordinatedPopulationMeanMeaning`: Fixed mean of the defined population, in the response's units..
+- `G11-T2-C5-coordinated`: `proppop`, `propsample`, `successcount`, `size`, `population`, `se`, `confidence`, `critical`, `margin`, `bounds`. Notation: `critical`: $z^*$; `margin`: $E$; `se`: $\widehat{SE}$; `population`: Population; $N$; `bounds`: Confidence interval; $L$, $U$; `propsample`: $\hat p$.
+- `G11-T2-C6-coordinated`: `meanpop`, `sd`, `proppop`, `planning`, `size`, `precisionplan`, `population`, `confidence`, `critical`, `margin`. Notation: `sd`: $\sigma$; `meanpop`: $\mu$; `critical`: $z^*$; `margin`: $E$, $E_{\rm target}$; `population`: Population; $N$. Meanings: `\CoordinatedPopulationMeanMeaning`: Fixed mean of the defined population, in the response's units..
+- `G11-T2-C7-coordinated`: `proppop`, `propsample`, `successcount`, `size`, `population`, `se`, `confidence`, `critical`, `margin`, `bounds`, `width`. Notation: `critical`: $z^*$; `margin`: $E$; `se`: $\widehat{SE}$; `population`: Population; $N$; `bounds`: Confidence interval; $L$, $U$; `propsample`: $\hat p$.
+- `G11-T2-C8-coordinated`: `meanpop`, `meansample`, `sd`, `sdsample`, `size`, `population`, `se`, `confidence`, `tail`, `critical`, `margin`, `bounds`, `df`. Notation: `sd`: $\sigma$; `sdsample`: $s$; `meanpop`: $\mu$; `meansample`: $\bar x$; `critical`: $t^*$, $z^*$; `margin`: $E$; `se`: $\widehat{SE}$; `population`: Population; $N$; `bounds`: Confidence interval; $L$, $U$. Meanings: `\CoordinatedPopulationMeanMeaning`: Fixed mean of the defined population, in the response's units..
+- `G11-T2-C9-coordinated`: `sample`, `population`, `size`, `meansample`, `sdsample`, `propsample`, `successcount`. Notation: `sdsample`: $s$; `meansample`: $\bar x$; `sample`: Selected sample; `population`: Population; $N$; `propsample`: $\hat p$. Meanings: `\CoordinatedSampleMeaning`: Selected units drawn under the stated sampling design..
+- `G11-T2-C10-coordinated`: `sample`, `population`, `size`, `obs`, `meanpop`, `meansample`, `sdsample`, `varsample`, `se`, `confidence`, `critical`, `margin`, `bounds`, `df`, `precisionplan`. Notation: `sdsample`: $s$; `meanpop`: $\mu$; `meansample`: $\bar x$; `critical`: $z^*$, $t^*$; `margin`: $E$; `se`: $\widehat{SE}$; `obs`: $x_i$; `sample`: Selected sample; `population`: Population; $N$; `bounds`: Confidence interval; $L$, $U$; `precisionplan`: $n$; achieved $E$; `ops`: $\sum x_i$, $\sum x_i^2$. Meanings: `\CoordinatedSampleMeaning`: Selected units drawn under the stated sampling design.; `\CoordinatedPopulationMeanMeaning`: Fixed mean of the defined population, in the response's units..
 
 ### Practice-local integration
 
 All source-backed G10 C1–C9 and G11 C1–C10 Term 2 practices load the renderer and registry once and select their respective coordinated key. Each selects `\CoordinatedTermTwoPalette` at document setup scope, before deriving graph colors. Existing toggle settings are preserved; newly integrated practices have the same commented disable instruction. No new document-wide body-markup pass is implied.
 
-G10 C1/C2 keep their local 0.6 mm horizontal / 0.3 mm vertical marker padding. The C1 superseded registry override and C2/C3 local concise tables were retired at their existing anchors. C2's `\cTwoValue`, `\cTwoOutcome`, `\cTwoMassHL`, and `\cTwoCDFHL` forward to primary, outcome, probability, and cumulative roles; `cTwoMassMarker=GTenHLProbability` and `cTwoCDFMarker=MathHLCumulativeColor`. Its opaque mass/CDF/guide graph inks remain separate (`blue!75!black`, `cyan!65!blue!80!black`, `cTwoMassColor!35`; black/black/gray when disabled). C3's one-argument `\FailureProb` now forwards to complementary probability; its expectation/probability graph inks retain their darker mixes and black disabled variants. The C8 existing detailed reference aligns mass, mean, variance and SD with the coordinated roles.
+G10 C1/C2 keep their local 0.6 mm horizontal / 0.3 mm vertical marker padding. The C1 superseded registry override and C2/C3 local concise tables were retired at their existing anchors. C2's `\cTwoValue`, `\cTwoOutcome`, `\cTwoMassHL`, and `\cTwoCDFHL` forward to primary, outcome, probability, and cumulative roles; `cTwoMassMarker=GTenHLProbability` and `cTwoCDFMarker=MathHLCumulativeColor`. Its opaque mass/CDF/guide graph inks remain separate (`blue!75!black`, `cyan!65!blue!80!black`, `cTwoMassColor!35`; black/black/gray when disabled). C3's one-argument `\SuccessProb` forwards to `\HLSuccessProbability` and `\FailureProb` to `\HLComplementProbability`; names, values and substitutions follow these wrappers. Its probability/break-even graph ink is `MathHLSuccessColor!50!black`; expectation ink is `ExpectedValueColor!55!black`, with black disabled variants. The C8 existing detailed reference aligns mass, mean, variance and SD with the coordinated roles.
 
-G11 C1 retains its group and statistic markers while its setup palette makes population means violet and population fractions blue; its explanatory prose and observation reference row agree. G11 C2 retires its local Symbol/Concept/Formula legend and removes the enclosing opening-guide minipage so the coordinated longtable can break across pages. Its `\CtwoSignificance` forwards to `\HLTailArea`, complete `\alpha/2` quantities remain together, and `\CtwoCI` still forwards to endpoints. Zero-argument `\CtwoCoverCount` and `\CtwoTotalCount` retain their calling convention and coverage meaning; their external confidence argument keeps its own role. Its central fill/cover/miss inks remain `CtwoConfidenceColor!55`, `GTenHLOutcome!70!black`, and `red!85!black` (disabled: `black!25`, black, black). Cover/miss line styles and symbols retain meaning independently of hue.
+G11 C1 retains its group and statistic markers while its setup palette leaves population means coral and population fractions pink; its explanatory prose and observation reference row agree. G11 C2 retires its local Symbol/Concept/Formula legend and removes the enclosing opening-guide minipage so the coordinated longtable can break across pages. Its `\CtwoSignificance` forwards to `\HLTailArea`, complete `\alpha/2` quantities remain together, and `\CtwoCI` still forwards to endpoints. Zero-argument `\CtwoCoverCount` and `\CtwoTotalCount` retain their calling convention and coverage meaning; their external confidence argument keeps its own role. Its central fill/cover/miss inks remain `CtwoConfidenceColor!55`, `GTenHLOutcome!70!black`, and `red!85!black` (disabled: `black!25`, black, black). Cover/miss line styles and symbols retain meaning independently of hue.
 
 G11 C3 selects the coordinated orange family before graph ink derivation. Theoretical `C_{\rm normal}` names and existing calculated coverage results use the cumulative role; nominal confidence keeps its separate cyan role. Its graph inks remain `CtwoSEColor!55!black`, `CtwoMoEColor!75!black`, `CtwoCriticalColor`, and `CtwoConfidenceColor!50!black`, all black when disabled. Its local `\CthreeTableHeader[alignment]{quantity}{qualifier}` (default alignment `r`, with two strut-bearing shortstack lines) and 0.4 mm graph-label padding are preserved. These target-scoped choices do not migrate slides, classrooms or outlines. Extended-reference expansion for the previously short/absent references remains outside this legend integration.
+
+### Probability-role reconciliation and preview
+
+General event probabilities and PMF masses use `\HLProbability` / `\GTenHLProbability`, light blue `GTenHLProbability` (`#86BFF0`). Success-model parameters (including individual break-even thresholds) use `\HLSuccessProbability`, the former complement mix `GTenHLProbability!65!CtwoCriticalColor`; complement parameters use `\HLComplementProbability`, the former registry success pink `#D74383`. The prior registry success wrapper was `\HLPopulationProportion`; its population-fraction meaning retains pink. The prior C3 `\SuccessProb` forwarding to general blue was inconsistent with that registry and now uses the dedicated success wrapper. A symbol such as $p_X(x)$ is a mass, not automatically a success parameter; unknown $q$ retains the unknown role. Cumulative probability and confidence remain separate roles.
+
+The success mix and complement alias are captured at registry load time, before any caller-scoped palette command. xcolor converts the success mix to HTML `6495DD`; the exact mix expression is authoritative. Confidence stays `CtwoConfidenceColor` (`#55C8F0`) through `\CtwoConfidence` / `\HLConfidence`, visibly more cyan than the general light blue at the unchanged fill opacity. Neither palette command changes these roles.
+
+[specific_highlights_view.tex](specific_highlights_view.tex) renders every registered key once, including legacy `G10-T2-C1`. Its per-entry group prevents palette leakage; coordinated entries additionally group their own palette selection. The preview uses A3 portrait and enabled highlights; G10 C10 remains an explicit pending notice, not a registry entry.
