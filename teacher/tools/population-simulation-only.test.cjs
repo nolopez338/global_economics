@@ -3,6 +3,12 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const root=path.resolve(__dirname,'../..'),read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const html=read('general_fundamentals/population_sample_simulation.html');
 const script=html.match(/<script>([\s\S]*?)<\/script>/)[1];
+test('both pages use the same Options controller while the public page stays self-contained',()=>{
+ const controller=read('assets/js/options-panel.js').replace(/\r\n/g,'\n').trim();
+ assert.ok(script.replace(/\r\n/g,'\n').includes(controller),'Keep the inline public controller synchronized with options-panel.js');
+ assert.match(read('general_fundamentals/population_sample_simulation_restricted.html'),/<script src="\.\.\/assets\/js\/options-panel\.js"><\/script>/);
+ assert.match(read('assets/js/population-simulation.js'),/initializeOptionsPanel\(\)/);
+});
 test('public simulation is self-contained, generated, and independent of survey assets and gate',()=>{
  assert.doesNotMatch(html,/survey|workbook|student_name|student_id|questionnaire|password|localStorage|fetch\s*\(|XMLHttpRequest|NAMES\s*=/i);
  assert.doesNotMatch(html,/<script[^>]+src=/i);
