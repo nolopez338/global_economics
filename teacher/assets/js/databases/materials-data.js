@@ -6128,6 +6128,14 @@ window.MATERIALS_DATA = [
     "Section": "B",
     "Class #": "2-1",
     "Date": "2026-11-19",
+    "Materials": []
+  },
+  {
+    "Grade": 11,
+    "Term": 2,
+    "Section": "B",
+    "Class #": "2-2",
+    "Date": "2026-11-23",
     "Materials": [
       {
         "Acronym": "C2P",
@@ -6148,14 +6156,6 @@ window.MATERIALS_DATA = [
         "Category": "classroom-activities"
       }
     ]
-  },
-  {
-    "Grade": 11,
-    "Term": 2,
-    "Section": "B",
-    "Class #": "2-2",
-    "Date": "2026-11-23",
-    "Materials": []
   },
   {
     "Grade": 11,

@@ -5054,10 +5054,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 2,
-    "Description": "C2: Interpret estimates and long-run confidence coverage",
+    "Description": "No Class: Godchildren meeting",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C2: Interpret estimates and long-run confidence coverage"
+    "Summary": "No Class"
   },
   {
     "Grade": 11,
@@ -5067,10 +5067,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 3,
-    "Description": "No Class",
+    "Description": "C2: Interpret estimates and long-run confidence coverage",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "No Class"
+    "Summary": "C2: Interpret estimates and long-run confidence coverage"
   },
   {
     "Grade": 11,

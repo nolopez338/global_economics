@@ -19,6 +19,16 @@ function fixture() {
   return { meetings, lessons, catalog: lessons.map((l, i) => ({ Grade: 11, Term: 2, 'Class #': String(i + 1), lessonId: l.id })) };
 }
 const ids = source => source.meetings.filter(m => m.Status === 'scheduled').map(m => m['Lesson ID']);
+
+// Reconstruct only the corrected dates for tests of the frozen migration audit.
+function migrationSource() {
+  const source = w.readSource();
+  const from = findMeeting(source, 11, 'B', '2026-11-19');
+  const to = findMeeting(source, 11, 'B', '2026-11-23');
+  Object.assign(from, { Status: 'scheduled', Reason: '', 'Canceled summary': '', 'Lesson ID': to['Lesson ID'], Overrides: structuredClone(to.Overrides) });
+  Object.assign(to, { Status: 'canceled', Reason: '', 'Canceled summary': 'No Class', 'Lesson ID': '', Overrides: {} });
+  return source;
+}
 test('cancellation cascades complete assignments, keeps empty assessments, consumes one trailing Extra', () => {
   const source = fixture(), before = structuredClone(source);
   const result = cancel(source, w.key(source.meetings[0]), 'School event', options);
@@ -84,7 +94,7 @@ test('reject invalid references, assignments, duplicates, material overrides, st
   assert.throws(() => w.build(source), /Day must|meeting day/);
 });
 test('migration preserves all schedule content, base catalogs, and unrelated dated associations', () => {
-  const source = w.readSource(), actual = w.build(source), baseline = require('../migration-baseline.json');
+  const source = migrationSource(), actual = w.build(source), baseline = require('../migration-baseline.json');
   assert.equal(actual.schedule.length, 594); assert.equal(actual.materials.length, 522);
   for (const [name, data] of Object.entries(actual)) assert.equal(hash(data), baseline.baselineHashes[name], name);
   for (const name of ['schedule', 'baseSchedule', 'baseMaterials']) assert.equal(hash(actual[name]), baseline.originalHashes[name]);
@@ -97,9 +107,9 @@ test('migration preserves all schedule content, base catalogs, and unrelated dat
   assert.equal(hash(restored), baseline.originalHashes.materials);
   for (const m of source.meetings.filter(m => m.Status === 'canceled')) assert.deepEqual(actual.materials.find(r => r.Grade === m.Grade && r.Section === m.Section.toUpperCase() && r.Date === m.Date.replaceAll(' / ', '-')).Materials, []);
 });
-test('both corrected Grade 11 cancellations are idempotent and retain every assessment', () => {
+test('corrected Grade 11 cancellations are idempotent and retain every assessment', () => {
   const source = w.readSource();
-  for (const [section, date, expected] of [['A', '2026-11-18', 'C2:'], ['B', '2026-11-23', 'C3:']]) {
+  for (const [section, date, expected] of [['A', '2026-11-18', 'C2:'], ['B', '2026-11-19', 'C2:']]) {
     const meeting = findMeeting(source, 11, section, date);
     assert.equal(meeting.Status, 'canceled'); assert.equal(meeting['Lesson ID'], '');
     assert.deepEqual(cancel(source, w.key(meeting)), source);
@@ -108,6 +118,36 @@ test('both corrected Grade 11 cancellations are idempotent and retain every asse
     assert.equal(rows.filter(r => r.Description.includes('Learning Evidence')).length, 5);
     assert.equal(rows.filter(r => r.Description === 'Extra Class').length, 2);
   }
+});
+
+test('Grade 11B transfers only the November 19 assignment to November 23', () => {
+  const source = w.readSource(), before = migrationSource();
+  const from = findMeeting(source, 11, 'B', '2026-11-19');
+  const to = findMeeting(source, 11, 'B', '2026-11-23');
+  const original = findMeeting(before, 11, 'B', '2026-11-19');
+  assert.equal(from.Status, 'canceled');
+  assert.equal(from.Reason, ': Godchildren meeting');
+  assert.equal(from['Canceled summary'], '');
+  assert.equal(from['Lesson ID'], '');
+  assert.deepEqual(from.Overrides, {});
+  assert.equal(to.Status, 'scheduled');
+  assert.equal(to.Reason, ''); assert.equal(to['Canceled summary'], '');
+  assert.equal(to['Lesson ID'], '055bbd52-a251-4622-8f76-6adc7d87fb6e');
+  assert.equal(to['Lesson ID'], original['Lesson ID']);
+  assert.deepEqual(to.Overrides, original.Overrides);
+  const data = w.build(source), oldData = w.build(before);
+  const affected = row => row.Grade === 11 && row.Section === 'B' && ['2026 / 11 / 19', '2026 / 11 / 23', '2026-11-19', '2026-11-23'].includes(row.Date);
+  for (const name of Object.keys(data)) {
+    assert.deepEqual(data[name].filter(r => !affected(r)), oldData[name].filter(r => !affected(r)), name);
+  }
+  source.meetings.forEach((m, i) => w.identityFields.forEach(f => assert.equal(m[f], before.meetings[i][f])));
+  assert.deepEqual(source.meetings.filter(m => !affected(m)), before.meetings.filter(m => !affected(m)));
+  const schedule = data.schedule.filter(affected), materials = data.materials.filter(affected);
+  assert.equal(schedule[0].Description, 'No Class: Godchildren meeting');
+  assert.equal(schedule[1].Description, 'C2: Interpret estimates and long-run confidence coverage');
+  w.contentFields.forEach(f => assert.equal(schedule[1][f], oldData.schedule.find(r => r.Grade === 11 && r.Section === 'B' && r.Date === original.Date)[f]));
+  assert.deepEqual(materials[0].Materials, []);
+  assert.deepEqual(materials[1].Materials, oldData.materials.find(r => r.Grade === 11 && r.Section === 'B' && r.Date === '2026-11-19').Materials);
 });
 test('CSV round trip, deterministic generation, stale-output detection, failure before writes, migration rerun', () => {
   const source = w.readSource(); assert.deepEqual(w.readMeetings(w.writeMeetings(source.meetings)), source.meetings);
@@ -142,7 +182,7 @@ test('frontend schedule links find the exact generated material record after pos
   }
 });
 test('one-time migration imports the legacy snapshot without changing unrelated data', () => {
-  const source = w.readSource(), data = w.build(source), baseline = require('../migration-baseline.json');
+  const source = migrationSource(), data = w.build(source), baseline = require('../migration-baseline.json');
   for (const removed of baseline.removedCanceledMaterials) {
     const [grade, section, date] = removed.meeting.split('|');
     data.materials.find(m => m.Grade === +grade && m.Section === section.toUpperCase() && m.Date === date.replaceAll(' / ', '-')).Materials = removed.Materials;
