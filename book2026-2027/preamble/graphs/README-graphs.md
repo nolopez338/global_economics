@@ -4,6 +4,8 @@
 
 Reusable LaTeX macros for economic and probability graphs in the 2026–2027 teaching materials.
 
+For mathematical highlights, palettes, records, legends, and viewers, start at [specific_highlights_index.md](../highlights/specific_highlights_index.md).
+
 ## Files
 
 | File | Type | Purpose |

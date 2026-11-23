@@ -1,11 +1,11 @@
 ---
 name: update-specific-highlights-summary
-description: Update or recreate the fixed specific_highlights.md reference from the repository's live LaTeX legend registry and shared highlights. Use for summary maintenance, not legend design or LaTeX authoring; no parameters required.
+description: Maintain the coordinated specific_highlights_XX.md documentation family from the repository's live LaTeX legend registry and shared highlights. Use for summary maintenance, not legend design or LaTeX authoring; no parameters required.
 ---
 
 # Update Specific Highlights Summary
 
-Update only `book2026-2027/preamble/graphs/specific_highlights.md`. Do not modify LaTeX sources, palettes, legends, other documentation, or authoring skills. Invocation requires no arguments or follow-up information.
+Start at [specific_highlights_index.md](../../../book2026-2027/preamble/highlights/specific_highlights_index.md) and update only the affected `specific_highlights_XX.md` family documents beside it. Do not recreate the removed monolithic summary or proposal, or create another overview. Do not modify LaTeX sources, palettes, legends, unrelated documentation, or authoring skills. Invocation requires no arguments or follow-up information.
 
 ## Locate and read
 
@@ -13,9 +13,9 @@ Resolve this loaded skill's absolute location and walk its ancestors to find the
 
 Read these small files directly on every invocation, using absolute paths from the resolved root:
 
-- `book2026-2027/preamble/graphs/specific_highlights.tex`: authoritative registry and legend definitions.
-- `book2026-2027/preamble/graphs/highlights.tex`: authoritative shared colors, wrappers, and rendering.
-- `book2026-2027/preamble/graphs/specific_highlights.md`, if present: initial presentation reference, never authority over LaTeX.
+- `book2026-2027/preamble/highlights/specific_highlights.tex`: public registry loader; follow its live catalog, dataset, table and compatibility dependencies.
+- `book2026-2027/preamble/highlights/highlights.tex`: public marker loader; follow its live palette, renderer and role dependencies.
+- `book2026-2027/preamble/highlights/specific_highlights_index.md`, if present: initial presentation reference, never authority over LaTeX.
 
 Follow additional local dependencies only to resolve legend content or color behavior. Do not build a persistent source cache. If a required source is missing or a definition cannot be resolved, report the specific gap; do not invent a mapping or claim full currency. Keep the output untouched when required sources are missing. For a partially unresolved definition, either retain the output with a clear limitation in the report or explicitly mark the unresolved portion in the summary; never present stale material as verified.
 
@@ -23,10 +23,10 @@ Follow additional local dependencies only to resolve legend content or color beh
 
 Inspect actual definitions, aliases, helper calls, optional branches, nested redefinitions, groups, and `colorlet` overrides. Comments and search/extraction results are supporting evidence, not a LaTeX interpreter. Trace each registered `practicehighlightlegend@...` key to its effective content, including aliases and slide variants. Trace wrapper calls to the color identifiers they actually reference; names and prefixes do not determine criterion usage.
 
-Maintain a concise English reference with relative source links, readable Markdown math, and tables where comparisons benefit. Preserve accurate explanations and useful organization, adapting sections as legend families evolve. Include:
+Maintain coordinated English module references with relative source links. Keep the index and editing guide short. Detailed inventories belong to their owning module documents, each with authoritative source links, dependencies, edit boundaries and an index backlink. Point to LaTeX records rather than creating a second editable mathematical catalog. Preserve accurate explanations and useful organization, adapting sections as legend families evolve. Include:
 
 - Loading order and guards, registry invocation, and unknown-key behavior.
-- Every live registered key, its concepts, notation, meanings, and presentation differences. Remove obsolete entries and mappings; keep shared definitions that remain live even if one registry consumer disappears. Do not hard-code counts or a fixed family list.
+- Every live registered key and its presentation differences, with pointers to authoritative concept/context records and explicit memberships. Remove obsolete entries and mappings; keep shared definitions that remain live even if one registry consumer disappears. Do not hard-code counts or a fixed family list.
 - Semantic wrappers and their actual color identifiers; relevant base colors with exact source identifiers and hex values; command/color aliases and exact xcolor mix expressions.
 - Local palette overrides, where they are applied, their grouping/scope, and differences from shared defaults. Distinguish a palette command's caller-controlled scope from a legend's grouped invocation.
 - Shared row helpers, their arguments (including optional defaults/branches), row order, and reveal behavior where these affect the legend. Describe local helper redefinitions separately from shared behavior.

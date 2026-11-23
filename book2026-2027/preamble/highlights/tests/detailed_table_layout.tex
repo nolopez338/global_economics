@@ -1,0 +1,53 @@
+% Run from preamble/highlights:
+% pdflatex -halt-on-error -output-directory=<isolated-directory> tests/detailed_table_layout.tex
+% Checks natural rendered widths, two-line-header minimum, local linewidth,
+% highlight toggles, explicit union paragraphs and table-setting isolation.
+% Inspect the resulting PDF too; dimension assertions do not detect overlap.
+\documentclass{article}
+\usepackage{array,longtable,booktabs,etoolbox,amsmath,amssymb}
+\input{highlights.tex}
+\input{specific_highlights.tex}
+\newsavebox{\ExpectedNotation}
+\newlength{\OriginalTabcolsep}
+\setlength{\OriginalTabcolsep}{\tabcolsep}
+\HighlightDeclareConcept{layout-test}{role={context},name={Test concept},
+  notation={$u$},brief={Brief meaning.},definition={Definition.},source={tests/detailed_table_layout.tex}}
+\HighlightDeclareContext{layout-test-a}{concept={layout-test},grade={10},term={1},criteria={1},
+  variant={test},notation={$u$},examples={First notation.},source={tests/detailed_table_layout.tex}}
+\HighlightDeclareContext{layout-test-b}{concept={layout-test},grade={10},term={1},criteria={2},
+  variant={test},notation={$v$},examples={Second notation.},source={tests/detailed_table_layout.tex}}
+\HighlightDeclareReference{layout-test}{status={available},members={layout-test-a,layout-test-b}}
+\begin{document}
+\section*{Natural width including highlight padding}
+\sbox{\ExpectedNotation}{$\GTenHLValue{\mathbb E}[\GTenHLSecond{Y_{\mathrm{alternative}}}]$}
+\HighlightDetailedTable{%
+  \relax\ifdim\linewidth<\maxdimen
+    \ifdim\dimexpr\linewidth-\wd\ExpectedNotation\relax>.01pt
+      \errmessage{Notation column exceeds widest body entry}\fi
+    \ifdim\dimexpr\wd\ExpectedNotation-\linewidth\relax>.01pt
+      \errmessage{Notation column clips highlight padding}\fi
+  \fi
+  $\GTenHLValue{\mathbb E}[\GTenHLSecond{Y_{\mathrm{alternative}}}]$ &
+  Expected value & A mathematical expectation. & One complete unwrapped entry.\\
+  $X$ & Variable & A variable. & A short entry must not set the width.\\}
+\ifdim\tabcolsep=\OriginalTabcolsep\else\errmessage{Table spacing leaked}\fi
+\section*{Two-line header minimum with highlights off}
+\GTenHighlightsfalse
+\sbox{\ExpectedNotation}{\shortstack[l]{\textbf{Symbol or}\\\textbf{notation}}}
+\begingroup\small
+\setlength{\linewidth}{.9\linewidth}
+% The header box must be measured at the actual table font size.
+\sbox{\ExpectedNotation}{\shortstack[l]{\textbf{Symbol or}\\\textbf{notation}}}
+\HighlightDetailedTable{%
+  \relax\ifdim\linewidth<\maxdimen
+    \ifdim\dimexpr\linewidth-\wd\ExpectedNotation\relax>.01pt
+      \errmessage{Short notation did not use the two-line-header minimum}\fi
+    \ifdim\dimexpr\wd\ExpectedNotation-\linewidth\relax>.01pt
+      \errmessage{Two-line header does not fit}\fi
+  \fi
+  $\GTenHLValue{X}$ & Variable & Definition. & Highlights off retains notation.\\}
+\endgroup
+\section*{Union notation with deliberate paragraph breaks}
+\HighlightSelectReference{layout-test}
+\HighlightRenderSelected{detailed}
+\end{document}

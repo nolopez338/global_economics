@@ -13,7 +13,7 @@ Deliver revised source and a matching, inspected PDF. Perform the ordered proces
 - Read the actual class, preamble, included definitions, relevant neighboring conventions, and applicable instructions. Reuse shared macros and relative inputs; retain intentional inline preambles and portability in standalone Beamer decks. Inspect consumers before changing a shared definition and verify affected consumers afterward.
 - Preserve task/solution navigation and stable labels. Common commands include `\QuestionsTasks`, `\SectionProblemsTableOfContents`, `\SectionProblemLink`, and `\secInicio`; read their current definitions before changing their usage.
 - Preserve mathematical meaning, units, assumptions, answer boundaries, and official criterion wording. Check changed calculations and dependent results. Keep independent/assessed work unsolved in student copies.
-- Respect document-specific formatting. Classroom activities omit instructional highlights; other documents may use shared highlight renderers and the legend registry under `book2026-2027/preamble/graphs/`. Preserve existing toggle settings and concept-notation-value roles. Concise legends and detailed references serve different purposes. Do not impose either on a document that does not need it.
+- Respect document-specific formatting. Classroom activities omit instructional highlights; other documents may use shared highlight renderers and the legend registry under `book2026-2027/preamble/highlights/`. Preserve existing toggle settings and concept-notation-value roles. Concise legends and detailed references serve different purposes. Do not impose either on a document that does not need it.
 - Prefer suitable local widths, wrapping, semantic consolidation, and splitting oversized material over tiny fonts, whole-table/frame scaling, or negative-spacing patches. Beamer reveals should reserve dimensions and preserve logical frame numbers.
 - Consult an available authoring, legend, or highlight skill only for an applicable responsibility. Apply relevant document rules without restarting completed work or importing unrelated content requirements.
 
@@ -37,6 +37,10 @@ Keep helpers local and narrowly scoped: no automatic downloads, document modific
 ## Validation asset index
 
 - [Verification workflow](references/verification-workflow.md): ordered source, build, log, mathematical, navigation, visual, variant, and final-delivery checks for LaTeX handouts and Beamer slides. Use on every complete update. This is the initial reusable process; add concrete helpers here as they are developed and exercised.
+
+- [PDF review renderer](scripts/render_pdf_review.py): render every PDF page plus numbered contact sheets for manual fit/overlap review. Requires Python, pypdfium2 and Pillow; use the bundled workspace Python. Run `python render_pdf_review.py input.pdf output-directory --dpi 90`; CLI help documents arguments, outputs, failures and limits. This does not detect overlap or replace inspecting the images.
+
+- [PDF rendering comparison](scripts/compare_pdf_rendering.py): compare every page of two PDFs using the same PDFium renderer with zero pixel tolerance. Use for visual-preservation refactors; optional page-count and physical-size assertions, per-page images and JSON reports support inspection. CLI help documents dependencies and limitations. Does not replace content review or manual inspection.
 
 ## Delivery
 

@@ -1,0 +1,189 @@
+% Authoritative declaration and selection interfaces. No table interception.
+\ifdefined\HighlightsCatalogLoaded\endinput\fi
+\let\HighlightsCatalogLoaded\relax
+\RequirePackage{xparse}
+\ExplSyntaxOn
+\cs_generate_variant:Nn \clist_map_inline:nn {en}
+\seq_new:N \g_hl_concepts_seq
+\seq_new:N \g_hl_contexts_seq
+\seq_new:N \g_hl_references_seq
+\seq_new:N \g_hl_selected_seq
+\seq_new:N \g_hl_union_seq
+\prop_new:N \l_hl_record_prop
+\tl_new:N \l_hl_id_tl
+\tl_new:N \l_hl_value_tl
+\tl_new:N \l_hl_example_tl
+\tl_new:N \l_hl_grade_tl
+\tl_new:N \l_hl_term_tl
+\tl_new:N \l_hl_schema_tl
+\tl_new:N \l_hl_member_rows_tl
+\seq_new:N \l_hl_example_contexts_seq
+\keys_define:nn { highlights/record }
+ {
+  role .code:n = \prop_put:Nnn \l_hl_record_prop {role}{#1},
+  name .code:n = \prop_put:Nnn \l_hl_record_prop {name}{#1},
+  notation .code:n = \prop_put:Nnn \l_hl_record_prop {notation}{#1},
+  brief .code:n = \prop_put:Nnn \l_hl_record_prop {brief}{#1},
+  definition .code:n = \prop_put:Nnn \l_hl_record_prop {definition}{#1},
+  source .code:n = \prop_put:Nnn \l_hl_record_prop {source}{#1},
+  concept .code:n = \prop_put:Nnn \l_hl_record_prop {concept}{#1},
+  grade .code:n = \prop_put:Nnn \l_hl_record_prop {grade}{#1},
+  term .code:n = \prop_put:Nnn \l_hl_record_prop {term}{#1},
+  criteria .code:n = \prop_put:Nnn \l_hl_record_prop {criteria}{#1},
+  variant .code:n = \prop_put:Nnn \l_hl_record_prop {variant}{#1},
+  examples .code:n = \prop_put:Nnn \l_hl_record_prop {examples}{#1},
+  meaning .code:n = \prop_put:Nnn \l_hl_record_prop {meaning}{#1},
+  display .code:n = \prop_put:Nnn \l_hl_record_prop {display}{#1},
+  legacy-key .code:n = \prop_put:Nnn \l_hl_record_prop {legacy-key}{#1},
+  status .choice:,
+  status / available .code:n = \prop_put:Nnn \l_hl_record_prop {status}{available},
+  status / pending .code:n = \prop_put:Nnn \l_hl_record_prop {status}{pending},
+  members .code:n = \prop_put:Nnn \l_hl_record_prop {members}{#1},
+  renderer .code:n = \prop_put:Nnn \l_hl_record_prop {renderer}{#1}
+ }
+\msg_new:nnn {highlights}{duplicate}{Duplicate~#1~record.}
+\msg_new:nnn {highlights}{missing}{Unknown~#1~record.}
+\cs_new_protected:Npn \hl_declare:nnn #1#2#3
+ {
+  \prop_if_exist:cTF {g_hl_#1_#2_prop}
+   {\msg_error:nnn {highlights}{duplicate}{#1/#2}}
+   {
+    \prop_clear:N \l_hl_record_prop
+    \keys_set:nn {highlights/record}{#3}
+    \prop_put:Nnn \l_hl_record_prop {id}{#2}
+    \prop_new:c {g_hl_#1_#2_prop}
+    \prop_gset_eq:cN {g_hl_#1_#2_prop} \l_hl_record_prop
+    \seq_gput_right:cn {g_hl_#1s_seq}{#2}
+   }
+ }
+\NewDocumentCommand \HighlightDeclareConcept {m +m}
+ {\hl_declare:nnn {concept}{#1}{#2}}
+\NewDocumentCommand \HighlightDeclareContext {m +m}
+ {
+  \hl_declare:nnn {context}{#1}{#2}
+  \tl_set:Nx \l_hl_id_tl {\prop_item:cn {g_hl_context_#1_prop}{concept}}
+  \prop_if_exist:cTF {g_hl_concept_\l_hl_id_tl _prop}
+   {
+    \prop_get:cnNTF {g_hl_concept_\l_hl_id_tl _prop}{contexts}\l_hl_value_tl
+     {\tl_put_right:Nn \l_hl_value_tl {,#1}}
+     {\tl_set:Nn \l_hl_value_tl {#1}}
+    \prop_gput:cnV {g_hl_concept_\l_hl_id_tl _prop}{contexts}\l_hl_value_tl
+   }
+   {\msg_error:nnx {highlights}{missing}{concept/\l_hl_id_tl}}
+ }
+\NewDocumentCommand \HighlightDeclareReference {m +m}
+ {
+  \hl_declare:nnn {reference}{#1}{#2}
+  \clist_map_inline:en {\prop_item:cn {g_hl_reference_#1_prop}{members}}
+   {
+    \prop_if_exist:cF {g_hl_context_##1_prop}
+     {\msg_error:nnn {highlights}{missing}{context/##1}}
+   }
+ }
+\NewExpandableDocumentCommand \HighlightConceptField {mm}
+ {\prop_item:cn {g_hl_concept_#1_prop}{#2}}
+\NewExpandableDocumentCommand \HighlightContextField {mm}
+ {\prop_item:cn {g_hl_context_#1_prop}{#2}}
+\NewExpandableDocumentCommand \HighlightReferenceField {mm}
+ {\prop_item:cn {g_hl_reference_#1_prop}{#2}}
+\cs_new:Npn \hl_effective:nn #1#2
+ {
+  \prop_if_in:cnTF {g_hl_context_#1_prop}{#2}
+   {\prop_item:cn {g_hl_context_#1_prop}{#2}}
+   {\prop_item:cn {g_hl_concept_\prop_item:cn {g_hl_context_#1_prop}{concept}_prop}{#2}}
+ }
+\NewExpandableDocumentCommand \HighlightEffectiveField {mm}
+ {\hl_effective:nn {#1}{#2}}
+\cs_new_protected:Npn \hl_select_reference:n #1
+ {
+  \prop_if_exist:cTF {g_hl_reference_#1_prop}
+   {
+    \clist_map_inline:en {\prop_item:cn {g_hl_reference_#1_prop}{members}}
+     {\seq_if_in:NnF \g_hl_selected_seq {##1}
+       {\seq_gput_right:Nn \g_hl_selected_seq {##1}}}
+   }
+   {\msg_error:nnn {highlights}{missing}{reference/#1}}
+ }
+\cs_new_protected:Npn \hl_select:nn #1#2
+ {
+  \seq_gclear:N \g_hl_selected_seq
+  \clist_map_inline:nn {10,11}
+   {\str_if_eq:nnT {#1}{all}{\hl_select_grade:nn {##1}{#2}}
+    \str_if_eq:nnT {#1}{##1}{\hl_select_grade:nn {##1}{#2}}}
+ }
+\cs_new_protected:Npn \hl_select_grade:nn #1#2
+ {
+  \clist_map_inline:nn {1,2,3}
+   {\str_if_eq:nnT {#2}{all}{\hl_select_reference:n {G#1-T##1-full}}
+    \str_if_eq:nnT {#2}{##1}{\hl_select_reference:n {G#1-T##1-full}}}
+ }
+\cs_new_protected:Npn \hl_union_add:nnn #1#2#3
+ {
+  \seq_if_exist:cF {g_hl_union_#1_#2_seq}
+   {\seq_new:c {g_hl_union_#1_#2_seq}}
+  \tl_if_blank:nF {#3}
+   {\seq_if_in:cnF {g_hl_union_#1_#2_seq}{#3}
+     {\seq_gput_right:cn {g_hl_union_#1_#2_seq}{#3}}}
+ }
+\cs_generate_variant:Nn \hl_union_add:nnn {VnV}
+\cs_new_protected:Npn \hl_get_effective:nnN #1#2#3
+ {
+  \prop_get:cnNTF {g_hl_context_#1_prop}{#2}#3
+   {}
+   {\prop_get:cnNTF {g_hl_concept_\l_hl_id_tl _prop}{#2}#3
+     {}{\tl_clear:N #3}}
+ }
+\cs_new_protected:Npn \hl_union_context:n #1
+ {
+  \tl_set:Nx \l_hl_id_tl {\HighlightContextField{#1}{concept}}
+  \seq_if_in:NVF \g_hl_union_seq \l_hl_id_tl
+   {\seq_gput_right:NV \g_hl_union_seq \l_hl_id_tl}
+  \clist_map_inline:nn {notation,brief,definition,meaning}
+   {
+    \hl_get_effective:nnN {#1}{##1}\l_hl_value_tl
+    \hl_union_add:VnV \l_hl_id_tl {##1}\l_hl_value_tl
+   }
+  \prop_get:cnN {g_hl_context_#1_prop}{examples}\l_hl_value_tl
+  \tl_if_blank:VF \l_hl_value_tl
+   {
+    % Deduplicate the statement before adding provenance labels. Two contexts
+    % with identical example text remain discoverable through their IDs.
+    \hl_union_add:VnV \l_hl_id_tl {examples}\l_hl_value_tl
+   }
+ }
+\cs_new_protected:Npn \hl_collect_selected:
+ {
+  \seq_map_inline:Nn \g_hl_union_seq
+   {\clist_map_inline:nn {notation,brief,definition,meaning,examples}
+     {\seq_if_exist:cT {g_hl_union_##1_####1_seq}
+       {\seq_gclear:c {g_hl_union_##1_####1_seq}}}}
+  \seq_gclear:N \g_hl_union_seq
+  \seq_map_function:NN \g_hl_selected_seq \hl_union_context:n
+ }
+\NewDocumentCommand \HighlightSelect {mm}
+ {\hl_select:nn {#1}{#2}\hl_collect_selected:}
+\NewDocumentCommand \HighlightSelectReference {m}
+ {\seq_gclear:N \g_hl_selected_seq\hl_select_reference:n {#1}\hl_collect_selected:}
+\NewDocumentCommand \HighlightAppendReference {m}
+ {\hl_select_reference:n {#1}\hl_collect_selected:}
+\NewDocumentCommand \HighlightForEachMember {m +m}
+ {
+  % Finish list bookkeeping before emitting alignment tokens. In particular,
+  % a following booktabs rule must see the final row break immediately.
+  \tl_clear:N \l_hl_member_rows_tl
+  \clist_map_inline:en {\HighlightReferenceField{#1}{members}}
+   {\tl_put_right:Nn \l_hl_member_rows_tl {#2{##1}}}
+  \tl_use:N \l_hl_member_rows_tl
+ }
+\NewDocumentCommand \HighlightReference {m O{detailed}}
+ {
+  \prop_if_exist:cTF {g_hl_reference_#1_prop}
+   {\str_if_eq:eeTF {\HighlightReferenceField{#1}{status}}{pending}
+     {Reference~not~yet~available.}
+     {\group_begin:\CoordinatedTermTwoPalette
+      \HighlightSelectReference{#1}\HighlightRenderSelected{#2}\group_end:}}
+   {\msg_error:nnn {highlights}{missing}{reference/#1}}
+ }
+\NewDocumentCommand \SpecificHighlightCollectUnion {mm}
+ {\HighlightSelect{#1}{#2}}
+\ExplSyntaxOff

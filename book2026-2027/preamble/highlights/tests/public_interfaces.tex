@@ -1,0 +1,95 @@
+% Run from preamble/highlights: pdflatex -halt-on-error -output-directory=<temp> tests/public_interfaces.tex
+\input{../preamble.tex}
+% Tone-only loading must not capture the later base aliases prematurely.
+\input{tone_highlight_colors.tex}
+\definecolor{ConeToneValueColor}{HTML}{000000}
+\input{highlights.tex}
+\GTenHighlightsfalse
+\input{highlights.tex}
+\ifGTenHighlights\errmessage{Repeated marker loading reset the switch}\fi
+\input{specific_highlights.tex}
+\input{specific_highlights.tex}
+\input{tone_specific_highlights.tex}
+\input{g11_tone_highlights.tex}
+\input{specific_highlights_unions.tex}
+\HighlightViewerLongtableFix
+\ifGTenHighlights\errmessage{Registry loading reset the switch}\fi
+\newcommand{\AssertColor}[2]{%
+  \convertcolorspec{named}{#1}{HTML}\ActualColor
+  \def\ExpectedColor{#2}%
+  \ifx\ActualColor\ExpectedColor\else\errmessage{Unexpected color #1}\fi}
+\AssertColor{ExpectedValueColor}{6500A8}
+\AssertColor{ConeToneValueColor}{FFBB55}
+\AssertColor{GTenHLValue}{FFBB55}
+\AssertColor{CtwoEndpointColor}{A75A27}
+\AssertColor{CtwoTtwoEndpointColor}{A75A27}
+\begingroup
+\CoordinatedTermTwoPalette
+\AssertColor{ExpectedValueColor}{D6A52A}
+\AssertColor{CtwoTtwoEndpointColor}{A75A27}
+\endgroup
+\AssertColor{ExpectedValueColor}{6500A8}
+\begingroup
+\renewcommand{\HLTtwoProbability}[1]{\def\Forwarded{#1}}
+\HLProbability{forwarding works}
+\def\ExpectedForward{forwarding works}
+\ifx\Forwarded\ExpectedForward\else\errmessage{Forwarding was captured}\fi
+\endgroup
+\ExplSyntaxOn
+\HighlightSelect{all}{all}
+\clist_map_inline:nn
+ {success-probability,population-proportion,poisson-expected-count,
+  exponential-rate,sample-standard-deviation,standard-error,complement-probability}
+ {\seq_if_in:NnF \g_hl_union_seq {#1}{\errmessage{Missing distinct concept #1}}}
+\seq_if_in:NnT \g_hl_union_seq {decision-complement}
+ {\errmessage{The identical complement concept was not merged}}
+\HighlightSelect{11}{2}
+\seq_map_inline:Nn \g_hl_selected_seq
+ {\str_if_eq:eeF {\HighlightContextField{#1}{grade}}{11}{\errmessage{Grade leak}}
+  \str_if_eq:eeF {\HighlightContextField{#1}{term}}{2}{\errmessage{Term leak}}}
+\ExplSyntaxOff
+% A fixture-only reference tests union identity independently of course data.
+\HighlightDeclareConcept{test-union-identity}{role={context},name={Test concept},
+  notation={$u$},brief={Test meaning.},definition={Test definition.},source={tests/public_interfaces.tex}}
+\HighlightDeclareContext{test-context-a}{concept={test-union-identity},grade={10},term={1},
+  criteria={1},variant={test},notation={$u$},examples={Shared test statement.},source={tests/public_interfaces.tex}}
+\HighlightDeclareContext{test-context-b}{concept={test-union-identity},grade={10},term={1},
+  criteria={2},variant={test},notation={$v$},examples={Shared test statement.},source={tests/public_interfaces.tex}}
+\HighlightDeclareReference{test-reference}{status={available},members={test-context-a,test-context-b}}
+\HighlightSelectReference{test-reference}
+\ExplSyntaxOn
+\int_compare:nNnF {\seq_count:c {g_hl_union_test-union-identity_examples_seq}}={1}
+ {\errmessage{An identical example was duplicated}}
+\int_compare:nNnF {\seq_count:c {g_hl_union_test-union-identity_notation_seq}}={2}
+ {\errmessage{Context notation was lost}}
+\ExplSyntaxOff
+\geometry{a3paper,margin=20mm}
+\begin{document}
+% The adapters must resolve inherited fields after context deduplication.
+\setbox0=\hbox{\csuse{g11tone@concept@variable}}
+\ifdim\wd0>1pt\else\errmessage{Inherited Term 1 concept disappeared}\fi
+\setbox0=\hbox{\SpecificHighlightCatalogConcept{10}{outcome}}
+\ifdim\wd0>1pt\else\errmessage{Inherited Term 2 concept disappeared}\fi
+\setbox0=\hbox{Mathematical content 123}
+\setbox2=\hbox{\GTenHLValue{Mathematical content 123}}
+\ifdim\wd0=\wd2\else\errmessage{Disabled marker changed text}\fi
+Disabled math: $\HLSampleSD{s}/\sqrt{\HLObservationCount{n}}$.
+\HighlightReference{G10-T3-full}
+\HighlightReference{G11-T3-full}
+\GTenHighlightstrue
+Text and script styles: \GTenHLValue{variable},
+$\GTenHLValue{X}_{\GTenHLSecond{i}}^{\GTenHLThird{2}}$.
+\COneTonePracticePalette
+\begin{tikzpicture}
+\draw[COne Tone density curve] (0,0)--(2,1);
+\fill[COne Tone probability area] (0,0)--(2,1)--(2,0)--cycle;
+\node at (1,-.4) {Graph information retained};
+\end{tikzpicture}
+\PracticeHighlightLegend{G10-T2-C8}
+\PracticeHighlightLegend{G11-T2-C1-slides}
+\PracticeHighlightLegend{G11-T1-C4}
+\COneToneDetailedReference{C4}
+\COneToneCatalog
+\HighlightReference{test-reference}
+\begingroup\GTenToneSchoolContext\GTenToneReference{C1-C2}\endgroup
+\end{document}

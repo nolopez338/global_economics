@@ -1,0 +1,1548 @@
+% ==========================================================================
+% 1. DOCUMENT SETUP AND PACKAGES
+% ==========================================================================
+% EDIT MAP
+% Content: block 4, in page/section order; each row keeps its examples nearby.
+% Typography/palettes/default spacing: block 2. All pt/mm values are LOGICAL
+% A3 dimensions unless explicitly marked physical; printing applies 5/6 once.
+% Highlights and measured table geometry: block 3. Preserve trailing % signs:
+% they suppress real inter-cell glue, especially around overlay/measurement boxes.
+% Local groups in block 4 deliberately override defaults; do not lift their
+% settings into shared defaults. Native TikZ graphs remain beside their context.
+\documentclass{article}
+\usepackage[a3paper,portrait,hmargin=6mm,top=7mm,bottom=7mm]{geometry}
+\usepackage{pgfpages}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor,colortbl}
+\usepackage{tikz}
+\usepackage{tabularx,array}
+\usepackage{etoolbox} % Explicit dependency: \pretocmd patches table struts.
+\usepackage{collcell} % Collect native math cells in composite example arrays.
+% expl3 (\ExplSyntaxOn below) is provided by the current LaTeX kernel.
+
+% ==========================================================================
+% 2. SHARED SETTINGS: GEOMETRY, PALETTES, TYPOGRAPHY, SPACING
+% ==========================================================================
+% Retain the A3 composition as the logical typesetting canvas; the physical
+% output below is exactly 250 x 350 mm. Fonts below account for the 5/6 scale.
+% Uniform 5/6 scaling: 297 x 420 mm becomes 247.5 x 350 mm.
+% Centering adds 1.25 mm at each side to absorb the aspect-ratio difference.
+\pgfpagesdeclarelayout{poster-board-eighth}{}{%
+  \pgfpagesphysicalpageoptions{logical pages=1,
+    physical width=250mm,physical height=350mm}%
+  \pgfpageslogicalpageoptions{1}{scale=0.833333333,
+    center=\pgfpoint{125mm}{175mm}}%
+}
+\pgfpagesuselayout{poster-board-eighth}
+\pagestyle{empty}
+% Use scalable mathematical operators at the reference text sizes.
+\input{omxlmex.fd}
+\DeclareFontShape{OMX}{lmex}{m}{n}{<->lmex10}{}
+% Central group palettes: dark ink, instructional accent, and quiet table rules.
+% Group A retains the original colors; group B uses coordinated cool teals.
+\definecolor{PosterAInk}{HTML}{172C3C}
+\definecolor{PosterAAccent}{HTML}{BF604D}
+\definecolor{PosterARule}{HTML}{A5AFB6}
+\definecolor{PosterBInk}{HTML}{17383B}
+\definecolor{PosterBAccent}{HTML}{287C7A}
+\definecolor{PosterBRule}{HTML}{91AAA9}
+% Existing semantic aliases also drive the unchanged panel tints and markers.
+% Select after a page break so the preceding page retains its own palette.
+\newcommand{\selectposterpalette}[1]{%
+  \colorlet{PosterInk}{Poster#1Ink}%
+  \colorlet{PosterAccent}{Poster#1Accent}%
+  \colorlet{PosterRule}{Poster#1Rule}%
+}
+\selectposterpalette{A}
+\color{PosterInk}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\setlength{\arrayrulewidth}{0.3pt}
+% Central typography controls, explicitly applied in table cells.
+% Printed sizes are 5/6 of these logical sizes: body 10.83 pt,
+% examples 10.67 pt, symbols 11.67 pt, table labels/notes 10.33 pt.
+\newcommand{\TitleFont}{\fontsize{27}{30}\selectfont\bfseries}
+\newcommand{\KickerFont}{\fontsize{13}{15}\selectfont\bfseries}
+\newcommand{\HeadingFont}{\fontsize{17}{20}\selectfont\bfseries}
+\newcommand{\DefinitionFont}{\fontsize{13}{15}\selectfont}
+\newcommand{\SymbolFont}{\fontsize{14}{16}\selectfont}
+\newcommand{\ExampleFont}{\fontsize{12.8}{14.8}\selectfont}
+\newcommand{\TableHeadFont}{\fontsize{12.4}{14.4}\selectfont\bfseries}
+\newcommand{\FooterFont}{\fontsize{12.4}{14.4}\selectfont}
+\DeclareMathSizes{12.6}{12.6}{8.8}{6.6}
+\DeclareMathSizes{14}{14}{9.8}{7}
+\DeclareMathSizes{13}{13}{9.1}{6.8}
+\DeclareMathSizes{12.8}{12.8}{9}{6.8}
+
+
+% Shared defaults: stretches are dimensionless; widths are linewidth fractions;
+% RowPadding is extra clearance on EACH side, in addition to 0.4 logical mm.
+\newcommand{\ExampleLineStretch}{1.12}
+\newcommand{\TightExampleSpacing}{}
+\newcommand{\MeasuredLineStretch}{1}
+\newcommand{\ContextHeading}{Example contexts}
+\newcommand{\SymbolColumnFraction}{.24}
+\newcommand{\MeaningColumnFraction}{.32}
+\newcommand{\PairExampleColumns}{r@{}E@{\quad}r@{}E}
+\newlength{\RowPadding}
+\setlength{\RowPadding}{0.7mm}
+% Shared highlight switch; overlays never replace native text or mathematics.
+\newif\ifPosterHighlights
+\PosterHighlightstrue
+% \PosterHighlightsfalse % Uncomment to disable instructional highlights.
+
+% ==========================================================================
+% 3. RENDERING HELPERS
+% ==========================================================================
+% 3.1 Native-metric highlight overlays (including integrals/fraction rules)
+% One restrained marker for the specific notation introduced in each row.
+% Rounded highlights keep even padding and the current math style.
+% Native symbol metrics preserve spacing and baselines; padding uses surrounding clearance.
+\newcommand{\notationhighlight}[1]{\ifPosterHighlights\mathpalette\highlightbackground{#1}\fi#1}
+\newcommand{\highlightbackground}[2]{\begingroup
+  % Paint only the background; the original symbol keeps its native math atom,
+  % italic correction, script attachment, and dimensions outside this overlay.
+  \raisebox{0pt}[0pt][0pt]{%
+  \makebox[0pt][l]{\hspace{-1.2pt}\tikz[baseline=(notationhighlight.base)]\node[
+    fill=PosterAccent!12,fill opacity=0.65,draw=none,rounded corners=2.6pt,
+    inner xsep=1.2pt,inner ysep=2.2pt,outer sep=0pt,
+    minimum width=0pt,minimum height=0pt
+  ] (notationhighlight) {$\mathsurround=0pt #1\phantom{#2}$};}%
+  }%
+  \endgroup}
+% Keep integral bounds on the native operator, including its italic correction;
+% the shared renderer paints behind the integral sign only.
+\newcommand{\notationintegral}[1]{\mathop{%
+  \mathopen{\ifPosterHighlights\mathpalette\highlightbackground{\int}\fi}#1}\nolimits}
+% Highlight the fraction rule alone, using the same renderer and toggle.
+% Keep the native fraction (and its numerator/denominator spacing) intact.
+\newsavebox{\FractionMeasure}
+\newlength{\FractionBarWidth}
+\newlength{\FractionAxis}
+\newlength{\FractionRule}
+\newcommand{\notationfraction}[2]{\mathinner{%
+  \mathopen{\ifPosterHighlights\mathpalette\notationfractionbar{{#1}{#2}}\fi}%
+  \frac{#1}{#2}}}
+\newcommand{\notationfractionbar}[2]{\notationfractionmeasure{#1}#2}
+\newcommand{\notationfractionmeasure}[3]{\begingroup
+  \sbox{\FractionMeasure}{$\mathsurround=0pt #1\frac{#2}{#3}$}%
+  \setlength{\FractionBarWidth}{\dimexpr\wd\FractionMeasure-2\nulldelimiterspace\relax}%
+  \ifx#1\displaystyle
+    \setlength{\FractionAxis}{\fontdimen22\textfont2}%
+    \setlength{\FractionRule}{\fontdimen8\textfont3}%
+  \else\ifx#1\textstyle
+    \setlength{\FractionAxis}{\fontdimen22\textfont2}%
+    \setlength{\FractionRule}{\fontdimen8\textfont3}%
+  \else\ifx#1\scriptstyle
+    \setlength{\FractionAxis}{\fontdimen22\scriptfont2}%
+    \setlength{\FractionRule}{\fontdimen8\scriptfont3}%
+  \else
+    \setlength{\FractionAxis}{\fontdimen22\scriptscriptfont2}%
+    \setlength{\FractionRule}{\fontdimen8\scriptscriptfont3}%
+  \fi\fi\fi
+  \raisebox{\dimexpr\FractionAxis-\FractionRule/2\relax}[0pt][0pt]{%
+    \makebox[0pt][l]{\hspace{\nulldelimiterspace}%
+      \highlightbackground{#1}{\rule{\FractionBarWidth}{\FractionRule}}}}%
+  \endgroup}
+
+
+% 3.2 Symmetric table struts (text tables only, never math arrays)
+% Text tables use a symmetric minimum row strut around the cell centers.
+% Keep its total height and leave mathematical arrays' internal spacing intact.
+\makeatletter
+\pretocmd{\@mkpream}{%
+  \ifx\@acol\@tabacol
+    \@tempdima=\dimexpr(\ht\@arstrutbox+\dp\@arstrutbox)/2\relax
+    \setbox\@arstrutbox=\hbox{\vrule width0pt height\@tempdima depth\@tempdima}%
+  \fi
+  }{}{\PackageError{notation-posters}{Cannot center table struts}{}}
+\makeatother
+
+% 3.3 Measured cells, aligned examples, and table renderers
+\newlength{\SymbolWidth}
+\newlength{\MeaningWidth}
+% Measure the complete cell (including wrapped text and tall mathematics),
+% then reserve the same clearance above and below its actual bounds.
+\newsavebox{\CellContent}
+% All table helpers share the same vertical center and local padding.
+% An extra 0.4 mm on each side gives A3 rows consistent breathing room.
+% Dispatch hook: normally identical to centeredcell; calculus locally fixes
+% header/reference clearance while body rows keep their own measured padding.
+\newcommand{\paddedcell}[1]{\centeredcell{#1}}
+\newcommand{\contextcell}[1]{%
+  \sbox{\CellContent}{#1}%
+  \raisebox{\dimexpr(\dp\CellContent-\ht\CellContent)/2\relax}{\usebox{\CellContent}}}
+\newcommand{\centeredcell}[1]{%
+  \sbox{\CellContent}{\begin{minipage}[t]{\linewidth}\raggedright #1\end{minipage}}%
+  \raisebox{\dimexpr(\dp\CellContent-\ht\CellContent)/2\relax}%
+    [\dimexpr(\ht\CellContent+\dp\CellContent)/2+\RowPadding+0.4mm\relax]%
+    [\dimexpr(\ht\CellContent+\dp\CellContent)/2+\RowPadding+0.4mm\relax]%
+    {\usebox{\CellContent}}%
+}
+% Keep each concept and its explanation in one measured Meaning cell.
+% Paragraphs work in the cell minipages and the paired/triple parboxes alike.
+\newcommand{\meaningexplanation}[1]{\textcolor{gray}{\textit{#1}}}
+\newcommand{\conceptmeaning}[2]{\begingroup
+  % Keep the concept and gray explanation close with readable A3 leading.
+  % Inherit the current body leading, including the dense calculus page.
+  #1\par #2\rule[-1pt]{0pt}{1pt}\par
+  \endgroup}
+\newsavebox{\ExampleContent}
+% Text-style r/E arrays preserve relation spacing and native operator sizes.
+\newcommand{\examplemath}[2][r@{}E]{\begingroup
+  \renewcommand{\arraystretch}{\ExampleLineStretch}%
+  \ifcsname NC@find@E\endcsname\else\newcolumntype{E}{>{{}}l}\fi%
+  \sbox{\ExampleContent}{$\begin{array}[t]{@{}#1@{}}#2\end{array}$}%
+  % Only overwide examples receive a small math-spacing correction.
+  % This preserves the font size, baselines, and all fitting examples.
+  \ifdim\wd\ExampleContent>\linewidth
+    \thickmuskip=4mu\relax\medmuskip=3mu\relax
+    \sbox{\ExampleContent}{$\begin{array}[t]{@{}#1@{}}#2\end{array}$}%
+  \fi
+  \ifdim\wd\ExampleContent>\linewidth
+    \TightExampleSpacing
+    \sbox{\ExampleContent}{$\begin{array}[t]{@{}#1@{}}#2\end{array}$}%
+  \fi
+  \usebox{\ExampleContent}\endgroup}
+\newcommand{\notationrow}[3]{%
+  \centeredcell{\centering\SymbolFont\ensuremath{\displaystyle #1}}&%
+  \centeredcell{\DefinitionFont #2}&\centeredcell{\ExampleFont #3}\\\hline
+}
+% Composite rows retain one shared example array for horizontal relation alignment.
+% Measure each logical row separately; center all its cells on that row's axis.
+\newsavebox{\PairFirst}
+\newsavebox{\PairSecond}
+\newsavebox{\PairThird}
+\newsavebox{\ExampleFirst}
+\newsavebox{\ExampleSecond}
+\newsavebox{\ExampleThird}
+\newsavebox{\CurrentExample}
+\newsavebox{\CurrentRow}
+\newlength{\ExampleWidth}
+\newcommand{\subrowcell}[1]{\begingroup
+  \setlength{\RowPadding}{0pt}\centeredcell{#1}\endgroup}
+\newcommand{\pairstrut}[1]{\rule[-\dp#1]{0pt}{\dimexpr\ht#1+\dp#1\relax}}
+\newcommand{\measurelogicalrow}[6]{%
+  \global\setbox#1=\hbox{\ExampleFont\examplemath[#3]{#6}}%
+  \global\setbox#2=\hbox{%
+    {\setlength{\linewidth}{\SymbolWidth}\subrowcell{\centering\SymbolFont$\displaystyle #4$}}%
+    {\setlength{\linewidth}{\MeaningWidth}\subrowcell{\DefinitionFont #5}}%
+    \raisebox{\dimexpr(\dp#1-\ht#1)/2\relax}{\usebox{#1}}}%
+}
+\newcommand{\pairlines}[3]{%
+  \renewcommand{\arraystretch}{0}%
+  \begin{tabular}[t]{@{}#1@{}}%
+  \pairstrut{\PairFirst}\subrowcell{#2}\\%
+  \pairstrut{\PairSecond}\subrowcell{#3}%
+  \end{tabular}%
+}
+\newcommand{\triplelines}[4]{%
+  \renewcommand{\arraystretch}{0}%
+  \begin{tabular}[t]{@{}#1@{}}%
+  \pairstrut{\PairFirst}\subrowcell{#2}\\%
+  \pairstrut{\PairSecond}\subrowcell{#3}\\%
+  \pairstrut{\PairThird}\subrowcell{#4}%
+  \end{tabular}%
+}
+% Apply one translation to every math column in a logical row, preserving
+% the relative baselines of its relations, fractions, and other mathematics.
+\newcommand{\compositemathcell}[1]{%
+  \pairstrut{\CurrentRow}%
+  \raisebox{\dimexpr(\dp\CurrentExample-\ht\CurrentExample)/2\relax}{\renewcommand{\arraystretch}{\MeasuredLineStretch}$#1$}}
+\newcommand{\compositerelationcell}[1]{\compositemathcell{{}#1}}
+\newcolumntype{R}{>{\collectcell\compositemathcell}r<{\endcollectcell}}
+\newcolumntype{L}{>{\collectcell\compositemathcell}l<{\endcollectcell}}
+\newcolumntype{Q}{>{\collectcell\compositerelationcell}l<{\endcollectcell}}
+\ExplSyntaxOn
+\newcommand{\compositecolumns}[1]{
+  \tl_set:Nn \l_tmpa_tl {#1}
+  \tl_replace_all:Nnn \l_tmpa_tl {r}{R}
+  \tl_replace_all:Nnn \l_tmpa_tl {l}{L}
+  \tl_replace_all:Nnn \l_tmpa_tl {E}{Q}
+  \cs_set:Npx \CompositeColumns {\exp_not:V \l_tmpa_tl}
+}
+\ExplSyntaxOff
+\newcommand{\selectlogicalrow}[2]{%
+  \global\setbox\CurrentRow=\copy#1%
+  \global\setbox\CurrentExample=\copy#2}
+\newcommand{\preparecomposite}{%
+  \renewcommand{\ExampleLineStretch}{\MeasuredLineStretch}%
+  \setlength{\ExampleWidth}{\dimexpr\linewidth-\SymbolWidth-\MeaningWidth-4\tabcolsep\relax}%
+  \setlength{\linewidth}{\ExampleWidth}}
+% Content interface: each braced entry contains {symbol}{meaning}{example}.
+% This keeps one notation's content together. Columns are array preambles:
+% r/E pairs share relation alignment; a single l preserves a nested array.
+% Mandatory arguments let these commands expand directly to \noalign in tables.
+\newcommand{\pairedentries}[2]{\expandafter\pairedentrieswithcolumns\expandafter{\PairExampleColumns}{#1}{#2}}
+\newcommand{\pairedentrieswithcolumns}[3]{\unpackpairedentries{#1}#2#3}
+\newcommand{\unpackpairedentries}[7]{%
+  \renderpairedrow{#1}{#2}{#5}{#3}{#6}{#4}{#7}}
+\newcommand{\tripleentries}[3]{\unpacktripleentries#1#2#3}
+\newcommand{\unpacktripleentries}[9]{%
+  \rendertriplerow{#1}{#4}{#7}{#2}{#5}{#8}{#3}{#6}{#9}}
+% Internal renderers below accept column-major arguments solely to preserve
+% the measured alignment algorithm. Edit entries in block 4, not these lists.
+\newcommand{\rendertriplerow}[9]{%
+  \noalign{\begingroup\preparecomposite
+    \measurelogicalrow{\ExampleFirst}{\PairFirst}{r@{}E}{#1}{#4}{#7}%
+    \measurelogicalrow{\ExampleSecond}{\PairSecond}{r@{}E}{#2}{#5}{#8}%
+    \measurelogicalrow{\ExampleThird}{\PairThird}{r@{}E}{#3}{#6}{#9}%
+  \endgroup}%
+  \paddedcell{\centering\SymbolFont\triplelines{c}%
+    {\centering$\displaystyle #1$}{\centering$\displaystyle #2$}{\centering$\displaystyle #3$}}&%
+  \paddedcell{\DefinitionFont\triplelines{l}{#4}{#5}{#6}}&%
+  \paddedcell{\ExampleFont\renewcommand{\ExampleLineStretch}{0}%
+    \selectlogicalrow{\PairFirst}{\ExampleFirst}%
+    \examplemath[R@{}Q]{\noalign{\selectlogicalrow{\PairFirst}{\ExampleFirst}}#7\\
+      \noalign{\selectlogicalrow{\PairSecond}{\ExampleSecond}}#8\\
+      \noalign{\selectlogicalrow{\PairThird}{\ExampleThird}}#9}}\\\hline
+}
+\newcommand{\renderpairedrow}[7]{%
+  \noalign{\begingroup\preparecomposite
+    \measurelogicalrow{\ExampleFirst}{\PairFirst}{#1}{#2}{#4}{#6}%
+    \measurelogicalrow{\ExampleSecond}{\PairSecond}{#1}{#3}{#5}{#7}%
+  \endgroup}%
+  \paddedcell{\centering\SymbolFont\pairlines{c}{\centering$\displaystyle #2$}{\centering$\displaystyle #3$}}&%
+  \paddedcell{\DefinitionFont\pairlines{l}{#4}{#5}}&%
+  \paddedcell{\ExampleFont\renewcommand{\ExampleLineStretch}{0}%
+    \compositecolumns{#1}%
+    \def\SingleExampleColumn{l}\def\TheseExampleColumns{#1}%
+    \ifx\SingleExampleColumn\TheseExampleColumns
+      \def\FirstExample{{#6}}\def\SecondExample{{#7}}%
+    \else\def\FirstExample{#6}\def\SecondExample{#7}\fi%
+    \selectlogicalrow{\PairFirst}{\ExampleFirst}%
+    \expandafter\examplemath\expandafter[\CompositeColumns]{\noalign{\selectlogicalrow{\PairFirst}{\ExampleFirst}}\FirstExample\\
+      \noalign{\selectlogicalrow{\PairSecond}{\ExampleSecond}}\SecondExample}}\\\hline
+}
+% Compact contexts use the existing palette and the table's example type.
+\newcommand{\examplecontexts}[1]{%
+  \begingroup
+  \setlength{\fboxsep}{0.5mm}%
+  \setlength{\fboxrule}{0.35pt}%
+  \noindent\fcolorbox{PosterAccent}{PosterAccent!10}{%
+    \begin{minipage}{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}
+      \ExampleFont\color{PosterInk}%
+      {\centering\textbf{\ContextHeading}\par}
+      #1\par
+    \end{minipage}}\par
+  \endgroup
+  \vspace{0.7mm}%
+}
+% A heading always spans the page; parallel tables belong to that section.
+\newcommand{\sectionheading}[1]{%
+  {\HeadingFont\color{PosterAccent}#1\par}%
+  \vspace{0.4mm}{\color{PosterInk}\hrule height 0.5pt}\vspace{0.8mm}%
+}
+\newcommand{\notationtable}[1]{%
+  \begingroup
+  \setlength{\SymbolWidth}{\SymbolColumnFraction\linewidth}%
+  \setlength{\MeaningWidth}{\MeaningColumnFraction\linewidth}%
+  \setlength{\tabcolsep}{0.5mm}%
+  \renewcommand{\arraystretch}{1}%
+  \arrayrulecolor{PosterRule}%
+  \begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash\SymbolFont}p{\SymbolWidth}>{\raggedright\arraybackslash\DefinitionFont}p{\MeaningWidth}>{\raggedright\arraybackslash\ExampleFont}X@{}}
+  \paddedcell{\centering\TableHeadFont Symbol}&\paddedcell{\TableHeadFont Meaning}&\paddedcell{\TableHeadFont Examples}\\\hline
+  #1
+  \end{tabularx}%
+  \endgroup
+}
+% Read the complete left table, then the right table, before the next section.
+\newcommand{\paralleltables}[2]{%
+  \noindent\begin{minipage}[t]{.49\linewidth}\vspace{0pt}\notationtable{#1}\end{minipage}\hfill
+  \begin{minipage}[t]{.49\linewidth}\vspace{0pt}\notationtable{#2}\end{minipage}\par
+  \vspace{1mm}%
+}
+% Parallel tables retain their measured subrows, local widths, and padding.
+\newcommand{\compacttables}{%
+  \renewcommand{\TightExampleSpacing}{\thinmuskip=0mu\relax\medmuskip=1mu\relax\thickmuskip=1mu\relax}%
+  \setlength{\RowPadding}{0.9mm}%
+  \renewcommand{\MeasuredLineStretch}{1}%
+  \renewcommand{\SymbolColumnFraction}{.22}%
+  \renewcommand{\MeaningColumnFraction}{.35}%
+  \renewcommand{\PairExampleColumns}{r@{}E}%
+  \renewcommand{\notationrow}[3]{%
+    \paddedcell{\centering\SymbolFont\ensuremath{\displaystyle ##1}}&%
+    \paddedcell{\DefinitionFont ##2}&\paddedcell{\ExampleFont ##3}\\\hline}%
+}
+% Each poster has its own fixed page and repeated identity.
+\newcommand{\posterheader}[1]{%
+  {\TitleFont\color{PosterAccent}MATHEMATICS\hfill\KickerFont #1\par}%
+  \vspace{2mm}{\color{PosterInk}\hrule height 0.8pt}\vspace{3mm}%
+  \color{PosterInk}%
+}
+
+% ==========================================================================
+% 4. POSTER CONTENT: PDF READING ORDER
+% ==========================================================================
+
+% Five-column reference row: symbol, concept, explanation, three examples.
+\newcommand{\comparisonrow}[6]{%
+  \paddedcell{\centering\SymbolFont\ensuremath{\displaystyle #1}}&%
+  \paddedcell{\DefinitionFont\conceptmeaning{#2}{\meaningexplanation{#3}}}&%
+  \paddedcell{\ExampleFont #4}&\paddedcell{\ExampleFont #5}&\paddedcell{\ExampleFont #6}\\\hline}
+\begin{document}
+% ==========================================================================
+% PAGE A-1: FOUNDATIONS
+% ==========================================================================
+\selectposterpalette{A}
+\posterheader{A-1\quad FOUNDATIONS}
+\begingroup
+\begingroup
+% General notation uses two independently headed tables in reading order.
+\setlength{\RowPadding}{1.1mm}
+\renewcommand{\MeasuredLineStretch}{1}
+\renewcommand{\SymbolColumnFraction}{.26}
+\renewcommand{\MeaningColumnFraction}{.33}
+{\HeadingFont\color{PosterAccent}General notation\par}
+\vspace{0.4mm}{\color{PosterInk}\hrule height 0.5pt}\vspace{0.4mm}
+\noindent\begin{minipage}[t]{.49\linewidth}
+% Balance the shorter left table using cell clearance only.
+\setlength{\RowPadding}{0.9mm}
+\vspace{0pt}
+\notationtable{
+\tripleentries%
+  {% Logical entry: symbol, meaning, example
+    {\mathrel{\notationhighlight{\mathord{=}}}}%
+    {Equal}%
+    {2+3&\mathrel{\notationhighlight{\mathord{=}}}5\quad 4-1\mathrel{\notationhighlight{\mathord{=}}}3}%
+  }%
+  {% Logical entry: symbol, meaning, example
+    {\mathrel{\notationhighlight{\mathord{\neq}}}}%
+    {Not equal}%
+    {2&\mathrel{\notationhighlight{\mathord{\neq}}}3\quad 5+1\mathrel{\notationhighlight{\mathord{\neq}}}7}%
+  }%
+  {% Logical entry: symbol, meaning, example
+    {\mathrel{\notationhighlight{\mathord{\approx}}}}%
+    {Approximately}%
+    {3.14&\mathrel{\notationhighlight{\mathord{\approx}}}\pi \quad\>\>\> \sqrt2\mathrel{\notationhighlight{\mathord{\approx}}}1.41}%
+  }
+
+\pairedentries%
+  {% Logical entry: symbol, meaning, example
+    {\mathrel{\notationhighlight{\mathord{<}}} \quad \mathrel{\notationhighlight{\mathord{>}}}}%
+    {Less | Greater than}%
+    {2&\mathrel{\notationhighlight{\mathord{<}}}3 & \qquad 5&\mathrel{\notationhighlight{\mathord{>}}}4}%
+  }%
+  {% Logical entry: symbol, meaning, example
+    {\mathrel{\notationhighlight{\mathord{\nless}}} \quad \mathrel{\notationhighlight{\mathord{\ngtr}}}}%
+    {Not Less | Greater}%
+    {2&\mathrel{\notationhighlight{\mathord{\nless}}}2 &\qquad  4&\mathrel{\notationhighlight{\mathord{\ngtr}}}5}%
+  }
+
+\pairedentries%
+  {% Logical entry: symbol, meaning, example
+    {\mathrel{\notationhighlight{\mathord{\leq}}} \quad \mathrel{\notationhighlight{\mathord{\geq}}}}%
+    {Less | Greater than or equal to}%
+    {2&\mathrel{\notationhighlight{\mathord{\leq}}}2 &\qquad  5&\mathrel{\notationhighlight{\mathord{\geq}}}4}%
+  }%
+  {% Logical entry: symbol, meaning, example
+    {\mathrel{\notationhighlight{\mathord{\nleq}}} \quad \mathrel{\notationhighlight{\mathord{\ngeq}}}}%
+    {Not Less | Greater than or equal to}%
+    {3&\mathrel{\notationhighlight{\mathord{\nleq}}}2 &\qquad  4&\mathrel{\notationhighlight{\mathord{\ngeq}}}5}%
+  }
+
+\notationrow
+  {\begin{gathered}ab=a(b)\\{}=a\mathbin{\notationhighlight{\cdot}} b=a\mathbin{\notationhighlight{\times}} b\end{gathered}}
+  {Multiplication: \\ \meaningexplanation{juxtaposition, parentheses, dot, or cross}}
+  {\examplemath{3x&=3\mathbin{\notationhighlight{\cdot}} x=3\mathbin{\notationhighlight{\times}} x\\2(4)&=2\mathbin{\notationhighlight{\cdot}}4=2\mathbin{\notationhighlight{\times}}4}}
+\notationrow
+  {\begin{gathered}\notationfraction{a}{b}=a\notationhighlight{/}b\\{}=a\mathbin{\notationhighlight{\div}} b\end{gathered}}
+  {Division: \\ \meaningexplanation{fraction, slash, or division sign ($b\neq0$)}}
+  {\examplemath{\notationfraction{12}{3}&=12\notationhighlight{/}3=12\mathbin{\notationhighlight{\div}}3=4\\\notationfraction{x}{5}&=x\notationhighlight{/}5=x\mathbin{\notationhighlight{\div}}5\\& \qquad \quad =\notationfraction{1}{5}x \> \> \! =0.2x}}
+}
+\end{minipage}\hfill
+\begin{minipage}[t]{.485\linewidth}
+\vspace{0pt}
+\notationtable{
+\notationrow
+  {\mathbin{\notationhighlight{\pm}}}
+  {Plus or minus: \meaningexplanation{two choices}}
+  {\examplemath{3\mathbin{\notationhighlight{\pm}}1&=4\text{ or }2\\-2\mathbin{\notationhighlight{\pm}}3&=1\text{ or }-5}}
+\notationrow
+  {\notationhighlight{|}a\notationhighlight{|}}
+  {Absolute value: \meaningexplanation{Distance to $0$}}
+  {\examplemath{\notationhighlight{|}-5\notationhighlight{|}&=5\\\notationhighlight{|}3\notationhighlight{|}&=3\quad \notationhighlight{|}0\notationhighlight{|}=0}}
+\pairedentrieswithcolumns{l}%
+  {% Logical entry: symbol, meaning, example
+    {a^{\notationhighlight{2}}}%
+    {Squared \par \meaningexplanation{Two factors of $a$}}%
+    {\begin{array}[t]{@{}r@{}l@{}}3^{\notationhighlight{2}}&{}=3\cdot3=9\\(-2)^{\notationhighlight{2}}&{}=(-2)(-2)=4\end{array}}%
+  }%
+  {% Logical entry: symbol, meaning, example
+    {a^{\notationhighlight{3}}}%
+    {Cubed \par \meaningexplanation{Three factors of $a$}}%
+    {\begin{array}[t]{@{}r@{}l@{}}2^{\notationhighlight{3}}&{}=2\cdot2\cdot2=8\\(-2)^{\notationhighlight{3}}&{}=(-2)(-2)(-2)\\&{}=-8\end{array}}%
+  }
+\pairedentrieswithcolumns{r@{}E}%
+  {% Logical entry: symbol, meaning, example
+    {\notationhighlight{\sqrt{a}}=a^{\notationhighlight{1/2}}}%
+    {Square root \quad \> \meaningexplanation{$a\geq0$}}%
+    {\notationhighlight{\sqrt9}&=3\text{ (not }\pm3\text{)}}%
+  }%
+  {% Logical entry: symbol, meaning, example
+    {\sqrt[\notationhighlight{3}]{a}=a^{\notationhighlight{1/3}}}%
+    {Cube root \qquad \! \meaningexplanation{$a\in\mathbb R$}}%
+    {\sqrt[\notationhighlight{3}]{-8}&=-2}%
+  }
+\pairedentrieswithcolumns{l}%
+  {% Logical entry: symbol, meaning, example
+    {a^{\notationhighlight{n}}}%
+    {$n$th power}%
+    {\begin{array}[t]{@{}r@{}l@{}}2^{\notationhighlight{4}}&{}=2\cdot2\cdot2\cdot2=16\\(-2)^{\notationhighlight{5}}&{}=-32\end{array}}%
+  }%
+  {% Logical entry: symbol, meaning, example
+    {\sqrt[\notationhighlight{n}]{a}=a^{1/\notationhighlight{n}}}%
+    {$n$th root}%
+    {\begin{array}[t]{@{}r@{}l@{}}\sqrt[\notationhighlight{4}]{16}&{}=\> \> \> 16^{\frac1{\notationhighlight{4}}} \quad  =2\\\sqrt[\notationhighlight{5}]{-32}&{}=(-32)^{\frac1{\notationhighlight{5}}}=-2\end{array}}%
+  }
+}
+\end{minipage}\par\vspace{0mm}
+\endgroup
+\vspace{3mm}
+\compacttables
+\renewcommand{\MeaningColumnFraction}{.35}
+% Shared heading row keeps both titles and their column rules aligned.
+\noindent\begin{minipage}[t]{.49\linewidth}\vspace{0pt}
+% --- \strut Sets ---
+\sectionheading{\strut Sets}
+\end{minipage}\hfill
+\begin{minipage}[t]{.49\linewidth}\vspace{0pt}
+% --- \strut Number systems ---
+\sectionheading{\strut Number systems}
+\end{minipage}\par\nobreak
+\noindent\begin{minipage}[t]{.49\linewidth}\vspace{0pt}
+\renewcommand{\ContextHeading}{Example guide}
+\examplecontexts{$U$: Universal set \quad $U=\{1,2,3,4\}$ \> | \> $A=\{1,2\}$ \> | \> $B=\{2,3\}$}
+% Fit the complement and its note using local cell clearance only.
+\setlength{\RowPadding}{1mm}
+\notationtable{
+\notationrow
+  {\mathopen{\notationhighlight{\{}}a,b,c\mathclose{\notationhighlight{\}}}}
+  {\conceptmeaning{Set}{\meaningexplanation{Ignores order and repetition}}}
+  {\examplemath{A&=\mathopen{\notationhighlight{\{}}2,1\mathclose{\notationhighlight{\}}}=\mathopen{\notationhighlight{\{}}1,2\mathclose{\notationhighlight{\}}}\\B&=\mathopen{\notationhighlight{\{}}2,3\mathclose{\notationhighlight{\}}}=\mathopen{\notationhighlight{\{}}2,2,3,3\mathclose{\notationhighlight{\}}}}}
+\pairedentries%
+  {% Logical entry: symbol, meaning, example
+    {\mathrel{\notationhighlight{\mathord{\in}}}}%
+    {Element of}%
+    {2&\mathrel{\notationhighlight{\mathord{\in}}} A \qquad 2 \mathrel{\notationhighlight{\mathord{\in}}} \{2\}}%
+  }%
+  {% Logical entry: symbol, meaning, example
+    {\mathrel{\notationhighlight{\mathord{\notin}}}}%
+    {Not an element of}%
+    {3&\mathrel{\notationhighlight{\mathord{\notin}}} A \qquad 3 \mathrel{\notationhighlight{\mathord{\notin}}} \{2\}}%
+  }
+\notationrow
+  {\{x\mathrel{\notationhighlight{\mathord{:}}}p(x)\}}
+  {\conceptmeaning{Set-builder notation}{\meaningexplanation{Select elements satisfying $p(x)$}}}
+  {\examplemath[l]{A=\{x\in U\mathrel{\notationhighlight{\mathord{:}}}x\leq2\}\\B=\{x\in U\mathrel{\notationhighlight{\mathord{:}}}1<x<4\}\\\varnothing=\{x\in U\mathrel{\notationhighlight{\mathord{:}}}x>4\}}}
+\pairedentries%
+  {% Logical entry: symbol, meaning, example
+    {\notationhighlight{\varnothing}}%
+    {\conceptmeaning{Empty set}{\meaningexplanation{No elements}}}%
+    {|\notationhighlight{\varnothing}|&=0}%
+  }%
+  {% Logical entry: symbol, meaning, example
+    {\notationhighlight{|}A\notationhighlight{|}}%
+    {\conceptmeaning{Cardinality}{\meaningexplanation{Number of elements}}}%
+    {\notationhighlight{|}A\notationhighlight{|}&=2 \qquad \notationhighlight{|}U\notationhighlight{|}=4}%
+  }
+\pairedentrieswithcolumns{l}%
+  {% Logical entry: symbol, meaning, example
+    {A\mathrel{\notationhighlight{\mathord{\subseteq}}} U}%
+    {\conceptmeaning{Subset}{\meaningexplanation{All elements included; equality allowed}}}%
+    {\renewcommand{\arraystretch}{0.8}\begin{array}[t]{@{}l@{}}A\mathrel{\notationhighlight{\mathord{\subseteq}}} A \qquad \>\>\>\> A\mathrel{\notationhighlight{\mathord{\subseteq}}} U\\ \\ \{1\}\mathrel{\notationhighlight{\mathord{\subseteq}}}\{1,2\}\end{array}}%
+  }%
+  {% Logical entry: symbol, meaning, example
+    {A\mathrel{\notationhighlight{\mathord{\subset}}} U}%
+    {\conceptmeaning{Proper subset}{\meaningexplanation{Included but not equal}}}%
+    {\renewcommand{\arraystretch}{0.8}\begin{array}[t]{@{}l@{}}\{1\}\mathrel{\notationhighlight{\mathord{\subset}}} A \qquad A\mathrel{\notationhighlight{\mathord{\subset}}} U\\ \\ A\mathrel{\notationhighlight{\mathord{\subset}}}\{1,2,3\}\end{array}}%
+  }
+\pairedentries%
+  {% Logical entry: symbol, meaning, example
+    {A\mathbin{\notationhighlight{\cup}} B}%
+    {\conceptmeaning{Union}{\meaningexplanation{In either or both}}}%
+    {A\mathbin{\notationhighlight{\cup}} B&=\{1,2,3\}}%
+  }%
+  {% Logical entry: symbol, meaning, example
+    {A\mathbin{\notationhighlight{\cap}} B}%
+    {\conceptmeaning{Intersection}{\meaningexplanation{In both}}}%
+    {A\mathbin{\notationhighlight{\cap}} B&=\{2\}}%
+  }
+\notationrow
+  {A\mathbin{\notationhighlight{\setminus}} B}
+  {\conceptmeaning{Difference}{\meaningexplanation{In $A$, outside $B$}}}
+  {\quad\>\>\! \examplemath{A & \mathbin{\notationhighlight{\setminus}} B=\{1\}} \\ \examplemath{\{3,4\} &\mathbin{\notationhighlight{\setminus}} \{4\}=\{3\}}}
+\notationrow
+  {A^{\notationhighlight{c}} \text{ or } A^{\notationhighlight{\prime}}}
+  {\conceptmeaning{Complement}{\meaningexplanation{In $U$, outside $A$}}}
+  {\examplemath{A^{\notationhighlight{c}}&=\{3,4\} \quad\>\>\>\>\>\> \{1\}^{\notationhighlight{c}} =  \{2,3,4\}\\B^{\notationhighlight{c}}&=\{1,4\} \quad\>\>\>\>\>\> \{1,2,3\}^{\notationhighlight{c}} =  \{4\}}}
+}\par\vspace{1mm}
+{\FooterFont \qquad\qquad $2$ is an element of $A$ \qquad | \qquad $\{2\}$ is a subset of $A$\par}
+\end{minipage}\hfill
+\begin{minipage}[t]{.49\linewidth}\vspace{0pt}
+% Transfer three percent of this table from to Meaning.
+\renewcommand{\SymbolColumnFraction}{.19}
+\renewcommand{\MeaningColumnFraction}{.38}
+% Fit the expanded number-system reference without changing typography.
+\setlength{\RowPadding}{1mm}
+\notationtable{
+\pairedentries%
+  {% Logical entry: symbol, meaning, example
+    {\notationhighlight{\mathbb N}}%
+    {Naturals}%
+    {\notationhighlight{\mathbb N}&=\{1,2,3,\ldots\}}%
+  }%
+  {% Logical entry: symbol, meaning, example
+    {\notationhighlight{\mathbb Z}}%
+    {Integers}%
+    {\notationhighlight{\mathbb Z}&=\{\ldots, -2, -1, 0, 1,2,\ldots\}}%
+  }
+\pairedentries%
+  {% Logical entry: symbol, meaning, example
+    {\notationhighlight{\mathbb Q}}%
+    {\conceptmeaning{Rationals}{\meaningexplanation{$p/q$; $p,q\in\mathbb Z$, $q\ne0$}}}%
+    {\tfrac12,-3&\in\notationhighlight{\mathbb Q}}%
+  }%
+  {% Logical entry: symbol, meaning, example
+    {\notationhighlight{\mathbb R}}%
+    {\conceptmeaning{Reals}{\meaningexplanation{The number line}}}%
+    {\sqrt2,\pi,\tfrac12,-3&\in\notationhighlight{\mathbb R}}%
+  }
+\notationrow
+  {\mathbb R\setminus\mathbb Q}
+  {Irrationals}
+  {\examplemath{\sqrt2,\pi&\in\mathbb R\setminus\mathbb Q}}
+\notationrow
+  {\notationhighlight{\mathbb C}}
+  {\conceptmeaning{Complex numbers}{\meaningexplanation{$a+bi$; $a,b\in\mathbb R$, $i^2=-1$}}}
+  {\examplemath{2+3i&\in\notationhighlight{\mathbb C}}}
+\notationrow
+  {\begin{gathered}[t]z=\\\notationhighlight{r}(\cos\notationhighlight{\theta}\\{}+i\sin\notationhighlight{\theta})\end{gathered}}
+  {\conceptmeaning{Polar form:}{\meaningexplanation{$z=a+bi$:\\ $\notationhighlight{r}=|z|=\sqrt{a^2+b^2}$;\\ $\notationhighlight{\theta}$: argument in radians ($z\ne0$).}}}
+  {\examplemath[l]{1+i=\notationhighlight{\sqrt{2}}(\cos(\notationhighlight{\pi/4})\\{}+i\sin(\notationhighlight{\pi/4}));\\\notationhighlight{r}=\notationhighlight{\sqrt2},\quad\notationhighlight{\theta}=\notationhighlight{\pi/4}}}
+\pairedentries%
+  {% Logical entry: symbol, meaning, example
+    {\mathbb R^{\notationhighlight{2}}}%
+    {\conceptmeaning{Real coordinate plane}{\meaningexplanation{Ordered pairs}}}%
+    {(2,-3)&\in\mathbb R^{\notationhighlight{2}}}%
+  }%
+  {% Logical entry: symbol, meaning, example
+    {\mathbb R^{\notationhighlight{3}}}%
+    {\conceptmeaning{Real coordinate space}{\meaningexplanation{Ordered triples}}}%
+    {(1,0,-2)&\in\mathbb R^{\notationhighlight{3}}}%
+  }
+\notationrow
+  {\mathbb R^{\notationhighlight{+}}}
+  {\conceptmeaning{Positive real numbers}{\meaningexplanation{Excludes zero}}}
+  {\examplemath{\mathbb R^{\notationhighlight{+}}&=\{x\in\mathbb R:x>0\}\\&=(0,\infty)}}
+\pairedentrieswithcolumns{l@{}E}%
+  {% Logical entry: symbol, meaning, example
+    {\mathopen{\notationhighlight{(}}a,b\mathclose{\notationhighlight{)}}}%
+    {\conceptmeaning{Open interval}{\meaningexplanation{Excludes endpoints}}}%
+    {x\in\mathopen{\notationhighlight{(}}1,3\mathclose{\notationhighlight{)}}:&\quad 1<x<3}%
+  }%
+  {% Logical entry: symbol, meaning, example
+    {\mathopen{\notationhighlight{[}}a,b\mathclose{\notationhighlight{]}}}%
+    {\conceptmeaning{Closed interval}{\meaningexplanation{Includes endpoints}}}%
+    {x\in\mathopen{\notationhighlight{[}}1,3\mathclose{\notationhighlight{]}}:&\quad 1\leq x\leq3}%
+  }
+\pairedentrieswithcolumns{l}%
+  {% Logical entry: symbol, meaning, example
+    {\mathopen{\notationhighlight{[}}a,b\mathclose{\notationhighlight{)}}}%
+    {\conceptmeaning{Half-open interval}{\meaningexplanation{Includes left endpoint}}}%
+    {\begin{array}[t]{@{}l@{}}2\in\mathopen{\notationhighlight{[}}2,5\mathclose{\notationhighlight{)}} \qquad 5\notin\mathopen{\notationhighlight{[}}2,5\mathclose{\notationhighlight{)}}\end{array}}%
+  }%
+  {% Logical entry: symbol, meaning, example
+    {\mathopen{\notationhighlight{(}}a,b\mathclose{\notationhighlight{]}}}%
+    {\conceptmeaning{Half-open interval}{\meaningexplanation{Includes right endpoint}}}%
+    {\begin{array}[t]{@{}l@{}}2\notin\mathopen{\notationhighlight{(}}2,5\mathclose{\notationhighlight{]}} \qquad 5\in\mathopen{\notationhighlight{(}}2,5\mathclose{\notationhighlight{]}}\end{array}}%
+  }
+\notationrow
+  {-\notationhighlight{\infty}\;|\;\notationhighlight{\infty}}
+  {Negative | Positive infinity}
+  {\qquad \examplemath[l]{(-\notationhighlight{\infty},0)\quad|\quad[0,\notationhighlight{\infty})}}
+}\vspace{1mm}
+{\FooterFont Intervals assume $a<b$. Some texts include $0$ in $\mathbb N$\par}
+\end{minipage}\par
+\par\vspace{3mm}
+\compacttables
+% --- Greek symbols and constants ---
+\sectionheading{Greek symbols and constants}
+% One alphabetic letter table beside a separate constants table.
+\begingroup
+\setlength{\RowPadding}{0.15mm}
+\setlength{\tabcolsep}{0.7mm}
+\renewcommand{\arraystretch}{0.8}
+\arrayrulecolor{PosterRule}
+\newcommand{\greekentry}[3]{%
+  \paddedcell{\DefinitionFont #1}&%
+  \paddedcell{\centering\SymbolFont\ensuremath{#2}}&%
+  \paddedcell{\centering\SymbolFont\ensuremath{#3}}%
+}
+\newcommand{\greekhead}{%
+  \paddedcell{\TableHeadFont Name}&%
+  \paddedcell{\centering\TableHeadFont Lowercase Symbol}&%
+  \paddedcell{\centering\TableHeadFont Uppercase Symbol}%
+}
+\noindent\begin{minipage}[t]{.49\linewidth}
+\vspace{0pt}
+\setlength{\tabcolsep}{0.25mm}
+\setlength{\RowPadding}{0.9mm}
+% Read down the left group, then the right group: six letters each.
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\centering\arraybackslash}p{.176\linewidth}>{\centering\arraybackslash}p{.176\linewidth}@{\hspace{0.7mm}{\color{lightgray}\vrule width 1.5pt}\hspace{0.7mm}}>{\raggedright\arraybackslash}X>{\centering\arraybackslash}p{.176\linewidth}>{\centering\arraybackslash}p{.176\linewidth}@{}}
+\greekhead&\greekhead\\\hline
+\greekentry{Alpha}{\alpha}{\mathrm A}&\greekentry{Mu}{\mu}{\mathrm M}\\\hline
+\greekentry{Beta}{\beta}{\mathrm B}&\greekentry{Pi}{\pi}{\Pi}\\\hline
+\greekentry{Gamma}{\gamma}{\Gamma}&\greekentry{Rho}{\rho}{\mathrm P}\\\hline
+\greekentry{Delta}{\delta}{\Delta}&\greekentry{Sigma}{\sigma}{\Sigma}\\\hline
+\greekentry{Theta}{\theta}{\Theta}&\greekentry{Phi}{\phi}{\Phi}\\\hline
+\greekentry{Lambda}{\lambda}{\Lambda}&\greekentry{Omega}{\omega}{\Omega}\\\hline
+\end{tabularx}
+\end{minipage}\hfill
+\begin{minipage}[t]{.49\linewidth}
+\vspace{0pt}
+\setlength{\RowPadding}{1.1mm}
+\begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash}p{.16\linewidth}>{\raggedright\arraybackslash}p{.26\linewidth}>{\raggedright\arraybackslash}X@{}}
+\paddedcell{\centering\TableHeadFont Constant}&
+\paddedcell{\TableHeadFont Name}&
+\paddedcell{\TableHeadFont Meaning / Value}\\\hline
+\paddedcell{\centering\SymbolFont $\notationhighlight{\pi}$}&
+\paddedcell{\DefinitionFont Pi}&
+\paddedcell{\DefinitionFont Circle constant\par $\notationhighlight{\pi}=C/d\approx\notationhighlight{3.14159}$\par \meaningexplanation{$C$: circumference; $d$: diameter.}}\\\hline
+\paddedcell{\centering\SymbolFont $\notationhighlight{e}$}&
+\paddedcell{\DefinitionFont Euler's number}&
+\paddedcell{\DefinitionFont Base of natural logarithms\par $\notationhighlight{e}\approx\notationhighlight{2.71828}$\par \meaningexplanation{$\ln x=y\iff \notationhighlight{e}^{y}=x$ ($x>0$);\\ $\ln1=0$, $\ln\notationhighlight{e}=1$}}\\\hline
+\paddedcell{\centering\SymbolFont $\notationhighlight{i}$}&
+\paddedcell{\DefinitionFont Imaginary unit}&
+\paddedcell{\DefinitionFont $\notationhighlight{i}^2=-1$\par \meaningexplanation{$a+b\notationhighlight{i}$; $a,b\in\mathbb R$}}\\\hline
+\end{tabularx}\par\vspace{0.8mm}
+\end{minipage}
+\endgroup
+{\color{PosterInk}\hrule height 0.5pt}\vspace{0.7mm}
+\endgroup
+\newpage
+% ==========================================================================
+% PAGE A-2: FUNCTIONS AND PROBABILITY
+% ==========================================================================
+\selectposterpalette{A}
+\posterheader{A-2\quad FUNCTIONS AND PROBABILITY}
+\begingroup
+\compacttables
+\begingroup
+% Compact spacing and balanced columns apply only to this middle poster.
+\setlength{\RowPadding}{0.8mm}
+\renewcommand{\SymbolColumnFraction}{.24}
+\renewcommand{\MeaningColumnFraction}{.38}
+% --- Function notation ---
+\sectionheading{Function notation}
+\begingroup
+\setlength{\tabcolsep}{0.5mm}
+\setlength{\RowPadding}{0.1mm}
+\renewcommand{\arraystretch}{1}
+\renewcommand{\ExampleLineStretch}{1.02}
+\arrayrulecolor{PosterRule}
+% Separate notation and definitions beside the three original example columns.
+
+\begin{tabularx}{\linewidth}{@{}p{.14\linewidth}p{.22\linewidth}p{.20\linewidth}p{.20\linewidth}X@{}}
+\paddedcell{\centering\TableHeadFont Symbol}&
+\paddedcell{\TableHeadFont Meaning}&
+\paddedcell{\TableHeadFont Square function}&
+\paddedcell{\TableHeadFont Square-root function}&
+\paddedcell{\TableHeadFont Linear function}\\\hline
+\multicolumn{2}{@{}p{\dimexpr.36\linewidth+2\tabcolsep\relax}}{%
+\paddedcell{\ExampleFont $h$: function; $x$: input; $h(x)$: output.\par
+$(x,h(x))$ is a point on its graph.\par
+A function assigns exactly one output in $K$ to each input in $D$.\par
+\textbf{Piecewise function:} different formulas for different input conditions.\par
+\noindent\begin{minipage}[c]{.56\linewidth}
+$\displaystyle p(x)=\begin{cases}
+  -x, & \notationhighlight{x<0},\\
+  x^2, & \notationhighlight{x\ge0}.
+\end{cases}$
+\end{minipage}\hfill
+\begin{minipage}[c]{.42\linewidth}
+$p(-2)=\notationhighlight{2}$\par
+$p(0)=\notationhighlight{0}$\par
+$p(2)=\notationhighlight{4}$
+\end{minipage}\par}&
+% Native TikZ coordinates retain the numerical values from Function value below.
+% Labels remain 9 pt at the physical 5/6 page size; only local graph units grow.
+% Quiet projections are drawn first so curves and marked points stay prominent.
+\paddedcell{\ExampleFont $f(x)=x^2$\par
+  \begin{tikzpicture}[font=\fontsize{10.8}{12}\selectfont,
+    every node/.style={inner sep=0pt},line cap=round,
+    guide/.style={draw=PosterInk!45,line width=0.50pt,dash pattern=on 1.2pt off 1.2pt},
+    leader/.style={draw=PosterInk!65,line width=0.6pt}]
+    \path[use as bounding box] (0,0) rectangle (56mm,44mm);
+    \begin{scope}[shift={(29mm,7mm)},x=5mm,y=2.2mm]
+      \draw[guide] (-2,0)--(-2,4)--(0,4);
+      \draw[guide] (3,0)--(3,9)--(0,9);
+      \draw[->,line width=0.70pt] (-3.4,0)--(4.6,0);
+      \draw[->,line width=0.70pt] (0,-.5)--(0,11);
+      \draw[PosterAccent,line width=1.4pt,domain=-3.1:3.4,samples=65]
+        plot (\x,{\x*\x});
+      \fill (-2,4) circle[radius=1.1pt] (3,9) circle[radius=1.1pt];
+      \node[below=1.5mm] at (-2,0) {$-2$};
+      \node[below=1.5mm] at (3,0) {$3$};
+      \node[right=1.5mm] at (0,4) {$4$};
+      \node[left=1.5mm] at (0,9) {$9$};
+      \coordinate (fNegativePoint) at (-2,4);
+      \coordinate (fPositivePoint) at (3,9);
+    \end{scope}
+    \node[anchor=center] (fNegativeLabel) at (19mm,37mm) {$(-2,f(-2))$};
+    \node[anchor=center] (fPositiveLabel) at (37.5mm,33mm) {$(3,f(3))$};
+    \draw[leader,shorten <=1.5pt,shorten >=1mm]
+      (fNegativePoint)--(fNegativeLabel);
+    \draw[leader,shorten <=1.5pt,shorten >=1mm]
+      (fPositivePoint)--(fPositiveLabel);
+  \end{tikzpicture}}&
+\paddedcell{\ExampleFont $g(x)=\sqrt{x}$\par
+  \begin{tikzpicture}[font=\fontsize{10.8}{12}\selectfont,
+    every node/.style={inner sep=0pt},line cap=round,
+    guide/.style={draw=PosterInk!45,line width=0.50pt,dash pattern=on 1.2pt off 1.2pt},
+    leader/.style={draw=PosterInk!65,line width=0.6pt}]
+    \path[use as bounding box] (0,0) rectangle (56mm,44mm);
+    \begin{scope}[shift={(6mm,7mm)},x=2.5mm,y=5.5mm]
+      \draw[guide] (9,0)--(9,3)--(0,3);
+      \draw[guide] (16,0)--(16,4)--(0,4);
+      \draw[->,line width=0.70pt] (-.5,0)--(19,0);
+      \draw[->,line width=0.70pt] (0,-.2)--(0,5.2);
+      % Parameterization x=t^2, y=t gives a smooth start, only for x>=0.
+      \draw[PosterAccent,line width=1.4pt,domain=0:4.25,samples=65,variable=\t]
+        plot ({\t*\t},\t);
+      \fill (9,3) circle[radius=1.1pt] (16,4) circle[radius=1.1pt];
+      \node[below=1.5mm] at (9,0) {$9$};
+      \node[below=1.5mm] at (16,0) {$16$};
+      \node[left=1.5mm] at (0,3) {$3$};
+      \node[left=1.5mm] at (0,4) {$4$};
+      \coordinate (gNinePoint) at (9,3);
+      \coordinate (gSixteenPoint) at (16,4);
+    \end{scope}
+    \node[anchor=center] (gNineLabel) at (37.25mm,17mm)
+      {$(9,g(9))$};
+    \node[anchor=center] (gSixteenLabel) at (35mm,35mm)
+      {$(16,g(16))$};
+    \draw[leader,shorten <=1.5pt,shorten >=1mm]
+      (gNinePoint)--(gNineLabel);
+    \draw[leader,shorten <=1.5pt,shorten >=1mm]
+      (gSixteenPoint)--(gSixteenLabel);
+  \end{tikzpicture}}&
+\paddedcell{\ExampleFont $\beta(x)=2x+1$\par
+  \begin{tikzpicture}[font=\fontsize{10.8}{12}\selectfont,
+    every node/.style={inner sep=0pt},line cap=round,
+    guide/.style={draw=PosterInk!45,line width=0.50pt,dash pattern=on 1.2pt off 1.2pt},
+    leader/.style={draw=PosterInk!65,line width=0.6pt}]
+    \path[use as bounding box] (0,0) rectangle (56mm,44mm);
+    \begin{scope}[shift={(25mm,16mm)},x=6mm,y=2.7mm]
+      \draw[guide] (-1,0)--(-1,-1)--(0,-1);
+      \draw[guide] (3,0)--(3,7)--(0,7);
+      \draw[->,line width=0.70pt] (-3.6,0)--(4.2,0);
+      \draw[->,line width=0.70pt] (0,-2.2)--(0,8.5);
+      \draw[PosterAccent,line width=1.4pt,domain=-1.6:3.7]
+        plot (\x,{2*\x+1});
+      \fill (-1,-1) circle[radius=1.1pt] (3,7) circle[radius=1.1pt];
+      \node[above=1.5mm] at (-1,0) {$-1$};
+      \node[below=1.5mm] at (3,0) {$3$};
+      \node[right=1.5mm] at (0,-1) {$-1$};
+      \node[left=1.5mm] at (0,7) {$7$};
+      \coordinate (betaNegativePoint) at (-1,-1);
+      \coordinate (betaPositivePoint) at (3,7);
+    \end{scope}
+    % Convert the former corner coordinates to centers using the label dimensions.
+    \setbox0=\hbox{\fontsize{10.8}{12}\selectfont $(-1,\beta(-1))$}%
+    \node[anchor=center] (betaNegativeLabel) at
+      (\dimexpr23mm-.5\wd0-.5\pgflinewidth\relax,
+       \dimexpr29mm-.5\ht0-.5\dp0-.5\pgflinewidth\relax)
+      {$(-1,\beta(-1))$};
+    \setbox0=\hbox{\fontsize{10.8}{12}\selectfont $(3,\beta(3))$}%
+    \node[anchor=center] (betaPositiveLabel) at
+      (\dimexpr28mm+.5\wd0+.5\pgflinewidth\relax,
+       \dimexpr38mm+.5\ht0+.5\dp0+.5\pgflinewidth\relax)
+      {$(3,\beta(3))$};
+    \draw[leader,shorten <=1mm,shorten >=1.5pt]
+      (betaNegativeLabel.south)--(betaNegativeLabel.south |- 0,11mm)--(betaNegativePoint);
+    \draw[leader,shorten <=1.5pt,shorten >=1mm]
+      (betaPositivePoint)--(betaPositiveLabel);
+  \end{tikzpicture}}\\\hline
+\comparisonrow
+  {h:D\mathrel{\notationhighlight{\mathord{\to}}} K}
+  {Function mapping}
+  {Domain $D$ \quad codomain $K$}
+  {$f:\mathbb R\mathrel{\notationhighlight{\mathord{\to}}}\mathbb R$}
+  {$g:[0,\infty)\mathrel{\notationhighlight{\mathord{\to}}}\mathbb R$}
+  {$\beta:\mathbb R\mathrel{\notationhighlight{\mathord{\to}}}\mathbb R$}
+\comparisonrow
+  {\mathop{\notationhighlight{\mathord{\operatorname{dom}}}}(h)=\notationhighlight{D}}
+  {Domain}
+  {Allowed inputs}
+  {$\mathop{\notationhighlight{\mathord{\operatorname{dom}}}}(f)=\notationhighlight{\mathbb R}$}
+  {$\mathop{\notationhighlight{\mathord{\operatorname{dom}}}}(g)=\notationhighlight{[0,\infty)}$}
+  {$\mathop{\notationhighlight{\mathord{\operatorname{dom}}}}(\beta)=\notationhighlight{\mathbb R}$}
+\comparisonrow
+  {\mathop{\notationhighlight{\mathord{\operatorname{codom}}}}(h)=\notationhighlight{K}}
+  {Codomain}
+  {Declared output target}
+  {$\mathop{\notationhighlight{\mathord{\operatorname{codom}}}}(f)=\notationhighlight{\mathbb R}$}
+  {$\mathop{\notationhighlight{\mathord{\operatorname{codom}}}}(g)=\notationhighlight{\mathbb R}$}
+  {$\mathop{\notationhighlight{\mathord{\operatorname{codom}}}}(\beta)=\notationhighlight{\mathbb R}$}
+\comparisonrow
+  {x\mathrel{\notationhighlight{\mathord{\mapsto}}} h(x)}
+  {Mapping rule}
+  {$\mapsto$ maps inputs\enspace $\to$ links sets}
+  {\quad\>\!\! $x\mathrel{\notationhighlight{\mathord{\mapsto}}} x^2$}
+  {\quad\>\!\! $x\mathrel{\notationhighlight{\mathord{\mapsto}}}\sqrt{x}$}
+  {\quad\>\!\! $x\mathrel{\notationhighlight{\mathord{\mapsto}}} 2x+1$}
+\comparisonrow
+  {\notationhighlight{h(x)}}
+  {Function value}
+  {Output at input $x$}
+  {\examplemath[l]{f\mathopen{\notationhighlight{(}}3\mathclose{\notationhighlight{)}}=3^2=\notationhighlight{9}\\f\mathopen{\notationhighlight{(}}-2\mathclose{\notationhighlight{)}}=(-2)^2=\notationhighlight{4}}}
+  {\examplemath[l]{g\mathopen{\notationhighlight{(}}9\mathclose{\notationhighlight{)}}=\sqrt{9}=\notationhighlight{3}\\g\mathopen{\notationhighlight{(}}16\mathclose{\notationhighlight{)}}=\sqrt{16}=\notationhighlight{4}}}
+  {\examplemath[l]{\beta\mathopen{\notationhighlight{(}}3\mathclose{\notationhighlight{)}}=2(3)+1=\notationhighlight{7}\\\beta\mathopen{\notationhighlight{(}}-1\mathclose{\notationhighlight{)}}=2(-1)+1=\notationhighlight{-1}}}
+\comparisonrow
+  {\mathop{\notationhighlight{\mathord{\operatorname{range}}}}(h)}
+  {Range}
+  {Only attained outputs}
+  {$\mathop{\notationhighlight{\mathord{\operatorname{range}}}}(f)=\notationhighlight{[0,\infty)}$}
+  {$\mathop{\notationhighlight{\mathord{\operatorname{range}}}}(g)=\notationhighlight{[0,\infty)}$}
+  {$\mathop{\notationhighlight{\mathord{\operatorname{range}}}}(\beta)=\notationhighlight{\mathbb R}$}
+\end{tabularx}\par
+\endgroup
+\vspace{2mm}
+% --- Probability and events ---
+\sectionheading{Probability and events}
+\begingroup
+\setlength{\tabcolsep}{0.6mm}
+% Share exact column dimensions between the context panel and main table.
+\setlength{\SymbolWidth}{.13\linewidth}
+\setlength{\MeaningWidth}{.25\linewidth}
+\setlength{\ExampleWidth}{\dimexpr(\linewidth-\SymbolWidth-\MeaningWidth-6\tabcolsep)/2\relax}
+\newcolumntype{V}{@{}p{\SymbolWidth}p{\MeaningWidth}p{\ExampleWidth}p{\ExampleWidth}@{}}
+\begingroup
+\setlength{\fboxsep}{0.5mm}
+\setlength{\fboxrule}{0.35pt}
+\noindent\fcolorbox{PosterAccent}{PosterAccent!10}{%
+  \begin{minipage}{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}
+  \ExampleFont\color{PosterInk}%
+  % Cancel the frame inset to retain the main table's column origins.
+  \makebox[\linewidth][l]{%
+  \hspace*{\dimexpr-\fboxsep-\fboxrule\relax}%
+  \begin{tabular}{V}
+  \multicolumn{2}{@{}p{\dimexpr\SymbolWidth+\MeaningWidth+2\tabcolsep\relax}}{%
+    \begin{minipage}[t]{\linewidth}\raggedright
+    {\centering\textbf{Example contexts}\par}
+    \vspace{0.5mm}
+    \textbf{Fractions, decimals, and percentages can express the same probability:}\par
+    \vspace{0.5mm}
+    {\centering
+    $\displaystyle P(A)=\frac{1}{2}=0.5=50\%$\par
+    \vspace{0.5mm}
+    $\displaystyle P(F)=\frac{3}{4}=0.75=75\%$\par}
+    \vspace{0.5mm}
+    Divide the numerator by the denominator to obtain the decimal representation.
+    Multiply the decimal by $100$ to obtain the percentage.\par
+    \end{minipage}}&
+  \begin{minipage}[t]{\ExampleWidth}\raggedright
+  \textbf{Die: one fair die roll}\par
+  A six-sided die\par
+  $\Omega=\{1,2,3,4,5,6\}$\par
+  \begingroup
+  \begin{tabularx}{\linewidth}{@{}>{\collectcell\contextcell}l<{\endcollectcell}>{\collectcell\subrowcell}X<{\endcollectcell}@{}}
+  \textbf{Symbol / event set}&\textbf{Meaning}\\
+  $A=\{1,3,5\}$&Odd result\\
+  $B=\{1,2\}$&Result at most $2$\\
+  $C=\{2,4,6\}$&Even result
+  \end{tabularx}\endgroup
+  \end{minipage}&
+  \begin{minipage}[t]{\ExampleWidth}\raggedright
+  \textbf{Coins: two independent fair tosses}\par
+  $\mathrm H$: heads, $\mathrm T$: tails\par
+  $\Omega=\{\mathrm{HH},\mathrm{HT},\mathrm{TH},\mathrm{TT}\}$\par
+  \begingroup
+  \begin{tabularx}{\linewidth}{@{}>{\collectcell\contextcell}l<{\endcollectcell}>{\collectcell\subrowcell}X<{\endcollectcell}@{}}
+  \textbf{Symbol / event set}&\textbf{Meaning}\\
+  $F=\{\mathrm{HH},\mathrm{HT},\mathrm{TH}\}$&At least one head\\
+  $G=\{\mathrm{HH},\mathrm{TT}\}$&Matching results\\
+  $J=\{\mathrm{TT}\}$&No heads
+  \end{tabularx}\endgroup
+  \end{minipage}
+  \end{tabular}}\par
+  \end{minipage}}\par
+\endgroup
+\vspace{0.7mm}
+% Compact this table locally so the complete probability poster stays on one page.
+\setlength{\RowPadding}{0.15mm}
+\renewcommand{\arraystretch}{1}
+\renewcommand{\ExampleLineStretch}{1.02}
+\arrayrulecolor{PosterRule}
+% Separate notation and definitions beside the two original experiment columns.
+\newcommand{\probabilityrow}[5]{%
+  \paddedcell{\centering\SymbolFont\ensuremath{\displaystyle #1}}&%
+  \paddedcell{\DefinitionFont\conceptmeaning{\if\relax\detokenize{#2}\relax\else#2:\fi}{\meaningexplanation{#3}}}&%
+  \paddedcell{\ExampleFont #4}&\paddedcell{\ExampleFont #5}\\\hline}
+\begin{tabular}{V}
+\paddedcell{\centering\TableHeadFont Symbol}&
+\paddedcell{\TableHeadFont Meaning}&
+\paddedcell{\TableHeadFont Die examples}&
+\paddedcell{\TableHeadFont Coins examples}\\\hline
+\probabilityrow
+  {\notationhighlight{\Omega}\quad\notationhighlight{\omega}}
+  {Sample space; outcome}
+  {All outcomes; one outcome}
+  {$|\notationhighlight{\Omega}|=6$ \qquad $\notationhighlight{\omega}=3\in\notationhighlight{\Omega}$\par \qquad \qquad \quad \> $\notationhighlight{\omega}=6\in\notationhighlight{\Omega}$}
+  {$|\notationhighlight{\Omega}|=4$ \qquad $\notationhighlight{\omega}=\mathrm{HT}\in\notationhighlight{\Omega}$\par \qquad \qquad \quad \> $\notationhighlight{\omega}=\mathrm{HH}\in\notationhighlight{\Omega}$}
+\probabilityrow
+  {\notationhighlight{E}\subseteq\Omega}
+  {Input: event}
+  {Outcome set, not a probability}
+  {\examplemath[l]{\notationhighlight{E}_1=\{1,4,6\},\quad |\notationhighlight{E}_1|=3\\\notationhighlight{E}_2=\{2,5\},\quad |\notationhighlight{E}_2|=2}}
+  {\examplemath[l]{\notationhighlight{E}_1=\{\mathrm{HH},\mathrm{HT}\},\quad |\notationhighlight{E}_1|=2\\\notationhighlight{E}_2=\{\mathrm{HH},\mathrm{TH}\},\quad |\notationhighlight{E}_2|=2}}
+\probabilityrow
+  {\begin{gathered}\notationhighlight{\mathcal P}(\Omega)\\{}=\{E:E\subseteq\Omega\}\end{gathered}}
+  {Power set; domain of $P$}
+  {All events (subsets of $\Omega$).}
+  {$|\notationhighlight{\mathcal P}(\Omega)|=2^6=64$; e.g.\par $\varnothing,\Omega,A,B,C,\{1\},A\cap B$}
+  {$|\notationhighlight{\mathcal P}(\Omega)|=2^4=16$; e.g.\par $\varnothing,\Omega,F,G,J,\{\mathrm{HT}\},F\cap G$}
+\probabilityrow
+  {\notationhighlight{P}}
+  {Probability measure}
+  {Function $\notationhighlight{P}:\mathcal P(\Omega)\to[0,1]$, $E\mapsto \notationhighlight{P}(E)$}
+  {\examplemath[l@{\quad}l]{\notationhighlight{P}(\varnothing)=0&\notationhighlight{P}(A)=\tfrac12\\\notationhighlight{P}(B)=\tfrac13&\notationhighlight{P}(\{6\})=\tfrac16}}
+  {\examplemath[l@{\quad}l]{\notationhighlight{P}(\Omega)=1&\notationhighlight{P}(F)=\tfrac34\\\notationhighlight{P}(G)=\tfrac12&\notationhighlight{P}(\{\mathrm{HT}\})=\tfrac14}}
+\probabilityrow
+  {[0,1]}
+  {Codomain}
+  {Declared numerical target }
+  {$[0,1]$ or $[0\%,100\%]$}
+  {$[0,1]$ $[0,1]$ or $[0\%,100\%]$}
+
+\probabilityrow
+  {\notationhighlight{P(E)}}
+  {Output: probability}
+  {Numerical value; $P(\varnothing)=\notationhighlight{0}$}
+  {$P(A)=\notationhighlight{\tfrac12}$ \quad $P(B)=\notationhighlight{\tfrac13}$ \quad $P(C)=\notationhighlight{\tfrac12}$}
+  {$P(F)=\notationhighlight{\tfrac34}$ \quad $P(G)=\notationhighlight{\tfrac12}$ \quad $P(J)=\notationhighlight{\tfrac14}$}
+\probabilityrow
+  {\notationhighlight{\text{Range}}(P)}
+  {}
+  {Attained probabilities}
+  {$\notationhighlight{\{0,\tfrac16,\tfrac26,\ldots,1\}}$}
+  {$\notationhighlight{\{0,\tfrac14,\tfrac12,\tfrac34,1\}}$}
+\probabilityrow
+  {P(E)=\frac{\notationhighlight{|}E\notationhighlight{|}}{\notationhighlight{|}\Omega\notationhighlight{|}}}
+  {Classical probability}
+  {Equally likely finite outcomes:}
+  {\examplemath[l]{A=\{1,3,5\}\\P(A)=\frac{\notationhighlight{|}A\notationhighlight{|}}{\notationhighlight{|}\Omega\notationhighlight{|}}=\frac{\notationhighlight{3}}{\notationhighlight{6}}=\tfrac12}}
+  {\examplemath[l]{F=\{\mathrm{HH},\mathrm{HT},\mathrm{TH}\}\\P(F)=\frac{\notationhighlight{|}F\notationhighlight{|}}{\notationhighlight{|}\Omega\notationhighlight{|}}=\frac{\notationhighlight{3}}{\notationhighlight{4}}}}
+\probabilityrow
+  {E^{\notationhighlight{c}}}
+  {Complement}
+  {In $\Omega$, outside $E$; $P(E^{\notationhighlight{c}})=1-P(E)$}
+  {\examplemath[l@{\quad}l]{A^{\notationhighlight{c}}=C&\{1,2\}^{\notationhighlight{c}}=\{3,4,5,6\}\\P(A^{\notationhighlight{c}})=\tfrac12&P(\{1,2\}^{\notationhighlight{c}})=\tfrac46=\tfrac23}}
+  {\examplemath[l@{\quad}l]{F^{\notationhighlight{c}}=J&\{\mathrm{HT}\}^{\notationhighlight{c}}=\{\mathrm{HH},\mathrm{TH},\mathrm{TT}\}\\P(F^{\notationhighlight{c}})=\tfrac14&P(\{\mathrm{HT}\}^{\notationhighlight{c}})=\tfrac34}}
+\probabilityrow
+  {E_1\mathbin{\notationhighlight{\cup}} E_2}
+  {Union}
+  {$E_1$ or $E_2$, or both}
+  {$A\mathbin{\notationhighlight{\cup}} B=A+B=\{1,2,3,5\}$}
+  {$F\mathbin{\notationhighlight{\cup}} G=F+G=\Omega$}
+\probabilityrow
+  {E_1\mathbin{\notationhighlight{\cap}} E_2}
+  {Intersection}
+  {$E_1$ and $E_2$ together}
+  {$A\mathbin{\notationhighlight{\cap}} B=AB=\{1\}$}
+  {$F\mathbin{\notationhighlight{\cap}} G=FG=\{\mathrm{HH}\}$}
+\probabilityrow
+  {\notationhighlight{E_1\cap E_2=\varnothing}}
+  {Disjoint}
+  {Mutually exclusive:}
+  {$\notationhighlight{A\cap C= AC = \varnothing}$}
+  {$\notationhighlight{F\cap J=\varnothing}$}
+\probabilityrow
+  {}
+  {Addition for disjoint events}
+  {If $E_1\cap E_2=\varnothing$ \qquad then $P(E_1\cup E_2)=P(E_1)+P(E_2)$}
+  {$P(A\cup C)=\tfrac12+\tfrac12=1$}
+  {$P(F\cup J)=\tfrac34+\tfrac14=1$}
+\paddedcell{\centering\SymbolFont $\displaystyle
+  \begin{gathered}P(E_1\cap E_2)\\{}=P(E_1)P(E_2)\end{gathered}$}&
+\paddedcell{\DefinitionFont\conceptmeaning{Independent events}{%
+  \meaningexplanation{The product rule at left defines independence.}\par
+  \meaningexplanation{Knowing one does not change the other's probability.}}}&
+\multicolumn{2}{p{\dimexpr2\ExampleWidth+2\tabcolsep\relax}@{}}{\paddedcell{\ExampleFont\raggedright
+  \textbf{Coin example: independence}\par
+  \begingroup
+  \begin{tabularx}{\linewidth}{@{}>{\collectcell\contextcell}l<{\endcollectcell}>{\collectcell\subrowcell}X<{\endcollectcell}@{}}
+  \textbf{Symbol}&\textbf{Meaning}\\
+  $E_1=\{\mathrm{HH},\mathrm{HT}\}$&First toss is heads\\
+  $E_2=\{\mathrm{HH},\mathrm{TH}\}$&Second toss is heads\\
+  $E_1\cap E_2=\{\mathrm{HH}\}$&Both tosses are heads\\
+  $P(E_1)=P(E_2)=\tfrac12$&Each event has two of four outcomes\\
+  $P(E_1\cap E_2)=P(E_1)P(E_2)=\tfrac12\cdot\tfrac12=\tfrac14$ \hspace{3mm} &One of four outcomes
+  \end{tabularx}\endgroup
+}}\\\hline
+\end{tabular}\par
+\endgroup
+{\color{PosterInk}\hrule height 0.5pt}\vspace{0.7mm}
+\endgroup
+\endgroup
+\newpage
+% ==========================================================================
+% PAGE B-1: SEQUENCES AND SUMMATION
+% ==========================================================================
+\selectposterpalette{B}
+\posterheader{B-1\quad SEQUENCES AND SUMMATION}
+\begingroup
+\compacttables
+% --- Sequences and subscripts ---
+\sectionheading{Sequences and subscripts}
+\renewcommand{\ContextHeading}{Reading guide}
+\examplecontexts{A \textbf{sequence} is an ordered list of indexed terms. Parentheses show sequences; braces show sets. Here all indices start at $i=1$, and $n\in\mathbb N$, $n\geq1$. Read each row across to compare the three sequences.}
+\begingroup
+\setlength{\tabcolsep}{0.8mm}
+\setlength{\RowPadding}{0.95mm}
+\renewcommand{\arraystretch}{1}
+\arrayrulecolor{PosterRule}
+% Local row helpers serve sequences and partial sums.
+% Concept-only rows leave Symbol empty rather than introduce new notation.
+% Coral marks isolate newly introduced symbols, indices, and bounds.
+% Carry each row's role through every example, including substituted indices and values.
+
+\newcommand{\sequencehead}{%
+  \paddedcell{\centering\TableHeadFont Symbol}&%
+  \paddedcell{\TableHeadFont Meaning}&%
+  \paddedcell{\TableHeadFont Sequence $a$}&%
+  \paddedcell{\TableHeadFont Sequence $b$}&%
+  \paddedcell{\TableHeadFont Sequence $c$}\\\hline}
+\begin{tabularx}{\linewidth}{@{}p{.10\linewidth}p{.18\linewidth}p{.225\linewidth}p{.225\linewidth}X@{}}
+\sequencehead
+\comparisonrow
+  {k_{\notationhighlight{i}}=f(\notationhighlight{i})}
+  {Rule and first terms}
+  {Substitute the index.}
+  {\examplemath[l]{a_{\notationhighlight{i}}=2\cdot\notationhighlight{i}\\(2\cdot\notationhighlight{1},2\cdot\notationhighlight{2},2\cdot\notationhighlight{3},2\cdot\notationhighlight{4},\ldots)\\=(2,4,6,8,\ldots)}}
+  {\examplemath[l]{b_{\notationhighlight{i}}=\notationhighlight{i}^2\\((\notationhighlight{1})^2,(\notationhighlight{2})^2,(\notationhighlight{3})^2,(\notationhighlight{4})^2,\ldots)\\=(1,4,9,16,\ldots)}}
+  {\examplemath[l]{c_{\notationhighlight{i}}=2^{\notationhighlight{i}-1}\\(2^{\notationhighlight{1}-1},2^{\notationhighlight{2}-1},2^{\notationhighlight{3}-1},2^{\notationhighlight{4}-1},\ldots)\\=(1,2,4,8,\ldots)}}
+\comparisonrow
+  {k_{\notationhighlight{i}}}
+  {Indexed term}
+  {Subscript: position.}
+  {\examplemath[l]{a_{\notationhighlight{3}}=2(\notationhighlight{3})=6\\a_{\notationhighlight{4}}=2(\notationhighlight{4})=8}}
+  {\examplemath[l]{b_{\notationhighlight{3}}=(\notationhighlight{3})^2=9\\b_{\notationhighlight{5}}=(\notationhighlight{5})^2=25}}
+  {\examplemath[l]{c_{\notationhighlight{3}}=2^{\notationhighlight{3}-1}=4\\c_{\notationhighlight{6}}=2^{\notationhighlight{6}-1}=32}}
+\comparisonrow
+  {k_{\notationhighlight{1}},\ k_{\notationhighlight{n}}}
+  {First term; $n$th term}
+  {Term at $1$ or $n$.}
+  {$a_{\notationhighlight{1}}=2$ \par $a_{\notationhighlight{n}}=2\notationhighlight{n}$}
+  {$b_{\notationhighlight{1}}=1$ \par $b_{\notationhighlight{n}}=\notationhighlight{n}^2$}
+  {$c_{\notationhighlight{1}}=1$ \par $c_{\notationhighlight{n}}=2^{\notationhighlight{n}-1}$}
+\comparisonrow
+  {(k_{i})_{i=1}^{\notationhighlight{4}}}
+  {Finite sequence}
+  {Last index fixes length.}
+  {\examplemath[l]{(a_{i})_{i=1}^{\notationhighlight{4}}=(2,4,6,8)\\(a_{i})_{i=1}^{\notationhighlight{3}}=(2,4,6)}}
+  {\examplemath[l]{(b_{i})_{i=1}^{\notationhighlight{4}}=(1,4,9,16)\\(b_{i})_{i=1}^{\notationhighlight{2}}=(1,4)}}
+  {\examplemath[l]{(c_{i})_{i=1}^{\notationhighlight{4}}=(1,2,4,8)\\(c_{i})_{i=1}^{\notationhighlight{1}}=(1)}}
+\comparisonrow
+  {(k_{i})_{i=1}^{\notationhighlight{\infty}}}
+  {Infinite sequence, etc.}
+  {No last term; $\infty$ is no index.}
+  {$(a_{i})_{i=1}^{\notationhighlight{\infty}}$\par $=(2,4,6,8,\ldots)$}
+  {$(b_{i})_{i=1}^{\notationhighlight{\infty}}$\par $=(1,4,9,16,\ldots)$}
+  {$(c_{i})_{i=1}^{\notationhighlight{\infty}}$\par $=(1,2,4,8,\ldots)$}
+\comparisonrow
+  {}
+  {Sequence order}
+  {Order matters.}
+  {$(a_{1},a_{2})\ne(a_{2},a_{1})$\par $(2,4)\ne(4,2)$}
+  {$(b_{1},b_{2})\ne(b_{2},b_{1})$\par $(1,4)\ne(4,1)$}
+  {$(c_{1},c_{2})\ne(c_{2},c_{1})$\par $(1,2)\ne(2,1)$}
+\comparisonrow
+  {}
+  {Sequence repetition}
+  {Repetition matters.}
+  {$(2,2,4)\ne(2,4)$}
+  {$(1,1,4)\ne(1,4)$}
+  {$(1,1,2)\ne(1,2)$}
+\end{tabularx}\par
+\vspace{0.5mm}
+{\FooterFont An index is not multiplication or an exponent. Sets ignore order and repetition sequences do not.\par}
+\vspace{3mm}
+% --- Summation and partial sums ---
+\sectionheading{Summation and partial sums}
+\renewcommand{\ContextHeading}{From terms to their sum}
+\examplecontexts{A \textbf{series} is a sum of sequence terms. The symbol $\mathop{\notationhighlight{\mathord{\sum}}}\displaylimits$ adds the summand as its index runs through consecutive integers between the bounds, \textbf{inclusive}. A partial sum adds finitely many terms.\par
+In $S_{n}^{(\notationhighlight{a})}$, $S_{m}^{(\notationhighlight{b})}$, and $S_{l}^{(\notationhighlight{c})}$, the parenthesized superscripts \textbf{label the sequence being summed; they are not powers}. The subscript $\notationhighlight{n}$, $\notationhighlight{m}$, or $\notationhighlight{l}$ counts the terms when the sum starts at $1$.}
+\begingroup
+\begin{tabularx}{\linewidth}{@{}p{.10\linewidth}p{.2\linewidth}p{.225\linewidth}p{.225\linewidth}X@{}}
+\sequencehead
+\comparisonrow
+  {\notationhighlight{k_{i}} = f(i)}
+  {Summand}
+  {Term being added.}
+  {$\notationhighlight{a_{i}}=2i$}
+  {$\notationhighlight{b_{i}}=i^2$}
+  {$\notationhighlight{c_{i}}=2^{i-1}$}
+\comparisonrow
+  {\sum_{\notationhighlight{i}=\notationhighlight{1}}^{\notationhighlight{n}}f(\notationhighlight{i})}
+  {Bounds and index}
+  {Lower bound $1$; upper bound $n,m,l$; local index $i$.}
+  {$\sum_{\notationhighlight{i}=\notationhighlight{1}}^{\notationhighlight{n}}a_{\notationhighlight{i}}$\par\vspace{1.8mm}Start: $a_{\notationhighlight{1}}$ | End: $a_{\notationhighlight{n}}$}
+  {$\sum_{\notationhighlight{i}=\notationhighlight{1}}^{\notationhighlight{m}}b_{\notationhighlight{i}}$\par\vspace{1.8mm}Start: $b_{\notationhighlight{1}}$ | End: $b_{\notationhighlight{m}}$}
+  {$\sum_{\notationhighlight{i}=\notationhighlight{1}}^{\notationhighlight{l}}c_{\notationhighlight{i}}$\par\vspace{1.8mm}Start: $c_{\notationhighlight{1}}$ | End: $c_{\notationhighlight{l}}$}
+\comparisonrow
+  {\notationhighlight{S}_{n}}
+  {Partial sum of the first $n$ terms}
+  {Add through index $n$, $m$, or $l$.}
+  {$\notationhighlight{S}_{n}^{(a)}=\sum_{i=1}^{n}a_{i}$\par\vspace{1.8mm}\qquad\! $=a_{1}+\cdots+a_{n}$}
+  {$\notationhighlight{S}_{m}^{(b)}=\sum_{i=1}^{m}b_{i}$\par\vspace{1.8mm}\qquad\! $=b_{1}+\cdots+b_{m}$}
+  {$\notationhighlight{S}_{l}^{(c)}=\sum_{i=1}^{l}c_{i}$\par\vspace{1.8mm}\qquad\! $=c_{1}+\cdots+c_{l}$}
+\comparisonrow
+  {\notationhighlight{a}_{4}\text{ vs }\notationhighlight{S}_{4}}
+  {Fourth term versus fourth partial sum}
+  {One term vs. four-term sum.}
+  {$\notationhighlight{a}_{4}=\notationhighlight{8}$\par\vspace{1.8mm} $\notationhighlight{S}_{4}^{(a)}=2+4+6+8=\notationhighlight{20}$}
+  {$\notationhighlight{b}_{4}=\notationhighlight{16}$\par\vspace{1.8mm} $\notationhighlight{S}_{4}^{(b)}=1+4+9+16=\notationhighlight{30}$}
+  {$\notationhighlight{c}_{4}=\notationhighlight{8}$\par\vspace{1.8mm} $\notationhighlight{S}_{4}^{(c)}=1+2+4+8=\notationhighlight{15}$}
+\comparisonrow
+  {\notationhighlight{i},\notationhighlight{j},\notationhighlight{k}}
+  {Index renaming}
+  {Rename the index throughout; keep bounds.}
+  {\examplemath[l]{S_{4}^{(a)}=\sum_{\notationhighlight{i}=1}^{4}a_{\notationhighlight{i}}=20\\{}\qquad\!=\sum_{\notationhighlight{j}=1}^{4}a_{\notationhighlight{j}}=20\\{}\qquad\!=\sum_{\notationhighlight{k}=1}^{4}a_{\notationhighlight{k}}=20}}
+  {\examplemath[l]{S_{4}^{(b)}=\sum_{\notationhighlight{i}=1}^{4}b_{\notationhighlight{i}}=30\\{}\qquad\!=\sum_{\notationhighlight{j}=1}^{4}b_{\notationhighlight{j}}=30\\{}\qquad=\sum_{\notationhighlight{k}=1}^{4}b_{\notationhighlight{k}}=30}}
+  {\examplemath[l]{S_{4}^{(c)}=\sum_{\notationhighlight{i}=1}^{4}c_{\notationhighlight{i}}=15\\{}\qquad\!=\sum_{\notationhighlight{j}=1}^{4}c_{\notationhighlight{j}}=15\\{}\qquad\!=\sum_{\notationhighlight{k}=1}^{4}c_{\notationhighlight{k}}=15}}
+\end{tabularx}\par
+\endgroup
+\vspace{3mm}
+% --- Worked summation examples ---
+\sectionheading{Worked summation examples}
+% Label only the first expansion. Reserve the full stack depth, including
+% clearance for highlight padding, a short upward arrow, and a readable label.
+\newcommand{\indexedterm}[3]{\mathord{\vtop{\offinterlineskip
+  \halign{\hfil##\hfil\cr
+    $\mathsurround=0pt #1$\cr
+    \noalign{\kern3.5pt}$\mathsurround=0pt\scriptscriptstyle\uparrow$\cr
+    \noalign{\kern1.5pt}$\mathsurround=0pt\scriptstyle\notationhighlight{#2=#3}$\cr}}}}
+\setlength{\RowPadding}{1.5mm}
+\renewcommand{\ExampleLineStretch}{1.3}
+\renewcommand{\SymbolColumnFraction}{.23}
+\renewcommand{\MeaningColumnFraction}{.35}
+\paralleltables{
+\notationrow
+  {\displaystyle\sum_{\notationhighlight{i=2}}^{4}3}
+  {\conceptmeaning{Constant sum}{\meaningexplanation{Add $3$ for $\notationhighlight{i=2,3,4}$}}}
+  {\examplemath[l]{\indexedterm{3}{i}{2}+\indexedterm{3}{i}{3}+\indexedterm{3}{i}{4}=9}}
+\notationrow
+  {\displaystyle\sum_{\notationhighlight{k=1}}^{3}k^{\notationhighlight{2}}}
+  {\conceptmeaning{Sum of squares}{\meaningexplanation{Square $k$ for\\ $\notationhighlight{k=1,2,3}$}}}
+  {\examplemath[l]{\indexedterm{1^{\notationhighlight{2}}}{k}{1}+\indexedterm{2^{\notationhighlight{2}}}{k}{2}+\indexedterm{3^{\notationhighlight{2}}}{k}{3}\\[1.8mm]{}=1+4+9=14}}
+\notationrow
+  {\displaystyle\sum_{\notationhighlight{j=0}}^{3}2^{j}}
+  {\conceptmeaning{Starting at zero}{\meaningexplanation{Powers of $2$;\\ $\notationhighlight{j=0,1,2,3}$}}}
+  {\examplemath[l]{\indexedterm{2^{\notationhighlight{0}}}{j}{0}+\indexedterm{2^{1}}{j}{1}+\indexedterm{2^{2}}{j}{2}+\indexedterm{2^{3}}{j}{3}\\[1.8mm]{}=1+2+4+8=15}}
+}{
+\notationrow
+  {\displaystyle\sum_{\notationhighlight{i=3}}^{5}i}
+  {\conceptmeaning{Shifted lower bound}{\meaningexplanation{Add $i$ for $\notationhighlight{i=3,4,5}$}}}
+  {\examplemath[l]{\indexedterm{\notationhighlight{3}}{i}{3}+\indexedterm{4}{i}{4}+\indexedterm{5}{i}{5}=12}}
+\notationrow
+  {\displaystyle\sum_{\notationhighlight{j=2}}^{4}b_{\notationhighlight{j}}}
+  {\conceptmeaning{Sequence terms}{\meaningexplanation{$b_{\notationhighlight{j}}=\notationhighlight{j}^2$;\\ $\notationhighlight{j=2,3,4}$}}}
+  {\examplemath[l]{\indexedterm{b_{\notationhighlight{2}}}{j}{2}+\indexedterm{b_{\notationhighlight{3}}}{j}{3}+\indexedterm{b_{\notationhighlight{4}}}{j}{4}\\[1.8mm]{}=(\notationhighlight{2})^2+(\notationhighlight{3})^2+(\notationhighlight{4})^2\\[1.8mm]{}=4+9+16=29}}
+\notationrow
+  {\displaystyle\sum_{\notationhighlight{k=1}}^{4}(2\notationhighlight{k}+1)}
+  {\conceptmeaning{Linear summand}{\meaningexplanation{$\notationhighlight{k=1,\ldots,4}$; add $2\notationhighlight{k}+1$}}}
+  {\examplemath[l]{\indexedterm{(2(\notationhighlight{1})+1)}{k}{1}+\indexedterm{(2(\notationhighlight{2})+1)}{k}{2}\\[1.8mm]{}\quad+\indexedterm{(2(\notationhighlight{3})+1)}{k}{3}+\indexedterm{(2(\notationhighlight{4})+1)}{k}{4}\\[1.8mm]{}=3+5+7+9=24}}
+}
+\endgroup
+{\color{PosterInk}\hrule height 0.5pt}\vspace{0.7mm}
+{\FooterFont Symbols acquire meaning from their mathematical context. State the starting index and label the sequence in every partial sum.\par}
+\endgroup
+\newpage
+% ==========================================================================
+% PAGE B-2: LIMITS AND CALCULUS
+% ==========================================================================
+\selectposterpalette{B}
+\posterheader{B-2\quad LIMITS AND CALCULUS}
+\begingroup
+% The densest poster needs slightly smaller body/example type; symbols and
+% headings retain the common sizes and no table is scaled.
+\renewcommand{\DefinitionFont}{\fontsize{12.6}{14.4}\selectfont}
+\renewcommand{\ExampleFont}{\fontsize{12.4}{14.4}\selectfont}
+\setlength{\RowPadding}{0.20mm}
+% Local column proportions reserve room for wrapped calculus examples.
+\renewcommand{\SymbolColumnFraction}{.25}
+\renewcommand{\MeaningColumnFraction}{.34}
+% Body notationrow uses centeredcell directly; paddedcell remains a separate
+% dispatch hook so headers/references keep 0.20 mm while body clearance varies.
+% These definitions and all smaller calculus fonts are confined to this page.
+\newcommand{\calculusrowpadding}[1]{%
+  \setlength{\RowPadding}{#1}%
+  \renewcommand{\paddedcell}[1]{{\setlength{\RowPadding}{0.20mm}\centeredcell{##1}}}%
+}
+% --- Limits and approaching values: read the numbered columns left to right ---
+\sectionheading{Limits and approaching values}
+\begingroup
+\setlength{\tabcolsep}{2mm}
+\arrayrulecolor{PosterRule}
+% Three measured cells give the progression a visible order; no table scaling.
+\begin{tabularx}{\linewidth}{@{}p{.25\linewidth}p{.37\linewidth}X@{}}
+\paddedcell{\TableHeadFont 1. Approaching an input}&
+\paddedcell{\TableHeadFont 2. Approaching an output}&
+\paddedcell{\TableHeadFont 3. Distinguish special cases}\\\hline
+\paddedcell{\DefinitionFont
+  $x\mathrel{\notationhighlight{\mathord{\to}}}a$: inputs get arbitrarily close to $a$; this is different from $x=a$.\par\vspace{1.5mm}
+  $x\mathrel{\notationhighlight{\mathord{\to}}}2$: $x$ approaches $2$; $x=2$ is exact.\par\vspace{2mm}
+  \textbf{Read the two sides together:}\par
+  $x\to a^{\notationhighlight{-}}$: approach from $x<a$.\par
+  $x\to a^{\notationhighlight{+}}$: approach from $x>a$.\par\vspace{1.5mm}
+  For example, $x\to2^{\notationhighlight{-}}$ uses $x<2$; $x\to2^{\notationhighlight{+}}$ uses $x>2$.\par\vspace{1.5mm}
+  \meaningexplanation{$a^-$ and $a^+$ show the approach side, not the sign of $f(x)$.}}
+&\paddedcell{\DefinitionFont
+  {\centering\SymbolFont $\displaystyle
+    \mathop{\notationhighlight{\mathord{\lim}}}\limits_{x\to a}f(x)=L$\par}
+  Read: input $x$ approaches $a$; output $f(x)$ approaches $L\in\mathbb R$.\par\vspace{0.6mm}
+  Use nearby domain inputs $x\ne a$; $f(a)$ may differ from $L$ or be undefined.\par\vspace{0.6mm}
+  \textbf{Both sides must agree:}\par
+  $\lim_{x\to a^-}f(x)=L=\lim_{x\to a^+}f(x)$\par
+  means the two-sided limit is $L$.\par\vspace{0.6mm}
+  \ExampleFont
+  $\mathop{\notationhighlight{\mathord{\lim}}}_{x\to2^-}x^2=4=\mathop{\notationhighlight{\mathord{\lim}}}_{x\to2^+}x^2$, so $\mathop{\notationhighlight{\mathord{\lim}}}_{x\to2}x^2=4$\par\vspace{0.6mm}
+  $\lim_{x\to1}\frac{x^2-1}{x-1}=2$: the quotient equals $x+1$ for $x\ne1$, but is undefined at $x=1$.}
+&\paddedcell{\DefinitionFont
+  \textbf{Unequal one-sided limits:}\par
+  For $g(x)=|x|/x$, $x\ne0$,\par
+  $\lim_{x\to0^-}g(x)=-1\ne1=\lim_{x\to0^+}g(x)$\par
+  The two-sided limit does not exist ($\notationhighlight{\text{DNE}}$).\par\vspace{0.6mm}
+  \textbf{Inputs without bound:}\par
+  $x\to\notationhighlight{+\infty}$ or $x\to\notationhighlight{-\infty}$: no finite target $a$.\par
+  $\lim_{x\to+\infty}\frac1x=0=\lim_{x\to-\infty}\frac1x$\par\vspace{0.6mm}
+  \textbf{Outputs without bound:}\par
+  $f(x)\to\notationhighlight{+\infty}$ or $f(x)\to\notationhighlight{-\infty}$: infinite-limit statements, not finite real limits.\par
+  \ExampleFont $\lim_{x\to a}\frac1{(x-a)^2}=+\infty$;\par
+  $\lim_{x\to0^+}\frac1x=+\infty$, $\lim_{x\to0^-}\frac1x=-\infty$}
+\\\hline
+\end{tabularx}\par
+\endgroup
+\vspace{2mm}
+% --- Change and derivatives ---
+\sectionheading{Change and derivatives}
+\renewcommand{\ContextHeading}{A derivative is a limit}
+\examplecontexts{Instantaneous change:
+$\displaystyle f^{\notationhighlight{\prime}}(a)=\lim_{h\to0}\frac{f(a+h)-f(a)}h$, $h\ne0$; the two-sided limit must be finite.
+For $f(x)=x^2$: $f'(a)=\lim_{h\to0}(2a+h)=2a$}
+\noindent\begin{minipage}[t]{.49\linewidth}\vspace{0pt}
+\notationtable{
+\notationrow
+  {\begin{gathered}\notationhighlight{\Delta} x,\\\notationhighlight{\Delta} y\end{gathered}}
+  {\conceptmeaning{Finite changes}{\meaningexplanation{$\notationhighlight{\Delta} x=x_2-x_1$; $\notationhighlight{\Delta} y=f(x_2)-f(x_1)$}}}
+  {$f(x)=x^2$, from $x=1$ to $x=3$:\par $\notationhighlight{\Delta} x=2$, $\notationhighlight{\Delta} y=9-1=8$}
+\notationrow
+  {\frac{\notationhighlight{\Delta} y}{\notationhighlight{\Delta} x}}
+  {\conceptmeaning{Average rate of change}{\meaningexplanation{Output change per input change; $\notationhighlight{\Delta} x\ne0$.}}}
+  {$f(x)=x^2$, from $1$ to $3$:\par $\notationhighlight{\Delta} y/\notationhighlight{\Delta} x=8/2=4$}
+\notationrow
+  {\begin{gathered}f^{\notationhighlight{\prime}}(x),\quad y^{\notationhighlight{\prime}},\\\frac{\notationhighlight{d}y}{\notationhighlight{d}x}\end{gathered}}
+  {\conceptmeaning{First derivative}{\meaningexplanation{Instantaneous rate for $y=f(x)$.}}}
+  {$y=f(x)=x^2$:\par $\begin{gathered}f^{\notationhighlight{\prime}}(x)=y^{\notationhighlight{\prime}}=\dfrac{\notationhighlight{d}y}{\notationhighlight{d}x}=2x\end{gathered}$}
+}
+\end{minipage}\hfill
+\begin{minipage}[t]{.49\linewidth}\vspace{0pt}
+\calculusrowpadding{1mm}
+\notationtable{
+\notationrow
+  {\frac{\notationhighlight{d}}{\notationhighlight{d}x},\quad f^{\notationhighlight{\prime}}(a)}
+  {\conceptmeaning{Differentiation; value at a point}{\meaningexplanation{$\notationhighlight{d}/\notationhighlight{d}x$: operator; $f^{\notationhighlight{\prime}}(a)$: derivative value at $a$.}}}
+  {$\dfrac{\notationhighlight{d}}{\notationhighlight{d}x}(x^2)=2x$\par $f^{\notationhighlight{\prime}}(3)=2(3)=6$}
+\notationrow
+  {\begin{gathered}f^{\notationhighlight{\prime\prime}}(x),\\\frac{d^{\notationhighlight{2}}y}{dx^{\notationhighlight{2}}}\end{gathered}}
+  {\conceptmeaning{Second derivative}{\meaningexplanation{Derivative of the first derivative.}}}
+  {$y=f(x)=x^2$:\par $\begin{gathered}f^{\notationhighlight{\prime\prime}}(x)=\dfrac{d^{\notationhighlight{2}}y}{dx^{\notationhighlight{2}}}=2\end{gathered}$}
+}
+\end{minipage}\par\vspace{2mm}
+% --- Integrals and evaluation ---
+\sectionheading{Integrals and evaluation}
+\noindent\begin{minipage}[t]{.49\linewidth}\vspace{0pt}
+\notationtable{
+\notationrow
+  {\notationintegral{\int} f(x)\,dx}
+  {\conceptmeaning{Indefinite integral}{\meaningexplanation{Antiderivatives $F(x)+C$; $F'=f$, $C\in\mathbb R$.}}}
+  {$\displaystyle\notationintegral{\int} 2x\,dx=x^2+C$\par A family of functions, one for each $C$.}
+\notationrow
+  {\notationintegral{\int_a^b} f(x)\,dx}
+  {\conceptmeaning{Definite integral}{\meaningexplanation{Signed accumulation from $a$ to $b$; integrand $f(x)$.}}}
+  {$\displaystyle\notationintegral{\int_1^2} 2x\,dx=3$\par A numerical value; signed accumulation is not always geometric area.}
+\notationrow
+  {F(x)\notationhighlight{\big|}_a^b}
+  {\conceptmeaning{Evaluation at the bounds}{\meaningexplanation{$F(b)-F(a)$. Equals $\int_a^b f(x)\,dx$ if $f$ is continuous on $[a,b]$ and $F'=f$.}}}
+  {\examplemath[l]{\displaystyle\int_1^2 2x\,dx=x^2\notationhighlight{\big|}_1^2\\{}=2^2-1^2=3}}
+}
+\end{minipage}\hfill
+\begin{minipage}[t]{.49\linewidth}\vspace{0pt}
+\calculusrowpadding{1mm}
+\notationtable{
+\notationrow
+  {\begin{gathered}\notationhighlight{\Delta x}=\frac{b-a}{n}\\
+  \notationhighlight{x_i}=a+i\notationhighlight{\Delta x}\\
+  \notationhighlight{R_n}=\\\sum_{i=1}^n f(\notationhighlight{x_i})\notationhighlight{\Delta x}\end{gathered}}
+  {\conceptmeaning{Riemann sum}{\meaningexplanation{Continuous $f$ on $[a,b]$; $n$ equal widths $\notationhighlight{\Delta x}$, right endpoints $\notationhighlight{x_i}$.}\par
+  $\begin{gathered}\displaystyle\int_a^b f(x)\,dx\\{}=\lim\limits_{n\to\infty}\notationhighlight{R_n}\end{gathered}$}}
+  {For $f(x)=2x$ on $[1,2]$:\par
+   \examplemath[l]{\notationhighlight{\Delta x}=\notationhighlight{1/n},\\\notationhighlight{x_i}=\notationhighlight{1+i/n}\\
+   \notationhighlight{R_n}=\sum_{i=1}^n2\bigl(\notationhighlight{1+i/n}\bigr)\bigl(\notationhighlight{1/n}\bigr)\\
+   {}=\notationhighlight{3+1/n}\to\notationhighlight{3}}}
+\notationrow
+  {\notationhighlight{d}x}
+  {\conceptmeaning{Integration variable}{\meaningexplanation{Integrate with respect to $x$.}}}
+  {In $\int_1^2 2x\,\notationhighlight{d}x$: bounds $1$, $2$;\par integrand $2x$; integration variable $x$.}
+}
+\end{minipage}\par
+
+\par\vspace{2mm}
+% --- Three complementary calculus pictures: definitions above, pictures below ---
+\sectionheading{Calculus in pictures}
+\noindent\begin{minipage}[t]{.325\linewidth}\vspace{0pt}
+{\TableHeadFont Derivative: secant to tangent\par}
+\ExampleFont $f(x)=x^2$, $a=1$; pictured $h=0.6$.\par
+% Derivative graph: Q=(1+h,f(1+h)); secant y=(2+h)x-(1+h).
+% All coordinates and both lines are evaluated from f(x)=x^2 at a=1.
+\begin{tikzpicture}[font=\fontsize{10.8}{12}\selectfont,
+  every node/.style={inner sep=1pt},line cap=round]
+  \path[use as bounding box] (0,0) rectangle (91mm,36mm);
+  \def\secantStep{0.6}
+  \begin{scope}[shift={(8mm,6mm)},x=36mm,y=7.5mm]
+    \coordinate (derivativeP) at (1,1);
+    \coordinate (derivativeQ) at ({1+\secantStep},{(1+\secantStep)^2});
+    \draw[->,line width=0.70pt] (0,0)--(2,0) node[right] {$x$};
+    \draw[->,line width=0.70pt] (0,0)--(0,3.6) node[above] {$y$};
+    \draw[PosterAccent,line width=1.70pt,domain=0:1.85,samples=50]
+      plot (\x,{\x*\x});
+    \draw[PosterInk,dashed,line width=1.4pt,domain=.25:2]
+      plot (\x,{2*\x-1});
+    \draw[PosterInk!60,line width=1.2pt,domain=.5:1.95]
+      plot (\x,{(2+\secantStep)*\x-(1+\secantStep)});
+    \draw[PosterInk!60,<->,line width=0.70pt]
+      (1,1)--({1+\secantStep},1) node[midway,below=1mm] {$\Delta x = h$};
+    \draw[PosterInk!60,<->,line width=0.70pt]
+      ({1+\secantStep},1)--(derivativeQ);
+    \fill (derivativeP) circle[radius=1.2pt] (derivativeQ) circle[radius=1.2pt];
+    \node (derivativePLabel) at (.55,2.25) {$P=(1,1)$};
+    \draw[PosterInk!60,line width=0.6pt,shorten <=1mm,shorten >=1mm]
+      (derivativePLabel.south)--(derivativeP);
+    \node (derivativeQLabel) at (1.15,3.6) {$Q$};
+    \draw[PosterInk!60,line width=0.6pt,shorten <=1mm,shorten >=1mm]
+      (derivativeQLabel.south)--(derivativeQ);
+
+    \node[anchor=west,text=PosterInk!60] at (1.72,1.7) {$\Delta y$};
+    % The existing movement arrow below Delta x = h indicates h -> 0+.
+    \draw[->,PosterAccent,line width=1.6pt] (1.5,.2)--(1.18,.2);
+    \node[below] at (2,0) {$2$};
+    \node[below left] at (0,0) {$0$};
+  \end{scope}
+\end{tikzpicture}\par
+$Q=(1+h,(1+h)^2)$; $\Delta y=f(1+h)-f(1)$\par
+Solid secant slope $\frac{\Delta y}h=2+h\to2$ as $h\to0$, $h\ne0$, from either side. $Q\to P$; dashed tangent: $y=2x-1$, $f'(1)=2$.
+\end{minipage}\hfill
+\begin{minipage}[t]{.31\linewidth}\vspace{0pt}
+{\TableHeadFont Indefinite integral: a family\par}
+\ExampleFont $\displaystyle\int2x\,dx=x^2+C$\par
+% Antiderivative graph: three translations, identified by their constants.
+\begin{tikzpicture}[font=\fontsize{10.8}{12}\selectfont,
+  every node/.style={inner sep=1pt},line cap=round,
+  densely dotted/.style={dash pattern=on .8pt off 1pt}]
+  \path[use as bounding box] (0,0) rectangle (87mm,36mm);
+  \begin{scope}[shift={(36mm,10mm)},x=17mm,y=6mm]
+    \draw[->,line width=0.70pt] (-1.8,0)--(2.55,0) node[right] {$x$};
+    \draw[->,line width=0.70pt] (0,-1.4)--(0,3.5) node[above] {$y$};
+    \foreach \constant/\linestyle in {-1/densely dotted,0/solid,1/dashed}{
+      \draw[PosterAccent,\linestyle,line width=1.6pt,domain=-1.4:1.4,samples=45]
+        plot (\x,{\x*\x+\constant});
+      \node[anchor=west] at (1.45,{1.4^2+\constant}) {$C=\constant$};
+    }
+    \node[below left] at (0,0) {$0$};
+  \end{scope}
+\end{tikzpicture}\par
+All curves have derivative $2x$: $\frac{d}{dx}(x^2+C)=2x$. The indefinite integral is a \textbf{family of functions}; changing $C$ shifts a curve vertically.
+\end{minipage}\hfill
+\begin{minipage}[t]{.325\linewidth}\vspace{0pt}
+{\TableHeadFont Definite integral: accumulation\par}
+\ExampleFont $\displaystyle\int_1^2 2x\,dx=3$\par
+% Definite-integral graph: exact trapezoid under y=2x, 1<=x<=2.
+\begin{tikzpicture}[font=\fontsize{10.8}{12}\selectfont,
+  every node/.style={inner sep=1pt},line cap=round]
+  \path[use as bounding box] (0,0) rectangle (91mm,36mm);
+  \begin{scope}[shift={(17mm,6mm)},x=23mm,y=6mm]
+    \fill[PosterAccent!18] (1,0)--(2,0)--(2,{2*2})--(1,{2*1})--cycle;
+    \draw[PosterRule,line width=0.8pt] (1,{2*1})--(1,0)--(2,0)--(2,{2*2});
+    \draw[->,line width=0.70pt] (0,0)--(2.7,0) node[right] {$x$};
+    \draw[->,line width=0.70pt] (0,0)--(0,4.6) node[above] {$y$};
+    \draw[PosterAccent,line width=1.70pt,domain=0:2.2]
+      plot (\x,{2*\x});
+    \node[above left] at (1.9,3.8) {$y=2x$};
+    \node at (1.5,1.1) {$3$};
+    \node[below=1mm] at (0,0) {$0$};
+    \node[below=1mm] at (1,0) {$1$};
+    \node[below=1mm] at (2,0) {$2$};
+    \node[left] at (0,4) {$4$};
+    \draw[PosterRule,dash pattern=on .3pt off 1pt,line width=0.6pt] (0,4)--(2,4);
+  \end{scope}
+\end{tikzpicture}\par
+On $[1,2]$, $2x\ge0$: the integral equals shaded area $\frac12(2+4)(2-1)=3$. In general, area below the axis counts negatively in \textbf{signed accumulation}.
+\end{minipage}\par\vspace{2mm}
+% --- Relevant examples ---
+\sectionheading{Relevant examples}
+\begingroup
+\setlength{\tabcolsep}{1mm}
+\setlength{\RowPadding}{0.45mm}
+\renewcommand{\arraystretch}{1}
+\arrayrulecolor{PosterRule}
+\newcommand{\calculusrow}[3]{%
+  \paddedcell{\SymbolFont $\displaystyle #1$}&%
+  \paddedcell{\SymbolFont $\displaystyle #2$}&%
+  \paddedcell{\SymbolFont $\displaystyle #3$}\\\hline}
+\noindent\begin{minipage}[t]{.52\linewidth}\vspace{0pt}
+\begin{tabularx}{\linewidth}{@{}p{.30\linewidth}p{.26\linewidth}X@{}}
+\paddedcell{\TableHeadFont Function $f(x)$}&
+\paddedcell{\TableHeadFont Derivative $f'(x)$}&
+\paddedcell{\TableHeadFont Indefinite integral\par $\int f(x)\,dx$}\\\hline
+\calculusrow
+  {e^x}
+  {e^x}
+  {e^x+C}
+\calculusrow
+  {\ln x\quad(x>0)}
+  {\frac1x}
+  {x\ln x-x+C}
+\calculusrow
+  {P(x)=\sum_{k=0}^{n}a_kx^k}
+  {\sum_{k=1}^{n}k a_kx^{k-1}}
+  {\sum_{k=0}^{n}\frac{a_k}{k+1}x^{k+1}+C}
+\end{tabularx}
+\end{minipage}\hfill
+\begin{minipage}[t]{.46\linewidth}\vspace{0pt}
+\begin{tabularx}{\linewidth}{@{}p{.28\linewidth}p{.29\linewidth}X@{}}
+\paddedcell{\TableHeadFont Function $f(x)$\par $x$ in radians}&
+\paddedcell{\TableHeadFont Derivative $f'(x)$}&
+\paddedcell{\TableHeadFont Indefinite integral\par $\int f(x)\,dx$}\\\hline
+\calculusrow
+  {\sin x}
+  {\cos x}
+  {-\cos x+C}
+\calculusrow
+  {\cos x}
+  {-\sin x}
+  {\sin x+C}
+\calculusrow
+  {\begin{gathered}\tan x\\(\cos x\ne0)\end{gathered}}
+  {\begin{gathered}\sec^2 x=\\\frac1{\cos^2 x}\end{gathered}}
+  {-\ln|\cos x|+C}
+\end{tabularx}
+\end{minipage}\par\vspace{0.8mm}
+\endgroup
+{\color{PosterInk}\hrule height 0.5pt}\vspace{0.7mm}
+{\FooterFont Limits describe approaching behavior; derivatives describe local change; definite integrals describe signed accumulation.\par}
+\endgroup
+\end{document}

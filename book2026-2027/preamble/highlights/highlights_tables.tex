@@ -1,0 +1,256 @@
+% Authoritative module; see specific_highlights_index.md.
+\ifdefined\HighlightsTablesLoaded\endinput\fi
+\let\HighlightsTablesLoaded\relax
+\RequirePackage{needspace}
+\RequirePackage{varwidth}
+% Explicit viewer setup, shared by all three previews. Ordinary consumers do
+% not change longtable's output routine merely by loading the registry.
+\makeatletter
+\newcommand{\HighlightViewerLongtableFix}{%
+  \ifdefined\HighlightViewerLongtableFixed\else
+    \let\HighlightViewerLongtableFixed\relax
+    \patchcmd{\LT@output}{\vss}{\vskip0pt plus1fil minus12pt\relax}{}%
+      {\PackageError{highlights}{Cannot patch longtable footer}{Review the installed longtable version.}}%
+    \patchcmd{\LT@output}{\vss}{\vskip0pt plus1fil minus12pt\relax}{}%
+      {\PackageError{highlights}{Cannot patch longtable continuation}{Review the installed longtable version.}}%
+  \fi}
+\makeatother
+% Record-based tables. Collection is complete before entering longtable.
+\ExplSyntaxOn
+\cs_new:Npn \hl_union_values:nn #1#2
+ {\seq_if_exist:cT {g_hl_union_#1_#2_seq}
+   {\seq_use:cn {g_hl_union_#1_#2_seq}{\par\smallskip}}}
+\cs_new_protected:Npn \hl_union_examples:n #1
+ {
+  \seq_if_exist:cT {g_hl_union_#1_examples_seq}
+   {\seq_map_inline:cn {g_hl_union_#1_examples_seq}
+     {
+      \seq_clear:N \l_hl_example_contexts_seq
+      \seq_map_inline:Nn \g_hl_selected_seq
+       {
+        \str_if_eq:eeT {\HighlightContextField{####1}{concept}}{#1}
+         {
+          \prop_get:cnN {g_hl_context_####1_prop}{examples}\l_hl_value_tl
+          \tl_if_eq:NnT \l_hl_value_tl {##1}
+           {
+            \tl_set:Nx \l_hl_example_tl
+             {Grade~\HighlightContextField{####1}{grade}~Term~
+              \HighlightContextField{####1}{term},~criteria~
+              \HighlightContextField{####1}{criteria}}
+            \seq_if_in:NVF \l_hl_example_contexts_seq \l_hl_example_tl
+             {\seq_put_right:NV \l_hl_example_contexts_seq \l_hl_example_tl}
+           }
+         }
+       }
+      \textbf{\seq_use:Nn \l_hl_example_contexts_seq {;~}:}~##1\par\smallskip
+     }}
+ }
+\cs_new_protected:Npn \hl_union_print:n #1
+ {
+  \hl_union_values:nn {#1}{notation} & \HighlightConceptField{#1}{name} &
+  \str_if_eq:VnTF \l_hl_schema_tl {concise}
+   {\hl_union_values:nn {#1}{brief}\\[4pt]}
+   {\hl_union_values:nn {#1}{definition} &
+    \hl_union_values:nn {#1}{meaning}
+    \hl_union_examples:n {#1}\\[4pt]}
+ }
+\NewDocumentCommand \SpecificHighlightUnionRows {m}
+ {\tl_gset:Nn \l_hl_schema_tl {#1}
+  \seq_map_function:NN \g_hl_union_seq \hl_union_print:n}
+\ExplSyntaxOff
+\newcommand{\HighlightRenderSelected}[1]{%
+  \ifnum\pdfstrcmp{#1}{concise}=0
+    \HighlightConciseTable{\SpecificHighlightUnionRows{concise}}%
+  \else
+    \HighlightDetailedTable{\SpecificHighlightUnionRows{detailed}}%
+  \fi}
+\newcommand{\HighlightConciseTable}[1]{%
+  \setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.16}%
+  \begin{longtable}{@{}>{\raggedright\arraybackslash}p{.30\linewidth}>{\raggedright\arraybackslash}p{.23\linewidth}>{\raggedright\arraybackslash}p{\dimexpr.47\linewidth-4\tabcolsep\relax}@{}}
+  \COneToneConciseHeaders\endfirsthead
+  \COneToneConciseHeaders\endhead
+  \midrule\multicolumn{3}{r}{Continued on the next page}\\\endfoot
+  \bottomrule\endlastfoot
+  #1\end{longtable}}
+\newsavebox{\HighlightDetailedMeasureBox}
+\newlength{\HighlightDetailedNotationWidth}
+\newlength{\HighlightDetailedTextWidth}
+\newcommand{\HighlightDetailedTable}[1]{%
+  \begingroup
+  % Reuse the repository's longtable footer fix only within this table group.
+  \HighlightViewerLongtableFix
+  \setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.16}%
+  % Measure body notation at its natural width, including rendered marker boxes.
+  % varwidth preserves deliberate paragraph breaks in registry union entries;
+  % its unrestricted measure prevents automatic wrapping of notation.
+  % The other three columns are deliberately roomy in this discarded trial.
+  \sbox{\HighlightDetailedMeasureBox}{%
+    \begin{tabular}{@{}>{\begin{varwidth}[t]{\maxdimen}\raggedright}l<{\end{varwidth}}*{3}{>{\raggedright\arraybackslash}p{\linewidth}}@{}}
+      #1\end{tabular}}%
+  \setlength{\HighlightDetailedNotationWidth}{\dimexpr
+    \wd\HighlightDetailedMeasureBox-3\linewidth-6\tabcolsep\relax}%
+  % Reserve only the two-line header's minimum width, never its one-line width.
+  \sbox{\HighlightDetailedMeasureBox}{\shortstack[l]{\textbf{Symbol or}\\\textbf{notation}}}%
+  \ifdim\wd\HighlightDetailedMeasureBox>\HighlightDetailedNotationWidth
+    \setlength{\HighlightDetailedNotationWidth}{\wd\HighlightDetailedMeasureBox}%
+  \fi
+  % Preserve the text columns' 22:23:25 proportions within the remaining width.
+  \setlength{\HighlightDetailedTextWidth}{\dimexpr
+    \linewidth-\HighlightDetailedNotationWidth-6\tabcolsep\relax}%
+  \begin{longtable}{@{}>{\raggedright\arraybackslash}p{\HighlightDetailedNotationWidth}>{\raggedright\arraybackslash}p{\dimexpr\HighlightDetailedTextWidth*22/70\relax}>{\raggedright\arraybackslash}p{\dimexpr\HighlightDetailedTextWidth*23/70\relax}>{\raggedright\arraybackslash}p{\dimexpr\HighlightDetailedTextWidth-\HighlightDetailedTextWidth*22/70-\HighlightDetailedTextWidth*23/70\relax}@{}}
+  \COneToneDetailedHeaders\endfirsthead
+  \COneToneDetailedHeaders\endhead
+  \midrule\multicolumn{4}{r}{Continued on the next page}\\\endfoot
+  \bottomrule\endlastfoot
+  #1\end{longtable}\endgroup}
+\newcommand{\SpecificHighlightUnion}[3]{%
+  \begingroup\CoordinatedTermTwoPalette
+  \SpecificHighlightCollectUnion{#1}{#2}%
+  \ifnum\pdfstrcmp{#2}{3}=0 Reference not yet available.%
+  \else\HighlightRenderSelected{#3}\fi\endgroup}
+\newcommand{\SpecificHighlightCatalogRow}[6]{%
+  \ifnum\pdfstrcmp{\SpecificHighlightCatalogScope}{all}=0
+    \SpecificHighlightCatalogPrint{#3}{#4}{#5}{#6}%
+  \else
+    \ifnum\pdfstrcmp{#1}{both}=0
+      \SpecificHighlightCatalogPrint{#3}{#4}{#5}{#6}%
+    \else
+      \ifnum\pdfstrcmp{\SpecificHighlightCatalogScope}{#1}=0
+        \SpecificHighlightCatalogPrint{#3}{#4}{#5}{#6}%
+      \fi
+    \fi
+  \fi}
+
+\newcommand{\SpecificHighlightCatalogPrint}[4]{%
+  \csname coordinatednotation@#1@#2\endcsname & #3 & #4\\[4pt]}
+
+\newcommand{\SpecificHighlightCatalogConcept}[2]{\HighlightEffectiveField{g#1-t2-default-#2}{name}}
+
+\newcommand{\SpecificHighlightCatalogGroup}[1]{%
+  \ifnum\pdfstrcmp{\SpecificHighlightCatalogScope}{all}=0
+    \midrule
+    \multicolumn{3}{@{}l@{}}{\strut\textbf{#1}}\\*[3pt]
+  \fi}
+
+\newcommand{\SpecificHighlightCatalog}[1]{\begingroup\CoordinatedTermTwoPalette\def\SpecificHighlightCatalogScope{#1}\ifnum\pdfstrcmp{#1}{all}=0 \HighlightSelectReference{G10-T2-introduction}\HighlightAppendReference{G11-T2-introduction}\else\HighlightSelectReference{G#1-T2-introduction}\fi\HighlightRenderSelected{concise}\endgroup}
+
+\newcommand{\SpecificHighlightCatalogTable}{%
+  \setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.20}%
+  \begin{longtable}{@{}>{\raggedright\arraybackslash}p{.32\linewidth}>{\raggedright\arraybackslash}p{.22\linewidth}>{\raggedright\arraybackslash}p{\dimexpr.46\linewidth-4\tabcolsep\relax}@{}}
+  \toprule
+  \textbf{Symbol or notation} & \textbf{Concept} & \textbf{Brief meaning}\\\midrule
+  \endfirsthead
+  \toprule
+  \textbf{Symbol or notation} & \textbf{Concept} & \textbf{Brief meaning}\\\midrule
+  \endhead
+  \midrule\multicolumn{3}{r}{Continued on the next page}\\\endfoot
+  \bottomrule\endlastfoot
+  \SpecificHighlightCatalogRows
+  \end{longtable}}
+
+\newcommand{\SpecificHighlightCatalogRows}{\SpecificHighlightUnionRows{concise}}
+
+\newcommand{\PracticeHighlightLegendCell}[2]{#2}
+
+\newcommand{\GradeElevenCOneLegendTable}[4]{%
+  \par\medskip\noindent
+  \begin{tabularx}{\linewidth}{@{}*{2}{>{\raggedright\arraybackslash}X}@{}}
+    \toprule
+    \textbf{Sample (green)} & \textbf{Population (red)} \\
+    \midrule
+    #1{2}
+    #2{3}
+    #3{4}
+    \GradeElevenCOneLegendVariances{4}
+    #4{5}
+    \bottomrule
+  \end{tabularx}\par\medskip}
+
+\newcommand{\CoordinatedLegendRow}[4]{%
+  % Context rows belong in notation references, never in highlight legends.
+  \ifnum\pdfstrcmp{#1}{context}=0
+    \expandafter\CoordinatedOmitRow
+  \else
+    \expandafter\CoordinatedPrintRow
+  \fi{#2}{#3}{#4}}
+
+\newcommand{\CoordinatedOmitRow}[3]{}
+
+\newcommand{\CoordinatedPrintRow}[3]{#1 & #2 & #3\\[3pt]}
+
+\newcommand{\CoordinatedLegendEntry}[2]{%
+  \csname coordinatedrow@#1@#2\endcsname}
+
+\newcommand{\CoordinatedLegendTable}[1]{%
+  \par\smallskip
+  \setlength{\tabcolsep}{4pt}%
+  \renewcommand{\arraystretch}{1.18}%
+  \begin{longtable}{@{}>{\raggedright\arraybackslash}p{.32\linewidth}>{\raggedright\arraybackslash}p{.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr.43\linewidth-4\tabcolsep\relax}@{}}
+  \toprule
+  \textbf{Symbol or notation} & \textbf{Concept} & \textbf{Brief meaning}\\\midrule
+  \endfirsthead
+  \toprule
+  \textbf{Symbol or notation} & \textbf{Concept} & \textbf{Brief meaning}\\\midrule
+  \endhead
+  \midrule\multicolumn{3}{r}{\small Continued on the next page}\\\endfoot
+  \bottomrule\endlastfoot
+  #1
+  \end{longtable}\par\smallskip}
+
+\newcommand{\GTenToneRow}[3]{\csname tonenotation@#1\endcsname & #2 & #3\\[3pt]}
+
+\newcommand{\GTenToneLegendHeader}{\toprule Symbol or notation & Concept & Brief meaning\\\midrule}
+
+\newcommand{\GTenToneReferenceHeader}{\toprule Symbol or notation & Concept & Definition & Meaning in the introductory examples\\\midrule}
+
+\newcommand{\GTenToneHighlightLegend}[1]{%
+  \par\smallskip\begingroup\setlength{\tabcolsep}{4pt}
+  \begin{longtable}{@{}>{\raggedright\arraybackslash}p{.30\linewidth}>{\raggedright\arraybackslash}p{.24\linewidth}>{\raggedright\arraybackslash}p{\dimexpr.46\linewidth-4\tabcolsep\relax}@{}}
+  \GTenToneLegendHeader\endfirsthead
+  \GTenToneLegendHeader\endhead
+  \bottomrule\endlastfoot
+  \csname tonecatalog@#1\endcsname
+  \end{longtable}\endgroup\par\smallskip}
+
+\newcommand{\GTenToneReference}[1]{%
+  \par\smallskip\begingroup\setlength{\tabcolsep}{4pt}
+  \renewcommand{\GTenToneRow}[3]{\csname tonenotation@##1\endcsname & ##2 & ##3 & \csname toneexample@#1@##1\endcsname\\[3pt]}%
+  \begin{longtable}{@{}>{\raggedright\arraybackslash}p{.30\linewidth}>{\raggedright\arraybackslash}p{.22\linewidth}>{\raggedright\arraybackslash}p{.23\linewidth}>{\raggedright\arraybackslash}p{\dimexpr.25\linewidth-6\tabcolsep\relax}@{}}
+  \GTenToneReferenceHeader\endfirsthead
+  \GTenToneReferenceHeader\endhead
+  \midrule\multicolumn{4}{r}{Continued on the next page}\\\endfoot
+  \bottomrule\endlastfoot
+  \csname tonecatalog@#1\endcsname
+  \end{longtable}\endgroup\par\smallskip}
+
+\newcommand{\COneToneConciseHeaders}{%
+  \toprule\textbf{Symbol or notation} & \textbf{Concept} & \textbf{Brief meaning}\\\midrule}
+
+\newcommand{\COneToneDetailedHeaders}{%
+  \toprule\textbf{Symbol or notation} & \textbf{Concept} & \textbf{Definition} & \textbf{Meaning in the introductory examples}\\\midrule}
+
+\newcommand{\COneToneDataRow}[2]{%
+  \csuse{g11tone@notation@#2} & \csuse{g11tone@concept@#2} & \csuse{g11tone@brief@#2}\\[3pt]}
+
+\newcommand{\COneToneDetailedRow}[2]{%
+  \csuse{g11tone@notation@#2} & \csuse{g11tone@concept@#2} & \csuse{g11tone@definition@#2} & \csuse{g11tone@example@#1@#2}\\[4pt]}
+
+\newcommand{\COneToneLegendTable}[1]{%
+  \begingroup\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.16}%
+  \begin{longtable}{@{}>{\raggedright\arraybackslash}p{.30\linewidth}>{\raggedright\arraybackslash}p{.25\linewidth}>{\raggedright\arraybackslash}p{\dimexpr.45\linewidth-4\tabcolsep\relax}@{}}
+  \COneToneConciseHeaders\endfirsthead
+  \COneToneConciseHeaders\endhead
+  \midrule\multicolumn{3}{r}{Continued on the next page}\\\endfoot
+  \bottomrule\endlastfoot
+  #1
+  \end{longtable}\endgroup}
+
+\newcommand{\COneToneDetailedReference}[1]{%
+  \begingroup\setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.16}%
+  \begin{longtable}{@{}>{\raggedright\arraybackslash}p{.22\linewidth}>{\raggedright\arraybackslash}p{.18\linewidth}>{\raggedright\arraybackslash}p{.27\linewidth}>{\raggedright\arraybackslash}p{\dimexpr.33\linewidth-6\tabcolsep\relax}@{}}
+  \COneToneDetailedHeaders\endfirsthead
+  \COneToneDetailedHeaders\endhead
+  \midrule\multicolumn{4}{r}{Continued on the next page}\\\endfoot
+  \bottomrule\endlastfoot
+  \csuse{g11tone@detailed@#1}%
+  \end{longtable}\endgroup}

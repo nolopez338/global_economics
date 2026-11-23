@@ -1,8 +1,8 @@
 % Run pdfLaTeX from the source directory. Keep the lookup for the activity's year.
 % Exactly ONE worked example, ONE guided example, and FIVE independent exercises.
 % Counts apply to the whole activity; never repeat these blocks per family.
-% No instructional highlights, highlighted text/math, semantic highlight commands,
-% or highlight legends anywhere, including optional review solutions.
+% Printable student activity only. Required gray headings and white criterion boxes
+% are structural styles; semantic instructional highlights and legends are forbidden.
 % Strip source highlighting while preserving content and ordinary formatting.
 % Avoid inherited highlight-producing macros (e.g. the shaded preamble boxed macro).
 \makeatletter
@@ -17,9 +17,6 @@
 \linespread{1.04}
 \setlength{\parskip}{4pt}
 \raggedbottom
-
-\newif\ifprintsolutions
-\printsolutionsfalse % Set \printsolutionstrue to include the review pages.
 
 % Exactly TWO table-style families. All helpers size to local \linewidth.
 % Family 1: plain opening notation/formula reference, never a highlight legend.
@@ -40,7 +37,7 @@
     \end{tabularx}\par
     \endgroup
 }
-% Family 2: all instructional/problem tables, including optional review tables.
+% Family 2: all instructional/problem tables, in the printable activity.
 % Width variants below are the SAME ruled family; adapt column count if needed.
 % Body rows end with \\ \hline. Keep group/case headings short or wrap them.
 \newcommand{\ClassroomRuledTable}[4]{%
@@ -66,9 +63,21 @@
         {\textbf{Symbol} & \textbf{Concept} & \textbf{Calculation, result, and meaning in context}}{#3}%
 }
 \newcommand{\TableGroup}[1]{\multicolumn{3}{|l|}{\textbf{#1}}\\ \hline}
+% Structural styles for the printable activity only; no semantic highlighting.
 \newcommand{\stageheading}[1]{%
-    \par\Needspace{6\baselineskip}\addvspace{0.65\baselineskip}%
-    {\centering\large\bfseries #1\par}\nopagebreak[4]
+    \par\Needspace{4\baselineskip}\addvspace{4pt}%
+    {\centering\large\bfseries
+     \tikz[baseline=(title.base)]{%
+         \node[fill=black!10,text=black,rounded corners=2mm,
+             inner sep=3pt,outer sep=0pt] (title) {\strut #1};}\par}%
+    \nopagebreak[4]\smallskip
+}
+\newcommand{\criterionbox}[2]{%
+    \begin{tcolorbox}[colback=white,colframe=black!45,boxrule=.4pt,
+        arc=2mm,boxsep=0pt,left=6pt,right=6pt,top=5pt,bottom=5pt,
+        before skip=4pt,after skip=4pt,width=\linewidth]
+        \textbf{#1} #2
+    \end{tcolorbox}%
 }
 \newcommand{\problemtitle}[3]{%
     \par\Needspace{4\baselineskip}\addvspace{0.4\baselineskip}%
@@ -88,10 +97,16 @@
     {\Large\bfseries [Criterion and activity title]\par}
     Global Economics \textbar{} [Grade] \textbar{} [Term] \textbar{} [Lesson]\par
 }
-\textbf{[Criterion code]} [Criterion statement.]
+\criterionbox{[Criterion code]}{[Complete official criterion statement, verbatim.]}
 
 \stageheading{Equations and basic procedure}
-[Conditions, ordered procedure, and checks for the actual topic.]\par
+[Substantive plain formulas, notation, and conditions for the actual topic.]
+% Every task and reusable procedure: at most THREE numbered steps.
+\begin{enumerate}[label=\arabic*.,itemsep=2pt]
+\item {[First consolidated procedure step.]}
+\item {[Second consolidated procedure step.]}
+\item {[Third consolidated procedure step, if needed.]}
+\end{enumerate}\par
 % Replace illustrative symbols/relations with actual topic content. Preserve all
 % needed definitions and formulas; no unnecessary gaps between filled rows.
 \noindent\begin{minipage}[t]{.49\linewidth}
@@ -109,13 +124,22 @@
 }
 \end{minipage}\par
 
+\stageheading{General tasks}
+% Required mathematical outputs only; no commentary, justification, or checks.
+% Derive actual outputs from the source; repeat for another task only if needed.
+\task{Task 1.}{[Concise mathematical task title.]}
+\begin{enumerate}[label=\arabic*.,itemsep=2pt]
+\item {[First group of required mathematical outputs.]}
+\item {[Second group of required mathematical outputs.]}
+\item {[Final outputs, including contextual interpretations where required.]}
+\end{enumerate}
+
 % Exactly one fully solved worked example, with clear step-by-step reasoning.
 \stageheading{Worked example}
 \problemtitle{1}{[Worked problem title]}{Type A}
 [Context, units, and constraints. Illustrative givens: two quantities of 12 and
 8 units. Replace this entire example with a complete source-aligned problem.]
-\task{Task 1.}{Organize the information in the two ruled tables. Classifications
-appear as group headings; the columns are Symbol, Concept, and In context...}
+\task{Task 1.}{Information tables.}
 \noindent\begin{minipage}[t]{.49\linewidth}
 \vspace{0pt}
 \InformationTable{
@@ -132,8 +156,7 @@ appear as group headings; the columns are Symbol, Concept, and In context...}
     $d$ & Difference & Excess of the first quantity over the second, in units. \\ \hline
 }
 \end{minipage}\par
-\task{Task 2.}{Calculate and interpret. In the broad third column, show the
-formula, numerical substitution, result with units, and contextual meaning.}
+\task{Task 2.}{Totals, differences, and contextual meanings.}
 \CalculationTable{
     \TableGroup{Combined quantities}
     $T$ & Total & $T=a+b=12+8=20$ units.\par
@@ -141,7 +164,7 @@ formula, numerical substitution, result with units, and contextual meaning.}
     $d$ & Difference & $d=a-b=12-8=4$ units.\par
       The first part exceeds the second by 4 units. \\ \hline
 }
-Check immediately below the table: $T-b=20-8=12=a$ and
+\textbf{Checks.} $T-b=20-8=12=a$ and
 $d+b=4+8=12=a$. Both recover the first quantity, and all values use the
 same units. [Add every further step, check, and interpretation required by
 the actual source problem; consolidation must not omit reasoning.]
@@ -152,7 +175,7 @@ the actual source problem; consolidation must not omit reasoning.]
 [Fresh context, givens, units, and constraints. Illustrative structure: two
 cases share a first quantity of 15 units; second quantities are 6 and 9 units.
 Replace with the actual topic's givens and case structure.]
-\task{Task 1.}{Record the shared quantity once. Complete its units and meaning.}
+\task{Task 1.}{Shared quantity, units, and meaning.}
 \InformationTable{
     \TableGroup{Shared information}
     $a$ & First quantity & 15 \rule{.6in}{.3pt}. Meaning: \\[18pt] \hline
@@ -160,8 +183,7 @@ Replace with the actual topic's givens and case structure.]
 % Reserve this measured prompt+case-table block; resize for actual content.
 % Break at a task boundary instead of separating the prompt from its tables.
 \Needspace{20\baselineskip}
-\task{Task 2.}{Complete each case below. Use formula, substitution, result with
-units, then meaning in the third column. Check each result below the tables.}
+\task{Task 2.}{For each case: totals, differences, and contextual meanings.}
 % Repeat headings in separate case blocks. Gaps are adjustable writing space,
 % not universal heights. Leave key reasoning and final answers for students.
 \noindent\begin{minipage}[t]{.49\linewidth}
@@ -183,87 +205,31 @@ units, then meaning in the third column. Check each result below the tables.}
     $d$ & Difference & \\[48pt] \hline
 }
 \end{minipage}\par
-\task{Check and interpret.}{[Prompts for verification and comparing the cases;
-leave the key reasoning and final interpretation to students.]}
+\task{Interpretation.}{[Required contextual meanings; leave final interpretations to students.]}
 \workspace{4\baselineskip}
 \responseline
 
-% Exactly five UNSOLVED independent exercises with appropriate workspace.
-% Independent exercises 1--3 (problems 3--5): consolidate core skills.
-% Independent exercises 4--5 (problems 6--7): slightly greater challenge,
-% always within the same topic and assessment criterion.
+% Exactly five UNSOLVED independent exercises: descriptions and givens only.
+% No repeated tasks, procedural hints, starter calculations, checklists, response
+% lines, blank tables, graph templates, reserved workspace, or solving locations.
+% Every description supplies context, period where relevant, definitions, values,
+% units, constraints, assumptions, and any essential problem-specific output.
+% A compact given-data table is permitted. Do not prescribe lesson-specific math.
+% Problems 3--5 consolidate core skills; problems 6--7 add modest challenge.
 \stageheading{Independent Practice}
-% Reserves below fit these placeholder prompts plus workspace and response line.
-% Remeasure for actual tasks; allow longer problems to break at task boundaries.
-\Needspace{17\baselineskip}
 \problemtitle{3}{[First independent problem title]}{Type A}
-[Fresh context, givens, units, and constraints.]
-\task{Task 1.}{[First task with fewer hints.]}
-\task{Task 2.}{[Next task and interpretation.]}
-\workspace{6\baselineskip}
-\responseline
+[Fresh self-contained problem description with all required givens.]
 
-\Needspace{17\baselineskip}
 \problemtitle{4}{[Second independent problem title]}{Type A}
-[Fresh context, givens, units, and constraints.]
-\task{Task 1.}{[First task with fewer hints.]}
-\task{Task 2.}{[Next task and interpretation.]}
-\workspace{6\baselineskip}
-\responseline
+[Fresh self-contained problem description with all required givens.]
 
-\Needspace{17\baselineskip}
 \problemtitle{5}{[Third independent problem title]}{[Family label]}
-[Fresh context, givens, units, and constraints; consolidate core skills.]
-\task{Task 1.}{[Core task with fewer hints; leave unsolved.]}
-\task{Task 2.}{[Next task and interpretation; leave unsolved.]}
-\workspace{6\baselineskip}
-\responseline
+[Fresh self-contained description consolidating core skills, with all givens.]
 
-\Needspace{19\baselineskip}
 \problemtitle{6}{[Fourth independent problem title]}{[Family label]}
-[Fresh context, givens, units, and constraints; slightly more challenging within the same topic and criterion.]
-\task{Task 1.}{[Modestly more demanding application of the core skills; leave unsolved.]}
-\task{Task 2.}{[Next task and interpretation; leave unsolved.]}
-\workspace{8\baselineskip}
-\responseline
+[Fresh self-contained description with all givens; modest challenge within the topic and criterion.]
 
-\Needspace{19\baselineskip}
 \problemtitle{7}{[Fifth independent problem title]}{[Family label]}
-[Fresh context, givens, units, and constraints; slightly more challenging within the same topic and criterion.]
-\task{Task 1.}{[Modestly more demanding application of the core skills; leave unsolved.]}
-\task{Task 2.}{[Next task and interpretation; leave unsolved.]}
-\workspace{8\baselineskip}
-\responseline
-
-% Optional review only: solutions to existing problems 2--7, no new examples.
-% Student exercises above remain unsolved. No highlights on review pages either.
-\ifprintsolutions
-    \clearpage
-    \stageheading{Solutions}
-    \problemtitle{2}{[Guided problem title]}{Type A}
-    \task{Task 1.}{[Show how to use the givens.]}
-    \task{Task 2.}{[Show the reasoning, checks, and interpretation.]}
-
-    \problemtitle{3}{[First independent problem title]}{Type A}
-    \task{Task 1.}{[Show how to use the givens.]}
-    \task{Task 2.}{[Show the reasoning, checks, and interpretation.]}
-
-    \problemtitle{4}{[Second independent problem title]}{Type A}
-    \task{Task 1.}{[Show how to use the givens.]}
-    \task{Task 2.}{[Show the reasoning, checks, and interpretation.]}
-
-    \problemtitle{5}{[Third independent problem title]}{[Family label]}
-    \task{Task 1.}{[Show how to use the givens.]}
-    \task{Task 2.}{[Show the reasoning, checks, and interpretation.]}
-
-    \problemtitle{6}{[Fourth independent problem title]}{[Family label]}
-    \task{Task 1.}{[Show how to use the givens.]}
-    \task{Task 2.}{[Show the reasoning, checks, and interpretation.]}
-
-    \problemtitle{7}{[Fifth independent problem title]}{[Family label]}
-    \task{Task 1.}{[Show how to use the givens.]}
-    \task{Task 2.}{[Show the reasoning, checks, and interpretation.]}
-\fi
+[Fresh self-contained description with all givens; modest challenge within the topic and criterion.]
 
 \end{document}
-
