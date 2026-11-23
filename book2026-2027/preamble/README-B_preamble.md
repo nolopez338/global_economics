@@ -25,7 +25,9 @@ Shared LaTeX preambles, graph macros, visual assets, and inventory guidance supp
 
 | Folder | Purpose | README |
 |---|---|---|
-| [`graphs/`](graphs/) | Defines reusable economic and probability graph macros, including density plots, shaded regions, and histograms. | [`README-graphs.md`](graphs/README-graphs.md) |
+| [`graphs/`](graphs/) | Defines reusable economic and probability graph macros for expected monetary value, uniform, linear, triangular, exponential, and normal densities, shaded regions, histograms, and overlays. | [`README-graphs.md`](graphs/README-graphs.md) |
+| [`highlights/`](highlights/) | Unavailable: newly discovered folder has no qualifying immediate child README. | None. |
+
 | [`imgs/`](imgs/) | Stores IHS, ICONTEC, and Cambridge image assets for document illustrations. | None. |
 
 ## Directory Structure
@@ -33,6 +35,8 @@ Shared LaTeX preambles, graph macros, visual assets, and inventory guidance supp
 ```text
 preamble/
 ├── graphs/
+├── highlights/
+
 ├── imgs/
 ├── global_economics_cover.tex
 ├── preamble-unused.tex
