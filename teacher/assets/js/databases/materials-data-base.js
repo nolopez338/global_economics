@@ -1,16 +1,6 @@
-/*
-  Manually maintained date-independent master catalog. Edit records directly;
-  schedule generation must never overwrite this file.
-  Term 2: sequential classes 1–20 for Grades 10 and 11. Assessment classes,
-  including class 16 and the class 17 catch-up, intentionally have no links.
-  Grade 10 C10 targets are placeholders following the surrounding L3 convention:
-  1-practice_activities/G10_T2_L3_C10_practice_activity.pdf,
-  3-slides/G10_T2_L3_C10_slides.pdf,
-  2-class_activities/G10_T2_L3_C10_classroom_activity.pdf.
-  Mock targets intentionally use G{grade}_T2_L{evidence}_C{criteria}_exam.pdf
-  and _exam_solution.pdf under the verified term_2/4-learning_evidences/ folder.
-  Evidence 1 is split into C1C2 and C3C4; these permitted placeholders may 404.
-*/
+// AUTO-GENERATED from teacher/authoring/schedule.csv and lessons.json.
+// Run: node teacher/authoring/generate-schedule-data.js
+// Do not edit manually.
 window.MATERIALS_DATA_BASE = [
   {
     "Grade": 10,

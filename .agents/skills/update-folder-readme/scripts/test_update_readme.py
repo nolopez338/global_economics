@@ -84,8 +84,7 @@ class WorkflowTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'No exact match'):
             helper.prepare(self.root, 'README-W_G10_T3_ER.md')
         for bad in ('../' + NAME, NAME + '\n', 'notes.txt', 'notes.pdf',
-                    r'content\notes.md', '/notes.md', 'C:notes.md',
-                    'notes.md/other.md', 'notes?.md', 'notes*.md',
+                    'C:notes.md', 'notes.md/other.md', 'notes?.md', 'notes*.md',
                     'notes\x00.md', '.md', '.markdown', ''):
             with self.assertRaises(ValueError):
                 helper.prepare(self.root, bad)
@@ -123,9 +122,9 @@ class WorkflowTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Selection is not'):
             helper.prepare(self.root, name, 'elsewhere/' + name)
 
-    def test_cli_rejects_extra_arguments_and_paths_without_state(self):
+    def test_cli_rejects_extra_arguments_and_invalid_paths_without_state(self):
         state_path = self.root / 'state.json'
-        for arguments in ([NAME, 'extra.md'], ['../' + NAME], ['content\\' + NAME],
+        for arguments in ([NAME, 'extra.md'], ['../' + NAME], ['missing\\notes.md'],
                           ['notes.txt']):
             with self.subTest(arguments=arguments):
                 result = subprocess.run(
@@ -134,6 +133,186 @@ class WorkflowTests(unittest.TestCase):
                     capture_output=True, text=True)
                 self.assertNotEqual(result.returncode, 0)
                 self.assertFalse(state_path.exists())
+
+    def test_explicit_paths_bypass_discovery(self):
+        for argument in ('content/' + NAME, 'content\\' + NAME,
+                         '/content/' + NAME, '\\content\\' + NAME,
+                         str(self.target), self.target.as_posix()):
+            with self.subTest(argument=argument), patch.object(
+                    helper, 'discover', side_effect=AssertionError('discovery called')):
+                state = helper.prepare(self.root, argument)
+                self.assertEqual(state['target'], 'content/' + NAME)
+                self.assertTrue(state['target_existed'])
+                self.assertEqual(state['mode'], 'update')
+                self.assertEqual(state['cutoff_ns'], self.time)
+
+    @unittest.skipUnless(os.name == 'nt', 'Windows case-insensitive paths')
+    def test_case_variants_keep_live_template_protection(self):
+        prefix = self.template_target()
+        state = helper.prepare(self.root, helper.TEMPLATE.upper())
+        self.assertEqual(state['target'], helper.TEMPLATE)
+        with self.assertRaisesRegex(ValueError, 'Preserve live template'):
+            helper.commit(state, b'# Directory Summary\nlost instructions')
+        self.assertEqual(helper.commit(state, prefix + b'# Directory Summary\nnew'), 'updated')
+
+    def test_symlink_rejection_without_os_privileges(self):
+        original = helper.is_link
+        for rel in ('content', 'content/new.md', helper.TEMPLATE):
+            with self.subTest(rel=rel), patch.object(
+                    helper, 'is_link', lambda path: path == self.root / rel or original(path)):
+                with self.assertRaisesRegex(ValueError, 'Symlink traversal'):
+                    helper.prepare(self.root, 'content/new.md')
+
+    def test_creation_cli_read_commit_and_reporting(self):
+        self.source('old.tex', -100)
+        state_path = self.root / 'state.json'
+        proposal = self.root / 'proposal.md'
+        proposal.write_bytes(b'# Directory Summary\nproposal')
+        def run(*arguments, success=True):
+            result = subprocess.run(
+                [sys.executable, '-B', str(Path(helper.__file__).resolve()), *arguments],
+                cwd=self.root, capture_output=True, text=True)
+            self.assertEqual(result.returncode == 0, success, result.stderr)
+            return result.stdout + result.stderr
+        run('prepare', 'content/new notes.md', '--state', str(state_path))
+        self.assertFalse((self.folder / 'new notes.md').exists())
+        run('read', '--state', str(state_path), '--path', 'content/old.tex')
+        run('read', '--state', str(state_path), '--path', 'content/new notes.md', success=False)
+        report = run('commit', '--state', str(state_path), '--proposal', str(proposal))
+        self.assertTrue(report.startswith('created\n'))
+        self.assertIn('not applicable', report)
+        self.assertIn('content/new notes.md', report)
+        self.assertIn('content/old.tex', report)
+        self.assertIn('unreviewed_eligible', report)
+
+    def test_cli_keeps_state_and_proposals_outside_folder_in_both_modes(self):
+        for target in ('content/' + NAME, 'content/new.md'):
+            with self.subTest(target=target):
+                result = subprocess.run(
+                    [sys.executable, '-B', str(Path(helper.__file__).resolve()), 'prepare',
+                     target, '--state', str(self.folder / 'state.json')], cwd=self.root,
+                    capture_output=True, text=True)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn('outside the summarized folder', result.stderr)
+                self.assertFalse((self.folder / 'state.json').exists())
+
+    def test_quoted_paths_spaces_extensions_and_leading_backslash(self):
+        folder = self.root / 'teacher' / 'assets' / 'css'
+        folder.mkdir(parents=True)
+        state = helper.prepare(self.root, r'\teacher\assets\css\README_TAcss.md')
+        self.assertEqual(state['target'], 'teacher/assets/css/README_TAcss.md')
+        self.assertEqual(state['mode'], 'create')
+        for name in ('folder notes.MD', 'folder notes.MARKDOWN'):
+            for arg in (f'"content/{name}"', f"'content/{name}'", f'content/{name}'):
+                with self.subTest(argument=arg):
+                    self.assertEqual(helper.prepare(self.root, arg)['target'], 'content/' + name)
+        state_path = self.root / 'state.json'
+        result = subprocess.run(
+            [sys.executable, '-B', str(Path(helper.__file__).resolve()), 'prepare',
+             'content/folder notes.md', '--state', str(state_path)], cwd=self.folder,
+            capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(state_path.read_text())['mode'], 'create')
+
+    def test_invalid_explicit_paths_and_missing_parents(self):
+        (self.folder / 'directory.md').mkdir()
+        outside = self.root.parent / 'outside.md'
+        arguments = ('content/directory.md', 'missing/notes.md', '../outside.md',
+                     'content/../notes.md', 'content/notes.txt', 'content/NUL.md',
+                     'content/notes?.md', 'content/notes.md/', '//server/share/notes.md',
+                     'C:notes.md', 'content/notes\x00.md', 'content/notes.md ')
+        if os.name == 'nt':
+            arguments += (str(outside), 'Z:/outside.md')
+        for argument in arguments:
+            with self.subTest(argument=argument), self.assertRaises(ValueError):
+                helper.prepare(self.root, argument)
+        self.assertFalse((self.root / 'missing').exists())
+        with self.assertRaisesRegex(ValueError, 'explicit filepath is required'):
+            helper.prepare(self.root, 'absent.md')
+
+    def test_creation_all_eligible_immediate_inputs_and_proposal(self):
+        for name, offset in (('old.tex', -100), ('equal.tex', 0), ('new.tex', 100),
+                             ('ignored.pdf', -100), ('child/README.md', -100),
+                             ('child/README-topic.md', 0), ('child/notes.md', 100),
+                             ('child/deep/README.md', 100)):
+            self.source(name, offset)
+        state = helper.prepare(self.root, 'content/new summary.md')
+        self.assertFalse(state['target_existed'])
+        self.assertIsNone(state['cutoff_ns'])
+        self.assertEqual(state['cutoff_utc'], 'not applicable')
+        self.assertEqual(set(state['controls']), {helper.TEMPLATE})
+        self.assertEqual(set(state['eligible']), {'content/' + NAME, 'content/old.tex',
+                         'content/equal.tex', 'content/new.tex', 'content/child/README.md',
+                         'content/child/README-topic.md'})
+        with self.assertRaisesRegex(ValueError, 'Read denied'):
+            helper.read_input(state, state['target'])
+        for rel in state['eligible']:
+            helper.read_input(state, rel)
+        proposed = b'# Directory Summary\nnew summary from proposal\n'
+        self.assertFalse((self.folder / 'new summary.md').exists())
+        self.assertEqual(helper.commit(state, proposed), 'created')
+        self.assertEqual((self.folder / 'new summary.md').read_bytes(), proposed)
+        self.assertFalse(list(self.folder.glob('.readme-*.tmp')))
+
+    def test_missing_live_template_stops_creation_including_template_target(self):
+        template = self.root / helper.TEMPLATE
+        template.unlink()
+        for argument in ('content/new.md', helper.TEMPLATE):
+            with self.subTest(argument=argument), self.assertRaisesRegex(ValueError, 'template is missing'):
+                helper.prepare(self.root, argument)
+        self.assertFalse(template.exists())
+
+    def test_creation_rechecks_inputs_controls_and_inventory(self):
+        for what in ('reviewed', 'control', 'inventory'):
+            with self.subTest(what=what):
+                source = self.source('old.tex', -100)
+                state = helper.prepare(self.root, 'content/new.md')
+                helper.read_input(state, 'content/old.tex')
+                if what == 'reviewed':
+                    source.write_bytes(b'changed')
+                elif what == 'control':
+                    (self.root / helper.TEMPLATE).write_bytes(b'changed template')
+                else:
+                    self.source('extra.tex')
+                with self.assertRaisesRegex(ValueError, 'Concurrent'):
+                    helper.commit(state, b'proposal')
+                self.assertFalse((self.folder / 'new.md').exists())
+
+    def test_concurrent_creation_before_and_after_final_verification(self):
+        target = self.folder / 'new.md'
+        state = helper.prepare(self.root, 'content/new.md')
+        target.write_bytes(b'concurrent')
+        with self.assertRaisesRegex(ValueError, 'Concurrent target creation'):
+            helper.commit(state, b'proposal')
+        self.assertEqual(target.read_bytes(), b'concurrent')
+        target.unlink()
+        state = helper.prepare(self.root, 'content/new.md')
+        real_publish = helper.publish_new
+        def race(source, destination):
+            target.write_bytes(b'race winner')
+            return real_publish(source, destination)
+        with patch.object(helper, 'publish_new', race):
+            with self.assertRaisesRegex(ValueError, 'Concurrent target creation'):
+                helper.commit(state, b'proposal')
+        self.assertEqual(target.read_bytes(), b'race winner')
+        self.assertFalse(list(self.folder.glob('.readme-*.tmp')))
+
+    def test_symlink_traversal_and_concurrent_replacement(self):
+        link = self.root / 'linked'
+        try:
+            link.symlink_to(self.folder, target_is_directory=True)
+        except OSError as error:
+            self.skipTest(f'Symlinks unavailable: {error}')
+        with self.assertRaisesRegex(ValueError, 'Symlink traversal'):
+            helper.prepare(self.root, 'linked/new.md')
+        target_link = self.folder / 'linked.md'
+        target_link.symlink_to(self.target)
+        with self.assertRaisesRegex(ValueError, 'Symlink traversal'):
+            helper.prepare(self.root, 'content/linked.md')
+        state = helper.prepare(self.root, 'content/new.md')
+        (self.folder / 'new.md').symlink_to(self.target)
+        with self.assertRaises(ValueError):
+            helper.commit(state, b'proposal')
 
     def test_nonstandard_strict_boundary_and_child_scope(self):
         self.target = self.target.rename(self.folder / 'summary.md')

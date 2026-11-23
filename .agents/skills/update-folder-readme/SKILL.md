@@ -1,22 +1,31 @@
 ---
 name: update-folder-readme
-description: Update an existing Global Economics directory summary by one exact Markdown filename, coded or nonstandard, reviewing only eligible sources strictly newer than the selected file.
+description: Update a Global Economics directory summary by Markdown filename or filepath, or create one at an explicit missing filepath. Existing summaries use strictly newer sources; creation reviews all eligible immediate inputs.
 ---
 
 # Update Folder README
 
-Accept exactly one existing Markdown filename with a `.md` or `.markdown`
+Accept exactly one Markdown filename or filepath with a `.md` or `.markdown`
 extension (case insensitive), for example:
 
 ```text
 $update-folder-readme README-B_G11_T2_PA.md
 $update-folder-readme template_README.md
 $update-folder-readme "folder notes.md"
+$update-folder-readme "teacher/assets/css/folder notes.markdown"
+$update-folder-readme C:\Users\orlan\Desktop\SanBartolo\global_economics\teacher\assets\css\README_TAcss.md
+$update-folder-readme \teacher\assets\css\README_TAcss.md
 ```
 
-Reject paths (including either slash, drive prefixes, or traversal), extra
-arguments, non-Markdown names, control characters, and invalid portable filename
-characters. A quoted filename containing spaces is one argument. Treat the
+Accept Windows absolute and repository-relative paths with either slash style.
+A single leading slash or backslash (including the example above) means
+repository-relative. Relative paths are anchored to the Git root, not the
+working directory. Reject extra arguments, non-Markdown names, control
+characters, invalid portable path components, `..` traversal, drive-relative
+paths, UNC paths, directories as targets, and symlink/junction traversal.
+The resolved target must remain inside the repository and its parent must
+already exist; never create parent directories. A quoted path or filename
+containing spaces is one argument. Treat the
 selected Markdown file as its directory's summary regardless of its name.
 Recognized codes matching
 `^README-(B|W)_G(10|11)_T(1|2|3)_(PA|CA|SL|LE|ER)\.md$`
@@ -34,26 +43,43 @@ inside the repository, run:
 ```text
 python <helper> prepare README-B_G11_T2_PA.md --state <temporary-state.json>
 python <helper> prepare template_README.md --state <temporary-state.json>
+python <helper> prepare "teacher/assets/css/folder notes.md" --state <temporary-state.json>
+python <helper> prepare "\teacher\assets\css\README_TAcss.md" --state <temporary-state.json>
 ```
 
 Keep state and the UTF-8 proposal outside the summarized folder, preferably
-in the system temporary directory. The helper finds the Git root and exact
-filename matches, including untracked files in normal content directories,
+in the system temporary directory. The helper finds the Git root. Explicit
+paths resolve directly, without repository-wide discovery: an existing file
+selects update mode and a missing file selects creation mode. For a bare
+filename only, find exact matches, including untracked files in normal content directories,
 excluding Git internals, caches, build directories, and symlink traversal.
-No match: report and stop without creating a file. Multiple matches: list
+No match: report that an explicit filepath is required for creation and stop;
+never guess a destination. Multiple matches: list
 every repository-relative path and ask which to use; after the answer rerun
 prepare with internal `--select <repository-relative-path>`. This resolves
-ambiguity; it does not change the skill's filename-only invocation contract.
+ambiguity; `--select` is only for bare-filename discovery.
 Report traversal errors rather than treating incomplete discovery as unique.
 
-Prepare fixes the selected file's original filesystem `st_mtime_ns` cutoff before changes,
+In update mode, prepare fixes the selected file's original filesystem `st_mtime_ns` cutoff before changes,
 and records immediate file/folder metadata plus immediate child READMEs.
 Only `mtime_ns > cutoff_ns` qualifies; equal times never qualify. Use integer
 nanoseconds consistently and UTC when displaying them. Never substitute Git
 dates, creation times, document dates, or now.
 
-Read the selected summary and live `book2026-2027/preamble/template_README.md`
-as control documents regardless of timestamps. Read sources through:
+In creation mode, prepare records `target_existed: false`, `mode: create`,
+`cutoff_ns: null`, and `cutoff_utc: "not applicable"`. There is no cutoff:
+review all eligible immediate source files and qualifying immediate child
+READMEs regardless of modification time. Apply the live exclusions and resolve
+child-summary ambiguity before reading. Never recursively inspect subfolders.
+Describe the planned summary's own purpose, commands, sections, and tree entry
+from the proposal; it is not an existing input. Report unsupported, unreadable,
+unreviewed, or incomplete inputs rather than guessing their contents.
+
+Read the existing selected summary (update mode only) and live
+`book2026-2027/preamble/template_README.md` as control documents regardless of
+timestamps. If the live control template is missing, stop with a clear error;
+never create it without its instructions, even when it is the explicit target.
+Read sources through:
 
 ```text
 python <helper> read --state <temporary-state.json> --path <repository-relative-path>
@@ -66,7 +92,7 @@ but the live template remains authoritative. For eligible binary assets use
 the helper's `--output <temporary-file>` option, then inspect that copy with
 the appropriate viewer. Record unreadable/unsupported files as limitations.
 
-Never reopen or hash unchanged source contents, force a full review, or use
+In update mode, never reopen or hash unchanged source contents, force a full review, or use
 the older README skill's cache workflow. Reuse existing descriptions, public
 commands, and explicit section analyses for unchanged files. A newly discovered
 older/equal file lacking an existing description is incomplete: report it
@@ -74,7 +100,8 @@ without inferring its contents from its name. Template changes and source
 imports/links never authorize reading unchanged dependencies.
 
 For subfolder descriptions read only eligible immediate child READMEs, using
-the same cutoff; resolve multiple child README candidates before reading.
+the same cutoff in update mode and no cutoff in creation mode; resolve multiple
+child README candidates before reading.
 Child-summary discovery remains limited to `README.md` and `README-*.md`
 (case sensitive), not arbitrary Markdown files. Accepting a nonstandard target
 does not expand this rule.
@@ -106,9 +133,9 @@ relationships, and guesses based only on filenames. Do not read unchanged
 dependencies to enrich descriptions; reuse supported descriptions or report
 missing information.
 
-Update reviewed files' descriptions, public definitions (including aliases
+Create or update reviewed files' descriptions, public definitions (including aliases
 and variants), and explicit sections in source order/hierarchy wherever
-represented. Update purpose only when reviewed changes support it. Derive
+represented. In update mode, update purpose only when reviewed changes support it. Derive
 the selected summary's own description/sections from the proposal, including
 its actual name and role even if it is not called README. Reconcile names,
 existence, links, removed items, and the target's actual filename from metadata
@@ -143,8 +170,12 @@ python <helper> commit --state <temporary-state.json> --proposal <proposal.md>
 ```
 
 The helper checks controls, reviewed inputs, and inventory for concurrent
-edits, avoids writing identical bytes, and otherwise replaces the README
-atomically. On conflict stop and report; never overwrite a stale proposal.
+edits. In update mode it avoids writing identical bytes and otherwise replaces
+the summary atomically. In creation mode it refuses a target that appeared
+after prepare and publishes atomically without overwriting (Windows no-overwrite
+rename; hard-link publication on POSIX). If the filesystem cannot support this,
+stop; never fall back to an overwriting operation or a partial target write.
+On conflict stop and report; never overwrite a stale proposal.
 Only the selected summary may change. Do not modify sources, other summaries,
 or unrelated skills; the live template may change only when it is the selected
 target and its instruction prefix must remain intact. Never touch timestamps
@@ -154,9 +185,11 @@ sources.
 
 ## Completion report
 
-Return the selected repository-relative path, fixed cutoff (UTC and exact
-epoch nanoseconds), files actually reviewed because newer, updated/already
-current, and any skipped, unreadable, ambiguous, conflicting, or incomplete
-items. Include unreviewed eligible inputs and newly discovered older/equal
-files without prior information among limitations. If stopped before saving,
-say so explicitly.
+Report `created`, `updated`, or `already current`; the repository-relative
+target; the fixed update cutoff (UTC with nine fractional digits and exact epoch
+nanoseconds), or “not applicable” for creation; reviewed source inputs and
+controls; and limitations. Identify skipped, unsupported, unreadable, ambiguous,
+conflicting, incomplete, and unreviewed eligible inputs. For updates, also
+identify newly discovered older/equal files without prior information. The
+helper reports unreviewed eligible inputs automatically; add review-specific
+limitations in the completion message. If stopped before saving, say so explicitly.

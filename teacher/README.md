@@ -48,7 +48,14 @@ teacher/
 │       ├── theme-toggle.js
 │       └── year-calendar-data.js
 ├── authoring/
+│   ├── README.md
 │   ├── generate-schedule-data.js
+│   ├── lesson-workflow.js
+│   ├── lessons.json
+│   ├── migrate-lessons.js
+│   ├── migration-baseline.json
+│   ├── reschedule.js
+│   ├── tests/
 │   └── schedule.csv
 ├── pages/
 │   ├── class.html
@@ -295,94 +302,45 @@ mistaken for dependencies of the current weekly pages.
 
 ## Schedule and calendar data
 
-### Canonical runtime schedule
+### Linked meetings and lessons
 
-`authoring/schedule.csv` is the editable source for the current 2026–2027
-class-meeting records. It contains display-shaped columns for grade, section,
-class slot, date, term, weekday, cycle day, description, public material,
-teacher material, and summary.
+`authoring/schedule.csv` owns dated meeting identities, status, and assignments.
+`authoring/lessons.json` owns stable lesson IDs, descriptions, summaries, complete
+materials lists, and references for the undated catalog. An assignment can carry
+explicit section-specific overrides. Lesson IDs and overrides move together.
 
-`authoring/generate-schedule-data.js` is the canonical Node generator. It parses
-the CSV, imports `year-calendar-data.js`, validates supported classes, dates,
-terms, weekdays, cycle days/numbers, required meeting coverage, duplicate keys,
-nonblank content fields (using `-` for placeholders), and ordering, then writes
-`assets/js/schedule-data.js`. A validation failure occurs before the existing
-artifact is replaced. Run it from the repository root with:
+`authoring/generate-schedule-data.js` validates the academic calendar and all
+assignments before generating **all four** files under `assets/js/databases/`:
+`schedule-data.js`, `materials-data.js`, `schedule-data-base.js`, and
+`materials-data-base.js`. These are generated artifacts; edit their authoritative
+sources. Frontend globals, field formats, material metadata, and URLs are preserved.
 
-```bash
+```sh
 node teacher/authoring/generate-schedule-data.js
-```
-
-`assets/js/schedule-data.js` is marked auto-generated and assigns the current
-records to `window.SCHEDULE_DATA`; do not edit it by hand. It is consumed by
-class pages, Full Schedule, and the generated prototype.
-
-The schedule generator writes **only** `assets/js/databases/schedule-data.js`.
-It neither reads nor writes either materials database.
-
-### Manually maintained materials databases
-
-The materials files are independent, authoritative, hand-authored databases:
-
-- `assets/js/databases/materials-data-base.js` is the undated catalog. Each
-  record requires integer `Grade` and `Term`, a non-empty numeric string
-  `Class #`, and a `Materials` array. Its unique key is
-  `Grade/Term/Class #`.
-- `assets/js/databases/materials-data.js` contains dated meetings. Each record
-  requires integer `Grade` and `Term`, an uppercase-letter `Section`, a
-  meeting-shaped `Class #` (for example `1-2`), an ISO `Date`, and a
-  `Materials` array. Its unique key is `Grade/Section/Date`; `Term` is required
-  metadata but is not part of navigation identity.
-
-Every material requires exactly the documented core values `Acronym`, `Name`,
-`Hyperlink`, and `Category`. Acronyms must contain 1–4 non-whitespace
-characters, names must be non-empty, and hyperlinks must be absolute HTTP or
-HTTPS URLs. `Category` supplies the canonical broad badge; `Name` supplies the
-concise resource-specific card label (for example, criteria, topic, or
-purpose). A name that merely repeats its user-facing category label—including
-case, spacing, punctuation, and obvious singular/plural variations—is invalid.
-Empty material arrays are valid and render an empty state. Additional record
-or material properties are accepted with a console/validator warning, so an
-intentional metadata addition does not disable pages while remaining visible
-to maintainers.
-
-Edit the appropriate JavaScript array directly. To add a dated meeting, add a
-unique record to `materials-data.js`; to change the general catalog, edit
-`materials-data-base.js`. Similar content may intentionally be duplicated. If
-a change applies both generally and to existing dated meetings, update both
-files manually—there is no synchronization and neither is derived from the
-schedule CSV. The base catalog is the authoritative source for shared material
-metadata: make a shared metadata correction there first, then manually copy it
-to every corresponding dated occurrence. Identical hyperlinks shared between
-the catalogs must retain identical `Acronym`, `Name`, and `Category` values;
-dated-only materials remain supported. Validate without modifying either file:
-
-```bash
+node teacher/authoring/generate-schedule-data.js --check
 node teacher/authoring/validate-materials-data.js
-node --test teacher/authoring/tests/materials-workflow.test.js
+node --test teacher/authoring/tests/*.test.js
 ```
 
-The validator reports totals, valid/invalid records, every record error and
-warning, malformed values, empty collections, and duplicate keys. To preview
-from the repository root:
+Cancel/postpone or reorder lessons with the authoring command, which also validates
+and regenerates all four datasets:
 
-```bash
-python3 -m http.server 8000
-# Open http://localhost:8000/teacher/pages/materials.html?grade=10&section=B&date=2026-08-18
+```sh
+node teacher/authoring/reschedule.js cancel 11 C 2026-11-17 "School event"
+node teacher/authoring/reschedule.js move 11 B 2026-11-30 2027-01-14
 ```
 
-That example renders Grade 10B, Class 1-2. With no query string the same page
-renders the base catalog. Supplying any dated parameter requires all three of
-`grade`, `section`, and `date`.
+Cancellation preserves the meeting identity, emits No Class and empty materials,
+postpones complete lesson assignments within the same section and term, and consumes
+one trailing Extra Class slot. Insufficient capacity fails without writes. Repeating
+the same cancellation never shifts twice. The November 18 Grade 11A and November 23
+Grade 11B corrections were already synchronized and are preserved.
 
-To prove ordinary schedule generation preserved manual work, hash both files,
-run the generator, and compare the hashes:
-
-```bash
-sha256sum teacher/assets/js/databases/materials-data.js teacher/assets/js/databases/materials-data-base.js > /tmp/materials.before
-node teacher/authoring/generate-schedule-data.js
-sha256sum -c /tmp/materials.before
-```
+See [the authoring workflow](authoring/README.md) for the schema, exact commands,
+material rules, before/after example, migration audit, and historical limitations.
+The migration preserved every schedule record and all other dated associations;
+15 older No Class meetings had stale material lists cleared and archived in
+`authoring/migration-baseline.json`.
 
 ### Retained schedule datasets
 
@@ -532,10 +490,12 @@ pages/full_schedule.html
 ### Calendar and generated schedule data
 
 ```text
-authoring/schedule.csv
+authoring/schedule.csv + authoring/lessons.json
 └── authoring/generate-schedule-data.js (Node/CommonJS)
-    ├── imports assets/js/year-calendar-data.js for validation
-    └── generates assets/js/schedule-data.js
+    ├── validates against assets/js/databases/year-calendar-data.js
+    ├── generates assets/js/databases/materials-data.js + materials-data-base.js
+    ├── generates assets/js/databases/schedule-data-base.js
+    └── generates assets/js/databases/schedule-data.js
         ├── pages/class.html
         ├── pages/full_schedule.html
         └── assets/html/schedule_prototype_generated.html

@@ -206,15 +206,14 @@ test("base catalog validates grouping fields, empty lists, and malformed records
   const data = load("materials-data-base").MATERIALS_DATA_BASE; assert.ok(data.some(r => r.Grade === 10 && r["Class #"] === "2"));
 });
 
-test("manual databases and schedule are unchanged by read-only validation", () => {
+test("generated databases and schedule are unchanged by read-only validation", () => {
   const paths = files.map(file => path.join(root, file)); const before = paths.map(file => fs.readFileSync(file));
   const schedulePath = path.join(root, "assets/js/databases/schedule-data.js"); const scheduleBefore = fs.readFileSync(schedulePath);
   const result = spawnSync(process.execPath, [path.join(root, "authoring/validate-materials-data.js")], { encoding: "utf8" });
   assert.equal(result.status, 0, result.stderr || result.stdout);
   paths.forEach((file, index) => assert.deepEqual(fs.readFileSync(file), before[index]));
   assert.deepEqual(fs.readFileSync(schedulePath), scheduleBefore);
-  const generator = fs.readFileSync(path.join(root, "authoring/generate-schedule-data.js"), "utf8");
-  assert.doesNotMatch(generator, /writeFileSync\([^\n]*materials/);
+
 });
 
 test("a manually inserted fixture validates and can be selected without a generator", () => {
@@ -280,30 +279,18 @@ test("both Term 2 catalogs have the exact 20-class sequence and reference target
   }
 });
 
-test("all scheduled Term 2 sections map by sequential meeting with no omissions or duplicates", () => {
-  const schedule = plain(load("schedule-data").SCHEDULE_DATA).filter(affected);
-  const datedRecords = plain(load("materials-data").MATERIALS_DATA).filter(affected);
-  const baseRecords = plain(load("materials-data-base").MATERIALS_DATA_BASE).filter(affected);
-  assert.equal(schedule.length, 210);
-  assert.equal(datedRecords.length, schedule.length);
-  const key = r => `${r.Grade}|${r.Section.toUpperCase()}|${v.normalizeDate(r.Date)}`;
-  assert.equal(new Set(schedule.map(key)).size, schedule.length);
-  assert.equal(new Set(datedRecords.map(key)).size, datedRecords.length);
-  assert.deepEqual(datedRecords.map(key).sort(), schedule.map(key).sort());
-  const groups = Map.groupBy(schedule, r => `${r.Grade}|${r.Section.toUpperCase()}`);
-  assert.deepEqual([...groups.keys()].sort(), ["10|A", "10|B", "10|C", "10|D", "10|E", "10|SEMINAR", "11|A", "11|B", "11|C", "11|D", "11|E"]);
-  for (const [group, meetings] of groups) {
-    meetings.sort((a, b) => v.normalizeDate(a.Date).localeCompare(v.normalizeDate(b.Date)));
-    const seminar = group === "10|SEMINAR";
-    assert.equal(meetings.length, seminar ? 10 : 20);
-    meetings.forEach((meeting, index) => {
-      const ordinal = index + 1;
-      assert.equal(meeting["Class #"], seminar ? `${ordinal}-1` : `${Math.floor(index / 2) + 1}-${index % 2 + 1}`);
-      const record = datedRecords.find(r => key(r) === key(meeting));
-      assert.equal(record["Class #"], meeting["Class #"]);
-      assert.equal(record.Term, meeting.Term);
-      assert.deepEqual(record.Materials, baseRecords.find(r => r.Grade === record.Grade && r["Class #"] === String(ordinal)).Materials, `${group} sequential class ${ordinal}`);
-    });
+test("Term 2 schedule and materials resolve from the same explicit assignment", () => {
+  const w = require('../lesson-workflow');
+  const source = w.readSource();
+  const data = w.build(source);
+  const schedule = plain(load('schedule-data').SCHEDULE_DATA);
+  const materials = plain(load('materials-data').MATERIALS_DATA);
+  assert.deepEqual(schedule, data.schedule);
+  assert.deepEqual(materials, data.materials);
+  for (const m of source.meetings.filter(affected)) {
+    const record = materials.find(r => r.Grade === m.Grade && r.Section === m.Section.toUpperCase() && r.Date === m.Date.replaceAll(' / ', '-'));
+    const expected = m.Status === 'canceled' ? [] : { ...source.lessons.find(l => l.id === m['Lesson ID']), ...m.Overrides }.Materials;
+    assert.deepEqual(record.Materials, expected);
   }
 });
 
@@ -347,14 +334,14 @@ test("base mode renders combined five-card meetings and mock-only meetings for b
   }
 });
 
-test("January 15 Grade 11B is scheduled class 4-2 with no assessment materials", () => {
+test("January 15 Grade 11B retains postponed mock materials in scheduled class 4-2", () => {
   const schedule = load("schedule-data").SCHEDULE_DATA;
   const matches = schedule.filter(r => r.Grade === 11 && r.Section === "B" && v.normalizeDate(r.Date) === "2027-01-15");
   assert.equal(matches.length, 1); assert.equal(matches[0]["Class #"], "4-2");
-  assert.match(matches[0].Description, /Learning Evidence C3 C4/);
+  assert.match(matches[0].Description, /C3 C4: Mock/);
   const data = load("materials-data").MATERIALS_DATA;
   const page = render("?grade=11&section=B&date=2027-01-15", { MATERIALS_DATA: data });
-  assert.equal(page.content.children[0].textContent, "No materials found for Grade 11B on 2027-01-15.");
+  assert.equal(page.content.children[1].children.length, 2);
 });
 
 test("unrelated materials and every original record identity are preserved", () => {
@@ -365,6 +352,15 @@ test("unrelated materials and every original record identity are preserved", () 
     ["materials-data", "MATERIALS_DATA", "515dca2d2fb86279bbc46dd5b76ee5a01da15d1edba942bf27d869d5c6b17620", "7a18e00bcbcd2d6202087ab822b17c5cd057095d473a7eca2083ef8750a7608f"]
   ]) {
     const data = plain(load(file)[globalName]);
+    // Restore only the explicitly recorded stale lists to compare the pre-migration baseline.
+    if (file === 'materials-data') {
+      const report = require('../migration-baseline.json');
+      for (const removed of report.removedCanceledMaterials) {
+        const record = data.find(r => `${r.Grade}|${r.Section === 'SEMINAR' ? 'Seminar' : r.Section}|${r.Date.replaceAll('-', ' / ')}` === removed.meeting);
+        assert.deepEqual(record.Materials, []);
+        record.Materials = removed.Materials;
+      }
+    }
     assert.equal(hash(data.filter(r => !affected(r))), unrelatedHash);
     assert.equal(hash(data.map(({ Materials, ...identity }) => identity)), identityHash);
   }

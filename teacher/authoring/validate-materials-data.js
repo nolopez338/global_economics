@@ -10,6 +10,10 @@ const databases = [
   ["base", "MATERIALS_DATA_BASE", path.join(__dirname, "../assets/js/databases/materials-data-base.js")]
 ];
 let failed = false;
+try {
+  require('./lesson-workflow').generate(undefined, { check: true });
+  console.log('All four generated datasets match the validated lesson assignments.');
+} catch (error) { console.error(error.message); failed = true; }
 for (const [kind, globalName, file] of databases) {
   const context = { window: {} };
   vm.runInNewContext(fs.readFileSync(file, "utf8"), context, { filename: file });

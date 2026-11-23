@@ -1,10 +1,6 @@
-/*
-  Manually maintained dated class materials. Edit records directly;
-  schedule generation must never overwrite this file.
-  Term 2 materials are copied from sequential base classes within each section.
-  A–E use two sessions per week; SEMINAR uses one (ten sequential meetings).
-  See materials-data-base.js for intentionally permitted placeholder targets.
-*/
+// AUTO-GENERATED from teacher/authoring/schedule.csv and lessons.json.
+// Run: node teacher/authoring/generate-schedule-data.js
+// Do not edit manually.
 window.MATERIALS_DATA = [
   {
     "Grade": 10,
@@ -12,20 +8,7 @@ window.MATERIALS_DATA = [
     "Section": "A",
     "Class #": "1-1",
     "Date": "2026-08-12",
-    "Materials": [
-      {
-        "Acronym": "IS",
-        "Name": "Introductory slide",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro1.html",
-        "Category": "slides"
-      },
-      {
-        "Acronym": "T1O",
-        "Name": "Term 1 outline",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-outline.html",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 10,
@@ -219,14 +202,7 @@ window.MATERIALS_DATA = [
     "Section": "A",
     "Class #": "6-2",
     "Date": "2026-09-28",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 10,
@@ -372,26 +348,7 @@ window.MATERIALS_DATA = [
     "Section": "A",
     "Class #": "2-1",
     "Date": "2026-11-18",
-    "Materials": [
-      {
-        "Acronym": "C2P",
-        "Name": "C2 practice activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/1-practice_activities/G10_T2_L1_C2_practice_activity.pdf",
-        "Category": "practice-activities"
-      },
-      {
-        "Acronym": "C2S",
-        "Name": "C2 slides",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/3-slides/G10_T2_L1_C2_slides.pdf",
-        "Category": "slides"
-      },
-      {
-        "Acronym": "C2A",
-        "Name": "C2 classroom activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/2-class_activities/G10_T2_L1_C2_classroom_activity.pdf",
-        "Category": "classroom-activities"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 10,
@@ -1820,20 +1777,7 @@ window.MATERIALS_DATA = [
     "Section": "C",
     "Class #": "1-1",
     "Date": "2026-08-12",
-    "Materials": [
-      {
-        "Acronym": "IS",
-        "Name": "Introductory slide",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro1.html",
-        "Category": "slides"
-      },
-      {
-        "Acronym": "T1O",
-        "Name": "Term 1 outline",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-outline.html",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 10,
@@ -1937,14 +1881,7 @@ window.MATERIALS_DATA = [
     "Section": "C",
     "Class #": "3-2",
     "Date": "2026-09-04",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 10,
@@ -3613,20 +3550,7 @@ window.MATERIALS_DATA = [
     "Section": "E",
     "Class #": "1-1",
     "Date": "2026-08-12",
-    "Materials": [
-      {
-        "Acronym": "IS",
-        "Name": "Introductory slide",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro1.html",
-        "Category": "slides"
-      },
-      {
-        "Acronym": "T1O",
-        "Name": "Term 1 outline",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-outline.html",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 10,
@@ -4595,14 +4519,7 @@ window.MATERIALS_DATA = [
     "Section": "SEMINAR",
     "Class #": "5-1",
     "Date": "2026-09-21",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 10,
@@ -4992,14 +4909,7 @@ window.MATERIALS_DATA = [
     "Section": "A",
     "Class #": "1-1",
     "Date": "2026-08-12",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 11,
@@ -5202,14 +5112,7 @@ window.MATERIALS_DATA = [
     "Section": "A",
     "Class #": "6-1",
     "Date": "2026-09-24",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 11,
@@ -5370,6 +5273,14 @@ window.MATERIALS_DATA = [
     "Section": "A",
     "Class #": "2-1",
     "Date": "2026-11-18",
+    "Materials": []
+  },
+  {
+    "Grade": 11,
+    "Term": 2,
+    "Section": "A",
+    "Class #": "2-2",
+    "Date": "2026-11-23",
     "Materials": [
       {
         "Acronym": "C2P",
@@ -5395,8 +5306,8 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "A",
-    "Class #": "2-2",
-    "Date": "2026-11-23",
+    "Class #": "3-1",
+    "Date": "2026-11-27",
     "Materials": [
       {
         "Acronym": "C3P",
@@ -5434,16 +5345,16 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "A",
-    "Class #": "3-1",
-    "Date": "2026-11-27",
+    "Class #": "3-2",
+    "Date": "2026-12-01",
     "Materials": []
   },
   {
     "Grade": 11,
     "Term": 2,
     "Section": "A",
-    "Class #": "3-2",
-    "Date": "2026-12-01",
+    "Class #": "4-1",
+    "Date": "2027-01-13",
     "Materials": [
       {
         "Acronym": "C4P",
@@ -5469,8 +5380,8 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "A",
-    "Class #": "4-1",
-    "Date": "2027-01-13",
+    "Class #": "4-2",
+    "Date": "2027-01-15",
     "Materials": [
       {
         "Acronym": "ME",
@@ -5490,16 +5401,16 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "A",
-    "Class #": "4-2",
-    "Date": "2027-01-15",
+    "Class #": "5-1",
+    "Date": "2027-01-21",
     "Materials": []
   },
   {
     "Grade": 11,
     "Term": 2,
     "Section": "A",
-    "Class #": "5-1",
-    "Date": "2027-01-21",
+    "Class #": "5-2",
+    "Date": "2027-01-25",
     "Materials": [
       {
         "Acronym": "C5P",
@@ -5525,8 +5436,8 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "A",
-    "Class #": "5-2",
-    "Date": "2027-01-25",
+    "Class #": "6-1",
+    "Date": "2027-01-29",
     "Materials": [
       {
         "Acronym": "C6P",
@@ -5552,8 +5463,8 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "A",
-    "Class #": "6-1",
-    "Date": "2027-01-29",
+    "Class #": "6-2",
+    "Date": "2027-02-02",
     "Materials": [
       {
         "Acronym": "C7P",
@@ -5591,16 +5502,16 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "A",
-    "Class #": "6-2",
-    "Date": "2027-02-02",
+    "Class #": "7-1",
+    "Date": "2027-02-08",
     "Materials": []
   },
   {
     "Grade": 11,
     "Term": 2,
     "Section": "A",
-    "Class #": "7-1",
-    "Date": "2027-02-08",
+    "Class #": "7-2",
+    "Date": "2027-02-10",
     "Materials": [
       {
         "Acronym": "C8P",
@@ -5626,8 +5537,8 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "A",
-    "Class #": "7-2",
-    "Date": "2027-02-10",
+    "Class #": "8-1",
+    "Date": "2027-02-16",
     "Materials": [
       {
         "Acronym": "C9P",
@@ -5653,8 +5564,8 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "A",
-    "Class #": "8-1",
-    "Date": "2027-02-16",
+    "Class #": "8-2",
+    "Date": "2027-02-18",
     "Materials": [
       {
         "Acronym": "C10P",
@@ -5687,14 +5598,6 @@ window.MATERIALS_DATA = [
         "Category": "mock-practices"
       }
     ]
-  },
-  {
-    "Grade": 11,
-    "Term": 2,
-    "Section": "A",
-    "Class #": "8-2",
-    "Date": "2027-02-18",
-    "Materials": []
   },
   {
     "Grade": 11,
@@ -6064,14 +5967,7 @@ window.MATERIALS_DATA = [
     "Section": "B",
     "Class #": "6-1",
     "Date": "2026-09-25",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 11,
@@ -6259,6 +6155,14 @@ window.MATERIALS_DATA = [
     "Section": "B",
     "Class #": "2-2",
     "Date": "2026-11-23",
+    "Materials": []
+  },
+  {
+    "Grade": 11,
+    "Term": 2,
+    "Section": "B",
+    "Class #": "3-1",
+    "Date": "2026-11-30",
     "Materials": [
       {
         "Acronym": "C3P",
@@ -6296,16 +6200,16 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "B",
-    "Class #": "3-1",
-    "Date": "2026-11-30",
+    "Class #": "3-2",
+    "Date": "2026-12-01",
     "Materials": []
   },
   {
     "Grade": 11,
     "Term": 2,
     "Section": "B",
-    "Class #": "3-2",
-    "Date": "2026-12-01",
+    "Class #": "4-1",
+    "Date": "2027-01-14",
     "Materials": [
       {
         "Acronym": "C4P",
@@ -6331,8 +6235,8 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "B",
-    "Class #": "4-1",
-    "Date": "2027-01-14",
+    "Class #": "4-2",
+    "Date": "2027-01-15",
     "Materials": [
       {
         "Acronym": "ME",
@@ -6352,16 +6256,16 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "B",
-    "Class #": "4-2",
-    "Date": "2027-01-15",
+    "Class #": "5-1",
+    "Date": "2027-01-22",
     "Materials": []
   },
   {
     "Grade": 11,
     "Term": 2,
     "Section": "B",
-    "Class #": "5-1",
-    "Date": "2027-01-22",
+    "Class #": "5-2",
+    "Date": "2027-01-25",
     "Materials": [
       {
         "Acronym": "C5P",
@@ -6387,8 +6291,8 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "B",
-    "Class #": "5-2",
-    "Date": "2027-01-25",
+    "Class #": "6-1",
+    "Date": "2027-02-01",
     "Materials": [
       {
         "Acronym": "C6P",
@@ -6414,8 +6318,8 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "B",
-    "Class #": "6-1",
-    "Date": "2027-02-01",
+    "Class #": "6-2",
+    "Date": "2027-02-02",
     "Materials": [
       {
         "Acronym": "C7P",
@@ -6453,16 +6357,16 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "B",
-    "Class #": "6-2",
-    "Date": "2027-02-02",
+    "Class #": "7-1",
+    "Date": "2027-02-09",
     "Materials": []
   },
   {
     "Grade": 11,
     "Term": 2,
     "Section": "B",
-    "Class #": "7-1",
-    "Date": "2027-02-09",
+    "Class #": "7-2",
+    "Date": "2027-02-10",
     "Materials": [
       {
         "Acronym": "C8P",
@@ -6488,8 +6392,8 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "B",
-    "Class #": "7-2",
-    "Date": "2027-02-10",
+    "Class #": "8-1",
+    "Date": "2027-02-17",
     "Materials": [
       {
         "Acronym": "C9P",
@@ -6515,8 +6419,8 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "B",
-    "Class #": "8-1",
-    "Date": "2027-02-17",
+    "Class #": "8-2",
+    "Date": "2027-02-18",
     "Materials": [
       {
         "Acronym": "C10P",
@@ -6549,14 +6453,6 @@ window.MATERIALS_DATA = [
         "Category": "mock-practices"
       }
     ]
-  },
-  {
-    "Grade": 11,
-    "Term": 2,
-    "Section": "B",
-    "Class #": "8-2",
-    "Date": "2027-02-18",
-    "Materials": []
   },
   {
     "Grade": 11,
@@ -6776,14 +6672,7 @@ window.MATERIALS_DATA = [
     "Section": "C",
     "Class #": "1-1",
     "Date": "2026-08-12",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 11,
@@ -6911,14 +6800,7 @@ window.MATERIALS_DATA = [
     "Section": "C",
     "Class #": "5-2",
     "Date": "2026-09-23",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 11,
@@ -6926,14 +6808,7 @@ window.MATERIALS_DATA = [
     "Section": "C",
     "Class #": "6-1",
     "Date": "2026-09-24",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 11,
@@ -7698,14 +7573,7 @@ window.MATERIALS_DATA = [
     "Section": "D",
     "Class #": "3-2",
     "Date": "2026-09-04",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 11,
@@ -8485,14 +8353,7 @@ window.MATERIALS_DATA = [
     "Section": "E",
     "Class #": "1-1",
     "Date": "2026-08-12",
-    "Materials": [
-      {
-        "Acronym": "MAT",
-        "Name": "Google reference",
-        "Hyperlink": "https://www.google.com",
-        "Category": "extra-resources"
-      }
-    ]
+    "Materials": []
   },
   {
     "Grade": 11,
