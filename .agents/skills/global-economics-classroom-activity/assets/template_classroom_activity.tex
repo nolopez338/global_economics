@@ -1,8 +1,9 @@
 % Run pdfLaTeX from the source directory. Keep the lookup for the activity's year.
 % Exactly ONE worked example, ONE guided example, and FIVE independent exercises.
 % Counts apply to the whole activity; never repeat these blocks per family.
-% Printable student activity only. Required gray headings and white criterion boxes
-% are structural styles; semantic instructional highlights and legends are forbidden.
+% Printable student activity only. Gray section/task headings, bold underlined
+% subtask titles, and white criterion boxes are structural styles. Semantic
+% instructional highlights and legends are forbidden.
 % Strip source highlighting while preserving content and ordinary formatting.
 % Avoid inherited highlight-producing macros (e.g. the shaded preamble boxed macro).
 \makeatletter
@@ -17,6 +18,9 @@
 \linespread{1.04}
 \setlength{\parskip}{4pt}
 \raggedbottom
+
+\begin{document}
+\begingroup % Activity-only helpers; flush pages before ending this group.
 
 % Exactly TWO table-style families. All helpers size to local \linewidth.
 % Family 1: plain opening notation/formula reference, never a highlight legend.
@@ -68,7 +72,7 @@
     \par\Needspace{4\baselineskip}\addvspace{4pt}%
     {\centering\large\bfseries
      \tikz[baseline=(title.base)]{%
-         \node[fill=black!10,text=black,rounded corners=2mm,
+         \node[fill=black!10,draw=black,line width=0.2pt,text=black,rounded corners=2mm,
              inner sep=3pt,outer sep=0pt] (title) {\strut #1};}\par}%
     \nopagebreak[4]\smallskip
 }
@@ -87,11 +91,27 @@
      \end{varwidth}}%
     \hfill\textbf{#3}\par\nopagebreak[4]
 }
-\newcommand{\task}[2]{\par\noindent\textbf{#1} #2\par}
+% Level 2: full numbered task title in #1; optional instructions in #2.
+% Shade only the title and padding; wrap within the local linewidth.
+\newcommand{\taskheading}[1]{%
+    \par\Needspace{5\baselineskip}\addvspace{4pt}%
+    \noindent\tikz[baseline=(title.base)]{%
+        \node[fill=black!5,draw=none,text=black,rounded corners=2mm,
+            inner sep=3pt,outer sep=0pt] (title) {%
+            \begin{varwidth}{\dimexpr\linewidth-6pt\relax}%
+                \raggedright\bfseries\strut #1\strut
+            \end{varwidth}};}\par\nopagebreak[4]\smallskip
+}
+\newcommand{\task}[2]{\taskheading{#1}#2}
+% Level 3: restart 1--3 within each task; instructions stay outside underline.
+% Keep titles short: ordinary underline is intentionally unbreakable.
+\newcommand{\subtaskheading}[2]{%
+    \par\Needspace{4\baselineskip}\addvspace{4pt}%
+    \noindent{\color{black}\textbf{\underline{#1. #2.}}}\par
+    \nopagebreak[4]\smallskip
+}
 \newcommand{\responseline}{\par\noindent\rule{0pt}{1.55em}\hrulefill\par}
 \newcommand{\workspace}[1]{\par\noindent\rule{0pt}{#1}\par\nopagebreak[4]}
-
-\begin{document}
 
 {\centering
     {\Large\bfseries [Criterion and activity title]\par}
@@ -127,11 +147,15 @@
 \stageheading{General tasks}
 % Required mathematical outputs only; no commentary, justification, or checks.
 % Derive actual outputs from the source; repeat for another task only if needed.
-\task{Task 1.}{[Concise mathematical task title.]}
+\task{Task 1 --- [Concise mathematical task title].}{}
 \begin{enumerate}[label=\arabic*.,itemsep=2pt]
 \item {[First group of required mathematical outputs.]}
 \item {[Second group of required mathematical outputs.]}
 \item {[Final outputs, including contextual interpretations where required.]}
+\end{enumerate}
+\task{Task 2 --- [Second mathematical task title, when needed].}{}
+\begin{enumerate}[label=\arabic*.,itemsep=2pt]
+\item {[Required calculations and contextual meanings.]}
 \end{enumerate}
 
 % Exactly one fully solved worked example, with clear step-by-step reasoning.
@@ -139,7 +163,8 @@
 \problemtitle{1}{[Worked problem title]}{Type A}
 [Context, units, and constraints. Illustrative givens: two quantities of 12 and
 8 units. Replace this entire example with a complete source-aligned problem.]
-\task{Task 1.}{Information tables.}
+\task{Task 1 --- Information tables.}{}
+\subtaskheading{1}{Given and derived quantities}
 \noindent\begin{minipage}[t]{.49\linewidth}
 \vspace{0pt}
 \InformationTable{
@@ -156,7 +181,8 @@
     $d$ & Difference & Excess of the first quantity over the second, in units. \\ \hline
 }
 \end{minipage}\par
-\task{Task 2.}{Totals, differences, and contextual meanings.}
+\task{Task 2 --- Totals, differences, and contextual meanings.}{}
+\subtaskheading{1}{Calculations and meanings}
 \CalculationTable{
     \TableGroup{Combined quantities}
     $T$ & Total & $T=a+b=12+8=20$ units.\par
@@ -164,7 +190,8 @@
     $d$ & Difference & $d=a-b=12-8=4$ units.\par
       The first part exceeds the second by 4 units. \\ \hline
 }
-\textbf{Checks.} $T-b=20-8=12=a$ and
+\subtaskheading{2}{Checks and interpretation}
+$T-b=20-8=12=a$ and
 $d+b=4+8=12=a$. Both recover the first quantity, and all values use the
 same units. [Add every further step, check, and interpretation required by
 the actual source problem; consolidation must not omit reasoning.]
@@ -175,7 +202,8 @@ the actual source problem; consolidation must not omit reasoning.]
 [Fresh context, givens, units, and constraints. Illustrative structure: two
 cases share a first quantity of 15 units; second quantities are 6 and 9 units.
 Replace with the actual topic's givens and case structure.]
-\task{Task 1.}{Shared quantity, units, and meaning.}
+\task{Task 1 --- Shared quantity, units, and meaning.}{}
+\subtaskheading{1}{Shared information}
 \InformationTable{
     \TableGroup{Shared information}
     $a$ & First quantity & 15 \rule{.6in}{.3pt}. Meaning: \\[18pt] \hline
@@ -183,11 +211,13 @@ Replace with the actual topic's givens and case structure.]
 % Reserve this measured prompt+case-table block; resize for actual content.
 % Break at a task boundary instead of separating the prompt from its tables.
 \Needspace{20\baselineskip}
-\task{Task 2.}{For each case: totals, differences, and contextual meanings.}
+\task{Task 2 --- Totals, differences, and contextual meanings for each case.}{}
+% Corresponding numbers repeat across parallel cases, not as new steps.
 % Repeat headings in separate case blocks. Gaps are adjustable writing space,
 % not universal heights. Leave key reasoning and final answers for students.
 \noindent\begin{minipage}[t]{.49\linewidth}
 \vspace{0pt}
+\subtaskheading{1}{Case A calculations}
 % Widen short columns locally so headings fit at half width without shrinking.
 \CalculationTable[.14\linewidth][.24\linewidth]{
     \TableGroup{Case A}
@@ -198,6 +228,7 @@ Replace with the actual topic's givens and case structure.]
 \end{minipage}\hfill
 \begin{minipage}[t]{.49\linewidth}
 \vspace{0pt}
+\subtaskheading{1}{Case B calculations}
 \CalculationTable[.14\linewidth][.24\linewidth]{
     \TableGroup{Case B}
     $b$ & Second quantity & 9 units. [Contextual meaning.] \\ \hline
@@ -205,7 +236,10 @@ Replace with the actual topic's givens and case structure.]
     $d$ & Difference & \\[48pt] \hline
 }
 \end{minipage}\par
-\task{Interpretation.}{[Required contextual meanings; leave final interpretations to students.]}
+% Keep this prompt with its actual writing space and response line.
+\Needspace{10\baselineskip}
+\subtaskheading{2}{Interpretation}
+[Required contextual meanings; leave final interpretations to students.]
 \workspace{4\baselineskip}
 \responseline
 
@@ -232,4 +266,7 @@ Replace with the actual topic's givens and case structure.]
 \problemtitle{7}{[Fifth independent problem title]}{[Family label]}
 [Fresh self-contained description with all givens; modest challenge within the topic and criterion.]
 
+\par\clearpage % Flush the printable activity before restoring other styles.
+\endgroup
+% Preserve any existing appended solutions here, with their original formatting.
 \end{document}

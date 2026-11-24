@@ -68,7 +68,7 @@
     \par\Needspace{4\baselineskip}\addvspace{4pt}%
     {\centering\large\bfseries
      \tikz[baseline=(title.base)]{%
-         \node[fill=black!10,text=black,rounded corners=2mm,
+         \node[fill=black!10,draw=black,line width=0.2pt,text=black,rounded corners=2mm,
              inner sep=3pt,outer sep=0pt] (title) {\strut #1};}\par}%
     \nopagebreak[4]\smallskip
 }
@@ -87,7 +87,16 @@
      \end{varwidth}}%
     \hfill\textbf{#3}\par\nopagebreak[4]
 }
-\newcommand{\task}[2]{\par\noindent\textbf{#1} #2\par}
+\newcommand{\taskheading}[1]{%
+    \par\Needspace{5\baselineskip}\addvspace{4pt}%
+    \noindent\tikz[baseline=(title.base)]{%
+        \node[fill=black!5,text=black,rounded corners=2mm,
+            inner sep=3pt,outer sep=0pt] (title) {%
+            \begin{varwidth}{\dimexpr\linewidth-6pt\relax}%
+                \raggedright\bfseries\strut #1\strut
+            \end{varwidth}};}\par\nopagebreak[4]\smallskip
+}
+\newcommand{\task}[2]{\taskheading{#1}#2}
 \newcommand{\responseline}{\par\noindent\rule{0pt}{1.55em}\hrulefill\par}
 \newcommand{\workspace}[1]{\par\noindent\rule{0pt}{#1}\par\nopagebreak[4]}
 
@@ -184,7 +193,7 @@ F_{Y_i}(t)\\
 }
 For $0<p<1$, $S_X=\{0,1\}$ and $S_{Y_i}=\{f_i(0),f_i(1)\}$.
 
-\stageheading{General tasks}
+\stageheading{General tasks}\vspace{-3mm}
 \noindent\begin{minipage}[t]{.49\linewidth}\vspace{0pt}
 \task{Task 1 --- Binary model and distributions.}{}
 \begin{enumerate}[label=\arabic*.,itemsep=2pt,topsep=2pt,leftmargin=1.5em]
@@ -196,14 +205,19 @@ For $0<p<1$, $S_X=\{0,1\}$ and $S_{Y_i}=\{f_i(0),f_i(1)\}$.
 \begin{minipage}[t]{.49\linewidth}\vspace{0pt}
 \task{Task 2 --- Individual expected values.}{}
 \begin{enumerate}[label=\arabic*.,itemsep=2pt,topsep=2pt,leftmargin=1.5em]
-\item Each expectation formula for fixed payoffs and varying $p\in[0,1]$, exact break-even probability, and separate positive and negative expectation intervals.
-\item Extended payoff tables: state payoffs, expectation formulas, exact roots, and initial expectations (USD); contextual expected gain, loss, and break-even per period.
-\item Separately labelled expected-value graphs: $p\in[0,1]$, monetary scale in USD, endpoint payoffs, expectation line, zero line, and exact break-even probability.
+\item Calculate each expectation at the initial probability (USD) and interpret it per period.
+\item For varying $p\in[0,1]$, derive each expectation formula, break-even root, and positive/negative intervals.
+\item Separate labelled graphs: $p\in[0,1]$, label endpoints, expectation and zero lines.
 \end{enumerate}
 \end{minipage}\par
 
 
-\stageheading{Worked example}\vspace{-3mm}
+\begingroup
+% Consistent positive separation, confined to the worked example.
+\NewDocumentCommand{\WorkedColumnPair}{+m +m}{\par\noindent\begin{minipage}[t]{.49\linewidth}\vspace{0pt}\raggedright #1\end{minipage}\hfill\begin{minipage}[t]{.49\linewidth}\vspace{0pt}\raggedright #2\end{minipage}\par}
+\RenewDocumentCommand{\ColumnPair}{+m +m}{%
+  \par\addvspace{4mm}\WorkedColumnPair{#1}{#2}\par\addvspace{4mm}}
+\stageheading{Worked example}\vspace{2mm}
 \problemtitle{1}{Campus concert food stand or indoor games}{}
 A student club compares two hypothetical fundraising choices for one weekend: a food
 stand at a campus outdoor concert or an indoor games afternoon. The concert either goes
@@ -215,11 +229,36 @@ potential players away, and a net gain of USD 90 if it is cancelled, because stu
 seek an indoor alternative. Only one option would be chosen; both use the same concert outcome.
 
 \task{Task 1 --- Establish the binary model and monetary transformations.}{}
+\textbf{\underline{1. Binary model and monetary transformations.}}\nopagebreak[4]
 \textbf{Shared model.} One observation is the club's net outcome over one weekend for the chosen option.
 Let $E$ be the concert going ahead and $E^c$ its cancellation.
 Set $X=1$ on $E$, $X=0$ on $E^c$. Then $X\sim\operatorname{Bernoulli}(p)$ , $p=P(E)=3/8$.
+\vspace{2mm}
+\ColumnPair{
+\textbf{$Y_1$: food stand net profit (USD)}
+\vspace{2mm}
 \[
-\text{For } 0<p<1 \quad:\quad S_X=\{x\in\mathbb R:P(X=x)>0\}=\{0,1\},\quad
+\begin{aligned}
+&f_1(0)=-45<0 \qquad f_1(1)=105>0\\
+Y_1&=f_1(0)+[f_1(1)-f_1(0)]X\\
+&=-45+[105-(-45)]X = -45+150X
+\end{aligned}
+\]
+}{
+\textbf{$Y_2$: games afternoon net profit (USD)}
+\vspace{2mm}
+\[
+\begin{aligned}
+&f_2(0)=90>0 \qquad f_2(1)=-30<0\\
+Y_2&=f_2(0)+[f_2(1)-f_2(0)]X\\
+&=90+[(-30)-90]X = 90-120X
+\end{aligned}
+\]
+}
+\vspace{3mm}
+\textbf{\underline{2. Supports, PMFs, and ordered CDFs}}\nopagebreak[4]\vspace{2mm}
+\[
+\text{For } 0<p<1 \quad:\quad S_X=\{x\in\mathbb R:P(X=x)>0\}=\{0,1\} \qquad
 \begin{gathered}
 m_X(x)\\
 =
@@ -232,36 +271,19 @@ F_X(t)\\
 \end{gathered}
 \begin{cases}0&t<0\\1-p&0\leq t<1\\1&t\geq1\end{cases}
 \]
-Initially $P(X=0)=5/8$, $P(X=1)=3/8$ and the CDF plateau is $5/8$.
-At $p=0$, $S_X=\{0\}$; at $p=1$, $S_X=\{1\}$.
+
+\vspace{2mm}
+ $ p=0 \rightarrow$  $S_X=\{0\}$ \qquad  $ p=1 \rightarrow$  $S_X=\{1\}$
 
 \ColumnPair{
-\textbf{$Y_1$: food stand net profit (USD).}\par
-
-\[
-\begin{aligned}
-&f_1(0)=-45<0 \qquad f_1(1)=105>0\\
-Y_1&=f_1(0)+[f_1(1)-f_1(0)]X\\
-&=-45+[105-(-45)]X = -45+150X
-\end{aligned}
-\]
-\textbf{Support} \vspace{-3mm}
+\textbf{Support} \vspace{2mm}
 \[
 \begin{aligned}
 S_{Y_1}&=\{y\in\mathbb R:P(Y_1=y)>0\} =\{-45,105\}
 \end{aligned}
 \]
 }{
-\textbf{$Y_2$: games afternoon net profit (USD).}\par
-
-\[
-\begin{aligned}
-&f_2(0)=90>0 \qquad f_2(1)=-30<0\\
-Y_2&=f_2(0)+[f_2(1)-f_2(0)]X\\
-&=90+[(-30)-90]X = 90-120X
-\end{aligned}
-\]
-\textbf{Support} \vspace{-3mm}
+\textbf{Support} \vspace{2mm}
 \[
 \begin{aligned}
 S_{Y_2}&=\{y\in\mathbb R:P(Y_2=y)>0\} =\{-30,90\}
@@ -299,6 +321,8 @@ F_{Y_2}(t)\\
 \begin{cases}0&t<-30\\p&-30\leq t<90\\1&t\geq90\end{cases}
 \]
 }
+\textbf{\underline{3. Initial probabilities and loss events.}}\nopagebreak[4]
+Initially $P(X=0)=5/8$, $P(X=1)=3/8$.
 \ColumnPair{
 \textbf{$Y_1$ --- Initial probabilities and loss.}
 \[
@@ -308,10 +332,7 @@ m_{Y_1}(-45)=\tfrac58,\quad m_{Y_1}(105)=\tfrac38\\
 \end{gathered}
 \]
 Five out of eight weekends produce a food stand loss.
-\par\textbf{Endpoint supports} (USD).
-\[
-p=0:\ S_{Y_1}=\{-45\};\quad p=1:\ S_{Y_1}=\{105\}
-\]
+\par
 }{
 \textbf{$Y_2$ --- Initial probabilities and loss.}
 \[
@@ -321,121 +342,98 @@ m_{Y_2}(-30)=\tfrac38,\quad m_{Y_2}(90)=\tfrac58\\
 \end{gathered}
 \]
 Three out of eight weekends produce a games afternoon loss.
-\par\textbf{Endpoint supports} (USD).
-\[
-p=0:\ S_{Y_2}=\{90\};\quad p=1:\ S_{Y_2}=\{-30\}
-\]
+\par
 }
 
-\Needspace{6\baselineskip}
-\task{Task 2 --- Analyse each expected value separately.}{}
-\textbf{Common assumptions.} Retain the shared indicator from Task 1, hold both state
-payoffs of each variable fixed, and vary only $p=P(E)\in[0,1]$.
+\newpage
+\task{Task 2 --- Individual expected values.}{}
+\textbf{\underline{1. Initial expected values}} ($p=3/8$)\nopagebreak[4] 
 \ColumnPair{
-\textbf{$Y_1$ --- Expectation derivation} (USD).
+\textbf{$Y_1$: initial expectation (USD).}
+\[
+\begin{aligned}
+\mathbb E[Y_1]\big|_{p=\tfrac38}&=105(\tfrac38)-45(\tfrac58)=\tfrac{315-225}{8}=\tfrac{45}{4}=11.25\ \text{USD}
+\end{aligned}
+\]
+Food stand: expected gain of USD 11.25 per weekend.
+
+}{
+\textbf{$Y_2$: initial expectation (USD).}
+\[
+\begin{aligned}
+\mathbb E[Y_2]\big|_{p=\tfrac38}&=-30(\tfrac38)+90(\tfrac58)=\tfrac{-90+450}{8}=\tfrac{360}{8}=45\ \text{USD}
+\end{aligned}
+\]
+Games afternoon: expected gain of USD 45 per weekend.
+
+}
+\textbf{\underline{2. Expectation formulas and sign intervals.}} Keep payoffs fixed; vary $p\in[0,1]$.\nopagebreak[4]
+\ColumnPair{
+\textbf{$Y_1$: expectation and break-even (USD).}
 \[
 \begin{aligned}
 \mathbb E[Y_1]&=p f_1(1)+(1-p)f_1(0)\\
-&=105p-45(1-p)\\
-&=105p-45+45p=-45+150p
+&=105p-45(1-p)=-45+150p
 \end{aligned}
 \]
-\textbf{Break-even equation.}
 \[
 \begin{aligned}
 \mathbb E[Y_1]=0&\iff-45+150p=0\\
-&\iff150p=45\\
-&\iff p=\tfrac{45}{150}=\tfrac3{10}
+&\iff 150p=45\iff p=\tfrac{45}{150}=\tfrac3{10}
 \end{aligned}
 \]
 }{
-\textbf{$Y_2$ --- Expectation derivation} (USD).
+\textbf{$Y_2$: expectation and break-even (USD).}
 \[
 \begin{aligned}
 \mathbb E[Y_2]&=p f_2(1)+(1-p)f_2(0)\\
-&=-30p+90(1-p)\\
-&=-30p+90-90p=90-120p
+&=-30p+90(1-p)=90-120p
 \end{aligned}
 \]
-\textbf{Break-even equation.}
 \[
 \begin{aligned}
 \mathbb E[Y_2]=0&\iff90-120p=0\\
-&\iff-120p=-90\\
-&\iff p=\tfrac{-90}{-120}=\tfrac34
+&\iff -120p=-90\iff p=\tfrac{-90}{-120}=\tfrac34
 \end{aligned}
 \]
 }
 \ColumnPair{
-\textbf{$Y_1$ --- Positive and negative expectations.}
+\textbf{$Y_1$: sign intervals.}
 \[
 \begin{aligned}
-\mathbb E[Y_1]>0&\iff150p>45\\
-&\iff p>\tfrac3{10}\\
-&\iff p\in(\tfrac3{10},1]\\[3pt]
-\mathbb E[Y_1]<0&\iff150p<45\\
-&\iff p<\tfrac3{10}\\
-&\iff p\in[0,\tfrac3{10})
+\mathbb E[Y_1]>0&\iff p>\tfrac3{10}\iff p\in(\tfrac3{10},1]\\[3pt]
+\mathbb E[Y_1]<0&\iff150p<45\iff p\in[0,\tfrac3{10})
 \end{aligned}
 \]
-The food stand has expected net gain above $3/10$, expected net loss below $3/10$, and break-even at $3/10$.
+
 }{
-\textbf{$Y_2$ --- Positive and negative expectations.}
+\textbf{$Y_2$: sign intervals.}
 \[
 \begin{aligned}
-\mathbb E[Y_2]>0&\iff-120p>-90\\
-&\iff p<\tfrac34\\
-&\iff p\in[0,\tfrac34)\\[3pt]
-\mathbb E[Y_2]<0&\iff-120p<-90\\
-&\iff p>\tfrac34\\
-&\iff p\in(\tfrac34,1]
+\mathbb E[Y_2]>0&\iff-120p>-90\iff p\in[0,\tfrac34)\\[3pt]
+\mathbb E[Y_2]<0&\iff-120p<-90\iff p\in(\tfrac34,1]
 \end{aligned}
 \]
-Division by $-120$ reverses the inequalities. The games afternoon has expected net gain below $3/4$, expected net loss above $3/4$, and break-even at $3/4$.
+Dividing by $-120$ reverses both inequalities.
 }
+\vspace{2mm}
+\textbf{\underline{3. Graphs.}}\vspace{2mm}
 \ColumnPair{
-\textbf{$Y_1$ --- Initial value and interpretation.}
-\[
-\begin{aligned}
-\mathbb E[Y_1]\big|_{p=3/8}&=105(\tfrac38)-45(\tfrac58)\\
-&=\tfrac{315-225}{8}=\tfrac{45}{4}\\
-&=11.25\ \text{USD}
-\end{aligned}
-\]
-The long-run expected gain is USD 11.25 per weekend.
-\PayoffSummary{$f_1(0),f_1(1)$ (USD)&$-45,105$\\\hline
-$\mathbb E[Y_1]$ (USD)&$-45+150p$\\\hline
-Exact $p_1^*$&$3/10$\\\hline
-Initial value (USD)&$45/4=11.25$\\\hline}
+\textbf{$Y_1$: graph.}\par\centering \vspace{2mm}
+\EVGraph{1}{-45}{105}{3/10}
 }{
-\textbf{$Y_2$ --- Initial value and interpretation.}
-\[
-\begin{aligned}
-\mathbb E[Y_2]\big|_{p=3/8}&=-30(\tfrac38)+90(\tfrac58)\\
-&=\tfrac{-90+450}{8}=\tfrac{360}{8}\\
-&=45\ \text{USD}
-\end{aligned}
-\]
-The long-run expected gain is USD 45 per weekend.
-\PayoffSummary{$f_2(0),f_2(1)$ (USD)&$90,-30$\\\hline
-$\mathbb E[Y_2]$ (USD)&$90-120p$\\\hline
-Exact $p_2^*$&$3/4$\\\hline
-Initial value (USD)&$45$\\\hline}
+\textbf{$Y_2$: graph.}\par\centering \vspace{2mm}
+\EVGraph{2}{90}{-30}{3/4}
 }
-\ColumnPair{
-\textbf{$Y_1$ --- Graph.}\par\centering
-\EVGraph{1}{-45}{105}{3/10}\par Exact zero: $p_1^*=3/10$.
-}{
-\textbf{$Y_2$ --- Graph.}\par\centering
-\EVGraph{2}{90}{-30}{3/4}\par Exact zero: $p_2^*=3/4$.
-}
-Solid lines show expectations; dashed horizontal lines show zero; dots mark the individual roots.
-\textbf{Worked checks.} The endpoint expectations are the state payoffs:
+\textbf{Checks.} Endpoint expectations equal the state payoffs:
 $\mathbb E[Y_1](0)=-45$, $\mathbb E[Y_1](1)=105$;
 $\mathbb E[Y_2](0)=90$, $\mathbb E[Y_2](1)=-30$ (USD).
 At the roots, $-45+150(3/10)=0$ and $90-120(3/4)=0$.
-Positive initial expectation does not guarantee realized profit: each weekend gives one of the two state payoffs.
-At break-even the long-run average is zero although each realized payoff is nonzero.
+Each weekend yields a state payoff, so a positive expectation does not guarantee profit;
+at break-even, the long-run average is zero despite nonzero realized payoffs.
+
+\par\clearpage
+\endgroup
 
 \stageheading{Guided Example}
 \problemtitle{2}{Graduation photo booth options}{Scaffolded}
@@ -448,256 +446,214 @@ The decorated set has a net gain of USD 126 if the target is met and a net loss 
 otherwise: it attracts higher-priced bookings but costs more to prepare. Only one option
 would be chosen; both are modelled using the same booking-target outcome.
 
-\task{Task 1 --- Establish the binary model and monetary transformations.}{}
-\textbf{Shared model.} One observation is the photographer's net outcome over one graduation weekend.
-Let $E$ be meeting the booking target and $E^c$ falling short; exactly one occurs.
-Set $X=1$ on $E$, $X=0$ on $E^c$. Then $X\sim\operatorname{Bernoulli}(p)$ is unitless,
-$p=P(E)$, initially $p=2/7$, and both options use the same $X$; no independence is assumed.
-Complete the numerical entries throughout the scaffold.
-\[
-S_X=\{x\in\mathbb R:P(X=x)>0\}=\{0,1\}\quad(0<p<1),\quad
-\begin{gathered}
-m_X(x)\\
-=
-\end{gathered}
-\begin{cases}1-p&x=0\\p&x=1\\0&\text{otherwise}\end{cases}
-\enspace
-\begin{gathered}
-F_X(t)\\
-=
-\end{gathered}
-\begin{cases}0&t<0\\1-p&0\leq t<1\\1&t\geq1\end{cases}
-\]
-Initially $P(X=1)=2/7$, $P(X=0)=1-2/7=\calcblank$;
-the CDF plateau is $\calcblank$.
-At $p=0$, $S_X=\{\shortblank\}$; at $p=1$, $S_X=\{\shortblank\}$.
 
+% Helpers and writing-space settings are local to the guided example.
+\begingroup
+\newcommand{\subtaskheading}[2]{%
+    \par\Needspace{5\baselineskip}\addvspace{2pt}%
+    \noindent\textbf{\underline{#1. #2.}}\par\nopagebreak[4]}
+% Empty neutral writing areas; all definitions end with this example.
+\newcommand{\writingbox}[2][6mm]{%
+  \tikz[baseline=(answer.base)]{\node[draw=black!25,fill=black!1,
+    rounded corners=2mm,line width=.3pt,inner sep=0pt,outer sep=.3pt,
+    minimum width=#2,minimum height=#1] (answer) {\phantom{0}};}}
+\renewcommand{\calcblank}{\writingbox[6mm]{11mm}}
+\renewcommand{\shortblank}{\writingbox{7.5mm}}
+\newcommand{\probblank}{\writingbox[8mm]{11mm}}
+\newcommand{\wordblank}[1]{\writingbox[7mm]{#1}}
+\setlength{\parskip}{0pt}\setlength{\jot}{0pt}\setlength{\arraycolsep}{2.5pt}
+\setlength{\abovedisplayskip}{3pt}
+\setlength{\belowdisplayskip}{3pt}
+\setlength{\abovedisplayshortskip}{3pt}
+\setlength{\belowdisplayshortskip}{3pt}
+
+\task{Task 1 --- Establish the binary model and monetary transformations.}{}
+\subtaskheading{1}{Binary model and monetary transformations}
+\textbf{Shared model.} One observation is the photographer's net outcome over one graduation
+weekend for the chosen option. Let $E$ be \wordblank{3.4cm} and $E^c$ be
+\wordblank{3.4cm}. Set $X=1$ on $E$, $X=0$ on $E^c$.
+Then $X\sim\operatorname{Bernoulli}(p)$, $p=P(E)=2/7$ initially. 
 \ColumnPair{
-\textbf{$Y_1$: simple-backdrop net profit (USD).}\par
-\textbf{State payoffs and affine rule.}
+\textbf{$Y_1$: simple-backdrop net profit (USD).}
 \[
 \begin{aligned}
-f_1(0)&=-24<0,& f_1(1)&=72>0\\
-Y_1&=f_1(0)+[f_1(1)-f_1(0)]X\\
-&=-24+[72-(-24)]X\\
-&=-24+\calcblank X
-\end{aligned}
-\]
-\textbf{Support} (USD; $0<p<1$).
-\[
-\begin{aligned}
-S_{Y_1}&=\{y\in\mathbb R:P(Y_1=y)>0\}\\
-&=\{\calcblank,\calcblank\}
+&f_1(0)=-24<0\qquad f_1(1)=72>0\\[1pt]
+Y_1&=f_1(0)+[f_1(1)-f_1(0)]X\\[1pt]
+&=-24+[72-(-24)]X=-24+\calcblank\,X
 \end{aligned}
 \]
 }{
-\textbf{$Y_2$: decorated-set net profit (USD).}\par
-\textbf{State payoffs and affine rule.}
+\textbf{$Y_2$: decorated-set net profit (USD).}
 \[
 \begin{aligned}
-f_2(0)&=-54<0,& f_2(1)&=126>0\\
-Y_2&=f_2(0)+[f_2(1)-f_2(0)]X\\
-&=-54+[126-(-54)]X\\
-&=-54+\calcblank X
+&f_2(0)=-54<0\qquad f_2(1)=126>0\\[1pt]
+Y_2&=f_2(0)+[f_2(1)-f_2(0)]X\\[1pt]
+&=-54+[\calcblank-(\calcblank)]X=-54+\calcblank\,X
 \end{aligned}
 \]
+}
+
+\subtaskheading{2}{Supports, PMFs, and ordered CDFs} 
+\[
+\text{For }0<p<1:\quad S_X=\{x\in\mathbb R:P(X=x)>0\}=\{0,1\}\qquad
+\begin{gathered}m_X(x)\\=\end{gathered}
+\begin{cases}1-p&x=0\\p&x=1\\0&\text{otherwise}\end{cases}
+\enspace
+\begin{gathered}F_X(t)\\=\end{gathered}
+\begin{cases}0&t<0\\1-p&0\leq t<1\\1&t\geq1\end{cases}
+\]
+$p=0\ \longrightarrow\ S_X=\{\shortblank\}$\qquad
+$p=1\ \longrightarrow\ S_X=\{\shortblank\}$.
+\ColumnPair{
 \textbf{Support} (USD; $0<p<1$).
 \[
-\begin{aligned}
-S_{Y_2}&=\{y\in\mathbb R:P(Y_2=y)>0\}\\
-&=\{\calcblank,\calcblank\}
-\end{aligned}
+S_{Y_1}=\{y\in\mathbb R:P(Y_1=y)>0\}=\{\probblank,\probblank\}
+\]
+}{
+\textbf{Support} (USD; $0<p<1$).
+\[
+S_{Y_2}=\{y\in\mathbb R:P(Y_2=y)>0\}=\{\probblank,\probblank\}
 \]
 }
 \ColumnPair{
 \textbf{$Y_1$ --- Complete PMF and ordered CDF.}
-\[
-\begin{aligned}
-&\begin{gathered}
-m_{Y_1}(y)\\
-=
-\end{gathered}
-\begin{cases}1-p&y=\calcblank\\[5pt]p&y=\calcblank\\[5pt]0&\text{otherwise}\end{cases}\\[5pt]
-&\begin{gathered}
-F_{Y_1}(t)\\
-=
-\end{gathered}
-\begin{cases}0&t<\calcblank\\[5pt]1-p&\shortblank\leq t<\shortblank\\[5pt]1&t\geq\calcblank\end{cases}
-\end{aligned}
-\]
+\[ \begin{gathered}m_{Y_1}(y)\\=\end{gathered}
+\begin{cases}1-p&y=\shortblank\\[1pt]p&y=\shortblank\\[1pt]0&\text{otherwise}\end{cases} \hspace{1pt}\begin{gathered}F_{Y_1}(t)\\=\end{gathered}
+\begin{cases}0&t<\shortblank\\[1pt]1-p&\shortblank\leq t<\shortblank\\[1pt]1&t\geq\shortblank\end{cases} \]
 }{
 \textbf{$Y_2$ --- Complete PMF and ordered CDF.}
-\[
-\begin{aligned}
-&\begin{gathered}
-m_{Y_2}(y)\\
-=
-\end{gathered}
-\begin{cases}1-p&y=\calcblank\\[5pt]p&y=\calcblank\\[5pt]0&\text{otherwise}\end{cases}\\[5pt]
-&\begin{gathered}
-F_{Y_2}(t)\\
-=
-\end{gathered}
-\begin{cases}0&t<\calcblank\\[5pt]1-p&\shortblank\leq t<\shortblank\\[5pt]1&t\geq\calcblank\end{cases}
-\end{aligned}
-\]
+\[ \begin{gathered}m_{Y_2}(y)\\=\end{gathered}
+\begin{cases}1-p&y=\shortblank\\[1pt]p&y=\shortblank\\[1pt]0&\text{otherwise}\end{cases} \hspace{1pt}\begin{gathered}F_{Y_2}(t)\\=\end{gathered}
+\begin{cases}0&t<\shortblank\\[1pt]1-p&\shortblank\leq t<\shortblank\\[1pt]1&t\geq\shortblank\end{cases} \]
 }
+
+\subtaskheading{3}{Initial probabilities and loss events}
+Initially $P(X=0)=1-2/7=\probblank$, $P(X=1)=2/7$.
 \ColumnPair{
 \textbf{$Y_1$ --- Initial probabilities and loss.}
 \[
 \begin{gathered}
-m_{Y_1}(-24)\\
-=
+m_{Y_1}(-24)=\probblank,\quad m_{Y_1}(72)=\probblank\\[1pt]
+\{Y_1<0\}=\{X=\shortblank\}=\shortblank\\[1pt]
+P(Y_1<0)=\probblank
 \end{gathered}
-1-\tfrac27=\calcblank,
-\quad
-\begin{gathered}
-m_{Y_1}(72)\\
-=
-\end{gathered}
-\calcblank
 \]
-$\{Y_1<0\}=\{X=\shortblank\}=E^c$.\par
-$P(Y_1<0)=1-p=1-2/7=\calcblank$ initially.\par
-In the long run, $\shortblank$ out of seven weekends produce a simple-backdrop loss.
-\par\textbf{Endpoint supports} (USD).
-\[
-p=0:\ S_{Y_1}=\{\calcblank\};\quad p=1:\ S_{Y_1}=\{\calcblank\}
-\]
+\shortblank\ out of seven weekends produce a simple-backdrop loss.
 }{
 \textbf{$Y_2$ --- Initial probabilities and loss.}
 \[
 \begin{gathered}
-m_{Y_2}(-54)\\
-=
+m_{Y_2}(-54)=\probblank,\quad m_{Y_2}(126)=\probblank\\[1pt]
+\{Y_2<0\}=\{X=\shortblank\}=\shortblank\\[1pt]
+P(Y_2<0)=\probblank
 \end{gathered}
-1-\tfrac27=\calcblank,
-\quad
-\begin{gathered}
-m_{Y_2}(126)\\
-=
-\end{gathered}
-\calcblank
 \]
-$\{Y_2<0\}=\{X=\shortblank\}=E^c$.\par
-$P(Y_2<0)=1-p=1-2/7=\calcblank$ initially.\par
-In the long run, $\shortblank$ out of seven weekends produce a decorated-set loss.
-\par\textbf{Endpoint supports} (USD).
-\[
-p=0:\ S_{Y_2}=\{\calcblank\};\quad p=1:\ S_{Y_2}=\{\calcblank\}
-\]
+\shortblank\ out of seven weekends produce a decorated-set loss.
 }
-\task{Task 2 --- Analyse each expected value separately.}{}
-\textbf{Common assumptions.} Retain the shared indicator from Task 1, hold both state
-payoffs of each variable fixed, and vary only $p=P(E)\in[0,1]$.
-\ColumnPair{
-\textbf{$Y_1$ --- Expectation derivation} (USD).
-\[
-\begin{aligned}
-\mathbb E[Y_1]&=p f_1(1)+(1-p)f_1(0)\\
-&=72p-24(1-p)\\
-&=72p-24+24p\\
-&=-24+\calcblank p
-\end{aligned}
-\]
-\textbf{Break-even equation.}
-\[
-\begin{aligned}
-\mathbb E[Y_1]=0&\iff-24+[72-(-24)]p=0\\
-&\iff\calcblank p=24\\[5pt]
-&\iff p=\frac{24}{\shortblank}=\calcblank
-\end{aligned}
-\]
-}{
-\textbf{$Y_2$ --- Expectation derivation} (USD).
-\[
-\begin{aligned}
-\mathbb E[Y_2]&=p f_2(1)+(1-p)f_2(0)\\
-&=126p-54(1-p)\\
-&=126p-54+54p\\
-&=-54+\calcblank p
-\end{aligned}
-\]
-\textbf{Break-even equation.}
-\[
-\begin{aligned}
-\mathbb E[Y_2]=0&\iff-54+[126-(-54)]p=0\\
-&\iff\calcblank p=54\\[5pt]
-&\iff p=\frac{54}{\shortblank}=\calcblank
-\end{aligned}
-\]
-}
-\ColumnPair{
-\textbf{$Y_1$ --- Positive and negative expectations.}
-\[
-\begin{aligned}
-\mathbb E[Y_1]>0&\iff[72-(-24)]p>24\\
-&\iff p>\calcblank\\[5pt]
-&\iff p\in(\calcblank,1]\\[5pt]
-\mathbb E[Y_1]<0&\iff[72-(-24)]p<24\\
-&\iff p<\calcblank\\[5pt]
-&\iff p\in[0,\calcblank)
-\end{aligned}
-\]
-The simple backdrop has expected net gain above $\calcblank$, expected net loss below $\calcblank$,
-and break-even at $\calcblank$.
-}{
-\textbf{$Y_2$ --- Positive and negative expectations.}
-\[
-\begin{aligned}
-\mathbb E[Y_2]>0&\iff[126-(-54)]p>54\\
-&\iff p>\calcblank\\[5pt]
-&\iff p\in(\calcblank,1]\\[5pt]
-\mathbb E[Y_2]<0&\iff[126-(-54)]p<54\\
-&\iff p<\calcblank\\[5pt]
-&\iff p\in[0,\calcblank)
-\end{aligned}
-\]
-The decorated set has expected net gain above $\calcblank$, expected net loss below $\calcblank$,
-and break-even at $\calcblank$.
-}
-\ColumnPair{
-\textbf{$Y_1$ --- Initial value and interpretation.}
-\[
-\begin{aligned}
-\mathbb E[Y_1]\big|_{p=2/7}&=72(\tfrac27)-24(1-\tfrac27)\\
-&=\frac{144-24(\shortblank)}7\\[5pt]
-&=\calcblank\ \text{USD}
-\end{aligned}
-\]
-The long-run expected \underline{\hspace{1.4cm}} (gain/loss) is USD $\calcblank$ per weekend.
-\PayoffSummary{$f_1(0),f_1(1)$ (USD)&$-24,72$\\\hline
-$\mathbb E[Y_1]$ (USD)&$-24+\shortblank p$\\[5pt]\hline
-Exact $p_1^*$&$\calcblank$\\[5pt]\hline
-Initial value (USD)&$\calcblank$\\[5pt]\hline}
-}{
-\textbf{$Y_2$ --- Initial value and interpretation.}
-\[
-\begin{aligned}
-\mathbb E[Y_2]\big|_{p=2/7}&=126(\tfrac27)-54(1-\tfrac27)\\
-&=\frac{252-54(\shortblank)}7\\[5pt]
-&=\calcblank\ \text{USD}
-\end{aligned}
-\]
-The long-run expected \underline{\hspace{1.4cm}} (gain/loss) is USD $\calcblank$ per weekend.
-\PayoffSummary{$f_2(0),f_2(1)$ (USD)&$-54,126$\\\hline
-$\mathbb E[Y_2]$ (USD)&$-54+\shortblank p$\\[5pt]\hline
-Exact $p_2^*$&$\calcblank$\\[5pt]\hline
-Initial value (USD)&$\calcblank$\\[5pt]\hline}
-}
-\ColumnPair{
-\textbf{$Y_1$ --- Graph.}\par
-Use a labelled USD scale; plot the endpoint payoffs, join them with the expectation line, and mark the exact root.
-\par\centering\BlankGraph{1}\par Exact zero: $p_1^*=\calcblank$.
-}{
-\textbf{$Y_2$ --- Graph.}\par
-Use a labelled USD scale; plot the endpoint payoffs, join them with the expectation line, and mark the exact root.
-\par\centering\BlankGraph{2}\par Exact zero: $p_2^*=\calcblank$.
-}
-The horizontal axes provide the zero lines; $p=P(E)$ ranges from 0 to 1.
-At either break-even probability, the long-run expected net profit is zero, although a realized weekend payoff is nonzero.
 
-\stageheading{Independent Practice}
+\newpage
+\task{Task 2 --- Individual expected values.}{}
+\subtaskheading{1}{Initial expected values}
+$p=2/7$. Give exact fractions, then round decimals to two places.
+\ColumnPair{
+\textbf{$Y_1$: initial expectation (USD).}
+\[
+\begin{aligned}
+\mathbb E[Y_1]\big|_{p=\tfrac27}
+&=72(\tfrac27)-24(\frac{\shortblank}{7})\\[1pt]
+&=\frac{144-\calcblank}{7}=\writingbox[8mm]{11mm}\approx\calcblank\ \text{USD}
+\end{aligned}
+\]
+Simple backdrop: expected \wordblank{1.5cm} (gain/loss) of USD $\calcblank$ per weekend.
+}{
+\textbf{$Y_2$: initial expectation (USD).}
+\[
+\begin{aligned}
+\mathbb E[Y_2]\big|_{p=\tfrac27}
+&=126(\tfrac27)-54(\frac{\shortblank}{7})\\[1pt]
+&=\frac{252-\calcblank}{7}=\writingbox[8mm]{11mm}\approx\calcblank\ \text{USD}
+\end{aligned}
+\]
+Decorated set: expected \wordblank{1.5cm} (gain/loss) of USD $\calcblank$ per weekend.
+}
+
+\subtaskheading{2}{Expectation formulas and sign intervals}
+Keep payoffs fixed; vary $p\in[0,1]$.
+\ColumnPair{
+\textbf{$Y_1$: expectation and break-even (USD).}
+\[
+\begin{aligned}
+\mathbb E[Y_1]&=p f_1(1)+(1-p)f_1(0)\\[1pt]
+&=72p-24(1-p)=-24+\calcblank\,p
+\\[3pt]
+\mathbb E[Y_1]=0&\iff-24+\calcblank\,p=0\\[1pt]
+&\iff\calcblank\,p=24\iff p=\frac{24}{\shortblank}=\writingbox[8mm]{11mm}
+\end{aligned}
+\]
+}{
+\textbf{$Y_2$: expectation and break-even (USD).}
+\[
+\begin{aligned}
+\mathbb E[Y_2]&=p f_2(1)+(1-p)f_2(0)\\[1pt]
+&=\calcblank\,p-54(1-p)=-54+\calcblank\,p
+\\[3pt]
+\mathbb E[Y_2]=0&\iff-54+\calcblank\,p=0\\[1pt]
+&\iff\calcblank\,p=54\iff p=\frac{54}{\shortblank}=\writingbox[8mm]{11mm}
+\end{aligned}
+\]
+}
+% Fresh paired row keeps corresponding sign work aligned.
+
+\ColumnPair{
+\textbf{$Y_1$: sign intervals.}
+\[
+\begin{aligned}
+\mathbb E[Y_1]>0&\iff\calcblank\,p>24\\[1pt]
+&\iff p>\writingbox[8mm]{11mm}\iff p\in(\writingbox[8mm]{9mm},1]\\[1pt]
+\mathbb E[Y_1]<0&\iff\calcblank\,p<24\iff p\in[0,\writingbox[8mm]{9mm})
+\end{aligned}
+\]
+}{
+\textbf{$Y_2$: sign intervals.}
+\[
+\begin{aligned}
+\mathbb E[Y_2]>0&\iff\calcblank\,p>54\\[1pt]
+&\iff p>\writingbox[8mm]{11mm}\iff p\in(\writingbox[8mm]{9mm},1]\\[1pt]
+\mathbb E[Y_2]<0&\iff\calcblank\,p<54\iff p\in[0,\writingbox[8mm]{9mm})
+\end{aligned}
+\]
+}
+Dividing by the \wordblank{1.5cm} (positive/negative)
+coefficient \wordblank{1.8cm} (keeps/reverses) both inequalities.
+
+
+\par\vspace{3pt}\subtaskheading{3}{Graphs}
+Label each USD scale; join the endpoint payoffs, show the zero line, and mark the exact root.
+\ColumnPair{
+\textbf{$Y_1$: graph.}\par\centering
+\BlankGraph{1}
+}{
+\textbf{$Y_2$: graph.}\par\centering
+\BlankGraph{2}
+}
+
+\Needspace{8\baselineskip}
+\textbf{Endpoint and root calculations.} Endpoint expectations equal the state payoffs:
+\[
+\mathbb E[Y_1](0)=\calcblank,\quad \mathbb E[Y_1](1)=\calcblank,\quad
+\mathbb E[Y_2](0)=\calcblank,\quad \mathbb E[Y_2](1)=\calcblank\quad\text{(USD).}
+\]
+At the roots, $-24+\calcblank(\writingbox[8mm]{11mm})=0$ and
+$-54+\calcblank(\writingbox[8mm]{11mm})=0$.
+\par Each weekend yields a state payoff. A positive expectation means
+\wordblank{4cm} over many weekends; an individual weekend can still yield
+\wordblank{3cm}. At break-even, the long-run average is
+\wordblank{2cm}, although each realized payoff is \wordblank{2cm}.
+\par\noindent\writingbox[7mm]{\dimexpr\linewidth-1pt\relax}\par
+\par\clearpage
+\endgroup
+
+\stageheading{Independent Practice}\vspace{-3mm}
 \problemtitle{3}{Campus portraits or an online CV workshop}{Core: service}
 A recent graduate compares two hypothetical freelance activities for one day: campus
 portrait sessions or an online CV workshop. The university's orientation day either goes
