@@ -8,7 +8,7 @@ Copy the [LaTeX scaffold](../assets/template_classroom_activity.tex) to the inte
 - Give the single worked example a complete solution with clear, step-by-step reasoning, intermediate results, checks, and interpretation.
 - Give the single guided example structured prompts and sufficient workspace for each required step. Students complete the key reasoning and final answer.
 - Leave all five independent exercises unsolved in the student handout with only numbered titles, concise self-contained descriptions, and optional compact given-data tables. The first three (problems 3–5) consolidate core skills. The last two (problems 6–7) are slightly more challenging within the same topic and assessment criterion; do not import unrelated advanced material.
-- Never include semantic instructional highlights, semantic highlight commands, or highlight legends in the printable activity. All three structural heading levels, including bold underlined subtask titles, and criterion boxes are explicitly permitted. This exception does not permit semantic styling of concepts, notation, values, or mathematics. Remove highlight wrappers while preserving their text or mathematics. Remove highlight-only legends, labels, and navigation; retain any substantive notation or explanation in ordinary form. Do not copy highlight definitions or imports. Preserve ordinary headings, bold task labels, tables, and mathematical layout.
+- Never include semantic instructional highlights, semantic highlight commands, or highlight legends in the printable activity. All three structural heading levels, including bold underlined subtask titles, criterion boxes, and neutral guided response boxes are explicitly permitted structural or response-area styling. This exception does not permit semantic styling of concepts, notation, values, or mathematics. Remove highlight wrappers while preserving their text or mathematics. Remove highlight-only legends, labels, and navigation; retain any substantive notation or explanation in ordinary form. Do not copy highlight definitions or imports. Preserve ordinary headings, bold task labels, tables, and mathematical layout.
 - Inspect commands inherited from the shared preamble and nested inputs before using them. For example, the current year-local `\boxed` produces a shaded box: display the result as ordinary mathematics instead. Replace other highlight-producing uses locally without editing shared files. Unused formatting definitions in the required shared preamble do not justify using highlights in the activity.
 
 ## Concise task language
@@ -29,12 +29,13 @@ Use `:` as the search-path separator on POSIX systems.
 
 ## Print layout
 
-- After the shared preamble, apply `\geometry{letterpaper,margin=0.25in}`. Keep the same margins for every printable page. Start with `\linespread{1.04}` and 4 pt paragraph spacing.
+- After the shared preamble, apply `\geometry{letterpaper,margin=0.25in,includefoot,footskip=14pt}`. This reserves footer space within the fixed margins. Keep the same margins for every printable page. Start with `\linespread{1.04}` and 4 pt paragraph spacing.
+- Inside the printable-activity group, use `\pagenumbering{arabic}` once at its start and `\pagestyle{plain}` for centered footer numbers beginning at 1, including the first page. Inspect inherited page styles and `\thispagestyle` overrides so no activity page suppresses its number. Flush the last activity page before ending the group; preserve any existing appended solutions' page styles and counters rather than restarting or renumbering them. Check every rendered footer for correct sequence, legibility, clipping, and overlap. Let content determine page count.
 - Use a compact centered title and course metadata. Put each complete official criterion in `\criterionbox{code}{verbatim statement}`: white fill, .4 pt `black!45` border, 2 mm corners, 6 pt horizontal / 5 pt vertical padding, and natural wrapping within local `\linewidth`. Keep plain bold `\problemtitle` titles and right-aligned family labels for problems 1–7. Apply the three-level heading hierarchy below.
 - Inspect existing helpers and packages before adding definitions; reuse the shared preamble's TikZ, xcolor, and tcolorbox. The scaffold defines its helpers inside a local printable-activity group after `\begin{document}`. End it only after `\par\clearpage`, before any existing appended solutions, to restore their own formatting. When adapting an existing file, preserve its solution helpers and settings; use activity-only names or local replacements rather than globally redefining shared helpers.
 - Pair related reference or instructional tables in top-aligned `.49\linewidth` minipages separated by `\hfill`, with `\vspace{0pt}` at each start, when this improves scanning. Keep related groups together in logical order. Use full-width blocks for wide or tall content. Keep each prompt close to its data and response space. For a short block that must stay together, reserve its measured height with `\Needspace` before the block. Allow long problems to break at task boundaries.
-- Size tables to the local `\linewidth`. Use wrapping `tabularx` columns as needed and `longtable` with repeated headings for multi-page tables. In the guided example, leave blank cells, lines, or space for calculations or sketches when needed. Let the content determine the page count.
-- Use `\workspace{<height>}` for adjustable blank working space and `\responseline` for short answers. The scaffold's heights are starting points: expand them to fit the actual reasoning, calculations, tables, or graphs. Keep guided prompts next to their response spaces; reserve the measured prompt-plus-workspace block before its subtask heading, as the scaffold does for the final interpretation. Independent problems follow one another compactly without answer space.
+- Size tables to the local `\linewidth`. Use wrapping `tabularx` columns as needed and `longtable` with repeated headings for multi-page tables. In the Guided Example, use empty guided response boxes for student answers and retain required graphing space. Let the content determine the page count.
+- Use the Guided Example-only `\guidedresponsebox[<height>]{<width>}` and `\guidedpair{<left>}{<right>}` helpers described below. Reserve the measured prompt-plus-response block before its heading. Independent problems follow one another compactly without answer space.
 - For graphs, consult the year-local [graph guide](../../../../book2026-2027/preamble/graphs/README-graphs.md) and check the chosen command's arguments and dependencies. Load the graph inputs the activity uses. Check axes, units, labels, plotted values, and annotations at print size.
 
 ## Three-level structural heading hierarchy
@@ -53,7 +54,7 @@ Task nodes contain a ragged-right `varwidth` capped at `\dimexpr\linewidth-6pt\r
 \task{Task 2 --- Calculate totals and differences.}{}
 \subtaskheading{1}{Calculations}
 Use the given quantities in each case.
-% Tables and calculations follow; guided versions retain blanks/workspace.
+% Tables and calculations follow; guided versions use empty guided response boxes.
 \subtaskheading{2}{Interpretation}
 State the required contextual meanings.
 ```
@@ -63,6 +64,42 @@ Preserve ordinary `enumerate` items in General tasks and the reusable procedure.
 Use the same positive 4 pt before-spacing and positive `\smallskip` after-spacing for the three heading helpers. They reserve opening space with `\Needspace` and discourage a break after the heading with `\nopagebreak[4]`. These are starting reservations, not guarantees for arbitrarily tall content: reserve a measured opening block before its heading when necessary, and let long content break at meaningful task/stage boundaries. Do not copy negative `\vspace` adjustments from the reference.
 
 For corresponding subtask headings in paired blocks, use two top-aligned `.49\linewidth` minipages, each starting with `\vspace{0pt}` and its heading, separated by `\hfill`, as in the guided scaffold. The same number in both cases represents one parallel stage. Keep short titles to matching line counts; if either title cannot fit, use a shared heading above the pair. Start each subsequent corresponding stage as a fresh pair, rather than stacking all stages inside unequal-height columns. Reserve enough space for the pair before it begins; minipages cannot split across pages.
+
+## Guided response boxes
+
+Inspect the local helpers and actual rendered Guided Example pages of the [G10 C3 reference](../../../../book2026-2027/grade10/term_2/2-class_activities/G10_T2_L1_C3_classroom_activity.tex) before adaptation. Its `\writingbox` uses a TikZ node with an invisible `\phantom{0}` baseline anchor; its short, calculation, probability, and word variants demonstrate adjustable response dimensions. Adopt the neutral response-area styling across grades, terms, topics, and criteria, without importing its mathematics, fixed page distribution, or compact spacing settings.
+
+Call these **guided response boxes**, not semantic highlights. They are explicitly permitted neutral response areas; semantic color coding and highlight legends remain forbidden. Replace guided student-answer underlines with boxes, retaining bold underlined numbered subtask headings. Use exactly `fill=black!1`, `draw=black!25`, `line width=.3pt`, and `rounded corners=2mm` (the section-heading radius). Students write directly inside. Interiors contain no visible placeholders, underlines, hints, or answers; invisible baseline anchors are allowed. Prompts, units, supplied calculations, and explanations stay outside.
+
+The scaffold defines `\guidedresponsebox[<height>]{<width>}` only inside a Guided Example group. Its default minimum height is 9 mm; both dimensions are adjustable. `baseline=(answer.base)` with `\phantom{0}` preserves the surrounding text/math baseline while TikZ reserves the box's real height/depth. Do not hide dimensions with `\smash`, force overlap, or scale the equation. Check inline math, fraction numerators/denominators, displays, and aligned rows at their actual sizes. Increase positive row spacing where needed.
+
+| Expected handwritten response | Starting width and height; adjust to actual response |
+| --- | --- |
+| Short number | 12 mm by 9 mm |
+| Fraction | 16 mm by 12 mm, with extra vertical clearance for both levels and the bar |
+| Algebraic expression | 35 mm by 10 mm or wider/taller for its terms |
+| Event name | 45 mm by 10 mm or wider for natural language |
+| Verbal interpretation | Local available width by 22 mm or taller for multiple handwritten lines |
+
+```latex
+% Inside the Guided Example group only:
+Count: \guidedresponsebox{12mm}.
+\[
+  r=\guidedresponsebox[12mm]{16mm},\qquad
+  z=\guidedresponsebox[10mm]{35mm}
+\]
+Name the event: \guidedresponsebox[10mm]{45mm}.
+\par\Needspace{8\baselineskip}
+\subtaskheading{2}{Interpretation}
+State the contextual meaning.\par\nopagebreak[4]
+\noindent\guidedresponsebox[22mm]{\dimexpr\linewidth-1pt\relax}
+```
+
+These examples illustrate response shapes, not required mathematics. In table cells use the cell's local `\linewidth`, reserving room for the stroke/outer separation as above. Break a long prompt or equation naturally before its box if needed. A multiline box is an empty taller writing area, without printed ruling or placeholder text.
+
+Use `\guidedpair` for corresponding case headings, calculations, graphs, and response areas in top-aligned blocks. Each call creates a fresh row of `.49\linewidth` minipages beginning with `\vspace{0pt}`. Start every subsequent corresponding stage in another call, so unequal calculation heights do not stagger later headings. Use a shared stage heading if matching headings cannot fit. Reserve each measured heading/prompt/pair with `\Needspace` before it starts; keep prompts with their response areas and headings with opening content. Use full width if paired content would crowd handwriting or clip mathematics.
+
+Preserve the existing Guided Example's context, givens, values, task order, intermediate calculations, representations, explanations, and interpretations. Change response areas and layout without deleting or solving steps. Break pages at meaningful stage boundaries; let content and comfortable handwriting space determine pagination. Keep fixed margins, readable type, and positive spacing. Do not copy reference page numbers or compact by negative spacing, smaller fonts, scaling, or omitted steps. Flush the Guided Example before closing its group. Its helpers and spacing settings must not affect worked examples, independent exercises, criterion boxes, or appended solutions.
 
 ## Exactly two table-style families
 
@@ -131,7 +168,7 @@ These are reusable structural examples, not required topic content. For paired c
 
 Use short paragraphs or aligned mathematics to preserve the calculation sequence inside broad cells. Keep every necessary definition, classification, formula, intermediate step, check, unit, and interpretation. Consolidation changes structure, not mathematical or pedagogical coverage. When moving a calculation outside a table, retain its connection to the relevant quantity. Keep related groups in source order unless the learning progression requires a change.
 
-Guided tables must stay partially blank, leaving key reasoning and final answers for students. The reference's explicit row gaps (such as `\\[10pt]` or `\\[16pt]`) are adjustable starting points, not universal heights: size each blank row for the expected handwritten calculation and explanation. Independent tables contain given data only; omit blank answer cells, response lines, graph templates, and reserved workspace. Supply no independent solutions.
+Guided tables use empty guided response boxes for key reasoning and final answers. Size their boxes and rows for the expected handwritten calculation and explanation; explicit row gaps alone are not response areas. Independent tables contain given data only; omit blank answer cells, response lines, graph templates, and reserved workspace. Supply no independent solutions.
 
 Semantic consolidation, column-width allocation, and side-by-side placement are the primary compacting methods. Do not prescribe indiscriminate font reduction, scaled tables (`\resizebox`/`\scalebox`), fixed page counts, or copied negative vertical spacing. Use full-width tables and natural page breaks when necessary. Minipages and `tabularx` cannot split across pages: divide long content at meaningful group/task boundaries or use full-width `longtable` in the same family.
 
@@ -155,13 +192,15 @@ Before delivery:
 
 - Check every task and reusable procedure has at most three numbered steps and that General tasks lists only mathematical outputs. Student prompts must contain no justification or verification requests.
 - Count exactly one worked example, one guided example, and five independent exercises on the student pages. Check the worked solution is complete and explains every step.
-- Check the guided prompts leave meaningful work for students and have sufficient response space. Check every independent exercise is unsolved, self-contained, and compact, with no repeated tasks, hints, answer areas, or solving-location instructions.
+- Check guided response boxes have the exact neutral fill, border, line width, and 2 mm corners; interiors are empty without visible placeholders, underlines, hints, or answers. Preserve bold underlined numbered headings. Verify adequate number, fraction, algebraic, event-name, and verbal handwriting space, extra fraction clearance, and wider or multiline areas for long responses.
+- Inspect every rendered page for box appearance, baselines, handwriting clearance, alignment, wrapping, clipping, overlap, and page breaks. Verify top-aligned case headings/calculations/graphs/response areas, fresh paired stage rows, prompt/box and heading/opening-content protection, positive spacing, readable type, and fixed margins. No fixed reference pagination, negative spacing, smaller fonts, scaling, or omitted steps.
+- Verify Guided Example-only helper scope and unchanged context, givens, values, task order, intermediate calculations, representations, explanations, and interpretations. Check guided prompts leave meaningful work for students and have sufficient response space. Check every independent exercise is unsolved, self-contained, and compact, with no repeated tasks, hints, answer areas, or solving-location instructions.
 - Verify independent exercises 1–3 (problems 3–5) consolidate core skills and exercises 4–5 (problems 6–7) add modest challenge within the same topic and criterion.
 - Verify all five exact section titles and their order, centered large bold black text, compact `black!10` fill, black 0.2 pt borders, 2 mm corners, 3 pt inner padding, and zero outer padding. Verify complete verbatim criteria in their unchanged rounded white boxes.
 - Verify task titles pass through `\task` to `\taskheading`, with left-aligned bold black text, compact `black!5` fill, no visible border, 2 mm corners, 3 pt inner padding, zero outer padding, and title-only shading. Inspect long-title wrapping within both full and half local widths.
 - Verify numbered worked/guided stages are bold underlined titles without boxes or shading, with instructions outside the underline. Check task/subtask numbering independently of problem numbers 1–7, the three-step limit, paired heading alignment, and ordinary numbered lists in General tasks. Independent practice must not gain repeated task prompts.
 - Inspect every heading at all three levels on every rendered page for appearance, wrapping, positive spacing, alignment, clipping, overlap, and protection with opening content at page breaks. Check that reservations fit actual opening tables/pairs and no negative spacing was copied.
-- Inspect definitions, imports, nested inputs, and renders for semantic instructional highlights or legends; preserve their prohibition for concepts, notation, values, and mathematics. All three heading levels and criterion boxes are structural exceptions only.
+- Inspect definitions, imports, nested inputs, and renders for semantic instructional highlights or legends; preserve their prohibition for concepts, notation, values, and mathematics. All three heading levels, criterion boxes, and neutral guided response boxes are permitted structural or response-area styles only.
 - Check logs for missing inputs and overfull boxes. Inspect fixed margins, legible tables, heading spacing, clean page breaks, and sufficient guided workspace with compact independent flow.
 - Render the compiled PDF and inspect every page: wrapping in both half-width and full-width tables, complete and legible formulas, continuous grid alignment, local widths within margins, repeated headings and case titles, natural page breaks, sufficient guided workspace, and compact independent flow without reserved blank space. Confirm exactly the two style families and that every task instruction matches the displayed tables. Fix overfull boxes rather than hiding their warnings or shrinking the whole table.
 - When updating a document with appended solutions, verify their content and rendered appearance remain unchanged and activity styles do not reach those pages. Do not add solutions or review variants.

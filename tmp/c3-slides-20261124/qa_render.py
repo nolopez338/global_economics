@@ -2,9 +2,9 @@ from pathlib import Path
 import re,subprocess,json,concurrent.futures
 from PIL import Image,ImageOps,ImageDraw
 W=Path(__file__).resolve().parent
-P=W/'portable'
+P=W/'final-v3'
 nav=(P/'build/lesson.nav').read_text()
-ranges=[tuple(map(int,m)) for m in re.findall(r'\\beamer@framepages\{(\d+)\}\{(\d+)\}',nav)]
+ranges=[tuple(map(int,m)) for m in re.findall(r'\\beamer@framepages\s*\{(\d+)\}\{(\d+)\}',nav)]
 print('frames',len(ranges),'pages',ranges[-1][-1])
 assert len(ranges)==41
 R=W/'inspection';R.mkdir(exist_ok=True)
@@ -32,3 +32,6 @@ def sheets(files,prefix):
 sheets(sorted(R.glob('final-*.png')),'sheet-finals')
 sheets(sorted(R.glob('overlay-*.png')),'sheet-overlays')
 print('Rendered',len(jobs),'pages and contact sheets')
+
+
+
