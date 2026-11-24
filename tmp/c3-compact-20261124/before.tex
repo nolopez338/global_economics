@@ -1,0 +1,709 @@
+% Run pdfLaTeX from the source directory. Keep the lookup for the activity's year.
+% Exactly ONE worked example, ONE guided example, and FIVE independent exercises.
+% Counts apply to the whole activity; never repeat these blocks per family.
+% Printable student activity only. Required gray headings and white criterion boxes
+% are structural styles; semantic instructional highlights and legends are forbidden.
+% Strip source highlighting while preserving content and ordinary formatting.
+% Avoid inherited highlight-producing macros (e.g. the shaded preamble boxed macro).
+\makeatletter
+\def\input@path{{../../../preamble/}}
+\makeatother
+\input{preamble.tex}
+\usepackage{needspace}
+\usepackage{varwidth}
+
+\geometry{letterpaper,margin=0.25in}
+\pagestyle{empty}
+\linespread{1.04}
+\setlength{\parskip}{4pt}
+\raggedbottom
+
+% Exactly TWO table-style families. All helpers size to local \linewidth.
+% Family 1: plain opening notation/formula reference, never a highlight legend.
+% Adapt widths or use full width for the topic's actual definitions and formulas.
+\newcommand{\NotationReferenceTable}[1]{%
+    \par\begingroup
+    \small
+    \setlength{\tabcolsep}{3pt}
+    \setlength{\extrarowheight}{0pt}
+    \setlength{\parskip}{0pt}
+    \renewcommand{\arraystretch}{1}
+    \noindent\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{.21\linewidth}>{\raggedright\arraybackslash}p{.34\linewidth}>{\raggedright\arraybackslash}X@{}}
+        \toprule
+        \textbf{Symbol} & \textbf{Concept} & \textbf{Formula} \\
+        \midrule
+        #1
+        \bottomrule
+    \end{tabularx}\par
+    \endgroup
+}
+% Family 2: all instructional/problem tables, in the printable activity.
+% Width variants below are the SAME ruled family; adapt column count if needed.
+% Body rows end with \\ \hline. Keep group/case headings short or wrap them.
+\newcommand{\ClassroomRuledTable}[4]{%
+    \par\begingroup
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \setlength{\extrarowheight}{0pt}
+    \setlength{\parskip}{0pt}
+    \renewcommand{\arraystretch}{1.16}
+    \noindent\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{#1}|>{\raggedright\arraybackslash}p{#2}|>{\raggedright\arraybackslash}X|}
+        \hline
+        #3 \\ \hline
+        #4
+    \end{tabularx}\par
+    \endgroup
+}
+\newcommand{\InformationTable}[1]{%
+    \ClassroomRuledTable{.14\linewidth}{.32\linewidth}
+        {\textbf{Symbol} & \textbf{Concept} & \textbf{In context...}}{#1}%
+}
+\NewDocumentCommand{\CalculationTable}{O{.10\linewidth} O{.20\linewidth} +m}{%
+    \ClassroomRuledTable{#1}{#2}
+        {\textbf{Symbol} & \textbf{Concept} & \textbf{Calculation, result, and meaning in context}}{#3}%
+}
+\newcommand{\TableGroup}[1]{\multicolumn{3}{|l|}{\textbf{#1}}\\ \hline}
+% Structural styles for the printable activity only; no semantic highlighting.
+\newcommand{\stageheading}[1]{%
+    \par\Needspace{4\baselineskip}\addvspace{4pt}%
+    {\centering\large\bfseries
+     \tikz[baseline=(title.base)]{%
+         \node[fill=black!10,text=black,rounded corners=2mm,
+             inner sep=3pt,outer sep=0pt] (title) {\strut #1};}\par}%
+    \nopagebreak[4]\smallskip
+}
+\newcommand{\criterionbox}[2]{%
+    \begin{tcolorbox}[colback=white,colframe=black!45,boxrule=.4pt,
+        arc=2mm,boxsep=0pt,left=6pt,right=6pt,top=5pt,bottom=5pt,
+        before skip=4pt,after skip=4pt,width=\linewidth]
+        \textbf{#1} #2
+    \end{tcolorbox}%
+}
+\newcommand{\problemtitle}[3]{%
+    \par\Needspace{4\baselineskip}\addvspace{0.4\baselineskip}%
+    \noindent
+    {\begin{varwidth}[t]{0.75\linewidth}%
+         \bfseries\strut #1. #2%
+     \end{varwidth}}%
+    \hfill\textbf{#3}\par\nopagebreak[4]
+}
+\newcommand{\task}[2]{\par\noindent\textbf{#1} #2\par}
+\newcommand{\responseline}{\par\noindent\rule{0pt}{1.55em}\hrulefill\par}
+\newcommand{\workspace}[1]{\par\noindent\rule{0pt}{#1}\par\nopagebreak[4]}
+
+
+% Local graphs use only the packages in the year-local preamble.
+\newcommand{\EVGraph}[4]{%
+\begin{tikzpicture}\begin{axis}[
+ width=.88\linewidth,height=5.4cm,xmin=0,xmax=1,
+ ymin={min(#2,#3)-.2*abs(#3-#2)},ymax={max(#2,#3)+.2*abs(#3-#2)},
+ axis lines=left,xlabel={$p=P(E)$},ylabel={Expected net profit (USD)},
+ title={$\mathbb E[Y_{#1}]$},xtick={0,1},ytick={#2,0,#3},
+ extra x ticks={#4},extra x tick labels={$#4$},
+ extra x tick style={tick label style={font=\small}},grid=major]
+ \addplot[black,thick,domain=0:1,samples=2]{#2+(#3-#2)*x};
+ \addplot[black,dashed,domain=0:1,samples=2]{0};
+ \addplot[black,only marks,mark=*] coordinates {(#4,0)};
+\end{axis}\end{tikzpicture}}
+\newcommand{\BlankGraph}[1]{%
+\begin{tikzpicture}[x=6.1cm,y=1cm]
+ \draw[step=.61cm,black!20,very thin] (0,-1.4) grid (1,1.4);
+ \draw[->] (0,-1.4)--(0,1.7) node[above,font=\small] {$\mathbb E[Y_{#1}]$ (USD)};
+ \draw[->] (0,0)--(1.08,0) node[right,font=\small] {$p$};
+ \node[below left] at (0,0) {$0$}; \node[below] at (1,0) {$1$};
+\end{tikzpicture}}
+
+% Short corresponding blocks can break naturally between paired procedures.
+\NewDocumentCommand{\ColumnPair}{+m +m}{%
+\par\noindent\begin{minipage}[t]{.49\linewidth}\vspace{0pt}\raggedright
+#1
+\end{minipage}\hfill
+\begin{minipage}[t]{.49\linewidth}\vspace{0pt}\raggedright
+#2
+\end{minipage}\par}
+\newcommand{\calcblank}{\underline{\hspace{1.15cm}}}
+\newcommand{\shortblank}{\underline{\hspace{.7cm}}}
+\newcommand{\PayoffSummary}[1]{%
+\par\begingroup\small\setlength{\tabcolsep}{4pt}
+\setlength{\parskip}{0pt}\renewcommand{\arraystretch}{1.16}
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{.44\linewidth}|>{\raggedright\arraybackslash}X|}\hline
+\textbf{Payoff summary} & \textbf{Value}\\\hline
+#1\end{tabularx}\par\endgroup}
+\begin{document}
+
+{\centering {\Large\bfseries Bernoulli Models and Individual Break-Even Analysis\par}
+Global Economics \textbar{} Grade 10 \textbar{} Term 2 \textbar{} Lesson 1\par}
+\criterionbox{C3:}{Models binary economic outcomes with Bernoulli random variables, interpreting success and failure in contexts such as default, gain, loss, or claim occurrence.}
+
+\stageheading{Equations and basic procedure}
+One observation in its stated period has two mutually exclusive, exhaustive states.
+The event label ``success'' means that $E$ occurs; it need not mean a monetary gain.
+All data are hypothetical. All monetary payoffs are net gains or losses after the stated costs. Each $Y_i$ has one strictly positive and one strictly negative payoff.
+\NotationReferenceTable{
+$E, E^c$ & Event and complement & $E^c$: all outcomes outside $E$.\\
+$X,p$ & Unitless Bernoulli indicator & $X=1$ on $E$, $X=0$ on $E^c$; $p=P(E)\in[0,1]$.\\
+$1-p$ & Complementary mass & $P(X=0)=1-p$; $P(X=1)=p$.\\
+$S_X,S_{Y_i}$ & Positive-probability supports & $S_X=\{x\in\mathbb R:P(X=x)>0\}$; $S_{Y_i}=\{y\in\mathbb R:P(Y_i=y)>0\}$.\\
+$f_i,Y_i$ & State-to-money rule (USD) & $f_i:\{0,1\}\to\mathbb R$; $Y_i=f_i(X)$.\\
+$f_i(0),f_i(1)$ & Fixed state payoffs (USD) & $Y_i=f_i(0)+[f_i(1)-f_i(0)]X$; $f_i(0)f_i(1)<0$.\\
+$m_Z(z)$ & Probability mass function & $m_Z(z)=P(Z=z)$; zero outside the stated values.\\
+$F_Z(t)$ & Cumulative distribution function & $F_Z(t)=P(Z\leq t)$; includes mass at the threshold.\\
+$\mathbb E[Y_i]$ & Expected net profit (USD) & $p f_i(1)+(1-p)f_i(0)=f_i(0)+[f_i(1)-f_i(0)]p$.\\
+$p_i^*$ & Individual break-even probability & $p_i^*=-f_i(0)/[f_i(1)-f_i(0)]\in(0,1)$.\\
+}
+\ColumnPair{
+\textbf{Indicator distribution (valid also at $p=0,1$):}
+\[
+\begin{gathered}
+m_X(x)\\
+=
+\end{gathered}
+\begin{cases}1-p,&x=0,\\p,&x=1,\\0,&x\notin\{0,1\},\end{cases}
+\enspace
+\begin{gathered}
+F_X(t)\\
+=
+\end{gathered}
+\begin{cases}0,&t<0,\\1-p,&0\leq t<1,\\1,&t\geq1.\end{cases}
+\]
+}{
+\textbf{Monetary distribution:} write $a=\min(f_i(0),f_i(1))$, $b=\max(f_i(0),f_i(1))$ and $q=P(Y_i=a)$.
+\[
+\begin{gathered}
+m_{Y_i}(y)\\
+=
+\end{gathered}
+\begin{cases}1-p,&y=f_i(0),\\p,&y=f_i(1),\\0,&\text{otherwise},\end{cases}
+\enspace
+\begin{gathered}
+F_{Y_i}(t)\\
+=
+\end{gathered}
+\begin{cases}0,&t<a,\\q,&a\leq t<b,\\1,&t\geq b.\end{cases}
+\]
+}
+For $0<p<1$, $S_X=\{0,1\}$ and $S_{Y_i}=\{f_i(0),f_i(1)\}$.
+
+\stageheading{General tasks}
+\noindent\begin{minipage}[t]{.49\linewidth}\vspace{0pt}
+\task{Task 1 --- Binary model and distributions.}{}
+\begin{enumerate}[label=\arabic*.,itemsep=2pt,topsep=2pt,leftmargin=1.5em]
+\item Observation, period, states $E,E^c$, shared unitless $X$, and monetary rules $Y_i=f_i(X)$ with state payoffs (USD).
+\item Positive-probability set-builder supports, complete PMFs, and numerically ordered piecewise CDFs for $X$ and each $Y_i$, with numerical initial masses and supports at $p=0,1$.
+\item Each loss event $\{Y_i<0\}$ in $X$, its probability function, initial probability, and contextual meaning.
+\end{enumerate}
+\end{minipage}\hfill
+\begin{minipage}[t]{.49\linewidth}\vspace{0pt}
+\task{Task 2 --- Individual expected values.}{}
+\begin{enumerate}[label=\arabic*.,itemsep=2pt,topsep=2pt,leftmargin=1.5em]
+\item Each expectation formula for fixed payoffs and varying $p\in[0,1]$, exact break-even probability, and separate positive and negative expectation intervals.
+\item Extended payoff tables: state payoffs, expectation formulas, exact roots, and initial expectations (USD); contextual expected gain, loss, and break-even per period.
+\item Separately labelled expected-value graphs: $p\in[0,1]$, monetary scale in USD, endpoint payoffs, expectation line, zero line, and exact break-even probability.
+\end{enumerate}
+\end{minipage}\par
+
+
+\stageheading{Worked example}\vspace{-3mm}
+\problemtitle{1}{Campus concert food stand or indoor games}{}
+A student club compares two hypothetical fundraising choices for one weekend: a food
+stand at a campus outdoor concert or an indoor games afternoon. The concert either goes
+ahead or is cancelled; initially, it goes ahead on three out of every eight weekends.
+After food, room, equipment, and publicity costs as applicable, the food stand has a net
+gain of USD 105 if the concert goes ahead and a net loss of USD 45 if it is cancelled.
+The games afternoon has a net loss of USD 30 if the concert goes ahead, because it draws
+potential players away, and a net gain of USD 90 if it is cancelled, because students
+seek an indoor alternative. Only one option would be chosen; both use the same concert outcome.
+
+\task{Task 1 --- Establish the binary model and monetary transformations.}{}
+\textbf{Shared model.} One observation is the club's net outcome over one weekend for the chosen option.
+Let $E$ be the concert going ahead and $E^c$ its cancellation; exactly one occurs.
+Set $X=1$ on $E$, $X=0$ on $E^c$. Then $X\sim\operatorname{Bernoulli}(p)$ is unitless,
+$p=P(E)$, initially $p=3/8$, and both activities use this same $X$; no independence is assumed.
+For $0<p<1$,
+\[
+S_X=\{x\in\mathbb R:P(X=x)>0\}=\{0,1\},\quad
+m_X(x)=\begin{cases}1-p,&x=0,\\p,&x=1,\\0,&\text{otherwise},\end{cases}\quad
+F_X(t)=\begin{cases}0,&t<0,\\1-p,&0\leq t<1,\\1,&t\geq1.\end{cases}
+\]
+Initially $P(X=0)=5/8$, $P(X=1)=3/8$ and the CDF plateau is $5/8$.
+At $p=0$, $S_X=\{0\}$; at $p=1$, $S_X=\{1\}$.
+
+\ColumnPair{
+\textbf{$Y_1$: food stand net profit (USD).}\par
+\textbf{State payoffs and affine rule.}
+\[
+\begin{aligned}
+&f_1(0)=-45<0 \qquad f_1(1)=105>0,\\
+Y_1&=f_1(0)+[f_1(1)-f_1(0)]X\\
+&=-45+[105-(-45)]X = -45+150X
+\end{aligned}
+\]
+\textbf{Support} (USD; $0<p<1$).
+\[
+\begin{aligned}
+S_{Y_1}&=\{y\in\mathbb R:P(Y_1=y)>0\} =\{-45,105\}
+\end{aligned}
+\]
+}{
+\textbf{$Y_2$: games afternoon net profit (USD).}\par
+\textbf{State payoffs and affine rule.}
+\[
+\begin{aligned}
+f_2(0)&=90>0,& f_2(1)&=-30<0,\\
+Y_2&=f_2(0)+[f_2(1)-f_2(0)]X\\
+&=90+[(-30)-90]X\\
+&=90-120X.
+\end{aligned}
+\]
+\textbf{Support} (USD; $0<p<1$).
+\[
+\begin{aligned}
+S_{Y_2}&=\{y\in\mathbb R:P(Y_2=y)>0\}\\
+&=\{-30,90\}.
+\end{aligned}
+\]
+}
+\ColumnPair{
+\textbf{$Y_1$ --- Complete PMF and ordered CDF.}
+\[
+m_{Y_1}(y)=\begin{cases}1-p,&y=-45,\\p,&y=105,\\0,&\text{otherwise},\end{cases}
+\]
+\[
+F_{Y_1}(t)=\begin{cases}0,&t<-45,\\1-p,&-45\leq t<105,\\1,&t\geq105.\end{cases}
+\]
+}{
+\textbf{$Y_2$ --- Complete PMF and ordered CDF.}
+\[
+m_{Y_2}(y)=\begin{cases}p,&y=-30,\\1-p,&y=90,\\0,&\text{otherwise},\end{cases}
+\]
+\[
+F_{Y_2}(t)=\begin{cases}0,&t<-30,\\p,&-30\leq t<90,\\1,&t\geq90.\end{cases}
+\]
+}
+\ColumnPair{
+\textbf{$Y_1$ --- Initial probabilities and loss.}
+\[
+m_{Y_1}(-45)=\tfrac58,\quad m_{Y_1}(105)=\tfrac38.
+\]
+\[
+\{Y_1<0\}=\{X=0\}=E^c,\quad P(Y_1<0)=1-p.
+\]
+Initially, the loss probability is $5/8$: in the long run, five out of eight weekends produce a food stand loss.
+\par\textbf{Endpoint supports} (USD).
+\[
+p=0:\ S_{Y_1}=\{-45\};\quad p=1:\ S_{Y_1}=\{105\}.
+\]
+}{
+\textbf{$Y_2$ --- Initial probabilities and loss.}
+\[
+m_{Y_2}(-30)=\tfrac38,\quad m_{Y_2}(90)=\tfrac58.
+\]
+\[
+\{Y_2<0\}=\{X=1\}=E,\quad P(Y_2<0)=p.
+\]
+Initially, the loss probability is $3/8$: in the long run, three out of eight weekends produce a games afternoon loss.
+\par\textbf{Endpoint supports} (USD).
+\[
+p=0:\ S_{Y_2}=\{90\};\quad p=1:\ S_{Y_2}=\{-30\}.
+\]
+}
+
+\Needspace{6\baselineskip}
+\task{Task 2 --- Analyse each expected value separately.}{}
+\textbf{Common assumptions.} Retain the shared indicator from Task 1, hold both state
+payoffs of each variable fixed, and vary only $p=P(E)\in[0,1]$.
+\ColumnPair{
+\textbf{$Y_1$ --- Expectation derivation} (USD).
+\[
+\begin{aligned}
+\mathbb E[Y_1]&=p f_1(1)+(1-p)f_1(0)\\
+&=105p-45(1-p)\\
+&=105p-45+45p=-45+150p.
+\end{aligned}
+\]
+\textbf{Break-even equation.}
+\[
+\begin{aligned}
+\mathbb E[Y_1]=0&\iff-45+150p=0\\
+&\iff150p=45\\
+&\iff p=\tfrac{45}{150}=\tfrac3{10}.
+\end{aligned}
+\]
+}{
+\textbf{$Y_2$ --- Expectation derivation} (USD).
+\[
+\begin{aligned}
+\mathbb E[Y_2]&=p f_2(1)+(1-p)f_2(0)\\
+&=-30p+90(1-p)\\
+&=-30p+90-90p=90-120p.
+\end{aligned}
+\]
+\textbf{Break-even equation.}
+\[
+\begin{aligned}
+\mathbb E[Y_2]=0&\iff90-120p=0\\
+&\iff-120p=-90\\
+&\iff p=\tfrac{-90}{-120}=\tfrac34.
+\end{aligned}
+\]
+}
+\ColumnPair{
+\textbf{$Y_1$ --- Positive and negative expectations.}
+\[
+\begin{aligned}
+\mathbb E[Y_1]>0&\iff150p>45\\
+&\iff p>\tfrac3{10}\\
+&\iff p\in(\tfrac3{10},1],\\[3pt]
+\mathbb E[Y_1]<0&\iff150p<45\\
+&\iff p<\tfrac3{10}\\
+&\iff p\in[0,\tfrac3{10}).
+\end{aligned}
+\]
+The food stand has expected net gain above $3/10$, expected net loss below $3/10$, and break-even at $3/10$.
+}{
+\textbf{$Y_2$ --- Positive and negative expectations.}
+\[
+\begin{aligned}
+\mathbb E[Y_2]>0&\iff-120p>-90\\
+&\iff p<\tfrac34\\
+&\iff p\in[0,\tfrac34),\\[3pt]
+\mathbb E[Y_2]<0&\iff-120p<-90\\
+&\iff p>\tfrac34\\
+&\iff p\in(\tfrac34,1].
+\end{aligned}
+\]
+Division by $-120$ reverses the inequalities. The games afternoon has expected net gain below $3/4$, expected net loss above $3/4$, and break-even at $3/4$.
+}
+\ColumnPair{
+\textbf{$Y_1$ --- Initial value and interpretation.}
+\[
+\begin{aligned}
+\mathbb E[Y_1]\big|_{p=3/8}&=105(\tfrac38)-45(\tfrac58)\\
+&=\tfrac{315-225}{8}=\tfrac{45}{4}\\
+&=11.25\ \text{USD}.
+\end{aligned}
+\]
+The long-run expected gain is USD 11.25 per weekend.
+\PayoffSummary{$f_1(0),f_1(1)$ (USD)&$-45,105$\\\hline
+$\mathbb E[Y_1]$ (USD)&$-45+150p$\\\hline
+Exact $p_1^*$&$3/10$\\\hline
+Initial value (USD)&$45/4=11.25$\\\hline}
+}{
+\textbf{$Y_2$ --- Initial value and interpretation.}
+\[
+\begin{aligned}
+\mathbb E[Y_2]\big|_{p=3/8}&=-30(\tfrac38)+90(\tfrac58)\\
+&=\tfrac{-90+450}{8}=\tfrac{360}{8}\\
+&=45\ \text{USD}.
+\end{aligned}
+\]
+The long-run expected gain is USD 45 per weekend.
+\PayoffSummary{$f_2(0),f_2(1)$ (USD)&$90,-30$\\\hline
+$\mathbb E[Y_2]$ (USD)&$90-120p$\\\hline
+Exact $p_2^*$&$3/4$\\\hline
+Initial value (USD)&$45$\\\hline}
+}
+\ColumnPair{
+\textbf{$Y_1$ --- Graph.}\par\centering
+\EVGraph{1}{-45}{105}{3/10}\par Exact zero: $p_1^*=3/10$.
+}{
+\textbf{$Y_2$ --- Graph.}\par\centering
+\EVGraph{2}{90}{-30}{3/4}\par Exact zero: $p_2^*=3/4$.
+}
+Solid lines show expectations; dashed horizontal lines show zero; dots mark the individual roots.
+\textbf{Worked checks.} The endpoint expectations are the state payoffs:
+$\mathbb E[Y_1](0)=-45$, $\mathbb E[Y_1](1)=105$;
+$\mathbb E[Y_2](0)=90$, $\mathbb E[Y_2](1)=-30$ (USD).
+At the roots, $-45+150(3/10)=0$ and $90-120(3/4)=0$.
+Positive initial expectation does not guarantee realized profit: each weekend gives one of the two state payoffs.
+At break-even the long-run average is zero although each realized payoff is nonzero.
+
+\stageheading{Guided Example}
+\problemtitle{2}{Graduation photo booth options}{Scaffolded}
+A student photographer compares two hypothetical photo booth options for one graduation
+weekend: a simple backdrop or a decorated set. Advance bookings either meet the advertised
+target or fall short; initially, the target is met on two out of every seven weekends.
+After equipment hire, decorations, printing, and travel costs as applicable, the simple
+backdrop has a net gain of USD 72 if the target is met and a net loss of USD 24 otherwise.
+The decorated set has a net gain of USD 126 if the target is met and a net loss of USD 54
+otherwise: it attracts higher-priced bookings but costs more to prepare. Only one option
+would be chosen; both are modelled using the same booking-target outcome.
+
+\task{Task 1 --- Establish the binary model and monetary transformations.}{}
+\textbf{Shared model.} One observation is the photographer's net outcome over one graduation weekend.
+Let $E$ be meeting the booking target and $E^c$ falling short; exactly one occurs.
+Set $X=1$ on $E$, $X=0$ on $E^c$. Then $X\sim\operatorname{Bernoulli}(p)$ is unitless,
+$p=P(E)$, initially $p=2/7$, and both options use the same $X$; no independence is assumed.
+Complete the numerical entries throughout the scaffold.
+\[
+S_X=\{x\in\mathbb R:P(X=x)>0\}=\{0,1\}\quad(0<p<1),\quad
+m_X(x)=\begin{cases}1-p,&x=0,\\p,&x=1,\\0,&\text{otherwise},\end{cases}\quad
+F_X(t)=\begin{cases}0,&t<0,\\1-p,&0\leq t<1,\\1,&t\geq1.\end{cases}
+\]
+Initially $P(X=1)=2/7$, $P(X=0)=1-2/7=\calcblank$;
+the CDF plateau is $\calcblank$.
+At $p=0$, $S_X=\{\shortblank\}$; at $p=1$, $S_X=\{\shortblank\}$.
+
+\ColumnPair{
+\textbf{$Y_1$: simple-backdrop net profit (USD).}\par
+\textbf{State payoffs and affine rule.}
+\[
+\begin{aligned}
+f_1(0)&=-24<0,& f_1(1)&=72>0,\\
+Y_1&=f_1(0)+[f_1(1)-f_1(0)]X\\
+&=-24+[72-(-24)]X\\
+&=-24+\calcblank X.
+\end{aligned}
+\]
+\textbf{Support} (USD; $0<p<1$).
+\[
+\begin{aligned}
+S_{Y_1}&=\{y\in\mathbb R:P(Y_1=y)>0\}\\
+&=\{\calcblank,\calcblank\}.
+\end{aligned}
+\]
+}{
+\textbf{$Y_2$: decorated-set net profit (USD).}\par
+\textbf{State payoffs and affine rule.}
+\[
+\begin{aligned}
+f_2(0)&=-54<0,& f_2(1)&=126>0,\\
+Y_2&=f_2(0)+[f_2(1)-f_2(0)]X\\
+&=-54+[126-(-54)]X\\
+&=-54+\calcblank X.
+\end{aligned}
+\]
+\textbf{Support} (USD; $0<p<1$).
+\[
+\begin{aligned}
+S_{Y_2}&=\{y\in\mathbb R:P(Y_2=y)>0\}\\
+&=\{\calcblank,\calcblank\}.
+\end{aligned}
+\]
+}
+\ColumnPair{
+\textbf{$Y_1$ --- Complete PMF and ordered CDF.}
+\[
+m_{Y_1}(y)=\begin{cases}1-p,&y=\calcblank,\\[5pt]p,&y=\calcblank,\\[5pt]0,&\text{otherwise},\end{cases}
+\]
+\[
+F_{Y_1}(t)=\begin{cases}0,&t<\calcblank,\\[5pt]1-p,&\shortblank\leq t<\shortblank,\\[5pt]1,&t\geq\calcblank.\end{cases}
+\]
+}{
+\textbf{$Y_2$ --- Complete PMF and ordered CDF.}
+\[
+m_{Y_2}(y)=\begin{cases}1-p,&y=\calcblank,\\[5pt]p,&y=\calcblank,\\[5pt]0,&\text{otherwise},\end{cases}
+\]
+\[
+F_{Y_2}(t)=\begin{cases}0,&t<\calcblank,\\[5pt]1-p,&\shortblank\leq t<\shortblank,\\[5pt]1,&t\geq\calcblank.\end{cases}
+\]
+}
+\ColumnPair{
+\textbf{$Y_1$ --- Initial probabilities and loss.}
+\[
+\begin{aligned}
+m_{Y_1}(-24)&=1-\tfrac27=\calcblank,\\[5pt]
+m_{Y_1}(72)&=\calcblank.
+\end{aligned}
+\]
+$\{Y_1<0\}=\{X=\shortblank\}=E^c$.\par
+$P(Y_1<0)=1-p=1-2/7=\calcblank$ initially.\par
+In the long run, $\shortblank$ out of seven weekends produce a simple-backdrop loss.
+\par\textbf{Endpoint supports} (USD).
+\[
+\begin{aligned}
+p=0:&\ S_{Y_1}=\{\calcblank\},\\[5pt]
+p=1:&\ S_{Y_1}=\{\calcblank\}.
+\end{aligned}
+\]
+}{
+\textbf{$Y_2$ --- Initial probabilities and loss.}
+\[
+\begin{aligned}
+m_{Y_2}(-54)&=1-\tfrac27=\calcblank,\\[5pt]
+m_{Y_2}(126)&=\calcblank.
+\end{aligned}
+\]
+$\{Y_2<0\}=\{X=\shortblank\}=E^c$.\par
+$P(Y_2<0)=1-p=1-2/7=\calcblank$ initially.\par
+In the long run, $\shortblank$ out of seven weekends produce a decorated-set loss.
+\par\textbf{Endpoint supports} (USD).
+\[
+\begin{aligned}
+p=0:&\ S_{Y_2}=\{\calcblank\},\\[5pt]
+p=1:&\ S_{Y_2}=\{\calcblank\}.
+\end{aligned}
+\]
+}
+\task{Task 2 --- Analyse each expected value separately.}{}
+\textbf{Common assumptions.} Retain the shared indicator from Task 1, hold both state
+payoffs of each variable fixed, and vary only $p=P(E)\in[0,1]$.
+\ColumnPair{
+\textbf{$Y_1$ --- Expectation derivation} (USD).
+\[
+\begin{aligned}
+\mathbb E[Y_1]&=p f_1(1)+(1-p)f_1(0)\\
+&=72p-24(1-p)\\
+&=72p-24+24p\\
+&=-24+\calcblank p.
+\end{aligned}
+\]
+\textbf{Break-even equation.}
+\[
+\begin{aligned}
+\mathbb E[Y_1]=0&\iff-24+[72-(-24)]p=0\\
+&\iff\calcblank p=24\\[5pt]
+&\iff p=\frac{24}{\shortblank}=\calcblank.
+\end{aligned}
+\]
+}{
+\textbf{$Y_2$ --- Expectation derivation} (USD).
+\[
+\begin{aligned}
+\mathbb E[Y_2]&=p f_2(1)+(1-p)f_2(0)\\
+&=126p-54(1-p)\\
+&=126p-54+54p\\
+&=-54+\calcblank p.
+\end{aligned}
+\]
+\textbf{Break-even equation.}
+\[
+\begin{aligned}
+\mathbb E[Y_2]=0&\iff-54+[126-(-54)]p=0\\
+&\iff\calcblank p=54\\[5pt]
+&\iff p=\frac{54}{\shortblank}=\calcblank.
+\end{aligned}
+\]
+}
+\ColumnPair{
+\textbf{$Y_1$ --- Positive and negative expectations.}
+\[
+\begin{aligned}
+\mathbb E[Y_1]>0&\iff[72-(-24)]p>24\\
+&\iff p>\calcblank\\[5pt]
+&\iff p\in(\calcblank,1],\\[5pt]
+\mathbb E[Y_1]<0&\iff[72-(-24)]p<24\\
+&\iff p<\calcblank\\[5pt]
+&\iff p\in[0,\calcblank).
+\end{aligned}
+\]
+The simple backdrop has expected net gain above $\calcblank$, expected net loss below $\calcblank$,
+and break-even at $\calcblank$.
+}{
+\textbf{$Y_2$ --- Positive and negative expectations.}
+\[
+\begin{aligned}
+\mathbb E[Y_2]>0&\iff[126-(-54)]p>54\\
+&\iff p>\calcblank\\[5pt]
+&\iff p\in(\calcblank,1],\\[5pt]
+\mathbb E[Y_2]<0&\iff[126-(-54)]p<54\\
+&\iff p<\calcblank\\[5pt]
+&\iff p\in[0,\calcblank).
+\end{aligned}
+\]
+The decorated set has expected net gain above $\calcblank$, expected net loss below $\calcblank$,
+and break-even at $\calcblank$.
+}
+\ColumnPair{
+\textbf{$Y_1$ --- Initial value and interpretation.}
+\[
+\begin{aligned}
+\mathbb E[Y_1]\big|_{p=2/7}&=72(\tfrac27)-24(1-\tfrac27)\\
+&=\frac{144-24(\shortblank)}7\\[5pt]
+&=\calcblank\ \text{USD}.
+\end{aligned}
+\]
+The long-run expected \underline{\hspace{1.4cm}} (gain/loss) is USD $\calcblank$ per weekend.
+\PayoffSummary{$f_1(0),f_1(1)$ (USD)&$-24,72$\\\hline
+$\mathbb E[Y_1]$ (USD)&$-24+\shortblank p$\\[5pt]\hline
+Exact $p_1^*$&$\calcblank$\\[5pt]\hline
+Initial value (USD)&$\calcblank$\\[5pt]\hline}
+}{
+\textbf{$Y_2$ --- Initial value and interpretation.}
+\[
+\begin{aligned}
+\mathbb E[Y_2]\big|_{p=2/7}&=126(\tfrac27)-54(1-\tfrac27)\\
+&=\frac{252-54(\shortblank)}7\\[5pt]
+&=\calcblank\ \text{USD}.
+\end{aligned}
+\]
+The long-run expected \underline{\hspace{1.4cm}} (gain/loss) is USD $\calcblank$ per weekend.
+\PayoffSummary{$f_2(0),f_2(1)$ (USD)&$-54,126$\\\hline
+$\mathbb E[Y_2]$ (USD)&$-54+\shortblank p$\\[5pt]\hline
+Exact $p_2^*$&$\calcblank$\\[5pt]\hline
+Initial value (USD)&$\calcblank$\\[5pt]\hline}
+}
+\ColumnPair{
+\textbf{$Y_1$ --- Graph.}\par
+Use a labelled USD scale; plot the endpoint payoffs, join them with the expectation line, and mark the exact root.
+\par\centering\BlankGraph{1}\par Exact zero: $p_1^*=\calcblank$.
+}{
+\textbf{$Y_2$ --- Graph.}\par
+Use a labelled USD scale; plot the endpoint payoffs, join them with the expectation line, and mark the exact root.
+\par\centering\BlankGraph{2}\par Exact zero: $p_2^*=\calcblank$.
+}
+The horizontal axes provide the zero lines; $p=P(E)$ ranges from 0 to 1.
+At either break-even probability, the long-run expected net profit is zero, although a realized weekend payoff is nonzero.
+
+\stageheading{Independent Practice}
+\problemtitle{3}{Campus portraits or an online CV workshop}{Core: service}
+A recent graduate compares two hypothetical freelance activities for one day: campus
+portrait sessions or an online CV workshop. The university's orientation day either goes
+ahead or is cancelled; initially, it goes ahead on three out of every five days considered.
+After equipment, software, and advertising costs as applicable, portraits have a net gain
+of USD 84 if orientation goes ahead and a net loss of USD 36 if it is cancelled. The CV
+workshop has a net loss of USD 48 if orientation goes ahead, since potential participants
+are busy on campus, and a net gain of USD 72 if it is cancelled, since they are free to
+attend online. Only one activity would be chosen; both use the same orientation outcome.
+
+\problemtitle{4}{Meal preparation in a shared kitchen}{Core: sales}
+Housemates compare two hypothetical plans for a small meal-preparation side business over
+one month: disposable food boxes or reusable containers. Monthly subscriptions either
+meet their advertised target or fall short; initially, the target is met in two out of
+every five months. After ingredients, packaging, kitchen use, and cleaning costs as
+applicable, the disposable-box plan has a net gain of USD 98 if the target is met and a
+net loss of USD 42 otherwise. The reusable-container plan has a net gain of USD 70 if the
+target is met and a net loss of USD 70 otherwise, reflecting its container and cleaning
+costs. Only one plan would be chosen; both use the same subscription-target outcome.
+
+\Needspace{12\baselineskip}
+\problemtitle{5}{Freelance video editing equipment}{Core: capacity}
+A freelance video editor compares two hypothetical equipment choices over one quarter:
+a personal laptop or a workstation rented only when a large project is confirmed.
+A large project either arrives or does not arrive; initially, one arrives in four out
+of every nine quarters. After software, promotion, and any equipment rental costs, the
+laptop option has a net gain of USD 150 with the project and a net loss of USD 75 without
+it. The workstation option has a net gain of USD 375 with the project, because faster
+editing allows more paid deliverables, and a net loss of USD 75 without it, when no
+workstation is rented. Only one option would be chosen; both use the same project outcome.
+
+\problemtitle{6}{First-job event shifts}{Extension: precision}
+A young adult compares two hypothetical job offers for one paid shift during a week:
+catering work or ticket-desk work at the same event. The event either is cancelled or
+goes ahead; initially, cancellation occurs in five out of every twelve weeks. After
+transport bookings and required preparation costs, the catering offer has a net loss of
+USD 27.50 if the event is cancelled and a net gain of USD 82.50 if it goes ahead. The
+ticket-desk offer has a net loss of USD 45 if it is cancelled and a net gain of USD 67.50
+if it goes ahead. Cancellation means no shift pay, but preparation and booked transport
+still cost money. Only one offer would be accepted; both use the same weekly event outcome.
+The decimal amounts are exact.
+
+\problemtitle{7}{Online tutoring or an offline study workshop}{Extension: relabelling}
+A student tutor compares two hypothetical choices for a scheduled revision weekend within
+one month: online tutoring from a shared apartment or an offline study workshop at a
+nearby library. The apartment building's internet either is interrupted during that
+weekend or remains uninterrupted; initially, an interruption occurs in seven out of every
+twenty months. After preparation, advertising, internet, and room-booking costs as
+applicable, online tutoring has a net loss of USD 64 with interruption and a net gain of
+USD 96 with uninterrupted service. The offline workshop has a net gain of USD 112 with
+interruption, as affected students seek help at the library, and a net loss of USD 28
+with uninterrupted service, when too few attend. Only one option would be chosen; both
+use the same monthly internet outcome. For each option, also express net profit as a
+constant plus a coefficient times an indicator that equals one for uninterrupted service
+and zero for interruption. Express its expected net profit in terms of the probability of
+uninterrupted service, which is one minus the interruption probability; find the exact
+break-even probability of uninterrupted service and calculate its initial expected net profit
+under this relabelling. Use the interruption probability on the horizontal axis of both
+expected-value graphs.
+
+\end{document}
