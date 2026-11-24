@@ -22,8 +22,42 @@
 \setbeamertemplate{navigation symbols}{}
 \setbeamertemplate{headline}{}
 \setbeamercovered{invisible}
+
+% Structural hierarchy adapted from Worked Example 1; independent of highlights.
+\newcommand{\TaskName}[1]{\ifcase#1\or
+Establish the binary model and monetary transformations.\or
+Individual expected values.\fi}
+\newcommand{\SubtaskName}[2]{\ifcase#1\or
+  \ifcase#2\or Binary model and monetary transformations.\or
+  Supports, PMFs, and ordered CDFs.\or Initial probabilities and loss events.\fi
+\or
+  \ifcase#2\or Initial expected values.\or
+  Expectation formulas and sign intervals.\or Graphs.\fi
+\fi}
+\newcommand{\TaskHeading}[1]{%
+  \par\noindent\tikz[baseline=(tasktitle.base)]{%
+    \node[fill=black!5,text=GEInk,rounded corners=2mm,
+      inner xsep=4pt,inner ysep=3pt,outer sep=0pt,
+      text width=\dimexpr\linewidth-8pt\relax,align=left,
+      font=\footnotesize\bfseries] (tasktitle) {Task #1 --- \TaskName{#1}};}\par}
+\newcommand{\SubtaskHeading}[2]{%
+  {\normalsize\bfseries\underline{#2. \SubtaskName{#1}{#2}}\par}}
+\newcommand{\ActiveTask}{0}
+\newcommand{\ActiveSubtask}{0}
+\newcommand{\SetTaskSubtask}[2]{\renewcommand{\ActiveTask}{#1}%
+  \renewcommand{\ActiveSubtask}{#2}}
+\newcommand{\TaskBody}{\setlength{\parskip}{0pt}}
+\newcommand{\ActiveHierarchy}{%
+  \begingroup\setlength{\parskip}{0pt}
+  \ifnum\ActiveTask>0
+    \TaskHeading{\ActiveTask}\vskip2pt
+    \SubtaskHeading{\ActiveTask}{\ActiveSubtask}\vskip3pt
+  \fi\endgroup}
+
 \setbeamertemplate{frametitle}{%
-  \vskip.5em
+  \raggedright\setlength{\parskip}{0pt}
+  \vskip.3em
+  \ActiveHierarchy
   {\usebeamerfont{frametitle}\strut\insertframetitle\strut\par}%
   \ifx\insertframesubtitle\empty\else
     {\usebeamerfont{framesubtitle}\strut\insertframesubtitle\strut\par}%
@@ -110,7 +144,7 @@
 \let\Prob\HLProbability
 \let\CDF\HLCumulativeProbability
 \newcommand{\EV}[1]{\V{\mathbb E}[\M{Y_{#1}}]}
-\newcommand{\Ask}[1]{\textbf{#1}\par\medskip}
+\newcommand{\Ask}[1]{\textbf{#1}\par\smallskip}
 \newcommand{\LegendTable}[1]{\begingroup\small
 \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{.34\linewidth}>{\raggedright\arraybackslash}p{.25\linewidth}>{\raggedright\arraybackslash}X@{}}
 \toprule\textbf{Symbol or notation}&\textbf{Concept}&\textbf{Brief meaning}\\\midrule
@@ -146,7 +180,7 @@ $f_i(0),f_i(1)$ & \HLMathContext{Transformation} \HLMathContext{inputs} & Scale,
 {\color{GETeal}\usebeamerfont{subtitle}\insertsubtitle\par}\medskip
 {\color{GEInk}\usebeamerfont{title}\inserttitle\par}\bigskip
 {\normalsize\GEOfficialCriterion\par}\vfill}
-% SOURCE MAP (line numbers refer to sources read 2026-11-24):
+% SOURCE MAP (historical line numbers; identify current source by headings):
 % Practice: book2026-2027/grade10/term_2/1-practice_activities/G10_T2_L1_C3_practice_activity.tex
 % Classroom: book2026-2027/grade10/term_2/2-class_activities/G10_T2_L1_C3_classroom_activity.tex
 % Selected ONLY worked example 1, Campus concert food stand or indoor games,
@@ -166,6 +200,13 @@ $f_i(0),f_i(1)$ & \HLMathContext{Transformation} \HLMathContext{inputs} & Scale,
 % Opening and closing invoke the exact same three row macros. No context filtering.
 % Transformation function name/brief are short baseline-aligned marker fragments
 % split only at spaces for readable wrapping; text and color are unchanged.
+% Hierarchy map: Task 1.1 observation/indicator/transformation and checks;
+% Task 1.2 support/PMF/CDF prerequisites, distributions and endpoint supports;
+% Task 1.3 initial probabilities and loss events. Task 2.1 expectation prerequisite
+% and initial expectations; Task 2.2 varying-p formulas, roots and sign intervals;
+% Task 2.3 graphs, endpoint/root checks and contextual interpretation.
+% Frame comments below retain original frame identifiers for source traceability;
+% Overview and sign-work continuations preserve the step-by-step reveals.
 \begin{document}
 \section{Bernoulli models}
 \begin{frame}\titlepage\end{frame}
@@ -214,23 +255,35 @@ students seek an indoor alternative.}\par
 
 \end{frame}
 % Frame 7: classroom general tasks 198--213 and worked Tasks 1 and 2
-\begin{frame}[t]{The questions we will answer}
-
-\textbf{Task 1 --- Establish the binary model and monetary transformations.}
-\begin{enumerate}
-\item Define one observation, the two states, the indicator and both monetary rules.
-\item Give supports, complete PMFs and numerically ordered piecewise CDFs.
-\item Identify each loss event, its probability and its contextual meaning.
-\end{enumerate}
+\begin{frame}[t]{The questions we will answer (1/2)}
+\TaskHeading{1}
 \medskip
-\textbf{Task 2 --- Individual expected values.}
-Calculate initial expectations; then keep payoffs fixed and vary $p\in[0,1]$.
-Find each expectation formula, its own break-even threshold and sign intervals.
+\SubtaskHeading{1}{1}
+Define one observation, the two states, the indicator and both monetary rules.
+\medskip
+\SubtaskHeading{1}{2}
+Give supports, complete PMFs and numerically ordered piecewise CDFs.
+\medskip
+\SubtaskHeading{1}{3}
+Identify each loss event, its probability and its contextual meaning.
+\end{frame}
+\begin{frame}[t]{The questions we will answer (2/2)}
+\TaskHeading{2}
+\medskip
+\SubtaskHeading{2}{1}
+Calculate initial expectations and interpret them per weekend.
+\medskip
+\SubtaskHeading{2}{2}
+Keep payoffs fixed; vary $p\in[0,1]$. Find each expectation formula,
+its own break-even threshold and sign intervals.
+\medskip
+\SubtaskHeading{2}{3}
 Draw separate labelled graphs and check endpoints and roots.
-
 \end{frame}
 % Frame 8: classroom worked example 1, Task 1 (231--346)
+\SetTaskSubtask{1}{1}
 \begin{frame}[t]{One observation, two exhaustive states}
+\TaskBody
 
 \Ask{What is one observation, and which event will be labelled success?}
 \visible<2->{One observation is the club's net outcome over \textbf{one weekend}
@@ -248,7 +301,9 @@ it need not mean a monetary profit.}\par
 
 \end{frame}
 % Frame 9: classroom worked example 1, Task 1 (231--346)
+\SetTaskSubtask{1}{1}
 \begin{frame}[t]{Encode the event with a Bernoulli indicator}
+\TaskBody
 
 \Ask{How do we encode the two states numerically?}
 \visible<2->{\[\I{X}=\begin{cases}\I{1}&\text{on }\A{E},\\\I{0}&\text{on }\A{E^c}.\end{cases}\]
@@ -264,7 +319,9 @@ The indicator $\I{X}$ is unitless.}\par
 
 \end{frame}
 % Frame 10: classroom prerequisites 157--193 and worked transformation formulas 238--262
+\SetTaskSubtask{1}{1}
 \begin{frame}[t]{From a state to money: the general rule}
+\TaskBody
 
 \Ask{How can one formula reproduce both state payoffs?}
 \visible<2->{$\T{f_i}:\{0,1\}\to\mathbb R$ maps an indicator state to money.
@@ -281,7 +338,9 @@ At $\I{X}=\I{1}$ the change is added: the result is $\M{f_i(1)}$.}\par
 
 \end{frame}
 % Frame 11: classroom worked example 1, Task 1 (231--346)
+\SetTaskSubtask{1}{1}
 \begin{frame}[t]{Derive the food stand transformation}
+\TaskBody
 
 \Ask{What is $Y_1$ as a constant plus a coefficient times $X$?}
 $\M{f_1(0)}=\M{-45}$; $\M{f_1(1)}=\M{105}$ USD.
@@ -295,7 +354,9 @@ $\M{f_1(0)}=\M{-45}$; $\M{f_1(1)}=\M{105}$ USD.
 
 \end{frame}
 % Frame 12: classroom worked example 1, Task 1 (231--346)
+\SetTaskSubtask{1}{1}
 \begin{frame}[t]{Check the food stand rule at both states}
+\TaskBody
 
 \Ask{Does $Y_1=-45+150X$ reproduce the given payoffs?}
 \visible<2->{\[\I{X}=\I{0}:\quad \M{Y_1}=\M{-45}+\M{150}(\I{0})=\M{-45}\ \text{USD}.\]}\par
@@ -309,7 +370,9 @@ The rule matches both states and has the required units.}\par
 
 \end{frame}
 % Frame 13: classroom worked example 1, Task 1 (231--346)
+\SetTaskSubtask{1}{1}
 \begin{frame}[t]{Derive the indoor games transformation}
+\TaskBody
 
 \Ask{What is $Y_2$ as a constant plus a coefficient times $X$?}
 $\M{f_2(0)}=\M{90}$; $\M{f_2(1)}=\M{-30}$ USD.
@@ -323,7 +386,9 @@ $\M{f_2(0)}=\M{90}$; $\M{f_2(1)}=\M{-30}$ USD.
 
 \end{frame}
 % Frame 14: classroom worked example 1, Task 1 (231--346)
+\SetTaskSubtask{1}{1}
 \begin{frame}[t]{Check the indoor games rule at both states}
+\TaskBody
 
 \Ask{Does $Y_2=90-120X$ reproduce the given payoffs?}
 \visible<2->{\[\I{X}=\I{0}:\quad \M{Y_2}=\M{90}-\M{120}(\I{0})=\M{90}\ \text{USD}.\]}\par
@@ -337,7 +402,9 @@ The rule matches both states and has the required units.}\par
 
 \end{frame}
 % Frame 15: classroom 163--193; practice binary-model prerequisite 187--207; legend CDF definition
+\SetTaskSubtask{1}{2}
 \begin{frame}[t]{Support, PMF and CDF: three different questions}
+\TaskBody
 
 \Ask{Which values occur, how much mass has each, and how much accumulates?}
 \visible<2->{\textbf{Support:} values with positive probability:
@@ -356,7 +423,9 @@ The left limit $F_Z(t^-)=P(Z<t)$ excludes that cutoff.}\par
 
 \end{frame}
 % Frame 16: classroom worked example 1, Task 1 (231--346)
+\SetTaskSubtask{1}{2}
 \begin{frame}[t]{The distribution of the indicator}
+\TaskBody
 
 \Ask{What are the complete PMF and ordered CDF of $X$?}
 \visible<2->{For $0<p<1$, $\I{S_X}=\{\I{0},\I{1}\}$.}\par
@@ -373,7 +442,9 @@ At $t=0$ the CDF includes $5/8$; at $t=1$ it includes both masses.}\par
 
 \end{frame}
 % Frame 17: classroom worked example 1, Task 1 (231--346)
+\SetTaskSubtask{1}{2}
 \begin{frame}[t]{Food stand: support and complete PMF}
+\TaskBody
 
 \Ask{Which payoffs can $Y_1$ take, and which state supplies each mass?}
 \visible<2->{For $0<p<1$, $\M{S_{Y_1}}=\{\M{-45},\M{105}\}$ USD.}\par
@@ -390,7 +461,9 @@ $\Prob{m_{Y_1}(105)}=\S{3/8}$. The two masses sum to 1.}\par
 
 \end{frame}
 % Frame 18: classroom worked example 1, Task 1 (231--346)
+\SetTaskSubtask{1}{2}
 \begin{frame}[t]{Food stand: build its ordered CDF}
+\TaskBody
 
 \Ask{As the USD cutoff $t$ increases, when does each mass enter?}
 \visible<2->{The values are ordered $\M{-45}<\M{105}$.
@@ -409,7 +482,9 @@ The inequalities include each jump at its payoff.}\par
 
 \end{frame}
 % Frame 19: classroom worked example 1, Task 1 (231--346)
+\SetTaskSubtask{1}{2}
 \begin{frame}[t]{Indoor games: support and complete PMF}
+\TaskBody
 
 \Ask{Which payoff is lower, and which indicator state produces it?}
 \visible<2->{For $0<p<1$, $\M{S_{Y_2}}=\{\M{-30},\M{90}\}$ USD.
@@ -427,7 +502,9 @@ $\Prob{m_{Y_2}(90)}=\Q{5/8}$.}\par
 
 \end{frame}
 % Frame 20: classroom worked example 1, Task 1 (231--346)
+\SetTaskSubtask{1}{2}
 \begin{frame}[t]{Indoor games: order money, not state labels}
+\TaskBody
 
 \Ask{Why is the middle CDF level $p$, rather than $1-p$?}
 \visible<2->{The numerical order is $\M{-30}<\M{90}$.
@@ -446,7 +523,9 @@ A CDF accumulates payoffs in numerical order, even when the transformation decre
 
 \end{frame}
 % Frame 21: classroom indicator endpoints 280--285; practice positive-mass support qualifications and notation reference
+\SetTaskSubtask{1}{2}
 \begin{frame}[t]{At probability endpoints, support changes}
+\TaskBody
 
 \Ask{Does a value with zero probability belong to the support?}
 \visible<2->{No. Support contains only positive-mass values.
@@ -462,7 +541,9 @@ $p=1$ & \GERevealCell{5}{$\{\I{1}\}$} & \GERevealCell{5}{$\{\M{105}\}$} & \GERev
 
 \end{frame}
 % Frame 22: classroom worked example 1, Task 1 (231--346)
+\SetTaskSubtask{1}{3}
 \begin{frame}[t]{Food stand: identify the loss event}
+\TaskBody
 
 \Ask{When does the chosen food stand produce a loss?}
 \visible<2->{A loss means $\M{Y_1}<0$. Of the two payoffs, only $\M{-45}$ is negative.}\par
@@ -474,13 +555,14 @@ $p=1$ & \GERevealCell{5}{$\{\I{1}\}$} & \GERevealCell{5}{$\{\M{105}\}$} & \GERev
 In the model, five out of eight weekends produce a food stand loss.
 This is a probability interpretation, not a guarantee about any particular eight weekends.}\par
 
-\medskip
 \visible<5->{The loss event is a condition on an observation; the support is a set of payoff values.}\par
 
 
 \end{frame}
 % Frame 23: classroom worked example 1, Task 1 (231--346)
+\SetTaskSubtask{1}{3}
 \begin{frame}[t]{Indoor games: identify the loss event}
+\TaskBody
 
 \Ask{When does the chosen games afternoon produce a loss?}
 \visible<2->{Only the payoff $\M{-30}$ is negative; it occurs when the concert goes ahead.}\par
@@ -500,7 +582,9 @@ The label success describes $E$, not whether the club earns money.}\par
 
 \section{Individual expectations}
 % Frame 24: classroom Task 2, 349--432; expected-value prerequisite
-\begin{frame}[t]{Task 2: probability-weighted net profit}
+\SetTaskSubtask{2}{1}
+\begin{frame}[t]{Probability-weighted net profit}
+\TaskBody
 
 \Ask{What is the expected net profit per weekend for each alternative?}
 \visible<2->{Expectation weights each payoff by its probability:
@@ -516,7 +600,9 @@ Then hold both state payoffs fixed and vary $p\in[0,1]$, analysing each alternat
 
 \end{frame}
 % Frame 25: classroom 350--365, initial food stand expectation
+\SetTaskSubtask{2}{1}
 \begin{frame}[t]{Food stand: initial expected value}
+\TaskBody
 
 \Ask{At $p=3/8$, what is the food stand's expected net profit?}
 \[\begin{aligned}
@@ -530,7 +616,9 @@ Its possible individual payoffs remain \M{USD $-45$} and \M{USD 105}.}\par
 
 \end{frame}
 % Frame 26: classroom 366--373, initial games expectation
+\SetTaskSubtask{2}{1}
 \begin{frame}[t]{Indoor games: initial expected value}
+\TaskBody
 
 \Ask{At $p=3/8$, what is the games afternoon's expected net profit?}
 \[\begin{aligned}
@@ -544,7 +632,9 @@ Its possible individual payoffs remain \M{USD $-30$} and \M{USD 90}.}\par
 
 \end{frame}
 % Frame 27: classroom 374--400: expectation formulas
+\SetTaskSubtask{2}{2}
 \begin{frame}[t]{Food stand: let the probability vary}
+\TaskBody
 
 \Ask{With state payoffs fixed, how does $\mathbb E[Y_1]$ depend on $p$?}
 \[\begin{aligned}
@@ -558,7 +648,9 @@ Its possible individual payoffs remain \M{USD $-30$} and \M{USD 90}.}\par
 
 \end{frame}
 % Frame 28: classroom 380--400: individual zero equations
+\SetTaskSubtask{2}{2}
 \begin{frame}[t]{Food stand: its own break-even threshold}
+\TaskBody
 
 \Ask{For which probability is this alternative's expected net profit zero?}
 \[\begin{aligned}
@@ -572,7 +664,9 @@ It makes this alternative's expectation zero.}\par
 
 \end{frame}
 % Frame 29: classroom 374--400: expectation formulas
+\SetTaskSubtask{2}{2}
 \begin{frame}[t]{Indoor games: let the probability vary}
+\TaskBody
 
 \Ask{With state payoffs fixed, how does $\mathbb E[Y_2]$ depend on $p$?}
 \[\begin{aligned}
@@ -586,7 +680,9 @@ It makes this alternative's expectation zero.}\par
 
 \end{frame}
 % Frame 30: classroom 380--400: individual zero equations
+\SetTaskSubtask{2}{2}
 \begin{frame}[t]{Indoor games: its own break-even threshold}
+\TaskBody
 
 \Ask{For which probability is this alternative's expected net profit zero?}
 \[\begin{aligned}
@@ -600,7 +696,9 @@ It makes this alternative's expectation zero.}\par
 
 \end{frame}
 % Frame 31: classroom 401--410: food stand sign intervals
+\SetTaskSubtask{2}{2}
 \begin{frame}[t]{Food stand: positive and negative expectations}
+\TaskBody
 
 \Ask{On which probability intervals is the expected net profit positive or negative?}
 \visible<2->{\[\begin{aligned}
@@ -611,14 +709,21 @@ It makes this alternative's expectation zero.}\par
 \visible<3->{Expected net gain: $\S{p}\in\S{(\tfrac3{10},1]}$.
 Dividing by positive $150$ keeps the inequality direction.}\par
 
-\visible<4->{\[\EV{1}<0\iff150p<45\iff p<\S{\tfrac3{10}}.\]
+\end{frame}
+\SetTaskSubtask{2}{2}
+\begin{frame}[t]{Food stand: negative expectation and zero}
+\TaskBody
+\Ask{On which probability intervals is the expected net profit positive or negative?}
+\visible<2->{\[\EV{1}<0\iff150p<45\iff p<\S{\tfrac3{10}}.\]
 Expected net loss: $\S{p}\in\S{[0,\tfrac3{10})}$.
 At $p=3/10$, the expectation is \V{zero}.}\par
 
 
 \end{frame}
 % Frame 32: classroom 411--418: games intervals and negative division
+\SetTaskSubtask{2}{2}
 \begin{frame}[t]{Indoor games: why the inequality reverses}
+\TaskBody
 
 \Ask{Solve $90-120p>0$. What happens when we divide by $-120$?}
 \visible<2->{\[\EV{2}>0\iff-120p>-90\iff p<\S{\tfrac34}.\]
@@ -634,17 +739,19 @@ At $p=3/4$, the expectation is \V{zero}.}\par
 
 \end{frame}
 % Frame 33: classroom 420--426 graphs; practice BreakEvenGraph semantic strokes; fixed bounds across overlays
+\SetTaskSubtask{2}{3}
 \begin{frame}[t]{Food stand: expected-value graph}
+\TaskBody
 
 \Ask{How do the state payoffs and the zero threshold determine this graph?}
 \centering
-\begin{tikzpicture}[x=1cm,y=1cm]
-\path[use as bounding box] (0,-.3) rectangle (12,5.35);
+\begin{tikzpicture}[x=1cm,y=.6cm]
+\path[use as bounding box] (0,-1) rectangle (12,5.35);
 \draw[black!15,step=.5] (1.5,1) grid (9.5,4.7);
 \draw[->] (1.5,1)--(9.9,1);
 \draw[->] (1.5,1)--(1.5,4.9);
 \node[anchor=west,font=\small,text=ExpectedInk] at (1.5,5.12) {Expected net profit (USD): $\EV{1}$};
-\node[font=\small,text=ProbabilityInk] at (5.6,-.15) {Probability $\S{p}=P(\A{E})$};
+\node[font=\small,text=ProbabilityInk] at (5.6,-.75) {Probability $\S{p}=P(\A{E})$};
 \node[below,font=\small] at (1.5,1) {$0$};
 \node[below,font=\small] at (9.5,1) {$1$};
 \visible<2->{
@@ -663,14 +770,16 @@ At $p=3/4$, the expectation is \V{zero}.}\par
 \draw[ProbabilityInk,thick,dotted] (3.900,2.321)--(3.900,1);
 \fill[black] (3.900,2.321) circle (2.4pt);
 \node[below,font=\small] at (3.900,1) {$\S{p_1^*}=\S{\frac3{10}}$};
-\node[anchor=west,font=\small] at (10,3.2) {Break-even};
-\node[anchor=west,font=\small] at (10,2.65) {$\bigl(\S{\frac3{10}},\V{0}\bigr)$};
+\node[anchor=west,font=\small] at (10.4,3.8) {Break-even};
+\node[anchor=west,font=\small] at (10.4,2.75) {$\bigl(\S{\frac3{10}},\V{0}\bigr)$};
 }
 \end{tikzpicture}
 
 \end{frame}
 % Frame 34: classroom 427--432 endpoint/root checks and sign interpretations
+\SetTaskSubtask{2}{3}
 \begin{frame}[t]{Food stand: connect graph, algebra and meaning}
+\TaskBody
 
 \Ask{Do the graph's endpoints and root agree with the formula?}
 \visible<2->{\[\begin{aligned}
@@ -688,17 +797,19 @@ Below it, $p\in\S{[0,\frac3{10})}$: \V{expected net loss}.}\par
 
 \end{frame}
 % Frame 35: classroom 420--426 graphs; practice BreakEvenGraph semantic strokes; fixed bounds across overlays
+\SetTaskSubtask{2}{3}
 \begin{frame}[t]{Indoor games: expected-value graph}
+\TaskBody
 
 \Ask{How do the state payoffs and the zero threshold determine this graph?}
 \centering
-\begin{tikzpicture}[x=1cm,y=1cm]
-\path[use as bounding box] (0,-.3) rectangle (12,5.35);
+\begin{tikzpicture}[x=1cm,y=.6cm]
+\path[use as bounding box] (0,-1) rectangle (12,5.35);
 \draw[black!15,step=.5] (1.5,1) grid (9.5,4.7);
 \draw[->] (1.5,1)--(9.9,1);
 \draw[->] (1.5,1)--(1.5,4.9);
 \node[anchor=west,font=\small,text=ExpectedInk] at (1.5,5.12) {Expected net profit (USD): $\EV{2}$};
-\node[font=\small,text=ProbabilityInk] at (5.6,-.15) {Probability $\S{p}=P(\A{E})$};
+\node[font=\small,text=ProbabilityInk] at (5.6,-.75) {Probability $\S{p}=P(\A{E})$};
 \node[below,font=\small] at (1.5,1) {$0$};
 \node[below,font=\small] at (9.5,1) {$1$};
 \visible<2->{
@@ -717,14 +828,16 @@ Below it, $p\in\S{[0,\frac3{10})}$: \V{expected net loss}.}\par
 \draw[ProbabilityInk,thick,dotted] (7.500,2.189)--(7.500,1);
 \fill[black] (7.500,2.189) circle (2.4pt);
 \node[below,font=\small] at (7.500,1) {$\S{p_2^*}=\S{\frac34}$};
-\node[anchor=west,font=\small] at (10,3.2) {Break-even};
-\node[anchor=west,font=\small] at (10,2.65) {$\bigl(\S{\frac34},\V{0}\bigr)$};
+\node[anchor=west,font=\small] at (10.4,3.8) {Break-even};
+\node[anchor=west,font=\small] at (10.4,2.75) {$\bigl(\S{\frac34},\V{0}\bigr)$};
 }
 \end{tikzpicture}
 
 \end{frame}
 % Frame 36: classroom 427--432 endpoint/root checks and sign interpretations
-\begin{frame}[t]{Indoor games: connect graph, algebra and meaning}
+\SetTaskSubtask{2}{3}
+\begin{frame}[t]{Indoor games: check graph and formula}
+\TaskBody
 
 \Ask{Do the graph's endpoints and root agree with the formula?}
 \visible<2->{\[\begin{aligned}
@@ -742,7 +855,9 @@ Below it, $p\in\S{(\frac34,1]}$: \V{expected net loss}.}\par
 
 \end{frame}
 % Frame 37: classroom 427--432 and context 229; loss probabilities 325--345
+\SetTaskSubtask{2}{3}
 \begin{frame}[t]{Expectation describes an average, not a guarantee}
+\TaskBody
 
 \Ask{Does positive expectation guarantee profit on one weekend? Does break-even mean every payoff is zero?}
 \visible<2->{No. At $p=3/8$, both expectations are positive, but the food stand still loses
@@ -762,6 +877,7 @@ each threshold describes that alternative's individual expectation.}\par
 
 \section{Synthesis}
 % Frame 38: synthesis of selected worked example 1, Tasks 1--2 only
+\SetTaskSubtask{0}{0}
 \begin{frame}[t]{From one event to an individual threshold}
 
 \A{Binary event} $E$: concert goes ahead
