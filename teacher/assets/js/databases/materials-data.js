@@ -4589,15 +4589,27 @@ window.MATERIALS_DATA = [
     "Date": "2026-11-12",
     "Materials": [
       {
-        "Acronym": "T1O",
-        "Name": "Term 1 outline",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-outline.html",
+        "Acronym": "INS",
+        "Name": "Ver instrucciones y salones de la primera sesión",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/seminars/src/term_2/first_class.html",
         "Category": "extra-resources"
       },
       {
-        "Acronym": "T2O",
-        "Name": "Term 2 outline",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term2/g10-t2-outline.html",
+        "Acronym": "S1",
+        "Name": "Lista de coevaluación · Sesión 1:",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/checklist_evaluativo_feria.pdf",
+        "Category": "classroom-activities"
+      },
+      {
+        "Acronym": "RES",
+        "Name": "Consultar resumen de los proyectos del Periodo 1 (PDF)",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_1/second_learning_evidence/seminars_summary.pdf",
+        "Category": "extra-resources"
+      },
+      {
+        "Acronym": "TAB",
+        "Name": "Abrir tabla de resúmenes por grupo (LaTeX)",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_1/second_learning_evidence/seminars_summary_table.pdf",
         "Category": "extra-resources"
       }
     ]
@@ -4610,21 +4622,9 @@ window.MATERIALS_DATA = [
     "Date": "2026-11-24",
     "Materials": [
       {
-        "Acronym": "C1P",
-        "Name": "C1 practice activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/1-practice_activities/G10_T2_L1_C1_practice_activity.pdf",
-        "Category": "practice-activities"
-      },
-      {
-        "Acronym": "C1S",
-        "Name": "C1 slides",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/3-slides/G10_T2_L1_C1_slides.pdf",
-        "Category": "slides"
-      },
-      {
-        "Acronym": "C1A",
-        "Name": "C1 classroom activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/2-class_activities/G10_T2_L1_C1_classroom_activity.pdf",
+        "Acronym": "S2",
+        "Name": "Lista de coevaluación · Sesión 2:",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/checklist_evaluativo_feria2.pdf",
         "Category": "classroom-activities"
       }
     ]
@@ -4637,21 +4637,9 @@ window.MATERIALS_DATA = [
     "Date": "2026-12-02",
     "Materials": [
       {
-        "Acronym": "C2P",
-        "Name": "C2 practice activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/1-practice_activities/G10_T2_L1_C2_practice_activity.pdf",
-        "Category": "practice-activities"
-      },
-      {
-        "Acronym": "C2S",
-        "Name": "C2 slides",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/3-slides/G10_T2_L1_C2_slides.pdf",
-        "Category": "slides"
-      },
-      {
-        "Acronym": "C2A",
-        "Name": "C2 classroom activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/2-class_activities/G10_T2_L1_C2_classroom_activity.pdf",
+        "Acronym": "G1",
+        "Name": "Abrir actividad de clase de C1–C2",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/C1C2-Activity.pdf",
         "Category": "classroom-activities"
       }
     ]
@@ -4664,34 +4652,10 @@ window.MATERIALS_DATA = [
     "Date": "2027-01-18",
     "Materials": [
       {
-        "Acronym": "C3P",
-        "Name": "C3 practice activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/1-practice_activities/G10_T2_L1_C3_practice_activity.pdf",
-        "Category": "practice-activities"
-      },
-      {
-        "Acronym": "C3S",
-        "Name": "C3 slides",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/3-slides/G10_T2_L1_C3_slides.pdf",
-        "Category": "slides"
-      },
-      {
-        "Acronym": "C3A",
-        "Name": "C3 classroom activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/2-class_activities/G10_T2_L1_C3_classroom_activity.pdf",
+        "Acronym": "G2",
+        "Name": "Abrir actividad de clase de C3–C4",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/C3C4-Activity.pdf",
         "Category": "classroom-activities"
-      },
-      {
-        "Acronym": "ME",
-        "Name": "C1 & C2 mock exam",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/4-learning_evidences/G10_T2_L1_C1C2_exam.pdf",
-        "Category": "mock-practices"
-      },
-      {
-        "Acronym": "MS",
-        "Name": "C1 & C2 mock solution",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/4-learning_evidences/G10_T2_L1_C1C2_exam_solution.pdf",
-        "Category": "mock-practices"
       }
     ]
   },
@@ -4701,7 +4665,20 @@ window.MATERIALS_DATA = [
     "Section": "SEMINAR",
     "Class #": "5-1",
     "Date": "2027-01-26",
-    "Materials": []
+    "Materials": [
+      {
+        "Acronym": "G2",
+        "Name": "Abrir actividad de clase de C3–C4",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/C3C4-Activity.pdf",
+        "Category": "classroom-activities"
+      },
+      {
+        "Acronym": "E1",
+        "Name": "C1–C4 Primera evidencia de aprendizaje",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/seminars/src/G10_T2.html#first-learning-evidence",
+        "Category": "extra-resources"
+      }
+    ]
   },
   {
     "Grade": 10,
@@ -4711,21 +4688,9 @@ window.MATERIALS_DATA = [
     "Date": "2027-02-03",
     "Materials": [
       {
-        "Acronym": "C4P",
-        "Name": "C4 practice activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/1-practice_activities/G10_T2_L1_C4_practice_activity.pdf",
-        "Category": "practice-activities"
-      },
-      {
-        "Acronym": "C4S",
-        "Name": "C4 slides",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/3-slides/G10_T2_L1_C4_slides.pdf",
-        "Category": "slides"
-      },
-      {
-        "Acronym": "C4A",
-        "Name": "C4 classroom activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/2-class_activities/G10_T2_L1_C4_classroom_activity.pdf",
+        "Acronym": "G3",
+        "Name": "Abrir actividad de clase de C5–C6",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/C5C6-Activity.pdf",
         "Category": "classroom-activities"
       }
     ]
@@ -4738,16 +4703,10 @@ window.MATERIALS_DATA = [
     "Date": "2027-02-11",
     "Materials": [
       {
-        "Acronym": "ME",
-        "Name": "C3 & C4 mock exam",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/4-learning_evidences/G10_T2_L1_C3C4_exam.pdf",
-        "Category": "mock-practices"
-      },
-      {
-        "Acronym": "MS",
-        "Name": "C3 & C4 mock solution",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/4-learning_evidences/G10_T2_L1_C3C4_exam_solution.pdf",
-        "Category": "mock-practices"
+        "Acronym": "G3",
+        "Name": "Abrir actividad de clase de C5–C6",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/C5C6-Activity.pdf",
+        "Category": "classroom-activities"
       }
     ]
   },
@@ -4757,7 +4716,14 @@ window.MATERIALS_DATA = [
     "Section": "SEMINAR",
     "Class #": "8-1",
     "Date": "2027-02-19",
-    "Materials": []
+    "Materials": [
+      {
+        "Acronym": "G4",
+        "Name": "Abrir actividad de clase de C7–C8",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/C7C8-Activity.pdf",
+        "Category": "classroom-activities"
+      }
+    ]
   },
   {
     "Grade": 10,
@@ -4767,21 +4733,9 @@ window.MATERIALS_DATA = [
     "Date": "2027-03-01",
     "Materials": [
       {
-        "Acronym": "C5P",
-        "Name": "C5 practice activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/1-practice_activities/G10_T2_L2_C5_practice_activity.pdf",
-        "Category": "practice-activities"
-      },
-      {
-        "Acronym": "C5S",
-        "Name": "C5 slides",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/3-slides/G10_T2_L2_C5_slides.pdf",
-        "Category": "slides"
-      },
-      {
-        "Acronym": "C5A",
-        "Name": "C5 classroom activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/2-class_activities/G10_T2_L2_C5_classroom_activity.pdf",
+        "Acronym": "G5",
+        "Name": "Abrir actividad de clase de C9–C10",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/C9C10-Activity.pdf",
         "Category": "classroom-activities"
       }
     ]
@@ -4794,21 +4748,33 @@ window.MATERIALS_DATA = [
     "Date": "2027-03-09",
     "Materials": [
       {
-        "Acronym": "C6P",
-        "Name": "C6 practice activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/1-practice_activities/G10_T2_L2_C6_practice_activity.pdf",
-        "Category": "practice-activities"
+        "Acronym": "DOC",
+        "Name": "Introducción · Documento acumulativo de LaTeX",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/seminars/src/G10_T2.html#introduction",
+        "Category": "extra-resources"
       },
       {
-        "Acronym": "C6S",
-        "Name": "C6 slides",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/3-slides/G10_T2_L2_C6_slides.pdf",
-        "Category": "slides"
+        "Acronym": "E2",
+        "Name": "C5–C10 Segunda evidencia de aprendizaje",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/seminars/src/G10_T2.html#second-learning-evidence",
+        "Category": "extra-resources"
       },
       {
-        "Acronym": "C6A",
-        "Name": "C6 classroom activity",
-        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_2/2-class_activities/G10_T2_L2_C6_classroom_activity.pdf",
+        "Acronym": "G3",
+        "Name": "Abrir actividad de clase de C5–C6",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/C5C6-Activity.pdf",
+        "Category": "classroom-activities"
+      },
+      {
+        "Acronym": "G4",
+        "Name": "Abrir actividad de clase de C7–C8",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/C7C8-Activity.pdf",
+        "Category": "classroom-activities"
+      },
+      {
+        "Acronym": "G5",
+        "Name": "Abrir actividad de clase de C9–C10",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/C9C10-Activity.pdf",
         "Category": "classroom-activities"
       }
     ]

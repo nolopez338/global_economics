@@ -351,7 +351,8 @@ test("unrelated materials and every original record identity are preserved", () 
     ["materials-data-base", "MATERIALS_DATA_BASE", "8ff1e484a16df02ee6f6198768c8da234ae24281b46f9adca76675f68070d5df", "6f2f33efba1b76bfc5f7aa6298062d23f1a7d740e3127a0823453699c4aab17c"],
     ["materials-data", "MATERIALS_DATA", "515dca2d2fb86279bbc46dd5b76ee5a01da15d1edba942bf27d869d5c6b17620", "7a18e00bcbcd2d6202087ab822b17c5cd057095d473a7eca2083ef8750a7608f"]
   ]) {
-    const data = plain(load(file)[globalName]);
+    // The new seminar base catalog is an intentional addition to this older baseline.
+    const data = plain(load(file)[globalName]).filter(r => r.Grade !== '10S');
     // Restore only the explicitly recorded stale lists to compare the pre-migration baseline.
     if (file === 'materials-data') {
       const report = require('../migration-baseline.json');

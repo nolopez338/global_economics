@@ -10,6 +10,19 @@ const w = require('../lesson-workflow');
 const { cancel, move, findMeeting } = require('../reschedule');
 const options = { calendar: false };
 const hash = value => crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
+// Frozen migration hashes predate the post-May-11 numbering correction. Restore
+// only those displayed labels for audit comparisons; validate live data normally.
+function migrationSnapshot(data) {
+  const snapshot = structuredClone(data);
+  const calendar = require('../../assets/js/databases/year-calendar-data');
+  for (const row of snapshot.schedule) {
+    if (row.Section !== 'Seminar' && row.Date > '2027 / 05 / 11') {
+      const info = calendar.getAcademicDateInfo(row.Date.replaceAll(' / ', '-'));
+      row['Class #'] = `${info.cycleNumber}-${row['Class #'].split('-')[1]}`;
+    }
+  }
+  return snapshot;
+}
 function fixture() {
   const material = { Acronym: 'C1', Name: 'Criterion 1', Hyperlink: 'https://example.com/practice.pdf', Category: 'practice-activities' };
   const lesson = (id, Materials = [material], kind = 'instruction') => ({ id, Grade: 11, Term: 2, kind, Description: kind === 'extra' ? 'Extra Class' : id, Summary: kind === 'extra' ? 'Extra Class' : `${id} summary`, Material: '-', 'Material teacher': '-', Materials });
@@ -21,8 +34,15 @@ function fixture() {
 const ids = source => source.meetings.filter(m => m.Status === 'scheduled').map(m => m['Lesson ID']);
 
 // Reconstruct only the corrected dates for tests of the frozen migration audit.
-function migrationSource() {
+function migrationSource({ seminar = true } = {}) {
   const source = w.readSource();
+  // Reconstruct the frozen migration snapshot, before the dedicated seminar catalog.
+  if (seminar) source.catalog = source.catalog.filter(c => c.Grade !== '10S');
+  const crosswalk = require('../migration-baseline.json').crosswalk;
+  for (const m of source.meetings.filter(m => seminar && m.Grade === 10 && m.Section === 'Seminar' && m.Term === 2)) {
+    m['Lesson ID'] = crosswalk.find(c => c.meeting === w.key(m)).lessonId;
+    m.Overrides = { Description: '-', Summary: '-' };
+  }
   const from = findMeeting(source, 11, 'B', '2026-11-19');
   const to = findMeeting(source, 11, 'B', '2026-11-23');
   Object.assign(from, { Status: 'scheduled', Reason: '', 'Canceled summary': '', 'Lesson ID': to['Lesson ID'], Overrides: structuredClone(to.Overrides) });
@@ -94,7 +114,7 @@ test('reject invalid references, assignments, duplicates, material overrides, st
   assert.throws(() => w.build(source), /Day must|meeting day/);
 });
 test('migration preserves all schedule content, base catalogs, and unrelated dated associations', () => {
-  const source = migrationSource(), actual = w.build(source), baseline = require('../migration-baseline.json');
+  const source = migrationSource(), actual = migrationSnapshot(w.build(source)), baseline = require('../migration-baseline.json');
   assert.equal(actual.schedule.length, 594); assert.equal(actual.materials.length, 522);
   for (const [name, data] of Object.entries(actual)) assert.equal(hash(data), baseline.baselineHashes[name], name);
   for (const name of ['schedule', 'baseSchedule', 'baseMaterials']) assert.equal(hash(actual[name]), baseline.originalHashes[name]);
@@ -121,7 +141,7 @@ test('corrected Grade 11 cancellations are idempotent and retain every assessmen
 });
 
 test('Grade 11B transfers only the November 19 assignment to November 23', () => {
-  const source = w.readSource(), before = migrationSource();
+  const source = w.readSource(), before = migrationSource({ seminar: false });
   const from = findMeeting(source, 11, 'B', '2026-11-19');
   const to = findMeeting(source, 11, 'B', '2026-11-23');
   const original = findMeeting(before, 11, 'B', '2026-11-19');
@@ -205,7 +225,7 @@ test('one-time migration imports the legacy snapshot without changing unrelated 
     assert.equal(fs.existsSync(path.join(dir, 'lessons.json')), false);
     fs.writeFileSync(legacyFile, originalText);
     assert.match(migrate(dir, dir), /Migrated 594/);
-    const imported = w.build(w.readSource(dir));
+    const imported = migrationSnapshot(w.build(w.readSource(dir)));
     for (const [name, rows] of Object.entries(imported)) assert.equal(hash(rows), baseline.baselineHashes[name], name);
     assert.deepEqual(w.readSource(dir).meetings.map(m => [m.Status, Object.keys(m.Overrides)]), source.meetings.map(m => [m.Status, Object.keys(m.Overrides)]));
     assert.match(migrate(dir, dir), /Already migrated/);

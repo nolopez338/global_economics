@@ -81,7 +81,7 @@
   var baseAudit = validation.audit(window.MATERIALS_DATA_BASE, "base");
   reportAudit("Base materials", baseAudit);
   if (baseAudit.error) { showStatus("Materials are currently unavailable. Please return to the schedule and try again later."); return; }
-  var records = baseAudit.records.filter(function (item) { return item.valid; }).map(function (item) { return item.record; }).sort(function (a, b) { return a.Grade - b.Grade || a.Term - b.Term || Number(a["Class #"]) - Number(b["Class #"]); });
+  var records = baseAudit.records.filter(function (item) { return item.valid; }).map(function (item) { return item.record; }).sort(function (a, b) { return String(a.Grade).localeCompare(String(b.Grade), "en", { numeric: true }) || a.Term - b.Term || Number(a["Class #"]) - Number(b["Class #"]); });
   if (!records.length) { showStatus("No materials found."); return; }
   content.replaceChildren();
   var grades = new Map();

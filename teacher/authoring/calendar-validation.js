@@ -29,6 +29,7 @@ function validateCalendar(records) {
   }
 
   const actualKeys = new Set();
+  const previousClass = new Map();
   for (const [index, record] of records.entries()) {
     const rowNumber = index + 2;
     const classId = `${record.Grade}${record.Section}`;
@@ -40,9 +41,18 @@ function validateCalendar(records) {
     const info = calendar.getAcademicDateInfo(isoDate);
     const meetingNumber = days.indexOf(info.cycleDay) + 1;
     if (!meetingNumber) fail(`row ${rowNumber} is not a meeting day for ${classId}`);
-    const expectedClassNumber = `${info.cycleNumber}-${meetingNumber}`;
+    let expectedClassNumber = `${info.cycleNumber}-${meetingNumber}`;
+    // Regular sections continue their two-meeting sequence after Term 3 ends.
+    // The calendar's out-of-term cycle reset still applies to seminars.
+    if (isoDate > '2027-05-11' && record.Section !== 'Seminar') {
+      const previous = previousClass.get(classId);
+      if (!previous) fail(`row ${rowNumber} has no preceding class for ${classId}`);
+      const [cycle, slot] = previous.split('-').map(Number);
+      expectedClassNumber = slot === 1 ? `${cycle}-2` : `${cycle + 1}-1`;
+    }
     const expectedTerm = info.term === null ? null : Number(info.term.slice(-1));
     if (record["Class #"] !== expectedClassNumber) fail(`row ${rowNumber} Class # must be ${expectedClassNumber}`);
+    previousClass.set(classId, expectedClassNumber);
     if (record.Term !== expectedTerm) fail(`row ${rowNumber} Term must be ${expectedTerm}`);
     if (record.Weekday !== weekdayNames[info.weekday]) fail(`row ${rowNumber} Weekday is incorrect`);
     if (record.Day !== info.cycleDay) fail(`row ${rowNumber} Day must be ${info.cycleDay}`);

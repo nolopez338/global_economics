@@ -103,7 +103,7 @@
     var errors = [], warnings = [], required = kind === "dated" ? DATED_REQUIRED : BASE_REQUIRED;
     properties(record, required, "Record", errors, warnings);
     if (!record || typeof record !== "object") return { valid: false, errors: errors, warnings: warnings };
-    if (!Number.isInteger(record.Grade) || record.Grade < 1) errors.push("Grade must be a positive integer");
+    if (!(kind === "base" && record.Grade === "10S") && (!Number.isInteger(record.Grade) || record.Grade < 1)) errors.push("Grade must be a positive integer (or 10S in the base catalog)");
     if (!Number.isInteger(record.Term) || record.Term < 1) errors.push("Term must be a positive integer");
     if (typeof record["Class #"] !== "string" || !/^\d+(?:-\d+)?$/.test(record["Class #"].trim())) errors.push("Class # is invalid");
     if (kind === "dated") {

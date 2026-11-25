@@ -655,7 +655,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "A",
-    "Class #": "2-1",
+    "Class #": "7-1",
     "Date": "2027 / 05 / 13",
     "Term": null,
     "Weekday": "Thursday",
@@ -668,7 +668,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "A",
-    "Class #": "2-2",
+    "Class #": "7-2",
     "Date": "2027 / 05 / 18",
     "Term": null,
     "Weekday": "Tuesday",
@@ -681,7 +681,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "A",
-    "Class #": "3-1",
+    "Class #": "8-1",
     "Date": "2027 / 05 / 24",
     "Term": null,
     "Weekday": "Monday",
@@ -694,7 +694,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "A",
-    "Class #": "3-2",
+    "Class #": "8-2",
     "Date": "2027 / 05 / 26",
     "Term": null,
     "Weekday": "Wednesday",
@@ -707,7 +707,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "A",
-    "Class #": "4-1",
+    "Class #": "9-1",
     "Date": "2027 / 06 / 02",
     "Term": null,
     "Weekday": "Wednesday",
@@ -720,7 +720,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "A",
-    "Class #": "4-2",
+    "Class #": "9-2",
     "Date": "2027 / 06 / 04",
     "Term": null,
     "Weekday": "Friday",
@@ -733,7 +733,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "A",
-    "Class #": "5-1",
+    "Class #": "10-1",
     "Date": "2027 / 06 / 11",
     "Term": null,
     "Weekday": "Friday",
@@ -1396,7 +1396,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "B",
-    "Class #": "2-1",
+    "Class #": "7-1",
     "Date": "2027 / 05 / 18",
     "Term": null,
     "Weekday": "Tuesday",
@@ -1409,7 +1409,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "B",
-    "Class #": "2-2",
+    "Class #": "7-2",
     "Date": "2027 / 05 / 19",
     "Term": null,
     "Weekday": "Wednesday",
@@ -1422,7 +1422,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "B",
-    "Class #": "3-1",
+    "Class #": "8-1",
     "Date": "2027 / 05 / 26",
     "Term": null,
     "Weekday": "Wednesday",
@@ -1435,7 +1435,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "B",
-    "Class #": "3-2",
+    "Class #": "8-2",
     "Date": "2027 / 05 / 27",
     "Term": null,
     "Weekday": "Thursday",
@@ -1448,7 +1448,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "B",
-    "Class #": "4-1",
+    "Class #": "9-1",
     "Date": "2027 / 06 / 04",
     "Term": null,
     "Weekday": "Friday",
@@ -1461,7 +1461,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "B",
-    "Class #": "4-2",
+    "Class #": "9-2",
     "Date": "2027 / 06 / 08",
     "Term": null,
     "Weekday": "Tuesday",
@@ -2124,7 +2124,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "C",
-    "Class #": "2-1",
+    "Class #": "7-1",
     "Date": "2027 / 05 / 13",
     "Term": null,
     "Weekday": "Thursday",
@@ -2137,7 +2137,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "C",
-    "Class #": "2-2",
+    "Class #": "7-2",
     "Date": "2027 / 05 / 20",
     "Term": null,
     "Weekday": "Thursday",
@@ -2150,7 +2150,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "C",
-    "Class #": "3-1",
+    "Class #": "8-1",
     "Date": "2027 / 05 / 24",
     "Term": null,
     "Weekday": "Monday",
@@ -2163,7 +2163,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "C",
-    "Class #": "3-2",
+    "Class #": "8-2",
     "Date": "2027 / 05 / 28",
     "Term": null,
     "Weekday": "Friday",
@@ -2176,7 +2176,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "C",
-    "Class #": "4-1",
+    "Class #": "9-1",
     "Date": "2027 / 06 / 02",
     "Term": null,
     "Weekday": "Wednesday",
@@ -2189,7 +2189,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "C",
-    "Class #": "4-2",
+    "Class #": "9-2",
     "Date": "2027 / 06 / 09",
     "Term": null,
     "Weekday": "Wednesday",
@@ -2202,7 +2202,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "C",
-    "Class #": "5-1",
+    "Class #": "10-1",
     "Date": "2027 / 06 / 11",
     "Term": null,
     "Weekday": "Friday",
@@ -2852,7 +2852,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "D",
-    "Class #": "1-2",
+    "Class #": "6-2",
     "Date": "2027 / 05 / 12",
     "Term": null,
     "Weekday": "Wednesday",
@@ -2865,7 +2865,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "D",
-    "Class #": "2-1",
+    "Class #": "7-1",
     "Date": "2027 / 05 / 19",
     "Term": null,
     "Weekday": "Wednesday",
@@ -2878,7 +2878,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "D",
-    "Class #": "2-2",
+    "Class #": "7-2",
     "Date": "2027 / 05 / 21",
     "Term": null,
     "Weekday": "Friday",
@@ -2891,7 +2891,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "D",
-    "Class #": "3-1",
+    "Class #": "8-1",
     "Date": "2027 / 05 / 27",
     "Term": null,
     "Weekday": "Thursday",
@@ -2904,7 +2904,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "D",
-    "Class #": "3-2",
+    "Class #": "8-2",
     "Date": "2027 / 06 / 01",
     "Term": null,
     "Weekday": "Tuesday",
@@ -2917,7 +2917,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "D",
-    "Class #": "4-1",
+    "Class #": "9-1",
     "Date": "2027 / 06 / 08",
     "Term": null,
     "Weekday": "Tuesday",
@@ -2930,7 +2930,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "D",
-    "Class #": "4-2",
+    "Class #": "9-2",
     "Date": "2027 / 06 / 10",
     "Term": null,
     "Weekday": "Thursday",
@@ -3593,7 +3593,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "E",
-    "Class #": "2-1",
+    "Class #": "7-1",
     "Date": "2027 / 05 / 13",
     "Term": null,
     "Weekday": "Thursday",
@@ -3606,7 +3606,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "E",
-    "Class #": "2-2",
+    "Class #": "7-2",
     "Date": "2027 / 05 / 20",
     "Term": null,
     "Weekday": "Thursday",
@@ -3619,7 +3619,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "E",
-    "Class #": "3-1",
+    "Class #": "8-1",
     "Date": "2027 / 05 / 24",
     "Term": null,
     "Weekday": "Monday",
@@ -3632,7 +3632,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "E",
-    "Class #": "3-2",
+    "Class #": "8-2",
     "Date": "2027 / 05 / 28",
     "Term": null,
     "Weekday": "Friday",
@@ -3645,7 +3645,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "E",
-    "Class #": "4-1",
+    "Class #": "9-1",
     "Date": "2027 / 06 / 02",
     "Term": null,
     "Weekday": "Wednesday",
@@ -3658,7 +3658,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "E",
-    "Class #": "4-2",
+    "Class #": "9-2",
     "Date": "2027 / 06 / 09",
     "Term": null,
     "Weekday": "Wednesday",
@@ -3671,7 +3671,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 10,
     "Section": "E",
-    "Class #": "5-1",
+    "Class #": "10-1",
     "Date": "2027 / 06 / 11",
     "Term": null,
     "Weekday": "Friday",
@@ -3806,10 +3806,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 4,
-    "Description": "-",
+    "Description": "Inter group presentation",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Presentación entre grupos"
   },
   {
     "Grade": 10,
@@ -3819,10 +3819,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 4,
-    "Description": "-",
+    "Description": "In group presentation",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Presentación dentro del grupo"
   },
   {
     "Grade": 10,
@@ -3832,10 +3832,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "-",
+    "Description": "C1 and C2 guide",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C1–C2: alternativas y selección"
   },
   {
     "Grade": 10,
@@ -3845,10 +3845,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 4,
-    "Description": "-",
+    "Description": "C3 and C4 guide",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C3–C4: representación y prototipo"
   },
   {
     "Grade": 10,
@@ -3858,10 +3858,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 4,
-    "Description": "-",
+    "Description": "Presentación de prototipo (C4) — First learning evidence",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C4: presentación del primer prototipo"
   },
   {
     "Grade": 10,
@@ -3871,10 +3871,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 4,
-    "Description": "-",
+    "Description": "C5 and C6 guide",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5–C6: diseño y plan de trabajo"
   },
   {
     "Grade": 10,
@@ -3884,10 +3884,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 4,
-    "Description": "-",
+    "Description": "Prototipo final (C5 y C6)",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C5–C6: prototipo final"
   },
   {
     "Grade": 10,
@@ -3897,10 +3897,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 4,
-    "Description": "-",
+    "Description": "C7 and C8 guide",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C7–C8: pruebas y ajustes"
   },
   {
     "Grade": 10,
@@ -3910,10 +3910,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 4,
-    "Description": "-",
+    "Description": "C9 and C10 guide",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "C9–C10: colaboración y valor diferencial"
   },
   {
     "Grade": 10,
@@ -3923,10 +3923,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 4,
-    "Description": "-",
+    "Description": "Informe final (todo acumulado) — Second learning evidence",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "-"
+    "Summary": "Informe final acumulativo"
   },
   {
     "Grade": 10,
@@ -4698,7 +4698,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "A",
-    "Class #": "2-1",
+    "Class #": "7-1",
     "Date": "2027 / 05 / 13",
     "Term": null,
     "Weekday": "Thursday",
@@ -4711,7 +4711,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "A",
-    "Class #": "2-2",
+    "Class #": "7-2",
     "Date": "2027 / 05 / 18",
     "Term": null,
     "Weekday": "Tuesday",
@@ -4724,7 +4724,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "A",
-    "Class #": "3-1",
+    "Class #": "8-1",
     "Date": "2027 / 05 / 24",
     "Term": null,
     "Weekday": "Monday",
@@ -4737,7 +4737,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "A",
-    "Class #": "3-2",
+    "Class #": "8-2",
     "Date": "2027 / 05 / 26",
     "Term": null,
     "Weekday": "Wednesday",
@@ -4750,7 +4750,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "A",
-    "Class #": "4-1",
+    "Class #": "9-1",
     "Date": "2027 / 06 / 02",
     "Term": null,
     "Weekday": "Wednesday",
@@ -4763,7 +4763,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "A",
-    "Class #": "4-2",
+    "Class #": "9-2",
     "Date": "2027 / 06 / 04",
     "Term": null,
     "Weekday": "Friday",
@@ -4776,7 +4776,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "A",
-    "Class #": "5-1",
+    "Class #": "10-1",
     "Date": "2027 / 06 / 11",
     "Term": null,
     "Weekday": "Friday",
@@ -5439,7 +5439,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "B",
-    "Class #": "2-1",
+    "Class #": "7-1",
     "Date": "2027 / 05 / 14",
     "Term": null,
     "Weekday": "Friday",
@@ -5452,7 +5452,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "B",
-    "Class #": "2-2",
+    "Class #": "7-2",
     "Date": "2027 / 05 / 18",
     "Term": null,
     "Weekday": "Tuesday",
@@ -5465,7 +5465,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "B",
-    "Class #": "3-1",
+    "Class #": "8-1",
     "Date": "2027 / 05 / 25",
     "Term": null,
     "Weekday": "Tuesday",
@@ -5478,7 +5478,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "B",
-    "Class #": "3-2",
+    "Class #": "8-2",
     "Date": "2027 / 05 / 26",
     "Term": null,
     "Weekday": "Wednesday",
@@ -5491,7 +5491,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "B",
-    "Class #": "4-1",
+    "Class #": "9-1",
     "Date": "2027 / 06 / 03",
     "Term": null,
     "Weekday": "Thursday",
@@ -5504,7 +5504,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "B",
-    "Class #": "4-2",
+    "Class #": "9-2",
     "Date": "2027 / 06 / 04",
     "Term": null,
     "Weekday": "Friday",
@@ -6154,7 +6154,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "C",
-    "Class #": "1-2",
+    "Class #": "6-2",
     "Date": "2027 / 05 / 12",
     "Term": null,
     "Weekday": "Wednesday",
@@ -6167,7 +6167,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "C",
-    "Class #": "2-1",
+    "Class #": "7-1",
     "Date": "2027 / 05 / 13",
     "Term": null,
     "Weekday": "Thursday",
@@ -6180,7 +6180,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "C",
-    "Class #": "2-2",
+    "Class #": "7-2",
     "Date": "2027 / 05 / 21",
     "Term": null,
     "Weekday": "Friday",
@@ -6193,7 +6193,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "C",
-    "Class #": "3-1",
+    "Class #": "8-1",
     "Date": "2027 / 05 / 24",
     "Term": null,
     "Weekday": "Monday",
@@ -6206,7 +6206,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "C",
-    "Class #": "3-2",
+    "Class #": "8-2",
     "Date": "2027 / 06 / 01",
     "Term": null,
     "Weekday": "Tuesday",
@@ -6219,7 +6219,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "C",
-    "Class #": "4-1",
+    "Class #": "9-1",
     "Date": "2027 / 06 / 02",
     "Term": null,
     "Weekday": "Wednesday",
@@ -6232,7 +6232,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "C",
-    "Class #": "4-2",
+    "Class #": "9-2",
     "Date": "2027 / 06 / 10",
     "Term": null,
     "Weekday": "Thursday",
@@ -6245,7 +6245,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "C",
-    "Class #": "5-1",
+    "Class #": "10-1",
     "Date": "2027 / 06 / 11",
     "Term": null,
     "Weekday": "Friday",
@@ -6908,7 +6908,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "D",
-    "Class #": "2-1",
+    "Class #": "7-1",
     "Date": "2027 / 05 / 18",
     "Term": null,
     "Weekday": "Tuesday",
@@ -6921,7 +6921,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "D",
-    "Class #": "2-2",
+    "Class #": "7-2",
     "Date": "2027 / 05 / 20",
     "Term": null,
     "Weekday": "Thursday",
@@ -6934,7 +6934,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "D",
-    "Class #": "3-1",
+    "Class #": "8-1",
     "Date": "2027 / 05 / 26",
     "Term": null,
     "Weekday": "Wednesday",
@@ -6947,7 +6947,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "D",
-    "Class #": "3-2",
+    "Class #": "8-2",
     "Date": "2027 / 05 / 28",
     "Term": null,
     "Weekday": "Friday",
@@ -6960,7 +6960,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "D",
-    "Class #": "4-1",
+    "Class #": "9-1",
     "Date": "2027 / 06 / 04",
     "Term": null,
     "Weekday": "Friday",
@@ -6973,7 +6973,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "D",
-    "Class #": "4-2",
+    "Class #": "9-2",
     "Date": "2027 / 06 / 09",
     "Term": null,
     "Weekday": "Wednesday",
@@ -7623,7 +7623,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "E",
-    "Class #": "1-2",
+    "Class #": "6-2",
     "Date": "2027 / 05 / 12",
     "Term": null,
     "Weekday": "Wednesday",
@@ -7636,7 +7636,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "E",
-    "Class #": "2-1",
+    "Class #": "7-1",
     "Date": "2027 / 05 / 13",
     "Term": null,
     "Weekday": "Thursday",
@@ -7649,7 +7649,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "E",
-    "Class #": "2-2",
+    "Class #": "7-2",
     "Date": "2027 / 05 / 21",
     "Term": null,
     "Weekday": "Friday",
@@ -7662,7 +7662,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "E",
-    "Class #": "3-1",
+    "Class #": "8-1",
     "Date": "2027 / 05 / 24",
     "Term": null,
     "Weekday": "Monday",
@@ -7675,7 +7675,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "E",
-    "Class #": "3-2",
+    "Class #": "8-2",
     "Date": "2027 / 06 / 01",
     "Term": null,
     "Weekday": "Tuesday",
@@ -7688,7 +7688,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "E",
-    "Class #": "4-1",
+    "Class #": "9-1",
     "Date": "2027 / 06 / 02",
     "Term": null,
     "Weekday": "Wednesday",
@@ -7701,7 +7701,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "E",
-    "Class #": "4-2",
+    "Class #": "9-2",
     "Date": "2027 / 06 / 10",
     "Term": null,
     "Weekday": "Thursday",
@@ -7714,7 +7714,7 @@ window.SCHEDULE_DATA = [
   {
     "Grade": 11,
     "Section": "E",
-    "Class #": "5-1",
+    "Class #": "10-1",
     "Date": "2027 / 06 / 11",
     "Term": null,
     "Weekday": "Friday",

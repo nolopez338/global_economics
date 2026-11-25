@@ -1009,5 +1009,257 @@ window.SCHEDULE_DATA = [
     "Material": "-",
     "Material teacher": "-",
     "Summary": "Extra Class"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "1",
+    "Term": 1,
+    "Description": "Seminars Presentation",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "2",
+    "Term": 1,
+    "Description": "Introduction: C1 Guide",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "3",
+    "Term": 1,
+    "Description": "Cesa Talk",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "4",
+    "Term": 1,
+    "Description": "C2 Guide",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "5",
+    "Term": 1,
+    "Description": "No Class: Civic Event",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "6",
+    "Term": 1,
+    "Description": "C3 & C4 Guide",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "7",
+    "Term": 1,
+    "Description": "C5 & C6 Guide",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "8",
+    "Term": 1,
+    "Description": "C7 & C8 Guide",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "9",
+    "Term": 1,
+    "Description": "C9 & C10 Guide",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "1",
+    "Term": 2,
+    "Description": "Inter group presentation",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "Presentación entre grupos"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "2",
+    "Term": 2,
+    "Description": "In group presentation",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "Presentación dentro del grupo"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "3",
+    "Term": 2,
+    "Description": "C1 and C2 guide",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C1–C2: alternativas y selección"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "4",
+    "Term": 2,
+    "Description": "C3 and C4 guide",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C3–C4: representación y prototipo"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "5",
+    "Term": 2,
+    "Description": "Presentación de prototipo (C4) — First learning evidence",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C4: presentación del primer prototipo"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "6",
+    "Term": 2,
+    "Description": "C5 and C6 guide",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C5–C6: diseño y plan de trabajo"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "7",
+    "Term": 2,
+    "Description": "Prototipo final (C5 y C6)",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C5–C6: prototipo final"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "8",
+    "Term": 2,
+    "Description": "C7 and C8 guide",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C7–C8: pruebas y ajustes"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "9",
+    "Term": 2,
+    "Description": "C9 and C10 guide",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "C9–C10: colaboración y valor diferencial"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "10",
+    "Term": 2,
+    "Description": "Informe final (todo acumulado) — Second learning evidence",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "Informe final acumulativo"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "1",
+    "Term": 3,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "2",
+    "Term": 3,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "3",
+    "Term": 3,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "4",
+    "Term": 3,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "5",
+    "Term": 3,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "6",
+    "Term": 3,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "7",
+    "Term": 3,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "8",
+    "Term": 3,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
+  },
+  {
+    "Grade": "10S",
+    "Class #": "9",
+    "Term": 3,
+    "Description": "-",
+    "Material": "-",
+    "Material teacher": "-",
+    "Summary": "-"
   }
 ];

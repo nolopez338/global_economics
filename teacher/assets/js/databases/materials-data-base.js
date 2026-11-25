@@ -1783,5 +1783,407 @@ window.MATERIALS_DATA_BASE = [
         "Category": "extra-resources"
       }
     ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 1,
+    "Class #": "1",
+    "Materials": [
+      {
+        "Acronym": "IS",
+        "Name": "Introductory slide",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro1.html",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "T1O",
+        "Name": "Term 1 outline",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-outline.html",
+        "Category": "extra-resources"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 1,
+    "Class #": "2",
+    "Materials": [
+      {
+        "Acronym": "C2S",
+        "Name": "Slide for C2",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-intro2.html",
+        "Category": "slides"
+      },
+      {
+        "Acronym": "CA",
+        "Name": "C1 & C2",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/grade10/term_1/4-extra_material/G10_T1_C1C2_practice_activity1_print1_solved.pdf",
+        "Category": "classroom-activities"
+      },
+      {
+        "Acronym": "PA",
+        "Name": "C1 & C2",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/grade10/src/pages/term1/g10-t1-c1c2-practice1.html",
+        "Category": "practice-activities"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 1,
+    "Class #": "3",
+    "Materials": [
+      {
+        "Acronym": "MAT",
+        "Name": "Google reference",
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 1,
+    "Class #": "4",
+    "Materials": [
+      {
+        "Acronym": "MAT",
+        "Name": "Google reference",
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 1,
+    "Class #": "5",
+    "Materials": []
+  },
+  {
+    "Grade": "10S",
+    "Term": 1,
+    "Class #": "6",
+    "Materials": [
+      {
+        "Acronym": "MAT",
+        "Name": "Google reference",
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 1,
+    "Class #": "7",
+    "Materials": [
+      {
+        "Acronym": "MAT",
+        "Name": "Google reference",
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 1,
+    "Class #": "8",
+    "Materials": [
+      {
+        "Acronym": "MAT",
+        "Name": "Google reference",
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 1,
+    "Class #": "9",
+    "Materials": [
+      {
+        "Acronym": "MAT",
+        "Name": "Google reference",
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 2,
+    "Class #": "1",
+    "Materials": [
+      {
+        "Acronym": "INS",
+        "Name": "Ver instrucciones y salones de la primera sesión",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/seminars/src/term_2/first_class.html",
+        "Category": "extra-resources"
+      },
+      {
+        "Acronym": "S1",
+        "Name": "Lista de coevaluación · Sesión 1:",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/checklist_evaluativo_feria.pdf",
+        "Category": "classroom-activities"
+      },
+      {
+        "Acronym": "RES",
+        "Name": "Consultar resumen de los proyectos del Periodo 1 (PDF)",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_1/second_learning_evidence/seminars_summary.pdf",
+        "Category": "extra-resources"
+      },
+      {
+        "Acronym": "TAB",
+        "Name": "Abrir tabla de resúmenes por grupo (LaTeX)",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_1/second_learning_evidence/seminars_summary_table.pdf",
+        "Category": "extra-resources"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 2,
+    "Class #": "2",
+    "Materials": [
+      {
+        "Acronym": "S2",
+        "Name": "Lista de coevaluación · Sesión 2:",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/checklist_evaluativo_feria2.pdf",
+        "Category": "classroom-activities"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 2,
+    "Class #": "3",
+    "Materials": [
+      {
+        "Acronym": "G1",
+        "Name": "Abrir actividad de clase de C1–C2",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/C1C2-Activity.pdf",
+        "Category": "classroom-activities"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 2,
+    "Class #": "4",
+    "Materials": [
+      {
+        "Acronym": "G2",
+        "Name": "Abrir actividad de clase de C3–C4",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/C3C4-Activity.pdf",
+        "Category": "classroom-activities"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 2,
+    "Class #": "5",
+    "Materials": [
+      {
+        "Acronym": "G2",
+        "Name": "Abrir actividad de clase de C3–C4",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/C3C4-Activity.pdf",
+        "Category": "classroom-activities"
+      },
+      {
+        "Acronym": "E1",
+        "Name": "C1–C4 Primera evidencia de aprendizaje",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/seminars/src/G10_T2.html#first-learning-evidence",
+        "Category": "extra-resources"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 2,
+    "Class #": "6",
+    "Materials": [
+      {
+        "Acronym": "G3",
+        "Name": "Abrir actividad de clase de C5–C6",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/C5C6-Activity.pdf",
+        "Category": "classroom-activities"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 2,
+    "Class #": "7",
+    "Materials": [
+      {
+        "Acronym": "G3",
+        "Name": "Abrir actividad de clase de C5–C6",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/C5C6-Activity.pdf",
+        "Category": "classroom-activities"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 2,
+    "Class #": "8",
+    "Materials": [
+      {
+        "Acronym": "G4",
+        "Name": "Abrir actividad de clase de C7–C8",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/C7C8-Activity.pdf",
+        "Category": "classroom-activities"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 2,
+    "Class #": "9",
+    "Materials": [
+      {
+        "Acronym": "G5",
+        "Name": "Abrir actividad de clase de C9–C10",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/C9C10-Activity.pdf",
+        "Category": "classroom-activities"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 2,
+    "Class #": "10",
+    "Materials": [
+      {
+        "Acronym": "DOC",
+        "Name": "Introducción · Documento acumulativo de LaTeX",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/seminars/src/G10_T2.html#introduction",
+        "Category": "extra-resources"
+      },
+      {
+        "Acronym": "E2",
+        "Name": "C5–C10 Segunda evidencia de aprendizaje",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/seminars/src/G10_T2.html#second-learning-evidence",
+        "Category": "extra-resources"
+      },
+      {
+        "Acronym": "G3",
+        "Name": "Abrir actividad de clase de C5–C6",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/C5C6-Activity.pdf",
+        "Category": "classroom-activities"
+      },
+      {
+        "Acronym": "G4",
+        "Name": "Abrir actividad de clase de C7–C8",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/C7C8-Activity.pdf",
+        "Category": "classroom-activities"
+      },
+      {
+        "Acronym": "G5",
+        "Name": "Abrir actividad de clase de C9–C10",
+        "Hyperlink": "https://nolopez338.github.io/global_economics/book2026-2027/seminars/term_2/C9C10-Activity.pdf",
+        "Category": "classroom-activities"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 3,
+    "Class #": "1",
+    "Materials": [
+      {
+        "Acronym": "MAT",
+        "Name": "Google reference",
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 3,
+    "Class #": "2",
+    "Materials": [
+      {
+        "Acronym": "MAT",
+        "Name": "Google reference",
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 3,
+    "Class #": "3",
+    "Materials": [
+      {
+        "Acronym": "MAT",
+        "Name": "Google reference",
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 3,
+    "Class #": "4",
+    "Materials": [
+      {
+        "Acronym": "MAT",
+        "Name": "Google reference",
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 3,
+    "Class #": "5",
+    "Materials": [
+      {
+        "Acronym": "MAT",
+        "Name": "Google reference",
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 3,
+    "Class #": "6",
+    "Materials": [
+      {
+        "Acronym": "MAT",
+        "Name": "Google reference",
+        "Hyperlink": "https://www.google.com",
+        "Category": "extra-resources"
+      }
+    ]
+  },
+  {
+    "Grade": "10S",
+    "Term": 3,
+    "Class #": "7",
+    "Materials": []
+  },
+  {
+    "Grade": "10S",
+    "Term": 3,
+    "Class #": "8",
+    "Materials": []
+  },
+  {
+    "Grade": "10S",
+    "Term": 3,
+    "Class #": "9",
+    "Materials": []
   }
 ];

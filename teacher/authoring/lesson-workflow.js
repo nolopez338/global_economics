@@ -75,7 +75,8 @@ function validateSource(source, { calendar = true } = {}) {
   }
   const catalogKeys = new Set();
   for (const c of catalog) {
-    resolve(c.lessonId, c.Grade, c.Term);
+    // Seminar is a separate base catalog; dated lessons retain numeric Grade 10.
+    resolve(c.lessonId, c.Grade === '10S' ? 10 : c.Grade, c.Term);
     const k = `${c.Grade}|${c.Term}|${c['Class #']}`;
     if (!/^\d+$/.test(c['Class #']) || catalogKeys.has(k)) fail(`Invalid/duplicate catalog slot: ${k}`);
     catalogKeys.add(k);

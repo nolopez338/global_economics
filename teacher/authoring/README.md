@@ -14,6 +14,12 @@ Run these commands from the repository root with Node.js 18 or newer.
   Allocate a new UUID for a genuinely new lesson (`node -e "console.log(require('node:crypto').randomUUID())"`).
   The `catalog` array maps undated grade/term/displayed class numbers to lesson IDs.
   Catalog numbers are presentation metadata, never runtime lesson identity.
+  Grade 10 Seminar has a separate base catalog with `Grade: "10S"`: 9, 10,
+  and 9 sequential classes in Terms 1, 2, and 3. Its lessons retain numeric
+  `Grade: 10`, as do dated meetings (`Section: "Seminar"`). Do not share edited
+  seminar lessons with regular classes. The class page filters numeric dated
+  records by grade and section; it does not load or fall back to the base catalog.
+  Base materials accept `"10S"` only in base mode, and display it as its own group.
 - CSV `Lesson ID` plus `Overrides` form one assignment. Overrides are a JSON object
   with optional Description, Summary, Material, Material teacher, or Materials fields.
   Materials overrides replace the whole list. Use them for explicit section-specific
@@ -64,6 +70,23 @@ and Category (`slides`, `classroom-activities`, `practice-activities`, `extra-re
 `mock-practices`). Preserve existing URLs; the validator checks URL syntax, not live
 resource availability. Existing Term 2 placeholder URLs are retained. No resources
 are invented by migration or generation.
+
+Regular sections continue their two-class sequence strictly after May 11, 2027,
+from each section's last label (including `6-1` continuing to `6-2`). Calendar
+validation enforces this continuation without changing the calendar's cycle Day,
+registered terms, seminar numbering, or meeting coverage. These out-of-term
+meetings remain unassigned. Existing dates end at `9-2` for 10B, 10D, 11B and
+11D, and at `10-1` for the other regular sections; no section reaches `10-2`.
+
+Grade 10 Seminar Term 2 materials follow the links and labels in
+`seminars/src/G10_T2.html`, resolved against the established GitHub Pages root.
+There are no linked dedicated assessment documents: class 5 uses the C3–C4
+guide and `#first-learning-evidence`; class 7 uses the C5–C6 guide; class 10
+uses `#introduction` (the cumulative LaTeX document instructions),
+`#second-learning-evidence`, and the C5–C10 guides. Term 1 and Term 3 base
+entries copy available dated seminar content, including historical placeholders
+and the canceled meeting. Term 3 base classes 7–9 have no assigned dated content;
+they retain `-` fields and empty materials without assigning the out-of-term dates.
 
 ## Cancel a meeting and postpone its lesson
 
