@@ -1,0 +1,223 @@
+\documentclass[12pt,aspectratio=169]{beamer}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,array,booktabs,tabularx,tikz,pgfplots}
+% Add language support appropriate to the source, if needed.
+% Keep this preamble inline in every delivered deck.
+\definecolor{GEInk}{HTML}{132A3E}
+\definecolor{GETeal}{HTML}{17675E}
+\definecolor{GEFooter}{HTML}{EAF2F1}
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{normal text}{fg=GEInk,bg=white}
+\setbeamercolor{structure}{fg=GETeal}
+\setbeamercolor{frametitle}{fg=GEInk}
+\setbeamercolor{GE footer}{fg=GETeal,bg=GEFooter}
+\setbeamerfont{normal text}{family=\sffamily,size=\normalsize}
+\setbeamerfont{title}{size=\huge,series=\bfseries}
+\setbeamerfont{subtitle}{size=\normalsize,series=\bfseries}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{framesubtitle}{size=\normalsize,series=\mdseries}
+\setbeamerfont{GE footer}{size=\footnotesize}
+\setbeamersize{text margin left=9mm,text margin right=9mm}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}
+\setbeamercovered{invisible}
+\setbeamertemplate{frametitle}{%
+  \vskip.5em
+  {\usebeamerfont{frametitle}\strut\insertframetitle\strut\par}%
+  \ifx\insertframesubtitle\empty\else
+    {\usebeamerfont{framesubtitle}\strut\insertframesubtitle\strut\par}%
+  \fi
+  \vskip.25em
+}
+\setbeamertemplate{footline}{%
+  \begin{beamercolorbox}[wd=\paperwidth,ht=3ex,dp=1.3ex,
+    leftskip=9mm,rightskip=9mm]{GE footer}%
+    \usebeamerfont{GE footer}\insertsectionhead\hfill
+    \insertframenumber/\inserttotalframenumber
+  \end{beamercolorbox}%
+}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{.35em}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.22}
+\AtBeginEnvironment{frame}{\raggedright}
+\addtobeamertemplate{frametitle}{}{%
+  \setlength{\abovedisplayskip}{6pt plus 2pt minus 2pt}%
+  \setlength{\belowdisplayskip}{6pt plus 2pt minus 2pt}%
+  \setlength{\abovedisplayshortskip}{6pt plus 2pt minus 2pt}%
+  \setlength{\belowdisplayshortskip}{6pt plus 2pt minus 2pt}%
+}
+
+\pgfplotsset{compat=1.18}
+% Portable resolved snapshot: highlights_palette.tex, highlights_roles.tex,
+% highlights_g11_t2.tex:4488 and highlights_compat_ttwo.tex:746 (live registry).
+% Registry members: meanpop, meansample, sd, size, se, confidence, tail,
+% critical, margin, bounds, width, normal, theoretical, budget, shape.
+% highlights_tables.tex:169 deliberately omits context rows budget and shape.
+% Role definitions retained from the lesson; the opening legend stays in that lesson.
+\definecolor{HighlightLiteral22}{HTML}{FF765C}
+\colorlet{CfiveTonePopulationMeanColor}{HighlightLiteral22}
+\colorlet{G11T2C1PopulationMean}{CfiveTonePopulationMeanColor}
+\definecolor{HighlightLiteral21}{HTML}{9BDD36}
+\colorlet{CsevenToneSampleMeanColor}{HighlightLiteral21}
+\colorlet{G11T2C1SampleMean}{CsevenToneSampleMeanColor}
+\definecolor{HighlightLiteral24}{HTML}{E42134}
+\colorlet{CfiveTonePopulationSDColor}{HighlightLiteral24}
+\colorlet{G11T2C1PopulationSD}{CfiveTonePopulationSDColor}
+\definecolor{HighlightLiteral26}{HTML}{173B17}
+\colorlet{CsixToneCountColor}{HighlightLiteral26}
+\colorlet{G11T2C1Sample}{CsixToneCountColor}
+\definecolor{HighlightLiteral33}{HTML}{F4D94B}
+\colorlet{CtwoSEColor}{HighlightLiteral33}
+\definecolor{HighlightLiteral31}{HTML}{55C8F0}
+\colorlet{CtwoConfidenceColor}{HighlightLiteral31}
+\definecolor{HighlightLiteral32}{HTML}{2648BB}
+\colorlet{CeightToneCriticalColor}{HighlightLiteral32}
+\colorlet{CtwoCriticalColor}{CeightToneCriticalColor}
+\colorlet{CeightToneTailColor}{CtwoConfidenceColor!55!CtwoCriticalColor}
+\colorlet{MathHLTailColor}{CeightToneTailColor}
+\definecolor{HighlightLiteral34}{HTML}{F28A18}
+\colorlet{CtwoMoEColor}{HighlightLiteral34}
+\colorlet{CeightToneBoundsColor}{CtwoMoEColor!45!white}
+\colorlet{MathHLBoundsColor}{CeightToneBoundsColor}
+\colorlet{CeightToneWidthColor}{CtwoMoEColor!45!black}
+\colorlet{MathHLWidthColor}{CeightToneWidthColor}
+\definecolor{HighlightLiteral37}{HTML}{43A5C9}
+\colorlet{ConeToneCumulativeColor}{HighlightLiteral37}
+\colorlet{MathHLCumulativeColor}{ConeToneCumulativeColor}
+\colorlet{CtwoEndpointColor}{MathHLBoundsColor}
+\colorlet{CtwoWidthColor}{MathHLWidthColor}
+% Slide-only padding per side, shared by every semantic highlight wrapper.
+\newlength{\GEHighlightVerticalPadding}
+\setlength{\GEHighlightVerticalPadding}{.5mm}
+\tikzset{ge marker/.style={rectangle,rounded corners=1mm,draw=none,
+  fill=#1,fill opacity=.32,text opacity=1,text=GEInk,
+  inner xsep=.6mm,inner ysep=\GEHighlightVerticalPadding,outer sep=0pt}}
+\newif\ifGTenHighlights
+\GTenHighlightstrue
+% \GTenHighlightsfalse % Uncomment to disable instructional highlights.
+% Preserve an existing source toggle setting when adapting a deck.
+\makeatletter
+\newcommand{\GEHighlightMath}[2]{%
+  \tikz[baseline=(gehl.base)]\node[ge marker=\GECurrentRole]
+    (gehl) {$\m@th#1#2$};}
+\newcommand{\GEHighlight}[2]{%
+  \ifGTenHighlights
+  \begingroup\def\GECurrentRole{#1}%
+  \ifmmode\mathpalette\GEHighlightMath{#2}%
+  \else\tikz[baseline=(gehl.base)]\node[ge marker=#1](gehl){#2};\fi
+  \endgroup
+  \else#2\fi}
+\makeatother
+\newcommand{\HighlightStroke}[2]{\GEHighlight{#1}{#2}}
+
+\newcommand{\HLTtwoPopulationMean}[1]{\HighlightStroke{G11T2C1PopulationMean}{#1}}
+\newcommand{\HLPopulationMean}[1]{\HLTtwoPopulationMean{#1}}
+\newcommand{\HLTtwoSampleMean}[1]{\HighlightStroke{G11T2C1SampleMean}{#1}}
+\newcommand{\HLSampleMean}[1]{\HLTtwoSampleMean{#1}}
+\newcommand{\HLTtwoPopulationSD}[1]{\HighlightStroke{G11T2C1PopulationSD}{#1}}
+\newcommand{\HLPopulationSD}[1]{\HLTtwoPopulationSD{#1}}
+\newcommand{\HLTtwoObservationCount}[1]{\HighlightStroke{G11T2C1Sample}{#1}}
+\newcommand{\HLObservationCount}[1]{\HLTtwoObservationCount{#1}}
+\newcommand{\HLTtwoStandardError}[1]{\HighlightStroke{CtwoSEColor}{#1}}
+\newcommand{\HLStandardError}[1]{\HLTtwoStandardError{#1}}
+\newcommand{\HLTtwoConfidence}[1]{\HighlightStroke{CtwoConfidenceColor}{#1}}
+\newcommand{\HLConfidence}[1]{\HLTtwoConfidence{#1}}
+\newcommand{\HLTtwoTailArea}[1]{\HighlightStroke{MathHLTailColor}{#1}}
+\newcommand{\HLTailArea}[1]{\HLTtwoTailArea{#1}}
+\newcommand{\HLTtwoCriticalValue}[1]{\HighlightStroke{CtwoCriticalColor}{#1}}
+\newcommand{\HLCriticalValue}[1]{\HLTtwoCriticalValue{#1}}
+\newcommand{\HLTtwoMarginOfError}[1]{\HighlightStroke{CtwoMoEColor}{#1}}
+\newcommand{\HLMarginOfError}[1]{\HLTtwoMarginOfError{#1}}
+\newcommand{\HLTtwoIntervalBounds}[1]{\HighlightStroke{MathHLBoundsColor}{#1}}
+\newcommand{\HLIntervalBounds}[1]{\HLTtwoIntervalBounds{#1}}
+\newcommand{\HLTtwoIntervalWidth}[1]{\HighlightStroke{MathHLWidthColor}{#1}}
+\newcommand{\HLIntervalWidth}[1]{\HLTtwoIntervalWidth{#1}}
+\newcommand{\HLTtwoCumulativeProbability}[1]{\HighlightStroke{MathHLCumulativeColor}{#1}}
+\newcommand{\HLCumulativeProbability}[1]{\HLTtwoCumulativeProbability{#1}}
+\newcommand{\CtwoTtwoPoint}[1]{\HighlightStroke{G11T2C1SampleMean}{#1}}
+\newcommand{\CtwoPoint}[1]{\CtwoTtwoPoint{#1}}
+\newcommand{\CtwoTtwoSD}[1]{\HighlightStroke{G11T2C1PopulationSD}{#1}}
+\newcommand{\CtwoSD}[1]{\CtwoTtwoSD{#1}}
+\newcommand{\CtwoTtwoSize}[1]{\HighlightStroke{G11T2C1Sample}{#1}}
+\newcommand{\CtwoSize}[1]{\CtwoTtwoSize{#1}}
+\newcommand{\CtwoTtwoSE}[1]{\HighlightStroke{CtwoSEColor}{#1}}
+\newcommand{\CtwoSE}[1]{\CtwoTtwoSE{#1}}
+\newcommand{\CtwoTtwoMoE}[1]{\HighlightStroke{CtwoMoEColor}{#1}}
+\newcommand{\CtwoMoE}[1]{\CtwoTtwoMoE{#1}}
+\newcommand{\CtwoTtwoCritical}[1]{\HighlightStroke{CtwoCriticalColor}{#1}}
+\newcommand{\CtwoCritical}[1]{\CtwoTtwoCritical{#1}}
+\newcommand{\CtwoTtwoConfidence}[1]{\HighlightStroke{CtwoConfidenceColor}{#1}}
+\newcommand{\CtwoConfidence}[1]{\CtwoTtwoConfidence{#1}}
+\newcommand{\CtwoTtwoEndpoint}[1]{\HighlightStroke{CtwoEndpointColor}{#1}}
+\newcommand{\CtwoEndpoint}[1]{\CtwoTtwoEndpoint{#1}}
+\newcommand{\CtwoTtwoWidth}[1]{\HighlightStroke{CtwoWidthColor}{#1}}
+\newcommand{\CtwoWidth}[1]{\CtwoTtwoWidth{#1}}
+\newcommand{\CtwoTtwoMean}[1]{\HighlightStroke{G11T2C1PopulationMean}{#1}}
+\newcommand{\CtwoMean}[1]{\CtwoTtwoMean{#1}}
+
+\newcommand{\GERevealCell}[2]{\leavevmode\visible<#1->{#2}}
+\title{Warm-up: Planning the school journey}
+\subtitle{Global Economics | Grade 11 | Term 2 | Lesson 1 | C3}
+\author{}\date{}
+\begin{document}
+\section{Warm-up}
+% Instructional source (unchanged):
+% book2026-2027/grade11/term_2/3-slides/G11_T2_L1_C3_slides.tex
+% Anchors: "The confidence interval stays centred at 84" (centre and bounds);
+% "Task 2: Fixed SE, changing multiplier" (uncertainty and confidence choice);
+% "What changes, and what stays fixed?" (precision/reliability synthesis).
+% Central idea: a shared estimate can support different interval widths;
+% greater coverage requires a wider interval when the data/model stay fixed.
+% Purpose: compare how cautiously two reports describe a mean journey time,
+% and why a more cautious range may be less useful for precise planning.
+% Accessible reasoning: both ranges share a centre; the wider one allows
+% more room for an estimate to miss the true mean. No formal CI calculation.
+% Later refinement: centre, standard error, critical value and margin explain
+% the width and quantify the precision/confidence trade-off under assumptions.
+% No practice used. Fresh context/data; no lesson example answers reproduced.
+% Use after the lesson's complete opening legend, before its first example.
+% Timing: reading 20 s + thinking/discussion 60 s + check/bridge 40 s = 120 s.
+% Frame 1 has no answer; frame 2 is the check, with bridge on overlay 2.
+\begin{frame}[t]{Planning the school journey}
+A school surveys a random sample of \CtwoSize{60} students about their
+journey times. Their average is \CtwoPoint{30 minutes}.
+
+\medskip
+Using the same survey, two reports suggest ranges for the
+\textbf{true average journey time of all students}:
+
+\medskip
+\begin{tabularx}{\linewidth}{@{}lX@{}}
+\toprule
+\textbf{Report A} & \CtwoEndpoint{28--32 minutes}\\[4pt]
+\textbf{Report B} & \CtwoEndpoint{24--36 minutes}\\
+\bottomrule
+\end{tabularx}
+
+\medskip
+\textbf{Which report would you choose if your priority is to avoid leaving
+the true average outside the range? Explain your reasoning.}
+
+\medskip
+{\color{GETeal}\textbf{Think and discuss: 60 seconds.}}
+\end{frame}
+
+\begin{frame}[t]{Check and connection}
+\textbf{An intuitive check.}
+Report B allows more room on either side of the same
+\CtwoPoint{30-minute estimate}. Every average inside A is also inside B.
+Neither range is guaranteed to contain the true average.
+
+\medskip
+A gives a tighter estimate for planning; B leaves more room for uncertainty.
+These ranges describe the \textbf{average}, not every student's journey.
+
+\medskip
+\visible<2->{\textbf{Where the lesson takes us.}
+We will connect the \CtwoPoint{centre} and \CtwoMoE{margin of error}
+to the data and the chosen \CtwoConfidence{confidence level},
+so we can explain how much wider a more cautious interval needs to be.}
+\end{frame}
+\end{document}
