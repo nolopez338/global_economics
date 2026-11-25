@@ -1,0 +1,200 @@
+\documentclass[12pt,aspectratio=169]{beamer}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,array,booktabs,tabularx,tikz}
+% Add language support appropriate to the source, if needed.
+% Keep this preamble inline in every delivered deck.
+\definecolor{GEInk}{HTML}{132A3E}
+\definecolor{GETeal}{HTML}{17675E}
+\definecolor{GEFooter}{HTML}{EAF2F1}
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{normal text}{fg=GEInk,bg=white}
+\setbeamercolor{structure}{fg=GETeal}
+\setbeamercolor{frametitle}{fg=GEInk}
+\setbeamercolor{GE footer}{fg=GETeal,bg=GEFooter}
+\setbeamerfont{normal text}{family=\sffamily,size=\normalsize}
+\setbeamerfont{title}{size=\huge,series=\bfseries}
+\setbeamerfont{subtitle}{size=\normalsize,series=\bfseries}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{framesubtitle}{size=\normalsize,series=\mdseries}
+\setbeamerfont{GE footer}{size=\footnotesize}
+\setbeamersize{text margin left=9mm,text margin right=9mm}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}
+\setbeamercovered{invisible}
+
+% Structural hierarchy adapted from Worked Example 1; independent of highlights.
+\newcommand{\TaskName}[1]{\ifcase#1\or
+Establish the binary model and monetary transformations.\or
+Individual expected values.\fi}
+\newcommand{\SubtaskName}[2]{\ifcase#1\or
+  \ifcase#2\or Binary model and monetary transformations.\or
+  Supports, PMFs, and ordered CDFs.\or Initial probabilities and loss events.\fi
+\or
+  \ifcase#2\or Initial expected values.\or
+  Expectation formulas and sign intervals.\or Graphs.\fi
+\fi}
+\newcommand{\TaskHeading}[1]{%
+  \par\noindent\tikz[baseline=(tasktitle.base)]{%
+    \node[fill=black!5,text=GEInk,rounded corners=2mm,
+      inner xsep=4pt,inner ysep=3pt,outer sep=0pt,
+      text width=\dimexpr\linewidth-8pt\relax,align=left,
+      font=\footnotesize\bfseries] (tasktitle) {Task #1 --- \TaskName{#1}};}\par}
+\newcommand{\SubtaskHeading}[2]{%
+  \par\noindent
+  {\normalsize\bfseries\underline{#2. \SubtaskName{#1}{#2}}\par}}
+\newcommand{\ActiveTask}{0}
+\newcommand{\ActiveSubtask}{0}
+\newcommand{\SetTaskSubtask}[2]{\renewcommand{\ActiveTask}{#1}%
+  \renewcommand{\ActiveSubtask}{#2}}
+\newcommand{\TaskBody}{\setlength{\parskip}{0pt}}
+\newcommand{\ActiveHierarchy}{%
+  \begingroup\setlength{\parskip}{0pt}
+  \ifnum\ActiveTask>0
+    \TaskHeading{\ActiveTask}\vskip2pt
+    \SubtaskHeading{\ActiveTask}{\ActiveSubtask}\vskip3pt
+  \fi\endgroup}
+
+\setbeamertemplate{frametitle}{%
+  \raggedright\setlength{\parskip}{0pt}
+  \vskip.3em
+  \ActiveHierarchy
+  {\usebeamerfont{frametitle}\strut\insertframetitle\strut\par}%
+  \ifx\insertframesubtitle\empty\else
+    {\usebeamerfont{framesubtitle}\strut\insertframesubtitle\strut\par}%
+  \fi
+  \vskip.25em
+}
+\setbeamertemplate{footline}{%
+  \begin{beamercolorbox}[wd=\paperwidth,ht=3ex,dp=1.3ex,
+    leftskip=9mm,rightskip=9mm]{GE footer}%
+    \usebeamerfont{GE footer}\insertsectionhead\hfill
+    \insertframenumber/\inserttotalframenumber
+  \end{beamercolorbox}%
+}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{.35em}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.22}
+\AtBeginEnvironment{frame}{\raggedright}
+\addtobeamertemplate{frametitle}{}{%
+  \setlength{\abovedisplayskip}{6pt plus 2pt minus 2pt}%
+  \setlength{\belowdisplayskip}{6pt plus 2pt minus 2pt}%
+  \setlength{\abovedisplayshortskip}{6pt plus 2pt minus 2pt}%
+  \setlength{\belowdisplayshortskip}{6pt plus 2pt minus 2pt}%
+}
+
+
+% Resolved coordinated palette: highlights_palette.tex, base and registry palettes.
+\definecolor{GTenHLValue}{HTML}{FFBB55}
+\definecolor{GTenHLSecond}{HTML}{8FD49A}
+\definecolor{GTenHLOutcome}{HTML}{BC9DE0}
+\definecolor{GTenHLProbability}{HTML}{86BFF0}
+\definecolor{CriticalColor}{HTML}{2648BB}
+\colorlet{G10T2C3FunctionColor}{GTenHLSecond!85!black}
+\colorlet{MathHLSuccessColor}{GTenHLProbability!65!CriticalColor}
+\definecolor{MathHLComplementColor}{HTML}{D74383}
+\definecolor{MathHLCumulativeColor}{HTML}{43A5C9}
+\definecolor{ExpectedValueColor}{HTML}{D6A52A}
+
+% Use \definecolor{MeaningfulRoleName}{HTML}{...} for each used role.
+% Slide-only padding per side, shared by every semantic highlight wrapper.
+\newlength{\GEHighlightVerticalPadding}
+\setlength{\GEHighlightVerticalPadding}{.5mm}
+\tikzset{ge marker/.style={rectangle,rounded corners=1mm,draw=none,
+  fill=#1,fill opacity=.32,text opacity=1,text=GEInk,
+  inner xsep=.6mm,inner ysep=\GEHighlightVerticalPadding,outer sep=0pt}}
+\newif\ifGTenHighlights
+\GTenHighlightsfalse
+% \GTenHighlightsfalse % Uncomment to disable instructional highlights.
+% Preserve an existing source toggle setting when adapting a deck.
+\makeatletter
+\newcommand{\GEHighlightMath}[2]{%
+  \tikz[baseline=(gehl.base)]\node[ge marker=\GECurrentRole]
+    (gehl) {$\m@th#1#2$};}
+\newcommand{\GEHighlight}[2]{%
+  \ifGTenHighlights
+  \begingroup\def\GECurrentRole{#1}%
+  \ifmmode\mathpalette\GEHighlightMath{#2}%
+  \else\tikz[baseline=(gehl.base)]\node[ge marker=#1](gehl){#2};\fi
+  \endgroup
+  \else#2\fi}
+\makeatother
+% Keep rows, rules, and table structure outside this space-reserving command.
+\newcommand{\GERevealCell}[2]{\leavevmode\visible<#1->{#2}}
+
+
+% All aliases share the single slide-only padding parameter and disabled branch.
+\newcommand{\GTenHLValue}[1]{\GEHighlight{GTenHLValue}{#1}}
+\newcommand{\GTenHLSecond}[1]{\GEHighlight{GTenHLSecond}{#1}}
+\newcommand{\HLMathEvent}[1]{\GEHighlight{GTenHLOutcome}{#1}}
+\newcommand{\HLProbability}[1]{\GEHighlight{GTenHLProbability}{#1}}
+\newcommand{\HLSuccessProbability}[1]{\GEHighlight{MathHLSuccessColor}{#1}}
+\newcommand{\HLComplementProbability}[1]{\GEHighlight{MathHLComplementColor}{#1}}
+\newcommand{\HLCumulativeProbability}[1]{\GEHighlight{MathHLCumulativeColor}{#1}}
+\newcommand{\HLExpectedValue}[1]{\GEHighlight{ExpectedValueColor}{#1}}
+\newcommand{\HLGtenCThreeFunction}[1]{\GEHighlight{G10T2C3FunctionColor}{#1}}
+\newcommand{\HLMathContext}[1]{#1}
+\let\I\GTenHLValue
+\let\M\GTenHLSecond
+\let\A\HLMathEvent
+\let\S\HLSuccessProbability
+\let\Q\HLComplementProbability
+\let\V\HLExpectedValue
+\let\T\HLGtenCThreeFunction
+\let\Prob\HLProbability
+\let\CDF\HLCumulativeProbability
+\newcommand{\EV}[1]{\V{\mathbb E}[\M{Y_{#1}}]}
+\newcommand{\Ask}[1]{\textbf{#1}\par\smallskip}
+% Instructional source (unchanged):
+% book2026-2027/grade10/term_2/3-slides/G10_T2_L1_C3_slides.tex
+% Anchors: "Food stand: build its ordered CDF"; "Indoor games: order money,
+% not state labels"; the prerequisite explanation of cumulative probability.
+% Central idea: order monetary outcomes and accumulate their probabilities
+% up to and including a chosen cutoff, regardless of the event-state labels.
+% Fresh context: a delivery-cost ceiling makes a cutoff question useful for
+% judging whether a financial limit is respected; data differ from the lesson.
+% Accessible reasoning: identify which delivery cost meets the limit and use
+% its supplied frequency. No notation, averaging, or CDF construction needed.
+% Later refinement: an ordered CDF organizes the same outcome probabilities
+% for any changing cutoff; equality includes the mass at that monetary value.
+% No supporting practice used. Intended placement: after the source lesson's
+% complete opening legend and before its first instructional example.
+% Timing: reading 20 s + student work 60 s + check/connection 40 s = 120 s.
+% Advance to frame 2 only after student discussion; no answer on frame 1.
+\title{Warm-up: a delivery-cost limit}
+\subtitle{Grade 10 \textbar{} Term 2 \textbar{} Lesson 1 \textbar{} C3}
+\author{}\date{}
+\begin{document}
+\section{Warm-up: delivery costs}
+\begin{frame}[t]{Warm-up: a delivery-cost limit}
+A school club orders supplies. Delivery costs depend on whether
+a second trip is needed. Use these chances for the next order:
+\par\smallskip
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xll@{}}
+\toprule
+Delivery outcome & Total delivery cost & Chance\\\midrule
+\A{One trip} & \M{USD 12} & \Prob{7 out of 10}\\[5pt]
+\A{Second trip needed} & \M{USD 28} & \Prob{3 out of 10}\\\bottomrule
+\end{tabularx}
+\par\smallskip
+\Ask{What is the chance the delivery cost stays at or below the club's
+USD 12 limit? Explain.}
+{\color{GETeal}\footnotesize Think and discuss: 60 seconds.}
+\end{frame}
+
+\begin{frame}[t]{Intuitive check and connection}
+The chance is \CDF{7 out of 10 (70\%)}: the \M{USD 12} cost meets the limit;
+the \M{USD 28} cost exceeds it.
+\par\smallskip
+\textbf{``At or below'' includes exactly equal to the cutoff}, so the
+\M{USD 12} outcome counts.
+\par\medskip
+\textbf{Into the lesson}\par
+A \CDF{cumulative distribution function (CDF)} orders the monetary outcomes
+and organizes the \CDF{chance accumulated up to any cutoff}.
+It uses the same outcome probabilities, so one representation can answer
+whether a limit is respected as the cutoff changes.
+\end{frame}
+\end{document}
+
