@@ -41,9 +41,11 @@ function validateCalendar(records) {
     const info = calendar.getAcademicDateInfo(isoDate);
     const meetingNumber = days.indexOf(info.cycleDay) + 1;
     if (!meetingNumber) fail(`row ${rowNumber} is not a meeting day for ${classId}`);
-    let expectedClassNumber = `${info.cycleNumber}-${meetingNumber}`;
+    const termCycleNumber = calendar.getTermCycleNumber(info.calendarYear, info.month, info.day);
+    let expectedClassNumber = `${termCycleNumber}-${meetingNumber}`;
     // Regular sections continue their two-meeting sequence after Term 3 ends.
-    // The calendar's out-of-term cycle reset still applies to seminars.
+    // Seminars retain their historical term-scoped reset, independently of
+    // the Calendar View's continuing six-school-day cycles.
     if (isoDate > '2027-05-11' && record.Section !== 'Seminar') {
       const previous = previousClass.get(classId);
       if (!previous) fail(`row ${rowNumber} has no preceding class for ${classId}`);

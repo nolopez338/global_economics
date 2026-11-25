@@ -71,6 +71,13 @@ and Category (`slides`, `classroom-activities`, `practice-activities`, `extra-re
 resource availability. Existing Term 2 placeholder URLs are retained. No resources
 are invented by migration or generation.
 
+Calendar View labels count six school days per cycle, continuing after May 11,
+2027 from `6-5` to `6-6`, through June 10 (`9-6`) and June 11 (`10-1`).
+Only an existing Day wrap from 6 to 1 advances the continuing cycle. Codes keep
+the final term's green styling without extending its registered boundaries or
+assigning lessons. `getTermCycleNumber` preserves the separate historical reset
+used for seminar validation and migration audits.
+
 Regular sections continue their two-class sequence strictly after May 11, 2027,
 from each section's last label (including `6-1` continuing to `6-2`). Calendar
 validation enforces this continuation without changing the calendar's cycle Day,

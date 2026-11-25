@@ -321,6 +321,11 @@
 
               const info = calendar.getAcademicDateInfo(isoDate);
               const termClass = info.term ? termClasses.get(info.term) : null;
+              // Continuing calendar codes keep the final term's color only;
+              // cells and accessible term labels still use the registered term.
+              const finalTerm = config.terms[config.terms.length - 1];
+              const cycleClass = termClass || (isoDate > finalTerm.endDate
+                ? termClasses.get(finalTerm.name) : null);
               const accessibleParts = [isoDate];
               const dayNumber = document.createElement("span");
               dayNumber.className = "day-number";
@@ -347,8 +352,8 @@
               if (info.cycleNumber !== null && info.cycleDay !== null) {
                 const cycle = document.createElement("span");
                 cycle.className = "cycle-day";
-                if (termClass) {
-                  cycle.classList.add(termClass);
+                if (cycleClass) {
+                  cycle.classList.add(cycleClass);
                 }
                 cycle.textContent = `${info.cycleNumber}-${info.cycleDay}`;
                 cycle.setAttribute("aria-hidden", "true");

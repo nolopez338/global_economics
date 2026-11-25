@@ -6,7 +6,8 @@
  * interpretation spanning August 2026 through June 2027. Terms are inclusive
  * date ranges within that academic year. Cycle day is the scheduled day value
  * stored for a date; cycle number is generated chronologically within each
- * term and restarts at 1 when a new term begins.
+ * term and restarts at 1 when a new term begins. After the final term,
+ * calendar cycles continue without assigning those dates to a term.
  */
 
 const WEEKDAY_CODES = ["mo", "tu", "we", "th", "fr", "sa", "su"];
@@ -592,7 +593,7 @@ function getAcademicMonthSequence(config) {
   return sequence;
 }
 
-function generateAcademicCycleNumbers(config) {
+function generateAcademicCycleNumbers(config, { resetOutsideTerms = false } = {}) {
   const generatedRegistry = {};
 
   let currentCycle = 1;
@@ -677,11 +678,11 @@ function generateAcademicCycleNumbers(config) {
         );
         const termName = term ? term.name : null;
 
-        if (termName !== previousTerm) {
+        if (termName !== previousTerm && (termName !== null || resetOutsideTerms)) {
           currentCycle = 1;
           previousCycleDay = null;
           previousTerm = termName;
-        } else if (cycleDay === 1 && previousCycleDay !== null) {
+        } else if (cycleDay === 1 && previousCycleDay === 6) {
           currentCycle++;
         }
 
@@ -701,6 +702,12 @@ function generateAcademicCycleNumbers(config) {
  * restart independently at the first scheduled cycle day of every term.
  */
 const cycleNumberRegistry = generateAcademicCycleNumbers(academicYearConfig);
+
+// Historical term-scoped numbering remains separate for seminar validation
+// and migration audits. It also resets on entry into the unassigned period.
+const termCycleNumberRegistry = generateAcademicCycleNumbers(
+  academicYearConfig, { resetOutsideTerms: true }
+);
 
 const calendar2026cycle = cycleNumberRegistry[2026];
 const calendar2027cycle = cycleNumberRegistry[2027];
@@ -772,6 +779,12 @@ function getCycleNumber(year, month, day) {
     month,
     day,
     "Cycle-number"
+  );
+}
+
+function getTermCycleNumber(year, month, day) {
+  return getRegisteredMatrixValue(
+    termCycleNumberRegistry, year, month, day, "Term cycle-number"
   );
 }
 
@@ -1000,6 +1013,7 @@ const academicCalendarExports = {
   getWeekday,
   getCycleDay,
   getCycleNumber,
+  getTermCycleNumber,
   getAcademicYear,
   isDateInAcademicYear,
   getTerm,

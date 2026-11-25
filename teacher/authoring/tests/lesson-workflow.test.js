@@ -18,7 +18,7 @@ function migrationSnapshot(data) {
   for (const row of snapshot.schedule) {
     if (row.Section !== 'Seminar' && row.Date > '2027 / 05 / 11') {
       const info = calendar.getAcademicDateInfo(row.Date.replaceAll(' / ', '-'));
-      row['Class #'] = `${info.cycleNumber}-${row['Class #'].split('-')[1]}`;
+      row['Class #'] = `${calendar.getTermCycleNumber(info.calendarYear, info.month, info.day)}-${row['Class #'].split('-')[1]}`;
     }
   }
   return snapshot;
