@@ -35,7 +35,7 @@ preamble+=r'''
  D/.style={object,diamond,aspect=1,fill=DiamondPurple}}
 % Object identifiers are ABOVE objects. Position/job labels are BELOW rows.
 \newcommand{\Obj}[4]{\node[#1] at (#2,#3) {};\node[font=\small] at (#2,{#3+.30}) {#4};}
-\newcommand{\Q}[1]{\textbf{#1}\par}
+\newcommand{\Q}[1]{\noindent\begin{minipage}{\linewidth}\raggedright\textbf{#1}\end{minipage}\par}
 \newcommand{\DiagramStart}{\par\centering\begin{tikzpicture}
  \path[use as bounding box] (-.05,-.55) rectangle (13.55,4.05);}
 \newcommand{\DiagramEnd}{\end{tikzpicture}\par\raggedright}
@@ -100,11 +100,11 @@ def grid_ordered(n,r,title,section=None):
         d+=node(x+.5,3.55,rf'First: {a}',opts='font=\small')
         for j,p in enumerate(v for v in ps if v[0]==a):
             y=2.75-j*.9
-            d+=row(p,x,y,ov=f'{a+1}-',step=1.25 if r==2 else .54)
+            d+=row(p,x,y,ov=f'{a+1}-',step=1.5 if r==2 else .54)
             if r==2:
                 d+=node(x,y-.32,'Reader',ov=f'{a+1}-',opts='font=\small')
-                d+=node(x+1.25,y-.32,'Recorder',ov=f'{a+1}-',opts='font=\small')
-        d+=box(x-.65,2.75-(n-2)*.9-.52,x+(r-1)*(1.25 if r==2 else .54)+.8,3.3,f'{n+2}-')
+                d+=node(x+1.5,y-.32,'Recorder',ov=f'{a+1}-',opts='font=\small')
+        d+=box(x-.65,2.75-(n-2)*.9-.52,x+(r-1)*(1.5 if r==2 else .54)+.8,3.3,f'{n+2}-')
     frame(title,'How many choices remain after the first object is used?',d,
           [(f'{n+2}-',f'{n} first-object groups; {n-1} assignments in each.'),
            (f'{n+3}-',rf'${n}\times{n-1}={len(ps)}$ assignments. Each object is used at most once.')],
@@ -171,26 +171,26 @@ intro('1C. Four input groups',0,'One outcome: circle, triangle, square, diamond.
 def panels(boundaries=True):
     d=''; cells=[]
     for a,b in product(range(1,3),repeat=2):
-        x=.6+(b-1)*6.7; y=3.0-(a-1)*2.0
-        d+=node(x,y+.43,'Fixed:',opts='anchor=west,font=\small')+row([a,b],x+1.3,y+.43,['C','T'])
+        x=.6+(b-1)*6.7; y=2.85-(a-1)*2.2
+        d+=node(x,y+.6,'Fixed:',opts='anchor=west,font=\small')+row([a,b],x+1.3,y+.6,['C','T'])
         for c,e in product(range(1,3),repeat=2):
-            xx=x+(e-1)*2.8; yy=y-.3-(c-1)*.82
+            xx=x+(e-1)*2.8; yy=y-(c-1)*.7
             d+=row([a,b,c,e],xx,yy,['C','T','S','D'],ov=f'{2+(a-1)*2+b-1}-',step=.46)
             cells.append([a,b,c,e])
-        if boundaries: d+=box(x-.3,y-1.48,x+4.7,y+.97,'6-8')
+        if boundaries: d+=box(x-.3,y-1.05,x+4.7,y+1.1,'6-8')
     return d,cells
 d,cells=panels()
-frame('1C. Four panels, each with its own fixed start','How many outcomes belong to each panel?',d,
+frame('1C. Four panels with fixed starts','How many outcomes belong to each panel?',d,
       [('6-','Four panels. Inside each: two square choices and two diamond choices.'),
        ('7-',r'Four outcomes per panel: $4\times4=16$.'),
        ('8-',r'Each $4$ is $2\times2$, so $2\times2\times2\times2=16$.')],
       'Panel rows fix circle; panel columns fix triangle. Inside panels rows vary square and columns vary diamond.')
 # Unchanged grid with alternative boundaries.
 d,_=panels(False)
-for y in [3,1]:d+=box(.3,y-1.48,12,y+.97,'6-7')
+for y in [2.85,.65]:d+=box(.3,y-1.05,12,y+1.1,'6-7')
 for a,b,c,e in product(range(1,3),repeat=4):
-    x=.6+(b-1)*6.7+(e-1)*2.8; y=3-(a-1)*2-.3-(c-1)*.82
-    d+=box(x-.25,y-.25,x+1.65,y+.5,'8-9' if e==1 else '10-',style='group,dashed' if e==1 else 'group')
+    x=.6+(b-1)*6.7+(e-1)*2.8; y=2.85-(a-1)*2.2-(c-1)*.7
+    d+=box(x-.25,y-.23,x+1.65,y+.45,'8-9' if e==1 else '10-',style='group,dashed' if e==1 else 'group')
 frame('1C. Regroup without moving any outcome','Can the same sixteen outcomes make two groups of eight?',d,
       [('6-7',r'Circle 1 gives eight; circle 2 gives eight. $2\times8=16$.'),
        ('8-9','The eight dashed boxes all end in diamond 1: one group of eight.'),
@@ -212,6 +212,7 @@ d+=box(5.2,2.08,6.6,3.18,'4-')+box(5.2,.48,6.6,1.58,'4-')
 frame('2A. Both possible rows','Does exchanging the objects change the row?',d,
       [('4-','Two first-position groups; one row in each.'),('5-',r'$2\times1=2$ rows. Yes: the objects exchange positions.')],
       'Position numbers below the rows are separate from identifiers above the circles.',section='2. Arrange all distinct objects')
+audit.append(dict(kind='ordered',n=2,r=2,rows=[(1,2),(2,1)],count=2))
 intro('2B. Arrange three distinct objects',3,'Use every object once in three left-to-right positions.')
 d=''
 for a in range(1,4):
@@ -245,11 +246,11 @@ for firsts in [(1,2),(3,4)]:
         d+=node(x+1,3.85,rf'First object: {a}',opts='font=\small')
         others=[v for v in range(1,5) if v!=a]
         for j,b in enumerate(others):
-            y=3.2-j*1.3
+            y=3.2-j*1.35
             remain=[v for v in others if v!=b]
             for k,tail in enumerate(permutations(remain)):
                 d+=row([a,b,*tail],x,y-k*.65,ov=f'{j+2}-',step=.6)
-            d+=box(x-.35,y-.96,x+2.2,y+.48,'5-')
+            d+=box(x-.35,y-.85,x+2.2,y+.46,'5-')
             d+=node(x+3.55,y-.1,rf'Second: {b}',ov='5-',opts='font=\small')
         d+=box(x-.55,-.5,x+4.65,4.05,'6-')
     frame(f'2C. Complete rows starting with {firsts[0]} or {firsts[1]}',
@@ -290,14 +291,15 @@ for a in range(1,4):
 frame('3A. Three one-position assignments','How many choices fill the single job?',d,
       [('5-','Three choices for one position: three assignments.')],
       'Unused objects are absent from the assignment. Only the selected Reader is counted.',section='3. Fill some ordered positions')
+audit.append(dict(kind='ordered',n=3,r=1,rows=[(1,),(2,),(3,)],count=3))
 d=''
 for a in range(1,4):
     x=1.5+(a-1)*4.2
     for j,p in enumerate(p for p in permutations(range(1,4)) if p[0]==a):
         y=2.7-j*1.3
-        d+=row(p,x,y,ov='2-',tail=1,step=.65)
-    d+=node(x,.55,'Reader',opts='font=\small')+node(x+1,.55,'unused tail',opts='font=\small')
-    d+=box(x-.4,.9,x+1.7,3.3,'3-')
+        d+=row(p,x,y,ov='2-',tail=1,step=.9)
+    d+=node(x,.55,'Reader',opts='font=\small')+node(x+1.5,.55,'unused tail',opts='font=\small')
+    d+=box(x-.4,.9,x+2.2,3.3,'3-')
 frame('3A. Full rows overcount the Reader assignment','Do the two faded tail orders change the Reader?',d,
       [('3-','No. Both rows in a box give the same one-position assignment.'),
        ('4-',r'Each assignment has $2!$ orders of its unused objects.'),
@@ -306,8 +308,8 @@ frame('3A. Full rows overcount the Reader assignment','Do the two faded tail ord
 intro('3B. Reader and Recorder from three',3,'One assignment: Reader first, Recorder second. No object repeats.')
 grid_ordered(3,2,'3B. Every ordered two-job assignment')
 frame('3B. The unused object has one order','Why is the unused-tail divisor now only one?',
-      row([1,2,3],5,2.7,tail=2,step=1.2)+node(5,1.8,'Reader',opts='font=\small')+
-      node(6.2,1.8,'Recorder',opts='font=\small')+node(7.4,1.8,'Unused',opts='font=\small'),
+      row([1,2,3],4,2.7,tail=2,step=2.2)+node(4,1.8,'Reader',opts='font=\small')+
+      node(6.2,1.8,'Recorder',opts='font=\small')+node(8.4,1.8,'Unused',opts='font=\small'),
       [('2-','After two jobs are filled, only one object is unused.'),
        ('3-',r'Its single order contributes $1!$: $3!\div1!=6$ assignments.')],
       'Every two-job assignment has exactly one full-row completion; do not divide by two job orders.')
@@ -320,7 +322,7 @@ for a in range(1,5):
         d+=row(p,x,y,step=.5)
 d+=node(3.1,.03,'All twelve assignments',opts='font=\small')
 for j,p in enumerate([(1,2),(1,3)]):
-    x=8.1;y=3-j*1.8
+    x=8.1;y=3-j*2.1
     remain=[v for v in range(1,5) if v not in p]
     for k,t in enumerate(permutations(remain)):
         d+=row([*p,*t],x,y-k*.65,ov=f'{j+2}-',tail=2,step=.8)
@@ -469,7 +471,7 @@ def copies_grid(c,t,counts=False):
             positions=[str(i+1) for i,v in enumerate(ts) if v=='C']
             d+=node(x+.8,y-.73,'Circle positions '+', '.join(positions),ov='2-',opts='font=\small')
     return d,rows
-frame('5B. Two matching circles and two matching triangles','Predict: how many visible rows use these four copies?',
+frame('5B. Two circles and two triangles','Predict: how many visible rows use these four copies?',
       row(['']*4,4.5,2.5,['C','C','T','T'],step=1.1),
       note='Every supplied object is placed once; circle positions determine the visible arrangement.')
 d,rows=copies_grid(2,2)
@@ -492,7 +494,7 @@ for pattern in [('C','C','T','T'),('C','T','C','T')]:
            ('5-','Erase identifiers: all four entries become the same visible row.')],
           'Row changes are independent of column changes. Temporary identifiers disappear at overlay 5; shapes never move.')
 d,rows=copies_grid(2,2,True)
-frame('5B. Every visible row has the same four-version structure','Can we use the same divisor for all six rows?',d,
+frame('5B. Four versions of every visible row','Can we use the same divisor for all six rows?',d,
       [('3-','Yes. In each box: two circle orders and two triangle orders.'),
        ('4-',r'$4!\div(2!\times2!)=24\div4=6$ visible arrangements.')],
       'Each of the six boxes refers to four labelled versions, not four distinct visible arrangements.')
@@ -520,7 +522,7 @@ d=''
 for p in range(4):
     ts=['C']*4;ts[p]='T';x=.8+p*3.35
     d+=row(['']*4,x,2.7,ts,step=.55)+box(x-.3,1,x+2,3.25,'2-')
-    d+=node(x+.8,1.5,'6 labelled versions',ov='2-',opts='font=\small')
+    d+=node(x+.8,1.5,'6 labelled versions',ov='2-',opts='font=\small,text width=2.1cm,align=center')
 frame('5C. The same six-version structure in every box','How many labelled rows altogether?',d,
       [('2-',r'Four visible arrangements; six versions each: $4\times6=24$.'),
        ('3-',r'$4!\div3!=24\div6=4$ visible arrangements.')],
@@ -559,9 +561,21 @@ d+=node(11.4,.6,'All or some? Matching copies?',ov='4-',opts='font=\small,text w
 frame('A visual decision guide','Are we choosing from inputs, assigning positions, or choosing members?',d,
       [('4-','For positions: all distinct objects, some distinct objects, or all matching copies?')],
       'Ask the outcome question first. Membership has no jobs; arrangements keep positions.',section='Synthesis')
+d=node(6.75,3.65,'Positions matter: what is supplied?')
+for x,head,vals,ts,meaning in [
+    (2.1,'All distinct',[1,2,3],['C']*3,'Every object, once.'),
+    (6.75,'Some distinct',[1,2],['C']*2,'Only selected positions.'),
+    (11.4,'All matching copies',['','',''],['C','C','T'],'Ignore exchanges of matching copies.')]:
+    d+=vis(rf'\draw[-{{Stealth}}] (6.75,3.3)--({x},2.8);','2-')
+    d+=node(x,2.45,head,ov='2-',opts=r'font=\bfseries')
+    d+=row(vals,x-.55,1.5,ts,ov='3-')
+    d+=node(x,.4,meaning,ov='3-',opts='text width=3.6cm,align=center,font=\small')
+frame('Decision guide: three kinds of position problems','Do we use all objects or some? Can any supplied copies be told apart?',d,
+      [('4-','Distinct objects keep their identifying numbers. Matching copies have none.')],
+      'Use the distinct-object rules only when every supplied object can be told apart. The matching-copy rule here uses all copies.')
 d=''
 for i,(title,vals,ts,form,meaning) in enumerate([
- ('Input choices',[1,1],['C','T'],r'$2\times3$','2 circle groups; 3 triangle choices each'),
+ ('Input choices',[1,1],['C','T'],r'$2\times3$','2 circle groups; 3 choices each'),
  ('All distinct',[1,2,3],['C']*3,r'$n!$','one fewer choice after every placement'),
  ('Some ordered',[1,2],['C']*2,r'$n!/(n-r)!$','divide by unused-tail orders')]):
     y=3.2-i*1.28
@@ -581,15 +595,15 @@ frame('Oral check 1: input groups','Two circles and two triangles: how many circ
       row([1,2],2,2.7,['C']*2,step=1)+row([1,2],8,2.7,['T']*2,step=1),
       [('2-',r'$2\times2=4$. Each circle leaves two triangle choices.')],
       'Wait for reasoning before overlay 2. Identifiers do not represent numeric values.',section='Oral checks')
-frame('Oral check 2: jobs or members?','From objects 1, 2, 3: how many two-job assignments? Two-member groups?',
+frame('Oral check 2: jobs or members?','Three objects: how many two-job assignments? Two-member groups?',
       row([1,2,3],5,2.6,step=1.1),
       [('2-',r'Jobs: $3\times2=6$. Switching holders changes their jobs.'),
-       ('3-',r'Groups: $6\div2!=3$. Both lists of a pair name the same members.')],
+       ('3-',r'Jobs: $6$. Groups: $6\div2!=3$. Each pair has two lists of the same members.')],
       'Do not reveal the member answer together with the job answer.')
 frame('Oral check 3: matching copies','Two matching circles and one triangle: how many visible rows?',
       row(['','',''],5,2.6,['C','C','T'],step=1.1),
       [('2-',r'$3!\div2!=3$. Each visible row has two circle-label versions.'),
-       ('3-','Every supplied copy appears once. The triangle has three possible positions.')],
+       ('3-','Answer: 3 visible rows. Every supplied copy appears exactly once.')],
       'Ask what the divisor counts before advancing. No labels appear on the real matching copies.')
 
 target.write_text(preamble+'\n'.join(frames)+'\n\\end{document}\n',encoding='utf-8')
