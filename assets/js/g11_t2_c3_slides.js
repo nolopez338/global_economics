@@ -3,6 +3,76 @@
 (() => {
   'use strict';
   const $ = s => document.querySelector(s);
+  // Keep window geometry separate from the demonstration's mathematical state.
+  function setupLaboratory(){
+    const panel=$('#laboratory'),header=$('#laboratory-header'),content=$('#laboratory-content');
+    const toggle=$('#laboratory-toggle'),handle=$('#laboratory-resize');
+    let floating=false,minimized=false,geometry=null,restored=null,gesture=null;
+    function viewport(){
+      const v=window.visualViewport;
+      return {x:(v?.offsetLeft||0)+8,y:(v?.offsetTop||0)+8,
+        width:Math.max(1,(v?.width||innerWidth)-16),height:Math.max(1,(v?.height||innerHeight)-16)};
+    }
+    function fit(rect){
+      const v=viewport();
+      const width=Math.min(v.width,Math.max(Math.min(360,v.width),rect.width));
+      const height=Math.min(v.height,Math.max(Math.min(minimized?64:300,v.height),rect.height));
+      return {width,height,x:Math.max(v.x,Math.min(rect.x,v.x+v.width-width)),y:Math.max(v.y,Math.min(rect.y,v.y+v.height-height))};
+    }
+    function paint(){
+      geometry=fit(geometry);
+      Object.assign(panel.style,{left:`${geometry.x}px`,top:`${geometry.y}px`,width:`${geometry.width}px`,height:minimized?'auto':`${geometry.height}px`});
+    }
+    function detach(){
+      if(floating)return;
+      const r=panel.getBoundingClientRect();
+      geometry={x:r.x,y:r.y,width:r.width,height:r.height};
+      floating=true;panel.classList.add('is-floating');
+      panel.closest('.lesson-body').classList.add('laboratory-detached');paint();
+    }
+    toggle.addEventListener('click',()=>{
+      detach();
+      if(!minimized){restored={...geometry};minimized=true;geometry={...geometry,width:Math.min(geometry.width,360),height:64};}
+      else {minimized=false;geometry={...restored};}
+      content.hidden=minimized;handle.hidden=minimized;
+      panel.classList.toggle('is-minimized',minimized);
+      toggle.setAttribute('aria-expanded',String(!minimized));
+      const label=`${minimized?'Restore':'Minimize'} mathematical demonstration`;
+      toggle.setAttribute('aria-label',label);toggle.title=label;
+      toggle.firstElementChild.textContent=minimized?'□':'−';paint();
+    });
+    function begin(e,kind){
+      if(!e.isPrimary||e.button!==0||e.target.closest('#laboratory-toggle'))return;
+      detach();gesture={id:e.pointerId,kind,x:e.clientX,y:e.clientY,rect:{...geometry}};
+      e.currentTarget.setPointerCapture(e.pointerId);panel.classList.add('is-manipulating');e.preventDefault();
+    }
+    function move(e){
+      if(!gesture||e.pointerId!==gesture.id)return;
+      const {rect,x,y,kind}=gesture,dx=e.clientX-x,dy=e.clientY-y;
+      geometry=kind==='move'?{...rect,x:rect.x+dx,y:rect.y+dy}:{...rect,width:rect.width+dx,height:rect.height+dy};
+      // Resizing is anchored at the top left and cannot grow beyond the viewport.
+      if(kind==='resize'){const v=viewport();geometry.width=Math.min(geometry.width,v.x+v.width-rect.x);geometry.height=Math.min(geometry.height,v.y+v.height-rect.y);}
+      paint();
+    }
+    function end(e){if(gesture?.id===e.pointerId){gesture=null;panel.classList.remove('is-manipulating');}}
+    [[header,'move'],[handle,'resize']].forEach(([target,kind])=>{
+      target.addEventListener('pointerdown',e=>begin(e,kind));
+      target.addEventListener('pointermove',move);
+      ['pointerup','pointercancel','lostpointercapture'].forEach(name=>target.addEventListener(name,end));
+      target.addEventListener('keydown',e=>{
+        if(e.target!==target||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;
+        e.preventDefault();e.stopPropagation();detach();
+        const delta=e.shiftKey?40:10,dx=e.key==='ArrowLeft'?-delta:e.key==='ArrowRight'?delta:0,dy=e.key==='ArrowUp'?-delta:e.key==='ArrowDown'?delta:0;
+        if(kind==='move'){geometry.x+=dx;geometry.y+=dy;}else {geometry.width+=dx;geometry.height+=dy;}
+        paint();
+      });
+    });
+    function refit(){if(floating)paint();}
+    window.addEventListener('resize',refit);
+    window.visualViewport?.addEventListener('resize',refit);
+    window.visualViewport?.addEventListener('scroll',refit);
+    document.addEventListener('fullscreenchange',refit);
+  }
   const colors = {mean:'#ff765c',point:'#9bdd36',sd:'#e42134',size:'#173b17',se:'#f4d94b',confidence:'#55c8f0',critical:'#2648bb',tail:'#408ed8',margin:'#f28a18',bounds:'#f9ca97',width:'#6d3e0b',normal:'#43a5c9'};
   const h = (role, text) => `<mark data-role="${role}" style="--role:${colors[role]}">${text}</mark>`;
   const sym = {mean:'μ',point:'x̄',sd:'σ',size:'n',se:'SE',confidence:'C',critical:'z<sup>*</sup>',tail:'α',margin:'MoE',bounds:'CI',width:'W',normal:'Φ'};
@@ -191,7 +261,7 @@
     chartKey=key;const a=$('#axes');a.replaceChildren();$('#points').replaceChildren();$('#guide').replaceChildren();
     xTicks.forEach(v=>{a.append(element('path',{d:`M${x(v)} 70V355`,class:'grid'}));text(a,x(v),382,v,'tick','middle');});
     yTicks.forEach(v=>{a.append(element('path',{d:`M90 ${y(v)}H710`,class:'grid'}));text(a,78,y(v)+6,v,'tick','end');});
-    a.append(element('path',{d:'M90 60V355H720',class:'axis'}));text(a,400,420,xlabel,'axis-title','middle');text(a,90,35,ylabel,'axis-title');
+    a.append(element('path',{d:'M90 60V355H720',class:'axis',fill:'none'}));text(a,400,420,xlabel,'axis-title','middle');text(a,90,35,ylabel,'axis-title');
     return {x,y};
   }
   function normalPath(z,offset={x:0,y:0,scale:1}){
@@ -204,7 +274,7 @@
     const key=areaMode?'normalArea':'normal';
     if(chartKey!==key){chartKey=key;$('#axes').replaceChildren();$('#points').replaceChildren();$('#guide').replaceChildren();const a=$('#axes');
       const x=v=>90+(v+4)/8*620,y=v=>355-v/.46*285;
-      a.append(element('path',{d:'M90 65V355H720',class:'axis'}));[-4,-3,-2,-1,0,1,2,3,4].forEach(v=>text(a,x(v),382,v,'tick','middle'));[0,.2,.4].forEach(v=>text(a,78,y(v)+5,v,'tick','end'));
+      a.append(element('path',{d:'M90 65V355H720',class:'axis',fill:'none'}));[-4,-3,-2,-1,0,1,2,3,4].forEach(v=>text(a,x(v),382,v,'tick','middle'));[0,.2,.4].forEach(v=>text(a,78,y(v)+5,v,'tick','end'));
       text(a,400,425,'z (unitless)','axis-title','middle');text(a,90,35,'Standard normal density · Z ∼ N(0, 1)','axis-title');
     }
     const n=normalPath(q.z);$('#curve').setAttribute('d',n.curve);$('#curve').style.stroke='#132a3e';$('#area').setAttribute('d',n.area);$('#area').style.fill='#c8edf9';
@@ -297,6 +367,7 @@
     document.querySelectorAll('[data-case]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.case===caseIndex&&+b.dataset.task===(task2()?2:1)));
     $('#locks').querySelectorAll('mark').forEach(el=>el.classList.toggle('focus-match',el.dataset.role===state.focusRole));
   }
+  setupLaboratory();
   $('#next').addEventListener('click',()=>reveal(1));$('#previous').addEventListener('click',()=>reveal(-1));
   $('#slide-select').addEventListener('change',e=>go(+e.target.value));
   $('#scrubber').addEventListener('input',e=>{stop();state.elapsed=0;state.schedule=null;setInput(+e.target.value);});

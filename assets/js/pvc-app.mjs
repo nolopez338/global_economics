@@ -4,10 +4,11 @@ import {TransformControls} from '../vendor/three-0.170.0/TransformControls.js';
 import {Design,CATALOG,RADIUS,INNER_RADIUS,INSERTION,localPorts,port,vec,quat,clone,validate,rectangle} from './pvc-model.mjs';
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const STORAGE='pvc-studio-v1', MAX_HISTORY=80;
+const STORAGE='pvc-studio-v1', ROTATION_STORAGE='pvc-studio-rotation-increment', MAX_HISTORY=80, DRAG_THRESHOLD=4;
+let rotationIncrement=90, pointerGesture=null;
 let model=new Design(), selected=new Set(), selectedJoint=null, tool='select', clipboard=null;
 let undo=[],redo=[],transaction=null,exported=JSON.stringify(model.data()), storageOK=true;
-let placement=null, candidate=null, pickedPorts=[], hovered=null, directDrag=null, marquee=null, gesture=false, cancelledGesture=false;
+let placement=null, candidate=null, pickedPorts=[], hovered=null, directDrag=null, marquee=null, cancelledGesture=false;
 const meshes=new Map(), scene=new THREE.Scene(), parts=new THREE.Group(), overlays=new THREE.Group(), ghost=new THREE.Group();
 const workspace=$('#workspace'), canvas=document.createElement('canvas');canvas.setAttribute('aria-label','Interactive PVC construction canvas');canvas.tabIndex=0;
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
@@ -24,7 +25,7 @@ const grid=new THREE.GridHelper(10000,400,0xaabfc3,0xd7e1e3);grid.material.trans
 const cameraPerspective=new THREE.PerspectiveCamera(42,1,1,100000), cameraOrtho=new THREE.OrthographicCamera(-600,600,600,-600,1,100000);
 let camera=cameraPerspective;camera.position.set(1000,850,1100);
 const orbit=new OrbitControls(camera,canvas);orbit.target.set(0,80,0);orbit.enableDamping=true;orbit.dampingFactor=.12;orbit.maxDistance=30000;orbit.minDistance=80;
-orbit.mouseButtons={LEFT:null,MIDDLE:THREE.MOUSE.PAN,RIGHT:THREE.MOUSE.ROTATE};orbit.update();
+orbit.mouseButtons={LEFT:THREE.MOUSE.PAN,MIDDLE:THREE.MOUSE.PAN,RIGHT:THREE.MOUSE.ROTATE};orbit.update();
 const pivot=new THREE.Object3D();scene.add(pivot);
 const gizmo=new TransformControls(camera,canvas);gizmo.setSize(.8);gizmo.setSpace('world');scene.add(gizmo.getHelper());
 const ray=new THREE.Raycaster(), pointer=new THREE.Vector2();
@@ -37,7 +38,7 @@ function begin(){if(!transaction)transaction=snapshot();}
 function persist(){try{localStorage.setItem(STORAGE,JSON.stringify(model.data()));storageOK=true;}catch{storageOK=false;status('Browser storage is unavailable or full. Use Save JSON to keep your work.',true);}}
 function commit(message){if(transaction&&JSON.stringify(transaction.data)!==JSON.stringify(model.data())){undo.push(transaction);if(undo.length>MAX_HISTORY)undo.shift();redo=[];persist();}transaction=null;refresh();if(message)status(message);}
 function action(fn,message){begin();try{fn();commit(message);}catch(e){restore(transaction);transaction=null;refresh();status(e.message,true);}}
-function history(direction){if(placement)cancelPlacement();const from=direction==='undo'?undo:redo,to=direction==='undo'?redo:undo;if(!from.length)return;to.push(snapshot());restore(from.pop());persist();refresh();status(direction==='undo'?'Undid construction change.':'Redid construction change.');}
+function history(direction){cancelInteraction();if(placement)cancelPlacement();const from=direction==='undo'?undo:redo,to=direction==='undo'?redo:undo;if(!from.length)return;to.push(snapshot());restore(from.pop());persist();refresh();status(direction==='undo'?'Undid construction change.':'Redid construction change.');}
 
 // Geometry: hollow tube walls, annular rims, recessed fitting sockets. No mesh scaling changes diameter.
 function material(color=0xf9fcfb){return new THREE.MeshStandardMaterial({color,roughness:.32,metalness:.04});}
@@ -111,7 +112,7 @@ function finishSnap(){if(candidate){const c=candidate;if(!c.internal){const t=mo
 
 // Inspector and selection state are independent of rendered geometry.
 function setSelection(ids,joint=null){selected=new Set(ids);selectedJoint=joint;pickedPorts=[];refresh();}
-function attach(){gizmo.detach();if(selected.size&&(tool==='translate'||tool==='rotate')){pivot.position.copy(center(selected));pivot.quaternion.identity();pivot.updateMatrixWorld(true);gizmo.setMode(tool);gizmo.setTranslationSnap($('#grid-snap').checked?25:null);gizmo.setRotationSnap($('#grid-snap').checked?Math.PI/12:null);gizmo.attach(pivot);}}
+function attach(){gizmo.detach();if(selected.size&&(tool==='translate'||tool==='move-piece'||tool==='rotate')){pivot.position.copy(center(selected));pivot.quaternion.identity();pivot.updateMatrixWorld(true);gizmo.setMode(tool==='move-piece'?'translate':tool);gizmo.setTranslationSnap($('#grid-snap').checked?25:null);gizmo.setRotationSnap($('#grid-snap').checked?Math.PI/12:null);gizmo.attach(pivot);}}
 function fields(container,prefix){for(const axis of ['x','y','z']){const label=document.createElement('label');label.textContent=axis.toUpperCase();const input=document.createElement('input');input.type='number';input.step=prefix==='position'?'1':'5';input.id=`${prefix}-${axis}`;input.setAttribute('aria-label',`${prefix} ${axis.toUpperCase()}`);label.append(input);$(container).append(label);input.addEventListener('change',()=>numericTransform(prefix,axis,input));}}
 fields('#position-fields','position');fields('#rotation-fields','rotation');
 function inspector(){
@@ -134,13 +135,31 @@ function inspector(){
 function pickPort(endpoint){if(model.occupied(endpoint.id,endpoint.port)){status('This port is occupied. Select and detach its joint first.',true);return;}selectedJoint=null;const i=pickedPorts.findIndex(e=>e.id===endpoint.id&&e.port===endpoint.port);if(i>=0)pickedPorts.splice(i,1);else{if(pickedPorts.length===2)pickedPorts=[];pickedPorts.push(endpoint);}inspector();showOverlays();status(pickedPorts.length===2?'Connect selected ports to align the assemblies.':'Port selected. Shift-select another piece, or choose a second port in Joints mode.');}
 function fmt(n){return Number(n.toFixed(3)).toLocaleString('en-US',{maximumFractionDigits:3});}function round(n){return Math.round(n*1000)/1000;}
 function summary(){const data=model.summary();$('#summary').replaceChildren();if(!data.rows.length)$('#summary').textContent='Your cut list will appear here.';for(const [name,count] of data.rows){const row=document.createElement('div');row.className='summary-row';const label=document.createElement('span'),value=document.createElement('b');label.textContent=name;value.textContent=`Ã— ${count}`;row.append(label,value);$('#summary').append(row);}$('#total-length').textContent=`${fmt(data.total)} mm`;$('#summary-count').textContent=`${model.pieces.length} pieces`;}
-function refresh(){sync();inspector();summary();attach();showOverlays();$('#undo').disabled=!undo.length;$('#redo').disabled=!redo.length;$('#paste').disabled=!clipboard;$('#copy').disabled=!selected.size;$('#delete').disabled=!selected.size&&!selectedJoint;$('#save-state').textContent=storageOK?'Saved on this device':'Save JSON to keep your work';}
-function setTool(next){if(placement)cancelPlacement();tool=next;$$('[data-tool]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tool===tool));attach();showOverlays();canvas.style.cursor=tool==='marquee'?'crosshair':'default';status(({select:'Click to select Â· Shift-click toggles Â· right drag orbits.',translate:'Drag an axis handle or a piece to move. Nearby compatible ports preview a snap.',rotate:'Drag a rotation ring. Connected pieces rotate together.',marquee:'Left drag selects pieces whose centres are inside the rectangle. Shift adds to selection.',joints:'Click cyan joint markers to inspect and detach. Free port markers can be paired.'})[tool]);}
+function refresh(){updateInstructions();sync();inspector();summary();attach();showOverlays();$('#undo').disabled=!undo.length;$('#redo').disabled=!redo.length;$('#paste').disabled=!clipboard;$('#copy').disabled=!selected.size;$('#delete').disabled=!selected.size&&!selectedJoint;$('#save-state').textContent=storageOK?'Saved on this device':'Save JSON to keep your work';}
+function updateInstructions(){
+  const degrees=`${rotationIncrement}°`;
+  $$('[data-turn]').forEach(b=>{const axis=b.dataset.turn;b.textContent=b.dataset.rotationLabel?`${b.dataset.rotationLabel} +${degrees} (${axis==='y'?'Q':'E'})`:`${axis.toUpperCase()} +${degrees}`;b.title=`Rotate around world ${axis.toUpperCase()} by ${degrees}`;b.disabled=!placement&&!selected.size;});
+  $('#placement-bar').textContent=`Click to place · Q: horizontal ${degrees} · E: vertical ${degrees} · Esc: cancel`;
+  $('#movement-bar').hidden=tool!=='move-piece'||!!placement;
+  workspace.dataset.mode=placement?'placement':tool;
+}
+function setTool(next){cancelInteraction();if(placement)cancelPlacement();tool=next;$$('[data-tool]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tool===tool||(tool==='move-piece'&&b.dataset.tool==='translate')));attach();showOverlays();updateInstructions();canvas.style.cursor=tool==='marquee'?'crosshair':tool==='move-piece'?'grab':'default';status(({select:'Click selects · Shift-click toggles · left drag pans · right drag orbits · double-click a piece to move.',translate:'Drag an axis handle to move. Double-click a piece for plane movement. Q/E rotate.', 'move-piece':'Piece movement mode · drag a highlighted piece on the working plane · Q/E rotate · Esc or Select exits.',rotate:'Drag a rotation ring, or Q/E for horizontal/vertical increments. Connected pieces rotate together.',marquee:'Left drag selects pieces whose centres are inside the rectangle. Shift adds to selection.',joints:'Click cyan joint markers to inspect and detach. Free port markers can be paired.'})[tool]);}
+function rotateDiscrete(axis){
+  if(transaction||pointerGesture||gizmo.dragging)return;
+  const rotation=new THREE.Quaternion().setFromAxisAngle(vec(axis==='x'?[1,0,0]:axis==='y'?[0,1,0]:[0,0,1]),THREE.MathUtils.degToRad(rotationIncrement));
+  if(placement){placement.q=rotation.multiply(quat(placement.q)).normalize().toArray();delete placement.target;previewPlacement();showOverlays();return;}
+  if(selected.size)action(()=>model.transform(expanded(),rotation,center(selected)),`Rotated the connected selection around world ${axis.toUpperCase()} by ${rotationIncrement}°.`);
+}
+function setRotationIncrement(value){
+  if(!Number.isFinite(value)||value<=0){status('Rotation increment must be a positive finite number.',true);$('#rotation-custom').value=rotationIncrement;return;}
+  rotationIncrement=value;$('#rotation-increment').value=[15,30,45,90].includes(value)?String(value):'custom';$('#rotation-custom-label').hidden=$('#rotation-increment').value!=='custom';$('#rotation-custom').value=value;
+  try{localStorage.setItem(ROTATION_STORAGE,String(value));}catch{status('Rotation preference could not be saved on this browser.',true);}updateInstructions();
+}
 function numericTransform(prefix,axis,input){if(!Number.isFinite(input.valueAsNumber)||Math.abs(input.valueAsNumber)>100000){inspector();status('Enter a finite value between âˆ’100,000 and 100,000.',true);return;}const anchor=model.pieces.find(p=>selected.has(p.id));if(!anchor)return;action(()=>{if(prefix==='position'){const delta=new THREE.Vector3();delta[axis]=input.valueAsNumber-anchor.p[['x','y','z'].indexOf(axis)];model.transform(expanded(),undefined,undefined,delta);}else{const e=new THREE.Euler().setFromQuaternion(quat(anchor.q),'XYZ');e[axis]=THREE.MathUtils.degToRad(input.valueAsNumber);const q=new THREE.Quaternion().setFromEuler(e).multiply(quat(anchor.q).invert());model.transform(expanded(),q,vec(anchor.p));}},'Transform applied to the connected selection.');}
 
 // Gizmo gestures are one transaction, even though the state and snap preview update every frame.
 gizmo.addEventListener('dragging-changed',e=>{
-  orbit.enabled=!e.value;if(e.value){begin();baseTransform=clone(model.data());activeIds=expanded();gesture=true;cancelledGesture=false;}
+  orbit.enabled=!e.value;if(e.value){begin();baseTransform=clone(model.data());activeIds=expanded();cancelledGesture=false;}
   else if(transaction){if(cancelledGesture){restore(transaction);transaction=null;}else{try{finishSnap();commit();}catch(error){restore(transaction);transaction=null;refresh();status(error.message,true);}}baseTransform=null;refresh();}
 });
 gizmo.addEventListener('objectChange',()=>{
@@ -152,40 +171,74 @@ function centerFrom(m,ids){const a=new THREE.Vector3();let n=0;for(const p of m.
 // Placement uses an explicit working plane and an actual hollow-geometry preview.
 function workPlane(through=null){const mode=$('#plane').value,normal=mode==='front'?vec([0,0,1]):mode==='side'?vec([1,0,0]):vec([0,1,0]);const value=Number($('#plane-offset').value)||0;return new THREE.Plane(normal,through?-normal.dot(through):-value);}
 function setRay(event){const r=canvas.getBoundingClientRect();pointer.set((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);}
-function planePoint(event,plane=workPlane()){setRay(event);const hit=ray.ray.intersectPlane(plane,new THREE.Vector3());if(!hit)return null;if($('#grid-snap').checked)hit.toArray().forEach((v,i)=>hit.setComponent(i,Math.round(v/25)*25));return hit;}
-function startPlacement(type){cancelPlacement();selectedJoint=null;placement={type,p:[0,60,0],q:[0,0,0,1],length:400};orbit.enabled=false;gizmo.detach();$('#placement-bar').hidden=false;$('#empty').hidden=true;canvas.style.cursor='crosshair';previewPlacement();status(`Placing ${CATALOG[type].name}. Move into the workspace; click to commit. Q rotates.`);}
+function planePoint(event,plane=workPlane(),snap=true){setRay(event);const hit=ray.ray.intersectPlane(plane,new THREE.Vector3());if(!hit)return null;if(snap&&$('#grid-snap').checked)hit.toArray().forEach((v,i)=>hit.setComponent(i,Math.round(v/25)*25));return hit;}
+function startPlacement(type){cancelInteraction();cancelPlacement();selectedJoint=null;placement={type,p:[0,60,0],q:[0,0,0,1],length:400};orbit.enabled=false;gizmo.detach();$('#placement-bar').hidden=false;$('#empty').hidden=true;canvas.style.cursor='crosshair';previewPlacement();updateInstructions();status(`Placing ${CATALOG[type].name}. Move into the workspace; click to commit. Q rotates horizontally; E vertically.`);}
 function previewPlacement(){clearGhost();if(!placement)return;const g=geometry({...placement,id:'preview'});g.position.copy(vec(placement.p));g.quaternion.copy(quat(placement.q));g.traverse(o=>{if(o.isMesh){o.material.transparent=true;o.material.opacity=.55;o.material.color.set(0x2aadaf);o.material.depthWrite=false;o.castShadow=false;}});ghost.add(g);}
 function updatePlacement(event){const point=planePoint(event);if(!point){status('Working plane is edge-on. Choose a different plane or camera view.',true);return false;}if($('#plane').value==='ground')point.y+=placement.type==='tube'?RADIUS:22;placement.p=point.toArray();
   const temp=model.add(placement.type,placement.p,placement.length,placement.q);findCandidate(new Set([temp.id]));if(candidate){const t=model.alignment(candidate.a,candidate.b);placement.p=vec(temp.p).sub(t.pivot).applyQuaternion(t.rotation).add(t.pivot).add(t.translation).toArray();placement.q=t.rotation.multiply(quat(temp.q)).toArray();placement.target={...candidate.b};}else delete placement.target;model.pieces.pop();candidate=null;previewPlacement();showOverlays();if(placement.target){marker(port(model.get(placement.target.id),placement.target.port).position,0x00dce0,9,{candidate:true});const p={...placement,id:'preview'},idx=localPorts(p).findIndex((_,i)=>port(p,i).position.distanceTo(port(model.get(placement.target.id),placement.target.port).position)<.05);if(idx>=0)marker(port(p,idx).position,0x00dce0,9,{candidate:true});}return true;}
-function commitPlacement(){const spec=clone(placement);cancelPlacement();action(()=>{const piece=model.add(spec.type,spec.p,spec.length,spec.q);if(spec.target){const target=port(model.get(spec.target.id),spec.target.port);const i=localPorts(piece).findIndex((_,i)=>port(piece,i).position.distanceTo(target.position)<.05);if(i<0)throw Error('Snap target changed; place the piece again.');model.connect({id:piece.id,port:i},spec.target,false);}selected=new Set([piece.id]);selectedJoint=null;},spec.target?'Placed and connected.':'Piece placed. Select Move to position it precisely.');}
-function cancelPlacement(){placement=null;candidate=null;clearGhost();$('#placement-bar').hidden=true;orbit.enabled=true;canvas.style.cursor='default';showOverlays();$('#empty').hidden=!!model.pieces.length;attach();}
+function commitPlacement(){const spec=clone(placement);cancelPlacement();action(()=>{const piece=model.add(spec.type,spec.p,spec.length,spec.q);if(spec.target){const target=port(model.get(spec.target.id),spec.target.port);const i=localPorts(piece).findIndex((_,i)=>port(piece,i).position.distanceTo(target.position)<.05);if(i<0)throw Error('Snap target changed; place the piece again.');model.connect({id:piece.id,port:i},spec.target,false);}selected=new Set([piece.id]);selectedJoint=null;},spec.target?'Placed and connected.':'Piece placed. Double-click it for movement mode; Q/E rotate the selection.');}
+function cancelPlacement(){placement=null;candidate=null;clearGhost();$('#placement-bar').hidden=true;orbit.enabled=true;canvas.style.cursor='default';showOverlays();$('#empty').hidden=!!model.pieces.length;attach();updateInstructions();}
 function hitPiece(event){setRay(event);const hit=ray.intersectObjects(parts.children,true)[0];if(!hit)return null;let o=hit.object;while(o&&!o.userData.id)o=o.parent;return o?.userData.id||null;}
 function hitOverlay(event){setRay(event);return ray.intersectObjects(overlays.children,false).find(h=>!h.object.userData.candidate)?.object.userData;}
 
+// Capture assigns one owner before OrbitControls / TransformControls see a gesture.
+// Camera input stays with OrbitControls, but sub-threshold motion never reaches it.
+function cancelInteraction(){
+  if(pointerGesture)pointerGesture.cancelled=true;
+  cancelledGesture=true;baseTransform=null;sliderBase=null;
+  if(transaction){restore(transaction);transaction=null;}
+  if(gizmo.dragging)gizmo.pointerUp({button:0});
+  directDrag=null;marquee=null;$('#marquee-box').hidden=true;candidate=null;clearGhost();orbit.enabled=!placement;refresh();
+}
+function clickSelection(e){const id=hitPiece(e);if(id){const next=e.shiftKey?new Set(selected):new Set();if(e.shiftKey&&next.has(id))next.delete(id);else next.add(id);setSelection(next);}else if(!e.shiftKey)setSelection([]);}
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 canvas.addEventListener('pointerdown',e=>{
-  if(e.button!==0)return;gesture=gizmo.dragging;cancelledGesture=false;if(placement||gizmo.dragging||gizmo.axis)return;
-  const overlay=hitOverlay(e);if(tool==='joints'&&overlay){if(overlay.joint){selectedJoint=overlay.joint;selected.clear();inspector();sync();attach();showOverlays();}else if(overlay.endpoint)pickPort(overlay.endpoint);gesture=true;return;}
-  if(tool==='marquee'){const r=canvas.getBoundingClientRect();marquee={x:e.clientX-r.left,y:e.clientY-r.top,shift:e.shiftKey};orbit.enabled=false;canvas.setPointerCapture(e.pointerId);gesture=true;return;}
-  const id=hitPiece(e);if(id){if(e.shiftKey){const next=new Set(selected);next.has(id)?next.delete(id):next.add(id);setSelection(next);}else if(!selected.has(id))setSelection([id]);
-    if(tool==='translate'&&!e.shiftKey&&selected.has(id)){const plane=workPlane(vec(model.get(id).p)),start=planePoint(e,plane);if(start){begin();directDrag={plane,start,base:clone(model.data()),ids:expanded(),moved:false};orbit.enabled=false;canvas.setPointerCapture(e.pointerId);}}}
-  else if(!e.shiftKey)setSelection([]);
-});
+  if(e.button!==0||pointerGesture)return;
+  canvas.focus();cancelledGesture=false;
+  const owner=placement?'placement':gizmo.axis&&gizmo.object?'gizmo':tool==='marquee'?'marquee':tool==='joints'?'joint':tool==='move-piece'&&!e.shiftKey&&hitPiece(e)?'piece':e.shiftKey?'click':'camera';
+  pointerGesture={owner,id:e.pointerId,x:e.clientX,y:e.clientY,moved:false,cancelled:false};
+  if(owner==='camera'||owner==='gizmo')return;
+  e.stopImmediatePropagation();canvas.setPointerCapture(e.pointerId);
+  if(owner==='marquee'){const r=canvas.getBoundingClientRect();marquee={x:e.clientX-r.left,y:e.clientY-r.top,shift:e.shiftKey};}
+  if(owner==='piece'){
+    const id=hitPiece(e);if(!expanded().has(id))setSelection([id]);
+    const plane=workPlane(vec(model.get(id).p)),start=planePoint(e,plane,false);
+    if(start)directDrag={plane,start,base:clone(model.data()),ids:expanded(),moved:false};
+    else status('Working plane is edge-on. Choose a different plane or camera view.',true);
+  }
+},true);
 canvas.addEventListener('pointermove',e=>{
+  const g=pointerGesture;
+  if(g&&g.id===e.pointerId){
+    g.moved ||= Math.hypot(e.clientX-g.x,e.clientY-g.y)>=DRAG_THRESHOLD;
+    if(g.owner!=='camera'&&g.owner!=='gizmo'||!g.moved)e.stopImmediatePropagation();
+    if(g.cancelled)return;
+    if(g.owner==='camera'||g.owner==='gizmo'||!g.moved)return;
+    if(marquee){const r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,b=$('#marquee-box');b.hidden=false;Object.assign(b.style,{left:Math.min(x,marquee.x)+'px',top:Math.min(y,marquee.y)+'px',width:Math.abs(x-marquee.x)+'px',height:Math.abs(y-marquee.y)+'px'});return;}
+    if(directDrag){const point=planePoint(e,directDrag.plane,false);if(point){begin();const delta=point.sub(directDrag.start);if($('#grid-snap').checked)delta.toArray().forEach((v,i)=>delta.setComponent(i,Math.round(v/25)*25));directDrag.moved=true;model=new Design(directDrag.base);model.transform(directDrag.ids,undefined,undefined,delta);sync();findCandidate(directDrag.ids);}return;}
+  }
   if(placement){updatePlacement(e);return;}
-  if(marquee){const r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,b=$('#marquee-box');b.hidden=false;Object.assign(b.style,{left:Math.min(x,marquee.x)+'px',top:Math.min(y,marquee.y)+'px',width:Math.abs(x-marquee.x)+'px',height:Math.abs(y-marquee.y)+'px'});return;}
-  if(directDrag){const point=planePoint(e,directDrag.plane);if(point){const delta=point.sub(directDrag.start);directDrag.moved=delta.length()>.1;model=new Design(directDrag.base);model.transform(directDrag.ids,undefined,undefined,delta);sync();findCandidate(directDrag.ids);}return;}
   if(gizmo.dragging)return;const id=hitPiece(e);if(id!==hovered){hovered=id;paint();}
-});
+},true);
 canvas.addEventListener('pointerleave',()=>{hovered=null;paint();});
 canvas.addEventListener('pointerup',e=>{
-  if(e.button!==0)return;
-  if(placement){if(updatePlacement(e))commitPlacement();return;}
-  if(marquee){const r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,next=marquee.shift?new Set(selected):new Set();for(const p of model.pieces){const v=vec(p.p).project(camera),sx=(v.x+1)/2*r.width,sy=(1-v.y)/2*r.height;if(v.z>=-1&&v.z<=1&&sx>=Math.min(x,marquee.x)&&sx<=Math.max(x,marquee.x)&&sy>=Math.min(y,marquee.y)&&sy<=Math.max(y,marquee.y))next.add(p.id);}marquee=null;$('#marquee-box').hidden=true;orbit.enabled=true;setSelection(next);}
-  if(directDrag){try{if(directDrag.moved)finishSnap();commit();}catch(error){restore(transaction);transaction=null;refresh();status(error.message,true);}directDrag=null;orbit.enabled=true;}
-  if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);
-});
-canvas.addEventListener('pointercancel',()=>{if(transaction){restore(transaction);transaction=null;}directDrag=null;marquee=null;$('#marquee-box').hidden=true;orbit.enabled=true;candidate=null;clearGhost();refresh();});
+  const g=pointerGesture;if(e.button!==0||!g||g.id!==e.pointerId)return;
+  pointerGesture=null;
+  const owned=g.owner!=='camera'&&g.owner!=='gizmo';if(owned)e.stopImmediatePropagation();
+  if(!g.cancelled){
+    if(g.owner==='placement'&&placement){if(!g.moved&&updatePlacement(e))commitPlacement();}
+    else if(marquee){const r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,next=marquee.shift?new Set(selected):new Set();if(g.moved)for(const p of model.pieces){const v=vec(p.p).project(camera),sx=(v.x+1)/2*r.width,sy=(1-v.y)/2*r.height;if(v.z>=-1&&v.z<=1&&sx>=Math.min(x,marquee.x)&&sx<=Math.max(x,marquee.x)&&sy>=Math.min(y,marquee.y)&&sy<=Math.max(y,marquee.y))next.add(p.id);}marquee=null;$('#marquee-box').hidden=true;setSelection(next);}
+    else if(directDrag){try{if(directDrag.moved){finishSnap();commit('Moved the connected selection. Piece movement mode remains active.');}}catch(error){restore(transaction);transaction=null;refresh();status(error.message,true);}directDrag=null;}
+    else if(!g.moved&&g.owner!=='gizmo'){
+      const overlay=g.owner==='joint'?hitOverlay(e):null;
+      if(overlay?.joint){selectedJoint=overlay.joint;selected.clear();refresh();}else if(overlay?.endpoint)pickPort(overlay.endpoint);else clickSelection(e);
+    }
+  }
+  if(owned&&canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);
+},true);
+canvas.addEventListener('dblclick',e=>{if(e.button!==0||placement||pointerGesture||tool==='marquee'||tool==='joints'||gizmo.dragging)return;const id=hitPiece(e);if(id){setSelection([id]);setTool('move-piece');}});
+canvas.addEventListener('pointercancel',()=>{cancelInteraction();pointerGesture=null;});
+canvas.addEventListener('lostpointercapture',()=>{if(pointerGesture){cancelInteraction();pointerGesture=null;}});
 workspace.addEventListener('dragover',e=>{if(placement){e.preventDefault();e.dataTransfer.dropEffect='copy';updatePlacement(e);}});
 workspace.addEventListener('drop',e=>{e.preventDefault();if(placement&&updatePlacement(e))commitPlacement();});
 
@@ -199,7 +252,11 @@ $('#length-slider').addEventListener('input',e=>editLength(e.target.value));
 $('#length-slider').addEventListener('change',()=>{sliderBase=null;commit('Tube cut length updated; valid joints preserved.');});
 $('#length-slider').addEventListener('blur',()=>{if(sliderBase){sliderBase=null;commit();}});
 $$('[data-tool]').forEach(b=>b.onclick=()=>setTool(b.dataset.tool));
-$$('[data-turn]').forEach(b=>b.onclick=()=>{if(selected.size)action(()=>model.transform(expanded(),new THREE.Quaternion().setFromAxisAngle(vec(b.dataset.turn==='x'?[1,0,0]:b.dataset.turn==='y'?[0,1,0]:[0,0,1]),Math.PI/2),center(selected)),'Rotated the connected selection by 90Â°.');});
+$$('[data-turn]').forEach(b=>b.onclick=()=>rotateDiscrete(b.dataset.turn));
+$('#rotation-increment').onchange=e=>{const custom=e.target.value==='custom';$('#rotation-custom-label').hidden=!custom;if(custom){$('#rotation-custom').focus();}else setRotationIncrement(Number(e.target.value));};
+$('#rotation-custom').onchange=e=>setRotationIncrement(e.target.valueAsNumber);
+try{const saved=Number(localStorage.getItem(ROTATION_STORAGE));if(saved>0&&Number.isFinite(saved))rotationIncrement=saved;}catch{}
+setRotationIncrement(rotationIncrement);
 $('#undo').onclick=()=>history('undo');$('#redo').onclick=()=>history('redo');
 $('#copy').onclick=()=>{if(selected.size){clipboard=model.copy(selected);$('#paste').disabled=false;status(`Copied ${clipboard.pieces.length} pieces and ${clipboard.connections.length} internal joints.`);}};
 $('#paste').onclick=()=>{if(clipboard)action(()=>{selected=model.paste(clipboard);selectedJoint=null;},'Pasted with fresh IDs, preserved internal joints, and an 80 mm offset.');};
@@ -230,10 +287,10 @@ $('#camera').onchange=e=>{const view=e.target.value,target=orbit.target.clone();
 function orientation(){const inverse=camera.quaternion.clone().invert(),lines=$('#axis-lines');lines.replaceChildren();for(const [axis,label,color] of [[[1,0,0],'X','#c45b55'],[[0,1,0],'Y','#479a69'],[[0,0,1],'Z','#558dc7']]){const v=vec(axis).applyQuaternion(inverse),x=42+v.x*27,y=42-v.y*27;const line=document.createElementNS('http://www.w3.org/2000/svg','line');for(const [k,val] of Object.entries({x1:42,y1:42,x2:x,y2:y,stroke:color,'stroke-width':2}))line.setAttribute(k,val);const text=document.createElementNS(line.namespaceURI,'text');text.setAttribute('x',x-4);text.setAttribute('y',y-5);text.setAttribute('fill',color);text.setAttribute('font-size',11);text.textContent=label;lines.append(line,text);}}
 let animation;function render(){animation=requestAnimationFrame(render);orbit.update();orientation();renderer.render(scene,camera);}resize();refresh();render();
 window.addEventListener('keydown',e=>{
-  if(e.target.closest('input,textarea,select,[contenteditable=true]')||$('#help').open)return;const key=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
+  if((e.target.closest('input,textarea,select')||e.target.isContentEditable)||$('#help').open)return;const key=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
   if(mod&&['c','v','z','y','a'].includes(key)){e.preventDefault();if(key==='c')$('#copy').click();if(key==='v')$('#paste').click();if(key==='z')history(e.shiftKey?'redo':'undo');if(key==='y')history('redo');if(key==='a')$('#select-all').click();return;}
-  if(key==='escape'){e.preventDefault();if(placement){cancelPlacement();status('Placement cancelled.');}else if(transaction){cancelledGesture=true;restore(transaction);transaction=null;baseTransform=null;directDrag=null;sliderBase=null;candidate=null;clearGhost();orbit.enabled=true;refresh();status('Transform cancelled.');}else{setSelection([]);pickedPorts=[];showOverlays();}return;}
-  if(placement&&key==='q'){placement.q=new THREE.Quaternion().setFromAxisAngle(vec([0,1,0]),Math.PI/2).multiply(quat(placement.q)).toArray();delete placement.target;previewPlacement();return;}
+  if(key==='escape'){e.preventDefault();const moving=tool==='move-piece';if(placement){cancelInteraction();cancelPlacement();status('Placement cancelled.');}else if(transaction||pointerGesture||moving){cancelInteraction();if(moving)setTool('select');status('Transform cancelled; piece movement mode exited.');}else{setSelection([]);pickedPorts=[];showOverlays();}return;}
+  if(!mod&&(key==='q'||key==='e')){e.preventDefault();if(!e.repeat)rotateDiscrete(key==='q'?'y':'x');return;}
   if(placement)return;if(key==='delete'||key==='backspace'){e.preventDefault();$('#delete').click();}if(key==='f')frame();if(key==='g')setTool('translate');if(key==='r')setTool('rotate');if(key==='v')setTool('select');
 });
 window.addEventListener('pagehide',event=>{if(event.persisted)return;cancelAnimationFrame(animation);observer.disconnect();gizmo.dispose();orbit.dispose();clearGroup(parts);clearGroup(overlays);clearGroup(ghost);grid.geometry.dispose();grid.material.dispose();floor.geometry.dispose();floor.material.dispose();renderer.dispose();});
