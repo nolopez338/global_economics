@@ -1,4 +1,4 @@
-import {Design, validate, vec, quat} from '../assets/js/pvc-model.mjs';
+import {Design, validate, vec, quat, rectangle} from '../assets/js/pvc-model.mjs';
 const iframe=document.querySelector('#app'), results=document.querySelector('#results');
 let w,d,c,api;
 const assert=(ok,message)=>{if(!ok)throw Error(message);};
@@ -123,4 +123,54 @@ await test('Discrete on-screen buttons share the custom increment for previews a
   tap(screen([0,0,0]));const before=state();click('.rotate-buttons [data-turn="z"]');assert(state().undo===before.undo+1,'Axis button transaction');
   const q=quat([0,0,0,1]).setFromAxisAngle(vec([0,0,1]),12.5*Math.PI/180).multiply(quat(before.data.pieces[0].q));assert(near(Math.abs(quat(state().data.pieces[0].q).dot(q)),1),'Axis button increment');
 });
+await test('Length units cycle globally without changing geometry, history or fractional dimensions',async()=>{
+  const m=new Design();m.add('tube',[123.456789,120,-80.123456],456.789123);m.add('tube',[600,120,0],1000);
+  await load(m);tap(screen(m.pieces[0].p));change('#plane-offset','123.456789');
+  const before=state();
+  for(let cycle=0;cycle<20;cycle++)for(const [unit,factor] of [['cm',10],['m',1000],['mm',1]]){
+    click('#length-unit');
+    assert(d.querySelector('#length-unit').textContent===unit,'Cycle order');
+    assert(near(Number(d.querySelector('#length').value),456.789123/factor,.001/factor),'Cut input');
+    assert(near(Number(d.querySelector('#position-x').value),123.456789/factor,.001/factor),'Position input');
+    assert(near(Number(d.querySelector('#plane-offset').value),123.456789/factor,.001/factor),'Plane input');
+    assert(Number(d.querySelector('#length').min)===80/factor&&Number(d.querySelector('#length-slider').max)===3000/factor,'Bounds');
+    assert(Number(d.querySelector('#length-slider').step)===1/factor,'Slider step');
+    for(const selector of ['.spec','.panel-note','.workspace-tag','#transform-section h3','#summary','#total-length','.footer-spec','#help']){
+      const text=d.querySelector(selector).textContent;
+      assert(text.includes(unit),'Missing selected unit in '+selector);
+      if(unit!=='mm')assert(!/\bmm\b|millimetres/.test(text),'Stale millimetres in '+selector);
+    }
+    assert(same(state().data,before.data)&&state().undo===before.undo,'Toggle changed canonical data/history');
+    // Unchanged rounded inputs must never be written back into geometry.
+    change('#length',d.querySelector('#length').value);change('#position-x',d.querySelector('#position-x').value);
+    assert(same(state().data,before.data),'Rounded display written back');
+  }
+});
+await test('Length, slider, position and plane edits use the current unit; undo and limits retain millimetres',async()=>{
+  for(const [unit,factor,clicks] of [['mm',1,0],['cm',10,1],['m',1000,2]]){
+    const m=new Design();m.add('tube',[0,120,0]);await load(m);click('#select-all');
+    for(let i=0;i<clicks;i++)click('#length-unit');
+    change('#length',String(725.125/factor));assert(near(state().data.pieces[0].length,725.125),'Length edit in '+unit);
+    assert(d.querySelector('#summary').textContent.includes(unit),'Cut list label');
+    change('#position-x',String(-321.5/factor));assert(near(state().data.pieces[0].p[0],-321.5),'Position edit');
+    change('#plane-offset',String(250/factor));
+    const slider=d.querySelector('#length-slider');slider.value=String(900/factor);slider.dispatchEvent(new w.Event('input',{bubbles:true}));slider.dispatchEvent(new w.Event('change',{bubbles:true}));
+    assert(near(state().data.pieces[0].length,900)&&near(Number(d.querySelector('#length').value),900/factor),'Slider edit');
+    click('#undo');assert(near(state().data.pieces[0].length,725.125),'Undo canonical length');click('#redo');
+    const before=state();change('#length',String(79/factor));assert(same(state().data,before.data),'Accepted invalid cut length');
+    assert(d.querySelector('#status').textContent.includes(unit),'Error unit');
+    change('#position-x',String(100001/factor));assert(same(state().data,before.data),'Position limit changed');
+    // A newly placed tube uses the selected-unit offset without scaling its geometry.
+    change('#plane','front');change('#camera','front');click('[data-type="tube"]');
+    pointer('pointermove',screen([0,0,250]),{buttons:0});
+    assert(near(state().placement.p[2],250),'Plane offset converted incorrectly');key('Escape');
+  }
+});
+await test('Converted length edits preserve connected joints and closed-loop locking',async()=>{
+  await load(connectedPair());tap(screen(state().data.pieces[0].p));click('#length-unit');click('#length-unit');
+  change('#length','0.875');validate(state().data);assert(near(state().data.pieces[0].length,875),'Connected resize');
+  await load(rectangle());tap(screen(state().data.pieces.find(p=>p.type==='tube').p));click('#length-unit');
+  assert(d.querySelector('#length').disabled&&d.querySelector('#length-slider').disabled,'Closed-loop lock lost');
+});
+
 document.title=results.querySelector('.fail')?'FAIL · PVC interaction tests':'PASS · PVC interaction tests';

@@ -5,6 +5,25 @@ import {Design,CATALOG,RADIUS,INNER_RADIUS,INSERTION,localPorts,port,vec,quat,cl
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const STORAGE='pvc-studio-v1', ROTATION_STORAGE='pvc-studio-rotation-increment', MAX_HISTORY=80, DRAG_THRESHOLD=4;
+// Geometry, history and portable designs always remain in millimetres.
+const LENGTH_UNITS=['mm','cm','m'], LENGTH_SCALES={mm:1,cm:10,m:1000};
+let lengthUnit='mm', planeOffset=0, statusSource='Ready. Choose a component to start building.';
+const scale=()=>LENGTH_SCALES[lengthUnit];
+const displayLength=n=>Number((n/scale()).toFixed({mm:3,cm:4,m:6}[lengthUnit]));
+const lengthText=n=>`${displayLength(n).toLocaleString('en-US',{maximumFractionDigits:6})} ${lengthUnit}`;
+const lengthTemplates=[];
+function unitText(text){return text.replace(/(\d[\d,]*(?:\.\d+)?)[–−](\d[\d,]*(?:\.\d+)?) mm\b/g,(_,a,b)=>`${displayLength(Number(a.replaceAll(',','')))}–${lengthText(Number(b.replaceAll(',','')))}`).replace(/(-?\d[\d,]*(?:\.\d+)?) mm\b/g,(_,n)=>lengthText(Number(n.replaceAll(',','')))).replace(/\bmm\b/g,lengthUnit).replace('millimetres',({mm:'millimetres',cm:'centimetres',m:'metres'})[lengthUnit]);}
+function showLengthInput(input,value){input.value=displayLength(value);input.dataset.displayValue=input.value;}
+function updateLengthUnits(){
+  for(const [node,text] of lengthTemplates)node.textContent=unitText(text);
+  const next=LENGTH_UNITS[(LENGTH_UNITS.indexOf(lengthUnit)+1)%3],button=$('#length-unit');
+  button.textContent=lengthUnit;button.setAttribute('aria-label',`Length unit: ${lengthUnit}. Switch to ${next}`);
+  for(const id of ['length','length-slider']){const input=$('#'+id);input.min=80/scale();input.max=3000/scale();input.step=1/scale();input.setAttribute('aria-label',`Tube cut length${id==='length-slider'?' slider':''} in ${lengthUnit}`);}
+  for(const axis of ['x','y','z']){const input=$('#position-'+axis);input.step=1/scale();input.setAttribute('aria-label',`position ${axis.toUpperCase()} in ${lengthUnit}`);}
+  $('#plane-offset').setAttribute('aria-label',`Plane offset in ${lengthUnit}`);$('#plane-offset').step=25/scale();showLengthInput($('#plane-offset'),planeOffset);
+  $('[data-type="tube"] small').textContent=`${displayLength(80)}–${displayLength(3000).toLocaleString('en-US')} ${lengthUnit} cut length`;
+  $('#status').textContent=unitText(statusSource);
+}
 let rotationIncrement=90, pointerGesture=null, doubleClickEligible=false;
 let model=new Design(), selected=new Set(), selectedJoint=null, tool='select', clipboard=null;
 let undo=[],redo=[],transaction=null,exported=JSON.stringify(model.data()), storageOK=true;
@@ -31,7 +50,7 @@ const gizmo=new TransformControls(camera,canvas);gizmo.setSize(.8);gizmo.setSpac
 const ray=new THREE.Raycaster(), pointer=new THREE.Vector2();
 let baseTransform=null, activeIds=new Set(), sliderBase=null;
 
-function status(text,error=false){$('#status').textContent=text;$('#status').dataset.error=error;}
+function status(text,error=false){statusSource=text;$('#status').textContent=unitText(text);$('#status').dataset.error=error;}
 function snapshot(){return {data:model.data(),selected:[...selected],joint:selectedJoint};}
 function restore(s){model=new Design(s.data);selected=new Set(s.selected.filter(id=>model.pieces.some(p=>p.id===id)));selectedJoint=s.joint;candidate=null;pickedPorts=[];}
 function begin(){if(!transaction)transaction=snapshot();}
@@ -118,13 +137,13 @@ fields('#position-fields','position');fields('#rotation-fields','rotation');
 function inspector(){
   const list=model.pieces.filter(p=>selected.has(p.id)),single=list.length===1?list[0]:null,joint=model.connections.find(c=>c.id===selectedJoint),moves=expanded();
   $('#selection-title').textContent=joint?'Selected joint':single?CATALOG[single.type].name:list.length?`${list.length} selected`:'Your design';
-  $('#selection-note').textContent=joint?`Joint ${joint.id.slice(0,8)} · tube to socket`:single?`Piece ${single.id.slice(0,8)} · Ø 32 mm`:list.length?'Edit a selection or its connected assemblies.':'Select a piece to refine it.';
+  $('#selection-note').textContent=joint?`Joint ${joint.id.slice(0,8)} · tube to socket`:single?`Piece ${single.id.slice(0,8)} · Ø ${lengthText(32)}`:list.length?'Edit a selection or its connected assemblies.':'Select a piece to refine it.';
   $('#selection-content').replaceChildren();if(!list.length)$('#selection-content').textContent=joint?'Detach to separate the two ports.':'Nothing selected';
-  for(const p of list.slice(0,8)){const chip=document.createElement('span');chip.className='piece-chip';chip.textContent=CATALOG[p.type].name+(p.type==='tube'?` · ${fmt(p.length)} mm`:'');$('#selection-content').append(chip);}if(list.length>8)$('#selection-content').append(`+ ${list.length-8} more`);
+  for(const p of list.slice(0,8)){const chip=document.createElement('span');chip.className='piece-chip';chip.textContent=CATALOG[p.type].name+(p.type==='tube'?` · ${lengthText(p.length)}`:'');$('#selection-content').append(chip);}if(list.length>8)$('#selection-content').append(`+ ${list.length-8} more`);
   $('#select-assembly').hidden=!list.length;$('#transform-section').hidden=!list.length;
-  if(list.length){const p=list[0],e=new THREE.Euler().setFromQuaternion(quat(p.q),'XYZ');['x','y','z'].forEach((a,i)=>{$(`#position-${a}`).value=round(p.p[i]);$(`#rotation-${a}`).value=round(THREE.MathUtils.radToDeg(e[a]));});$('#assembly-note').textContent=`${moves.size} pieces will move${moves.size>list.length?` · ${moves.size-list.length} connected companions highlighted in amber`:''}. Fields refer to the first selected piece.`;}
+  if(list.length){const p=list[0],e=new THREE.Euler().setFromQuaternion(quat(p.q),'XYZ');['x','y','z'].forEach((a,i)=>{showLengthInput($(`#position-${a}`),p.p[i]);$(`#rotation-${a}`).value=round(THREE.MathUtils.radToDeg(e[a]));});$('#assembly-note').textContent=`${moves.size} pieces will move${moves.size>list.length?` · ${moves.size-list.length} connected companions highlighted in amber`:''}. Fields refer to the first selected piece.`;}
   $('#length-section').hidden=single?.type!=='tube';
-  if(single?.type==='tube'){const plan=model.lengthPlan(single.id);$('#length').value=round(single.length);$('#length-slider').value=single.length;$('#length').disabled=$('#length-slider').disabled=!!plan.locked;$('#length-note').textContent=plan.locked?plan.reason:plan.fixed===null?'Physical cut length. Free tube resizes about its centre.':plan.side.size?'End 1 stays fixed. The assembly on end 2 translates with the new length.':`Connected end ${plan.fixed+1} stays fixed. The free end moves.`;$('#detach-blocking').hidden=!plan.locked;$('#detach-blocking').onclick=()=>{selectedJoint=plan.joint;setTool('joints');inspector();$('#detach').scrollIntoView({block:'nearest'});};}
+  if(single?.type==='tube'){const plan=model.lengthPlan(single.id);showLengthInput($('#length'),single.length);$('#length-slider').value=single.length/scale();$('#length').disabled=$('#length-slider').disabled=!!plan.locked;$('#length-note').textContent=plan.locked?plan.reason:plan.fixed===null?'Physical cut length. Free tube resizes about its centre.':plan.side.size?'End 1 stays fixed. The assembly on end 2 translates with the new length.':`Connected end ${plan.fixed+1} stays fixed. The free end moves.`;$('#detach-blocking').hidden=!plan.locked;$('#detach-blocking').onclick=()=>{selectedJoint=plan.joint;setTool('joints');inspector();$('#detach').scrollIntoView({block:'nearest'});};}
   $('#ports-section').hidden=!list.length&&!joint;$('#ports').replaceChildren();
   for(const p of list) localPorts(p).forEach((def,i)=>{
     const connection=model.connections.find(c=>[c.a,c.b].some(e=>e.id===p.id&&e.port===i));const row=document.createElement('div');row.className='port-row';const button=document.createElement('button');button.textContent=`${list.length>1?CATALOG[p.type].name+' · ':''}End ${i+1} · ${def.type}${connection?' · joined':''}`;button.setAttribute('aria-pressed',pickedPorts.some(e=>e.id===p.id&&e.port===i));button.onclick=()=>{if(connection){selectedJoint=connection.id;inspector();showOverlays();}else pickPort({id:p.id,port:i});};row.append(button);$('#ports').append(row);
@@ -133,8 +152,8 @@ function inspector(){
   $('#connect').hidden=pickedPorts.length!==2;$('#detach').hidden=!joint;
 }
 function pickPort(endpoint){if(model.occupied(endpoint.id,endpoint.port)){status('This port is occupied. Select and detach its joint first.',true);return;}selectedJoint=null;const i=pickedPorts.findIndex(e=>e.id===endpoint.id&&e.port===endpoint.port);if(i>=0)pickedPorts.splice(i,1);else{if(pickedPorts.length===2)pickedPorts=[];pickedPorts.push(endpoint);}inspector();showOverlays();status(pickedPorts.length===2?'Connect selected ports to align the assemblies.':'Port selected. Shift-select another piece, or choose a second port in Joints mode.');}
-function fmt(n){return Number(n.toFixed(3)).toLocaleString('en-US',{maximumFractionDigits:3});}function round(n){return Math.round(n*1000)/1000;}
-function summary(){const data=model.summary();$('#summary').replaceChildren();if(!data.rows.length)$('#summary').textContent='Your cut list will appear here.';for(const [name,count] of data.rows){const row=document.createElement('div');row.className='summary-row';const label=document.createElement('span'),value=document.createElement('b');label.textContent=name;value.textContent=`× ${count}`;row.append(label,value);$('#summary').append(row);}$('#total-length').textContent=`${fmt(data.total)} mm`;$('#summary-count').textContent=`${model.pieces.length} pieces`;}
+function round(n){return Math.round(n*1000)/1000;}
+function summary(){const rows=new Map();let total=0;for(const p of model.pieces){const key=p.type==='tube'?`tube:${p.length}`:p.type;if(!rows.has(key))rows.set(key,{name:p.type==='tube'?`Tube · ${lengthText(p.length)}`:CATALOG[p.type].name,count:0});rows.get(key).count++;if(p.type==='tube')total+=p.length;}$('#summary').replaceChildren();if(!rows.size)$('#summary').textContent='Your cut list will appear here.';for(const {name,count} of rows.values()){const row=document.createElement('div');row.className='summary-row';const label=document.createElement('span'),value=document.createElement('b');label.textContent=name;value.textContent=`× ${count}`;row.append(label,value);$('#summary').append(row);}$('#total-length').textContent=lengthText(total);$('#summary-count').textContent=`${model.pieces.length} pieces`;}
 function refresh(){updateInstructions();sync();inspector();summary();attach();showOverlays();$('#undo').disabled=!undo.length;$('#redo').disabled=!redo.length;$('#paste').disabled=!clipboard;$('#copy').disabled=!selected.size;$('#delete').disabled=!selected.size&&!selectedJoint;$('#save-state').textContent=storageOK?'Saved on this device':'Save JSON to keep your work';}
 function updateInstructions(){
   const degrees=`${rotationIncrement}°`;
@@ -155,7 +174,7 @@ function setRotationIncrement(value){
   rotationIncrement=value;$('#rotation-increment').value=[15,30,45,90].includes(value)?String(value):'custom';$('#rotation-custom-label').hidden=$('#rotation-increment').value!=='custom';$('#rotation-custom').value=value;
   try{localStorage.setItem(ROTATION_STORAGE,String(value));}catch{status('Rotation preference could not be saved on this browser.',true);}updateInstructions();
 }
-function numericTransform(prefix,axis,input){if(!Number.isFinite(input.valueAsNumber)||Math.abs(input.valueAsNumber)>100000){inspector();status('Enter a finite value between −100,000 and 100,000.',true);return;}const anchor=model.pieces.find(p=>selected.has(p.id));if(!anchor)return;action(()=>{if(prefix==='position'){const delta=new THREE.Vector3();delta[axis]=input.valueAsNumber-anchor.p[['x','y','z'].indexOf(axis)];model.transform(expanded(),undefined,undefined,delta);}else{const e=new THREE.Euler().setFromQuaternion(quat(anchor.q),'XYZ');e[axis]=THREE.MathUtils.degToRad(input.valueAsNumber);const q=new THREE.Quaternion().setFromEuler(e).multiply(quat(anchor.q).invert());model.transform(expanded(),q,vec(anchor.p));}},'Transform applied to the connected selection.');}
+function numericTransform(prefix,axis,input){if(prefix==='position'&&input.value===input.dataset.displayValue)return;const value=input.valueAsNumber*(prefix==='position'?scale():1);if(!Number.isFinite(value)||Math.abs(value)>100000){inspector();status(prefix==='position'?'Enter a finite position between −100,000 mm and 100,000 mm.':'Enter a finite value between −100,000 and 100,000.',true);return;}const anchor=model.pieces.find(p=>selected.has(p.id));if(!anchor)return;action(()=>{if(prefix==='position'){const delta=new THREE.Vector3();delta[axis]=value-anchor.p[['x','y','z'].indexOf(axis)];model.transform(expanded(),undefined,undefined,delta);}else{const e=new THREE.Euler().setFromQuaternion(quat(anchor.q),'XYZ');e[axis]=THREE.MathUtils.degToRad(input.valueAsNumber);const q=new THREE.Quaternion().setFromEuler(e).multiply(quat(anchor.q).invert());model.transform(expanded(),q,vec(anchor.p));}},'Transform applied to the connected selection.');}
 
 // Gizmo gestures are one transaction, even though the state and snap preview update every frame.
 gizmo.addEventListener('dragging-changed',e=>{
@@ -169,7 +188,7 @@ gizmo.addEventListener('objectChange',()=>{
 function centerFrom(m,ids){const a=new THREE.Vector3();let n=0;for(const p of m.pieces)if(ids.has(p.id)){a.add(vec(p.p));n++;}return a.divideScalar(n||1);}
 
 // Placement uses an explicit working plane and an actual hollow-geometry preview.
-function workPlane(through=null){const mode=$('#plane').value,normal=mode==='front'?vec([0,0,1]):mode==='side'?vec([1,0,0]):vec([0,1,0]);const value=Number($('#plane-offset').value)||0;return new THREE.Plane(normal,through?-normal.dot(through):-value);}
+function workPlane(through=null){const mode=$('#plane').value,normal=mode==='front'?vec([0,0,1]):mode==='side'?vec([1,0,0]):vec([0,1,0]);const value=planeOffset;return new THREE.Plane(normal,through?-normal.dot(through):-value);}
 function setRay(event){const r=canvas.getBoundingClientRect();pointer.set((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);}
 function planePoint(event,plane=workPlane(),snap=true){setRay(event);const hit=ray.ray.intersectPlane(plane,new THREE.Vector3());if(!hit)return null;if(snap&&$('#grid-snap').checked)hit.toArray().forEach((v,i)=>hit.setComponent(i,Math.round(v/25)*25));return hit;}
 function startPlacement(type){cancelInteraction();cancelPlacement();selectedJoint=null;placement={type,p:[0,60,0],q:[0,0,0,1],length:400};orbit.enabled=false;gizmo.detach();$('#placement-bar').hidden=false;$('#empty').hidden=true;canvas.style.cursor='crosshair';previewPlacement();updateInstructions();status(`Placing ${CATALOG[type].name}. Move into the workspace; click to commit. Q rotates horizontally; E vertically.`);}
@@ -250,8 +269,10 @@ workspace.addEventListener('drop',e=>{e.preventDefault();if(placement&&updatePla
 function thumbnail(type){const paths={tube:'M14 47 L65 17',coupling:'M20 44 L59 22',elbow90:'M16 45 Q45 47 45 18',elbow45:'M14 45 L35 34 Q40 30 61 30',tee:'M12 47 L65 17 M38 32 L56 53',cross:'M12 47 L65 17 M20 12 L57 53',corner:'M12 47 L38 32 L65 47 M38 32 L38 9',cap:'M27 39 L53 24'};return `<svg viewBox="0 0 78 64" aria-hidden="true"><defs><filter id="shadow-${type}"><feDropShadow dx="1" dy="3" stdDeviation="2" flood-color="#69888f" flood-opacity=".25"/></filter></defs><path d="${paths[type]}" stroke="#aec3c6" stroke-width="${type==='tube'?12:17}" fill="none" stroke-linecap="${type==='cap'?'round':'butt'}" filter="url(#shadow-${type})"/><path d="${paths[type]}" stroke="#f3f8f7" stroke-width="${type==='tube'?9:13}" fill="none"/><path d="${paths[type]}" stroke="#ffffff" stroke-width="3" opacity=".9" fill="none"/>${type==='tube'?'<ellipse cx="65" cy="17" rx="5" ry="6" fill="#6f9298" transform="rotate(48 65 17)"/><ellipse cx="65" cy="17" rx="3" ry="4" fill="#35575f" transform="rotate(48 65 17)"/>':''}</svg>`;}
 for(const [type,def] of Object.entries(CATALOG)){const b=document.createElement('button');b.className='material';b.draggable=true;b.dataset.type=type;b.innerHTML=thumbnail(type);const name=document.createElement('strong'),note=document.createElement('small');name.textContent=def.name;note.textContent=def.note;b.append(name,note);b.onclick=()=>startPlacement(type);b.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',type);e.dataTransfer.effectAllowed='copy';startPlacement(type);});b.addEventListener('dragend',()=>{if(placement)cancelPlacement();});$('#catalog').append(b);}
 
-function editLength(value){const p=model.pieces.find(p=>selected.has(p.id));if(!p)return;if(!sliderBase){begin();sliderBase=clone(transaction.data);}try{model=new Design(sliderBase);model.resize(p.id,Number(value));sync();summary();showOverlays();$('#length').value=round(Number(value));$('#length-slider').value=value;}catch(e){status(e.message,true);}}
-$('#length').addEventListener('change',e=>{const p=model.pieces.find(p=>selected.has(p.id));if(p)action(()=>model.resize(p.id,e.target.valueAsNumber),'Tube cut length updated; valid joints preserved.');});
+function editLength(value){const p=model.pieces.find(p=>selected.has(p.id));if(!p)return;if(!sliderBase){begin();sliderBase=clone(transaction.data);}try{model=new Design(sliderBase);model.resize(p.id,Number(value)*scale());sync();summary();showOverlays();showLengthInput($('#length'),Number(value)*scale());$('#length-slider').value=value;}catch(e){status(e.message,true);}}
+$('#length').addEventListener('change',e=>{const p=model.pieces.find(p=>selected.has(p.id));if(p&&e.target.value!==e.target.dataset.displayValue)action(()=>model.resize(p.id,e.target.valueAsNumber*scale()),'Tube cut length updated; valid joints preserved.');});
+$('#length-unit').onclick=()=>{lengthUnit=LENGTH_UNITS[(LENGTH_UNITS.indexOf(lengthUnit)+1)%3];updateLengthUnits();inspector();summary();};
+$('#plane-offset').onchange=e=>{if(e.target.value===e.target.dataset.displayValue)return;const value=e.target.valueAsNumber*scale();if(Number.isFinite(value))planeOffset=value;else status('Enter a finite plane offset.',true);showLengthInput(e.target,planeOffset);};
 $('#length-slider').addEventListener('input',e=>editLength(e.target.value));
 $('#length-slider').addEventListener('change',()=>{sliderBase=null;commit('Tube cut length updated; valid joints preserved.');});
 $('#length-slider').addEventListener('blur',()=>{if(sliderBase){sliderBase=null;commit();}});
@@ -289,6 +310,10 @@ function frame(){const ids=selected.size?expanded():new Set(model.pieces.map(p=>
 $('#frame').onclick=frame;
 $('#camera').onchange=e=>{const view=e.target.value,target=orbit.target.clone();camera=view==='perspective'?cameraPerspective:cameraOrtho;orbit.object=camera;gizmo.camera=camera;orbit.enableRotate=view==='perspective';camera.up.set(0,1,0);if(view==='top')camera.up.set(0,0,-1);const d=({perspective:[1,.8,1],top:[0,1,0],front:[0,0,1],side:[1,0,0]})[view];camera.position.copy(target).addScaledVector(vec(d).normalize(),2000);camera.lookAt(target);resize();orbit.update();frame();$('#view-label').textContent=e.target.selectedOptions[0].textContent;};
 function orientation(){const inverse=camera.quaternion.clone().invert(),lines=$('#axis-lines');lines.replaceChildren();for(const [axis,label,color] of [[[1,0,0],'X','#c45b55'],[[0,1,0],'Y','#479a69'],[[0,0,1],'Z','#558dc7']]){const v=vec(axis).applyQuaternion(inverse),x=42+v.x*27,y=42-v.y*27;const line=document.createElementNS('http://www.w3.org/2000/svg','line');for(const [k,val] of Object.entries({x1:42,y1:42,x2:x,y2:y,stroke:color,'stroke-width':2}))line.setAttribute(k,val);const text=document.createElementNS(line.namespaceURI,'text');text.setAttribute('x',x-4);text.setAttribute('y',y-5);text.setAttribute('fill',color);text.setAttribute('font-size',11);text.textContent=label;lines.append(line,text);}}
+// Capture static labels once; always convert their original millimetre text.
+const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+while(walker.nextNode()){const node=walker.currentNode;if(!node.parentElement.closest('script,#catalog,#length-unit,#status')&&/\bmm\b|millimetres/.test(node.textContent))lengthTemplates.push([node,node.textContent]);}
+updateLengthUnits();
 let animation;function render(){animation=requestAnimationFrame(render);if(orbit.enabled)orbit.update();orientation();renderer.render(scene,camera);}resize();refresh();render();
 window.addEventListener('keydown',e=>{
   if((e.target.closest('input,textarea,select')||e.target.isContentEditable)||$('#help').open)return;const key=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
