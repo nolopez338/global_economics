@@ -5,7 +5,7 @@ import {Design,CATALOG,RADIUS,INNER_RADIUS,INSERTION,localPorts,port,vec,quat,cl
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const STORAGE='pvc-studio-v1', ROTATION_STORAGE='pvc-studio-rotation-increment', MAX_HISTORY=80, DRAG_THRESHOLD=4;
-let rotationIncrement=90, pointerGesture=null;
+let rotationIncrement=90, pointerGesture=null, doubleClickEligible=false;
 let model=new Design(), selected=new Set(), selectedJoint=null, tool='select', clipboard=null;
 let undo=[],redo=[],transaction=null,exported=JSON.stringify(model.data()), storageOK=true;
 let placement=null, candidate=null, pickedPorts=[], hovered=null, directDrag=null, marquee=null, cancelledGesture=false;
@@ -137,18 +137,18 @@ function fmt(n){return Number(n.toFixed(3)).toLocaleString('en-US',{maximumFract
 function summary(){const data=model.summary();$('#summary').replaceChildren();if(!data.rows.length)$('#summary').textContent='Your cut list will appear here.';for(const [name,count] of data.rows){const row=document.createElement('div');row.className='summary-row';const label=document.createElement('span'),value=document.createElement('b');label.textContent=name;value.textContent=`Ã— ${count}`;row.append(label,value);$('#summary').append(row);}$('#total-length').textContent=`${fmt(data.total)} mm`;$('#summary-count').textContent=`${model.pieces.length} pieces`;}
 function refresh(){updateInstructions();sync();inspector();summary();attach();showOverlays();$('#undo').disabled=!undo.length;$('#redo').disabled=!redo.length;$('#paste').disabled=!clipboard;$('#copy').disabled=!selected.size;$('#delete').disabled=!selected.size&&!selectedJoint;$('#save-state').textContent=storageOK?'Saved on this device':'Save JSON to keep your work';}
 function updateInstructions(){
-  const degrees=`${rotationIncrement}°`;
+  const degrees=`${rotationIncrement}Â°`;
   $$('[data-turn]').forEach(b=>{const axis=b.dataset.turn;b.textContent=b.dataset.rotationLabel?`${b.dataset.rotationLabel} +${degrees} (${axis==='y'?'Q':'E'})`:`${axis.toUpperCase()} +${degrees}`;b.title=`Rotate around world ${axis.toUpperCase()} by ${degrees}`;b.disabled=!placement&&!selected.size;});
-  $('#placement-bar').textContent=`Click to place · Q: horizontal ${degrees} · E: vertical ${degrees} · Esc: cancel`;
+  $('#placement-bar').textContent=`Click to place Â· Q: horizontal ${degrees} Â· E: vertical ${degrees} Â· Esc: cancel`;
   $('#movement-bar').hidden=tool!=='move-piece'||!!placement;
   workspace.dataset.mode=placement?'placement':tool;
 }
-function setTool(next){cancelInteraction();if(placement)cancelPlacement();tool=next;$$('[data-tool]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tool===tool||(tool==='move-piece'&&b.dataset.tool==='translate')));attach();showOverlays();updateInstructions();canvas.style.cursor=tool==='marquee'?'crosshair':tool==='move-piece'?'grab':'default';status(({select:'Click selects · Shift-click toggles · left drag pans · right drag orbits · double-click a piece to move.',translate:'Drag an axis handle to move. Double-click a piece for plane movement. Q/E rotate.', 'move-piece':'Piece movement mode · drag a highlighted piece on the working plane · Q/E rotate · Esc or Select exits.',rotate:'Drag a rotation ring, or Q/E for horizontal/vertical increments. Connected pieces rotate together.',marquee:'Left drag selects pieces whose centres are inside the rectangle. Shift adds to selection.',joints:'Click cyan joint markers to inspect and detach. Free port markers can be paired.'})[tool]);}
+function setTool(next){cancelInteraction();if(placement)cancelPlacement();tool=next;$$('[data-tool]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tool===tool||(tool==='move-piece'&&b.dataset.tool==='translate')));attach();showOverlays();updateInstructions();canvas.style.cursor=tool==='marquee'?'crosshair':tool==='move-piece'?'grab':'default';status(({select:'Click selects Â· Shift-click toggles Â· left drag pans Â· right drag orbits Â· double-click a piece to move.',translate:'Drag an axis handle to move. Double-click a piece for plane movement. Q/E rotate.', 'move-piece':'Piece movement mode Â· drag a highlighted piece on the working plane Â· Q/E rotate Â· Esc or Select exits.',rotate:'Drag a rotation ring, or Q/E for horizontal/vertical increments. Connected pieces rotate together.',marquee:'Left drag selects pieces whose centres are inside the rectangle. Shift adds to selection.',joints:'Click cyan joint markers to inspect and detach. Free port markers can be paired.'})[tool]);}
 function rotateDiscrete(axis){
   if(transaction||pointerGesture||gizmo.dragging)return;
   const rotation=new THREE.Quaternion().setFromAxisAngle(vec(axis==='x'?[1,0,0]:axis==='y'?[0,1,0]:[0,0,1]),THREE.MathUtils.degToRad(rotationIncrement));
   if(placement){placement.q=rotation.multiply(quat(placement.q)).normalize().toArray();delete placement.target;previewPlacement();showOverlays();return;}
-  if(selected.size)action(()=>model.transform(expanded(),rotation,center(selected)),`Rotated the connected selection around world ${axis.toUpperCase()} by ${rotationIncrement}°.`);
+  if(selected.size)action(()=>model.transform(expanded(),rotation,center(selected)),`Rotated the connected selection around world ${axis.toUpperCase()} by ${rotationIncrement}Â°.`);
 }
 function setRotationIncrement(value){
   if(!Number.isFinite(value)||value<=0){status('Rotation increment must be a positive finite number.',true);$('#rotation-custom').value=rotationIncrement;return;}
@@ -193,11 +193,13 @@ function cancelInteraction(){
 function clickSelection(e){const id=hitPiece(e);if(id){const next=e.shiftKey?new Set(selected):new Set();if(e.shiftKey&&next.has(id))next.delete(id);else next.add(id);setSelection(next);}else if(!e.shiftKey)setSelection([]);}
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 canvas.addEventListener('pointerdown',e=>{
-  if(e.button!==0||pointerGesture)return;
+  if(pointerGesture){e.stopImmediatePropagation();return;}
+  if(e.button!==0)return;
   canvas.focus();cancelledGesture=false;
   const owner=placement?'placement':gizmo.axis&&gizmo.object?'gizmo':tool==='marquee'?'marquee':tool==='joints'?'joint':tool==='move-piece'&&!e.shiftKey&&hitPiece(e)?'piece':e.shiftKey?'click':'camera';
   pointerGesture={owner,id:e.pointerId,x:e.clientX,y:e.clientY,moved:false,cancelled:false};
   if(owner==='camera'||owner==='gizmo')return;
+  orbit.enabled=false;
   e.stopImmediatePropagation();canvas.setPointerCapture(e.pointerId);
   if(owner==='marquee'){const r=canvas.getBoundingClientRect();marquee={x:e.clientX-r.left,y:e.clientY-r.top,shift:e.shiftKey};}
   if(owner==='piece'){
@@ -224,6 +226,7 @@ canvas.addEventListener('pointerleave',()=>{hovered=null;paint();});
 canvas.addEventListener('pointerup',e=>{
   const g=pointerGesture;if(e.button!==0||!g||g.id!==e.pointerId)return;
   pointerGesture=null;
+  doubleClickEligible=!g.cancelled&&!g.moved&&['camera','click','piece'].includes(g.owner);
   const owned=g.owner!=='camera'&&g.owner!=='gizmo';if(owned)e.stopImmediatePropagation();
   if(!g.cancelled){
     if(g.owner==='placement'&&placement){if(!g.moved&&updatePlacement(e))commitPlacement();}
@@ -235,8 +238,9 @@ canvas.addEventListener('pointerup',e=>{
     }
   }
   if(owned&&canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);
+  if(owned)orbit.enabled=!placement;
 },true);
-canvas.addEventListener('dblclick',e=>{if(e.button!==0||placement||pointerGesture||tool==='marquee'||tool==='joints'||gizmo.dragging)return;const id=hitPiece(e);if(id){setSelection([id]);setTool('move-piece');}});
+canvas.addEventListener('dblclick',e=>{if(!doubleClickEligible||e.button!==0||placement||pointerGesture||tool==='marquee'||tool==='joints'||gizmo.dragging)return;const id=hitPiece(e);if(id){setSelection([id]);setTool('move-piece');}});
 canvas.addEventListener('pointercancel',()=>{cancelInteraction();pointerGesture=null;});
 canvas.addEventListener('lostpointercapture',()=>{if(pointerGesture){cancelInteraction();pointerGesture=null;}});
 workspace.addEventListener('dragover',e=>{if(placement){e.preventDefault();e.dataTransfer.dropEffect='copy';updatePlacement(e);}});
@@ -285,9 +289,10 @@ function frame(){const ids=selected.size?expanded():new Set(model.pieces.map(p=>
 $('#frame').onclick=frame;
 $('#camera').onchange=e=>{const view=e.target.value,target=orbit.target.clone();camera=view==='perspective'?cameraPerspective:cameraOrtho;orbit.object=camera;gizmo.camera=camera;orbit.enableRotate=view==='perspective';camera.up.set(0,1,0);if(view==='top')camera.up.set(0,0,-1);const d=({perspective:[1,.8,1],top:[0,1,0],front:[0,0,1],side:[1,0,0]})[view];camera.position.copy(target).addScaledVector(vec(d).normalize(),2000);camera.lookAt(target);resize();orbit.update();frame();$('#view-label').textContent=e.target.selectedOptions[0].textContent;};
 function orientation(){const inverse=camera.quaternion.clone().invert(),lines=$('#axis-lines');lines.replaceChildren();for(const [axis,label,color] of [[[1,0,0],'X','#c45b55'],[[0,1,0],'Y','#479a69'],[[0,0,1],'Z','#558dc7']]){const v=vec(axis).applyQuaternion(inverse),x=42+v.x*27,y=42-v.y*27;const line=document.createElementNS('http://www.w3.org/2000/svg','line');for(const [k,val] of Object.entries({x1:42,y1:42,x2:x,y2:y,stroke:color,'stroke-width':2}))line.setAttribute(k,val);const text=document.createElementNS(line.namespaceURI,'text');text.setAttribute('x',x-4);text.setAttribute('y',y-5);text.setAttribute('fill',color);text.setAttribute('font-size',11);text.textContent=label;lines.append(line,text);}}
-let animation;function render(){animation=requestAnimationFrame(render);orbit.update();orientation();renderer.render(scene,camera);}resize();refresh();render();
+let animation;function render(){animation=requestAnimationFrame(render);if(orbit.enabled)orbit.update();orientation();renderer.render(scene,camera);}resize();refresh();render();
 window.addEventListener('keydown',e=>{
   if((e.target.closest('input,textarea,select')||e.target.isContentEditable)||$('#help').open)return;const key=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
+  if((pointerGesture||gizmo.dragging)&&key!=='escape'){e.preventDefault();return;}
   if(mod&&['c','v','z','y','a'].includes(key)){e.preventDefault();if(key==='c')$('#copy').click();if(key==='v')$('#paste').click();if(key==='z')history(e.shiftKey?'redo':'undo');if(key==='y')history('redo');if(key==='a')$('#select-all').click();return;}
   if(key==='escape'){e.preventDefault();const moving=tool==='move-piece';if(placement){cancelInteraction();cancelPlacement();status('Placement cancelled.');}else if(transaction||pointerGesture||moving){cancelInteraction();if(moving)setTool('select');status('Transform cancelled; piece movement mode exited.');}else{setSelection([]);pickedPorts=[];showOverlays();}return;}
   if(!mod&&(key==='q'||key==='e')){e.preventDefault();if(!e.repeat)rotateDiscrete(key==='q'?'y':'x');return;}
