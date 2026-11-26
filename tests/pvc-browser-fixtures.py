@@ -11,7 +11,11 @@ HOOKS = '''
 globalThis.pvcTest = {
   read: () => ({data:model.data(),selected:[...selected],tool,
     undo:undo.length,redo:redo.length,placement:clone(placement),
-    candidate:clone(candidate),rotationIncrement,
+    candidate:clone(candidate),rotationIncrement,selectedJoint,
+    previewMesh:placementMesh?.uuid,
+    pickedPorts:clone(pickedPorts),transaction:clone(transaction),exported,
+    autosave:localStorage.getItem(STORAGE),lengthUnit,
+    history:clone({undo,redo}),
     camera:camera.position.toArray(),target:orbit.target.toArray(),
     cameraQ:camera.quaternion.toArray(),gizmoDragging:gizmo.dragging}),
   screen: p => {const v=vec(p).project(camera),r=canvas.getBoundingClientRect();
@@ -22,7 +26,7 @@ globalThis.pvcTest = {
 fixture = ROOT / 'tests/.pvc-browser'
 fixture.mkdir(exist_ok=True)
 source = (ROOT / 'assets/js/pvc-app.mjs').read_text(encoding='utf-8')
-source = source.replace("'../vendor/", "'../../assets/vendor/").replace("'./pvc-model.mjs'", "'../../assets/js/pvc-model.mjs'")
+source = source.replace("'../vendor/", "'../../assets/vendor/").replace("'./pvc-", "'../../assets/js/pvc-")
 source = source.replace("'pvc-studio-v1'", "'pvc-studio-browser-test'").replace("'pvc-studio-rotation-increment'", "'pvc-studio-browser-test-increment'")
 (fixture / 'pvc-app.mjs').write_text(source + HOOKS, encoding='utf-8')
 html = (ROOT / 'general_fundamentals/pvc_design.html').read_text(encoding='utf-8')

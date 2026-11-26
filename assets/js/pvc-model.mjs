@@ -27,6 +27,10 @@ export function port(piece, index) {
   // Socket's mating datum is its internal stop. A physical tube end seats 20 mm inside the mouth.
   return {...p, direction, mouth, position: mouth.clone().addScaledVector(direction,-p.insertion)};
 }
+export const compatiblePorts = (a,b) => a.type !== b.type;
+export function portAlignment(pa,pb) {
+  return {rotation:new Quaternion().setFromUnitVectors(pa.direction,pb.direction.clone().negate()),pivot:pa.position,translation:pb.position.clone().sub(pa.position)};
+}
 export class Design {
   constructor(data = {pieces:[],connections:[]}) { this.pieces=clone(data.pieces); this.connections=clone(data.connections); }
   data() {return {format:'pvc-studio',version:1,catalog:'pvc-32-v1',units:'mm',radius:RADIUS,pieces:clone(this.pieces),connections:clone(this.connections)};}
@@ -47,14 +51,14 @@ export class Design {
   check(a,b,geometry=true) {
     if(a.id===b.id) throw Error('A piece cannot connect to itself.');
     const pa=port(this.get(a.id),a.port),pb=port(this.get(b.id),b.port);
-    if(pa.type===pb.type) throw Error('Connect a tube end to a fitting socket. Tube-to-tube and socket-to-socket joints are incompatible.');
+    if(!compatiblePorts(pa,pb)) throw Error('Connect a tube end to a fitting socket. Tube-to-tube and socket-to-socket joints are incompatible.');
     if(this.occupied(a.id,a.port)||this.occupied(b.id,b.port)) throw Error('This port is occupied. Detach its joint first.');
     if(geometry&&(pa.position.distanceTo(pb.position)>.05||pa.direction.dot(pb.direction)>-.99999)) throw Error('This joint would distort the assembly. Align both ports exactly or detach an existing joint.');
     return [pa,pb];
   }
   alignment(a,b) {
     const [pa,pb]=this.check(a,b,false);
-    return {rotation:new Quaternion().setFromUnitVectors(pa.direction,pb.direction.clone().negate()),pivot:pa.position,translation:pb.position.clone().sub(pa.position)};
+    return portAlignment(pa,pb);
   }
   connect(a,b,align=true) {
     this.check(a,b,false);
@@ -85,7 +89,23 @@ export class Design {
     this.connections.push(...data.connections.map(c=>({id:uid(),a:{id:map.get(c.a.id),port:c.a.port},b:{id:map.get(c.b.id),port:c.b.port}})));
     return new Set(map.values());
   }
-  summary() {const rows=new Map();let total=0;for(const p of this.pieces){const name=p.type==='tube'?`Tube · ${Number(p.length.toFixed(3))} mm`:CATALOG[p.type].name;rows.set(name,(rows.get(name)||0)+1);if(p.type==='tube')total+=p.length;}return {rows:[...rows],total};}
+  materials() {return materialsSummary(this.pieces);}
+  summary() {const {rows,total}=this.materials();return {rows:rows.map(p=>[p.type==='tube'?`Tube · ${p.length} mm`:CATALOG[p.type].name,p.count]),total};}
+}
+// Exact numeric cut lengths are the grouping key; presentation never changes identity.
+export function materialsSummary(pieces) {
+  const rows=new Map(),cuts=[];
+  for(const p of pieces){
+    const key=p.type==='tube'?`tube:${p.length}`:p.type;
+    if(!rows.has(key))rows.set(key,{type:p.type,...(p.type==='tube'?{length:p.length}:{}),count:0});
+    rows.get(key).count++;if(p.type==='tube')cuts.push(String(p.length));
+  }
+  // Valid physical cuts (80-3000 mm) have decimal, non-exponential strings.
+  // Sum their decimal digits so repeated fractional cuts do not accumulate binary noise.
+  const places=Math.max(0,...cuts.map(n=>(n.split('.')[1]||'').length));
+  const digits=cuts.reduce((sum,n)=>{const [whole,fraction='']=n.split('.');return sum+BigInt(whole+fraction.padEnd(places,'0'));},0n).toString().padStart(places+1,'0');
+  const total=Number(places?digits.slice(0,-places)+'.'+digits.slice(-places):digits);
+  return {rows:[...rows.values()],total,count:pieces.length};
 }
 export function validate(data) {
   if(!data||data.format!=='pvc-studio'||data.version!==1||data.catalog!=='pvc-32-v1'||data.units!=='mm'||data.radius!==RADIUS)throw Error('Unsupported design. Expected PVC Studio v1, pvc-32-v1 catalog, millimetres and 32 mm tubes.');

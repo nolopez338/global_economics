@@ -173,4 +173,46 @@ await test('Converted length edits preserve connected joints and closed-loop loc
   assert(d.querySelector('#length').disabled&&d.querySelector('#length-slider').disabled,'Closed-loop lock lost');
 });
 
+await test('Catalog click and drag placement: every fitting and tube, all cameras, exact preview commit and history',async()=>{
+  for(const [index,type] of ['tube','coupling','elbow90','elbow45','tee','cross','corner','cap'].entries()){
+    const m=new Design(),target=m.add(type==='tube'?'tee':'tube',[0,120,0]);await load(m);
+    change('#camera',['perspective','top','front','side'][index%4]);await tick();
+    const dragEvent=(name,p)=>d.querySelector('#workspace').dispatchEvent(new w.DragEvent(name,{clientX:p.x,clientY:p.y,bubbles:true,cancelable:true,dataTransfer:new w.DataTransfer()}));
+    const button=d.querySelector(`[data-type="${type}"]`);
+    if(index%2)button.dispatchEvent(new w.DragEvent('dragstart',{bubbles:true,dataTransfer:new w.DataTransfer()}));else button.click();
+    const at=screen((await import('../assets/js/pvc-model.mjs')).port(target,type==='tube'?2:1).position.toArray());
+    if(index%2)dragEvent('dragover',at);else pointer('pointermove',at,{buttons:0});
+    const mesh=state().previewMesh,preview=state().placement;assert(preview.connection,'No connection preview: '+type);
+    assert(same(state().data,m.data())&&state().undo===0,'Preview mutated model');
+    for(let step=0;step<4;step++){key(step%2?'e':'q');const before=state().placement;pointer('pointermove',at,{buttons:0});assert(same(state().placement.q,before.q),'Pointer undid rotation '+type);}
+    assert(state().previewMesh===mesh,'Preview mesh rebuilt during movement/rotation');
+    const final=state().placement;
+    if(index%2){dragEvent('drop',at);button.dispatchEvent(new w.DragEvent('dragend',{bubbles:true}));}else tap(at);
+    const after=state(),added=after.data.pieces.at(-1);validate(after.data);
+    assert(same(added.p,final.p)&&same(added.q,final.q),'Preview jumped on placement '+type);
+    assert(after.data.connections.length===1&&after.undo===1&&after.selected[0]===added.id&&!after.placement,'Commit/selection '+type);
+    click('#undo');assert(same(state().data,m.data()),'Undo '+type);click('#redo');assert(same(state().data,after.data),'Redo '+type);
+  }
+});
+await test('Placement switches by pointer, stays stable near competitors, moves away, disables snap and cancels',async()=>{
+  const m=new Design();m.add('cap',[-20,120,0]);m.add('cap',[20,120,0]);await load(m);change('#camera','front');change('#plane','front');await tick();click('[data-type="tube"]');
+  const {port}=await import('../assets/js/pvc-model.mjs');
+  const a=screen(port(m.pieces[0],0).position.toArray()),b=screen(port(m.pieces[1],0).position.toArray());
+  pointer('pointermove',a,{buttons:0});const first=state().placement.connection;assert(first,'First target');
+  const mid={x:(a.x+b.x)/2+2,y:a.y};pointer('pointermove',mid,{buttons:0});assert(state().placement.connection.target.id===first.target.id,'Hysteresis');
+  pointer('pointermove',b,{buttons:0});assert(state().placement.connection.target.id!==first.target.id,'Did not switch');
+  const r=c.getBoundingClientRect(),far={x:r.left+10,y:r.bottom-10};pointer('pointermove',far,{buttons:0});assert(!state().placement.connection,'Far snap');
+  pointer('pointermove',b,{buttons:0});const check=d.querySelector('#port-snap');check.checked=false;check.dispatchEvent(new w.Event('change'));assert(!state().placement.connection,'Disabled snap');
+  const free=state().placement;tap(b);assert(same(state().data.pieces.at(-1).p,free.p)&&!state().data.connections.length,'Disabled free commit');click('#undo');click('[data-type="tube"]');pointer('pointermove',b,{buttons:0});
+  check.checked=true;check.dispatchEvent(new w.Event('change'));assert(state().placement.connection,'Reenabled snap');key('Escape');assert(!state().placement&&same(state().data,m.data())&&state().undo===0,'Escape mutated design');
+});
+await test('Occupied placement targets excluded and orthographic zoom remains targetable on edge-on plane',async()=>{
+  const m=connectedPair();await load(m);change('#camera','front');await tick();click('[data-type="tee"]');
+  const {port}=await import('../assets/js/pvc-model.mjs');const t=m.pieces[0],free=screen(port(t,0).position.toArray());
+  pointer('pointermove',free,{buttons:0});assert(state().placement.connection?.target.port===0,'Edge-on plane blocked connection');
+  c.dispatchEvent(new w.WheelEvent('wheel',{deltaY:-300,bubbles:true,cancelable:true}));await tick();
+  pointer('pointermove',screen(port(t,0).position.toArray()),{buttons:0});assert(state().placement.connection,'Zoom targeting');
+  const occupied=screen(port(t,1).position.toArray());pointer('pointermove',occupied,{buttons:0});assert(!state().placement.connection,'Occupied target selected');key('Escape');
+});
+
 document.title=results.querySelector('.fail')?'FAIL · PVC interaction tests':'PASS · PVC interaction tests';
