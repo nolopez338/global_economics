@@ -13,6 +13,9 @@ const workspace=$('#workspace'), canvas=document.createElement('canvas');canvas.
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.setClearColor(0xedf2f3);renderer.outputColorSpace=THREE.SRGBColorSpace;workspace.append(canvas);
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
+canvas.addEventListener('webglcontextlost',()=>{$('#fatal').hidden=false;$('#fatal').textContent='The graphics context was lost. Your completed edits are saved on this device. Wait for recovery, or reload this page.';});
+canvas.addEventListener('webglcontextrestored',()=>{$('#fatal').hidden=true;status('Graphics context restored.');});
 scene.add(parts,overlays,ghost);scene.add(new THREE.HemisphereLight(0xffffff,0x9aacb0,2.4));
 const light=new THREE.DirectionalLight(0xffffff,3.2);light.position.set(500,1000,650);light.castShadow=true;
 light.shadow.mapSize.set(2048,2048);Object.assign(light.shadow.camera,{left:-2500,right:2500,top:2500,bottom:-2500,near:1,far:5000});light.shadow.bias=-.0004;light.shadow.normalBias=1;scene.add(light);
@@ -70,7 +73,7 @@ function dispose(group){const geometries=new Set(),materials=new Set();group.tra
 function clearGroup(group){dispose(group);}
 function expanded(){return model.connected(selected);}
 function center(ids){const result=new THREE.Vector3();let n=0;for(const p of model.pieces)if(ids.has(p.id)){result.add(vec(p.p));n++;}return n?result.divideScalar(n):result;}
-function paint(){const companions=expanded();for(const [id,g] of meshes){const color=selected.has(id)?0x087e83:companions.has(id)?0xbd8b30:id===hovered?0x529ca4:0x000000;g.traverse(o=>{if(o.isMesh){o.material.emissive.setHex(color);o.material.emissiveIntensity=selected.has(id)?.28:companions.has(id)?.23:id===hovered?.17:0;}});}}
+function paint(){const companions=expanded();for(const [id,g] of meshes){const color=selected.has(id)?0x219da5:companions.has(id)?0xd29c36:id===hovered?0x8abcc4:g.userData.type==='tube'?0xeaf3f1:0xffffff;g.traverse(o=>{if(o.isMesh){o.material.color.setHex(color);if(o.material.side===THREE.BackSide)o.material.color.multiplyScalar(.65);o.material.emissive.setHex(0);o.material.emissiveIntensity=0;}});}}
 function sync(){
   const existing=new Set(model.pieces.map(p=>p.id));
   for(const [id,g] of meshes)if(!existing.has(id)){parts.remove(g);dispose(g);meshes.delete(id);}
@@ -98,13 +101,13 @@ function findCandidate(ids){
       for(let j=0;j<localPorts(other).length;j++){if(model.occupied(other.id,j))continue;const b={id:other.id,port:j},pb=port(other,j);if(pa.type===pb.type)continue;
         const internal=ids.has(other.id);if(internal&&(pa.position.distanceTo(pb.position)>.05||pa.direction.dot(pb.direction)>-.99999))continue;
         const distance=pa.position.distanceTo(pb.position),stable=candidate?.a.id===a.id&&candidate.a.port===i&&candidate.b.id===b.id&&candidate.b.port===j;
-        const weight=distance-(stable?18:0);if(distance<(stable?90:65)&&weight<score){score=weight;best={a,b,internal};}
+        const weight=distance-(stable?18:0);if(distance<(stable?90:65)&&weight<score){score=weight;best={a,b,internal,moving:[...ids]};}
       }
     }
   }
   candidate=best;clearGhost();if(best){const t=best.internal?null:model.alignment(best.a,best.b);if(!best.internal)showGhost(ids,t);status('Snap ready · release to seat the tube 20 mm into the socket.');}showOverlays();
 }
-function finishSnap(){if(candidate){const c=candidate;model.connect(c.a,c.b,!c.internal);status('Joint connected. Transforming either piece moves its connected assembly.');}candidate=null;clearGhost();}
+function finishSnap(){if(candidate){const c=candidate;if(!c.internal){const t=model.alignment(c.a,c.b);model.transform(new Set(c.moving),t.rotation,t.pivot,t.translation);}model.connect(c.a,c.b,false);status('Joint connected. Transforming either piece moves its connected assembly.');}candidate=null;clearGhost();}
 
 // Inspector and selection state are independent of rendered geometry.
 function setSelection(ids,joint=null){selected=new Set(ids);selectedJoint=joint;pickedPorts=[];refresh();}
@@ -229,8 +232,8 @@ let animation;function render(){animation=requestAnimationFrame(render);orbit.up
 window.addEventListener('keydown',e=>{
   if(e.target.closest('input,textarea,select,[contenteditable=true]')||$('#help').open)return;const key=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
   if(mod&&['c','v','z','y','a'].includes(key)){e.preventDefault();if(key==='c')$('#copy').click();if(key==='v')$('#paste').click();if(key==='z')history(e.shiftKey?'redo':'undo');if(key==='y')history('redo');if(key==='a')$('#select-all').click();return;}
-  if(key==='escape'){e.preventDefault();if(placement)cancelPlacement();else if(transaction){cancelledGesture=true;restore(transaction);transaction=null;baseTransform=null;directDrag=null;sliderBase=null;candidate=null;clearGhost();orbit.enabled=true;refresh();}else{setSelection([]);pickedPorts=[];showOverlays();}return;}
+  if(key==='escape'){e.preventDefault();if(placement){cancelPlacement();status('Placement cancelled.');}else if(transaction){cancelledGesture=true;restore(transaction);transaction=null;baseTransform=null;directDrag=null;sliderBase=null;candidate=null;clearGhost();orbit.enabled=true;refresh();status('Transform cancelled.');}else{setSelection([]);pickedPorts=[];showOverlays();}return;}
   if(placement&&key==='q'){placement.q=new THREE.Quaternion().setFromAxisAngle(vec([0,1,0]),Math.PI/2).multiply(quat(placement.q)).toArray();delete placement.target;previewPlacement();return;}
   if(placement)return;if(key==='delete'||key==='backspace'){e.preventDefault();$('#delete').click();}if(key==='f')frame();if(key==='g')setTool('translate');if(key==='r')setTool('rotate');if(key==='v')setTool('select');
 });
-window.addEventListener('pagehide',()=>{cancelAnimationFrame(animation);observer.disconnect();gizmo.dispose();orbit.dispose();clearGroup(parts);clearGroup(overlays);clearGroup(ghost);grid.geometry.dispose();grid.material.dispose();floor.geometry.dispose();floor.material.dispose();renderer.dispose();},{once:true});
+window.addEventListener('pagehide',event=>{if(event.persisted)return;cancelAnimationFrame(animation);observer.disconnect();gizmo.dispose();orbit.dispose();clearGroup(parts);clearGroup(overlays);clearGroup(ghost);grid.geometry.dispose();grid.material.dispose();floor.geometry.dispose();floor.material.dispose();renderer.dispose();});
