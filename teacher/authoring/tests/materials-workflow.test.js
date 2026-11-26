@@ -258,7 +258,7 @@ test("both Term 2 catalogs have the exact 20-class sequence and reference target
           const item = resources[index];
           assert.equal(item.Category, category);
           assert.match(item.Name, new RegExp(`^C${ci} `));
-          assert.equal(item.Hyperlink, `${site}book2026-2027/grade${grade}/term_2/${folder}/G${grade}_T2_L${level}_C${ci}_${suffix}.pdf`);
+          assert.equal(item.Hyperlink, `${site}book/grade${grade}/term_2/${folder}/G${grade}_T2_L${level}_C${ci}_${suffix}.pdf`);
           if (!(grade === 10 && ci === 10)) assert.ok(referenceLinks.includes(item.Hyperlink));
           assert.ok(item.Acronym.length <= 4);
         }
@@ -267,9 +267,9 @@ test("both Term 2 catalogs have the exact 20-class sequence and reference target
         const items = resources.filter(m => m.Category === "mock-practices");
         assert.equal(items.length, 2);
         const [level, criteria] = mock;
-        assert.ok(fs.statSync(path.join(root, `../book2026-2027/grade${grade}/term_2/4-learning_evidences`)).isDirectory());
+        assert.ok(fs.statSync(path.join(root, `../book/grade${grade}/term_2/4-learning_evidences`)).isDirectory());
         for (const [index, suffix] of [[0, ""], [1, "_solution"]]) {
-          assert.equal(items[index].Hyperlink, `${site}book2026-2027/grade${grade}/term_2/4-learning_evidences/G${grade}_T2_L${level}_${criteria}_exam${suffix}.pdf`);
+          assert.equal(items[index].Hyperlink, `${site}book/grade${grade}/term_2/4-learning_evidences/G${grade}_T2_L${level}_${criteria}_exam${suffix}.pdf`);
           assert.ok(items[index].Name.includes(criteria.match(/C\d+/g).join(" & ")));
           assert.match(items[index].Name, index ? /mock solution$/ : /mock exam$/);
         }
@@ -348,8 +348,8 @@ test("unrelated materials and every original record identity are preserved", () 
   const hash = value => require("node:crypto").createHash("sha256").update(JSON.stringify(value)).digest("hex");
   // Baselines captured before this Term 2 update, including pre-existing Term 1 metadata differences.
   for (const [file, globalName, unrelatedHash, identityHash] of [
-    ["materials-data-base", "MATERIALS_DATA_BASE", "8ff1e484a16df02ee6f6198768c8da234ae24281b46f9adca76675f68070d5df", "6f2f33efba1b76bfc5f7aa6298062d23f1a7d740e3127a0823453699c4aab17c"],
-    ["materials-data", "MATERIALS_DATA", "515dca2d2fb86279bbc46dd5b76ee5a01da15d1edba942bf27d869d5c6b17620", "7a18e00bcbcd2d6202087ab822b17c5cd057095d473a7eca2083ef8750a7608f"]
+    ["materials-data-base", "MATERIALS_DATA_BASE", "9bffc7b05d56e589ed0241503edd1bdfa204ec1c034d0676705743c3b65bba66", "6f2f33efba1b76bfc5f7aa6298062d23f1a7d740e3127a0823453699c4aab17c"],
+    ["materials-data", "MATERIALS_DATA", "5a56c4b2dfa006dea396a30f03339c4ed5bb6333a6e23e6d91ce4490963a25f3", "7a18e00bcbcd2d6202087ab822b17c5cd057095d473a7eca2083ef8750a7608f"]
   ]) {
     // The new seminar base catalog is an intentional addition to this older baseline.
     const data = plain(load(file)[globalName]).filter(r => r.Grade !== '10S');

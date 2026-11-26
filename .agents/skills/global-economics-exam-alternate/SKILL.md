@@ -76,5 +76,5 @@ Report links and shared indices for all generated pairs, plus any unresolved lim
 
 ```text
 Use $global-economics-exam-alternate to create 3 alternate versions of
-book2026-2027/grade10/term_2/4-learning_evidences/G10_T2_L1_C1C2_exam.tex
+book/grade10/term_2/4-learning_evidences/G10_T2_L1_C1C2_exam.tex
 ```

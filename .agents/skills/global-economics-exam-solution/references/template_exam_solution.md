@@ -2,12 +2,12 @@
 
 ## Shared inputs
 
-Copy the [solution-key scaffold](../assets/template_exam_solution.tex) to the key's intended source directory. Load the [shared exam preamble](../../../../book2026-2027/preamble/preamble_exams.tex) once with `\input{preamble_exams.tex}`. It supplies the document class, common packages, exam formatting, and navigation commands.
+Copy the [solution-key scaffold](../assets/template_exam_solution.tex) to the key's intended source directory. Load the [shared exam preamble](../../../../book/preamble/preamble_exams.tex) once with `\input{preamble_exams.tex}`. It supplies the document class, common packages, exam formatting, and navigation commands.
 
 The scaffold searches relative to the directory where pdfLaTeX runs. Its `\input@path` covers the skill's `assets/` directory and common source directories within the book. For a different layout, run from the key's source directory and prepend the absolute path to the shared `preamble/` directory to `TEXINPUTS`. This also resolves nested preamble and graph inputs. Keep the empty path component for TeX's default search paths. For example, in PowerShell:
 
 ```powershell
-$env:TEXINPUTS = 'C:/path/to/repo/book2026-2027/preamble/;'
+$env:TEXINPUTS = 'C:/path/to/repo/book/preamble/;'
 ```
 
 Resolve source-specific figure paths from the key's source directory, or copy the required assets into that directory and use relative paths. The build output directory controls where pdfLaTeX writes files.
@@ -28,7 +28,7 @@ Resolve source-specific figure paths from the key's source directory, or copy th
 
 ## Figures and wide work
 
-Preserve original figures in the prompt. For a reusable graph, start with the [graph workflow](../../../../book2026-2027/preamble/graphs/README-graphs.md). Open the chosen command's definition to confirm its argument order, meanings, units, and dependencies. After the exam preamble, import only the graph files used by the key and any required dependencies with `\input{graphs/<file>.tex}`.
+Preserve original figures in the prompt. For a reusable graph, start with the [graph workflow](../../../../book/preamble/graphs/README-graphs.md). Open the chosen command's definition to confirm its argument order, meanings, units, and dependencies. After the exam preamble, import only the graph files used by the key and any required dependencies with `\input{graphs/<file>.tex}`.
 
 Pair a figure and its calculation or completed table in top-aligned minipages when both are legible at normal size. Give each minipage enough width for its contents and keep their combined widths below `\linewidth`. Use `aligned` or `align*` to break long derivations and give wider work the full text width. For genuinely wide work, use a `landscape` environment from the shared preamble.
 

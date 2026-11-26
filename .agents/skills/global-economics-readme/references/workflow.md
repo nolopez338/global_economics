@@ -26,7 +26,7 @@ Edit only these plan fields:
   "readme": "README-child.md" }`; use null when absent. Multiple child README
   candidates require inspecting and selecting the summary; do not modify them.
 - `analysis.dependencies`: repository-relative path to list of affected owners,
-  e.g. `{"book2026-2027/preamble/sections.tex": ["file:lesson.tex"]}`.
+  e.g. `{"book/preamble/sections.tex": ["file:lesson.tex"]}`.
   Include every additional source actually consulted, including child contents,
   the vocabulary example if used, and custom macro definitions. A changed or
   removed dependency invalidates its owners. To register a new dependency,

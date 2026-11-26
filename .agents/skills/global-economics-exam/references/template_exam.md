@@ -2,15 +2,15 @@
 
 ## Shared inputs and logo
 
-Copy the [scaffold](../assets/template_exam.tex) into the exam source directory. It loads the [shared exam preamble](../../../../book2026-2027/preamble/preamble_exams.tex) once. The preamble supplies the document class, packages, and [exam layout commands](../../../../book2026-2027/preamble/preamble_exam_layout.tex).
+Copy the [scaffold](../assets/template_exam.tex) into the exam source directory. It loads the [shared exam preamble](../../../../book/preamble/preamble_exams.tex) once. The preamble supplies the document class, packages, and [exam layout commands](../../../../book/preamble/preamble_exam_layout.tex).
 
 The scaffold searches the shared preamble from its asset directory and from standard locations under the book directory. From another directory, add the absolute path to the shared preamble directory to `TEXINPUTS` for the build session. This resolves the initial preamble, its nested inputs, and graph imports. Use forward slashes in paths passed to TeX, a trailing slash on the directory, and an empty search component for TeX's default paths. PowerShell uses a semicolon as the separator.
 
 ~~~powershell
-$env:TEXINPUTS = 'C:/path/to/repo/book2026-2027/preamble/;'
+$env:TEXINPUTS = 'C:/path/to/repo/book/preamble/;'
 ~~~
 
-The scaffold sets `\graphicspath` after the preamble to locate the [institutional logo](../../../../book2026-2027/preamble/logo.png). For an external exam directory, TeX can also find the logo via `TEXINPUTS`. To specify a graphics directory explicitly, add it as a braced entry in `\graphicspath`, with a trailing slash. Add any exam-specific graphics directories there as well.
+The scaffold sets `\graphicspath` after the preamble to locate the [institutional logo](../../../../book/preamble/logo.png). For an external exam directory, TeX can also find the logo via `TEXINPUTS`. To specify a graphics directory explicitly, add it as a braced entry in `\graphicspath`, with a trailing slash. Add any exam-specific graphics directories there as well.
 
 ## Full-width front matter
 
@@ -50,7 +50,7 @@ Follow with `\LearningObjective{objective}{criteria}`, separating criterion entr
 
 ## Graphs
 
-Use the [shared graph index](../../../../book2026-2027/preamble/graphs/README-graphs.md) to find a suitable command. Read the macro definition to verify its argument order, widths, required libraries, and helper commands. After loading the exam preamble, import only the graph files the exam uses, including dependencies confirmed in those definitions. Use `\input{graphs/<file>.tex}` with the shared preamble directory on the input search path, or give the input an explicit path. Check the resulting graph against the task data and the current column width.
+Use the [shared graph index](../../../../book/preamble/graphs/README-graphs.md) to find a suitable command. Read the macro definition to verify its argument order, widths, required libraries, and helper commands. After loading the exam preamble, import only the graph files the exam uses, including dependencies confirmed in those definitions. Use `\input{graphs/<file>.tex}` with the shared preamble directory on the input search path, or give the input an explicit path. Check the resulting graph against the task data and the current column width.
 
 ## Build and inspect
 

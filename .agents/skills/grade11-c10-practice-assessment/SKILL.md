@@ -5,11 +5,11 @@ description: Assess submitted Grade 11 Term 1 Global Economics C10 practice PDFs
 
 # Assess Grade 11 C10 practice reports
 
-Work from the repository root. Read the authoritative assignment and rubric at `book2026-2027/grade11/term_1/1-practice_activities/G11_T1_C10_practice_activity.tex`. The companion `G11_C10_Task1_report.tex` illustrates evidence presentation. Its skew-normal mixture is optional. Assess the required work using one of the assignment's three model options.
+Work from the repository root. Read the authoritative assignment and rubric at `book/grade11/term_1/1-practice_activities/G11_T1_C10_practice_activity.tex`. The companion `G11_C10_Task1_report.tex` illustrates evidence presentation. Its skew-normal mixture is optional. Assess the required work using one of the assignment's three model options.
 
 ## Locate submissions and verify identities
 
-Find the PDFs and these rosters under `book2026-2027/grade11/term_1/5-extra_material/C10 Submissions/`.
+Find the PDFs and these rosters under `book/grade11/term_1/5-extra_material/C10 Submissions/`.
 
 - `11A-resultados_criterios.csv`
 - `11B-resultados_criterios.csv`

@@ -1,6 +1,6 @@
 # Classroom Activity Layout and Build Guide
 
-Copy the [LaTeX scaffold](../assets/template_classroom_activity.tex) to the intended source directory. Every activity has exactly one fully worked example, one guided example, and five unsolved independent exercises, with the mandatory three-level structural heading hierarchy below and boxed criteria, and no semantic instructional highlights in the printable portion. These counts apply to the whole activity, not to each problem family. Use the matching practice source for mathematical content. The [G11 C2 practice source](../../../../book2026-2027/grade11/term_2/1-practice_activities/G11_T2_L1_C2_practice.tex) and [G11 C2 classroom reference](../../../../book2026-2027/grade11/term_2/2-class_activities/G11_T2_L1_C2_classroom_activity.tex) demonstrate the transformations below. The G11 classroom reference supplies table/layout principles across grades and topics; its C2 symbols, classifications, and formulas are examples, not requirements. Do not inherit its problem-count discrepancies, nonstandard General assessment tasks heading, stale comments, or conflicting task instructions. The five required sections and fixed counts in the skill take precedence.
+Copy the [LaTeX scaffold](../assets/template_classroom_activity.tex) to the intended source directory. Every activity has exactly one fully worked example, one guided example, and five unsolved independent exercises, with the mandatory three-level structural heading hierarchy below and boxed criteria, and no semantic instructional highlights in the printable portion. These counts apply to the whole activity, not to each problem family. Use the matching practice source for mathematical content. The [G11 C2 practice source](../../../../book/grade11/term_2/1-practice_activities/G11_T2_L1_C2_practice.tex) and [G11 C2 classroom reference](../../../../book/grade11/term_2/2-class_activities/G11_T2_L1_C2_classroom_activity.tex) demonstrate the transformations below. The G11 classroom reference supplies table/layout principles across grades and topics; its C2 symbols, classifications, and formulas are examples, not requirements. Do not inherit its problem-count discrepancies, nonstandard General assessment tasks heading, stale comments, or conflicting task instructions. The five required sections and fixed counts in the skill take precedence.
 
 ## Content and highlight rules
 
@@ -19,10 +19,10 @@ Independent descriptions supply every given needed for General tasks: context, o
 
 ## Shared inputs
 
-Load the activity's year-local `preamble.tex` once. It declares the 11 pt article class. Run pdfLaTeX from the source directory. The scaffold searches `../../../preamble/` from `<year>/<grade>/<term>/2-class_activities/` and `../../../../book2026-2027/preamble/` from its own `assets/` directory. In a classroom activity, keep only the lookup for its own year. For scratch builds, replace the relative lookup or prepend the absolute year-local preamble directory to `TEXINPUTS`. A trailing path separator retains TeX's default search paths. The lookup also resolves `graphs/...` and nested inputs.
+Load the activity's year-local `preamble.tex` once. It declares the 11 pt article class. Run pdfLaTeX from the source directory. The scaffold searches `../../../preamble/` from `<year>/<grade>/<term>/2-class_activities/` and `../../../../book/preamble/` from its own `assets/` directory. In a classroom activity, keep only the lookup for its own year. For scratch builds, replace the relative lookup or prepend the absolute year-local preamble directory to `TEXINPUTS`. A trailing path separator retains TeX's default search paths. The lookup also resolves `graphs/...` and nested inputs.
 
 ```powershell
-$env:TEXINPUTS = 'C:/path/to/repo/book2026-2027/preamble/;'
+$env:TEXINPUTS = 'C:/path/to/repo/book/preamble/;'
 ```
 
 Use `:` as the search-path separator on POSIX systems.
@@ -36,11 +36,11 @@ Use `:` as the search-path separator on POSIX systems.
 - Pair related reference or instructional tables in top-aligned `.49\linewidth` minipages separated by `\hfill`, with `\vspace{0pt}` at each start, when this improves scanning. Keep related groups together in logical order. Use full-width blocks for wide or tall content. Keep each prompt close to its data and response space. For a short block that must stay together, reserve its measured height with `\Needspace` before the block. Allow long problems to break at task boundaries.
 - Size tables to the local `\linewidth`. Use wrapping `tabularx` columns as needed and `longtable` with repeated headings for multi-page tables. In the Guided Example, use empty guided response boxes for student answers and retain required graphing space. Let the content determine the page count.
 - Use the Guided Example-only `\guidedresponsebox[<height>]{<width>}` and `\guidedpair{<left>}{<right>}` helpers described below. Reserve the measured prompt-plus-response block before its heading. Independent problems follow one another compactly without answer space.
-- For graphs, consult the year-local [graph guide](../../../../book2026-2027/preamble/graphs/README-graphs.md) and check the chosen command's arguments and dependencies. Load the graph inputs the activity uses. Check axes, units, labels, plotted values, and annotations at print size.
+- For graphs, consult the year-local [graph guide](../../../../book/preamble/graphs/README-graphs.md) and check the chosen command's arguments and dependencies. Load the graph inputs the activity uses. Check axes, units, labels, plotted values, and annotations at print size.
 
 ## Three-level structural heading hierarchy
 
-Inspect the definitions and uses in the [G10 C3 heading reference](../../../../book2026-2027/grade10/term_2/2-class_activities/G10_T2_L1_C3_classroom_activity.tex). Its section border, compact task nodes, and bold underlined stages define the style; its negative vertical spacing is not part of this convention. Use the scaffold's local helpers across topics.
+Inspect the definitions and uses in the [G10 C3 heading reference](../../../../book/grade10/term_2/2-class_activities/G10_T2_L1_C3_classroom_activity.tex). Its section border, compact task nodes, and bold underlined stages define the style; its negative vertical spacing is not part of this convention. Use the scaffold's local helpers across topics.
 
 | Level and placement | Required appearance | Numbering and relationship |
 | --- | --- | --- |
@@ -67,7 +67,7 @@ For corresponding subtask headings in paired blocks, use two top-aligned `.49\li
 
 ## Guided response boxes
 
-Inspect the local helpers and actual rendered Guided Example pages of the [G10 C3 reference](../../../../book2026-2027/grade10/term_2/2-class_activities/G10_T2_L1_C3_classroom_activity.tex) before adaptation. Its `\writingbox` uses a TikZ node with an invisible `\phantom{0}` baseline anchor; its short, calculation, probability, and word variants demonstrate adjustable response dimensions. Adopt the neutral response-area styling across grades, terms, topics, and criteria, without importing its mathematics, fixed page distribution, or compact spacing settings.
+Inspect the local helpers and actual rendered Guided Example pages of the [G10 C3 reference](../../../../book/grade10/term_2/2-class_activities/G10_T2_L1_C3_classroom_activity.tex) before adaptation. Its `\writingbox` uses a TikZ node with an invisible `\phantom{0}` baseline anchor; its short, calculation, probability, and word variants demonstrate adjustable response dimensions. Adopt the neutral response-area styling across grades, terms, topics, and criteria, without importing its mathematics, fixed page distribution, or compact spacing settings.
 
 Call these **guided response boxes**, not semantic highlights. They are explicitly permitted neutral response areas; semantic color coding and highlight legends remain forbidden. Replace guided student-answer underlines with boxes, retaining bold underlined numbered subtask headings. Use exactly `fill=black!1`, `draw=black!25`, `line width=.3pt`, and `rounded corners=2mm` (the section-heading radius). Students write directly inside. Interiors contain no visible placeholders, underlines, hints, or answers; invisible baseline anchors are allowed. Prompts, units, supplied calculations, and explanations stay outside.
 

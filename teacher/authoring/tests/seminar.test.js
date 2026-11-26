@@ -62,9 +62,9 @@ test('seminar base catalog has sequential 9/10/9 slots, preserved history, and n
   const hashes = {
     // Includes the intentional regular-section continuation after May 11.
     schedule: 'aa6ba79702f89f21bf75a11393f3d351973df2f85051af3dd357827e7ea86d9a',
-    materials: 'b5652182187641ae625247a3c1e6507b33d89bd75649ec02f79fe001f9d64901',
+    materials: '85fac7c0e55f4301a3908d79d5ef90912d2e2c7ee4445f7d3affcba7e288ccfa',
     baseSchedule: '748590861628dac7102900311771a60ac0dfa5e501bc2be419c202afd269bfd2',
-    baseMaterials: '3aa3a32006763d71f11f72e98e9a31c6cb91a014bbb51a55c64b0e76663a3dda'
+    baseMaterials: '2c87bc100caeeb70532116ae37d50f593fe492ebba65f6b544acbcf2293aa995'
   };
   for (const [name, expected] of Object.entries(hashes)) assert.equal(hash(data[name].filter(r => !affected(r) && r.Grade !== '10S')), expected, name);
   assert.equal(hash(data.schedule.map(r => Object.fromEntries(w.identityFields.map(f => [f,r[f]])))), 'b5b7fd023a64e7bc6f87b1695b4cf6d812f4f17e7cd890a58691536492a3a0a8');

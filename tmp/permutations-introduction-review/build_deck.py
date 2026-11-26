@@ -4,8 +4,8 @@ from math import factorial
 import hashlib, json
 
 root=Path(__file__).resolve().parents[2]
-target=root/'book2026-2027/fundamentals/permutations1-introduction-slides.tex'
-source=root/'book2026-2027/fundamentals/permutations1.tex'
+target=root/'book/fundamentals/permutations1-introduction-slides.tex'
+source=root/'book/fundamentals/permutations1.tex'
 original_hash=hashlib.sha256(source.read_bytes()).hexdigest()
 # Preserve the established starter typography and footer, entirely inline.
 old=target.read_text(encoding='utf-8')

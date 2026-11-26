@@ -14,7 +14,7 @@ from urllib.parse import quote, unquote
 
 SCHEMA = 1
 VERSION = "1.0"
-TEMPLATE = "book2026-2027/preamble/template_README.md"
+TEMPLATE = "book/preamble/template_README.md"
 HEADINGS = ["Purpose", "Files", "Folders", "Directory Structure", "Public Commands", "Document Sections"]
 EXTRA = ["*.nav", "*.snm", "*.vrb", "*.bcf", "*.run.xml", "*.xdv", "*.dvi", "*.blg", "*.bbl", "*.ilg", "*.ind", "*.idx"]
 

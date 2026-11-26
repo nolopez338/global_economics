@@ -27,7 +27,7 @@ When using an authoring or highlighting skill for implementation guidance, use o
 ## Project conventions to retain while editing
 
 - Follow the target's language, grade/term/criterion metadata, neighboring filename conventions, class, and existing organization. An update does not request a different activity template or a rewritten lesson.
-- Reuse the target's shared preamble and relative inputs. Many handouts use `book2026-2027/preamble/preamble_exams.tex`; standalone Beamer decks can intentionally keep preambles and macros inline. Do not convert one arrangement into the other.
+- Reuse the target's shared preamble and relative inputs. Many handouts use `book/preamble/preamble_exams.tex`; standalone Beamer decks can intentionally keep preambles and macros inline. Do not convert one arrangement into the other.
 - Retain existing labels and navigation when moving content. Documents may use `\QuestionsTasks`, `\SectionProblemsTableOfContents`, `\SectionProblemLink`, and `\secInicio` for task, solution, and return links.
 - Reuse existing table helpers, graph commands, and local widths (`\linewidth` inside columns/minipages). Keep calculations, units, notation, and reasoning unless the requested change concerns them. Prefer reflow, useful column widths, or splitting content over indiscriminate font reduction.
 - Preserve highlight mappings and toggle settings where present. Shared definitions may live in `preamble/highlights/highlights.tex` and `specific_highlights.tex`. Classroom activities intentionally omit instructional highlights; do not import them from a practice source. Concise legends and detailed notation references have distinct purposes; do not merge or duplicate them incidentally.

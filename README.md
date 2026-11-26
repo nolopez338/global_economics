@@ -12,7 +12,7 @@ There is no repository-wide build step.
   [`teacher/README.md`](teacher/README.md) before editing schedule data.
 - `assets/interactive/index.html` opens the browser-only interactive assessment
   authoring tools.
-- `book2025-2026/` and `book2026-2027/` contain independent LaTeX source
+- `book2025-2026/` and `book/` contain independent LaTeX source
   collections. Their status and known contents are documented in their local
   README files.
 - [`other/README.md`](other/README.md) identifies standalone and experimental

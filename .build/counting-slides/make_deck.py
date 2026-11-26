@@ -6,7 +6,7 @@ preamble = starter.split('% Define source-derived role colors here.')[0]
 preamble += r'''
 \usetikzlibrary{arrows.meta,positioning,calc}
 \usepackage{cancel}
-% Source map: book2026-2027/fundamentals/permutations1.tex, lines 51--80:
+% Source map: book/fundamentals/permutations1.tex, lines 51--80:
 % Introduction: Counting Choices, stopping BEFORE Worked Examples (line 82).
 % Frames 2--4: multiplication paragraph; 5--8: factorial bullet;
 % 9--12: ordered positions bullet; 13--16: unordered groups bullet;
@@ -408,7 +408,7 @@ Temporary labels on the two B cards give two versions of each visible row.}
 ''','Finish by asking: what is one actual outcome, and how often did our first count include it?')
 
 assert len(frames)==26,len(frames)
-out=root/'book2026-2027/fundamentals/permutations1-introduction-slides.tex'
+out=root/'book/fundamentals/permutations1-introduction-slides.tex'
 deck=preamble+'\n'.join(frames)+'\n\\end{document}\n'
 # Center diagrams without the extra list spacing of the center environment.
 deck=deck.replace(r'\begin{center}',r'\par{\centering ').replace(r'\end{center}',r'\par}')

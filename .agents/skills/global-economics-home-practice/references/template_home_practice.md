@@ -4,12 +4,12 @@
 
 Copy the [LaTeX scaffold](../assets/template_home_practice.tex) into the intended source directory. Replace the bracketed placeholders and remove unused optional blocks.
 
-Keep the scaffold's `\input@path` setup and load the [shared preamble](../../../../book2026-2027/preamble/preamble_exams.tex) once. It initializes the document class and loads the shared layout and navigation commands. The relative search paths cover the scaffold's directory and typical activity directories under `book2026-2027/`.
+Keep the scaffold's `\input@path` setup and load the [shared preamble](../../../../book/preamble/preamble_exams.tex) once. It initializes the document class and loads the shared layout and navigation commands. The relative search paths cover the scaffold's directory and typical activity directories under `book/`.
 
-When the output source directory is outside that search range, add the absolute `book2026-2027/preamble/` directory to `TEXINPUTS` for the build session. Include the trailing slash on the directory and an empty path component for TeX's default search paths. This also resolves nested inputs. In PowerShell, use a semicolon as the path separator and replace the placeholder path below. On systems with a POSIX shell, use a colon as the separator.
+When the output source directory is outside that search range, add the absolute `book/preamble/` directory to `TEXINPUTS` for the build session. Include the trailing slash on the directory and an empty path component for TeX's default search paths. This also resolves nested inputs. In PowerShell, use a semicolon as the path separator and replace the placeholder path below. On systems with a POSIX shell, use a colon as the separator.
 
 ```powershell
-$env:TEXINPUTS = 'C:/path/to/repo/book2026-2027/preamble/;'
+$env:TEXINPUTS = 'C:/path/to/repo/book/preamble/;'
 ```
 
 ## Section layout
@@ -45,7 +45,7 @@ The scaffold loads the existing renderer once and places the commented disable t
 
 ## Graphs
 
-Use the [shared graph index](../../../../book2026-2027/preamble/graphs/README-graphs.md) to discover graph commands. Open the selected macro's definition to confirm its arguments, units or conventions, and dependencies. Add the required `\input{graphs/...}` lines after the shared preamble. Load only the graph files and dependencies used by the activity. Use local TikZ or PGFPlots when no shared command fits.
+Use the [shared graph index](../../../../book/preamble/graphs/README-graphs.md) to discover graph commands. Open the selected macro's definition to confirm its arguments, units or conventions, and dependencies. Add the required `\input{graphs/...}` lines after the shared preamble. Load only the graph files and dependencies used by the activity. Use local TikZ or PGFPlots when no shared command fits.
 
 Place a graph beside its calculation or table when both remain legible. Use two top-aligned `minipage` blocks with `\vspace{0pt}` at the start of each and leave room for the gap between them. Size the graph to its local `\linewidth`. Stack the blocks when the axes, labels, or reasoning need more width. Check that labels, units, scales, domains, and highlighted features agree with the mathematics.
 

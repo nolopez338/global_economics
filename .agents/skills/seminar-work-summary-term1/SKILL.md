@@ -5,11 +5,11 @@ description: Generate a Spanish, source-cited LaTeX summary of Term 1 seminar gr
 
 # Term 1 seminar work summary
 
-When invoked, generate `book2026-2027/seminars/term_1/second_learning_evidence/seminars_summary.tex` from verified student submissions. Paths below are relative to the project root. Creating or editing this skill does not invoke the summary workflow. Do not reassess, grade, or modify the CSV or submissions.
+When invoked, generate `book/seminars/term_1/second_learning_evidence/seminars_summary.tex` from verified student submissions. Paths below are relative to the project root. Creating or editing this skill does not invoke the summary workflow. Do not reassess, grade, or modify the CSV or submissions.
 
 ## Discover sources and verify groups
 
-- Read `book2026-2027/seminars/term_1/second_learning_evidence/resultados_criterios.csv` with a CSV parser that preserves quoted multiline fields (for example, Python `csv.DictReader` with `newline=''`); never split the file into lines as records.
+- Read `book/seminars/term_1/second_learning_evidence/resultados_criterios.csv` with a CSV parser that preserves quoted multiline fields (for example, Python `csv.DictReader` with `newline=''`); never split the file into lines as records.
 - Identify students using `ESTUDIANTES`; extract every URL in `ENLACE_ACTIVIDAD`, including newline-separated URLs within one cell. Deduplicate links while preserving their associations with every roster row. `No` identifies a roster row, not a seminar group.
 - Retrieve and read every distinct relevant PDF. Inspect tables, figures, and scanned pages as well as extracted text; render pages or use OCR where necessary. Record inaccessible sources and unreadable pages individually; do not treat failed extraction as absent student content.
 - Establish group membership using both shared submission links and explicit membership statements in PDFs. Verify membership across related submissions; one overlapping student or link alone does not justify merging groups. Retain separately verified groups while recording unresolved relationships without guessing.
@@ -20,9 +20,9 @@ When invoked, generate `book2026-2027/seminars/term_1/second_learning_evidence/s
 
 Read these guides solely to interpret the criteria:
 
-- `book2026-2027/seminars/term_1/C5C6-Activity.tex`
-- `book2026-2027/seminars/term_1/C7C8-Activity.tex`
-- `book2026-2027/seminars/term_1/C9C10-Activity.tex`
+- `book/seminars/term_1/C5C6-Activity.tex`
+- `book/seminars/term_1/C7C8-Activity.tex`
+- `book/seminars/term_1/C9C10-Activity.tex`
 
 All claims about completed work, problems, and solution ideas must come from the group's submitted PDFs. CSV Yes/No results and completion percentages are not evidence of what students wrote. Never convert assignment instructions into student work, infer a solution from a problem, or invent content. Preserve students' meaning and distinguish proposals from actions actually implemented.
 

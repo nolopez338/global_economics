@@ -8,7 +8,7 @@ Cleaning has **NOT** been performed. This batch covers **questions 1–18 only**
 - `transcription_manifest.csv`: UTF-8 CSV with one row per questionnaire, stable key, PDF pages, workbook sheet/row, completion status, and outstanding scan-reading uncertainties. Row numbers locate the present workbook and must be refreshed after sorting or adding records; IDs remain stable.
 - `README.md`: scope, conventions, uncertainty index, and handoff instructions.
 - Source scan: `assets/data/pdf/Encuesta-10A.pdf`.
-- Reference question wording, requested units, and option order: `book2026-2027/fundamentals/G10_T1_survey.tex`.
+- Reference question wording, requested units, and option order: `book/fundamentals/G10_T1_survey.tex`.
 - Full source template: `outputs/survey_template/Global_Economics_Survey_Database.xlsx`.
 
 The original PDF and template were preserved. Their SHA-256 values were checked before and after authoring:

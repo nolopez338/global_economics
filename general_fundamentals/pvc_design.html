@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PVC Studio · Furniture workspace</title>
+<link rel="icon" type="image/svg+xml" href="../assets/svg/icon_global.svg">
+<link rel="stylesheet" href="../assets/css/pvc-design.css">
+<script type="importmap">{"imports":{"three":"../assets/vendor/three-0.170.0/three.module.js"}}</script>
+</head>
+<body>
+<header class="app-header">
+  <a class="brand" href="./index.html" title="Back to fundamentals"><span class="brand-icon">⌑</span><span>PVC <b>STUDIO</b><small>FURNITURE WORKSPACE</small></span></a>
+  <div class="document-title">Untitled design <span id="save-state">Saved on this device</span></div>
+  <div class="header-actions"><button id="new">New</button><button id="import">Load JSON</button><button id="export" class="primary">Save JSON</button><button id="help-toggle" aria-expanded="false">Help</button></div>
+</header>
+<nav class="toolbar" aria-label="Construction tools">
+  <div class="tool-group"><button data-tool="select" aria-pressed="true" title="Select (V)">↖ <span>Select</span></button><button data-tool="translate" title="Move (G)">✥ <span>Move</span></button><button data-tool="rotate" title="Rotate (R)">⟳ <span>Rotate</span></button><button data-tool="marquee" title="Drag a rectangle to select">▧ <span>Marquee</span></button><button data-tool="joints" title="Select and detach joints">◉ <span>Joints</span></button></div>
+  <div class="tool-group"><button id="undo" title="Undo (Ctrl+Z)">↶</button><button id="redo" title="Redo (Ctrl+Shift+Z)">↷</button><button id="copy" title="Copy (Ctrl+C)">Copy</button><button id="paste" title="Paste (Ctrl+V)">Paste</button><button id="delete" title="Delete selected pieces or joint">Delete</button></div>
+  <div class="tool-group"><button id="frame" title="Frame selection (F)">Frame</button><select id="camera" aria-label="Camera view"><option value="perspective">Perspective</option><option value="top">Top</option><option value="front">Front</option><option value="side">Side</option></select></div>
+</nav>
+<main class="workbench">
+  <aside class="materials panel" aria-label="Materials catalog">
+    <div class="panel-heading"><span class="eyebrow">BUILDING BLOCKS</span><h1>Materials <span class="count">8</span></h1><p>Drag into the workspace.<br>Or click, then click to place.</p></div>
+    <div class="spec"><span class="spec-dot"></span> PVC · Ø 32 mm <small>One compatible system</small></div>
+    <div id="catalog" class="catalog"></div>
+    <div class="panel-note">All dimensions in millimetres.<br>Fitting sockets accept 20 mm of tube.</div>
+    <button id="sample" class="sample-button">Open rectangular frame</button>
+  </aside>
+  <section id="workspace" aria-label="3D construction workspace" tabindex="0">
+    <div class="viewport-top"><span class="workspace-tag">DESIGN SPACE <span> / mm</span></span><span id="view-label">Perspective</span></div>
+    <div id="empty"><div class="empty-icon">⌑</div><h2>Make room for your ideas.</h2><p>Start with a tube. Build something that fits.</p><button id="start" class="primary">Place your first tube</button><span>or drag any fitting from the materials panel</span></div>
+    <div id="fatal" role="alert" hidden></div>
+    <div id="marquee-box" hidden></div>
+    <div class="viewport-bottom"><span id="scene-count">0 pieces · 0 joints</span><span>Orbit: right drag · Pan: middle drag · Zoom: scroll</span></div>
+    <div id="placement-bar" hidden>Click to place · Q: rotate 90° · Esc: cancel</div>
+    <div id="orientation" title="World axes: red X, green Y, blue Z"><svg width="84" height="84" aria-label="World orientation"><g id="axis-lines"></g></svg></div>
+  </section>
+  <aside class="properties panel" aria-label="Selection properties">
+    <div class="panel-heading"><span class="eyebrow">INSPECTOR</span><h2 id="selection-title">Your design</h2><p id="selection-note">Select a piece to refine it.</p></div>
+    <section class="section"><div class="section-label">SELECTION <div><button id="select-all" class="text-button">All</button><button id="clear" class="text-button">Clear</button></div></div><div id="selection-content" class="muted">Nothing selected</div><button id="select-assembly" hidden>Select connected assembly</button></section>
+    <section id="transform-section" class="section" hidden><h3>Position <small>mm · world</small></h3><div class="triple" id="position-fields"></div><h3>Rotation <small>degrees · XYZ</small></h3><div class="triple" id="rotation-fields"></div><div class="rotate-buttons"><button data-turn="x">X +90°</button><button data-turn="y">Y +90°</button><button data-turn="z">Z +90°</button></div><p class="muted" id="assembly-note"></p></section>
+    <section id="length-section" class="section" hidden><h3>Tube cut length <small>mm</small></h3><div class="length-value"><input id="length" type="number" min="80" max="3000" step="1" aria-label="Tube cut length in mm"><span>mm</span></div><input id="length-slider" type="range" min="80" max="3000" step="1" aria-label="Tube cut length slider"><div class="range-labels"><span>80 mm</span><span>3,000 mm</span></div><p id="length-note" class="muted"></p><button id="detach-blocking" hidden>Show blocking joint</button></section>
+    <section id="ports-section" class="section" hidden><h3>Connection ports</h3><p class="muted">Choose two free compatible ports, then connect. Whole assemblies align rigidly.</p><div id="ports"></div><button id="connect" class="primary" hidden>Connect selected ports</button><button id="detach" hidden>Detach selected joint</button></section>
+    <section class="section settings"><h3>Placement & snapping</h3><label><input id="port-snap" type="checkbox" checked> Snap compatible ports</label><label><input id="grid-snap" type="checkbox"> Snap to 25 mm grid</label><label>Working plane <select id="plane"><option value="ground">Ground · XZ</option><option value="front">Front · XY</option><option value="side">Side · YZ</option></select></label><label>Plane offset (mm) <input id="plane-offset" type="number" value="0" step="25"></label></section>
+    <section class="section summary"><div class="section-label">MATERIALS SUMMARY <span id="summary-count">0 pieces</span></div><div id="summary"></div><div class="total"><span>Total tube length</span><b id="total-length">0 mm</b></div><p class="muted">Cut lengths include the tube inserted into sockets. Fittings are counted separately.</p></section>
+  </aside>
+</main>
+<footer><span id="status" role="status" aria-live="polite">Ready. Choose a component to start building.</span><span class="footer-spec">Ø 32 mm · 20 mm insertion</span></footer>
+<dialog id="help"><div class="help-header"><span class="eyebrow">A LITTLE GUIDANCE</span><button id="help-close" aria-label="Close help">Close</button></div><h2>From pieces to possibilities.</h2><dl><dt>Place a piece</dt><dd>Drag a material onto the working plane, or click a material then click the workspace. Preview before placing; Q turns it 90°. Escape cancels.</dd><dt>Look around</dt><dd>Right drag orbits; middle drag pans; scroll zooms. Camera presets give perspective, top, front and side views. Frame or F fits your selection, or the whole design when empty.</dd><dt>Select & transform</dt><dd>Click selects; Shift-click toggles. Marquee tool drags a screen rectangle around piece centres. Move (G) and Rotate (R) expose axis handles. Numeric fields set world position and XYZ Euler rotation. Connected pieces always move together, including the amber-highlighted companions.</dd><dt>Connect</dt><dd>Bring a free tube end near a free fitting socket. Cyan markers and a translucent preview show the proposed snap. Release to connect; the moving assembly aligns rigidly. You can also select two ports in the inspector. A tube seats 20 mm inside a socket. Closed frames must align exactly to close.</dd><dt>Detach a joint</dt><dd>Use Joints mode and click a cyan joint marker, or select a joint in the inspector. Detach removes just that edge; geometry stays in place. Alternate paths keep an assembly joined.</dd><dt>Change a cut length</dt><dd>The number and slider stay in sync. A connected end stays fixed; a second branch translates when free to do so. A closed loop locks length until you detach a joint. Free tubes resize about their centres.</dd><dt>Copy & history</dt><dd>Ctrl/Cmd+C and V preserve selected internal joints. External joints are omitted. Ctrl/Cmd+Z undoes; Ctrl/Cmd+Shift+Z or Ctrl+Y redoes. Ctrl/Cmd+A selects all; Delete removes the selection. Escape clears selection or cancels placement / a transform.</dd><dt>Keep your work</dt><dd>Changes auto-save on this browser. Save JSON exports a portable file; Load JSON validates it before replacing your design. New and sample designs ask before replacing unexported work.</dd></dl><p class="muted">This is a geometric construction planner. It does not certify load capacity, joint strength, collisions, or manufacturing tolerances.</p></dialog>
+<input id="file" type="file" accept=".json,application/json" hidden>
+<script type="module">
+try { await import('../assets/js/pvc-app.mjs'); }
+catch(error) { const box=document.querySelector('#fatal');box.hidden=false;box.textContent='The 3D workspace could not start. Serve this repository with its local HTTP server and use a browser with WebGL enabled. '+error.message;document.querySelector('#empty').hidden=true; console.error(error); }
+</script>
+</body></html>

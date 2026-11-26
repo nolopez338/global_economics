@@ -1,0 +1,666 @@
+\makeatletter
+\def\input@path{{./}{../}{../../}{../../../}{../../../../}{preamble/}{../preamble/}{../../preamble/}{../../../preamble/}{../../../../preamble/}{book/preamble/}}
+\makeatother
+
+%\input{preamble_G10_T1_practice_activities_c1_c3.tex}
+\input{preamble.tex}
+\input{graphs/highlights.tex}
+% \GTenHighlightsfalse % Uncomment to disable instructional highlights.
+\input{graphs/specific_highlights.tex}
+
+
+% C5-only adaptation of the reference's measured calculation pairs.
+% Measure operation and result stages separately: even unequal line counts
+% share operation/result baselines. All rows use the same measured struts.
+\newsavebox{\CfiveOpBox}
+\newsavebox{\CfiveResultBox}
+\newsavebox{\CfiveLeftBox}
+\newsavebox{\CfiveRightBox}
+\newlength{\CfiveOpHeight}
+\newlength{\CfiveOpDepth}
+\newlength{\CfiveResultHeight}
+\newlength{\CfiveResultDepth}
+\newlength{\CfiveLeftWidth}
+\newlength{\CfiveRightWidth}
+\newif\ifCfiveMeasuring
+\newcommand{\CfiveCell}[2]{%
+  \sbox{\CfiveOpBox}{$\begin{gathered}#1\end{gathered}$}%
+  \sbox{\CfiveResultBox}{$= #2$}%
+  \ifCfiveMeasuring
+    \ifdim\ht\CfiveOpBox>\CfiveOpHeight \global\CfiveOpHeight=\ht\CfiveOpBox\fi
+    \ifdim\dp\CfiveOpBox>\CfiveOpDepth \global\CfiveOpDepth=\dp\CfiveOpBox\fi
+    \ifdim\ht\CfiveResultBox>\CfiveResultHeight \global\CfiveResultHeight=\ht\CfiveResultBox\fi
+    \ifdim\dp\CfiveResultBox>\CfiveResultDepth \global\CfiveResultDepth=\dp\CfiveResultBox\fi
+  \fi
+  $\begin{gathered}
+    \vphantom{\rule[-\CfiveOpDepth]{0pt}{\dimexpr\CfiveOpHeight+\CfiveOpDepth\relax}}\usebox{\CfiveOpBox}\\
+    \vphantom{\rule[-\CfiveResultDepth]{0pt}{\dimexpr\CfiveResultHeight+\CfiveResultDepth\relax}}\usebox{\CfiveResultBox}
+  \end{gathered}$%
+}
+\newcommand{\SymbolicCell}[2]{\CfiveCell{#1}{#2}}
+\newcommand{\CalcResult}[2]{\CfiveCell{#1}{#2}}
+\newcommand{\CalculationPair}[3]{%
+  \par\medskip\noindent\begin{minipage}{\linewidth}
+  \linespread{1}\selectfont\setlength{\parskip}{0pt}%
+  \setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.2}%
+  \global\CfiveOpHeight=0pt \global\CfiveOpDepth=0pt
+  \global\CfiveResultHeight=0pt \global\CfiveResultDepth=0pt
+  \CfiveMeasuringtrue
+  \sbox{\CfiveLeftBox}{#2}\sbox{\CfiveRightBox}{#3}%
+  \CfiveMeasuringfalse
+  \setlength{\CfiveLeftWidth}{\dimexpr\wd\CfiveLeftBox+8pt\relax}%
+  \setlength{\CfiveRightWidth}{\dimexpr\wd\CfiveRightBox+8pt\relax}%
+  \ifdim\CfiveLeftWidth<170pt \setlength{\CfiveLeftWidth}{170pt}\fi
+  \ifdim\CfiveRightWidth<170pt \setlength{\CfiveRightWidth}{170pt}\fi
+  \textbf{#1}\par\smallskip
+  \noindent\hbox to\linewidth{\hfil
+    \begin{minipage}[t]{\CfiveLeftWidth}
+    \centering\textbf{\strut Symbolic calculations}\par\smallskip #2
+    \end{minipage}\hspace{20pt}%
+    \begin{minipage}[t]{\CfiveRightWidth}
+    \centering\textbf{\strut Numerical calculations}\par\smallskip #3
+    \end{minipage}\hfil}%
+  \end{minipage}\par\medskip
+}
+\newcommand{\CfiveSymbols}[1]{%
+  \textbf{Step 1: Symbols, values, and meanings.}
+  \begin{center}\small
+  \begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}p{0.28\linewidth} >{\raggedright\arraybackslash}X@{}}
+  \toprule Symbol & Value or identification & Meaning \\ \midrule
+  #1
+  \bottomrule\end{tabularx}\end{center}
+}
+% Match the reference's wide sheets without loading its C1--C3 preamble.
+\newenvironment{CfiveLandscape}{%
+  \clearpage\savegeometry{CfivePortrait}%
+  \newgeometry{left=0.4in,right=0.4in,top=0.4in,textheight=10.05in}%
+  \paperwidth=14in\paperheight=11in
+  \pdfpagewidth=\paperwidth\pdfpageheight=\paperheight
+  \textwidth=13.2in\hsize=\textwidth\linewidth=\textwidth\columnwidth=\textwidth
+}{%
+  \clearpage\paperwidth=8.5in\paperheight=11in
+  \pdfpagewidth=\paperwidth\pdfpageheight=\paperheight
+  \loadgeometry{CfivePortrait}%
+}
+
+
+\title{10th Grade \\ Term 1 \\ C5 Practice Activity}
+\author{}
+\date{}
+
+\pagestyle{empty}
+
+\begin{document}
+	
+	\maketitle
+	\vspace*{-2.5cm}
+	
+	% ============================================================
+	% CRITERION
+	% ============================================================
+	
+	\section*{Evaluated Criterion}
+	
+	C5: Constructs opportunity loss tables and applies the Minimax regret criterion to select the alternative that minimises the maximum opportunity loss.
+	
+	% ============================================================
+	% INTRODUCTION
+	% ============================================================
+	\section{Minimax Regret Criterion}
+\phantomsection\label{tone:legend}
+\PracticeHighlightLegend{G10-T1-C5}
+
+	
+	When \GTenToneHL{probability}{probabilities} are not available, a decision-maker can compare
+	\GTenToneHL{alternative}{alternatives} by considering the \GTenToneHL{regret}{opportunity} \GTenToneHL{regret}{loss}, or \GTenToneHL{regret}{regret}, associated
+	with each possible \GTenToneHL{state}{state} \GTenToneHL{state}{of} \GTenToneHL{state}{nature}. Regret measures the \GTenToneHL{payoff}{payoff} that could have been obtained by choosing the
+	best \GTenToneHL{alternative}{alternative} for the \GTenToneHL{state}{state} \GTenToneHL{state}{of} \GTenToneHL{state}{nature} that actually occurs, minus the
+	\GTenToneHL{payoff}{payoff} obtained from the selected \GTenToneHL{alternative}{alternative}.
+	
+	For a \GTenToneHL{payoff}{payoff} table with \GTenToneHL{alternative}{alternatives} in rows and \GTenToneHL{state}{states} \GTenToneHL{state}{of} \GTenToneHL{state}{nature} in
+	columns, let
+	$
+	\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_i},\GTenToneHL{state}{S_j})
+	$
+	represent the \GTenToneHL{payoff}{payoff} obtained when \GTenToneHL{alternative}{alternative} $\GTenToneHL{alternative}{A_i}$ is selected and
+	\GTenToneHL{state}{state} \GTenToneHL{state}{of} \GTenToneHL{state}{nature} $\GTenToneHL{state}{S_j}$ occurs.
+
+	For each \GTenToneHL{state}{state} \GTenToneHL{state}{of} \GTenToneHL{state}{nature}, first identify the best available \GTenToneHL{payoff}{payoff}:
+	\[
+	\begin{aligned}
+		\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_j})
+		&=
+		\max_i \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_i},\GTenToneHL{state}{S_j})
+		\\
+		&=
+		\max
+		\left\{
+		\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_j}),
+		\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_j}),
+		\ldots,
+		\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_m},\GTenToneHL{state}{S_j})
+		\right\}.
+	\end{aligned}
+	\]
+	
+	The \GTenToneHL{regret}{regret} associated with \GTenToneHL{alternative}{alternative} $\GTenToneHL{alternative}{A_i}$ under state $\GTenToneHL{state}{S_j}$ is then
+	\[
+	\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_i},\GTenToneHL{state}{S_j})
+	=
+	\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_j})-\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_i},\GTenToneHL{state}{S_j}).
+	\]
+	
+	For each \GTenToneHL{alternative}{alternative}, determine its maximum possible \GTenToneHL{regret}{regret}:
+	\[
+	\begin{aligned}
+		\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_i})
+		&=
+		\max_j \GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_i},\GTenToneHL{state}{S_j})
+		=
+		\max_j
+		\left\{
+		\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_j})-\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_i},\GTenToneHL{state}{S_j})
+		\right\}
+		\\
+		&=
+		\max
+		\left\{
+		\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_i},\GTenToneHL{state}{S_1}),
+		\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_i},\GTenToneHL{state}{S_2}),
+		\ldots,
+		\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_i},\GTenToneHL{state}{S_n})
+		\right\}.
+	\end{aligned}
+	\]
+	
+	The \GTenToneHL{maxregret}{Minimax} \GTenToneHL{maxregret}{Regret} criterion selects the \GTenToneHL{alternative}{alternative} whose \GTenToneHL{maxregret}{maximum} \GTenToneHL{maxregret}{regret}
+	is as small as possible:
+	
+	\[
+	A^*_{\mathrm{Minimax\ Regret}}
+	=
+	\arg\min_i \GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_i}).
+	\]
+	
+	Thus, the procedure is:
+	
+	\[
+	\boxed{
+		\begin{aligned}
+			&\text{Best payoff in each state}
+			\;\longrightarrow\;
+			\text{Regret table}
+			\;\longrightarrow\;
+			\text{Maximum regret for each alternative}
+			\\
+			&\text{Minimum of those maximum regrets}
+		\end{aligned}
+	}
+	\]
+	
+	The selected \GTenToneHL{alternative}{alternative} minimizes the largest \GTenToneHL{regret}{opportunity} \GTenToneHL{regret}{loss} that
+	could result from the decision.
+	
+	
+	% ============================================================
+	% GENERAL 2x2 PROBLEM
+	% ============================================================
+	
+\clearpage
+\section{General 2x2 Problem}
+	
+	Consider the following \GTenToneHL{payoff}{payoff} table:
+	
+	\begin{center}
+		\renewcommand{\arraystretch}{1.3}
+		\begin{tabular}{lcc}
+			\toprule
+			Alternative & $\GTenToneHL{state}{S_1}$ & $\GTenToneHL{state}{S_2}$ \\
+			\midrule
+			$\GTenToneHL{alternative}{A_1}$
+			& $\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_1})$
+			& $\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_2})$
+			\\
+			
+			$\GTenToneHL{alternative}{A_2}$
+			& $\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_1})$
+			& $\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_2})$
+			\\
+			\bottomrule
+		\end{tabular}
+	\end{center}
+	
+	Construct the \GTenToneHL{regret}{opportunity} \GTenToneHL{regret}{loss} table and determine the decision using
+	the \GTenToneHL{maxregret}{Minimax} \GTenToneHL{maxregret}{Regret} criterion.
+	
+	\subsection{Solution}
+\CfiveSymbols{
+$\GTenToneHL{alternative}{A_1},\GTenToneHL{alternative}{A_2}$ & Two available \GTenToneHL{alternative}{alternatives} & Choices represented by the \GTenToneHL{payoff}{payoff}-table rows. \\
+$\GTenToneHL{state}{S_1},\GTenToneHL{state}{S_2}$ & Two possible states & Outcomes represented by the \GTenToneHL{payoff}{payoff}-table columns. \\
+$\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_i},\GTenToneHL{state}{S_j})$ & Given symbolically & Payoff for choice $\GTenToneHL{alternative}{A_i}$ in state $\GTenToneHL{state}{S_j}$, in the problem's monetary units. \\
+$\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_j})$ & Calculated in Step 2 & Best \GTenToneHL{payoff}{payoff} in state $\GTenToneHL{state}{S_j}$: the column maximum. \\
+$\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_i},\GTenToneHL{state}{S_j})$ & Calculated in Step 3 & Regret: the state's best \GTenToneHL{payoff}{payoff} minus this choice's \GTenToneHL{payoff}{payoff}. \\
+$\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_i})$ & Calculated in Step 4 & Largest \GTenToneHL{regret}{regret} for choice $\GTenToneHL{alternative}{A_i}$: the \GTenToneHL{best}{row} \GTenToneHL{best}{maximum}. \\
+}
+No numerical data are supplied; this template uses symbolic calculations only.
+\clearpage
+
+\textbf{Step 2: Find the best \GTenToneHL{payoff}{payoff} in each state.}
+\begin{center}
+\begin{tabular}{@{}lc@{}}
+\toprule
+State & Symbolic calculations \\ \midrule
+$\GTenToneHL{state}{S_1}$ & $\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_1})=\max\{\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_1}),\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_1})\}$ \\
+$\GTenToneHL{state}{S_2}$ & $\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_2})=\max\{\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_2}),\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_2})\}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\textbf{Step 3: Calculate opportunity losses.}
+Subtract each \GTenToneHL{payoff}{payoff} from its own column's best \GTenToneHL{payoff}{payoff}. The result of each
+subtraction is the \GTenToneHL{regret}{regret} identified on the second line.
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & $\GTenToneHL{state}{S_1}$ & $\GTenToneHL{state}{S_2}$ \\ \midrule
+$\GTenToneHL{alternative}{A_1}$ & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_1})-\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_1})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_1})} & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_2})-\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_2})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_2})} \\
+$\GTenToneHL{alternative}{A_2}$ & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_1})-\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_1})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_1})} & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_2})-\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_2})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_2})} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\textbf{Step 4: Find the \GTenToneHL{maxregret}{maximum} \GTenToneHL{maxregret}{regret} for each \GTenToneHL{alternative}{alternative}.}
+\begin{center}
+\begin{tabular}{@{}lc@{}}
+\toprule
+Alternative & Symbolic calculations \\ \midrule
+$\GTenToneHL{alternative}{A_1}$ & $\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_1})=\max\{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_1}),\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_2})\}$ \\
+$\GTenToneHL{alternative}{A_2}$ & $\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_2})=\max\{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_1}),\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_2})\}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\textbf{Step 5: Apply the \GTenToneHL{maxregret}{Minimax} \GTenToneHL{maxregret}{Regret} criterion.}
+\[
+R^*=\min\{\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_1}),\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_2})\},\qquad
+A^*_{\mathrm{Minimax\ Regret}}=\arg\min_i \GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_i}).
+\]
+Choose $\GTenToneHL{alternative}{A_1}$ if $\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_1})<\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_2})$, choose $\GTenToneHL{alternative}{A_2}$ if $\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_2})<\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_1})$,
+and recommend both \GTenToneHL{alternative}{alternatives} if $\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_1})=\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_2})$.
+
+\textbf{Step 6: Final symbolic \GTenToneHL{regret}{opportunity} \GTenToneHL{regret}{loss} table.}
+\begin{center}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Alternative & $\GTenToneHL{state}{S_1}$ & $\GTenToneHL{state}{S_2}$ & \GTenToneHL{maxregret}{Maximum} \GTenToneHL{maxregret}{regret} \\ \midrule
+$\GTenToneHL{alternative}{A_1}$ & $\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_1})$ & $\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_2})$ & $\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_1})$ \\
+$\GTenToneHL{alternative}{A_2}$ & $\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_1})$ & $\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_2})$ & $\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_2})$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\clearpage
+
+\phantomsection\label{tone:reference}
+\subsection*{Notation reference}
+\GTenToneReference{C5}
+\section{Contextualized 2x2 Problem - Coffee shop}
+	
+	A small coffee shop is considering whether to introduce a new dessert line or keep its current menu. The manager knows that the level of customer traffic during the promotional weekend is uncertain and has no reliable information about the \GTenToneHL{probability}{probability} of high or low traffic.
+	
+	What decision should the manager make using the \GTenToneHL{maxregret}{Minimax} \GTenToneHL{maxregret}{Regret} criterion?
+	
+	\begin{center}
+		\renewcommand{\arraystretch}{1.3}
+		\begin{tabular}{lcc}
+			\toprule
+			Alternative & High traffic ($\GTenToneHL{state}{S_1}$) & Low traffic ($\GTenToneHL{state}{S_2}$) \\
+			\midrule
+			Launch dessert line ($\GTenToneHL{alternative}{A_1}$) & \GTenToneHL{payoff}{42} & \GTenToneHL{payoff}{8} \\
+			Keep current menu ($\GTenToneHL{alternative}{A_2}$) & \GTenToneHL{payoff}{28} & \GTenToneHL{payoff}{20} \\
+			\bottomrule
+		\end{tabular}
+	\end{center}
+	
+	All \GTenToneHL{payoff}{payoffs} are expressed in thousands of dollars.
+	
+	Determine the decision using the \GTenToneHL{maxregret}{Minimax} \GTenToneHL{maxregret}{Regret} criterion.
+	
+	\subsection{Solution}
+\CfiveSymbols{
+$\GTenToneHL{alternative}{A_1}$ & Launch dessert line & Alternative chosen before the state is known. \\
+$\GTenToneHL{alternative}{A_2}$ & Keep current menu & Alternative chosen before the state is known. \\
+$\GTenToneHL{state}{S_1}$ & High traffic & Possible state outside the decision-maker's control. \\
+$\GTenToneHL{state}{S_2}$ & Low traffic & Possible state outside the decision-maker's control. \\
+$\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_j})$ & 42, 8 (thousand dollars) & Payoffs for Launch dessert line, in $\GTenToneHL{state}{S_1}$, $\GTenToneHL{state}{S_2}$ order. \\
+$\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_j})$ & 28, 20 (thousand dollars) & Payoffs for Keep current menu, in $\GTenToneHL{state}{S_1}$, $\GTenToneHL{state}{S_2}$ order. \\
+$\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_j})$ & Calculated in Step 2 & Best available \GTenToneHL{payoff}{payoff} in state $\GTenToneHL{state}{S_j}$ (column maximum). \\
+$\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_i},\GTenToneHL{state}{S_j})$ & Calculated in Step 3 & Opportunity loss: the best \GTenToneHL{payoff}{payoff} in this state minus this \GTenToneHL{alternative}{alternative}'s \GTenToneHL{payoff}{payoff}. \\
+$\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_i})$ & Calculated in Step 4 & \GTenToneHL{maxregret}{Maximum} \GTenToneHL{maxregret}{regret} for \GTenToneHL{alternative}{alternative} $\GTenToneHL{alternative}{A_i}$ (\GTenToneHL{best}{row} \GTenToneHL{best}{maximum}). \\
+}
+All \GTenToneHL{payoff}{payoff} and \GTenToneHL{regret}{regret} amounts below are in thousands of dollars.
+\clearpage
+\CalculationPair{Step 2: Find the best \GTenToneHL{payoff}{payoff} in each state.}{
+\begin{tabular}{@{}lc@{}}
+\toprule
+State & Comparison \\ \midrule
+$\GTenToneHL{state}{S_1}$ & \SymbolicCell{\max\{\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_1}),\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_1})\}}{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_1})} \\
+$\GTenToneHL{state}{S_2}$ & \SymbolicCell{\max\{\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_2}),\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_2})\}}{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_2})} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lc@{}}
+\toprule
+State & Comparison \\ \midrule
+$\GTenToneHL{state}{S_1}$ & \CalcResult{\max\{\GTenToneHL{benchmark}{42},\GTenToneHL{payoff}{28}\}}{\GTenToneHL{regret}{42}} \\
+$\GTenToneHL{state}{S_2}$ & \CalcResult{\max\{\GTenToneHL{benchmark}{8},\GTenToneHL{payoff}{20}\}}{\GTenToneHL{regret}{20}} \\
+\bottomrule
+\end{tabular}}
+\CalculationPair{Step 3: Calculate opportunity losses.}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & $\GTenToneHL{state}{S_1}$ & $\GTenToneHL{state}{S_2}$ \\ \midrule
+$\GTenToneHL{alternative}{A_1}$ & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_1}) - \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_1})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_1})} & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_2}) - \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_2})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_2})} \\
+$\GTenToneHL{alternative}{A_2}$ & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_1}) - \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_1})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_1})} & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_2}) - \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_2})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_2})} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & $\GTenToneHL{state}{S_1}$ & $\GTenToneHL{state}{S_2}$ \\ \midrule
+$\GTenToneHL{alternative}{A_1}$ & \CalcResult{\GTenToneHL{benchmark}{42} - \GTenToneHL{payoff}{42}}{\GTenToneHL{regret}{0}} & \CalcResult{\GTenToneHL{benchmark}{20} - \GTenToneHL{payoff}{8}}{\GTenToneHL{regret}{12}} \\
+$\GTenToneHL{alternative}{A_2}$ & \CalcResult{\GTenToneHL{payoff}{42} - \GTenToneHL{payoff}{28}}{\GTenToneHL{benchmark}{14}} & \CalcResult{\GTenToneHL{payoff}{20} - \GTenToneHL{payoff}{20}}{\GTenToneHL{benchmark}{0}} \\
+\bottomrule
+\end{tabular}}
+\CalculationPair{Step 4: Find the \GTenToneHL{maxregret}{maximum} \GTenToneHL{maxregret}{regret} for each \GTenToneHL{alternative}{alternative}.}{
+\begin{tabular}{@{}lc@{}}
+\toprule
+Alternative & Row maximum \\ \midrule
+$\GTenToneHL{alternative}{A_1}$ & \SymbolicCell{\max\{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_1}),\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_2})\}}{\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_1})} \\
+$\GTenToneHL{alternative}{A_2}$ & \SymbolicCell{\max\{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_1}),\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_2})\}}{\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_2})} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lc@{}}
+\toprule
+Alternative & Row maximum \\ \midrule
+$\GTenToneHL{alternative}{A_1}$ & \CalcResult{\max\{\GTenToneHL{benchmark}{0},\GTenToneHL{payoff}{12}\}}{\GTenToneHL{regret}{12}} \\
+$\GTenToneHL{alternative}{A_2}$ & \CalcResult{\max\{\GTenToneHL{benchmark}{14},\GTenToneHL{payoff}{0}\}}{\GTenToneHL{regret}{14}} \\
+\bottomrule
+\end{tabular}}
+\CalculationPair{Step 5: Apply the \GTenToneHL{maxregret}{Minimax} \GTenToneHL{maxregret}{Regret} criterion.}{
+\begin{tabular}{@{}lc@{}}
+\toprule
+Quantity & Comparison \\ \midrule
+$R^*$ & \SymbolicCell{\min\{\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_1}),\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_2})\}}{R^*} \\
+$A^*$ & \SymbolicCell{\arg\min_i \GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_i})}{A^*_{\mathrm{Minimax\ Regret}}} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lc@{}}
+\toprule
+Quantity & Comparison \\ \midrule
+$R^*$ & \CalcResult{\min\{\GTenToneHL{benchmark}{12},\GTenToneHL{payoff}{14}\}}{\GTenToneHL{regret}{12}} \\
+$A^*$ & \CalcResult{\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_1})=R^*=12}{\GTenToneHL{alternative}{A_1}} \\
+\bottomrule
+\end{tabular}}
+\noindent\begin{minipage}{\linewidth}
+Launch the dessert line ($\GTenToneHL{alternative}{A_1}$): it minimizes \GTenToneHL{maxregret}{maximum} \GTenToneHL{maxregret}{regret} at \$12,000, compared with \$14,000 for keeping the current menu. There is no tie.
+
+\textbf{Step 6: Final numerical \GTenToneHL{regret}{opportunity} \GTenToneHL{regret}{loss} table (thousand dollars).}
+\begin{center}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Alternative & $\GTenToneHL{state}{S_1}$ & $\GTenToneHL{state}{S_2}$ & \GTenToneHL{maxregret}{Maximum} \GTenToneHL{maxregret}{regret} \\ \midrule
+$\GTenToneHL{alternative}{A_1}$: Launch dessert line & \GTenToneHL{regret}{0} & \GTenToneHL{regret}{12} & \textbf{12} (recommended) \\
+$\GTenToneHL{alternative}{A_2}$: Keep current menu & \GTenToneHL{regret}{14} & \GTenToneHL{regret}{0} & \GTenToneHL{maxregret}{14} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+\clearpage
+\section{Contextualized 2x2 Problem - Clothing store}
+	
+	A local clothing store is deciding whether to launch a new advertising campaign before the holiday season or continue with its current marketing strategy. The manager knows that customer response to the campaign is uncertain and has no reliable information about the \GTenToneHL{probability}{probability} of strong or weak sales.
+	
+	What decision should the manager make using the \GTenToneHL{maxregret}{Minimax} \GTenToneHL{maxregret}{Regret} criterion?
+	
+	\begin{center}
+		\renewcommand{\arraystretch}{1.3}
+		\begin{tabular}{lcc}
+			\toprule
+			Alternative & Strong sales ($\GTenToneHL{state}{S_1}$) & Weak sales ($\GTenToneHL{state}{S_2}$) \\
+			\midrule
+			Launch new campaign ($\GTenToneHL{alternative}{A_1}$) & \GTenToneHL{payoff}{55} & \GTenToneHL{payoff}{5} \\
+			Keep current strategy ($\GTenToneHL{alternative}{A_2}$) & \GTenToneHL{payoff}{35} & \GTenToneHL{payoff}{22} \\
+			\bottomrule
+		\end{tabular}
+	\end{center}
+	
+	All \GTenToneHL{payoff}{payoffs} are expressed in thousands of dollars.
+	
+	Determine the decision using the \GTenToneHL{maxregret}{Minimax} \GTenToneHL{maxregret}{Regret} criterion.
+	
+	% ============================================================
+	% SOLUTION 2x2
+	% ============================================================
+	
+	\subsection{Solution}
+\CfiveSymbols{
+$\GTenToneHL{alternative}{A_1}$ & Launch new campaign & Alternative chosen before the state is known. \\
+$\GTenToneHL{alternative}{A_2}$ & Keep current strategy & Alternative chosen before the state is known. \\
+$\GTenToneHL{state}{S_1}$ & Strong sales & Possible state outside the decision-maker's control. \\
+$\GTenToneHL{state}{S_2}$ & Weak sales & Possible state outside the decision-maker's control. \\
+$\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_j})$ & 55, 5 (thousand dollars) & Payoffs for Launch new campaign, in $\GTenToneHL{state}{S_1}$, $\GTenToneHL{state}{S_2}$ order. \\
+$\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_j})$ & 35, 22 (thousand dollars) & Payoffs for Keep current strategy, in $\GTenToneHL{state}{S_1}$, $\GTenToneHL{state}{S_2}$ order. \\
+$\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_j})$ & Calculated in Step 2 & Best available \GTenToneHL{payoff}{payoff} in state $\GTenToneHL{state}{S_j}$ (column maximum). \\
+$\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_i},\GTenToneHL{state}{S_j})$ & Calculated in Step 3 & Opportunity loss: the best \GTenToneHL{payoff}{payoff} in this state minus this \GTenToneHL{alternative}{alternative}'s \GTenToneHL{payoff}{payoff}. \\
+$\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_i})$ & Calculated in Step 4 & \GTenToneHL{maxregret}{Maximum} \GTenToneHL{maxregret}{regret} for \GTenToneHL{alternative}{alternative} $\GTenToneHL{alternative}{A_i}$ (\GTenToneHL{best}{row} \GTenToneHL{best}{maximum}). \\
+}
+All \GTenToneHL{payoff}{payoff} and \GTenToneHL{regret}{regret} amounts below are in thousands of dollars.
+\clearpage
+\CalculationPair{Step 2: Find the best \GTenToneHL{payoff}{payoff} in each state.}{
+\begin{tabular}{@{}lc@{}}
+\toprule
+State & Comparison \\ \midrule
+$\GTenToneHL{state}{S_1}$ & \SymbolicCell{\max\{\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_1}),\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_1})\}}{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_1})} \\
+$\GTenToneHL{state}{S_2}$ & \SymbolicCell{\max\{\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_2}),\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_2})\}}{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_2})} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lc@{}}
+\toprule
+State & Comparison \\ \midrule
+$\GTenToneHL{state}{S_1}$ & \CalcResult{\max\{\GTenToneHL{benchmark}{55},\GTenToneHL{payoff}{35}\}}{\GTenToneHL{regret}{55}} \\
+$\GTenToneHL{state}{S_2}$ & \CalcResult{\max\{\GTenToneHL{regret}{5},\GTenToneHL{regret}{22}\}}{\GTenToneHL{maxregret}{22}} \\
+\bottomrule
+\end{tabular}}
+\CalculationPair{Step 3: Calculate opportunity losses.}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & $\GTenToneHL{state}{S_1}$ & $\GTenToneHL{state}{S_2}$ \\ \midrule
+$\GTenToneHL{alternative}{A_1}$ & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_1}) - \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_1})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_1})} & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_2}) - \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_2})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_2})} \\
+$\GTenToneHL{alternative}{A_2}$ & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_1}) - \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_1})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_1})} & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_2}) - \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_2})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_2})} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Alternative & $\GTenToneHL{state}{S_1}$ & $\GTenToneHL{state}{S_2}$ \\ \midrule
+$\GTenToneHL{alternative}{A_1}$ & \CalcResult{\GTenToneHL{regret}{55} - \GTenToneHL{regret}{55}}{\GTenToneHL{maxregret}{0}} & \CalcResult{\GTenToneHL{maxregret}{22} - \GTenToneHL{maxregret}{5}}{\GTenToneHL{payoff}{17}} \\
+$\GTenToneHL{alternative}{A_2}$ & \CalcResult{55 - 35}{\GTenToneHL{payoff}{20}} & \CalcResult{22 - 22}{\GTenToneHL{payoff}{0}} \\
+\bottomrule
+\end{tabular}}
+\CalculationPair{Step 4: Find the \GTenToneHL{maxregret}{maximum} \GTenToneHL{maxregret}{regret} for each \GTenToneHL{alternative}{alternative}.}{
+\begin{tabular}{@{}lc@{}}
+\toprule
+Alternative & Row maximum \\ \midrule
+$\GTenToneHL{alternative}{A_1}$ & \SymbolicCell{\max\{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_1}),\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_2})\}}{\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_1})} \\
+$\GTenToneHL{alternative}{A_2}$ & \SymbolicCell{\max\{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_1}),\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_2})\}}{\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_2})} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lc@{}}
+\toprule
+Alternative & Row maximum \\ \midrule
+$\GTenToneHL{alternative}{A_1}$ & \CalcResult{\max\{\GTenToneHL{payoff}{0},\GTenToneHL{payoff}{17}\}}{\GTenToneHL{benchmark}{17}} \\
+$\GTenToneHL{alternative}{A_2}$ & \CalcResult{\max\{\GTenToneHL{payoff}{20},\GTenToneHL{payoff}{0}\}}{\GTenToneHL{benchmark}{20}} \\
+\bottomrule
+\end{tabular}}
+\CalculationPair{Step 5: Apply the \GTenToneHL{maxregret}{Minimax} \GTenToneHL{maxregret}{Regret} criterion.}{
+\begin{tabular}{@{}lc@{}}
+\toprule
+Quantity & Comparison \\ \midrule
+$R^*$ & \SymbolicCell{\min\{\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_1}),\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_2})\}}{R^*} \\
+$A^*$ & \SymbolicCell{\arg\min_i \GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_i})}{A^*_{\mathrm{Minimax\ Regret}}} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lc@{}}
+\toprule
+Quantity & Comparison \\ \midrule
+$R^*$ & \CalcResult{\min\{\GTenToneHL{benchmark}{17},\GTenToneHL{payoff}{20}\}}{\GTenToneHL{regret}{17}} \\
+$A^*$ & \CalcResult{\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_1})=R^*=17}{\GTenToneHL{alternative}{A_1}} \\
+\bottomrule
+\end{tabular}}
+\noindent\begin{minipage}{\linewidth}
+Launch the new campaign ($\GTenToneHL{alternative}{A_1}$): it minimizes \GTenToneHL{maxregret}{maximum} \GTenToneHL{maxregret}{regret} at \$17,000, compared with \$20,000 for keeping the current strategy. There is no tie.
+
+\textbf{Step 6: Final numerical \GTenToneHL{regret}{opportunity} \GTenToneHL{regret}{loss} table (thousand dollars).}
+\begin{center}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Alternative & $\GTenToneHL{state}{S_1}$ & $\GTenToneHL{state}{S_2}$ & \GTenToneHL{maxregret}{Maximum} \GTenToneHL{maxregret}{regret} \\ \midrule
+$\GTenToneHL{alternative}{A_1}$: Launch new campaign & \GTenToneHL{regret}{0} & \GTenToneHL{regret}{17} & \textbf{17} (recommended) \\
+$\GTenToneHL{alternative}{A_2}$: Keep current strategy & \GTenToneHL{regret}{20} & \GTenToneHL{regret}{0} & \GTenToneHL{maxregret}{20} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+\begin{CfiveLandscape}
+\section{Contextualized 4x3 Problem - Technology company}
+	
+	A technology company is deciding which product strategy to adopt for the launch of a new device. The manager knows that market conditions are uncertain and has no reliable information about the \GTenToneHL{probability}{probability} of each possible level of demand. The company is considering four possible strategies: launching a premium version, launching a standard version, launching a budget version, or delaying the launch.
+	
+	The level of market demand could be high, medium, or low. The estimated \GTenToneHL{payoff}{profit} for each strategy under each possible market condition is shown in the table below.
+	
+	What decision should the company make using the \GTenToneHL{maxregret}{Minimax} \GTenToneHL{maxregret}{Regret} criterion?
+	
+	\begin{center}
+		\renewcommand{\arraystretch}{1.3}
+		\begin{tabular}{lccc}
+			\toprule
+			Alternative & High demand ($\GTenToneHL{state}{S_1}$) & Medium demand ($\GTenToneHL{state}{S_2}$) & Low demand ($\GTenToneHL{state}{S_3}$) \\
+			\midrule
+			Premium version ($\GTenToneHL{alternative}{A_1}$) & \GTenToneHL{payoff}{80} & \GTenToneHL{payoff}{35} & \GTenToneHL{payoff}{-20} \\
+			Standard version ($\GTenToneHL{alternative}{A_2}$) & \GTenToneHL{payoff}{60} & \GTenToneHL{payoff}{42} & \GTenToneHL{payoff}{18} \\
+			Budget version ($\GTenToneHL{alternative}{A_3}$) & \GTenToneHL{payoff}{40} & \GTenToneHL{payoff}{32} & \GTenToneHL{payoff}{25} \\
+			Delay launch ($\GTenToneHL{alternative}{A_4}$) & \GTenToneHL{payoff}{15} & \GTenToneHL{payoff}{15} & \GTenToneHL{payoff}{15} \\
+			\bottomrule
+		\end{tabular}
+	\end{center}
+	
+	All \GTenToneHL{payoff}{payoffs} are expressed in thousands of dollars.
+	
+	Determine the decision using the \GTenToneHL{maxregret}{Minimax} \GTenToneHL{maxregret}{Regret} criterion.
+	
+	% ============================================================
+	% SOLUTION 4x3
+	% ============================================================
+	
+	\subsection{Solution}
+\CfiveSymbols{
+$\GTenToneHL{alternative}{A_1}$ & Premium version & Alternative chosen before the state is known. \\
+$\GTenToneHL{alternative}{A_2}$ & Standard version & Alternative chosen before the state is known. \\
+$\GTenToneHL{alternative}{A_3}$ & Budget version & Alternative chosen before the state is known. \\
+$\GTenToneHL{alternative}{A_4}$ & Delay launch & Alternative chosen before the state is known. \\
+$\GTenToneHL{state}{S_1}$ & High demand & Possible state outside the decision-maker's control. \\
+$\GTenToneHL{state}{S_2}$ & Medium demand & Possible state outside the decision-maker's control. \\
+$\GTenToneHL{state}{S_3}$ & Low demand & Possible state outside the decision-maker's control. \\
+$\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_j})$ & 80, 35, -20 (thousand dollars) & Payoffs for Premium version, in $\GTenToneHL{state}{S_1}$, $\GTenToneHL{state}{S_2}$, $\GTenToneHL{state}{S_3}$ order. \\
+$\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_j})$ & 60, 42, 18 (thousand dollars) & Payoffs for Standard version, in $\GTenToneHL{state}{S_1}$, $\GTenToneHL{state}{S_2}$, $\GTenToneHL{state}{S_3}$ order. \\
+$\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_3},\GTenToneHL{state}{S_j})$ & 40, 32, 25 (thousand dollars) & Payoffs for Budget version, in $\GTenToneHL{state}{S_1}$, $\GTenToneHL{state}{S_2}$, $\GTenToneHL{state}{S_3}$ order. \\
+$\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_4},\GTenToneHL{state}{S_j})$ & 15, 15, 15 (thousand dollars) & Payoffs for Delay launch, in $\GTenToneHL{state}{S_1}$, $\GTenToneHL{state}{S_2}$, $\GTenToneHL{state}{S_3}$ order. \\
+$\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_j})$ & Calculated in Step 2 & Best available \GTenToneHL{payoff}{payoff} in state $\GTenToneHL{state}{S_j}$ (column maximum). \\
+$\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_i},\GTenToneHL{state}{S_j})$ & Calculated in Step 3 & Opportunity loss: the best \GTenToneHL{payoff}{payoff} in this state minus this \GTenToneHL{alternative}{alternative}'s \GTenToneHL{payoff}{payoff}. \\
+$\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_i})$ & Calculated in Step 4 & \GTenToneHL{maxregret}{Maximum} \GTenToneHL{maxregret}{regret} for \GTenToneHL{alternative}{alternative} $\GTenToneHL{alternative}{A_i}$ (\GTenToneHL{best}{row} \GTenToneHL{best}{maximum}). \\
+}
+All \GTenToneHL{payoff}{payoff} and \GTenToneHL{regret}{regret} amounts below are in thousands of dollars.
+\clearpage
+\CalculationPair{Step 2: Find the best \GTenToneHL{payoff}{payoff} in each state.}{
+\begin{tabular}{@{}lc@{}}
+\toprule
+State & Comparison \\ \midrule
+$\GTenToneHL{state}{S_1}$ & \SymbolicCell{\max\{\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_1}),\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_1}),\\P_{ay}(\GTenToneHL{alternative}{A_3},\GTenToneHL{state}{S_1}),\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_4},\GTenToneHL{state}{S_1})\}}{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_1})} \\
+$\GTenToneHL{state}{S_2}$ & \SymbolicCell{\max\{\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_2}),\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_2}),\\P_{ay}(\GTenToneHL{alternative}{A_3},\GTenToneHL{state}{S_2}),\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_4},\GTenToneHL{state}{S_2})\}}{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_2})} \\
+$\GTenToneHL{state}{S_3}$ & \SymbolicCell{\max\{\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_3}),\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_3}),\\P_{ay}(\GTenToneHL{alternative}{A_3},\GTenToneHL{state}{S_3}),\GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_4},\GTenToneHL{state}{S_3})\}}{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_3})} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lc@{}}
+\toprule
+State & Comparison \\ \midrule
+$\GTenToneHL{state}{S_1}$ & \CalcResult{\max\{80,60,\\40,15\}}{\GTenToneHL{regret}{80}} \\
+$\GTenToneHL{state}{S_2}$ & \CalcResult{\max\{35,42,\\32,15\}}{\GTenToneHL{regret}{42}} \\
+$\GTenToneHL{state}{S_3}$ & \CalcResult{\max\{-20,18,\\25,15\}}{\GTenToneHL{regret}{25}} \\
+\bottomrule
+\end{tabular}}
+\CalculationPair{Step 3: Calculate opportunity losses.}{
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Alternative & $\GTenToneHL{state}{S_1}$ & $\GTenToneHL{state}{S_2}$ & $\GTenToneHL{state}{S_3}$ \\ \midrule
+$\GTenToneHL{alternative}{A_1}$ & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_1}) - \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_1})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_1})} & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_2}) - \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_2})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_2})} & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_3}) - \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_3})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_3})} \\
+$\GTenToneHL{alternative}{A_2}$ & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_1}) - \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_1})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_1})} & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_2}) - \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_2})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_2})} & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_3}) - \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_3})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_3})} \\
+$\GTenToneHL{alternative}{A_3}$ & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_1}) - \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_3},\GTenToneHL{state}{S_1})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_3},\GTenToneHL{state}{S_1})} & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_2}) - \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_3},\GTenToneHL{state}{S_2})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_3},\GTenToneHL{state}{S_2})} & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_3}) - \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_3},\GTenToneHL{state}{S_3})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_3},\GTenToneHL{state}{S_3})} \\
+$\GTenToneHL{alternative}{A_4}$ & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_1}) - \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_4},\GTenToneHL{state}{S_1})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_4},\GTenToneHL{state}{S_1})} & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_2}) - \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_4},\GTenToneHL{state}{S_2})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_4},\GTenToneHL{state}{S_2})} & \SymbolicCell{\GTenToneHL{benchmark}{b}(\GTenToneHL{state}{S_3}) - \GTenToneHL{payoff}{P_{ay}}(\GTenToneHL{alternative}{A_4},\GTenToneHL{state}{S_3})}{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_4},\GTenToneHL{state}{S_3})} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Alternative & $\GTenToneHL{state}{S_1}$ & $\GTenToneHL{state}{S_2}$ & $\GTenToneHL{state}{S_3}$ \\ \midrule
+$\GTenToneHL{alternative}{A_1}$ & \CalcResult{\GTenToneHL{regret}{80} - \GTenToneHL{regret}{80}}{\GTenToneHL{maxregret}{0}} & \CalcResult{\GTenToneHL{regret}{42} - \GTenToneHL{regret}{35}}{\GTenToneHL{maxregret}{7}} & \CalcResult{\GTenToneHL{maxregret}{25} - (-\GTenToneHL{maxregret}{20})}{\GTenToneHL{payoff}{45}} \\
+$\GTenToneHL{alternative}{A_2}$ & \CalcResult{80 - 60}{\GTenToneHL{payoff}{20}} & \CalcResult{42 - 42}{\GTenToneHL{payoff}{0}} & \CalcResult{25 - 18}{\GTenToneHL{benchmark}{7}} \\
+$\GTenToneHL{alternative}{A_3}$ & \CalcResult{80 - 40}{\GTenToneHL{benchmark}{40}} & \CalcResult{42 - 32}{\GTenToneHL{benchmark}{10}} & \CalcResult{\GTenToneHL{benchmark}{25} - \GTenToneHL{payoff}{25}}{\GTenToneHL{regret}{0}} \\
+$\GTenToneHL{alternative}{A_4}$ & \CalcResult{\GTenToneHL{benchmark}{80} - \GTenToneHL{payoff}{15}}{\GTenToneHL{regret}{65}} & \CalcResult{\GTenToneHL{benchmark}{42} - \GTenToneHL{payoff}{15}}{\GTenToneHL{regret}{27}} & \CalcResult{\GTenToneHL{benchmark}{25} - \GTenToneHL{payoff}{15}}{\GTenToneHL{regret}{10}} \\
+\bottomrule
+\end{tabular}}
+\clearpage
+\CalculationPair{Step 4: Find the \GTenToneHL{maxregret}{maximum} \GTenToneHL{maxregret}{regret} for each \GTenToneHL{alternative}{alternative}.}{
+\begin{tabular}{@{}lc@{}}
+\toprule
+Alternative & Row maximum \\ \midrule
+$\GTenToneHL{alternative}{A_1}$ & \SymbolicCell{\max\{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_1}),\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_2}),\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_1},\GTenToneHL{state}{S_3})\}}{\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_1})} \\
+$\GTenToneHL{alternative}{A_2}$ & \SymbolicCell{\max\{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_1}),\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_2}),\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_2},\GTenToneHL{state}{S_3})\}}{\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_2})} \\
+$\GTenToneHL{alternative}{A_3}$ & \SymbolicCell{\max\{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_3},\GTenToneHL{state}{S_1}),\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_3},\GTenToneHL{state}{S_2}),\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_3},\GTenToneHL{state}{S_3})\}}{\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_3})} \\
+$\GTenToneHL{alternative}{A_4}$ & \SymbolicCell{\max\{\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_4},\GTenToneHL{state}{S_1}),\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_4},\GTenToneHL{state}{S_2}),\GTenToneHL{regret}{r}(\GTenToneHL{alternative}{A_4},\GTenToneHL{state}{S_3})\}}{\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_4})} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lc@{}}
+\toprule
+Alternative & Row maximum \\ \midrule
+$\GTenToneHL{alternative}{A_1}$ & \CalcResult{\max\{0,7,45\}}{\GTenToneHL{regret}{45}} \\
+$\GTenToneHL{alternative}{A_2}$ & \CalcResult{\max\{20,0,7\}}{\GTenToneHL{regret}{20}} \\
+$\GTenToneHL{alternative}{A_3}$ & \CalcResult{\max\{40,10,0\}}{\GTenToneHL{regret}{40}} \\
+$\GTenToneHL{alternative}{A_4}$ & \CalcResult{\max\{65,27,10\}}{\GTenToneHL{regret}{65}} \\
+\bottomrule
+\end{tabular}}
+\CalculationPair{Step 5: Apply the \GTenToneHL{maxregret}{Minimax} \GTenToneHL{maxregret}{Regret} criterion.}{
+\begin{tabular}{@{}lc@{}}
+\toprule
+Quantity & Comparison \\ \midrule
+$R^*$ & \SymbolicCell{\min\{\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_1}),\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_2}),\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_3}),\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_4})\}}{R^*} \\
+$A^*$ & \SymbolicCell{\arg\min_i \GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_i})}{A^*_{\mathrm{Minimax\ Regret}}} \\
+\bottomrule
+\end{tabular}}{
+\begin{tabular}{@{}lc@{}}
+\toprule
+Quantity & Comparison \\ \midrule
+$R^*$ & \CalcResult{\min\{45,20,40,65\}}{\GTenToneHL{regret}{20}} \\
+$A^*$ & \CalcResult{\GTenToneHL{maxregret}{R}(\GTenToneHL{alternative}{A_2})=R^*=20}{\GTenToneHL{alternative}{A_2}} \\
+\bottomrule
+\end{tabular}}
+\noindent\begin{minipage}{\linewidth}
+Launch the standard version ($\GTenToneHL{alternative}{A_2}$): it minimizes \GTenToneHL{maxregret}{maximum} \GTenToneHL{maxregret}{regret} at \$20,000. The other strategies have maximum regrets of \$45,000 (premium), \$40,000 (budget), and \$65,000 (delay). There is no tie.
+
+\textbf{Step 6: Final numerical \GTenToneHL{regret}{opportunity} \GTenToneHL{regret}{loss} table (thousand dollars).}
+\begin{center}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Alternative & $\GTenToneHL{state}{S_1}$ & $\GTenToneHL{state}{S_2}$ & $\GTenToneHL{state}{S_3}$ & \GTenToneHL{maxregret}{Maximum} \GTenToneHL{maxregret}{regret} \\ \midrule
+$\GTenToneHL{alternative}{A_1}$: Premium version & \GTenToneHL{regret}{0} & \GTenToneHL{regret}{7} & \GTenToneHL{regret}{45} & \GTenToneHL{maxregret}{45} \\
+$\GTenToneHL{alternative}{A_2}$: Standard version & \GTenToneHL{regret}{20} & \GTenToneHL{regret}{0} & \GTenToneHL{regret}{7} & \textbf{20} (recommended) \\
+$\GTenToneHL{alternative}{A_3}$: Budget version & \GTenToneHL{regret}{40} & \GTenToneHL{regret}{10} & \GTenToneHL{regret}{0} & \GTenToneHL{maxregret}{40} \\
+$\GTenToneHL{alternative}{A_4}$: Delay launch & \GTenToneHL{regret}{65} & \GTenToneHL{regret}{27} & \GTenToneHL{regret}{10} & \GTenToneHL{maxregret}{65} \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{minipage}
+\end{CfiveLandscape}
+\end{document}

@@ -5,7 +5,7 @@ description: Assess Grade 10 Global Economics seminar PDFs for Term 1 second lea
 
 # Assess second learning evidence
 
-Work from the repository root. Read the submitted PDFs in `book2026-2027/seminars/term_1/second_learning_evidence`. Use these LaTeX guides in `book2026-2027/seminars/term_1` as the requirements.
+Work from the repository root. Read the submitted PDFs in `book/seminars/term_1/second_learning_evidence`. Use these LaTeX guides in `book/seminars/term_1` as the requirements.
 
 | Guide | CSV columns |
 | --- | --- |

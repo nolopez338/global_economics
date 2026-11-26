@@ -18,7 +18,7 @@ SKIP = {'.git', '.hg', '.svn', '__pycache__', '.cache', '.pytest_cache',
 ARTIFACTS = ('*.aux', '*.log', '*.synctex*', '*.toc', '*.out', '*.lof',
              '*.lot', '*.fls', '*.fdb_latexmk', '*.pdf', '*.gz', '*.bat',
              '*.nav', '*.snm', '*.vrb', '*.bcf', '*.run.xml', '*.blg', '*.pyc')
-TEMPLATE = 'book2026-2027/preamble/template_README.md'
+TEMPLATE = 'book/preamble/template_README.md'
 
 
 def validate_filename(name):

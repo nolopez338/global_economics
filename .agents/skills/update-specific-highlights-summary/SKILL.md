@@ -5,17 +5,17 @@ description: Maintain the coordinated specific_highlights_XX.md documentation fa
 
 # Update Specific Highlights Summary
 
-Start at [specific_highlights_index.md](../../../book2026-2027/preamble/highlights/specific_highlights_index.md) and update only the affected `specific_highlights_XX.md` family documents beside it. Do not recreate the removed monolithic summary or proposal, or create another overview. Do not modify LaTeX sources, palettes, legends, unrelated documentation, or authoring skills. Invocation requires no arguments or follow-up information.
+Start at [specific_highlights_index.md](../../../book/preamble/highlights/specific_highlights_index.md) and update only the affected `specific_highlights_XX.md` family documents beside it. Do not recreate the removed monolithic summary or proposal, or create another overview. Do not modify LaTeX sources, palettes, legends, unrelated documentation, or authoring skills. Invocation requires no arguments or follow-up information.
 
 ## Locate and read
 
-Resolve this loaded skill's absolute location and walk its ancestors to find the repository containing `.agents/skills/update-specific-highlights-summary` and `book2026-2027`. Anchor to that repository, independently of the process working directory; do not select another checkout from the current directory. A `.git` directory or worktree file can corroborate the root but is not required. If the root is ambiguous or missing, report the limitation rather than guessing.
+Resolve this loaded skill's absolute location and walk its ancestors to find the repository containing `.agents/skills/update-specific-highlights-summary` and `book`. Anchor to that repository, independently of the process working directory; do not select another checkout from the current directory. A `.git` directory or worktree file can corroborate the root but is not required. If the root is ambiguous or missing, report the limitation rather than guessing.
 
 Read these small files directly on every invocation, using absolute paths from the resolved root:
 
-- `book2026-2027/preamble/highlights/specific_highlights.tex`: public registry loader; follow its live catalog, dataset, table and compatibility dependencies.
-- `book2026-2027/preamble/highlights/highlights.tex`: public marker loader; follow its live palette, renderer and role dependencies.
-- `book2026-2027/preamble/highlights/specific_highlights_index.md`, if present: initial presentation reference, never authority over LaTeX.
+- `book/preamble/highlights/specific_highlights.tex`: public registry loader; follow its live catalog, dataset, table and compatibility dependencies.
+- `book/preamble/highlights/highlights.tex`: public marker loader; follow its live palette, renderer and role dependencies.
+- `book/preamble/highlights/specific_highlights_index.md`, if present: initial presentation reference, never authority over LaTeX.
 
 Follow additional local dependencies only to resolve legend content or color behavior. Do not build a persistent source cache. If a required source is missing or a definition cannot be resolved, report the specific gap; do not invent a mapping or claim full currency. Keep the output untouched when required sources are missing. For a partially unresolved definition, either retain the output with a clear limitation in the report or explicitly mark the unresolved portion in the summary; never present stale material as verified.
 

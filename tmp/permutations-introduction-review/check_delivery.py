@@ -6,8 +6,8 @@ import pypdfium2 as pdfium
 
 here=Path(__file__).resolve().parent
 root=here.parents[1]
-deck=root/'book2026-2027/fundamentals/permutations1-introduction-slides.tex'
-practice=root/'book2026-2027/fundamentals/permutations1.tex'
+deck=root/'book/fundamentals/permutations1-introduction-slides.tex'
+practice=root/'book/fundamentals/permutations1.tex'
 audit=json.loads((here/'outcome-audit.json').read_text())
 assert deck.read_bytes()==(here/'lesson.tex').read_bytes()
 assert hashlib.sha256(practice.read_bytes()).hexdigest()==audit['source_sha256']

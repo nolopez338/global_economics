@@ -41,7 +41,7 @@ const source=fs.readFileSync(path.join(root,'assets/js/g11_t2_c3_slides.js'),'ut
 const context={window:{G11C3Math:{model,cdf,invCdf}}};
 vm.createContext(context);
 vm.runInContext(source.slice(0,source.indexOf('  const state='))+'globalThis.lesson={slides,legend};})();',context);
-const tex=fs.readFileSync(path.join(root,'book2026-2027/grade11/term_2/3-slides/G11_T2_L1_C3_slides.tex'),'utf8');
+const tex=fs.readFileSync(path.join(root,'book/grade11/term_2/3-slides/G11_T2_L1_C3_slides.tex'),'utf8');
 const originalTitles=[...tex.matchAll(/\\begin\{frame\}(?:\[t\])?(?:\{([^}]+)\})?/g)].map((match,i)=>i===0?'Anatomy of a confidence interval':match[1]);
 assert.equal(context.lesson.slides.length,26);
 assert.deepEqual(Array.from(context.lesson.slides,s=>s.title),originalTitles);

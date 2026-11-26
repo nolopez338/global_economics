@@ -6,7 +6,7 @@ description: Create or incrementally update one Global Economics folder README f
 # Global Economics README
 
 Input: one target folder, absolute or relative to the repository root. Example:
-`$global-economics-readme book2026-2027/grade10/term_1/1-practice_activities`.
+`$global-economics-readme book/grade10/term_1/1-practice_activities`.
 Optional `--force` requests full hashing and semantic review.
 
 Work only on that folder's immediate summary README. Preserve an existing
@@ -16,7 +16,7 @@ Never change source documents, child READMEs, or the template.
 
 ## Workflow
 
-1. Read **the live** `book2026-2027/preamble/template_README.md` on every
+1. Read **the live** `book/preamble/template_README.md` on every
    invocation; it is authoritative. Read the existing README when present.
    The Grade 10 Term 1 practice README is a domain vocabulary/content example,
    not a structural authority. Do not copy its omissions, compressed headings,

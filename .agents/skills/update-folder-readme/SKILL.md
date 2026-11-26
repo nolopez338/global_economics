@@ -76,7 +76,7 @@ from the proposal; it is not an existing input. Report unsupported, unreadable,
 unreviewed, or incomplete inputs rather than guessing their contents.
 
 Read the existing selected summary (update mode only) and live
-`book2026-2027/preamble/template_README.md` as control documents regardless of
+`book/preamble/template_README.md` as control documents regardless of
 timestamps. If the live control template is missing, stop with a clear error;
 never create it without its instructions, even when it is the explicit target.
 Read sources through:
@@ -145,7 +145,7 @@ unchanged contents, preserve supported content and report the limitation.
 
 ### When the target is the live control template
 
-For `book2026-2027/preamble/template_README.md`, treat control and target as
+For `book/preamble/template_README.md`, treat control and target as
 one record, review it once as a control, and exclude controls from the newer-source list.
 The helper preserves the exact bytes before the first standalone
 `# Directory Summary` line: the template title, AI instructions, exclusions,

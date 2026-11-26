@@ -1,0 +1,161 @@
+\documentclass[12pt,aspectratio=169]{beamer}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,array,booktabs,tabularx,tikz}
+% Add language support appropriate to the source, if needed.
+% Keep this preamble inline in every delivered deck.
+\definecolor{GEInk}{HTML}{132A3E}
+\definecolor{GETeal}{HTML}{17675E}
+\definecolor{GEFooter}{HTML}{EAF2F1}
+\setbeamercolor{background canvas}{bg=white}
+\setbeamercolor{normal text}{fg=GEInk,bg=white}
+\setbeamercolor{structure}{fg=GETeal}
+\setbeamercolor{frametitle}{fg=GEInk}
+\setbeamercolor{GE footer}{fg=GETeal,bg=GEFooter}
+\setbeamerfont{normal text}{family=\sffamily,size=\normalsize}
+\setbeamerfont{title}{size=\huge,series=\bfseries}
+\setbeamerfont{subtitle}{size=\normalsize,series=\bfseries}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{framesubtitle}{size=\normalsize,series=\mdseries}
+\setbeamerfont{GE footer}{size=\footnotesize}
+\setbeamersize{text margin left=9mm,text margin right=9mm}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}
+\setbeamercovered{invisible}
+\setbeamertemplate{frametitle}{%
+  \vskip.5em
+  {\usebeamerfont{frametitle}\strut\insertframetitle\strut\par}%
+  \ifx\insertframesubtitle\empty\else
+    {\usebeamerfont{framesubtitle}\strut\insertframesubtitle\strut\par}%
+  \fi
+  \vskip.25em
+}
+\setbeamertemplate{footline}{%
+  \begin{beamercolorbox}[wd=\paperwidth,ht=3ex,dp=1.3ex,
+    leftskip=9mm,rightskip=9mm]{GE footer}%
+    \usebeamerfont{GE footer}\insertsectionhead\hfill
+    \insertframenumber/\inserttotalframenumber
+  \end{beamercolorbox}%
+}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{.35em}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.22}
+\AtBeginEnvironment{frame}{\raggedright}
+\addtobeamertemplate{frametitle}{}{%
+  \setlength{\abovedisplayskip}{6pt plus 2pt minus 2pt}%
+  \setlength{\belowdisplayskip}{6pt plus 2pt minus 2pt}%
+  \setlength{\abovedisplayshortskip}{6pt plus 2pt minus 2pt}%
+  \setlength{\belowdisplayshortskip}{6pt plus 2pt minus 2pt}%
+}
+
+
+\definecolor{PopulationMean}{HTML}{FF765C}
+\definecolor{SampleMean}{HTML}{9BDD36}
+\definecolor{PopulationSD}{HTML}{E42134}
+\definecolor{SampleSize}{HTML}{173B17}
+\definecolor{Confidence}{HTML}{55C8F0}
+\definecolor{Critical}{HTML}{2648BB}
+\definecolor{StandardError}{HTML}{F4D94B}
+\definecolor{MarginError}{HTML}{F28A18}
+\colorlet{Endpoint}{MarginError!45!white}
+\colorlet{Width}{MarginError!45!black}
+\definecolor{Coverage}{HTML}{BC9DE0}
+
+\definecolor{Error}{HTML}{28AFA2}
+\newif\ifGTenHighlights
+\GTenHighlightstrue
+% \GTenHighlightsfalse % Uncomment to disable instructional highlights.
+% Transparent markers retain identical dimensions before activation and with
+% highlights disabled. Visibility and instructional activation are independent.
+\newlength{\GEHighlightVerticalPadding}
+\setlength{\GEHighlightVerticalPadding}{.5mm}
+\tikzset{ge marker/.style={rectangle,rounded corners=1mm,draw=none,
+ fill=#1,fill opacity=\GEOpacity,text opacity=1,text=GEInk,
+ inner xsep=.6mm,inner ysep=\GEHighlightVerticalPadding,outer sep=0pt}}
+\makeatletter
+\newcommand{\GEHighlightMath}[2]{\tikz[baseline=(gehl.base)]
+ \node[ge marker=\GECurrentRole](gehl){$\m@th#1#2$};}
+\newcommand{\GEHighlight}[2]{\begingroup
+ \def\GEOpacity{0}\ifGTenHighlights\def\GEOpacity{.32}\fi
+ \def\GECurrentRole{#1}\ifmmode\mathpalette\GEHighlightMath{#2}
+ \else\tikz[baseline=(gehl.base)]\node[ge marker=#1](gehl){#2};\fi\endgroup}
+\makeatother
+\newcommand{\GEPlain}[1]{{\GTenHighlightsfalse\GEHighlight{white}{#1}}}
+\newcommand{\At}[3]{\ifnum#1=0\relax\GEPlain{#3}\else\alt<#1->{\GEHighlight{#2}{#3}}{\GEPlain{#3}}\fi}
+\newcommand{\R}[2]{\leavevmode\visible<#1->{#2}}
+\newcommand{\CtwoMean}[1]{\GEHighlight{PopulationMean}{#1}}
+\newcommand{\CtwoPoint}[1]{\GEHighlight{SampleMean}{#1}}
+\newcommand{\CtwoSD}[1]{\GEHighlight{PopulationSD}{#1}}
+\newcommand{\CtwoSize}[1]{\GEHighlight{SampleSize}{#1}}
+\newcommand{\CtwoConfidence}[1]{\GEHighlight{Confidence}{#1}}
+\newcommand{\CtwoSignificance}[1]{\GEHighlight{Confidence}{#1}}
+\newcommand{\CtwoCritical}[1]{\GEHighlight{Critical}{#1}}
+\newcommand{\CtwoSE}[1]{\GEHighlight{StandardError}{#1}}
+\newcommand{\CtwoMoE}[1]{\GEHighlight{MarginError}{#1}}
+\newcommand{\CtwoEndpoint}[1]{\GEHighlight{Endpoint}{#1}}
+\newcommand{\CtwoCI}[1]{\GEHighlight{Endpoint}{#1}}
+\newcommand{\CtwoWidth}[1]{\GEHighlight{Width}{#1}}
+\newcommand{\CtwoCoverage}[1]{\GEHighlight{Coverage}{#1}}
+\newcommand{\CtwoError}[1]{\GEHighlight{Error}{#1}}
+\newcommand{\CtwoCoverCount}{\CtwoCoverage{N_{\rm cover}}}
+\newcommand{\CtwoTotalCount}{\CtwoCoverage{N}}
+
+% Instructional source (unchanged):
+% book/grade11/term_2/3-slides/G11_T2_L1_C2_slides.tex
+% Anchors: "Task 2 -- Point estimate and confidence interval" (one estimate
+% versus a range); "Task 3 -- Observed coverage and absolute error";
+% "Task 3 -- What confidence means" (fixed mean, repeated-sample coverage,
+% and a realized interval that either covers or misses).
+% Central idea: evaluate an interval-producing method across repeated samples,
+% while keeping each population mean fixed for its own study.
+% Purpose: decide whether a failed cafeteria report alone discredits a method.
+% Accessible reasoning: a method with occasional past misses can miss again;
+% compare 6 with 7--9, without formal statistical calculations or terminology.
+% Later refinement: sample mean versus interval, and nominal confidence versus
+% observed long-run coverage; no probability assigned to a realized interval.
+% No supporting practice used. No original worked-example answers reproduced.
+% Use after the source's complete opening legend, before its first example.
+% Timing: reading 25 s + student work 55 s + check/connection 40 s = 120 s.
+% Reveal: advance to frame 2 only after the 55-second student discussion.
+\title{Point estimates and confidence levels -- warm-up}
+\subtitle{Grade 11 -- Term 2 -- Lesson 1 -- C2}
+\author{}\date{}
+\begin{document}
+\section{Warm-up}
+\begin{frame}[t]{A cafeteria report}
+Each day, a school samples lunch receipts and reports a range for that day's
+\CtwoMean{average purchase amount}.
+
+Over many comparable days, about \CtwoCoverage{9 in 10 reports} included the
+true daily average, later checked using all receipts.
+\medskip
+
+Today's report gives \CtwoEndpoint{\$7} to \CtwoEndpoint{\$9}.
+The full receipt audit later finds an average of \CtwoMean{\$6}.
+\medskip
+
+\textbf{Is this one missed range enough to reject the reporting method?}
+Explain your reasoning.
+\medskip
+
+{\color{GETeal}\textbf{Discuss with a partner: 55 seconds.}}
+\end{frame}
+
+\begin{frame}[t]{Check and connect}
+\textbf{One miss is not enough on its own.}
+
+The true average, \CtwoMean{\$6}, is outside \CtwoEndpoint{\$7} to
+\CtwoEndpoint{\$9}: this report missed. But a method that has succeeded in
+about \CtwoCoverage{9 out of 10 reports} has also had occasional misses.
+\medskip
+
+One failure does not establish that the method has become unreliable;
+neither does its past record guarantee today's success.
+\medskip
+
+\textbf{In the lesson:} compare a single estimate with a range, then investigate
+how often ranges from repeated samples contain a fixed population average.
+This will make the meaning of ``confidence'' more precise.
+\end{frame}
+\end{document}

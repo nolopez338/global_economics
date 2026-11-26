@@ -63,12 +63,12 @@ test('numbering correction preserves protected records, meeting metadata, materi
   assert.equal(data.materials.length, 522);
   // These fingerprints exclude only the 69 labels being corrected. They retain
   // dates, cycle Days, assignments, cancellations, content and every seminar row.
-  assert.equal(hash(withoutCorrectedLabels(source.meetings)), '7b2279b40fe470d801f49bf151adb99dd65177a3579bcf0df6d09635d6fc3ae7');
-  assert.equal(hash(source.meetings.filter(m => !affected(m))), '789abedb8bad78621e5fc483f4c2b5ffd5ddacc32649a2490c8379e5ff443154');
+  assert.equal(hash(withoutCorrectedLabels(source.meetings)), '44b3b385a1c92c253b0cfd0cd9cdd2006511f8caf327d0f6e202a7a9eba7817a');
+  assert.equal(hash(source.meetings.filter(m => !affected(m))), '18e26e6475d933f35936e46fe224d4a58910bcaf8aad2f9004d7586769179a6c');
   assert.equal(hash(withoutCorrectedLabels(data.schedule)), '82a5ce53265b111173e1139b9055746fcef6df832024363f1e9f36a623e84ad3');
-  assert.equal(hash(data.materials), '59cb6390bed0699e5e1f71de0b24c823701b6216346219c51bc1e8b89c48c896');
+  assert.equal(hash(data.materials), '9f9ead35a1a8f1fffc2d1eba9fa8116d81076cf55dcccc4adde7b0d45697e505');
   assert.equal(hash(data.baseSchedule), '6e1eb5001334b6de962887c17e71c09d29e01f6546975baee272f2ac3342f016');
-  assert.equal(hash(data.baseMaterials), '92f942803c282d17f9bd6a3e81fbd5f730e9ae8bf6501eddf443f3f8ebd3e44f');
+  assert.equal(hash(data.baseMaterials), '5c4cd22bce621c4b72a2b1a72d413881e5644bb6513e11e64b0d69266324523c');
 });
 
 test('calendar validation rejects resets, indiscriminate 7-1, and changed calendar coverage', () => {

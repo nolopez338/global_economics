@@ -1,0 +1,2241 @@
+\makeatletter
+\def\input@path{{./}{../../../preamble/}{book/preamble/}}
+\makeatother
+\input{preamble_exams.tex}
+\input{highlights/highlights.tex}
+% \GTenHighlightsfalse % Uncomment to disable instructional highlights.
+\input{highlights/specific_highlights.tex}
+\CoordinatedTermTwoPalette
+% Local semantic roles: indicator, success probability, complementary probability,
+% monetary consequence, transformation function, and expected monetary value. Shared rendering and toggle remain authoritative.
+\newcommand{\Indicator}[1]{\GTenHLValue{#1}}
+\newcommand{\SuccessProb}[1]{\HLSuccessProbability{#1}}
+\newcommand{\FailureProb}[1]{\HLComplementProbability{#1}}
+\newcommand{\Money}[1]{\GTenHLSecond{#1}}
+\newcommand{\TransformationFunction}[1]{\HLGtenCThreeFunction{#1}}
+\newcommand{\ExpectedValue}[1]{\HLExpectedValue{#1}}
+% Dark inks from the marker families keep graph strokes and text readable.
+\ifGTenHighlights
+  \colorlet{CThreeExpectedInk}{ExpectedValueColor!55!black}
+  \colorlet{CThreeProbabilityInk}{MathHLSuccessColor!50!black}
+  \newcommand{\CThreeGraphLegendShift}{-\baselineskip}
+\else
+  \colorlet{CThreeExpectedInk}{black}
+  \colorlet{CThreeProbabilityInk}{black}
+  \newcommand{\CThreeGraphLegendShift}{0pt}
+\fi
+\usepackage{needspace}
+\hypersetup{pdftitle={Grade 10 Term 2 Discrete Probability}}
+\setlength{\emergencystretch}{2em}
+\title{Grade 10, Term 2, Lesson 1, Criterion C4\\Binomial Models and Individual Break-Even Analysis}
+\author{}
+\date{}
+% Individual expected-value graph: variable, state 0, state 1, exact root.
+\newcommand{\BreakEvenGraph}[4]{%
+% Keep near-zero tick backgrounds apart without moving their tick marks.
+\def\CThreeGraphTickAnchor{east}%
+\ifGTenHighlights
+  \pgfmathparse{min(abs(#2),abs(#3))/abs(#3-#2)<.15}%
+  \ifdim\pgfmathresult pt>0pt
+    \def\CThreeGraphTickAnchor{\ifdim\tick pt=0pt south east\else\ifdim\tick pt<0pt north east\else east\fi\fi}%
+  \fi
+\fi
+\begin{tikzpicture}\begin{axis}[
+ width=.86\linewidth,height=5.3cm,xmin=0,xmax=1,
+ ymin={min(#2,#3)-.15*abs(#3-#2)},
+ ymax={max(#2,#3)+.15*abs(#3-#2)},
+ axis lines=left,xlabel={\textcolor{CThreeProbabilityInk}{\SuccessProb{Trial success probability} $\SuccessProb{p}$}},
+ ylabel={\textcolor{CThreeExpectedInk}{\ExpectedValue{Expected net profit} (\ExpectedValue{USD})}},
+ yticklabel style={text=CThreeExpectedInk,anchor=\CThreeGraphTickAnchor}, xticklabel style={text=CThreeProbabilityInk},grid=major,
+ yticklabel={$\ExpectedValue{\pgfmathprintnumber{\tick}}$},
+ xticklabel={$\SuccessProb{\pgfmathprintnumber{\tick}}$},
+ title={$\textcolor{CThreeExpectedInk}{\ExpectedValue{\mathbb E}}[\Money{Y_{#1}}]$: individual \SuccessProb{break-even} analysis},
+ ytick={#2,0,#3},
+ xtick={0,1},extra x ticks={#4},extra x tick labels={$\SuccessProb{p_{#1}^*}=\SuccessProb{#4}$},
+ extra x tick style={tick label style={font=\small,text=CThreeProbabilityInk}},
+ legend style={at={(.5,-.35)},anchor=north,legend columns=3,font=\small,
+   yshift=\CThreeGraphLegendShift}]
+\addplot[CThreeExpectedInk,thick,domain=0:1,samples=2]{#2+(#3-#2)*x};
+\addlegendentry{$\textcolor{CThreeExpectedInk}{\ExpectedValue{\mathbb E}}[\Money{Y_{#1}}]$}
+\addplot[black,dashed,domain=0:1,samples=2]{0};\addlegendentry{\ExpectedValue{Zero}}
+\addplot[CThreeProbabilityInk,thick,dotted,forget plot] coordinates {(#4,0) (#4,{min(#2,#3)-.15*abs(#3-#2)})};
+\addplot[black,only marks,mark=*,forget plot] coordinates {(0,#2) (1,#3)};
+\addplot[black,only marks,mark=*] coordinates {(#4,0)};
+\addlegendentry{\SuccessProb{Break-even}}
+\end{axis}\end{tikzpicture}}
+% Corresponding alternatives share a row; all inherited spacing is retained.
+\NewDocumentCommand{\PracticeColumnPair}{+m +m}{%
+\par\noindent\begin{minipage}[t]{.48\linewidth}\vspace{0pt}#1\end{minipage}\hfill
+\begin{minipage}[t]{.48\linewidth}\vspace{0pt}#2\end{minipage}\par}
+
+% Document-local extension: shared registry and other consumers remain unchanged.
+\newcommand{\TrialCount}[1]{\HLObservationCount{#1}}
+\newcommand{\Count}[1]{\GTenHLValue{#1}}
+\expandafter\renewcommand\csname practicehighlightlegend@G10-T2-C4-coordinated\endcsname{%
+\HighlightConciseTable{
+$\HLMathEvent{E_j},\HLMathEvent{E_j^c}$ & \HLMathEvent{Trial events} & Success and failure on one trial.\\[4pt]
+$\Indicator{B_j}$; $\Count{X,k}$ & \Count{Indicator; count} & One binary result; total successes and a possible count.\\[4pt]
+$\TrialCount{n}$ & \TrialCount{Fixed trial count} & Number observed, chosen beforehand.\\[4pt]
+$\SuccessProb{p}$; $\FailureProb{1-p}$ & \SuccessProb{Success}; \FailureProb{failure} & Complementary probabilities for one trial.\\[4pt]
+$\Money{Y_i},\Money{a_i},\Money{b_i}$; $\TransformationFunction{f_i}$ & \Money{Money}; \TransformationFunction{rule} & Net payoff, baseline, change per success; count-to-money map.\\[4pt]
+$\HLProbability{m_X(k),q_k}$ & \HLProbability{Probability mass} & Probability at exactly one count.\\[4pt]
+$\HLCumulativeProbability{F_X(t)}$ & \HLCumulativeProbability{Cumulative probability} & Probability up to and including a threshold.\\[4pt]
+$\ExpectedValue{\mathbb E}[\Money{Y_i}]$ & \ExpectedValue{Expectation} & Long-run average net payoff.\\[4pt]
+$\SuccessProb{p_i^*}$ & \SuccessProb{Break-even probability} & Trial probability making one expectation zero.\\[4pt]
+}}
+
+\begin{document}
+\maketitle
+\setcounter{tocdepth}{1}
+\setcounter{secnumdepth}{2}
+\phantomsection\label{toc}
+\tableofcontents
+\section*{Evaluated criteria}
+\begin{description}
+\item[\textbf{C4}] Applies the binomial distribution to fixed-trial financial situations by verifying its conditions and calculating probabilities using the binomial probability formula.
+\end{description}
+\textbf{How to practise.} Attempt each C4 task before opening its linked worked solution.
+Use the return arrows for the contents, problem and problem list. All data are hypothetical.
+Keep exact expressions and round final probabilities to four decimal places.
+Money is net profit in USD for the entire stated period, after the stated costs.
+Choose one hypothetical alternative; all alternatives in a problem are functions of the same count $X$.
+Independent trials do not make these monetary variables independent.
+Analyse each expectation against its own zero threshold.
+
+\clearpage
+\section{Introduction}\label{sec:introduction}\label{sec:t2-c4-introduction}
+\subsection*{Highlight legend}
+\phantomsection\label{tab:highlight-legend}
+\PracticeHighlightLegend{G10-T2-C4-coordinated}
+Related probability shades distinguish success, failure, exact mass and cumulative probability.
+Names, notation and units preserve meaning in grayscale and with highlights disabled.
+See the \hyperref[tab:notation-reference]{detailed notation reference} after the two examples.
+
+\subsection*{From one binary result to a fixed count}
+A single trial has two outcomes; a fixed collection can have many success counts.
+For trial $j$, let $\HLMathEvent{E_j}$ denote success and $\HLMathEvent{E_j^c}$ failure, and define
+\[
+\Indicator{B_j}=\begin{cases}1,&E_j\text{ occurs},\\0,&E_j^c\text{ occurs}.\end{cases}
+\qquad
+\Count{X}=\sum_{j=1}^{\TrialCount{n}}\Indicator{B_j}\sim\operatorname{Bin}(\TrialCount{n},\SuccessProb{p}),\quad n>1.
+\]
+The indicators are independent Bernoulli$(p)$ variables. $B_1=1$ concerns one trial;
+$X=2$ concerns the whole collection and is a different event.
+Mathematical success can be financially undesirable, as in Example 2.
+
+\textbf{Four binomial conditions.} (1) Fix $n$ before observation and observe all $n$ trials;
+do not stop at the first success. (2) Each trial has mutually exclusive and exhaustive success/failure outcomes.
+(3) Assume independence: learning other results does not change a trial's probability.
+(4) Use the same $p$ for every trial. Separate customers or sessions alone do not prove independence:
+common shocks or changing groups can invalidate the model. The following scenarios explicitly assume these conditions.
+
+\textbf{Why combinations?} A specified order with $k$ successes has probability $p^k(1-p)^{n-k}$.
+There are $\binom nk=n!/[k!(n-k)!]$ such orders; $0!=1$.
+For example, two successes in three trials can be SSF, SFS or FSS, so their total is
+$3p^2(1-p)$, not just $p^2(1-p)$. Thus
+\[
+\HLProbability{P(X=k)}=\binom nk\SuccessProb{p}^{k}\FailureProb{(1-p)}^{n-k},\qquad k=0,\ldots,n.
+\]
+\clearpage
+\subsection{Introductory example 1: campus art-print stall}\label{ex:intro-one}
+A student books all four sales slots before the weekend. Compare a small print batch with a large batch; both can serve every slot without stock shortages.
+The observation period is one weekend. One trial is one of four pre-booked campus-market sales slots.
+Success means attendance in that slot meets its fixed target; failure means attendance in that slot falls below its target.
+All $\TrialCount{n}=\TrialCount{4}$ trials are fixed before observation and all are observed.
+Assume independent outcomes and constant $\SuccessProb{p}=\SuccessProb{\frac{2}{5}}$ for each trial, under every alternative.
+The following baseline and per-success changes already include the relevant costs.
+\begin{center}\begin{tabular}{lrr}\toprule Alternative & Baseline $a_i$ (USD) & Change $b_i$ (USD/success)\\\midrule
+$A_1$: small print batch & -20 & 20\\
+$A_2$: large print batch & -40 & 40\\
+\bottomrule\end{tabular}\end{center}
+\QuestionsTasks[sec:t2-c4-introduction]{
+{4}/{sol:c4-art-model}/{\textbf{Task 1 --- Establish the binomial model and monetary transformations.}
+\textbf{1.} Define the trial indicators, count and model; verify the four conditions and derive each monetary rule.
+\textbf{2.} Give positive-probability supports, complete PMFs and real-threshold CDFs for the count and every alternative, including $p=0,1$.
+\textbf{3.} Calculate the full initial masses, $P(X=2)$ and each probability of a strictly negative payoff. Translate each loss into an integer count event.},
+{4}/{sol:c4-art-decision}/{\textbf{Task 2 --- Individual expected values.}
+\textbf{1.} Calculate and interpret every initial expectation.
+\textbf{2.} Hold $n$ and the monetary rules fixed; derive each expectation for $p\in[0,1]$, its exact zero threshold and both strict sign intervals.
+\textbf{3.} Graph each expectation separately with its zero line, endpoints and exact root. Check the endpoints and root, and distinguish expected profit, realized profit and loss probability.}
+}
+\subsubsection*{Task 1 --- Worked solution}\label{sol:c4-art-model}
+\paragraph{1. Binomial model and monetary transformations.}
+For $j=1,\ldots,4$, $\HLMathEvent{E_j}$ means attendance in that slot meets its fixed target; $E_j^c$ means attendance in that slot falls below its target.
+Set $\Indicator{B_j}=1$ on $E_j$ and $B_j=0$ otherwise.
+The fixed count, binary outcomes, assumed independence and common probability give
+\[
+\Count{X}=\Indicator{B_1}+\cdots+\Indicator{B_4}\sim\operatorname{Bin}(4,p),
+\quad \SuccessProb{p_0}=\SuccessProb{\frac{2}{5}},\quad \FailureProb{1-p_0}=\FailureProb{\frac{3}{5}}.
+\]
+$X$ counts high-demand slots; it has count units, whereas each $Y_i$ is in USD per one weekend.
+\PracticeColumnPair{
+\textbf{$Y_1$: small print batch.}
+Here $\Money{a_1}=\Money{-20}$ represents a fixed cost of 20 USD; $\Money{b_1}=\Money{20}$ means 20 USD extra net receipts per success.
+\[
+\Money{Y_1}=\TransformationFunction{f_1}(\Count{X})=\Money{-20}+\Money{20}\Count{X}.
+\]
+Thus $f_1(0)=-20$ and $f_1(4)=60$ USD: both strict payoff signs are attainable when $0<p<1$.
+}{
+\textbf{$Y_2$: large print batch.}
+Here $\Money{a_2}=\Money{-40}$ represents a fixed cost of 40 USD; $\Money{b_2}=\Money{40}$ means 40 USD extra net receipts per success.
+\[
+\Money{Y_2}=\TransformationFunction{f_2}(\Count{X})=\Money{-40}+\Money{40}\Count{X}.
+\]
+Thus $f_2(0)=-40$ and $f_2(4)=120$ USD: both strict payoff signs are attainable when $0<p<1$.
+}
+\clearpage
+\paragraph{2. Supports, PMFs, and ordered CDFs.}
+Write $\HLProbability{q_k}=\binom{4}k p^k(1-p)^{4-k}$ for integer $k=0,\ldots,4$.
+\[
+S_X=\{x\in\mathbb R:P(X=x)>0\}=
+\begin{cases}\{0,\ldots,4\},&0<p<1,\\\{0\},&p=0,\\\{4\},&p=1.\end{cases}
+\]
+\[
+m_X(x)=\begin{cases}q_x,&x\in\{0,\ldots,4\},\\0,&\text{otherwise},\end{cases}
+\qquad
+F_X(t)=\begin{cases}0,&t<0,\\\displaystyle\sum_{j=0}^{\lfloor t\rfloor}q_j,&0\leq t<4,\\1,&t\geq 4.\end{cases}
+\]
+The PMF is zero at noninteger counts too. At $p=0$ use $q_0=1$, all others zero;
+at $p=1$ use $q_{4}=1$, all others zero (equivalently take endpoint limits).
+The sum $\sum_{k=0}^4q_k=(p+(1-p))^4=1$ checks normalization.
+Each affine rule is one-to-one, so its mass at $f_i(k)$ is exactly $q_k$.
+\PracticeColumnPair{
+\textbf{$Y_1$: small print batch.}
+For $0<p<1$, the support in ascending USD order is
+\[S_{Y_1}=\{-20,0,20,40,60\}.\]
+This is $\{y:P(Y_1=y)>0\}$. At $p=0$ only $-20$ remains; at $p=1$ only $60$ remains.
+\[
+m_{Y_1}(y)=\begin{cases}q_k,&y=-20+20k,\\&k=0,\ldots,4,\\0,&\text{otherwise}.\end{cases}
+\]
+Since $-20+20X\leq t$ means $X\leq \lfloor(t-(-20))/20\rfloor$,
+\[
+F_{Y_1}(t)=\begin{cases}0,&t<-20,\\\displaystyle \sum_{j=0}^{\lfloor(t-(-20))/20\rfloor}q_j,&-20\leq t<60,\\1,&t\geq 60.\end{cases}
+\]
+For example, $F_{Y_1}(0)=q_0+q_1$; the jump includes its threshold.
+}{
+\textbf{$Y_2$: large print batch.}
+For $0<p<1$, the support in ascending USD order is
+\[S_{Y_2}=\{-40,0,40,80,120\}.\]
+This is $\{y:P(Y_2=y)>0\}$. At $p=0$ only $-40$ remains; at $p=1$ only $120$ remains.
+\[
+m_{Y_2}(y)=\begin{cases}q_k,&y=-40+40k,\\&k=0,\ldots,4,\\0,&\text{otherwise}.\end{cases}
+\]
+Since $-40+40X\leq t$ means $X\leq \lfloor(t-(-40))/40\rfloor$,
+\[
+F_{Y_2}(t)=\begin{cases}0,&t<-40,\\\displaystyle \sum_{j=0}^{\lfloor(t-(-40))/40\rfloor}q_j,&-40\leq t<120,\\1,&t\geq 120.\end{cases}
+\]
+For example, $F_{Y_2}(0)=q_0+q_1$; the jump includes its threshold.
+}
+CDFs run from the smallest to largest monetary value, regardless of count order. Floors round down; ceilings round up. The displayed finite sums include every jump at its threshold and are right-continuous. Endpoint formulas still apply, but zero-mass values leave the support.
+\clearpage\paragraph{3. Initial probabilities and loss events.}
+At $p_0=\frac{2}{5}$, $q_k=\binom{4}k(\frac{2}{5})^k(\frac{3}{5})^{4-k}$. The following exact table gives all initial count and monetary masses. In column $k$, each amount $f_i(k)$ has probability $q_k=w_k/625$; all other amounts have probability zero.
+\begin{center}\begin{tabular}{lrrrrr}\toprule
+$k$ & 0 & 1 & 2 & 3 & 4\\\midrule
+$w_k$ & 81 & 216 & 216 & 96 & 16\\
+$f_1(k)$ (USD) & -20 & 0 & 20 & 40 & 60\\
+$f_2(k)$ (USD) & -40 & 0 & 40 & 80 & 120\\
+\bottomrule\end{tabular}\end{center}
+\textbf{Requested count event (C4).} The endpoints in $X=2$ are explicit. Using the binomial formula,
+\[P(X=2)=\binom{4}{2}(\frac{2}{5})^{2}(\frac{3}{5})^{2}.\]
+\[P(X=2)=q_{2}=\frac{216}{625}\approx\HLProbability{0.3456}.\]
+This is the probability of the stated count of high-demand slots over one weekend, with no monetary units.
+\PracticeColumnPair{
+\textbf{$Y_1$: small print batch.}
+\[
+\begin{aligned}
+Y_1<0&\iff -20+20X<0\\
+&\iff X<1\iff X\leq 0.
+\end{aligned}
+\]
+Hence the initial probability of a net loss is
+\[
+P(Y_1<0)=\sum_{j=0}^{0}q_j
+=\frac{81}{625}\approx\HLProbability{0.1296}.
+\]
+The loss counts are $\{0\}$. A zero payoff is excluded by the strict inequality.
+}{
+\textbf{$Y_2$: large print batch.}
+\[
+\begin{aligned}
+Y_2<0&\iff -40+40X<0\\
+&\iff X<1\iff X\leq 0.
+\end{aligned}
+\]
+Hence the initial probability of a net loss is
+\[
+P(Y_2<0)=\sum_{j=0}^{0}q_j
+=\frac{81}{625}\approx\HLProbability{0.1296}.
+\]
+The loss counts are $\{0\}$. A zero payoff is excluded by the strict inequality.
+}
+\secInicio[ex:intro-one][sec:t2-c4-introduction]
+\clearpage
+\subsubsection*{Task 2 --- Worked solution}\label{sol:c4-art-decision}
+\paragraph{1. Initial expected values.}
+Connect expectation to the full distribution: $\mathbb E[X]=\sum_{k=0}^4kq_k=np$.
+Equivalently, $\mathbb E[B_j]=1p+0(1-p)=p$, so linearity gives
+$\mathbb E[B_1+\cdots+B_4]=4p$.
+At the supplied $p_0=\frac{2}{5}$, $\ExpectedValue{\mathbb E[X]}=4(\frac{2}{5})=\frac{8}{5}$ successes.
+For each alternative, the same distribution gives $\mathbb E[Y_i]=\sum_k f_i(k)q_k$.
+\PracticeColumnPair{
+\textbf{$Y_1$: small print batch.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=\sum_{k=0}^4(-20+20k)q_k\\
+&=-20+20\left(\frac{8}{5}\right)\\
+&=\ExpectedValue{12\ \text{USD}}.
+\end{aligned}
+\]
+This is \ExpectedValue{expected net gain} per one weekend: a long-run average, with negative values denoting a net loss.
+}{
+\textbf{$Y_2$: large print batch.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=\sum_{k=0}^4(-40+40k)q_k\\
+&=-40+40\left(\frac{8}{5}\right)\\
+&=\ExpectedValue{24\ \text{USD}}.
+\end{aligned}
+\]
+This is \ExpectedValue{expected net gain} per one weekend: a long-run average, with negative values denoting a net loss.
+}
+\paragraph{2. Expectation formulas and sign intervals.}
+Keep $n=4$, the trial definition and all $a_i,b_i$ fixed; vary only $p\in[0,1]$.
+Since $\sum q_k=1$ and $\sum kq_k=np$,
+\[
+\ExpectedValue{\mathbb E}[\Money{Y_i}]=\sum_{k=0}^4(a_i+b_i k)q_k
+=a_i\sum q_k+b_i\sum kq_k=a_i+b_i np.
+\]
+\PracticeColumnPair{
+\textbf{$Y_1$: small print batch.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=-20+(20)(4)p\\
+&=-20+80p\quad\text{USD},\\
+\mathbb E[Y_1]=0&\iff 80p=20\\
+&\iff \SuccessProb{p_1^*}=\SuccessProb{\frac{1}{4}}.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\mathbb E[Y_1]>0&\iff 80p>20\\
+&\iff p>\frac{1}{4}\\
+&\iff p\in \left(\frac{1}{4},1\right],\\
+\mathbb E[Y_1]<0&\iff 80p<20\\
+&\iff p<\frac{1}{4}\\
+&\iff p\in \left[0,\frac{1}{4}\right).
+\end{aligned}
+\]
+At $p=\frac{1}{4}$, the expectation is zero: break-even.
+}{
+\textbf{$Y_2$: large print batch.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=-40+(40)(4)p\\
+&=-40+160p\quad\text{USD},\\
+\mathbb E[Y_2]=0&\iff 160p=40\\
+&\iff \SuccessProb{p_2^*}=\SuccessProb{\frac{1}{4}}.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\mathbb E[Y_2]>0&\iff 160p>40\\
+&\iff p>\frac{1}{4}\\
+&\iff p\in \left(\frac{1}{4},1\right],\\
+\mathbb E[Y_2]<0&\iff 160p<40\\
+&\iff p<\frac{1}{4}\\
+&\iff p\in \left[0,\frac{1}{4}\right).
+\end{aligned}
+\]
+At $p=\frac{1}{4}$, the expectation is zero: break-even.
+}
+Positive expectation means expected net gain; negative means expected net loss. Equality concerns average money, not the probability of success or loss.
+\clearpage\paragraph{3. Individual graphs and checks.}
+\textbf{$Y_1$: small print batch.}
+\begin{center}\BreakEvenGraph{1}{-20}{60}{1/4}\end{center}
+The endpoints are $(0,-20)$ and $(1,60)$: $\mathbb E[Y_1](0)=f_1(0)=-20$ and
+$\mathbb E[Y_1](1)=f_1(4)=60$ USD.
+The exact root check is $-20+(80)(\frac{1}{4})=0$.
+\par\medskip
+\textbf{$Y_2$: large print batch.}
+\begin{center}\BreakEvenGraph{2}{-40}{120}{1/4}\end{center}
+The endpoints are $(0,-40)$ and $(1,120)$: $\mathbb E[Y_2](0)=f_2(0)=-40$ and
+$\mathbb E[Y_2](1)=f_2(4)=120$ USD.
+The exact root check is $-40+(160)(\frac{1}{4})=0$.
+\par\medskip
+Each period realizes one of the listed count-based payoffs, not necessarily the expectation.
+Expected profit is an average in USD; probability of loss is a unitless chance of $Y_i<0$.
+Both strictly negative and strictly positive outcomes retain positive probability at each interior break-even value.
+All alternatives share $X$; separate graphs do not imply independent monetary outcomes.
+\secInicio[ex:intro-one][sec:t2-c4-introduction]
+\clearpage
+\subsection{Introductory example 2: freelance livestream work}\label{ex:intro-two}
+A freelancer commits to three paid sessions before the day begins. Compare home internet alone with mobile-data backup. Count home-internet disruptions even when backup limits their financial effect.
+The observation period is one day. One trial is one of three scheduled livestream sessions.
+Success means a home-internet disruption occurs during that session; failure means no home-internet disruption occurs during that session.
+All $\TrialCount{n}=\TrialCount{3}$ trials are fixed before observation and all are observed.
+Assume independent outcomes and constant $\SuccessProb{p}=\SuccessProb{\frac{1}{10}}$ for each trial, under every alternative.
+The following baseline and per-success changes already include the relevant costs.
+\begin{center}\begin{tabular}{lrr}\toprule Alternative & Baseline $a_i$ (USD) & Change $b_i$ (USD/success)\\\midrule
+$A_1$: home internet alone & 100 & -40\\
+$A_2$: mobile-data backup & 60 & -25\\
+\bottomrule\end{tabular}\end{center}
+\QuestionsTasks[sec:t2-c4-introduction]{
+{4}/{sol:c4-internet-model}/{\textbf{Task 1 --- Establish the binomial model and monetary transformations.}
+\textbf{1.} Define the trial indicators, count and model; verify the four conditions and derive each monetary rule.
+\textbf{2.} Give positive-probability supports, complete PMFs and real-threshold CDFs for the count and every alternative, including $p=0,1$.
+\textbf{3.} Calculate the full initial masses, $P(X\geq 1)$ and each probability of a strictly negative payoff. Translate each loss into an integer count event.},
+{4}/{sol:c4-internet-decision}/{\textbf{Task 2 --- Individual expected values.}
+\textbf{1.} Calculate and interpret every initial expectation.
+\textbf{2.} Hold $n$ and the monetary rules fixed; derive each expectation for $p\in[0,1]$, its exact zero threshold and both strict sign intervals.
+\textbf{3.} Graph each expectation separately with its zero line, endpoints and exact root. Check the endpoints and root, and distinguish expected profit, realized profit and loss probability.}
+}
+\subsubsection*{Task 1 --- Worked solution}\label{sol:c4-internet-model}
+\paragraph{1. Binomial model and monetary transformations.}
+For $j=1,\ldots,3$, $\HLMathEvent{E_j}$ means a home-internet disruption occurs during that session; $E_j^c$ means no home-internet disruption occurs during that session.
+Set $\Indicator{B_j}=1$ on $E_j$ and $B_j=0$ otherwise.
+The fixed count, binary outcomes, assumed independence and common probability give
+\[
+\Count{X}=\Indicator{B_1}+\cdots+\Indicator{B_3}\sim\operatorname{Bin}(3,p),
+\quad \SuccessProb{p_0}=\SuccessProb{\frac{1}{10}},\quad \FailureProb{1-p_0}=\FailureProb{\frac{9}{10}}.
+\]
+$X$ counts disrupted sessions; it has count units, whereas each $Y_i$ is in USD per one day.
+\PracticeColumnPair{
+\textbf{$Y_1$: home internet alone.}
+Here $\Money{a_1}=\Money{100}$ represents a baseline net receipt of 100 USD with no successes; $\Money{b_1}=\Money{-40}$ means 40 USD net reduction through refunds, lost receipts and disruption costs per success.
+\[
+\Money{Y_1}=\TransformationFunction{f_1}(\Count{X})=\Money{100}-\Money{40}\Count{X}.
+\]
+Thus $f_1(0)=100$ and $f_1(3)=-20$ USD: both strict payoff signs are attainable when $0<p<1$.
+}{
+\textbf{$Y_2$: mobile-data backup.}
+Here $\Money{a_2}=\Money{60}$ represents a baseline net receipt of 60 USD with no successes; $\Money{b_2}=\Money{-25}$ means 25 USD net reduction through refunds, lost receipts and disruption costs per success.
+\[
+\Money{Y_2}=\TransformationFunction{f_2}(\Count{X})=\Money{60}-\Money{25}\Count{X}.
+\]
+Thus $f_2(0)=60$ and $f_2(3)=-15$ USD: both strict payoff signs are attainable when $0<p<1$.
+}
+\clearpage
+\paragraph{2. Supports, PMFs, and ordered CDFs.}
+Write $\HLProbability{q_k}=\binom{3}k p^k(1-p)^{3-k}$ for integer $k=0,\ldots,3$.
+\[
+S_X=\{x\in\mathbb R:P(X=x)>0\}=
+\begin{cases}\{0,\ldots,3\},&0<p<1,\\\{0\},&p=0,\\\{3\},&p=1.\end{cases}
+\]
+\[
+m_X(x)=\begin{cases}q_x,&x\in\{0,\ldots,3\},\\0,&\text{otherwise},\end{cases}
+\qquad
+F_X(t)=\begin{cases}0,&t<0,\\\displaystyle\sum_{j=0}^{\lfloor t\rfloor}q_j,&0\leq t<3,\\1,&t\geq 3.\end{cases}
+\]
+The PMF is zero at noninteger counts too. At $p=0$ use $q_0=1$, all others zero;
+at $p=1$ use $q_{3}=1$, all others zero (equivalently take endpoint limits).
+The sum $\sum_{k=0}^3q_k=(p+(1-p))^3=1$ checks normalization.
+Each affine rule is one-to-one, so its mass at $f_i(k)$ is exactly $q_k$.
+\PracticeColumnPair{
+\textbf{$Y_1$: home internet alone.}
+For $0<p<1$, the support in ascending USD order is
+\[S_{Y_1}=\{-20,20,60,100\}.\]
+This is $\{y:P(Y_1=y)>0\}$. At $p=0$ only $100$ remains; at $p=1$ only $-20$ remains.
+\[
+m_{Y_1}(y)=\begin{cases}q_k,&y=100-40k,\\&k=0,\ldots,3,\\0,&\text{otherwise}.\end{cases}
+\]
+Since $100-40X\leq t$ means $X\geq \lceil(100-t)/40\rceil$,
+\[
+F_{Y_1}(t)=\begin{cases}0,&t<-20,\\\displaystyle \sum_{j=\lceil(100-t)/40\rceil}^{3}q_j,&-20\leq t<100,\\1,&t\geq 100.\end{cases}
+\]
+For example, $F_{Y_1}(20)=q_3+q_{2}$; the jump includes its threshold.
+}{
+\textbf{$Y_2$: mobile-data backup.}
+For $0<p<1$, the support in ascending USD order is
+\[S_{Y_2}=\{-15,10,35,60\}.\]
+This is $\{y:P(Y_2=y)>0\}$. At $p=0$ only $60$ remains; at $p=1$ only $-15$ remains.
+\[
+m_{Y_2}(y)=\begin{cases}q_k,&y=60-25k,\\&k=0,\ldots,3,\\0,&\text{otherwise}.\end{cases}
+\]
+Since $60-25X\leq t$ means $X\geq \lceil(60-t)/25\rceil$,
+\[
+F_{Y_2}(t)=\begin{cases}0,&t<-15,\\\displaystyle \sum_{j=\lceil(60-t)/25\rceil}^{3}q_j,&-15\leq t<60,\\1,&t\geq 60.\end{cases}
+\]
+For example, $F_{Y_2}(10)=q_3+q_{2}$; the jump includes its threshold.
+}
+CDFs run from the smallest to largest monetary value, regardless of count order. Floors round down; ceilings round up. The displayed finite sums include every jump at its threshold and are right-continuous. Endpoint formulas still apply, but zero-mass values leave the support.
+\clearpage\paragraph{3. Initial probabilities and loss events.}
+At $p_0=\frac{1}{10}$, $q_k=\binom{3}k(\frac{1}{10})^k(\frac{9}{10})^{3-k}$. The following exact table gives all initial count and monetary masses. In column $k$, each amount $f_i(k)$ has probability $q_k=w_k/1000$; all other amounts have probability zero.
+\begin{center}\begin{tabular}{lrrrr}\toprule
+$k$ & 0 & 1 & 2 & 3\\\midrule
+$w_k$ & 729 & 243 & 27 & 1\\
+$f_1(k)$ (USD) & 100 & 60 & 20 & -20\\
+$f_2(k)$ (USD) & 60 & 35 & 10 & -15\\
+\bottomrule\end{tabular}\end{center}
+\textbf{Requested count event (C4).} The endpoints in $X\geq 1$ are explicit. Using the binomial formula,
+\[P(X\geq 1)=1-F_X(0)=1-\sum_{j=0}^{0}\binom{3}j(\frac{1}{10})^j(\frac{9}{10})^{3-j}.\]
+\[P(X\geq 1)=q_{1}+q_{2}+q_{3}=\frac{271}{1000}\approx\HLProbability{0.2710}.\]
+The complement ends at 0, not 1.
+This is the probability of the stated count of disrupted sessions over one day, with no monetary units.
+\PracticeColumnPair{
+\textbf{$Y_1$: home internet alone.}
+\[
+\begin{aligned}
+Y_1<0&\iff 100-40X<0\\
+&\iff X>\frac{5}{2}\iff X\geq 3.
+\end{aligned}
+\]
+Hence the initial probability of a net loss is
+\[
+P(Y_1<0)=1-\sum_{j=0}^{2}q_j
+=\frac{1}{1000}\approx\HLProbability{0.0010}.
+\]
+The loss counts are $\{3\}$. The cutoff is an integer; do not round the strict threshold to the nearest integer.
+}{
+\textbf{$Y_2$: mobile-data backup.}
+\[
+\begin{aligned}
+Y_2<0&\iff 60-25X<0\\
+&\iff X>\frac{12}{5}\iff X\geq 3.
+\end{aligned}
+\]
+Hence the initial probability of a net loss is
+\[
+P(Y_2<0)=1-\sum_{j=0}^{2}q_j
+=\frac{1}{1000}\approx\HLProbability{0.0010}.
+\]
+The loss counts are $\{3\}$. The cutoff is an integer; do not round the strict threshold to the nearest integer.
+}
+\secInicio[ex:intro-two][sec:t2-c4-introduction]
+\clearpage
+\subsubsection*{Task 2 --- Worked solution}\label{sol:c4-internet-decision}
+\paragraph{1. Initial expected values.}
+Connect expectation to the full distribution: $\mathbb E[X]=\sum_{k=0}^3kq_k=np$.
+Equivalently, $\mathbb E[B_j]=1p+0(1-p)=p$, so linearity gives
+$\mathbb E[B_1+\cdots+B_3]=3p$.
+At the supplied $p_0=\frac{1}{10}$, $\ExpectedValue{\mathbb E[X]}=3(\frac{1}{10})=\frac{3}{10}$ successes.
+For each alternative, the same distribution gives $\mathbb E[Y_i]=\sum_k f_i(k)q_k$.
+\PracticeColumnPair{
+\textbf{$Y_1$: home internet alone.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=\sum_{k=0}^3(100-40k)q_k\\
+&=100-40\left(\frac{3}{10}\right)\\
+&=\ExpectedValue{88\ \text{USD}}.
+\end{aligned}
+\]
+This is \ExpectedValue{expected net gain} per one day: a long-run average, with negative values denoting a net loss.
+}{
+\textbf{$Y_2$: mobile-data backup.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=\sum_{k=0}^3(60-25k)q_k\\
+&=60-25\left(\frac{3}{10}\right)\\
+&=\ExpectedValue{\frac{105}{2}\ \text{USD}}.
+\end{aligned}
+\]
+This is \ExpectedValue{expected net gain} per one day: a long-run average, with negative values denoting a net loss.
+}
+\paragraph{2. Expectation formulas and sign intervals.}
+Keep $n=3$, the trial definition and all $a_i,b_i$ fixed; vary only $p\in[0,1]$.
+Since $\sum q_k=1$ and $\sum kq_k=np$,
+\[
+\ExpectedValue{\mathbb E}[\Money{Y_i}]=\sum_{k=0}^3(a_i+b_i k)q_k
+=a_i\sum q_k+b_i\sum kq_k=a_i+b_i np.
+\]
+\PracticeColumnPair{
+\textbf{$Y_1$: home internet alone.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=100+(-40)(3)p\\
+&=100-120p\quad\text{USD},\\
+\mathbb E[Y_1]=0&\iff -120p=-100\\
+&\iff \SuccessProb{p_1^*}=\SuccessProb{\frac{5}{6}}.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\mathbb E[Y_1]>0&\iff -120p>-100\\
+&\iff p<\frac{5}{6}\\
+&\iff p\in \left[0,\frac{5}{6}\right),\\
+\mathbb E[Y_1]<0&\iff -120p<-100\\
+&\iff p>\frac{5}{6}\\
+&\iff p\in \left(\frac{5}{6},1\right].
+\end{aligned}
+\]
+Dividing by the negative slope reverses both inequalities. At $p=\frac{5}{6}$, the expectation is zero: break-even.
+}{
+\textbf{$Y_2$: mobile-data backup.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=60+(-25)(3)p\\
+&=60-75p\quad\text{USD},\\
+\mathbb E[Y_2]=0&\iff -75p=-60\\
+&\iff \SuccessProb{p_2^*}=\SuccessProb{\frac{4}{5}}.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\mathbb E[Y_2]>0&\iff -75p>-60\\
+&\iff p<\frac{4}{5}\\
+&\iff p\in \left[0,\frac{4}{5}\right),\\
+\mathbb E[Y_2]<0&\iff -75p<-60\\
+&\iff p>\frac{4}{5}\\
+&\iff p\in \left(\frac{4}{5},1\right].
+\end{aligned}
+\]
+Dividing by the negative slope reverses both inequalities. At $p=\frac{4}{5}$, the expectation is zero: break-even.
+}
+Positive expectation means expected net gain; negative means expected net loss. Equality concerns average money, not the probability of success or loss.
+\clearpage\paragraph{3. Individual graphs and checks.}
+\textbf{$Y_1$: home internet alone.}
+\begin{center}\BreakEvenGraph{1}{100}{-20}{5/6}\end{center}
+The endpoints are $(0,100)$ and $(1,-20)$: $\mathbb E[Y_1](0)=f_1(0)=100$ and
+$\mathbb E[Y_1](1)=f_1(3)=-20$ USD.
+The exact root check is $100+(-120)(\frac{5}{6})=0$.
+\par\medskip
+\textbf{$Y_2$: mobile-data backup.}
+\begin{center}\BreakEvenGraph{2}{60}{-15}{4/5}\end{center}
+The endpoints are $(0,60)$ and $(1,-15)$: $\mathbb E[Y_2](0)=f_2(0)=60$ and
+$\mathbb E[Y_2](1)=f_2(3)=-15$ USD.
+The exact root check is $60+(-75)(\frac{4}{5})=0$.
+\par\medskip
+Each period realizes one of the listed count-based payoffs, not necessarily the expectation.
+Expected profit is an average in USD; probability of loss is a unitless chance of $Y_i<0$.
+Both strictly negative and strictly positive outcomes retain positive probability at each interior break-even value.
+All alternatives share $X$; separate graphs do not imply independent monetary outcomes.
+\secInicio[ex:intro-two][sec:t2-c4-introduction]
+
+\clearpage
+\section{Notation Reference and Practice Procedure}\label{sec:notation-and-procedure}
+\subsection*{Detailed notation reference}\phantomsection\label{tab:notation-reference}
+\begingroup\small
+\HighlightDetailedTable{
+$\HLMathEvent{E_j,E_j^c}$ & \HLMathEvent{Trial success; failure} & Complementary events for one specified trial, not events about the aggregate count. &
+\textbullet\ \hyperref[ex:intro-one]{Example 1}: one slot meets/falls below its attendance target.\par
+\textbullet\ \hyperref[ex:intro-two]{Example 2}: one session has/has no home-internet disruption.\\[4pt]
+$\Indicator{B_j}$; $\Count{X,k}$ & \Count{Indicator; success count} & Independent $B_j\sim\operatorname{Bernoulli}(p)$; $X=\sum B_j\sim\operatorname{Bin}(n,p)$. $k$ is an integer possible count; $B_j$ is only 0 or 1. &
+\textbullet\ \hyperref[ex:intro-one]{Example 1}: $X$ counts high-demand slots.\par
+\textbullet\ \hyperref[ex:intro-two]{Example 2}: $X$ counts disrupted sessions.\\[4pt]
+$\TrialCount{n}$ & \TrialCount{Fixed trial count} & Chosen before results; all trials are observed, with $n>1$. &
+\textbullet\ \hyperref[ex:intro-one]{Example 1}: $\TrialCount{4}$ slots per weekend.\par
+\textbullet\ \hyperref[ex:intro-two]{Example 2}: $\TrialCount{3}$ sessions per day.\\[4pt]
+$\SuccessProb{p}$; $\FailureProb{1-p}$ & \SuccessProb{Success}; \FailureProb{failure probability} & Constant, unitless per-trial probabilities. $0\leq p\leq1$. Independence concerns the trials. &
+\textbullet\ \hyperref[ex:intro-one]{Example 1}: $\SuccessProb{2/5}$ and $\FailureProb{3/5}$.\par
+\textbullet\ \hyperref[ex:intro-two]{Example 2}: $\SuccessProb{1/10}$ and $\FailureProb{9/10}$.\\[4pt]
+$\binom nk$; $\sum$ & Arrangements; summation & $\binom nk=n!/[k!(n-k)!]$ counts orders; $\sum$ adds terms over the displayed integer endpoints. &
+\textbullet\ \hyperref[ex:intro-one]{Example 1}: $\binom42=6$ orders of two high-demand slots.\par
+\textbullet\ \hyperref[ex:intro-two]{Example 2}: add disruption-count masses for a cumulative event.\\[4pt]
+$\Count{S_X}$; $\Money{S_{Y_i}}$ & Positive-mass support & $S_Z=\{z:P(Z=z)>0\}$. For $0<p<1$, all counts $0,\ldots,n$ and their distinct affine images occur. At $p=0,1$, supports shrink to one value. &
+\textbullet\ \hyperref[ex:intro-one]{Example 1}: counts $0,1,2,3,4$; $Y_1$ values $-20,0,20,40,60$ USD initially.\par
+\textbullet\ \hyperref[ex:intro-two]{Example 2}: counts $0,1,2,3$; $Y_1$ values $-20,20,60,100$ USD initially.\\[4pt]
+$\TransformationFunction{f_i}$; $\Money{Y_i}$ & \TransformationFunction{Transformation}; \Money{monetary variable} & $f_i:\{0,\ldots,n\}\to\mathbb R$, $Y_i=f_i(X)=a_i+b_iX$, $b_i\ne0$. All alternatives use the same $X$ and need not be independent. &
+\textbullet\ \hyperref[ex:intro-one]{Example 1}: $Y_1=-20+20X$, $Y_2=-40+40X$.\par
+\textbullet\ \hyperref[ex:intro-two]{Example 2}: $Y_1=100-40X$, $Y_2=60-25X$ (USD).\\[4pt]
+$\Money{a_i,b_i}$ & \Money{Baseline; change per success} & $a_i=f_i(0)$ in USD; $b_i$ in USD/success. Endpoint $f_i(n)=a_i+b_in$ is different from $f_i(1)$. &
+\textbullet\ \hyperref[ex:intro-one]{Example 1}: small batch costs 20 USD fixed, earns 20 extra USD per high-demand slot.\par
+\textbullet\ \hyperref[ex:intro-two]{Example 2}: home-only baseline 100 USD, reduced by 40 USD per disruption.\\[4pt]
+$\HLProbability{q_k,m_{Y_i}(y)}$ & \HLProbability{PMF} & $q_k=\binom nk p^k(1-p)^{n-k}$; $m_{Y_i}(f_i(k))=q_k$, zero elsewhere. PMFs give discrete masses, not densities. &
+\textbullet\ \hyperref[ex:intro-one]{Example 1}: $q_2=216/625$; $Y_1=20$ has this mass.\par
+\textbullet\ \hyperref[ex:intro-two]{Example 2}: $q_3=1/1000$; $Y_1=-20$ has this mass.\\[4pt]
+$\HLCumulativeProbability{F_Z(t)}$ & \HLCumulativeProbability{CDF} & $F_Z(t)=P(Z\leq t)$ for real $t$. Accumulate masses in numerical value order, including each threshold. &
+\textbullet\ \hyperref[ex:intro-one]{Example 1}: $F_{Y_1}(0)=q_0+q_1$.\par
+\textbullet\ \hyperref[ex:intro-two]{Example 2}: $F_{Y_1}(20)=q_3+q_2$ (reversed count order).\\[4pt]
+$\HLMathEvent{\{Y_i<0\}}$ & \HLMathEvent{Loss event} & A strict monetary condition, translated to integer counts before summing. A zero payoff is excluded. &
+\textbullet\ \hyperref[ex:intro-one]{Example 1}: $X<1$, hence $X=0$ for both batches.\par
+\textbullet\ \hyperref[ex:intro-two]{Example 2}: $X>5/2$, hence $X=3$ for home only.\\[4pt]
+$\ExpectedValue{\mathbb E}[\Money{Y_i}]$ & \ExpectedValue{Expected net profit} & $\mathbb E[X]=np$, $\mathbb E[Y_i]=\sum f_i(k)q_k=a_i+b_inp$, in USD per period. &
+\textbullet\ \hyperref[ex:intro-one]{Example 1}: initially \ExpectedValue{12 USD} and \ExpectedValue{24 USD} per weekend.\par
+\textbullet\ \hyperref[ex:intro-two]{Example 2}: initially \ExpectedValue{88 USD} and \ExpectedValue{52.5 USD} per day.\\[4pt]
+$\SuccessProb{p_i^*}$ & \SuccessProb{Individual break-even probability} & $p_i^*=-a_i/(b_in)$ makes only alternative $i$'s expectation zero. With opposite-sign endpoint payoffs it lies strictly inside $[0,1]$. &
+\textbullet\ \hyperref[ex:intro-one]{Example 1}: both roots $\SuccessProb{1/4}$.\par
+\textbullet\ \hyperref[ex:intro-two]{Example 2}: roots $\SuccessProb{5/6}$ and $\SuccessProb{4/5}$.\\[4pt]
+}\endgroup
+\clearpage\subsection{Reusable practice procedure}
+\textbf{Task 1 --- Establish the binomial model and monetary transformations.}
+\begin{enumerate}
+\item Define the period, one trial, success $E_j$ and failure $E_j^c$. Check fixed $n$, binary outcomes, independence and constant $p$; define $B_j$ and $X=\sum B_j$.
+\item Derive $Y_i=a_i+b_iX$ from fixed costs or baseline receipts and money per success. Use positive-mass supports. Give the full count PMF, zero elsewhere, and its real-threshold CDF.
+\item Derive each monetary distribution by mapping every count to its payoff. Sort values numerically for CDFs; a decreasing rule reverses count order. At $p=0$, only $f_i(0)$ remains; at $p=1$, only $f_i(n)$ remains.
+\item Substitute $p_0$ for initial masses. Exact $k$ uses $q_k$; at most integer $b$ uses $F_X(b)$; at least integer $a$ uses $1-F_X(a-1)$; an inclusive interval uses $F_X(b)-F_X(a-1)$. Translate $Y_i<0$ before adding masses.
+\end{enumerate}
+For $b_i>0$, loss means $X<-a_i/b_i$, hence $X\leq\lceil-a_i/b_i\rceil-1$.
+For $b_i<0$, loss means $X>-a_i/b_i$, hence $X\geq\lfloor-a_i/b_i\rfloor+1$.
+Intersect these events with $0\leq X\leq n$. Strict inequalities exclude zero payoffs.
+
+\textbf{Task 2 --- Individual expected values.}
+\begin{enumerate}
+\item Calculate every initial $\sum f_i(k)q_k=a_i+b_inp_0$ before varying $p$; interpret the sign and units.
+\item Keep $n,a_i,b_i$ fixed. Derive $\mathbb E[X]=np$ from the indicators or distribution, then $\mathbb E[Y_i]=a_i+b_inp$. Solve its zero equation and both strict sign inequalities on $[0,1]$.
+\item For each alternative draw its own line joining $(0,f_i(0))$ to $(1,f_i(n))$, with the zero line and exact root. Substitute the root and both endpoints to check.
+\end{enumerate}
+For an increasing expectation, gain occurs on $(p_i^*,1]$ and loss on $[0,p_i^*)$.
+For a decreasing expectation these intervals reverse. Division by a negative slope reverses inequalities.
+At equality the expectation is zero, while realized payoffs remain uncertain.
+Probability of loss and expected net profit are different quantities: the former measures the chance of negative outcomes; the latter weights all payoffs by their probabilities.
+\secInicio[][sec:t2-c4-introduction]
+\clearpage\section{General Worked Problems}\label{sec:t2-c4-general}\label{sec:t2-c4-foundational}\label{sec:t2-c4-intermediate}
+Each C4 problem verifies a fixed-trial binomial model, calculates exact and cumulative probabilities, then analyses each monetary expectation separately.
+\SectionProblemsTableOfContents{\SectionProblemLink{prob:c4-inventory}{Campus sticker sales for one weekend}\\
+\SectionProblemLink{prob:c4-coffee}{Campus fair or online CV workshop}\\
+\SectionProblemLink{prob:c4-energy}{Freelance digital projects for one month}\\
+\SectionProblemLink{prob:c4-manufacturing}{Graduation photography for one quarter}}
+\subsection{Campus sticker sales for one weekend}\label{prob:c4-inventory}
+A student books four sales slots in advance. Compare a basic sticker pack with a premium pack obtained more cheaply per sticker through a shared bulk order. Each plan can serve every slot.
+The observation period is one weekend. One trial is one of four pre-booked campus-market sales slots.
+Success means attendance in that slot meets its fixed target; failure means attendance in that slot falls below its target.
+All $\TrialCount{n}=\TrialCount{4}$ trials are fixed before observation and all are observed.
+Assume independent outcomes and constant $\SuccessProb{p}=\SuccessProb{\frac{2}{5}}$ for each trial, under every alternative.
+The following baseline and per-success changes already include the relevant costs.
+\begin{center}\begin{tabular}{lrr}\toprule Alternative & Baseline $a_i$ (USD) & Change $b_i$ (USD/success)\\\midrule
+$A_1$: basic sticker pack & -40 & 30\\
+$A_2$: premium sticker pack & -20 & 50\\
+\bottomrule\end{tabular}\end{center}
+\QuestionsTasks[sec:t2-c4-general]{
+{4}/{sol:c4-inventory-model}/{\textbf{Task 1 --- Establish the binomial model and monetary transformations.}
+\textbf{1.} Define the trial indicators, count and model; verify the four conditions and derive each monetary rule.
+\textbf{2.} Give positive-probability supports, complete PMFs and real-threshold CDFs for the count and every alternative, including $p=0,1$.
+\textbf{3.} Calculate the full initial masses, $P(X\leq 2)$ and each probability of a strictly negative payoff. Translate each loss into an integer count event.},
+{4}/{sol:c4-inventory-decision}/{\textbf{Task 2 --- Individual expected values.}
+\textbf{1.} Calculate and interpret every initial expectation.
+\textbf{2.} Hold $n$ and the monetary rules fixed; derive each expectation for $p\in[0,1]$, its exact zero threshold and both strict sign intervals.
+\textbf{3.} Graph each expectation separately with its zero line, endpoints and exact root. Check the endpoints and root, and distinguish expected profit, realized profit and loss probability.}
+}
+\clearpage\subsubsection*{Task 1 --- Worked solution}\label{sol:c4-inventory-model}
+\paragraph{1. Binomial model and monetary transformations.}
+For $j=1,\ldots,4$, $\HLMathEvent{E_j}$ means attendance in that slot meets its fixed target; $E_j^c$ means attendance in that slot falls below its target.
+Set $\Indicator{B_j}=1$ on $E_j$ and $B_j=0$ otherwise.
+The fixed count, binary outcomes, assumed independence and common probability give
+\[
+\Count{X}=\Indicator{B_1}+\cdots+\Indicator{B_4}\sim\operatorname{Bin}(4,p),
+\quad \SuccessProb{p_0}=\SuccessProb{\frac{2}{5}},\quad \FailureProb{1-p_0}=\FailureProb{\frac{3}{5}}.
+\]
+$X$ counts high-demand slots; it has count units, whereas each $Y_i$ is in USD per one weekend.
+\PracticeColumnPair{
+\textbf{$Y_1$: basic sticker pack.}
+Here $\Money{a_1}=\Money{-40}$ represents a fixed cost of 40 USD; $\Money{b_1}=\Money{30}$ means 30 USD extra net receipts per success.
+\[
+\Money{Y_1}=\TransformationFunction{f_1}(\Count{X})=\Money{-40}+\Money{30}\Count{X}.
+\]
+Thus $f_1(0)=-40$ and $f_1(4)=80$ USD: both strict payoff signs are attainable when $0<p<1$.
+}{
+\textbf{$Y_2$: premium sticker pack.}
+Here $\Money{a_2}=\Money{-20}$ represents a fixed cost of 20 USD; $\Money{b_2}=\Money{50}$ means 50 USD extra net receipts per success.
+\[
+\Money{Y_2}=\TransformationFunction{f_2}(\Count{X})=\Money{-20}+\Money{50}\Count{X}.
+\]
+Thus $f_2(0)=-20$ and $f_2(4)=180$ USD: both strict payoff signs are attainable when $0<p<1$.
+}
+\clearpage
+\paragraph{2. Supports, PMFs, and ordered CDFs.}
+Write $\HLProbability{q_k}=\binom{4}k p^k(1-p)^{4-k}$ for integer $k=0,\ldots,4$.
+\[
+S_X=\{x\in\mathbb R:P(X=x)>0\}=
+\begin{cases}\{0,\ldots,4\},&0<p<1,\\\{0\},&p=0,\\\{4\},&p=1.\end{cases}
+\]
+\[
+m_X(x)=\begin{cases}q_x,&x\in\{0,\ldots,4\},\\0,&\text{otherwise},\end{cases}
+\qquad
+F_X(t)=\begin{cases}0,&t<0,\\\displaystyle\sum_{j=0}^{\lfloor t\rfloor}q_j,&0\leq t<4,\\1,&t\geq 4.\end{cases}
+\]
+The PMF is zero at noninteger counts too. At $p=0$ use $q_0=1$, all others zero;
+at $p=1$ use $q_{4}=1$, all others zero (equivalently take endpoint limits).
+The sum $\sum_{k=0}^4q_k=(p+(1-p))^4=1$ checks normalization.
+Each affine rule is one-to-one, so its mass at $f_i(k)$ is exactly $q_k$.
+\PracticeColumnPair{
+\textbf{$Y_1$: basic sticker pack.}
+For $0<p<1$, the support in ascending USD order is
+\[S_{Y_1}=\{-40,-10,20,50,80\}.\]
+This is $\{y:P(Y_1=y)>0\}$. At $p=0$ only $-40$ remains; at $p=1$ only $80$ remains.
+\[
+m_{Y_1}(y)=\begin{cases}q_k,&y=-40+30k,\\&k=0,\ldots,4,\\0,&\text{otherwise}.\end{cases}
+\]
+Since $-40+30X\leq t$ means $X\leq \lfloor(t-(-40))/30\rfloor$,
+\[
+F_{Y_1}(t)=\begin{cases}0,&t<-40,\\\displaystyle \sum_{j=0}^{\lfloor(t-(-40))/30\rfloor}q_j,&-40\leq t<80,\\1,&t\geq 80.\end{cases}
+\]
+For example, $F_{Y_1}(-10)=q_0+q_1$; the jump includes its threshold.
+}{
+\textbf{$Y_2$: premium sticker pack.}
+For $0<p<1$, the support in ascending USD order is
+\[S_{Y_2}=\{-20,30,80,130,180\}.\]
+This is $\{y:P(Y_2=y)>0\}$. At $p=0$ only $-20$ remains; at $p=1$ only $180$ remains.
+\[
+m_{Y_2}(y)=\begin{cases}q_k,&y=-20+50k,\\&k=0,\ldots,4,\\0,&\text{otherwise}.\end{cases}
+\]
+Since $-20+50X\leq t$ means $X\leq \lfloor(t-(-20))/50\rfloor$,
+\[
+F_{Y_2}(t)=\begin{cases}0,&t<-20,\\\displaystyle \sum_{j=0}^{\lfloor(t-(-20))/50\rfloor}q_j,&-20\leq t<180,\\1,&t\geq 180.\end{cases}
+\]
+For example, $F_{Y_2}(30)=q_0+q_1$; the jump includes its threshold.
+}
+CDFs run from the smallest to largest monetary value, regardless of count order. Floors round down; ceilings round up. The displayed finite sums include every jump at its threshold and are right-continuous. Endpoint formulas still apply, but zero-mass values leave the support.
+\clearpage\paragraph{3. Initial probabilities and loss events.}
+At $p_0=\frac{2}{5}$, $q_k=\binom{4}k(\frac{2}{5})^k(\frac{3}{5})^{4-k}$. The following exact table gives all initial count and monetary masses. In column $k$, each amount $f_i(k)$ has probability $q_k=w_k/625$; all other amounts have probability zero.
+\begin{center}\begin{tabular}{lrrrrr}\toprule
+$k$ & 0 & 1 & 2 & 3 & 4\\\midrule
+$w_k$ & 81 & 216 & 216 & 96 & 16\\
+$f_1(k)$ (USD) & -40 & -10 & 20 & 50 & 80\\
+$f_2(k)$ (USD) & -20 & 30 & 80 & 130 & 180\\
+\bottomrule\end{tabular}\end{center}
+\textbf{Requested count event (C4).} The endpoints in $X\leq 2$ are explicit. Using the binomial formula,
+\[P(X\leq 2)=F_X(2)=\sum_{j=0}^{2}\binom{4}j(\frac{2}{5})^j(\frac{3}{5})^{4-j}.\]
+\[P(X\leq 2)=q_{0}+q_{1}+q_{2}=\frac{513}{625}\approx\HLProbability{0.8208}.\]
+This is the probability of the stated count of high-demand slots over one weekend, with no monetary units.
+\PracticeColumnPair{
+\textbf{$Y_1$: basic sticker pack.}
+\[
+\begin{aligned}
+Y_1<0&\iff -40+30X<0\\
+&\iff X<\frac{4}{3}\iff X\leq 1.
+\end{aligned}
+\]
+Hence the initial probability of a net loss is
+\[
+P(Y_1<0)=\sum_{j=0}^{1}q_j
+=\frac{297}{625}\approx\HLProbability{0.4752}.
+\]
+The loss counts are $\{0,1\}$. The cutoff is an integer; do not round the strict threshold to the nearest integer.
+}{
+\textbf{$Y_2$: premium sticker pack.}
+\[
+\begin{aligned}
+Y_2<0&\iff -20+50X<0\\
+&\iff X<\frac{2}{5}\iff X\leq 0.
+\end{aligned}
+\]
+Hence the initial probability of a net loss is
+\[
+P(Y_2<0)=\sum_{j=0}^{0}q_j
+=\frac{81}{625}\approx\HLProbability{0.1296}.
+\]
+The loss counts are $\{0\}$. The cutoff is an integer; do not round the strict threshold to the nearest integer.
+}
+\secInicio[prob:c4-inventory][sec:t2-c4-general]
+\clearpage
+\subsubsection*{Task 2 --- Worked solution}\label{sol:c4-inventory-decision}
+\paragraph{1. Initial expected values.}
+Connect expectation to the full distribution: $\mathbb E[X]=\sum_{k=0}^4kq_k=np$.
+Equivalently, $\mathbb E[B_j]=1p+0(1-p)=p$, so linearity gives
+$\mathbb E[B_1+\cdots+B_4]=4p$.
+At the supplied $p_0=\frac{2}{5}$, $\ExpectedValue{\mathbb E[X]}=4(\frac{2}{5})=\frac{8}{5}$ successes.
+For each alternative, the same distribution gives $\mathbb E[Y_i]=\sum_k f_i(k)q_k$.
+\PracticeColumnPair{
+\textbf{$Y_1$: basic sticker pack.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=\sum_{k=0}^4(-40+30k)q_k\\
+&=-40+30\left(\frac{8}{5}\right)\\
+&=\ExpectedValue{8\ \text{USD}}.
+\end{aligned}
+\]
+This is \ExpectedValue{expected net gain} per one weekend: a long-run average, with negative values denoting a net loss.
+}{
+\textbf{$Y_2$: premium sticker pack.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=\sum_{k=0}^4(-20+50k)q_k\\
+&=-20+50\left(\frac{8}{5}\right)\\
+&=\ExpectedValue{60\ \text{USD}}.
+\end{aligned}
+\]
+This is \ExpectedValue{expected net gain} per one weekend: a long-run average, with negative values denoting a net loss.
+}
+\paragraph{2. Expectation formulas and sign intervals.}
+Keep $n=4$, the trial definition and all $a_i,b_i$ fixed; vary only $p\in[0,1]$.
+Since $\sum q_k=1$ and $\sum kq_k=np$,
+\[
+\ExpectedValue{\mathbb E}[\Money{Y_i}]=\sum_{k=0}^4(a_i+b_i k)q_k
+=a_i\sum q_k+b_i\sum kq_k=a_i+b_i np.
+\]
+\PracticeColumnPair{
+\textbf{$Y_1$: basic sticker pack.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=-40+(30)(4)p\\
+&=-40+120p\quad\text{USD},\\
+\mathbb E[Y_1]=0&\iff 120p=40\\
+&\iff \SuccessProb{p_1^*}=\SuccessProb{\frac{1}{3}}.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\mathbb E[Y_1]>0&\iff 120p>40\\
+&\iff p>\frac{1}{3}\\
+&\iff p\in \left(\frac{1}{3},1\right],\\
+\mathbb E[Y_1]<0&\iff 120p<40\\
+&\iff p<\frac{1}{3}\\
+&\iff p\in \left[0,\frac{1}{3}\right).
+\end{aligned}
+\]
+At $p=\frac{1}{3}$, the expectation is zero: break-even.
+}{
+\textbf{$Y_2$: premium sticker pack.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=-20+(50)(4)p\\
+&=-20+200p\quad\text{USD},\\
+\mathbb E[Y_2]=0&\iff 200p=20\\
+&\iff \SuccessProb{p_2^*}=\SuccessProb{\frac{1}{10}}.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\mathbb E[Y_2]>0&\iff 200p>20\\
+&\iff p>\frac{1}{10}\\
+&\iff p\in \left(\frac{1}{10},1\right],\\
+\mathbb E[Y_2]<0&\iff 200p<20\\
+&\iff p<\frac{1}{10}\\
+&\iff p\in \left[0,\frac{1}{10}\right).
+\end{aligned}
+\]
+At $p=\frac{1}{10}$, the expectation is zero: break-even.
+}
+Positive expectation means expected net gain; negative means expected net loss. Equality concerns average money, not the probability of success or loss.
+\clearpage\paragraph{3. Individual graphs and checks.}
+\textbf{$Y_1$: basic sticker pack.}
+\begin{center}\BreakEvenGraph{1}{-40}{80}{1/3}\end{center}
+The endpoints are $(0,-40)$ and $(1,80)$: $\mathbb E[Y_1](0)=f_1(0)=-40$ and
+$\mathbb E[Y_1](1)=f_1(4)=80$ USD.
+The exact root check is $-40+(120)(\frac{1}{3})=0$.
+\par\medskip
+\textbf{$Y_2$: premium sticker pack.}
+\begin{center}\BreakEvenGraph{2}{-20}{180}{1/10}\end{center}
+The endpoints are $(0,-20)$ and $(1,180)$: $\mathbb E[Y_2](0)=f_2(0)=-20$ and
+$\mathbb E[Y_2](1)=f_2(4)=180$ USD.
+The exact root check is $-20+(200)(\frac{1}{10})=0$.
+\par\medskip
+Each period realizes one of the listed count-based payoffs, not necessarily the expectation.
+Expected profit is an average in USD; probability of loss is a unitless chance of $Y_i<0$.
+Both strictly negative and strictly positive outcomes retain positive probability at each interior break-even value.
+All alternatives share $X$; separate graphs do not imply independent monetary outcomes.
+\secInicio[prob:c4-inventory][sec:t2-c4-general]
+\clearpage
+\subsection{Campus fair or online CV workshop}\label{prob:c4-coffee}
+A graduate chooses a plan covering four separately organized fairs: portrait sessions for their customers, or an online CV workshop for the same four student groups. Each fair that goes ahead brings portrait business but draws one group away from the workshop.
+The observation period is one day. One trial is one of four separately organized campus careers fairs scheduled that day.
+Success means that fair goes ahead; failure means that fair is cancelled.
+All $\TrialCount{n}=\TrialCount{4}$ trials are fixed before observation and all are observed.
+Assume independent outcomes and constant $\SuccessProb{p}=\SuccessProb{\frac{1}{2}}$ for each trial, under every alternative.
+The following baseline and per-success changes already include the relevant costs.
+\begin{center}\begin{tabular}{lrr}\toprule Alternative & Baseline $a_i$ (USD) & Change $b_i$ (USD/success)\\\midrule
+$A_1$: portrait sessions & -40 & 35\\
+$A_2$: online CV workshop & 100 & -30\\
+\bottomrule\end{tabular}\end{center}
+\QuestionsTasks[sec:t2-c4-general]{
+{4}/{sol:c4-coffee-model}/{\textbf{Task 1 --- Establish the binomial model and monetary transformations.}
+\textbf{1.} Define the trial indicators, count and model; verify the four conditions and derive each monetary rule.
+\textbf{2.} Give positive-probability supports, complete PMFs and real-threshold CDFs for the count and every alternative, including $p=0,1$.
+\textbf{3.} Calculate the full initial masses, $P(1\leq X\leq 3)$ and each probability of a strictly negative payoff. Translate each loss into an integer count event.},
+{4}/{sol:c4-coffee-decision}/{\textbf{Task 2 --- Individual expected values.}
+\textbf{1.} Calculate and interpret every initial expectation.
+\textbf{2.} Hold $n$ and the monetary rules fixed; derive each expectation for $p\in[0,1]$, its exact zero threshold and both strict sign intervals.
+\textbf{3.} Graph each expectation separately with its zero line, endpoints and exact root. Check the endpoints and root, and distinguish expected profit, realized profit and loss probability.}
+}
+\subsubsection*{Task 1 --- Worked solution}\label{sol:c4-coffee-model}
+\paragraph{1. Binomial model and monetary transformations.}
+For $j=1,\ldots,4$, $\HLMathEvent{E_j}$ means that fair goes ahead; $E_j^c$ means that fair is cancelled.
+Set $\Indicator{B_j}=1$ on $E_j$ and $B_j=0$ otherwise.
+The fixed count, binary outcomes, assumed independence and common probability give
+\[
+\Count{X}=\Indicator{B_1}+\cdots+\Indicator{B_4}\sim\operatorname{Bin}(4,p),
+\quad \SuccessProb{p_0}=\SuccessProb{\frac{1}{2}},\quad \FailureProb{1-p_0}=\FailureProb{\frac{1}{2}}.
+\]
+$X$ counts fairs that go ahead; it has count units, whereas each $Y_i$ is in USD per one day.
+\PracticeColumnPair{
+\textbf{$Y_1$: portrait sessions.}
+Here $\Money{a_1}=\Money{-40}$ represents a fixed cost of 40 USD; $\Money{b_1}=\Money{35}$ means 35 USD extra net receipts per success.
+\[
+\Money{Y_1}=\TransformationFunction{f_1}(\Count{X})=\Money{-40}+\Money{35}\Count{X}.
+\]
+Thus $f_1(0)=-40$ and $f_1(4)=100$ USD: both strict payoff signs are attainable when $0<p<1$.
+}{
+\textbf{$Y_2$: online CV workshop.}
+Here $\Money{a_2}=\Money{100}$ represents a baseline net receipt of 100 USD with no successes; $\Money{b_2}=\Money{-30}$ means 30 USD net reduction through refunds, lost receipts and disruption costs per success.
+\[
+\Money{Y_2}=\TransformationFunction{f_2}(\Count{X})=\Money{100}-\Money{30}\Count{X}.
+\]
+Thus $f_2(0)=100$ and $f_2(4)=-20$ USD: both strict payoff signs are attainable when $0<p<1$.
+}
+\clearpage
+\paragraph{2. Supports, PMFs, and ordered CDFs.}
+Write $\HLProbability{q_k}=\binom{4}k p^k(1-p)^{4-k}$ for integer $k=0,\ldots,4$.
+\[
+S_X=\{x\in\mathbb R:P(X=x)>0\}=
+\begin{cases}\{0,\ldots,4\},&0<p<1,\\\{0\},&p=0,\\\{4\},&p=1.\end{cases}
+\]
+\[
+m_X(x)=\begin{cases}q_x,&x\in\{0,\ldots,4\},\\0,&\text{otherwise},\end{cases}
+\qquad
+F_X(t)=\begin{cases}0,&t<0,\\\displaystyle\sum_{j=0}^{\lfloor t\rfloor}q_j,&0\leq t<4,\\1,&t\geq 4.\end{cases}
+\]
+The PMF is zero at noninteger counts too. At $p=0$ use $q_0=1$, all others zero;
+at $p=1$ use $q_{4}=1$, all others zero (equivalently take endpoint limits).
+The sum $\sum_{k=0}^4q_k=(p+(1-p))^4=1$ checks normalization.
+Each affine rule is one-to-one, so its mass at $f_i(k)$ is exactly $q_k$.
+\PracticeColumnPair{
+\textbf{$Y_1$: portrait sessions.}
+For $0<p<1$, the support in ascending USD order is
+\[S_{Y_1}=\{-40,-5,30,65,100\}.\]
+This is $\{y:P(Y_1=y)>0\}$. At $p=0$ only $-40$ remains; at $p=1$ only $100$ remains.
+\[
+m_{Y_1}(y)=\begin{cases}q_k,&y=-40+35k,\\&k=0,\ldots,4,\\0,&\text{otherwise}.\end{cases}
+\]
+Since $-40+35X\leq t$ means $X\leq \lfloor(t-(-40))/35\rfloor$,
+\[
+F_{Y_1}(t)=\begin{cases}0,&t<-40,\\\displaystyle \sum_{j=0}^{\lfloor(t-(-40))/35\rfloor}q_j,&-40\leq t<100,\\1,&t\geq 100.\end{cases}
+\]
+For example, $F_{Y_1}(-5)=q_0+q_1$; the jump includes its threshold.
+}{
+\textbf{$Y_2$: online CV workshop.}
+For $0<p<1$, the support in ascending USD order is
+\[S_{Y_2}=\{-20,10,40,70,100\}.\]
+This is $\{y:P(Y_2=y)>0\}$. At $p=0$ only $100$ remains; at $p=1$ only $-20$ remains.
+\[
+m_{Y_2}(y)=\begin{cases}q_k,&y=100-30k,\\&k=0,\ldots,4,\\0,&\text{otherwise}.\end{cases}
+\]
+Since $100-30X\leq t$ means $X\geq \lceil(100-t)/30\rceil$,
+\[
+F_{Y_2}(t)=\begin{cases}0,&t<-20,\\\displaystyle \sum_{j=\lceil(100-t)/30\rceil}^{4}q_j,&-20\leq t<100,\\1,&t\geq 100.\end{cases}
+\]
+For example, $F_{Y_2}(10)=q_4+q_{3}$; the jump includes its threshold.
+}
+CDFs run from the smallest to largest monetary value, regardless of count order. Floors round down; ceilings round up. The displayed finite sums include every jump at its threshold and are right-continuous. Endpoint formulas still apply, but zero-mass values leave the support.
+\clearpage\paragraph{3. Initial probabilities and loss events.}
+At $p_0=\frac{1}{2}$, $q_k=\binom{4}k(\frac{1}{2})^k(\frac{1}{2})^{4-k}$. The following exact table gives all initial count and monetary masses. In column $k$, each amount $f_i(k)$ has probability $q_k=w_k/16$; all other amounts have probability zero.
+\begin{center}\begin{tabular}{lrrrrr}\toprule
+$k$ & 0 & 1 & 2 & 3 & 4\\\midrule
+$w_k$ & 1 & 4 & 6 & 4 & 1\\
+$f_1(k)$ (USD) & -40 & -5 & 30 & 65 & 100\\
+$f_2(k)$ (USD) & 100 & 70 & 40 & 10 & -20\\
+\bottomrule\end{tabular}\end{center}
+\textbf{Requested count event (C4).} The endpoints in $1\leq X\leq 3$ are explicit. Using the binomial formula,
+\[P(1\leq X\leq 3)=F_X(3)-F_X(0)=\sum_{j=1}^{3}\binom{4}j(\frac{1}{2})^j(\frac{1}{2})^{4-j}.\]
+\[P(1\leq X\leq 3)=q_{1}+q_{2}+q_{3}=\frac{7}{8}\approx\HLProbability{0.8750}.\]
+Both 1 and 3 are included; subtract counts at most 0, not at most 1.
+This is the probability of the stated count of fairs that go ahead over one day, with no monetary units.
+\PracticeColumnPair{
+\textbf{$Y_1$: portrait sessions.}
+\[
+\begin{aligned}
+Y_1<0&\iff -40+35X<0\\
+&\iff X<\frac{8}{7}\iff X\leq 1.
+\end{aligned}
+\]
+Hence the initial probability of a net loss is
+\[
+P(Y_1<0)=\sum_{j=0}^{1}q_j
+=\frac{5}{16}\approx\HLProbability{0.3125}.
+\]
+The loss counts are $\{0,1\}$. The cutoff is an integer; do not round the strict threshold to the nearest integer.
+}{
+\textbf{$Y_2$: online CV workshop.}
+\[
+\begin{aligned}
+Y_2<0&\iff 100-30X<0\\
+&\iff X>\frac{10}{3}\iff X\geq 4.
+\end{aligned}
+\]
+Hence the initial probability of a net loss is
+\[
+P(Y_2<0)=1-\sum_{j=0}^{3}q_j
+=\frac{1}{16}\approx\HLProbability{0.0625}.
+\]
+The loss counts are $\{4\}$. The cutoff is an integer; do not round the strict threshold to the nearest integer.
+}
+\secInicio[prob:c4-coffee][sec:t2-c4-general]
+\clearpage
+\subsubsection*{Task 2 --- Worked solution}\label{sol:c4-coffee-decision}
+\paragraph{1. Initial expected values.}
+Connect expectation to the full distribution: $\mathbb E[X]=\sum_{k=0}^4kq_k=np$.
+Equivalently, $\mathbb E[B_j]=1p+0(1-p)=p$, so linearity gives
+$\mathbb E[B_1+\cdots+B_4]=4p$.
+At the supplied $p_0=\frac{1}{2}$, $\ExpectedValue{\mathbb E[X]}=4(\frac{1}{2})=2$ successes.
+For each alternative, the same distribution gives $\mathbb E[Y_i]=\sum_k f_i(k)q_k$.
+\PracticeColumnPair{
+\textbf{$Y_1$: portrait sessions.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=\sum_{k=0}^4(-40+35k)q_k\\
+&=-40+35\left(2\right)\\
+&=\ExpectedValue{30\ \text{USD}}.
+\end{aligned}
+\]
+This is \ExpectedValue{expected net gain} per one day: a long-run average, with negative values denoting a net loss.
+}{
+\textbf{$Y_2$: online CV workshop.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=\sum_{k=0}^4(100-30k)q_k\\
+&=100-30\left(2\right)\\
+&=\ExpectedValue{40\ \text{USD}}.
+\end{aligned}
+\]
+This is \ExpectedValue{expected net gain} per one day: a long-run average, with negative values denoting a net loss.
+}
+\paragraph{2. Expectation formulas and sign intervals.}
+Keep $n=4$, the trial definition and all $a_i,b_i$ fixed; vary only $p\in[0,1]$.
+Since $\sum q_k=1$ and $\sum kq_k=np$,
+\[
+\ExpectedValue{\mathbb E}[\Money{Y_i}]=\sum_{k=0}^4(a_i+b_i k)q_k
+=a_i\sum q_k+b_i\sum kq_k=a_i+b_i np.
+\]
+\PracticeColumnPair{
+\textbf{$Y_1$: portrait sessions.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=-40+(35)(4)p\\
+&=-40+140p\quad\text{USD},\\
+\mathbb E[Y_1]=0&\iff 140p=40\\
+&\iff \SuccessProb{p_1^*}=\SuccessProb{\frac{2}{7}}.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\mathbb E[Y_1]>0&\iff 140p>40\\
+&\iff p>\frac{2}{7}\\
+&\iff p\in \left(\frac{2}{7},1\right],\\
+\mathbb E[Y_1]<0&\iff 140p<40\\
+&\iff p<\frac{2}{7}\\
+&\iff p\in \left[0,\frac{2}{7}\right).
+\end{aligned}
+\]
+At $p=\frac{2}{7}$, the expectation is zero: break-even.
+}{
+\textbf{$Y_2$: online CV workshop.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=100+(-30)(4)p\\
+&=100-120p\quad\text{USD},\\
+\mathbb E[Y_2]=0&\iff -120p=-100\\
+&\iff \SuccessProb{p_2^*}=\SuccessProb{\frac{5}{6}}.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\mathbb E[Y_2]>0&\iff -120p>-100\\
+&\iff p<\frac{5}{6}\\
+&\iff p\in \left[0,\frac{5}{6}\right),\\
+\mathbb E[Y_2]<0&\iff -120p<-100\\
+&\iff p>\frac{5}{6}\\
+&\iff p\in \left(\frac{5}{6},1\right].
+\end{aligned}
+\]
+Dividing by the negative slope reverses both inequalities. At $p=\frac{5}{6}$, the expectation is zero: break-even.
+}
+Positive expectation means expected net gain; negative means expected net loss. Equality concerns average money, not the probability of success or loss.
+\clearpage\paragraph{3. Individual graphs and checks.}
+\textbf{$Y_1$: portrait sessions.}
+\begin{center}\BreakEvenGraph{1}{-40}{100}{2/7}\end{center}
+The endpoints are $(0,-40)$ and $(1,100)$: $\mathbb E[Y_1](0)=f_1(0)=-40$ and
+$\mathbb E[Y_1](1)=f_1(4)=100$ USD.
+The exact root check is $-40+(140)(\frac{2}{7})=0$.
+\par\medskip
+\textbf{$Y_2$: online CV workshop.}
+\begin{center}\BreakEvenGraph{2}{100}{-20}{5/6}\end{center}
+The endpoints are $(0,100)$ and $(1,-20)$: $\mathbb E[Y_2](0)=f_2(0)=100$ and
+$\mathbb E[Y_2](1)=f_2(4)=-20$ USD.
+The exact root check is $100+(-120)(\frac{5}{6})=0$.
+\par\medskip
+Each period realizes one of the listed count-based payoffs, not necessarily the expectation.
+Expected profit is an average in USD; probability of loss is a unitless chance of $Y_i<0$.
+Both strictly negative and strictly positive outcomes retain positive probability at each interior break-even value.
+All alternatives share $X$; separate graphs do not imply independent monetary outcomes.
+\secInicio[prob:c4-coffee][sec:t2-c4-general]
+\clearpage
+\subsection{Freelance digital projects for one month}\label{prob:c4-energy}
+A freelancer follows the same four enquiries under either hypothetical service plan: social-media graphics or short video edits. Assume confirmation depends on the client budget decision and has the same probability under either plan; capacity suffices for all four.
+The observation period is one month. One trial is one of four client enquiries fixed at the start of the month.
+Success means that enquiry confirms a paid project by month end; failure means that enquiry does not confirm a project by month end.
+All $\TrialCount{n}=\TrialCount{4}$ trials are fixed before observation and all are observed.
+Assume independent outcomes and constant $\SuccessProb{p}=\SuccessProb{\frac{1}{4}}$ for each trial, under every alternative.
+The following baseline and per-success changes already include the relevant costs.
+\begin{center}\begin{tabular}{lrr}\toprule Alternative & Baseline $a_i$ (USD) & Change $b_i$ (USD/success)\\\midrule
+$A_1$: social-media graphics & -30 & 30\\
+$A_2$: short video edits & -60 & 30\\
+\bottomrule\end{tabular}\end{center}
+\QuestionsTasks[sec:t2-c4-general]{
+{4}/{sol:c4-energy-model}/{\textbf{Task 1 --- Establish the binomial model and monetary transformations.}
+\textbf{1.} Define the trial indicators, count and model; verify the four conditions and derive each monetary rule.
+\textbf{2.} Give positive-probability supports, complete PMFs and real-threshold CDFs for the count and every alternative, including $p=0,1$.
+\textbf{3.} Calculate the full initial masses, $P(X=1)$ and each probability of a strictly negative payoff. Translate each loss into an integer count event.},
+{4}/{sol:c4-energy-decision}/{\textbf{Task 2 --- Individual expected values.}
+\textbf{1.} Calculate and interpret every initial expectation.
+\textbf{2.} Hold $n$ and the monetary rules fixed; derive each expectation for $p\in[0,1]$, its exact zero threshold and both strict sign intervals.
+\textbf{3.} Graph each expectation separately with its zero line, endpoints and exact root. Check the endpoints and root, and distinguish expected profit, realized profit and loss probability.}
+}
+\subsubsection*{Task 1 --- Worked solution}\label{sol:c4-energy-model}
+\paragraph{1. Binomial model and monetary transformations.}
+For $j=1,\ldots,4$, $\HLMathEvent{E_j}$ means that enquiry confirms a paid project by month end; $E_j^c$ means that enquiry does not confirm a project by month end.
+Set $\Indicator{B_j}=1$ on $E_j$ and $B_j=0$ otherwise.
+The fixed count, binary outcomes, assumed independence and common probability give
+\[
+\Count{X}=\Indicator{B_1}+\cdots+\Indicator{B_4}\sim\operatorname{Bin}(4,p),
+\quad \SuccessProb{p_0}=\SuccessProb{\frac{1}{4}},\quad \FailureProb{1-p_0}=\FailureProb{\frac{3}{4}}.
+\]
+$X$ counts confirmed projects; it has count units, whereas each $Y_i$ is in USD per one month.
+\PracticeColumnPair{
+\textbf{$Y_1$: social-media graphics.}
+Here $\Money{a_1}=\Money{-30}$ represents a fixed cost of 30 USD; $\Money{b_1}=\Money{30}$ means 30 USD extra net receipts per success.
+\[
+\Money{Y_1}=\TransformationFunction{f_1}(\Count{X})=\Money{-30}+\Money{30}\Count{X}.
+\]
+Thus $f_1(0)=-30$ and $f_1(4)=90$ USD: both strict payoff signs are attainable when $0<p<1$.
+}{
+\textbf{$Y_2$: short video edits.}
+Here $\Money{a_2}=\Money{-60}$ represents a fixed cost of 60 USD; $\Money{b_2}=\Money{30}$ means 30 USD extra net receipts per success.
+\[
+\Money{Y_2}=\TransformationFunction{f_2}(\Count{X})=\Money{-60}+\Money{30}\Count{X}.
+\]
+Thus $f_2(0)=-60$ and $f_2(4)=60$ USD: both strict payoff signs are attainable when $0<p<1$.
+}
+\clearpage
+\paragraph{2. Supports, PMFs, and ordered CDFs.}
+Write $\HLProbability{q_k}=\binom{4}k p^k(1-p)^{4-k}$ for integer $k=0,\ldots,4$.
+\[
+S_X=\{x\in\mathbb R:P(X=x)>0\}=
+\begin{cases}\{0,\ldots,4\},&0<p<1,\\\{0\},&p=0,\\\{4\},&p=1.\end{cases}
+\]
+\[
+m_X(x)=\begin{cases}q_x,&x\in\{0,\ldots,4\},\\0,&\text{otherwise},\end{cases}
+\qquad
+F_X(t)=\begin{cases}0,&t<0,\\\displaystyle\sum_{j=0}^{\lfloor t\rfloor}q_j,&0\leq t<4,\\1,&t\geq 4.\end{cases}
+\]
+The PMF is zero at noninteger counts too. At $p=0$ use $q_0=1$, all others zero;
+at $p=1$ use $q_{4}=1$, all others zero (equivalently take endpoint limits).
+The sum $\sum_{k=0}^4q_k=(p+(1-p))^4=1$ checks normalization.
+Each affine rule is one-to-one, so its mass at $f_i(k)$ is exactly $q_k$.
+\PracticeColumnPair{
+\textbf{$Y_1$: social-media graphics.}
+For $0<p<1$, the support in ascending USD order is
+\[S_{Y_1}=\{-30,0,30,60,90\}.\]
+This is $\{y:P(Y_1=y)>0\}$. At $p=0$ only $-30$ remains; at $p=1$ only $90$ remains.
+\[
+m_{Y_1}(y)=\begin{cases}q_k,&y=-30+30k,\\&k=0,\ldots,4,\\0,&\text{otherwise}.\end{cases}
+\]
+Since $-30+30X\leq t$ means $X\leq \lfloor(t-(-30))/30\rfloor$,
+\[
+F_{Y_1}(t)=\begin{cases}0,&t<-30,\\\displaystyle \sum_{j=0}^{\lfloor(t-(-30))/30\rfloor}q_j,&-30\leq t<90,\\1,&t\geq 90.\end{cases}
+\]
+For example, $F_{Y_1}(0)=q_0+q_1$; the jump includes its threshold.
+}{
+\textbf{$Y_2$: short video edits.}
+For $0<p<1$, the support in ascending USD order is
+\[S_{Y_2}=\{-60,-30,0,30,60\}.\]
+This is $\{y:P(Y_2=y)>0\}$. At $p=0$ only $-60$ remains; at $p=1$ only $60$ remains.
+\[
+m_{Y_2}(y)=\begin{cases}q_k,&y=-60+30k,\\&k=0,\ldots,4,\\0,&\text{otherwise}.\end{cases}
+\]
+Since $-60+30X\leq t$ means $X\leq \lfloor(t-(-60))/30\rfloor$,
+\[
+F_{Y_2}(t)=\begin{cases}0,&t<-60,\\\displaystyle \sum_{j=0}^{\lfloor(t-(-60))/30\rfloor}q_j,&-60\leq t<60,\\1,&t\geq 60.\end{cases}
+\]
+For example, $F_{Y_2}(-30)=q_0+q_1$; the jump includes its threshold.
+}
+CDFs run from the smallest to largest monetary value, regardless of count order. Floors round down; ceilings round up. The displayed finite sums include every jump at its threshold and are right-continuous. Endpoint formulas still apply, but zero-mass values leave the support.
+\clearpage\paragraph{3. Initial probabilities and loss events.}
+At $p_0=\frac{1}{4}$, $q_k=\binom{4}k(\frac{1}{4})^k(\frac{3}{4})^{4-k}$. The following exact table gives all initial count and monetary masses. In column $k$, each amount $f_i(k)$ has probability $q_k=w_k/256$; all other amounts have probability zero.
+\begin{center}\begin{tabular}{lrrrrr}\toprule
+$k$ & 0 & 1 & 2 & 3 & 4\\\midrule
+$w_k$ & 81 & 108 & 54 & 12 & 1\\
+$f_1(k)$ (USD) & -30 & 0 & 30 & 60 & 90\\
+$f_2(k)$ (USD) & -60 & -30 & 0 & 30 & 60\\
+\bottomrule\end{tabular}\end{center}
+\textbf{Requested count event (C4).} The endpoints in $X=1$ are explicit. Using the binomial formula,
+\[P(X=1)=\binom{4}{1}(\frac{1}{4})^{1}(\frac{3}{4})^{3}.\]
+\[P(X=1)=q_{1}=\frac{27}{64}\approx\HLProbability{0.4219}.\]
+This is the probability of the stated count of confirmed projects over one month, with no monetary units.
+\PracticeColumnPair{
+\textbf{$Y_1$: social-media graphics.}
+\[
+\begin{aligned}
+Y_1<0&\iff -30+30X<0\\
+&\iff X<1\iff X\leq 0.
+\end{aligned}
+\]
+Hence the initial probability of a net loss is
+\[
+P(Y_1<0)=\sum_{j=0}^{0}q_j
+=\frac{81}{256}\approx\HLProbability{0.3164}.
+\]
+The loss counts are $\{0\}$. A zero payoff is excluded by the strict inequality.
+}{
+\textbf{$Y_2$: short video edits.}
+\[
+\begin{aligned}
+Y_2<0&\iff -60+30X<0\\
+&\iff X<2\iff X\leq 1.
+\end{aligned}
+\]
+Hence the initial probability of a net loss is
+\[
+P(Y_2<0)=\sum_{j=0}^{1}q_j
+=\frac{189}{256}\approx\HLProbability{0.7383}.
+\]
+The loss counts are $\{0,1\}$. A zero payoff is excluded by the strict inequality.
+}
+\secInicio[prob:c4-energy][sec:t2-c4-general]
+\clearpage
+\subsubsection*{Task 2 --- Worked solution}\label{sol:c4-energy-decision}
+\paragraph{1. Initial expected values.}
+Connect expectation to the full distribution: $\mathbb E[X]=\sum_{k=0}^4kq_k=np$.
+Equivalently, $\mathbb E[B_j]=1p+0(1-p)=p$, so linearity gives
+$\mathbb E[B_1+\cdots+B_4]=4p$.
+At the supplied $p_0=\frac{1}{4}$, $\ExpectedValue{\mathbb E[X]}=4(\frac{1}{4})=1$ successes.
+For each alternative, the same distribution gives $\mathbb E[Y_i]=\sum_k f_i(k)q_k$.
+\PracticeColumnPair{
+\textbf{$Y_1$: social-media graphics.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=\sum_{k=0}^4(-30+30k)q_k\\
+&=-30+30\left(1\right)\\
+&=\ExpectedValue{0\ \text{USD}}.
+\end{aligned}
+\]
+This is \ExpectedValue{break-even} per one month: a long-run average, with negative values denoting a net loss.
+}{
+\textbf{$Y_2$: short video edits.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=\sum_{k=0}^4(-60+30k)q_k\\
+&=-60+30\left(1\right)\\
+&=\ExpectedValue{-30\ \text{USD}}.
+\end{aligned}
+\]
+This is \ExpectedValue{expected net loss} per one month: a long-run average, with negative values denoting a net loss.
+}
+\paragraph{2. Expectation formulas and sign intervals.}
+Keep $n=4$, the trial definition and all $a_i,b_i$ fixed; vary only $p\in[0,1]$.
+Since $\sum q_k=1$ and $\sum kq_k=np$,
+\[
+\ExpectedValue{\mathbb E}[\Money{Y_i}]=\sum_{k=0}^4(a_i+b_i k)q_k
+=a_i\sum q_k+b_i\sum kq_k=a_i+b_i np.
+\]
+\PracticeColumnPair{
+\textbf{$Y_1$: social-media graphics.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=-30+(30)(4)p\\
+&=-30+120p\quad\text{USD},\\
+\mathbb E[Y_1]=0&\iff 120p=30\\
+&\iff \SuccessProb{p_1^*}=\SuccessProb{\frac{1}{4}}.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\mathbb E[Y_1]>0&\iff 120p>30\\
+&\iff p>\frac{1}{4}\\
+&\iff p\in \left(\frac{1}{4},1\right],\\
+\mathbb E[Y_1]<0&\iff 120p<30\\
+&\iff p<\frac{1}{4}\\
+&\iff p\in \left[0,\frac{1}{4}\right).
+\end{aligned}
+\]
+At $p=\frac{1}{4}$, the expectation is zero: break-even.
+}{
+\textbf{$Y_2$: short video edits.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=-60+(30)(4)p\\
+&=-60+120p\quad\text{USD},\\
+\mathbb E[Y_2]=0&\iff 120p=60\\
+&\iff \SuccessProb{p_2^*}=\SuccessProb{\frac{1}{2}}.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\mathbb E[Y_2]>0&\iff 120p>60\\
+&\iff p>\frac{1}{2}\\
+&\iff p\in \left(\frac{1}{2},1\right],\\
+\mathbb E[Y_2]<0&\iff 120p<60\\
+&\iff p<\frac{1}{2}\\
+&\iff p\in \left[0,\frac{1}{2}\right).
+\end{aligned}
+\]
+At $p=\frac{1}{2}$, the expectation is zero: break-even.
+}
+Positive expectation means expected net gain; negative means expected net loss. Equality concerns average money, not the probability of success or loss.
+\clearpage\paragraph{3. Individual graphs and checks.}
+\textbf{$Y_1$: social-media graphics.}
+\begin{center}\BreakEvenGraph{1}{-30}{90}{1/4}\end{center}
+The endpoints are $(0,-30)$ and $(1,90)$: $\mathbb E[Y_1](0)=f_1(0)=-30$ and
+$\mathbb E[Y_1](1)=f_1(4)=90$ USD.
+The exact root check is $-30+(120)(\frac{1}{4})=0$.
+\par\medskip
+\textbf{$Y_2$: short video edits.}
+\begin{center}\BreakEvenGraph{2}{-60}{60}{1/2}\end{center}
+The endpoints are $(0,-60)$ and $(1,60)$: $\mathbb E[Y_2](0)=f_2(0)=-60$ and
+$\mathbb E[Y_2](1)=f_2(4)=60$ USD.
+The exact root check is $-60+(120)(\frac{1}{2})=0$.
+\par\medskip
+Each period realizes one of the listed count-based payoffs, not necessarily the expectation.
+Expected profit is an average in USD; probability of loss is a unitless chance of $Y_i<0$.
+Both strictly negative and strictly positive outcomes retain positive probability at each interior break-even value.
+All alternatives share $X$; separate graphs do not imply independent monetary outcomes.
+\secInicio[prob:c4-energy][sec:t2-c4-general]
+\clearpage
+\subsection{Graduation photography for one quarter}\label{prob:c4-manufacturing}
+A graduate reserves three photography bookings for the quarter. Compare a basic photo package with an edited package, using the same ceremony outcomes and advance preparation costs.
+The observation period is one quarter. One trial is one of three separately organized graduation ceremonies booked in advance.
+Success means that ceremony goes ahead; failure means that ceremony is cancelled.
+All $\TrialCount{n}=\TrialCount{3}$ trials are fixed before observation and all are observed.
+Assume independent outcomes and constant $\SuccessProb{p}=\SuccessProb{\frac{3}{5}}$ for each trial, under every alternative.
+The following baseline and per-success changes already include the relevant costs.
+\begin{center}\begin{tabular}{lrr}\toprule Alternative & Baseline $a_i$ (USD) & Change $b_i$ (USD/success)\\\midrule
+$A_1$: basic photo package & -100 & 100\\
+$A_2$: edited photo package & -100 & 200\\
+\bottomrule\end{tabular}\end{center}
+\QuestionsTasks[sec:t2-c4-general]{
+{4}/{sol:c4-manufacturing-model}/{\textbf{Task 1 --- Establish the binomial model and monetary transformations.}
+\textbf{1.} Define the trial indicators, count and model; verify the four conditions and derive each monetary rule.
+\textbf{2.} Give positive-probability supports, complete PMFs and real-threshold CDFs for the count and every alternative, including $p=0,1$.
+\textbf{3.} Calculate the full initial masses, $P(X\geq 2)$ and each probability of a strictly negative payoff. Translate each loss into an integer count event.},
+{4}/{sol:c4-manufacturing-decision}/{\textbf{Task 2 --- Individual expected values.}
+\textbf{1.} Calculate and interpret every initial expectation.
+\textbf{2.} Hold $n$ and the monetary rules fixed; derive each expectation for $p\in[0,1]$, its exact zero threshold and both strict sign intervals.
+\textbf{3.} Graph each expectation separately with its zero line, endpoints and exact root. Check the endpoints and root, and distinguish expected profit, realized profit and loss probability.}
+}
+\subsubsection*{Task 1 --- Worked solution}\label{sol:c4-manufacturing-model}
+\paragraph{1. Binomial model and monetary transformations.}
+For $j=1,\ldots,3$, $\HLMathEvent{E_j}$ means that ceremony goes ahead; $E_j^c$ means that ceremony is cancelled.
+Set $\Indicator{B_j}=1$ on $E_j$ and $B_j=0$ otherwise.
+The fixed count, binary outcomes, assumed independence and common probability give
+\[
+\Count{X}=\Indicator{B_1}+\cdots+\Indicator{B_3}\sim\operatorname{Bin}(3,p),
+\quad \SuccessProb{p_0}=\SuccessProb{\frac{3}{5}},\quad \FailureProb{1-p_0}=\FailureProb{\frac{2}{5}}.
+\]
+$X$ counts ceremonies that go ahead; it has count units, whereas each $Y_i$ is in USD per one quarter.
+\PracticeColumnPair{
+\textbf{$Y_1$: basic photo package.}
+Here $\Money{a_1}=\Money{-100}$ represents a fixed cost of 100 USD; $\Money{b_1}=\Money{100}$ means 100 USD extra net receipts per success.
+\[
+\Money{Y_1}=\TransformationFunction{f_1}(\Count{X})=\Money{-100}+\Money{100}\Count{X}.
+\]
+Thus $f_1(0)=-100$ and $f_1(3)=200$ USD: both strict payoff signs are attainable when $0<p<1$.
+}{
+\textbf{$Y_2$: edited photo package.}
+Here $\Money{a_2}=\Money{-100}$ represents a fixed cost of 100 USD; $\Money{b_2}=\Money{200}$ means 200 USD extra net receipts per success.
+\[
+\Money{Y_2}=\TransformationFunction{f_2}(\Count{X})=\Money{-100}+\Money{200}\Count{X}.
+\]
+Thus $f_2(0)=-100$ and $f_2(3)=500$ USD: both strict payoff signs are attainable when $0<p<1$.
+}
+\clearpage
+\paragraph{2. Supports, PMFs, and ordered CDFs.}
+Write $\HLProbability{q_k}=\binom{3}k p^k(1-p)^{3-k}$ for integer $k=0,\ldots,3$.
+\[
+S_X=\{x\in\mathbb R:P(X=x)>0\}=
+\begin{cases}\{0,\ldots,3\},&0<p<1,\\\{0\},&p=0,\\\{3\},&p=1.\end{cases}
+\]
+\[
+m_X(x)=\begin{cases}q_x,&x\in\{0,\ldots,3\},\\0,&\text{otherwise},\end{cases}
+\qquad
+F_X(t)=\begin{cases}0,&t<0,\\\displaystyle\sum_{j=0}^{\lfloor t\rfloor}q_j,&0\leq t<3,\\1,&t\geq 3.\end{cases}
+\]
+The PMF is zero at noninteger counts too. At $p=0$ use $q_0=1$, all others zero;
+at $p=1$ use $q_{3}=1$, all others zero (equivalently take endpoint limits).
+The sum $\sum_{k=0}^3q_k=(p+(1-p))^3=1$ checks normalization.
+Each affine rule is one-to-one, so its mass at $f_i(k)$ is exactly $q_k$.
+\PracticeColumnPair{
+\textbf{$Y_1$: basic photo package.}
+For $0<p<1$, the support in ascending USD order is
+\[S_{Y_1}=\{-100,0,100,200\}.\]
+This is $\{y:P(Y_1=y)>0\}$. At $p=0$ only $-100$ remains; at $p=1$ only $200$ remains.
+\[
+m_{Y_1}(y)=\begin{cases}q_k,&y=-100+100k,\\&k=0,\ldots,3,\\0,&\text{otherwise}.\end{cases}
+\]
+Since $-100+100X\leq t$ means $X\leq \lfloor(t-(-100))/100\rfloor$,
+\[
+F_{Y_1}(t)=\begin{cases}0,&t<-100,\\\displaystyle \sum_{j=0}^{\lfloor(t-(-100))/100\rfloor}q_j,&-100\leq t<200,\\1,&t\geq 200.\end{cases}
+\]
+For example, $F_{Y_1}(0)=q_0+q_1$; the jump includes its threshold.
+}{
+\textbf{$Y_2$: edited photo package.}
+For $0<p<1$, the support in ascending USD order is
+\[S_{Y_2}=\{-100,100,300,500\}.\]
+This is $\{y:P(Y_2=y)>0\}$. At $p=0$ only $-100$ remains; at $p=1$ only $500$ remains.
+\[
+m_{Y_2}(y)=\begin{cases}q_k,&y=-100+200k,\\&k=0,\ldots,3,\\0,&\text{otherwise}.\end{cases}
+\]
+Since $-100+200X\leq t$ means $X\leq \lfloor(t-(-100))/200\rfloor$,
+\[
+F_{Y_2}(t)=\begin{cases}0,&t<-100,\\\displaystyle \sum_{j=0}^{\lfloor(t-(-100))/200\rfloor}q_j,&-100\leq t<500,\\1,&t\geq 500.\end{cases}
+\]
+For example, $F_{Y_2}(100)=q_0+q_1$; the jump includes its threshold.
+}
+CDFs run from the smallest to largest monetary value, regardless of count order. Floors round down; ceilings round up. The displayed finite sums include every jump at its threshold and are right-continuous. Endpoint formulas still apply, but zero-mass values leave the support.
+\clearpage\paragraph{3. Initial probabilities and loss events.}
+At $p_0=\frac{3}{5}$, $q_k=\binom{3}k(\frac{3}{5})^k(\frac{2}{5})^{3-k}$. The following exact table gives all initial count and monetary masses. In column $k$, each amount $f_i(k)$ has probability $q_k=w_k/125$; all other amounts have probability zero.
+\begin{center}\begin{tabular}{lrrrr}\toprule
+$k$ & 0 & 1 & 2 & 3\\\midrule
+$w_k$ & 8 & 36 & 54 & 27\\
+$f_1(k)$ (USD) & -100 & 0 & 100 & 200\\
+$f_2(k)$ (USD) & -100 & 100 & 300 & 500\\
+\bottomrule\end{tabular}\end{center}
+\textbf{Requested count event (C4).} The endpoints in $X\geq 2$ are explicit. Using the binomial formula,
+\[P(X\geq 2)=1-F_X(1)=1-\sum_{j=0}^{1}\binom{3}j(\frac{3}{5})^j(\frac{2}{5})^{3-j}.\]
+\[P(X\geq 2)=q_{2}+q_{3}=\frac{81}{125}\approx\HLProbability{0.6480}.\]
+The complement ends at 1, not 2.
+This is the probability of the stated count of ceremonies that go ahead over one quarter, with no monetary units.
+\PracticeColumnPair{
+\textbf{$Y_1$: basic photo package.}
+\[
+\begin{aligned}
+Y_1<0&\iff -100+100X<0\\
+&\iff X<1\iff X\leq 0.
+\end{aligned}
+\]
+Hence the initial probability of a net loss is
+\[
+P(Y_1<0)=\sum_{j=0}^{0}q_j
+=\frac{8}{125}\approx\HLProbability{0.0640}.
+\]
+The loss counts are $\{0\}$. A zero payoff is excluded by the strict inequality.
+}{
+\textbf{$Y_2$: edited photo package.}
+\[
+\begin{aligned}
+Y_2<0&\iff -100+200X<0\\
+&\iff X<\frac{1}{2}\iff X\leq 0.
+\end{aligned}
+\]
+Hence the initial probability of a net loss is
+\[
+P(Y_2<0)=\sum_{j=0}^{0}q_j
+=\frac{8}{125}\approx\HLProbability{0.0640}.
+\]
+The loss counts are $\{0\}$. The cutoff is an integer; do not round the strict threshold to the nearest integer.
+}
+\secInicio[prob:c4-manufacturing][sec:t2-c4-general]
+\clearpage
+\subsubsection*{Task 2 --- Worked solution}\label{sol:c4-manufacturing-decision}
+\paragraph{1. Initial expected values.}
+Connect expectation to the full distribution: $\mathbb E[X]=\sum_{k=0}^3kq_k=np$.
+Equivalently, $\mathbb E[B_j]=1p+0(1-p)=p$, so linearity gives
+$\mathbb E[B_1+\cdots+B_3]=3p$.
+At the supplied $p_0=\frac{3}{5}$, $\ExpectedValue{\mathbb E[X]}=3(\frac{3}{5})=\frac{9}{5}$ successes.
+For each alternative, the same distribution gives $\mathbb E[Y_i]=\sum_k f_i(k)q_k$.
+\PracticeColumnPair{
+\textbf{$Y_1$: basic photo package.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=\sum_{k=0}^3(-100+100k)q_k\\
+&=-100+100\left(\frac{9}{5}\right)\\
+&=\ExpectedValue{80\ \text{USD}}.
+\end{aligned}
+\]
+This is \ExpectedValue{expected net gain} per one quarter: a long-run average, with negative values denoting a net loss.
+}{
+\textbf{$Y_2$: edited photo package.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=\sum_{k=0}^3(-100+200k)q_k\\
+&=-100+200\left(\frac{9}{5}\right)\\
+&=\ExpectedValue{260\ \text{USD}}.
+\end{aligned}
+\]
+This is \ExpectedValue{expected net gain} per one quarter: a long-run average, with negative values denoting a net loss.
+}
+\paragraph{2. Expectation formulas and sign intervals.}
+Keep $n=3$, the trial definition and all $a_i,b_i$ fixed; vary only $p\in[0,1]$.
+Since $\sum q_k=1$ and $\sum kq_k=np$,
+\[
+\ExpectedValue{\mathbb E}[\Money{Y_i}]=\sum_{k=0}^3(a_i+b_i k)q_k
+=a_i\sum q_k+b_i\sum kq_k=a_i+b_i np.
+\]
+\PracticeColumnPair{
+\textbf{$Y_1$: basic photo package.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=-100+(100)(3)p\\
+&=-100+300p\quad\text{USD},\\
+\mathbb E[Y_1]=0&\iff 300p=100\\
+&\iff \SuccessProb{p_1^*}=\SuccessProb{\frac{1}{3}}.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\mathbb E[Y_1]>0&\iff 300p>100\\
+&\iff p>\frac{1}{3}\\
+&\iff p\in \left(\frac{1}{3},1\right],\\
+\mathbb E[Y_1]<0&\iff 300p<100\\
+&\iff p<\frac{1}{3}\\
+&\iff p\in \left[0,\frac{1}{3}\right).
+\end{aligned}
+\]
+At $p=\frac{1}{3}$, the expectation is zero: break-even.
+}{
+\textbf{$Y_2$: edited photo package.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=-100+(200)(3)p\\
+&=-100+600p\quad\text{USD},\\
+\mathbb E[Y_2]=0&\iff 600p=100\\
+&\iff \SuccessProb{p_2^*}=\SuccessProb{\frac{1}{6}}.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\mathbb E[Y_2]>0&\iff 600p>100\\
+&\iff p>\frac{1}{6}\\
+&\iff p\in \left(\frac{1}{6},1\right],\\
+\mathbb E[Y_2]<0&\iff 600p<100\\
+&\iff p<\frac{1}{6}\\
+&\iff p\in \left[0,\frac{1}{6}\right).
+\end{aligned}
+\]
+At $p=\frac{1}{6}$, the expectation is zero: break-even.
+}
+Positive expectation means expected net gain; negative means expected net loss. Equality concerns average money, not the probability of success or loss.
+\clearpage\paragraph{3. Individual graphs and checks.}
+\textbf{$Y_1$: basic photo package.}
+\begin{center}\BreakEvenGraph{1}{-100}{200}{1/3}\end{center}
+The endpoints are $(0,-100)$ and $(1,200)$: $\mathbb E[Y_1](0)=f_1(0)=-100$ and
+$\mathbb E[Y_1](1)=f_1(3)=200$ USD.
+The exact root check is $-100+(300)(\frac{1}{3})=0$.
+\par\medskip
+\textbf{$Y_2$: edited photo package.}
+\begin{center}\BreakEvenGraph{2}{-100}{500}{1/6}\end{center}
+The endpoints are $(0,-100)$ and $(1,500)$: $\mathbb E[Y_2](0)=f_2(0)=-100$ and
+$\mathbb E[Y_2](1)=f_2(3)=500$ USD.
+The exact root check is $-100+(600)(\frac{1}{6})=0$.
+\par\medskip
+Each period realizes one of the listed count-based payoffs, not necessarily the expectation.
+Expected profit is an average in USD; probability of loss is a unitless chance of $Y_i<0$.
+Both strictly negative and strictly positive outcomes retain positive probability at each interior break-even value.
+All alternatives share $X$; separate graphs do not imply independent monetary outcomes.
+\secInicio[prob:c4-manufacturing][sec:t2-c4-general]
+\clearpage\section{Advanced Problems}\label{sec:t2-c4-advanced}
+Coordinate three monetary transformations of one fixed count. Preserve each alternative's own zero threshold.
+\SectionProblemsTableOfContents{\SectionProblemLink{prob:fees}{Campus concert: three venue choices}\\
+\SectionProblemLink{prob:defects}{Student fitness sessions: three break-even thresholds}}
+\subsection{Campus concert: three venue choices}\label{prob:fees}
+\label{prob:c4-restaurant}
+A student group chooses a small hired room, a discounted student-union room or a large hired room for the same concert. Tickets are sold in five fixed group allotments; all venues can accommodate all allotments. Extra net receipts arise from each group reaching its target.
+The observation period is one evening. One trial is one of five preselected campus ticket-sales groups.
+Success means that group reaches its fixed ticket-sales target by the evening; failure means that group falls below its target.
+All $\TrialCount{n}=\TrialCount{5}$ trials are fixed before observation and all are observed.
+Assume independent outcomes and constant $\SuccessProb{p}=\SuccessProb{\frac{9}{25}}$ for each trial, under every alternative.
+The following baseline and per-success changes already include the relevant costs.
+\begin{center}\begin{tabular}{lrr}\toprule Alternative & Baseline $a_i$ (USD) & Change $b_i$ (USD/success)\\\midrule
+$A_1$: small hired room & -80 & 36\\
+$A_2$: student-union room & -20 & 48\\
+$A_3$: large hired room & -100 & 100\\
+\bottomrule\end{tabular}\end{center}
+\QuestionsTasks[sec:t2-c4-advanced]{
+{4}/{sol:c4-restaurant-model}/{\textbf{Task 1 --- Establish the binomial model and monetary transformations.}
+\textbf{1.} Define the trial indicators, count and model; verify the four conditions and derive each monetary rule.
+\textbf{2.} Give positive-probability supports, complete PMFs and real-threshold CDFs for the count and every alternative, including $p=0,1$.
+\textbf{3.} Calculate the full initial masses, $P(2\leq X\leq 4)$ and each probability of a strictly negative payoff. Translate each loss into an integer count event.},
+{4}/{sol:c4-restaurant-decision}/{\textbf{Task 2 --- Individual expected values.}
+\textbf{1.} Calculate and interpret every initial expectation.
+\textbf{2.} Hold $n$ and the monetary rules fixed; derive each expectation for $p\in[0,1]$, its exact zero threshold and both strict sign intervals.
+\textbf{3.} Graph each expectation separately with its zero line, endpoints and exact root. Check the endpoints and root, and distinguish expected profit, realized profit and loss probability.}
+}
+\clearpage\subsubsection*{Task 1 --- Worked solution}\label{sol:c4-restaurant-model}
+\paragraph{1. Binomial model and monetary transformations.}
+For $j=1,\ldots,5$, $\HLMathEvent{E_j}$ means that group reaches its fixed ticket-sales target by the evening; $E_j^c$ means that group falls below its target.
+Set $\Indicator{B_j}=1$ on $E_j$ and $B_j=0$ otherwise.
+The fixed count, binary outcomes, assumed independence and common probability give
+\[
+\Count{X}=\Indicator{B_1}+\cdots+\Indicator{B_5}\sim\operatorname{Bin}(5,p),
+\quad \SuccessProb{p_0}=\SuccessProb{\frac{9}{25}},\quad \FailureProb{1-p_0}=\FailureProb{\frac{16}{25}}.
+\]
+$X$ counts groups reaching their targets; it has count units, whereas each $Y_i$ is in USD per one evening.
+\PracticeColumnPair{
+\textbf{$Y_1$: small hired room.}
+Here $\Money{a_1}=\Money{-80}$ represents a fixed cost of 80 USD; $\Money{b_1}=\Money{36}$ means 36 USD extra net receipts per success.
+\[
+\Money{Y_1}=\TransformationFunction{f_1}(\Count{X})=\Money{-80}+\Money{36}\Count{X}.
+\]
+Thus $f_1(0)=-80$ and $f_1(5)=100$ USD: both strict payoff signs are attainable when $0<p<1$.
+}{
+\textbf{$Y_2$: student-union room.}
+Here $\Money{a_2}=\Money{-20}$ represents a fixed cost of 20 USD; $\Money{b_2}=\Money{48}$ means 48 USD extra net receipts per success.
+\[
+\Money{Y_2}=\TransformationFunction{f_2}(\Count{X})=\Money{-20}+\Money{48}\Count{X}.
+\]
+Thus $f_2(0)=-20$ and $f_2(5)=220$ USD: both strict payoff signs are attainable when $0<p<1$.
+}
+\par\noindent\begin{minipage}[t]{.48\linewidth}\vspace{0pt}
+\textbf{$Y_3$: large hired room.}
+Here $\Money{a_3}=\Money{-100}$ represents a fixed cost of 100 USD; $\Money{b_3}=\Money{100}$ means 100 USD extra net receipts per success.
+\[
+\Money{Y_3}=\TransformationFunction{f_3}(\Count{X})=\Money{-100}+\Money{100}\Count{X}.
+\]
+Thus $f_3(0)=-100$ and $f_3(5)=400$ USD: both strict payoff signs are attainable when $0<p<1$.
+\end{minipage}\par
+\clearpage
+\paragraph{2. Supports, PMFs, and ordered CDFs.}
+Write $\HLProbability{q_k}=\binom{5}k p^k(1-p)^{5-k}$ for integer $k=0,\ldots,5$.
+\[
+S_X=\{x\in\mathbb R:P(X=x)>0\}=
+\begin{cases}\{0,\ldots,5\},&0<p<1,\\\{0\},&p=0,\\\{5\},&p=1.\end{cases}
+\]
+\[
+m_X(x)=\begin{cases}q_x,&x\in\{0,\ldots,5\},\\0,&\text{otherwise},\end{cases}
+\qquad
+F_X(t)=\begin{cases}0,&t<0,\\\displaystyle\sum_{j=0}^{\lfloor t\rfloor}q_j,&0\leq t<5,\\1,&t\geq 5.\end{cases}
+\]
+The PMF is zero at noninteger counts too. At $p=0$ use $q_0=1$, all others zero;
+at $p=1$ use $q_{5}=1$, all others zero (equivalently take endpoint limits).
+The sum $\sum_{k=0}^5q_k=(p+(1-p))^5=1$ checks normalization.
+Each affine rule is one-to-one, so its mass at $f_i(k)$ is exactly $q_k$.
+\PracticeColumnPair{
+\textbf{$Y_1$: small hired room.}
+For $0<p<1$, the support in ascending USD order is
+\[S_{Y_1}=\{-80,-44,-8,28,64,100\}.\]
+This is $\{y:P(Y_1=y)>0\}$. At $p=0$ only $-80$ remains; at $p=1$ only $100$ remains.
+\[
+m_{Y_1}(y)=\begin{cases}q_k,&y=-80+36k,\\&k=0,\ldots,5,\\0,&\text{otherwise}.\end{cases}
+\]
+Since $-80+36X\leq t$ means $X\leq \lfloor(t-(-80))/36\rfloor$,
+\[
+F_{Y_1}(t)=\begin{cases}0,&t<-80,\\\displaystyle \sum_{j=0}^{\lfloor(t-(-80))/36\rfloor}q_j,&-80\leq t<100,\\1,&t\geq 100.\end{cases}
+\]
+For example, $F_{Y_1}(-44)=q_0+q_1$; the jump includes its threshold.
+}{
+\textbf{$Y_2$: student-union room.}
+For $0<p<1$, the support in ascending USD order is
+\[S_{Y_2}=\{-20,28,76,124,172,220\}.\]
+This is $\{y:P(Y_2=y)>0\}$. At $p=0$ only $-20$ remains; at $p=1$ only $220$ remains.
+\[
+m_{Y_2}(y)=\begin{cases}q_k,&y=-20+48k,\\&k=0,\ldots,5,\\0,&\text{otherwise}.\end{cases}
+\]
+Since $-20+48X\leq t$ means $X\leq \lfloor(t-(-20))/48\rfloor$,
+\[
+F_{Y_2}(t)=\begin{cases}0,&t<-20,\\\displaystyle \sum_{j=0}^{\lfloor(t-(-20))/48\rfloor}q_j,&-20\leq t<220,\\1,&t\geq 220.\end{cases}
+\]
+For example, $F_{Y_2}(28)=q_0+q_1$; the jump includes its threshold.
+}
+\par\noindent\begin{minipage}[t]{.48\linewidth}\vspace{0pt}
+\textbf{$Y_3$: large hired room.}
+For $0<p<1$, the support in ascending USD order is
+\[S_{Y_3}=\{-100,0,100,200,300,400\}.\]
+This is $\{y:P(Y_3=y)>0\}$. At $p=0$ only $-100$ remains; at $p=1$ only $400$ remains.
+\[
+m_{Y_3}(y)=\begin{cases}q_k,&y=-100+100k,\\&k=0,\ldots,5,\\0,&\text{otherwise}.\end{cases}
+\]
+Since $-100+100X\leq t$ means $X\leq \lfloor(t-(-100))/100\rfloor$,
+\[
+F_{Y_3}(t)=\begin{cases}0,&t<-100,\\\displaystyle \sum_{j=0}^{\lfloor(t-(-100))/100\rfloor}q_j,&-100\leq t<400,\\1,&t\geq 400.\end{cases}
+\]
+For example, $F_{Y_3}(0)=q_0+q_1$; the jump includes its threshold.
+\end{minipage}\par
+CDFs run from the smallest to largest monetary value, regardless of count order. Floors round down; ceilings round up. The displayed finite sums include every jump at its threshold and are right-continuous. Endpoint formulas still apply, but zero-mass values leave the support.
+\clearpage\paragraph{3. Initial probabilities and loss events.}
+At $p_0=\frac{9}{25}$, $q_k=\binom{5}k(\frac{9}{25})^k(\frac{16}{25})^{5-k}$. The following exact table gives all initial count and monetary masses. In column $k$, each amount $f_i(k)$ has probability $q_k=w_k/9765625$; all other amounts have probability zero.
+\begin{center}\begin{tabular}{lrrrrrr}\toprule
+$k$ & 0 & 1 & 2 & 3 & 4 & 5\\\midrule
+$w_k$ & 1048576 & 2949120 & 3317760 & 1866240 & 524880 & 59049\\
+$f_1(k)$ (USD) & -80 & -44 & -8 & 28 & 64 & 100\\
+$f_2(k)$ (USD) & -20 & 28 & 76 & 124 & 172 & 220\\
+$f_3(k)$ (USD) & -100 & 0 & 100 & 200 & 300 & 400\\
+\bottomrule\end{tabular}\end{center}
+\textbf{Requested count event (C4).} The endpoints in $2\leq X\leq 4$ are explicit. Using the binomial formula,
+\[P(2\leq X\leq 4)=F_X(4)-F_X(1)=\sum_{j=2}^{4}\binom{5}j(\frac{9}{25})^j(\frac{16}{25})^{5-j}.\]
+\[P(2\leq X\leq 4)=q_{2}+q_{3}+q_{4}=\frac{1141776}{1953125}\approx\HLProbability{0.5846}.\]
+Both 2 and 4 are included; subtract counts at most 1, not at most 2.
+This is the probability of the stated count of groups reaching their targets over one evening, with no monetary units.
+\PracticeColumnPair{
+\textbf{$Y_1$: small hired room.}
+\[
+\begin{aligned}
+Y_1<0&\iff -80+36X<0\\
+&\iff X<\frac{20}{9}\iff X\leq 2.
+\end{aligned}
+\]
+Hence the initial probability of a net loss is
+\[
+P(Y_1<0)=\sum_{j=0}^{2}q_j
+=\frac{7315456}{9765625}\approx\HLProbability{0.7491}.
+\]
+The loss counts are $\{0,1,2\}$. The cutoff is an integer; do not round the strict threshold to the nearest integer.
+}{
+\textbf{$Y_2$: student-union room.}
+\[
+\begin{aligned}
+Y_2<0&\iff -20+48X<0\\
+&\iff X<\frac{5}{12}\iff X\leq 0.
+\end{aligned}
+\]
+Hence the initial probability of a net loss is
+\[
+P(Y_2<0)=\sum_{j=0}^{0}q_j
+=\frac{1048576}{9765625}\approx\HLProbability{0.1074}.
+\]
+The loss counts are $\{0\}$. The cutoff is an integer; do not round the strict threshold to the nearest integer.
+}
+\par\noindent\begin{minipage}[t]{.48\linewidth}\vspace{0pt}
+\textbf{$Y_3$: large hired room.}
+\[
+\begin{aligned}
+Y_3<0&\iff -100+100X<0\\
+&\iff X<1\iff X\leq 0.
+\end{aligned}
+\]
+Hence the initial probability of a net loss is
+\[
+P(Y_3<0)=\sum_{j=0}^{0}q_j
+=\frac{1048576}{9765625}\approx\HLProbability{0.1074}.
+\]
+The loss counts are $\{0\}$. A zero payoff is excluded by the strict inequality.
+\end{minipage}\par
+\secInicio[prob:fees][sec:t2-c4-advanced]
+\clearpage
+\subsubsection*{Task 2 --- Worked solution}\label{sol:c4-restaurant-decision}
+\paragraph{1. Initial expected values.}
+Connect expectation to the full distribution: $\mathbb E[X]=\sum_{k=0}^5kq_k=np$.
+Equivalently, $\mathbb E[B_j]=1p+0(1-p)=p$, so linearity gives
+$\mathbb E[B_1+\cdots+B_5]=5p$.
+At the supplied $p_0=\frac{9}{25}$, $\ExpectedValue{\mathbb E[X]}=5(\frac{9}{25})=\frac{9}{5}$ successes.
+For each alternative, the same distribution gives $\mathbb E[Y_i]=\sum_k f_i(k)q_k$.
+\PracticeColumnPair{
+\textbf{$Y_1$: small hired room.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=\sum_{k=0}^5(-80+36k)q_k\\
+&=-80+36\left(\frac{9}{5}\right)\\
+&=\ExpectedValue{\frac{-76}{5}\ \text{USD}}.
+\end{aligned}
+\]
+This is \ExpectedValue{expected net loss} per one evening: a long-run average, with negative values denoting a net loss.
+}{
+\textbf{$Y_2$: student-union room.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=\sum_{k=0}^5(-20+48k)q_k\\
+&=-20+48\left(\frac{9}{5}\right)\\
+&=\ExpectedValue{\frac{332}{5}\ \text{USD}}.
+\end{aligned}
+\]
+This is \ExpectedValue{expected net gain} per one evening: a long-run average, with negative values denoting a net loss.
+}
+\par\noindent\begin{minipage}[t]{.48\linewidth}\vspace{0pt}
+\textbf{$Y_3$: large hired room.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_3}]&=\sum_{k=0}^5(-100+100k)q_k\\
+&=-100+100\left(\frac{9}{5}\right)\\
+&=\ExpectedValue{80\ \text{USD}}.
+\end{aligned}
+\]
+This is \ExpectedValue{expected net gain} per one evening: a long-run average, with negative values denoting a net loss.
+\end{minipage}\par
+\paragraph{2. Expectation formulas and sign intervals.}
+Keep $n=5$, the trial definition and all $a_i,b_i$ fixed; vary only $p\in[0,1]$.
+Since $\sum q_k=1$ and $\sum kq_k=np$,
+\[
+\ExpectedValue{\mathbb E}[\Money{Y_i}]=\sum_{k=0}^5(a_i+b_i k)q_k
+=a_i\sum q_k+b_i\sum kq_k=a_i+b_i np.
+\]
+\PracticeColumnPair{
+\textbf{$Y_1$: small hired room.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=-80+(36)(5)p\\
+&=-80+180p\quad\text{USD},\\
+\mathbb E[Y_1]=0&\iff 180p=80\\
+&\iff \SuccessProb{p_1^*}=\SuccessProb{\frac{4}{9}}.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\mathbb E[Y_1]>0&\iff 180p>80\\
+&\iff p>\frac{4}{9}\\
+&\iff p\in \left(\frac{4}{9},1\right],\\
+\mathbb E[Y_1]<0&\iff 180p<80\\
+&\iff p<\frac{4}{9}\\
+&\iff p\in \left[0,\frac{4}{9}\right).
+\end{aligned}
+\]
+At $p=\frac{4}{9}$, the expectation is zero: break-even.
+}{
+\textbf{$Y_2$: student-union room.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=-20+(48)(5)p\\
+&=-20+240p\quad\text{USD},\\
+\mathbb E[Y_2]=0&\iff 240p=20\\
+&\iff \SuccessProb{p_2^*}=\SuccessProb{\frac{1}{12}}.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\mathbb E[Y_2]>0&\iff 240p>20\\
+&\iff p>\frac{1}{12}\\
+&\iff p\in \left(\frac{1}{12},1\right],\\
+\mathbb E[Y_2]<0&\iff 240p<20\\
+&\iff p<\frac{1}{12}\\
+&\iff p\in \left[0,\frac{1}{12}\right).
+\end{aligned}
+\]
+At $p=\frac{1}{12}$, the expectation is zero: break-even.
+}
+\par\noindent\begin{minipage}[t]{.48\linewidth}\vspace{0pt}
+\textbf{$Y_3$: large hired room.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_3}]&=-100+(100)(5)p\\
+&=-100+500p\quad\text{USD},\\
+\mathbb E[Y_3]=0&\iff 500p=100\\
+&\iff \SuccessProb{p_3^*}=\SuccessProb{\frac{1}{5}}.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\mathbb E[Y_3]>0&\iff 500p>100\\
+&\iff p>\frac{1}{5}\\
+&\iff p\in \left(\frac{1}{5},1\right],\\
+\mathbb E[Y_3]<0&\iff 500p<100\\
+&\iff p<\frac{1}{5}\\
+&\iff p\in \left[0,\frac{1}{5}\right).
+\end{aligned}
+\]
+At $p=\frac{1}{5}$, the expectation is zero: break-even.
+\end{minipage}\par
+Positive expectation means expected net gain; negative means expected net loss. Equality concerns average money, not the probability of success or loss.
+\clearpage\paragraph{3. Individual graphs and checks.}
+\textbf{$Y_1$: small hired room.}
+\begin{center}\BreakEvenGraph{1}{-80}{100}{4/9}\end{center}
+The endpoints are $(0,-80)$ and $(1,100)$: $\mathbb E[Y_1](0)=f_1(0)=-80$ and
+$\mathbb E[Y_1](1)=f_1(5)=100$ USD.
+The exact root check is $-80+(180)(\frac{4}{9})=0$.
+\par\medskip
+\textbf{$Y_2$: student-union room.}
+\begin{center}\BreakEvenGraph{2}{-20}{220}{1/12}\end{center}
+The endpoints are $(0,-20)$ and $(1,220)$: $\mathbb E[Y_2](0)=f_2(0)=-20$ and
+$\mathbb E[Y_2](1)=f_2(5)=220$ USD.
+The exact root check is $-20+(240)(\frac{1}{12})=0$.
+\par\medskip
+\clearpage
+\textbf{$Y_3$: large hired room.}
+\begin{center}\BreakEvenGraph{3}{-100}{400}{1/5}\end{center}
+The endpoints are $(0,-100)$ and $(1,400)$: $\mathbb E[Y_3](0)=f_3(0)=-100$ and
+$\mathbb E[Y_3](1)=f_3(5)=400$ USD.
+The exact root check is $-100+(500)(\frac{1}{5})=0$.
+\par\medskip
+Each period realizes one of the listed count-based payoffs, not necessarily the expectation.
+Expected profit is an average in USD; probability of loss is a unitless chance of $Y_i<0$.
+Both strictly negative and strictly positive outcomes retain positive probability at each interior break-even value.
+All alternatives share $X$; separate graphs do not imply independent monetary outcomes.
+\secInicio[prob:fees][sec:t2-c4-advanced]
+\clearpage
+\subsection{Student fitness sessions: three break-even thresholds}\label{prob:defects}
+\label{prob:c4-agriculture}
+A student plans walking, dance or circuit sessions for the same four groups. All formats have capacity for all groups. Use the same enrollment responses for every hypothetical format, with different fixed preparation costs and receipts per successful group.
+The observation period is one university term. One trial is one of four preselected campus fitness-interest groups.
+Success means that group reaches its fixed enrollment target by the registration deadline; failure means that group falls below its target.
+All $\TrialCount{n}=\TrialCount{4}$ trials are fixed before observation and all are observed.
+Assume independent outcomes and constant $\SuccessProb{p}=\SuccessProb{\frac{1}{2}}$ for each trial, under every alternative.
+The following baseline and per-success changes already include the relevant costs.
+\begin{center}\begin{tabular}{lrr}\toprule Alternative & Baseline $a_i$ (USD) & Change $b_i$ (USD/success)\\\midrule
+$A_1$: walking group & -70 & 40\\
+$A_2$: dance sessions & -30 & 55\\
+$A_3$: circuit sessions & -150 & 75\\
+\bottomrule\end{tabular}\end{center}
+\QuestionsTasks[sec:t2-c4-advanced]{
+{4}/{sol:c4-agriculture-model}/{\textbf{Task 1 --- Establish the binomial model and monetary transformations.}
+\textbf{1.} Define the trial indicators, count and model; verify the four conditions and derive each monetary rule.
+\textbf{2.} Give positive-probability supports, complete PMFs and real-threshold CDFs for the count and every alternative, including $p=0,1$.
+\textbf{3.} Calculate the full initial masses, $P(X\leq 1)$ and each probability of a strictly negative payoff. Translate each loss into an integer count event.},
+{4}/{sol:c4-agriculture-decision}/{\textbf{Task 2 --- Individual expected values.}
+\textbf{1.} Calculate and interpret every initial expectation.
+\textbf{2.} Hold $n$ and the monetary rules fixed; derive each expectation for $p\in[0,1]$, its exact zero threshold and both strict sign intervals.
+\textbf{3.} Graph each expectation separately with its zero line, endpoints and exact root. Check the endpoints and root, and distinguish expected profit, realized profit and loss probability.}
+}
+\clearpage\subsubsection*{Task 1 --- Worked solution}\label{sol:c4-agriculture-model}
+\paragraph{1. Binomial model and monetary transformations.}
+For $j=1,\ldots,4$, $\HLMathEvent{E_j}$ means that group reaches its fixed enrollment target by the registration deadline; $E_j^c$ means that group falls below its target.
+Set $\Indicator{B_j}=1$ on $E_j$ and $B_j=0$ otherwise.
+The fixed count, binary outcomes, assumed independence and common probability give
+\[
+\Count{X}=\Indicator{B_1}+\cdots+\Indicator{B_4}\sim\operatorname{Bin}(4,p),
+\quad \SuccessProb{p_0}=\SuccessProb{\frac{1}{2}},\quad \FailureProb{1-p_0}=\FailureProb{\frac{1}{2}}.
+\]
+$X$ counts groups reaching their enrollment targets; it has count units, whereas each $Y_i$ is in USD per one university term.
+\PracticeColumnPair{
+\textbf{$Y_1$: walking group.}
+Here $\Money{a_1}=\Money{-70}$ represents a fixed cost of 70 USD; $\Money{b_1}=\Money{40}$ means 40 USD extra net receipts per success.
+\[
+\Money{Y_1}=\TransformationFunction{f_1}(\Count{X})=\Money{-70}+\Money{40}\Count{X}.
+\]
+Thus $f_1(0)=-70$ and $f_1(4)=90$ USD: both strict payoff signs are attainable when $0<p<1$.
+}{
+\textbf{$Y_2$: dance sessions.}
+Here $\Money{a_2}=\Money{-30}$ represents a fixed cost of 30 USD; $\Money{b_2}=\Money{55}$ means 55 USD extra net receipts per success.
+\[
+\Money{Y_2}=\TransformationFunction{f_2}(\Count{X})=\Money{-30}+\Money{55}\Count{X}.
+\]
+Thus $f_2(0)=-30$ and $f_2(4)=190$ USD: both strict payoff signs are attainable when $0<p<1$.
+}
+\par\noindent\begin{minipage}[t]{.48\linewidth}\vspace{0pt}
+\textbf{$Y_3$: circuit sessions.}
+Here $\Money{a_3}=\Money{-150}$ represents a fixed cost of 150 USD; $\Money{b_3}=\Money{75}$ means 75 USD extra net receipts per success.
+\[
+\Money{Y_3}=\TransformationFunction{f_3}(\Count{X})=\Money{-150}+\Money{75}\Count{X}.
+\]
+Thus $f_3(0)=-150$ and $f_3(4)=150$ USD: both strict payoff signs are attainable when $0<p<1$.
+\end{minipage}\par
+\clearpage
+\paragraph{2. Supports, PMFs, and ordered CDFs.}
+Write $\HLProbability{q_k}=\binom{4}k p^k(1-p)^{4-k}$ for integer $k=0,\ldots,4$.
+\[
+S_X=\{x\in\mathbb R:P(X=x)>0\}=
+\begin{cases}\{0,\ldots,4\},&0<p<1,\\\{0\},&p=0,\\\{4\},&p=1.\end{cases}
+\]
+\[
+m_X(x)=\begin{cases}q_x,&x\in\{0,\ldots,4\},\\0,&\text{otherwise},\end{cases}
+\qquad
+F_X(t)=\begin{cases}0,&t<0,\\\displaystyle\sum_{j=0}^{\lfloor t\rfloor}q_j,&0\leq t<4,\\1,&t\geq 4.\end{cases}
+\]
+The PMF is zero at noninteger counts too. At $p=0$ use $q_0=1$, all others zero;
+at $p=1$ use $q_{4}=1$, all others zero (equivalently take endpoint limits).
+The sum $\sum_{k=0}^4q_k=(p+(1-p))^4=1$ checks normalization.
+Each affine rule is one-to-one, so its mass at $f_i(k)$ is exactly $q_k$.
+\PracticeColumnPair{
+\textbf{$Y_1$: walking group.}
+For $0<p<1$, the support in ascending USD order is
+\[S_{Y_1}=\{-70,-30,10,50,90\}.\]
+This is $\{y:P(Y_1=y)>0\}$. At $p=0$ only $-70$ remains; at $p=1$ only $90$ remains.
+\[
+m_{Y_1}(y)=\begin{cases}q_k,&y=-70+40k,\\&k=0,\ldots,4,\\0,&\text{otherwise}.\end{cases}
+\]
+Since $-70+40X\leq t$ means $X\leq \lfloor(t-(-70))/40\rfloor$,
+\[
+F_{Y_1}(t)=\begin{cases}0,&t<-70,\\\displaystyle \sum_{j=0}^{\lfloor(t-(-70))/40\rfloor}q_j,&-70\leq t<90,\\1,&t\geq 90.\end{cases}
+\]
+For example, $F_{Y_1}(-30)=q_0+q_1$; the jump includes its threshold.
+}{
+\textbf{$Y_2$: dance sessions.}
+For $0<p<1$, the support in ascending USD order is
+\[S_{Y_2}=\{-30,25,80,135,190\}.\]
+This is $\{y:P(Y_2=y)>0\}$. At $p=0$ only $-30$ remains; at $p=1$ only $190$ remains.
+\[
+m_{Y_2}(y)=\begin{cases}q_k,&y=-30+55k,\\&k=0,\ldots,4,\\0,&\text{otherwise}.\end{cases}
+\]
+Since $-30+55X\leq t$ means $X\leq \lfloor(t-(-30))/55\rfloor$,
+\[
+F_{Y_2}(t)=\begin{cases}0,&t<-30,\\\displaystyle \sum_{j=0}^{\lfloor(t-(-30))/55\rfloor}q_j,&-30\leq t<190,\\1,&t\geq 190.\end{cases}
+\]
+For example, $F_{Y_2}(25)=q_0+q_1$; the jump includes its threshold.
+}
+\par\noindent\begin{minipage}[t]{.48\linewidth}\vspace{0pt}
+\textbf{$Y_3$: circuit sessions.}
+For $0<p<1$, the support in ascending USD order is
+\[S_{Y_3}=\{-150,-75,0,75,150\}.\]
+This is $\{y:P(Y_3=y)>0\}$. At $p=0$ only $-150$ remains; at $p=1$ only $150$ remains.
+\[
+m_{Y_3}(y)=\begin{cases}q_k,&y=-150+75k,\\&k=0,\ldots,4,\\0,&\text{otherwise}.\end{cases}
+\]
+Since $-150+75X\leq t$ means $X\leq \lfloor(t-(-150))/75\rfloor$,
+\[
+F_{Y_3}(t)=\begin{cases}0,&t<-150,\\\displaystyle \sum_{j=0}^{\lfloor(t-(-150))/75\rfloor}q_j,&-150\leq t<150,\\1,&t\geq 150.\end{cases}
+\]
+For example, $F_{Y_3}(-75)=q_0+q_1$; the jump includes its threshold.
+\end{minipage}\par
+CDFs run from the smallest to largest monetary value, regardless of count order. Floors round down; ceilings round up. The displayed finite sums include every jump at its threshold and are right-continuous. Endpoint formulas still apply, but zero-mass values leave the support.
+\clearpage\paragraph{3. Initial probabilities and loss events.}
+At $p_0=\frac{1}{2}$, $q_k=\binom{4}k(\frac{1}{2})^k(\frac{1}{2})^{4-k}$. The following exact table gives all initial count and monetary masses. In column $k$, each amount $f_i(k)$ has probability $q_k=w_k/16$; all other amounts have probability zero.
+\begin{center}\begin{tabular}{lrrrrr}\toprule
+$k$ & 0 & 1 & 2 & 3 & 4\\\midrule
+$w_k$ & 1 & 4 & 6 & 4 & 1\\
+$f_1(k)$ (USD) & -70 & -30 & 10 & 50 & 90\\
+$f_2(k)$ (USD) & -30 & 25 & 80 & 135 & 190\\
+$f_3(k)$ (USD) & -150 & -75 & 0 & 75 & 150\\
+\bottomrule\end{tabular}\end{center}
+\textbf{Requested count event (C4).} The endpoints in $X\leq 1$ are explicit. Using the binomial formula,
+\[P(X\leq 1)=F_X(1)=\sum_{j=0}^{1}\binom{4}j(\frac{1}{2})^j(\frac{1}{2})^{4-j}.\]
+\[P(X\leq 1)=q_{0}+q_{1}=\frac{5}{16}\approx\HLProbability{0.3125}.\]
+This is the probability of the stated count of groups reaching their enrollment targets over one university term, with no monetary units.
+\PracticeColumnPair{
+\textbf{$Y_1$: walking group.}
+\[
+\begin{aligned}
+Y_1<0&\iff -70+40X<0\\
+&\iff X<\frac{7}{4}\iff X\leq 1.
+\end{aligned}
+\]
+Hence the initial probability of a net loss is
+\[
+P(Y_1<0)=\sum_{j=0}^{1}q_j
+=\frac{5}{16}\approx\HLProbability{0.3125}.
+\]
+The loss counts are $\{0,1\}$. The cutoff is an integer; do not round the strict threshold to the nearest integer.
+}{
+\textbf{$Y_2$: dance sessions.}
+\[
+\begin{aligned}
+Y_2<0&\iff -30+55X<0\\
+&\iff X<\frac{6}{11}\iff X\leq 0.
+\end{aligned}
+\]
+Hence the initial probability of a net loss is
+\[
+P(Y_2<0)=\sum_{j=0}^{0}q_j
+=\frac{1}{16}\approx\HLProbability{0.0625}.
+\]
+The loss counts are $\{0\}$. The cutoff is an integer; do not round the strict threshold to the nearest integer.
+}
+\par\noindent\begin{minipage}[t]{.48\linewidth}\vspace{0pt}
+\textbf{$Y_3$: circuit sessions.}
+\[
+\begin{aligned}
+Y_3<0&\iff -150+75X<0\\
+&\iff X<2\iff X\leq 1.
+\end{aligned}
+\]
+Hence the initial probability of a net loss is
+\[
+P(Y_3<0)=\sum_{j=0}^{1}q_j
+=\frac{5}{16}\approx\HLProbability{0.3125}.
+\]
+The loss counts are $\{0,1\}$. A zero payoff is excluded by the strict inequality.
+\end{minipage}\par
+\secInicio[prob:defects][sec:t2-c4-advanced]
+\clearpage
+\subsubsection*{Task 2 --- Worked solution}\label{sol:c4-agriculture-decision}
+\paragraph{1. Initial expected values.}
+Connect expectation to the full distribution: $\mathbb E[X]=\sum_{k=0}^4kq_k=np$.
+Equivalently, $\mathbb E[B_j]=1p+0(1-p)=p$, so linearity gives
+$\mathbb E[B_1+\cdots+B_4]=4p$.
+At the supplied $p_0=\frac{1}{2}$, $\ExpectedValue{\mathbb E[X]}=4(\frac{1}{2})=2$ successes.
+For each alternative, the same distribution gives $\mathbb E[Y_i]=\sum_k f_i(k)q_k$.
+\PracticeColumnPair{
+\textbf{$Y_1$: walking group.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=\sum_{k=0}^4(-70+40k)q_k\\
+&=-70+40\left(2\right)\\
+&=\ExpectedValue{10\ \text{USD}}.
+\end{aligned}
+\]
+This is \ExpectedValue{expected net gain} per one university term: a long-run average, with negative values denoting a net loss.
+}{
+\textbf{$Y_2$: dance sessions.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=\sum_{k=0}^4(-30+55k)q_k\\
+&=-30+55\left(2\right)\\
+&=\ExpectedValue{80\ \text{USD}}.
+\end{aligned}
+\]
+This is \ExpectedValue{expected net gain} per one university term: a long-run average, with negative values denoting a net loss.
+}
+\par\noindent\begin{minipage}[t]{.48\linewidth}\vspace{0pt}
+\textbf{$Y_3$: circuit sessions.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_3}]&=\sum_{k=0}^4(-150+75k)q_k\\
+&=-150+75\left(2\right)\\
+&=\ExpectedValue{0\ \text{USD}}.
+\end{aligned}
+\]
+This is \ExpectedValue{break-even} per one university term: a long-run average, with negative values denoting a net loss.
+\end{minipage}\par
+\paragraph{2. Expectation formulas and sign intervals.}
+Keep $n=4$, the trial definition and all $a_i,b_i$ fixed; vary only $p\in[0,1]$.
+Since $\sum q_k=1$ and $\sum kq_k=np$,
+\[
+\ExpectedValue{\mathbb E}[\Money{Y_i}]=\sum_{k=0}^4(a_i+b_i k)q_k
+=a_i\sum q_k+b_i\sum kq_k=a_i+b_i np.
+\]
+\PracticeColumnPair{
+\textbf{$Y_1$: walking group.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_1}]&=-70+(40)(4)p\\
+&=-70+160p\quad\text{USD},\\
+\mathbb E[Y_1]=0&\iff 160p=70\\
+&\iff \SuccessProb{p_1^*}=\SuccessProb{\frac{7}{16}}.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\mathbb E[Y_1]>0&\iff 160p>70\\
+&\iff p>\frac{7}{16}\\
+&\iff p\in \left(\frac{7}{16},1\right],\\
+\mathbb E[Y_1]<0&\iff 160p<70\\
+&\iff p<\frac{7}{16}\\
+&\iff p\in \left[0,\frac{7}{16}\right).
+\end{aligned}
+\]
+At $p=\frac{7}{16}$, the expectation is zero: break-even.
+}{
+\textbf{$Y_2$: dance sessions.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_2}]&=-30+(55)(4)p\\
+&=-30+220p\quad\text{USD},\\
+\mathbb E[Y_2]=0&\iff 220p=30\\
+&\iff \SuccessProb{p_2^*}=\SuccessProb{\frac{3}{22}}.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\mathbb E[Y_2]>0&\iff 220p>30\\
+&\iff p>\frac{3}{22}\\
+&\iff p\in \left(\frac{3}{22},1\right],\\
+\mathbb E[Y_2]<0&\iff 220p<30\\
+&\iff p<\frac{3}{22}\\
+&\iff p\in \left[0,\frac{3}{22}\right).
+\end{aligned}
+\]
+At $p=\frac{3}{22}$, the expectation is zero: break-even.
+}
+\par\noindent\begin{minipage}[t]{.48\linewidth}\vspace{0pt}
+\textbf{$Y_3$: circuit sessions.}
+\[
+\begin{aligned}
+\ExpectedValue{\mathbb E}[\Money{Y_3}]&=-150+(75)(4)p\\
+&=-150+300p\quad\text{USD},\\
+\mathbb E[Y_3]=0&\iff 300p=150\\
+&\iff \SuccessProb{p_3^*}=\SuccessProb{\frac{1}{2}}.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+\mathbb E[Y_3]>0&\iff 300p>150\\
+&\iff p>\frac{1}{2}\\
+&\iff p\in \left(\frac{1}{2},1\right],\\
+\mathbb E[Y_3]<0&\iff 300p<150\\
+&\iff p<\frac{1}{2}\\
+&\iff p\in \left[0,\frac{1}{2}\right).
+\end{aligned}
+\]
+At $p=\frac{1}{2}$, the expectation is zero: break-even.
+\end{minipage}\par
+Positive expectation means expected net gain; negative means expected net loss. Equality concerns average money, not the probability of success or loss.
+\clearpage\paragraph{3. Individual graphs and checks.}
+\textbf{$Y_1$: walking group.}
+\begin{center}\BreakEvenGraph{1}{-70}{90}{7/16}\end{center}
+The endpoints are $(0,-70)$ and $(1,90)$: $\mathbb E[Y_1](0)=f_1(0)=-70$ and
+$\mathbb E[Y_1](1)=f_1(4)=90$ USD.
+The exact root check is $-70+(160)(\frac{7}{16})=0$.
+\par\medskip
+\textbf{$Y_2$: dance sessions.}
+\begin{center}\BreakEvenGraph{2}{-30}{190}{3/22}\end{center}
+The endpoints are $(0,-30)$ and $(1,190)$: $\mathbb E[Y_2](0)=f_2(0)=-30$ and
+$\mathbb E[Y_2](1)=f_2(4)=190$ USD.
+The exact root check is $-30+(220)(\frac{3}{22})=0$.
+\par\medskip
+\clearpage
+\textbf{$Y_3$: circuit sessions.}
+\begin{center}\BreakEvenGraph{3}{-150}{150}{1/2}\end{center}
+The endpoints are $(0,-150)$ and $(1,150)$: $\mathbb E[Y_3](0)=f_3(0)=-150$ and
+$\mathbb E[Y_3](1)=f_3(4)=150$ USD.
+The exact root check is $-150+(300)(\frac{1}{2})=0$.
+\par\medskip
+Each period realizes one of the listed count-based payoffs, not necessarily the expectation.
+Expected profit is an average in USD; probability of loss is a unitless chance of $Y_i<0$.
+Both strictly negative and strictly positive outcomes retain positive probability at each interior break-even value.
+All alternatives share $X$; separate graphs do not imply independent monetary outcomes.
+\secInicio[prob:defects][sec:t2-c4-advanced]
+
+\subsection*{Key ideas and common errors}
+A trial event and an aggregate count event are different. Fix $n$ before observation;
+do not stop after success. Verify independence and constant $p$, rather than inferring them from separate customers.
+For example, if all five concert ticket groups react to one common publicity shock, their outcomes may be dependent;
+the same binomial PMF is then unjustified. Enrollment responses sampled without replacement from a small fixed pool can also violate independence and constant probability.
+Count mathematical successes even when they cause monetary losses. The combination coefficient counts all arrangements.
+Use complete PMFs, positive-mass supports and ordered, right-continuous CDFs.
+The complement of at least $k$ ends at $k-1$; strict losses exclude zero money.
+Hold $n$ and payoff rules fixed when varying $p$. Each expectation has its own zero threshold;
+an intersection of alternatives does not answer an individual break-even question.
+Expected profit does not guarantee realized profit and does not equal the probability of avoiding loss.
+\secInicio[][sec:t2-c4-advanced]
+\end{document}
