@@ -34,7 +34,7 @@ for(const t of TEMPLATES.slice(1))test(`${t.name}: seated connected assembly, ro
 test('window front opening, sill, rear / side bracing and physical bounds',()=>{
   const m=buildTemplate('window'),group=new Group();
   for(const p of m.pieces){const g=geometry(p);g.position.fromArray(p.p);g.quaternion.fromArray(p.q);group.add(g);}
-  group.updateMatrixWorld(true);const box=new Box3().setFromObject(group,true);console.log('Window full rendered bounds mm:',box.min.toArray(),box.max.toArray(),box.getSize(vec([0,0,0])).toArray());
+  group.updateMatrixWorld(true);const box=new Box3().setFromObject(group,true);assert.deepEqual(box.min.toArray(),[-771,0,-544]);assert.deepEqual(box.max.toArray(),[771,2242,544]);
   const frontTubes=m.pieces.filter(p=>p.type==='tube'&&Math.abs(p.p[2]-175)<1e-8);
   for(const p of frontTubes){const ends=[port(p,0).position,port(p,1).position];assert(!ends.some(v=>v.y>1142&&v.y<2200&&Math.abs(v.x)<729));}
   assert(frontTubes.some(p=>Math.abs(p.p[1]-1121)<1e-8));
@@ -51,11 +51,10 @@ function segmentDistance(p1,q1,p2,q2){
   if(t<0){t=0;s=clamp(-c/a);}else if(t>1){t=1;s=clamp((b-c)/a);}
   return p1.clone().addScaledVector(d1,s).distanceTo(p2.clone().addScaledVector(d2,t));
 }
-for(const template of TEMPLATES.slice(1))test(`${template.id}: unrelated tubes do not intersect`,()=>{
+for(const template of TEMPLATES.slice(1))test(`${template.id}: tube walls do not intersect`,()=>{
   const m=buildTemplate(template.id),tubes=m.pieces.filter(p=>p.type==='tube');
-  const neighbors=p=>new Set(m.connections.filter(c=>c.a.id===p.id||c.b.id===p.id).map(c=>c.a.id===p.id?c.b.id:c.a.id));
   for(let i=0;i<tubes.length;i++)for(let j=0;j<i;j++){
-    const a=tubes[i],b=tubes[j],na=neighbors(a),nb=neighbors(b);if([...na].some(id=>nb.has(id)))continue;
+    const a=tubes[i],b=tubes[j];
     assert(segmentDistance(port(a,0).position,port(a,1).position,port(b,0).position,port(b,1).position)>32,`Unintended intersection ${a.id} / ${b.id}`);
   }
 });

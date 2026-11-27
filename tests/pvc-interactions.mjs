@@ -212,15 +212,18 @@ await test('192 CSS-pixel acquisition and strict release in every camera, zoomed
     for(const distance of [128,191.75,192]){
       pointer('pointermove',{x:at.x,y:at.y+distance},{buttons:0});
       assert(state().placement.connection?.target.id===target.id,`${view} ${zoomed} did not acquire at ${distance}px`);
+      const guide=d.querySelector('#placement-guide'),circle=guide.querySelector('circle'),r=c.getBoundingClientRect();
+      assert(!guide.hasAttribute('hidden')&&near(Number(circle.getAttribute('cx')),at.x-r.left)&&near(Number(circle.getAttribute('cy')),at.y-r.top),'Connection guide target '+view);
     }
     pointer('pointermove',{x:at.x,y:at.y+192.25},{buttons:0});
     assert(!state().placement.connection,'Target retained outside 192px '+view);
+    assert(d.querySelector('#placement-guide').hasAttribute('hidden'),'Free placement retained connection guide '+view);
     assert(same(state().placement.q,initial),'Automatic alignment contaminated free orientation '+view);
     key('e');const free=state().placement;
     pointer('pointermove',{x:at.x,y:at.y+200},{buttons:0});
     assert(same(state().placement.q,free.q),'Free pointer movement undid E '+view);
     assert(state().previewMesh===mesh&&same(state().data,m.data())&&state().undo===0,'Query allocated mesh or changed model/history '+view);
-    key('Escape');assert(!state().placement&&same(state().data,m.data()),'Escape changed design '+view);
+    key('Escape');assert(!state().placement&&same(state().data,m.data())&&d.querySelector('#placement-guide').hasAttribute('hidden'),'Escape changed design or retained guide '+view);
   }
 });
 await test('Placement switches by pointer, stays stable near competitors, moves away, disables snap and cancels',async()=>{
@@ -231,7 +234,7 @@ await test('Placement switches by pointer, stays stable near competitors, moves 
   const mid={x:(a.x+b.x)/2+2,y:a.y};pointer('pointermove',mid,{buttons:0});assert(state().placement.connection.target.id===first.target.id,'Hysteresis');
   pointer('pointermove',b,{buttons:0});assert(state().placement.connection.target.id!==first.target.id,'Did not switch');
   const r=c.getBoundingClientRect(),far={x:r.left+10,y:r.bottom-10};pointer('pointermove',far,{buttons:0});assert(!state().placement.connection,'Far snap');
-  pointer('pointermove',b,{buttons:0});const check=d.querySelector('#port-snap');check.checked=false;check.dispatchEvent(new w.Event('change'));assert(!state().placement.connection,'Disabled snap');
+  pointer('pointermove',b,{buttons:0});const check=d.querySelector('#port-snap');check.checked=false;check.dispatchEvent(new w.Event('change'));assert(!state().placement.connection&&d.querySelector('#placement-guide').hasAttribute('hidden'),'Disabled snap / guide');
   const free=state().placement;tap(b);assert(same(state().data.pieces.at(-1).p,free.p)&&!state().data.connections.length,'Disabled free commit');click('#undo');click('[data-type="tube"]');pointer('pointermove',b,{buttons:0});
   check.checked=true;check.dispatchEvent(new w.Event('change'));assert(state().placement.connection,'Reenabled snap');key('Escape');assert(!state().placement&&same(state().data,m.data())&&state().undo===0,'Escape mutated design');
 });

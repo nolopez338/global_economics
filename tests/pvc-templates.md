@@ -51,3 +51,14 @@ node tests/pvc-templates.browser.cjs
 The browser test requires Playwright and installed Chrome (set `NODE_PATH` to the bundled Node dependencies when needed). Its fixture uses separate browser-storage keys. It writes screenshots, portable JSON and the window PDF to `tmp/pvc-templates/`.
 
 Model checks cover all ten options, unique IDs, cut limits and increments, compatible ports used once, alignment within 1e-8 mm, a single connected component, occupied tube ends, serialization, materials totals, copied / transformed assemblies, invalid custom sockets, unintended tube intersections, the window opening and rendered bounds. Browser checks load all nine nonempty options, capture front / side / perspective views, exercise rejected replacements and Empty, one-step undo/redo, placement reset, actual JSON downloads and imports, autosave reload, materials and PDF generation, and the narrow dropdown. Inspect the saved images for the visual checks.
+
+## Verification results — 2026-11-26
+
+- 44 model, placement and template tests passed.
+- All ten dropdown options verified; all nine nonempty templates loaded in Chrome.
+- All 27 front / side / perspective captures inspected. Projected bounding-box corners fit the viewport in every view.
+- Replacement rejection, Empty, pending-placement reset, one-step undo/redo and autosave passed.
+- All nine designs passed actual JSON download/import and autosave reload checks, plus PDF generation (3–4 pages each). The window PDF was also downloaded through the application button and all four pages rendered and inspected.
+- Custom junction configurations, cut grouping, piece counts and tube totals verified; malformed socket layouts rejected.
+- All 19 existing editor interaction scenarios passed, including transforms, selection, connection snapping, unit changes, cut edits, keyboard handling and undo/redo.
+- Native mouse click / placement and native catalog drag checks passed. Responsive dropdown and browser error checks passed.

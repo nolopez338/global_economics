@@ -23,7 +23,11 @@ const server=http.createServer((req,res)=>fs.readFile(path.join(root,decodeURICo
  for(const {id,name} of options.slice(1)){
    await page.selectOption('#template',id);const previous=await read();await page.locator('#load-template').click();const state=await read();assert.equal(state.undo,previous.undo+1);assert.equal(state.data.pieces.length,new Set(state.data.pieces.map(p=>p.id)).size);assert.deepEqual(JSON.parse(state.autosave),state.data);
    assert.equal(await page.locator('#selection-content').innerText(),'Nothing selected');
-   for(const view of ['front','side','perspective']){await page.selectOption('#camera',view);await page.waitForTimeout(150);await page.locator('#workspace').screenshot({path:path.join(out,`${id}-${view}.png`)});}
+   for(const view of ['front','side','perspective']){await page.selectOption('#camera',view);await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+     const framing=await page.evaluate(async()=>{const {Box3,Group,Vector3}=await import('/assets/vendor/three-0.170.0/three.module.js');const {geometry,dispose}=await import('/assets/js/pvc-geometry.mjs');const g=new Group();for(const p of pvcTest.read().data.pieces){const o=geometry(p);o.position.fromArray(p.p);o.quaternion.fromArray(p.q);g.add(o);}g.updateMatrixWorld(true);const box=new Box3().setFromObject(g,true),bounds=document.querySelector('#workspace').getBoundingClientRect(),projected=[];for(const x of [box.min.x,box.max.x])for(const y of [box.min.y,box.max.y])for(const z of [box.min.z,box.max.z])projected.push(pvcTest.screen([x,y,z]));dispose(g);return {center:box.getCenter(new Vector3()).toArray(),target:pvcTest.read().target,inside:projected.every(p=>p.x>=bounds.left&&p.x<=bounds.right&&p.y>=bounds.top&&p.y<=bounds.bottom)};});
+     assert(framing.inside,`${id} ${view}: assembly is clipped ${JSON.stringify(framing)}`);
+     await page.locator('#workspace').screenshot({path:path.join(out,`${id}-${view}.png`)});}
+   if(process.env.PVC_VIEWS_ONLY){console.log(`PASS ${name}: front, side and perspective fully framed`);continue;}
    const data=state.data;
    // Download actual portable JSON, import it through the file input, then restore autosave.
    let event=page.waitForEvent('download');await page.locator('#export').click();let file=await event;const json=path.join(out,id+'.json');await file.saveAs(json);assert.deepEqual(JSON.parse(fs.readFileSync(json,'utf8')),data);

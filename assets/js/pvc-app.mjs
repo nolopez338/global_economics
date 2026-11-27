@@ -192,10 +192,10 @@ function previewPlacement(){
 }
 function updatePlacement(event,retainSource=true){
   placementPointer={clientX:event.clientX,clientY:event.clientY};
+  camera.updateMatrixWorld(true);
   let point=planePoint(event);
   if(point){if($('#plane').value==='ground')point.y+=placement.type==='tube'?RADIUS:22;if(point.toArray().every(n=>Number.isFinite(n)&&Math.abs(n)<1e7))placement.freeP=point.toArray();else point=null;}
   const prospective={...placement,id:'preview',p:placement.freeP,q:placement.intentQ};
-  camera.updateMatrixWorld(true);
   const rect=canvas.getBoundingClientRect();
   const previous=retainSource?placement.connection:placement.connection&&{target:placement.connection.target};
   const connection=$('#port-snap').checked?choosePlacement({piece:prospective,targets:placementPorts,pointer:{x:event.clientX,y:event.clientY},project:p=>projectPort(p,camera,rect),previous,
@@ -341,8 +341,9 @@ $('#import').onclick=()=>$('#file').click();$('#file').onchange=async e=>{const 
 try{const saved=localStorage.getItem(STORAGE);if(saved){model=validate(JSON.parse(saved));status(`Restored ${model.pieces.length} pieces from this browser.`);}}catch(error){status('Saved work could not be restored: '+error.message+'. Load a JSON backup to recover it.',true);}
 
 // Cameras, resize and world-axis indicator.
-function resize(){const w=workspace.clientWidth,h=workspace.clientHeight;renderer.setSize(w,h,false);cameraPerspective.aspect=w/h;cameraPerspective.updateProjectionMatrix();const vertical=(cameraOrtho.top-cameraOrtho.bottom)/2;cameraOrtho.left=-vertical*w/h;cameraOrtho.right=vertical*w/h;cameraOrtho.updateProjectionMatrix();}
+function resize(){const w=workspace.clientWidth,h=workspace.clientHeight;renderer.setSize(w,h,false);cameraPerspective.aspect=w/h;cameraPerspective.updateProjectionMatrix();const vertical=(cameraOrtho.top-cameraOrtho.bottom)/2;cameraOrtho.left=-vertical*w/h;cameraOrtho.right=vertical*w/h;cameraOrtho.updateProjectionMatrix();if(placement&&placementPointer)updatePlacement(placementPointer);}
 const observer=new ResizeObserver(resize);observer.observe(workspace);
+orbit.addEventListener('change',()=>{if(placement&&placementPointer)updatePlacement(placementPointer);});
 function frame(){const ids=selected.size?expanded():new Set(model.pieces.map(p=>p.id));if(!ids.size)return;sync();const box=new THREE.Box3();for(const id of ids)box.expandByObject(meshes.get(id));const size=box.getSize(new THREE.Vector3()),target=box.getCenter(new THREE.Vector3()),radius=Math.max(size.length()/2,100),aspect=workspace.clientWidth/workspace.clientHeight;
   const dir=camera.position.clone().sub(orbit.target).normalize();orbit.target.copy(target);
   if(camera.isPerspectiveCamera)camera.position.copy(target).addScaledVector(dir,radius/Math.sin(THREE.MathUtils.degToRad(camera.fov/2))*1.25/Math.min(aspect,1));

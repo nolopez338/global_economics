@@ -8,6 +8,8 @@ No build, backend, npm installation, or runtime CDN is required.
 
 - `assets/js/pvc-model.mjs`: structured catalog, local ports, graph traversal,
   rigid transforms, cut-length editing, copying, materials and import validation.
+- `assets/js/pvc-templates.mjs`: ten editable planning templates, connected bracing,
+  dimensions and cut-length planning.
 - `assets/js/pvc-app.mjs`: hollow geometry, Three.js scene and controls,
   selection, snap preview, gesture transactions, persistence and inspector.
 - `assets/css/pvc-design.css`: scoped application styling and responsive panels.
@@ -17,10 +19,23 @@ No build, backend, npm installation, or runtime CDN is required.
 Coordinates and dimensions use millimetres. All tubes have a 16 mm outer
 radius and 13 mm inner radius. Tube length is the physical cut length,
 including inserted material; allowed lengths are 80–3,000 mm. Tube local X
-is its longitudinal axis; end 1 is −X and end 2 is +X. Fitting socket mouths
+is its longitudinal axis; end 1 is −X and end 2 is +X. Standard fitting socket mouths
 are 45 mm from the local origin, and their internal mating stops are 20 mm
 inside their mouths. The tube end aligns with that stop, with opposing outward
 directions. Socket walls are thicker than tube walls.
+
+Custom multiway junctions serialize their local socket layout with validated
+normalized directions, 44–106 mm mouth reaches and the same 20 mm insertion.
+Materials distinguish socket configurations. These parts need compatible
+sourcing or fabrication; they are geometric planning components without
+certified load ratings. See [template dimensions, cuts and verification](../tests/pvc-templates.md).
+
+The labeled Template dropdown previews exactly ten options, including Empty.
+Only Load template replaces the assembly, using the existing unexported-work
+prompt. Each load is one undoable, autosaved operation with cleared temporary
+state and a framed view. Diagonal socket necks account for whole-mm cut
+rounding; all axial cuts use 100 mm increments. PDFs paginate large custom
+junction lists before the eight design views.
 
 Joints are graph edges with stable IDs and explicit piece/port endpoints.
 Proximity only proposes a new joint; existing joints never depend on mesh

@@ -19,6 +19,7 @@ const server=http.createServer((req,res)=>{
   const origin=`http://127.0.0.1:${server.address().port}`;
   const browser=await chromium.launch({...(process.env.PVC_BROWSER?{executablePath:process.env.PVC_BROWSER}:{channel:'chrome'}),headless:true,args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
   try{
+    if(!process.env.PVC_SKIP_INTERACTIONS&&!process.env.PVC_ONLY_STATIONARY){
     const page=await browser.newPage({viewport:{width:1440,height:1100}}),errors=[];
     page.setDefaultTimeout(120000);page.on('pageerror',error=>errors.push(error.message));
     await page.exposeFunction('reportPVCResult',text=>console.log(text));
@@ -34,6 +35,8 @@ const server=http.createServer((req,res)=>{
     const interactions=await page.locator('#results').innerText();
     assert(!interactions.includes('FAIL'),'DOM interaction suite failed');assert.deepEqual(errors,[]);
     await page.close();
+    }
+    if(process.env.PVC_ONLY_INTERACTIONS)return;
     for(const dpr of [1,2]){
       const context=await browser.newContext({viewport:{width:1440,height:1100},deviceScaleFactor:dpr});
       const page=await context.newPage(),errors=[];
@@ -51,6 +54,7 @@ const server=http.createServer((req,res)=>{
         const {Design}=await import('/assets/js/pvc-model.mjs');const {placementTargets}=await import('/assets/js/pvc-placement.mjs');
         const t=placementTargets(new Design(pvcTest.read().data))[0];return pvcTest.screen(t.position.toArray());
       });
+      if(!process.env.PVC_ONLY_STATIONARY){
       await load('cap');
       for(const view of ['front','side','top','perspective']){
         await page.selectOption('#camera',view);await page.selectOption('#plane',view==='side'?'side':view==='front'?'front':'ground');
@@ -58,11 +62,32 @@ const server=http.createServer((req,res)=>{
         const canvas=page.locator('#workspace canvas'),box=await canvas.boundingBox();
         await page.mouse.move(box.x+box.width/2,box.y+box.height/2);await page.mouse.wheel(0,-180);
         await page.locator('[data-type="tube"]').click();const at=await target();
-        for(const distance of [128,191.75]){await page.mouse.move(at.x,at.y+distance);assert((await read()).placement.connection,`DPR ${dpr}, ${view}, ${distance}px acquisition`);}
-        await page.mouse.move(at.x,at.y+192.25);assert.equal((await read()).placement.connection,null,`DPR ${dpr}, ${view} release`);
+        for(const distance of [128,191.75]){await page.mouse.move(at.x,at.y+distance);assert((await read()).placement.connection,`DPR ${dpr}, ${view}, ${distance}px acquisition`);assert(await page.locator('#placement-guide').isVisible());}
+        await page.mouse.move(at.x,at.y+192.25);assert.equal((await read()).placement.connection,null,`DPR ${dpr}, ${view} release`);assert(await page.locator('#placement-guide').isHidden());
         await page.keyboard.press('Escape');
       }
       console.log(`PASS real mouse 192 CSS-pixel targeting at DPR ${dpr}, four cameras and zoom`);
+      }
+      await load('cap');await page.selectOption('#camera','front');await page.selectOption('#plane','front');
+      await page.locator('[data-type="tube"]').click();const stationary=await target();await page.mouse.move(stationary.x,stationary.y+40);
+      assert((await read()).placement.connection);
+      const guideMatches=()=>page.evaluate(()=>{
+        const s=pvcTest.read(),connection=s.placement?.connection;if(!connection)return false;
+        const canvas=document.querySelector('#workspace canvas'),r=canvas.getBoundingClientRect(),guide=document.querySelector('#placement-guide'),circle=guide.querySelector('circle');
+        const target=s.data.pieces.find(p=>p.id===connection.target.id);
+        return import('/assets/js/pvc-model.mjs').then(({port})=>{
+          const projected=pvcTest.screen(port(target,connection.target.port).position.toArray());
+          return !guide.hasAttribute('hidden')&&Math.abs(Number(circle.getAttribute('cx'))-(projected.x-r.left))<1e-6&&Math.abs(Number(circle.getAttribute('cy'))-(projected.y-r.top))<1e-6;
+        });
+      });
+      await page.selectOption('#camera','top');assert(await guideMatches(),'Camera switch left stationary preview guide at old projection');
+      await page.setViewportSize({width:1520,height:1140});
+      await page.waitForFunction(()=>document.querySelector('#workspace canvas').width===Math.round(document.querySelector('#workspace').clientWidth*Math.min(devicePixelRatio,2)));
+      assert(await guideMatches(),'Resize left stationary preview guide at old projection');
+      await page.keyboard.press('Escape');assert(await page.locator('#placement-guide').isHidden());
+      await page.setViewportSize({width:1440,height:1100});
+      console.log(`PASS stationary pointer camera/resize retargeting and guide visibility at DPR ${dpr}`);
+      if(process.env.PVC_ONLY_STATIONARY){assert.deepEqual(errors,[]);await context.close();continue;}
       await load('tube');await page.selectOption('#camera','front');
       const at=await target(),button=page.locator('[data-type="corner"]'),box=await button.boundingBox();
       const base=await read();
@@ -99,6 +124,7 @@ const server=http.createServer((req,res)=>{
       await page.mouse.move(tubeBox.x+tubeBox.width/2,tubeBox.y+tubeBox.height/2);await page.mouse.down();
       await page.mouse.move(freeAt.x,freeAt.y,{steps:20});await page.waitForFunction(()=>pvcTest.read().placement);
       const free=(await read()).placement;assert.equal(free.connection,null);
+      assert(await page.locator('#placement-guide').isHidden());
       await page.mouse.up();await page.waitForFunction(()=>!pvcTest.read().placement);
       assert.equal((await read()).data.connections.length,0);assert.deepEqual((await read()).data.pieces.at(-1).p,free.p);
       await page.locator('#undo').click();await page.locator('#port-snap').check();
@@ -107,6 +133,7 @@ const server=http.createServer((req,res)=>{
       await page.mouse.move(cancelAt.x,cancelAt.y,{steps:20});await page.waitForFunction(()=>pvcTest.read().placement?.connection);
       await page.keyboard.press('Escape');await page.mouse.up();await page.waitForFunction(()=>!pvcTest.read().placement);
       assert.deepEqual((await read()).data,cancelBase.data);assert.equal((await read()).undo,cancelBase.undo);
+      assert(await page.locator('#placement-guide').isHidden());
       console.log(`PASS native drag snapping disabled and Escape cancellation at DPR ${dpr}`);
       assert.deepEqual(errors,[]);await context.close();
     }

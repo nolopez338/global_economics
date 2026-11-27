@@ -10,9 +10,9 @@ export const TEMPLATES=Object.freeze([
   {id:'desk',name:'Compact desk frame',description:'Compact top frame with a clear front knee opening; rear and side reinforcement. Add a desktop separately.',dimensions:'≈114 × 74 × 59 cm (W × H × D).'},
   {id:'clothes',name:'Freestanding clothes rack',description:'Hanging rail, intermediate rear supports and braced base outriggers. No front intermediate crossbars.',dimensions:'≈114 × 169 × 59 cm body; full footprint ≈114 × 149 cm.'},
   {id:'shoes',name:'Shoe rack',description:'Three open rail tiers with center supports and back / side triangulation. Add shelf surfaces separately.',dimensions:'≈114 × 74 × 39 cm (W × H × D).'},
-  {id:'plant',name:'Plant stand',description:'Two rail levels, a center support, braced back / sides and outriggers for the narrow upright shape. Add trays separately.',dimensions:'≈74 × 114 × 59 cm body; full footprint ≈74 × 129 cm.'},
-  {id:'hamper',name:'Laundry hamper frame',description:'Open top rim for a removable fabric liner; lower support rails and back / side diagonals.',dimensions:'≈74 × 94 × 59 cm (W × H × D).'},
-  {id:'display',name:'Freestanding display frame',description:'Clear upper front display area, mid-height rail, back / side triangulation and braced outriggers. Add a lightweight display panel separately.',dimensions:'≈134 × 199 × 49 cm body; full footprint ≈134 × 129 cm.'}
+  {id:'plant',name:'Plant stand',description:'Two raised rail levels, lower rails, center supports, braced back / sides and outriggers for the narrow upright shape. Add trays separately.',dimensions:'≈74 × 114 × 59 cm body; full footprint ≈74 × 129 cm.'},
+  {id:'hamper',name:'Laundry hamper frame',description:'Twin open top bays for removable fabric liners; lower support rails and back / side diagonals.',dimensions:'≈74 × 94 × 59 cm (W × H × D).'},
+  {id:'display',name:'Freestanding display frame',description:'Clear upper front display area, mid-height rail, back / side triangulation and braced outriggers. Add a lightweight display panel separately.',dimensions:'≈134 × 199 × 49 cm body; full footprint ≈134 × 139 cm.'}
 ]);
 
 // Match a junction to an existing catalog fitting whenever its socket layout permits.
