@@ -19,7 +19,29 @@ globalThis.pvcTest = {
     autosave:localStorage.getItem(STORAGE),lengthUnit,
     history:clone({undo,redo}),
     camera:camera.position.toArray(),target:orbit.target.toArray(),
-    cameraQ:camera.quaternion.toArray(),gizmoDragging:gizmo.dragging}),
+    cameraQ:camera.quaternion.toArray(),gizmoDragging:gizmo.dragging,
+    gizmoAxis:gizmo.axis,rotationDrag:rotationDrag&&{raw:rotationDrag.raw,held:rotationDrag.held,angle:gizmo.rotationAngle}}),
+  rotationHandles: axis => {
+    scene.updateMatrixWorld(true);
+    return gizmo._gizmo.picker.rotate.children.filter(o=>o.name===axis).flatMap(o=>{
+      const positions=o.geometry.getAttribute('position'),points=[];
+      for(let i=0;i<positions.count;i++)points.push(pvcTest.screen(new THREE.Vector3().fromBufferAttribute(positions,i).applyMatrix4(o.matrixWorld).toArray()));
+      return points;
+    });
+  },
+  rotationPointer: degrees => {
+    const angle=THREE.MathUtils.degToRad(degrees),axis=({X:[1,0,0],Y:[0,1,0],Z:[0,0,1]})[gizmo.axis];
+    const tangent=axis&&vec(axis).cross(gizmo.eye),point=gizmo.pointStart.clone();
+    if(!tangent||tangent.lengthSq()===0)point.applyAxisAngle(gizmo.eye,angle);
+    else{
+      // The drag plane faces the camera, while eye points from the pivot to
+      // the camera. They differ when the selection is away from orbit.target.
+      tangent.normalize();const normal=camera.getWorldDirection(new THREE.Vector3());
+      const direction=tangent.clone().addScaledVector(normal,-normal.dot(tangent));
+      point.addScaledVector(direction,angle*gizmo.worldPosition.distanceTo(camera.position)/(20*direction.dot(tangent)));
+    }
+    return pvcTest.screen(point.add(gizmo.worldPositionStart).toArray());
+  },
   screen: p => {const v=vec(p).project(camera),r=canvas.getBoundingClientRect();
     return {x:r.left+(v.x+1)*r.width/2,y:r.top+(1-v.y)*r.height/2};}
 };

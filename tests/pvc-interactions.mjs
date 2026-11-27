@@ -248,4 +248,82 @@ await test('Occupied placement targets excluded and orthographic zoom remains ta
   const occupied=screen(port(t,1).position.toArray());pointer('pointermove',occupied,{buttons:0});assert(!state().placement.connection,'Occupied target selected');key('Escape');
 });
 
+async function startRotation(axis){
+  for(const at of api.rotationHandles(axis)){
+    pointer('pointermove',at,{buttons:0});
+    if(state().gizmoAxis!==axis)continue;
+    pointer('pointerdown',at);
+    if(state().gizmoDragging)return at;
+    pointer('pointerup',at);
+  }
+  throw Error('Cannot acquire '+axis+' ring');
+}
+function rotationMove(angle){const at=api.rotationPointer(angle);pointer('pointermove',at,{button:-1});return at;}
+function checkRigidRotation(before,axis,degrees){
+  const after=state(),m=validate(after.data),ids=new Set(m.connected(new Set(before.selected)));
+  const pivot=before.data.pieces.filter(p=>before.selected.includes(p.id)).reduce((v,p)=>v.add(vec(p.p)),vec([0,0,0])).divideScalar(before.selected.length);
+  const rotation=quat([0,0,0,1]).setFromAxisAngle(vec(axis==='X'?[1,0,0]:axis==='Y'?[0,1,0]:[0,0,1]),degrees*Math.PI/180);
+  for(const p of before.data.pieces){
+    const actual=m.get(p.id),position=ids.has(p.id)?vec(p.p).sub(pivot).applyQuaternion(rotation).add(pivot):vec(p.p);
+    const orientation=ids.has(p.id)?rotation.clone().multiply(quat(p.q)):quat(p.q);
+    assert(position.distanceTo(vec(actual.p))<1e-6,'Rigid position '+axis+' '+degrees+': error '+position.distanceTo(vec(actual.p)));
+    assert(near(Math.abs(orientation.dot(quat(actual.q))),1),'Rigid orientation '+axis+' '+degrees);
+  }
+  assert(same(after.data.connections,before.data.connections),'Internal connections changed');
+  for(const joint of m.connections){const a=port(m.get(joint.a.id),joint.a.port),b=port(m.get(joint.b.id),joint.b.port);assert(a.position.distanceTo(b.position)<1e-6&&a.direction.dot(b.direction)<-.99999,'Broken joint');}
+}
+for(const axis of ['X','Y','Z'])for(const mode of ['single','group','companion']){
+  await test(`Magnetic ${axis}: ${mode}, both grid states, bidirectional capture/release, turns, cancel and history`,async()=>{
+    for(const grid of [false,true]){
+      const m=mode==='single'?new Design():connectedPair();
+      if(mode==='single')m.add('corner',[0,120,0],400,quat([0,0,0,1]).setFromAxisAngle(vec([1,1,0]).normalize(),.37).toArray());
+      if(mode!=='single')m.add('tee',[0,120,350],400,quat([0,0,0,1]).setFromAxisAngle(vec([0,0,1]),.23).toArray());
+      await load(m);
+      if(mode==='companion')tap(screen(m.pieces[0].p));else click('#select-all');
+      assert(state().selected.length===(mode==='companion'?1:m.pieces.length),'Selection');
+      const checkbox=d.querySelector('#grid-snap');checkbox.checked=grid;checkbox.dispatchEvent(new w.Event('change'));
+      d.querySelector('#port-snap').checked=false;
+      click('[data-tool="rotate"]');await tick();
+      const before=state();await startRotation(axis);
+      for(const [raw,applied] of [[20,20],[27,30],[34,30],[35,30],[39.123,39.123],[33,30],[25,30],[20.321,20.321],[-20,-20],[-27,-30],[-35,-30],[-39.12,-39.12],[-358,-360],[-364,-360],[-369.23,-369.23],[358,360],[364,360],[369.4,369.4],[718,720],[724,720],[729.123,729.123]]){
+        rotationMove(raw);checkRigidRotation(before,axis,applied);
+        assert(near(state().rotationDrag.raw,raw*Math.PI/180),'Raw angle fed back from snap: '+raw+' vs '+state().rotationDrag.raw*180/Math.PI);
+        assert(state().undo===0,'Drag produced intermediate undo entry');
+      }
+      let at=api.rotationPointer(729.123);pointer('pointerup',at);
+      const after=state();assert(after.undo===1&&!after.transaction&&!after.rotationDrag,'Completed drag history/state');
+      key('z',c,{ctrlKey:true});assert(same(state().data,before.data),'Rotation undo');
+      key('z',c,{ctrlKey:true,shiftKey:true});assert(same(state().data,after.data),'Rotation redo');
+      await tick();await startRotation(axis);rotationMove(28);key('Escape');pointer('pointerup',api.rotationPointer(28));
+      assert(same(state().data,after.data)&&state().undo===1&&!state().rotationDrag&&!state().gizmoDragging,'Escape rotation rollback');
+    }
+  });
+}
+for(const [axis,view] of [['X','side'],['Y','top'],['Z','front']])for(const ring of [axis,'E']){
+  await test(`Magnetic ${axis} in ${view} view, ${ring} ring: negative and multiple revolutions`,async()=>{
+    const m=new Design();m.add('corner',[0,120,0]);await load(m);click('#select-all');change('#camera',view);click('[data-tool="rotate"]');await tick();
+    d.querySelector('#port-snap').checked=false;const before=state();await startRotation(ring);
+    for(let raw=10;raw<=1080;raw+=10){rotationMove(raw);assert(near(state().rotationDrag.raw,raw*Math.PI/180),'Positive unwrap '+raw);}
+    checkRigidRotation(before,axis,1080);
+    for(let raw=1070;raw>=-720;raw-=10){rotationMove(raw);assert(near(state().rotationDrag.raw,raw*Math.PI/180),'Negative unwrap '+raw);}
+    checkRigidRotation(before,axis,-720);rotationMove(-729.345);checkRigidRotation(before,axis,-729.345);
+    pointer('pointerup',api.rotationPointer(-729.345));assert(state().undo===1,'Multi-turn history');
+  });
+}
+await test('Numeric XYZ entry stays exact near targets; custom buttons and Q/E keep their own increment with grid on',async()=>{
+  for(const axis of ['x','y','z']){
+    const m=new Design();m.add('corner',[0,120,0]);await load(m);click('#select-all');click('[data-tool="rotate"]');
+    const grid=d.querySelector('#grid-snap');grid.checked=true;grid.dispatchEvent(new w.Event('change'));
+    change('#rotation-'+axis,'29.125');const vector=vec(axis==='x'?[1,0,0]:axis==='y'?[0,1,0]:[0,0,1]);
+    let expected=quat([0,0,0,1]).setFromAxisAngle(vector,29.125*Math.PI/180);
+    assert(near(Math.abs(expected.dot(quat(state().data.pieces[0].q))),1),'Numeric rotation rounded '+axis);
+    change('#rotation-increment','custom');change('#rotation-custom','1.125');click('.rotate-buttons [data-turn="'+axis+'"]');
+    expected.setFromAxisAngle(vector,30.25*Math.PI/180);
+    assert(near(Math.abs(expected.dot(quat(state().data.pieces[0].q))),1),'Button rotation snapped '+axis);
+    key('q');key('e');
+    expected=quat([0,0,0,1]).setFromAxisAngle(vec([1,0,0]),1.125*Math.PI/180).multiply(quat([0,0,0,1]).setFromAxisAngle(vec([0,1,0]),1.125*Math.PI/180)).multiply(expected);
+    assert(near(Math.abs(expected.dot(quat(state().data.pieces[0].q))),1)&&state().undo===4,'Q/E increment or history changed');
+  }
+});
+
 document.title=results.querySelector('.fail')?'FAIL · PVC interaction tests':'PASS · PVC interaction tests';

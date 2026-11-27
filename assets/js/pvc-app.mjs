@@ -6,6 +6,7 @@ import {Design,CATALOG,RADIUS,localPorts,port,vec,quat,clone,validate,materialNa
 import {TEMPLATES,buildTemplate} from './pvc-templates.mjs';
 import {geometry,dispose} from './pvc-geometry.mjs';
 import {placementTargets,choosePlacement,projectPort,SNAP_PIXELS} from './pvc-placement.mjs';
+import {MagneticRotation} from './pvc-rotation.mjs';
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const STORAGE='pvc-studio-v1', ROTATION_STORAGE='pvc-studio-rotation-increment', MAX_HISTORY=80, DRAG_THRESHOLD=4;
@@ -54,7 +55,7 @@ orbit.mouseButtons={LEFT:THREE.MOUSE.PAN,MIDDLE:THREE.MOUSE.PAN,RIGHT:THREE.MOUS
 const pivot=new THREE.Object3D();scene.add(pivot);
 const gizmo=new TransformControls(camera,canvas);gizmo.setSize(.8);gizmo.setSpace('world');scene.add(gizmo.getHelper());
 const ray=new THREE.Raycaster(), pointer=new THREE.Vector2();
-let baseTransform=null, activeIds=new Set(), sliderBase=null, groupEdit=null, groupCancelled=false, groupRangeKey=null, groupRangePointer=null;
+let baseTransform=null, activeIds=new Set(), rotationDrag=null, sliderBase=null, groupEdit=null, groupCancelled=false, groupRangeKey=null, groupRangePointer=null;
 
 function status(text,error=false){statusSource=text;$('#status').textContent=unitText(text);$('#status').dataset.error=error;}
 function snapshot(){return {data:model.data(),selected:[...selected],joint:selectedJoint};}
@@ -108,7 +109,7 @@ function finishSnap(){if(candidate){const c=candidate;if(!c.internal){const t=mo
 
 // Inspector and selection state are independent of rendered geometry.
 function setSelection(ids,joint=null){finishLengthEdits();selected=new Set(ids);selectedJoint=joint;pickedPorts=[];refresh();}
-function attach(){gizmo.detach();if(selected.size&&(tool==='translate'||tool==='move-piece'||tool==='rotate')){pivot.position.copy(center(selected));pivot.quaternion.identity();pivot.updateMatrixWorld(true);gizmo.setMode(tool==='move-piece'?'translate':tool);gizmo.setTranslationSnap($('#grid-snap').checked?25:null);gizmo.setRotationSnap($('#grid-snap').checked?Math.PI/12:null);gizmo.attach(pivot);}}
+function attach(){gizmo.detach();if(selected.size&&(tool==='translate'||tool==='move-piece'||tool==='rotate')){pivot.position.copy(center(selected));pivot.quaternion.identity();pivot.updateMatrixWorld(true);gizmo.setMode(tool==='move-piece'?'translate':tool);gizmo.setTranslationSnap($('#grid-snap').checked?25:null);gizmo.setRotationSnap(null);gizmo.attach(pivot);}}
 function fields(container,prefix){for(const axis of ['x','y','z']){const label=document.createElement('label');label.textContent=axis.toUpperCase();const input=document.createElement('input');input.type='number';input.step=prefix==='position'?'1':'5';input.id=`${prefix}-${axis}`;input.setAttribute('aria-label',`${prefix} ${axis.toUpperCase()}`);label.append(input);$(container).append(label);input.addEventListener('change',()=>numericTransform(prefix,axis,input));}}
 fields('#position-fields','position');fields('#rotation-fields','rotation');
 function showSelectedPieces(list,joint){
@@ -150,7 +151,7 @@ function updateInstructions(){
   $('#movement-bar').hidden=tool!=='move-piece'||!!placement;
   workspace.dataset.mode=placement?'placement':tool;
 }
-function setTool(next){cancelInteraction();if(placement)cancelPlacement();tool=next;$$('[data-tool]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tool===tool||(tool==='move-piece'&&b.dataset.tool==='translate')));attach();showOverlays();updateInstructions();canvas.style.cursor=tool==='marquee'?'crosshair':tool==='move-piece'?'grab':'default';status(({select:'Click selects · Shift-click toggles · left drag pans · right drag orbits · double-click a piece to move.',translate:'Drag an axis handle to move. Double-click a piece for plane movement. Q/E rotate.', 'move-piece':'Piece movement mode · drag a highlighted piece on the working plane · Q/E rotate · Esc or Select exits.',rotate:'Drag a rotation ring, or Q/E for horizontal/vertical increments. Connected pieces rotate together.',marquee:'Left drag selects pieces whose centres are inside the rectangle. Shift adds to selection.',joints:'Click cyan joint markers to inspect and detach. Free port markers can be paired.'})[tool]);}
+function setTool(next){cancelInteraction();if(placement)cancelPlacement();tool=next;$$('[data-tool]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tool===tool||(tool==='move-piece'&&b.dataset.tool==='translate')));attach();showOverlays();updateInstructions();canvas.style.cursor=tool==='marquee'?'crosshair':tool==='move-piece'?'grab':'default';status(({select:'Click selects · Shift-click toggles · left drag pans · right drag orbits · double-click a piece to move.',translate:'Drag an axis handle to move. Double-click a piece for plane movement. Q/E rotate.', 'move-piece':'Piece movement mode · drag a highlighted piece on the working plane · Q/E rotate · Esc or Select exits.',rotate:'Drag a world-axis ring: magnetic angles catch within 3° and hold through 5°. Keep dragging beyond the catch for free rotation. Q/E use Rotation increment; connected pieces rotate together.',marquee:'Left drag selects pieces whose centres are inside the rectangle. Shift adds to selection.',joints:'Click cyan joint markers to inspect and detach. Free port markers can be paired.'})[tool]);}
 function rotateDiscrete(axis){
   if(transaction||pointerGesture&&!placement||gizmo.dragging)return;
   const rotation=new THREE.Quaternion().setFromAxisAngle(vec(axis==='x'?[1,0,0]:axis==='y'?[0,1,0]:[0,0,1]),THREE.MathUtils.degToRad(rotationIncrement));
@@ -173,11 +174,28 @@ function numericTransform(prefix,axis,input){if(prefix==='position'&&input.value
 
 // Gizmo gestures are one transaction, even though the state and snap preview update every frame.
 gizmo.addEventListener('dragging-changed',e=>{
-  orbit.enabled=!e.value;if(e.value){begin();baseTransform=clone(model.data());activeIds=expanded();cancelledGesture=false;}
-  else if(transaction){if(cancelledGesture){restore(transaction);transaction=null;}else{try{finishSnap();commit();}catch(error){restore(transaction);transaction=null;refresh();status(error.message,true);}}baseTransform=null;refresh();}
+  orbit.enabled=!e.value;if(e.value){
+    begin();baseTransform=clone(model.data());activeIds=expanded();cancelledGesture=false;
+    // Match TransformControls' in-plane fallback exactly. Its ordinary world
+    // X/Y/Z handles already supply continuous, unbounded raw angles.
+    const axis=({X:[1,0,0],Y:[0,1,0],Z:[0,0,1]})[gizmo.axis];
+    rotationDrag=tool==='rotate'&&gizmo.axis!=='XYZE'?new MagneticRotation({wrapped:gizmo.axis==='E'||!!axis&&vec(axis).cross(gizmo.eye).lengthSq()===0}):null;
+  }
+  else{
+    rotationDrag=null;
+    if(transaction){if(cancelledGesture){restore(transaction);transaction=null;}else{try{finishSnap();commit();}catch(error){restore(transaction);transaction=null;refresh();status(error.message,true);}}}
+    baseTransform=null;refresh();
+  }
 });
 gizmo.addEventListener('objectChange',()=>{
   if(!baseTransform||!transaction||cancelledGesture)return;
+  if(rotationDrag){
+    const angle=rotationDrag.update(gizmo.rotationAngle);
+    // Read raw input before changing the displayed pivot. TransformControls
+    // recomputes its next raw angle from the original pointer and drag start.
+    pivot.quaternion.setFromAxisAngle(gizmo.rotationAxis,angle);
+    gizmo.rotationAngle=angle;
+  }
   const base=new Design(baseTransform),origin=centerFrom(base,selected);model=base;model.transform(activeIds,pivot.quaternion,origin,pivot.position.clone().sub(origin));sync();findCandidate(activeIds);
 });
 function centerFrom(m,ids){const a=new THREE.Vector3();let n=0;for(const p of m.pieces)if(ids.has(p.id)){a.add(vec(p.p));n++;}return a.divideScalar(n||1);}
@@ -231,7 +249,7 @@ function hitOverlay(event){setRay(event);return ray.intersectObjects(overlays.ch
 // Camera input stays with OrbitControls, but sub-threshold motion never reaches it.
 function cancelInteraction(){
   if(pointerGesture)pointerGesture.cancelled=true;
-  cancelledGesture=true;baseTransform=null;sliderBase=null;groupEdit=null;groupCancelled=true;groupRangeKey=null;groupRangePointer=null;
+  cancelledGesture=true;baseTransform=null;rotationDrag=null;sliderBase=null;groupEdit=null;groupCancelled=true;groupRangeKey=null;groupRangePointer=null;
   if(transaction){restore(transaction);transaction=null;}
   if(gizmo.dragging)gizmo.pointerUp({button:0});
   directDrag=null;marquee=null;$('#marquee-box').hidden=true;candidate=null;clearGhost();orbit.enabled=!placement;refresh();
