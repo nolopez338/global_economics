@@ -20,7 +20,7 @@ function personGeometry(p){
   for(const s of [-1,1]){
     const shoulder=[s*(woman?.101:.116),.785,0],elbow=[s*.144,.64,0],wrist=[s*.164,.505,.012];
     ellipsoid(shoulder,[.033,.036,.037]);limb(shoulder,elbow,.03,.024);ellipsoid(elbow,[.024,.024,.025]);limb(elbow,wrist,.024,.018);ellipsoid([s*.165,.488,.012],[.021,.033,.023]);
-    const hip=[s*.055,.49,0],knee=[s*.061,.265,0],ankle=[s*.067,.057,0];
+    const hip=[s*.055,.49,0],knee=[s*.061,.265,0],ankle=[s*.067,.045,0];
     limb(hip,knee,woman?.046:.044,.032);ellipsoid(knee,[.032,.034,.034]);limb(knee,ankle,.032,.022);
     const foot=mesh(new THREE.BoxGeometry(.058,.05,.12),mat,g);foot.position.set(s*.067,.025,.025);
   }

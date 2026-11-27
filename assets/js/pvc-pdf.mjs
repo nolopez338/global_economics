@@ -91,11 +91,12 @@ function drawMaterials(doc,layout,thumbnails,summary,unit){
       y+=row.height;doc.setDrawColor(221,230,232);doc.line(x,y,x+layout.width,y);
     }
   }
+  if(!summary.count)text(doc,'No PVC construction materials. Scale references appear in the design views.',14,65,10);
   text(doc,`Total pieces: ${summary.count}${summary.references?`   |   Scale references: ${summary.references}`:''}`,12,267,11,true);text(doc,`Total tube cut length: ${pdfLength(summary.total,unit)}`,12,274,11,true);
   text(doc,'Cut lengths include the tube inserted into fitting sockets. Fittings are counted separately.',12,281,9);
 }
 export async function createDesignPDF(data,{unit='mm',title='Untitled design',onProgress=()=>{}}={}){
-  const model=validate(data);if(!model.pieces.length)throw Error('Add a component before exporting.');
+  const model=validate(data);if(!model.pieces.length)throw Error('Add a component or scale reference before exporting.');
   if(!Object.hasOwn(lengths,unit))throw Error('Unsupported length unit.');
   await import('../vendor/jspdf-3.0.3/jspdf.umd.min.js');
   const doc=new globalThis.jspdf.jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true});
@@ -118,6 +119,8 @@ export async function createDesignPDF(data,{unit='mm',title='Untitled design',on
       drawMaterials(doc,{...layout,groups:layout.groups.slice(page*layout.columns,(page+1)*layout.columns)},thumbnails,summary,unit);
     }
     parts.visible=true;reference.visible=false;
+    // Render every validated piece, including references omitted from materials.
+    // capture() frames the complete geometry union, not the construction list.
     for(const p of model.pieces){const g=geometry(p);g.position.copy(vec(p.p));g.quaternion.copy(quat(p.q));parts.add(g);}
     for(const [index,view] of PDF_VIEWS.entries()){
       onProgress(`PDF: rendering ${view.label} (${index+1} / 8)…`);await pause();
