@@ -83,13 +83,14 @@ body {
   cursor: pointer;
 }
 .icon-button svg { width: 1.75rem; height: 1.75rem; }
-.presentation-index {
+.presentation-hour {
   fill: currentColor;
   stroke: none;
-  font: 800 11px system-ui, sans-serif;
+  font: 500 8px system-ui, sans-serif;
   text-anchor: middle;
   dominant-baseline: middle;
 }
+.presentation-writing .presentation-hour { font-size: 7px; }
 .icon-button:hover { background: var(--surface); color: var(--text); }
 .icon-button[aria-pressed="true"] { background: var(--surface); color: var(--text); border-color: currentColor; box-shadow: inset 0 0 0 1px currentColor; }
 .icon-button:disabled { opacity: .55; cursor: wait; }
@@ -97,18 +98,35 @@ button:focus-visible, .return-link:focus-visible, input:focus-visible {
   outline: 3px solid var(--text);
   outline-offset: 3px;
 }
-.presentation-toolbar { display: flex; justify-content: flex-end; }
+.presentation-toolbar { display: flex; justify-content: flex-start; grid-row: 1; }
 .presentation-message { margin: 0; padding: .5rem; border: 1px solid currentColor; border-radius: .4rem; font-size: .875rem; line-height: 1.35; overflow-wrap: anywhere; }
 .presentation-message:empty { display: none; }
 
 .return-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   justify-self: start;
-  padding: .4rem .65rem;
-  border: 2px solid currentColor;
-  border-radius: .5rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: inherit;
-  font-weight: 700;
+  font: 2rem/1 system-ui, sans-serif;
   text-decoration: none;
+  cursor: pointer;
+}
+
+.presentation-active .class-view-controls,
+.presentation-active .class-view-header .return-link { display: none; }
+.presentation-active .class-view-header { grid-template-columns: 1fr; }
+.presentation-active .live-clock { grid-column: 1; grid-row: 1; text-align: center; }
+.class-view.presentation-active:not(.clock-mode):not(.minimal-mode) {
+  grid-template-rows: auto auto auto minmax(220px, 1fr);
+}
+.class-view.presentation-active.timer-mode:not(.clock-mode):not(.minimal-mode) {
+  grid-template-rows: auto auto minmax(220px, 1fr);
 }
 
 .control-button,
@@ -330,8 +348,8 @@ body.dark-theme .schedule-visual.period-lunch {
 .clock-mode .class-view-header,
 .clock-mode .status { display: none; }
 
-/* Only the main element's fullscreen hides content. Fullscreen on <html>
-   preserves the full-page grid, header, status, and active timer. */
+/* Whole-page presentation retains the clock, status, and active timer;
+   presentation-active hides its controls in both fullscreen and fit-window modes. */
 .class-view:fullscreen .presentation-message,
 .clock-mode .presentation-message,
 .minimal-mode .presentation-message { max-width: 36rem; justify-self: center; }
@@ -375,7 +393,6 @@ body.dark-theme .timer-visual:not(.timer-alarm) {
   .class-view-controls { justify-self: center; }
   .class-view-controls { flex-wrap: wrap; justify-content: flex-end; white-space: normal; }
   .theme-control { font-size: .8rem; }
-  .return-link { font-size: .875rem; }
 }
 
 /* Reserve room for the outline, keyboard focus and the existing alarm shake.

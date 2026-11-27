@@ -111,6 +111,143 @@ const { chromium } = require('playwright');
     await page.keyboard.press('Enter');
     assert.equal(await selected().getAttribute('id'), 'tab-monitors');
 
+    async function checkSeating() {
+      assert.deepEqual(await page.evaluate(() => {
+        const problems = [];
+        const seats = [...document.querySelectorAll('.classroom-seat')];
+        const monitors = [...document.querySelectorAll('.monitor-seat')];
+        const rows = [...document.querySelectorAll('.classroom-row')];
+        const board = document.querySelector('.classroom-board').getBoundingClientRect();
+        if (seats.length !== 20 || monitors.length !== 4 || rows.length !== 4) problems.push('seat/monitor/row count');
+        if (seats.some(seat => seat.getBoundingClientRect().bottom >= board.top)) problems.push('board must be below all seats');
+        rows.forEach((row, index) => {
+          const rowSeats = [...row.querySelectorAll('.classroom-seat')];
+          if (row.querySelector('.row-label').textContent !== `Row ${index + 1}`) problems.push('row label');
+          if (rowSeats.length !== 5 || row.querySelectorAll('.monitor-seat').length !== 1) problems.push('five seats and one monitor per row');
+          if (!rowSeats[0].classList.contains('monitor-seat')) problems.push('monitor is not the farthest seat');
+          if (rowSeats.slice(1).some(seat => seat.getBoundingClientRect().top <= rowSeats[0].getBoundingClientRect().bottom)) problems.push('monitor position/seat overlap');
+          rowSeats.forEach((seat, position) => {
+            const reference = rows[0].querySelectorAll('.classroom-seat')[position].getBoundingClientRect();
+            if (Math.abs(seat.getBoundingClientRect().top - reference.top) > 1) problems.push('seats staggered across columns');
+          });
+          const label = rowSeats[0].querySelector('.monitor-name');
+          const range = document.createRange();
+          range.selectNodeContents(label);
+          for (const r of range.getClientRects()) {
+            const seat = rowSeats[0].getBoundingClientRect();
+            if (r.left < seat.left || r.right > seat.right || r.bottom > seat.bottom) problems.push('name outside monitor seat');
+          }
+        });
+        return problems;
+      }), []);
+    }
+
+    const monitor = row => page.locator(`.monitor-seat[data-row="${row}"]`);
+    const assignedName = row => monitor(row).locator('.monitor-name');
+    const input = page.getByLabel('Monitor’s name', { exact: true });
+    const dialog = page.getByRole('dialog');
+    async function checkEditorLayout(target) {
+      const editor = target.getByRole('dialog');
+      assert.deepEqual(await editor.evaluate(el => {
+        const r = el.getBoundingClientRect();
+        const problems = [];
+        if (r.left < 0 || r.top < 0 || r.right > innerWidth || r.bottom > innerHeight) problems.push('editor outside viewport');
+        if (el.scrollWidth > el.clientWidth) problems.push('editor horizontal overflow');
+        return problems;
+      }), []);
+      for (const control of await editor.locator('input, button').all()) {
+        await control.scrollIntoViewIfNeeded();
+        const r = await control.boundingBox();
+        const bounds = await editor.boundingBox();
+        assert(r.x >= bounds.x && r.x + r.width <= bounds.x + bounds.width, 'editor control fits horizontally');
+        assert(r.y >= bounds.y && r.y + r.height <= bounds.y + bounds.height, 'editor control reachable vertically');
+      }
+    }
+    const requests = [];
+    const recordRequest = request => requests.push(request.url());
+    page.on('request', recordRequest);
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await checkSeating();
+    await monitor(1).dblclick();
+    assert(await dialog.isVisible());
+    assert(await input.evaluate(el => el === document.activeElement));
+    await input.fill('  Ana María  ');
+    await input.press('Enter');
+    assert.equal(await assignedName(1).textContent(), 'Ana María');
+    assert(await dialog.isHidden());
+    assert(await monitor(1).evaluate(el => el === document.activeElement));
+
+    await monitor(1).press('Enter');
+    assert.equal(await input.inputValue(), 'Ana María');
+    await input.fill('Cancelled edit');
+    await input.press('Escape');
+    assert.equal(await assignedName(1).textContent(), 'Ana María');
+    await monitor(2).press('Space');
+    const literalName = '<img src=x onerror=alert(1)>';
+    await input.fill(literalName);
+    await page.getByRole('button', { name: 'Save', exact: true }).click();
+    assert.equal(await assignedName(2).textContent(), literalName);
+    assert.equal(await monitor(2).locator('img').count(), 0, 'entered markup stays text');
+
+    await page.getByRole('button', { name: 'Assign or edit Row 2 monitor', exact: true }).click();
+    await page.getByRole('button', { name: 'Clear name', exact: true }).click();
+    assert.equal(await assignedName(2).textContent(), '—');
+    await monitor(1).dblclick();
+    await input.fill('   ');
+    await input.press('Enter');
+    assert.equal(await assignedName(1).textContent(), '—', 'blank submission clears assignment');
+
+    const names = ['Ana María', 'Juan Sebastián', 'Camila', 'Mateo'];
+    for (let row = 1; row <= 4; row++) {
+      await monitor(row).press('Enter');
+      await input.fill(names[row - 1]);
+      await input.press('Enter');
+    }
+    await page.getByRole('tab', { name: 'Classroom Rules', exact: true }).click();
+    await page.getByRole('tab', { name: 'Before We Begin', exact: true }).click();
+    await page.getByRole('tab', { name: 'Row Monitors', exact: true }).click();
+    assert.deepEqual(await page.locator('.monitor-name').allTextContents(), names);
+    await checkSeating();
+    await checkLayout(true);
+    await page.screenshot({ path: path.join(screenshots, 'desktop-assigned-monitors.png') });
+
+    await page.locator('#fullscreen-toggle').click();
+    await page.waitForFunction(() => document.fullscreenElement);
+    await monitor(3).dblclick();
+    await input.fill('Cancelled fullscreen edit');
+    await checkEditorLayout(page);
+    await page.screenshot({ path: path.join(screenshots, 'fullscreen-monitor-editor.png') });
+    await input.press('Escape');
+    assert.equal(await assignedName(3).textContent(), 'Camila');
+    assert(await page.evaluate(() => document.fullscreenElement?.id === 'exam-page'));
+    await monitor(3).press('Space');
+    await input.fill('Valentina');
+    await input.press('Enter');
+
+    // The editor remains usable with a narrow viewport and enlarged text.
+    await page.setViewportSize({ width: 320, height: 568 });
+    await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+    await monitor(4).press('Enter');
+    await checkEditorLayout(page);
+    await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+    await page.evaluate(() => { document.documentElement.style.fontSize = ''; });
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.evaluate(() => document.fullscreenElement.scrollTo(0, 0));
+    await checkSeating();
+    await checkLayout(true);
+    await page.locator('#fullscreen-toggle').click();
+    await page.waitForFunction(() => !document.fullscreenElement);
+    assert.deepEqual(requests, [], 'editing and switching tabs make no network requests');
+    page.off('request', recordRequest);
+
+    await page.reload();
+    await page.getByRole('tab', { name: 'Row Monitors', exact: true }).click();
+    assert.deepEqual(await page.locator('.monitor-name').allTextContents(), Array(4).fill('—'));
+    // Exercise a maximum-length, unbroken name at narrow widths and enlarged text.
+    await monitor(4).press('Enter');
+    await input.fill('A'.repeat(40));
+    await input.press('Enter');
+
     for (const [width, height, fontSize] of [[390, 844, '100%'], [320, 568, '100%'], [1280, 720, '200%'], [390, 844, '200%']]) {
       await page.setViewportSize({ width, height });
       await page.evaluate(size => { document.documentElement.style.fontSize = size; }, fontSize);
@@ -118,6 +255,7 @@ const { chromium } = require('playwright');
         await page.getByRole('tab', { name, exact: true }).click();
         await page.evaluate(() => scrollTo(0, 0));
         await checkLayout(false);
+        if (name === 'Row Monitors') await checkSeating();
         const panel = page.getByRole('tabpanel');
         await panel.scrollIntoViewIfNeeded();
         await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
@@ -133,6 +271,7 @@ const { chromium } = require('playwright');
         await page.getByRole('tab', { name, exact: true }).click();
         await page.evaluate(() => document.fullscreenElement.scrollTo(0, 0));
         await checkLayout(false);
+        if (name === 'Row Monitors') await checkSeating();
         const reachable = await page.evaluate(() => {
           const shell = document.fullscreenElement;
           shell.scrollTop = shell.scrollHeight;
@@ -144,9 +283,28 @@ const { chromium } = require('playwright');
       await page.locator('#fullscreen-toggle').click();
       await page.waitForFunction(() => !document.fullscreenElement);
     }
+
+    const touchContext = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+    try {
+      const touchPage = await touchContext.newPage();
+      await touchPage.goto(page.url());
+      await touchPage.getByRole('tab', { name: 'Row Monitors', exact: true }).tap();
+      await touchPage.getByRole('button', { name: 'Assign or edit Row 1 monitor', exact: true }).tap();
+      await touchPage.getByLabel('Monitor’s name', { exact: true }).fill('Isabella');
+      await touchPage.getByRole('button', { name: 'Save', exact: true }).tap();
+      assert.equal(await touchPage.locator('.monitor-name').first().textContent(), 'Isabella');
+      await touchPage.getByRole('button', { name: 'Assign or edit Row 1 monitor', exact: true }).tap();
+      await touchPage.getByLabel('Monitor’s name', { exact: true }).fill('Cancelled touch edit');
+      await checkEditorLayout(touchPage);
+      await touchPage.screenshot({ path: path.join(screenshots, 'mobile-monitor-editor.png'), fullPage: true });
+      await touchPage.getByRole('button', { name: 'Cancel', exact: true }).tap();
+      assert.equal(await touchPage.locator('.monitor-name').first().textContent(), 'Isabella');
+    } finally {
+      await touchContext.close();
+    }
     assert.equal(await page.locator('img').evaluateAll(images => images.every(img => img.complete && img.naturalWidth > 0)), true);
     assert.deepEqual(errors, []);
-    console.log(`Class tabs passed: all fullscreen sizes/timer states, keyboard, mobile, enlarged text, images and console. Screenshots: ${screenshots}`);
+    console.log(`Class tabs passed: 20 seats/four rear monitors, editing/clearing/cancelling, keyboard/touch, safe names, tab retention/reload reset, no edit requests, all fullscreen sizes/timer states, mobile, enlarged text, images and console. Screenshots: ${screenshots}`);
   } finally {
     await browser.close();
   }

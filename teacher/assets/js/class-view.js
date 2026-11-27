@@ -30,6 +30,7 @@
   const timerError = document.getElementById("timer-error");
   const timerVisual = document.getElementById("timer-visual");
   const timerDuration = document.getElementById("timer-duration");
+  const presentationHours = document.querySelectorAll(".presentation-hour");
   let entries = null;
   let loadedDate = "";
   let timerState = null;
@@ -68,12 +69,14 @@
     });
   }
 
-  function setPresentation(mode, { fit = false, focus = true } = {}) {
+  function setPresentation(mode, { fit = false, focus = true, active = mode !== "page" || fit } = {}) {
     presentation = mode;
     classView.classList.toggle("minimal-mode", mode === "minimal");
     classView.classList.toggle("clock-mode", mode === "clock");
     classView.classList.toggle("window-fit", fit);
-    presentationToolbar.hidden = mode === "page";
+    classView.classList.toggle("presentation-active", active);
+    presentationToolbar.hidden = !active;
+    if (active && timerDialog.open) timerDialog.close();
     [visual, timerVisual].forEach((circle) => {
       if (mode === "minimal") {
         circle.setAttribute("role", "button");
@@ -89,10 +92,7 @@
     });
     updatePresentationControls();
     if (!focus) return;
-    if (mode === "minimal") {
-      const activeCircle = timerState ? timerVisual : visual;
-      pendingFocus = activeCircle.hidden ? presentationExit : activeCircle;
-    } else if (mode === "clock") {
+    if (active) {
       pendingFocus = presentationExit;
     } else {
       pendingFocus = returnControl;
@@ -163,7 +163,7 @@
     });
   });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && !timerDialog.open && (presentation !== "page" || classView.classList.contains("window-fit"))) {
+    if (event.key === "Escape" && !timerDialog.open && classView.classList.contains("presentation-active")) {
       event.preventDefault();
       changePresentation(returnToPage);
     }
@@ -178,7 +178,7 @@
     returnControl = button;
     announce("");
     const keepFit = mode === "page" && presentation === "page" && classView.classList.contains("window-fit");
-    setPresentation(mode, { fit: keepFit });
+    setPresentation(mode, { fit: keepFit, active: true });
     if (!document.fullscreenEnabled || !target.requestFullscreen) {
       announce("Fullscreen is unavailable in this browser. The presentation is ready in this window.");
       return;
@@ -196,7 +196,7 @@
   document.addEventListener("fullscreenchange", () => {
     const current = document.fullscreenElement;
     // Native Escape/browser exit must also restore the toolbar and keyboard focus.
-    if (lastFullscreen === classView && current !== classView && presentation === "clock") {
+    if (lastFullscreen && !current && classView.classList.contains("presentation-active")) {
       setPresentation("page");
     }
     lastFullscreen = current;
@@ -289,7 +289,6 @@
 
   const returnPage = origin === "schedule-teacher" ? "schedule-teacher.html" : "schedule.html";
   returnLink.href = `../${returnPage}`;
-  returnLink.textContent = `\u2190 ${origin === "schedule-teacher" ? "Schedule" : "Schedule"}`;
   sourceFrame.src = `../${returnPage}`;
 
   function closeTimer() {
@@ -418,6 +417,10 @@
   function update() {
     const now = new Date();
     clock.textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    const hour = String(now.getHours() % 12 || 12);
+    presentationHours.forEach((label) => {
+      if (label.textContent !== hour) label.textContent = hour;
+    });
     if (timerState) return;
     const dateKey = localDate(now);
     const info = window.academicCalendar?.getAcademicDateInfo(dateKey);
