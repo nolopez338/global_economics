@@ -3,17 +3,27 @@
   const page = document.getElementById("exam-page");
   const label = document.getElementById("timer-label");
   const value = document.getElementById("timer-value");
+  const digits = value.querySelector(".timer-digits");
   const toggle = document.getElementById("fullscreen-toggle");
   const fullscreenIcon = toggle.querySelector("svg path");
   const message = document.getElementById("fullscreen-message");
 
   function update() {
     const state = window.SchoolDayTimer?.countdownAt(new Date()) || {
-      label: "Calendar unavailable", remaining: ""
+      label: "Calendar unavailable", remaining: "", remainingSeconds: null
     };
     label.textContent = state.label;
-    value.textContent = state.remaining;
+    digits.textContent = state.remaining;
     value.hidden = !state.remaining;
+    // Recompute from raw seconds on every tick, including target/calendar changes.
+    const active = !value.hidden && Number.isFinite(state.remainingSeconds);
+    if (active) {
+      value.dataset.urgency = state.remainingSeconds > 1200 ? "green"
+        : state.remainingSeconds >= 300 ? "yellow" : "red";
+    } else {
+      delete value.dataset.urgency;
+    }
+    value.classList.toggle("is-urgent", active && state.remainingSeconds < 60);
   }
 
   function syncFullscreen() {

@@ -45,6 +45,22 @@
     .timer-label { margin: 0; color: var(--muted); font-size: 1rem; font-weight: 600; }
     .timer-value { margin: .1rem 0 0; font-size: clamp(1.75rem, 3.8vh, 2.75rem);
       line-height: 1.1; font-weight: 700; font-variant-numeric: tabular-nums; }
+    /* Keep the original line box; only the painted digits are enlarged. */
+    .timer-digits { display: inline-block; line-height: .8; vertical-align: top;
+      white-space: nowrap; pointer-events: none; transform: scale(2); transform-origin: right top; }
+    .timer-value[data-urgency="green"] { color: #91df9a; }
+    .timer-value[data-urgency="yellow"] { color: #ffe082; }
+    .timer-value[data-urgency="red"] { color: #ff8a80; }
+    /* Separate transforms keep the shake from replacing the digits' scale. */
+    .timer-value.is-urgent { animation: countdown-shake .4s ease-in-out infinite; }
+    @keyframes countdown-shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-1px); }
+      75% { transform: translateX(1px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .timer-value.is-urgent { animation: none; }
+    }
     .timer-value[hidden], [hidden] { display: none !important; }
     .fullscreen-toggle { display: inline-flex; align-items: center; justify-content: center;
       flex: 0 0 auto; padding: .35rem; border: 1px solid #41566d;
@@ -119,7 +135,7 @@
               </button>
               <p id="timer-label" class="timer-label">Checking school calendar…</p>
             </div>
-            <p id="timer-value" class="timer-value" role="timer" aria-live="off" hidden></p>
+            <p id="timer-value" class="timer-value" role="timer" aria-live="off" hidden><span class="timer-digits"></span></p>
           </div>
           <p id="fullscreen-message" class="fullscreen-message" role="status" hidden></p>
         </div>

@@ -37,7 +37,7 @@
   function countdownAt(now, calendar = window.academicCalendar) {
     const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
     if (now.getDay() === 0 || now.getDay() === 6) {
-      return { label: "Weekend · no school", remaining: "" };
+      return { label: "Weekend · no school", remaining: "", remainingSeconds: null };
     }
     let info;
     try {
@@ -46,22 +46,25 @@
       // Missing or failed calendar lookups must never produce a countdown.
     }
     if (!info || info.isHoliday == null) {
-      return { label: "Calendar unavailable", remaining: "" };
+      return { label: "Calendar unavailable", remaining: "", remainingSeconds: null };
     }
-    if (info.isHoliday) return { label: "School holiday", remaining: "" };
+    if (info.isHoliday) return { label: "School holiday", remaining: "", remainingSeconds: null };
     if (!Number.isInteger(info.cycleDay) || info.cycleDay < 1 || info.cycleDay > 6) {
-      return { label: "Not a school day", remaining: "" };
+      return { label: "Not a school day", remaining: "", remainingSeconds: null };
     }
     const minutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60 + now.getMilliseconds() / 60000;
     const current = periods.find(period => minutes >= period.start && minutes < period.end);
     const upcoming = periods.find(period => minutes < period.start);
+    const seconds = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds() + now.getMilliseconds() / 1000;
     if (current) {
-      return { label: `${current.name} ends in`, remaining: durationText((current.end - minutes) * 60) };
+      const remainingSeconds = current.end * 60 - seconds;
+      return { label: `${current.name} ends in`, remaining: durationText(remainingSeconds), remainingSeconds };
     }
     if (upcoming) {
-      return { label: `${upcoming.name} starts in`, remaining: durationText((upcoming.start - minutes) * 60) };
+      const remainingSeconds = upcoming.start * 60 - seconds;
+      return { label: `${upcoming.name} starts in`, remaining: durationText(remainingSeconds), remainingSeconds };
     }
-    return { label: "School day ended", remaining: "" };
+    return { label: "School day ended", remaining: "", remainingSeconds: null };
   }
 
   window.SchoolDayTimer = { periods, progress, durationText, countdownAt };

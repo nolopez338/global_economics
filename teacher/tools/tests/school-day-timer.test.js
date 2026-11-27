@@ -30,7 +30,9 @@ test('local calendar and countdown across a complete school day', () => {
     ['16:00:00', 'School day ended', ''],
     ['23:59:59', 'School day ended', '']
   ]) {
-    assert.deepEqual({ ...timer.countdownAt(at(time)) }, { label, remaining }, time);
+    const state = timer.countdownAt(at(time));
+    assert.deepEqual({ label: state.label, remaining: state.remaining }, { label, remaining }, time);
+    assert.equal(Number.isFinite(state.remainingSeconds), Boolean(remaining), time);
   }
 });
 
@@ -48,10 +50,28 @@ test('non-school days and failed or absent calendar data have no countdown', () 
     ['2026-12-24', 'Not a school day'],
     ['2028-01-03', 'Calendar unavailable']
   ]) {
-    assert.deepEqual({ ...timer.countdownAt(new Date(`${date}T08:00:00`)) }, { label, remaining: '' });
+    assert.deepEqual({ ...timer.countdownAt(new Date(`${date}T08:00:00`)) }, { label, remaining: '', remainingSeconds: null });
   }
   for (const calendar of [null, {}, { getAcademicDateInfo() { throw Error('offline'); } }]) {
-    assert.deepEqual({ ...timer.countdownAt(at('08:00:00'), calendar) }, { label: 'Calendar unavailable', remaining: '' });
+    assert.deepEqual({ ...timer.countdownAt(at('08:00:00'), calendar) }, { label: 'Calendar unavailable', remaining: '', remainingSeconds: null });
+  }
+});
+
+test('raw remaining seconds retain subsecond precision at urgency boundaries', () => {
+  for (const [time, seconds, remaining] of [
+    ['07:34:59.999', 1200.001, '20:01'],
+    ['07:35:00', 1200, '20:00'],
+    ['07:35:00.001', 1199.999, '20:00'],
+    ['07:49:59.999', 300.001, '5:01'],
+    ['07:50:00', 300, '5:00'],
+    ['07:50:00.001', 299.999, '5:00'],
+    ['07:53:59.999', 60.001, '1:01'],
+    ['07:54:00', 60, '1:00'],
+    ['07:54:00.001', 59.999, '1:00']
+  ]) {
+    const state = timer.countdownAt(at(time));
+    assert.ok(Math.abs(state.remainingSeconds - seconds) < 1e-9, time);
+    assert.equal(state.remaining, remaining, time);
   }
 });
 
