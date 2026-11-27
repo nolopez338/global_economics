@@ -36,3 +36,19 @@ construction-only totals and a separate reference count. Render the downloaded
 PDFs and inspect the pages as well as browser screenshots. Automated assertions
 and visual inspection are separate checks; neither establishes behavior on every
 browser/GPU or confirms a screen reader's spoken delivery.
+
+Verified on 2026-11-27: all 126 model/geometry/regression tests passed. The real
+Chrome Person suite passed, as did the existing catalog/validation, placement
+(including the full interaction runner), and coordinated-resize browser suites.
+Both downloaded PDF samples passed the content/image checks; all six rendered
+pages and desktop/narrow-layout screenshots were visually inspected. Verification
+used Chromium with software WebGL; other browsers, physical GPUs and spoken
+screen-reader delivery were not tested.
+
+Feature files: `general_fundamentals/pvc_design.html`,
+`assets/css/pvc-design.css`, and `assets/js/pvc-{app,model,geometry,placement,pdf}.mjs`,
+plus the new shared `assets/js/pvc-person.mjs`. Documentation is in
+`general_fundamentals/pvc_design.md` and this file. New checks are
+`pvc-person.test.mjs`, `pvc-person.browser.cjs`, and `pvc-person-pdf-check.py`;
+existing model, standard catalog, placement and catalog browser assertions now
+distinguish references from the seven PVC types. Generated QA folders are ignored.

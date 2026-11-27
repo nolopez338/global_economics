@@ -63,6 +63,7 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+deco
     for(const [unit,height,step,min,max] of [['cm','120','1','60','170'],['m','1.2','0.01','0.6','1.7'],['mm','1200','10','600','1700']]){
       before=await read();await page.locator('#person-unit').click();assert.equal(await page.locator('#person-height').inputValue(),height);assert.equal(await slider.inputValue(),height);assert.equal(await slider.getAttribute('step'),step);assert.equal(await slider.getAttribute('min'),min);assert.equal(await slider.getAttribute('max'),max);assert.deepEqual((await read()).data,before.data);
       await slider.focus();await slider.press('ArrowRight');assert.equal((await read()).data.pieces[0].height,1210);await slider.press('ArrowLeft');assert.equal((await read()).data.pieces[0].height,1200);
+      const factor={mm:1,cm:10,m:1000}[unit];await number('#person-height',1255/factor);assert.equal((await read()).data.pieces[0].height,1255);assert.equal(Number(await slider.inputValue()),1255/factor);await number('#person-height',1200/factor);
     }
     // Preserve typed/imported precision even off the slider's base grid.
     await number('#person-height',1234.56);assert.equal(await slider.inputValue(),'1234.56');await slider.press('ArrowRight');assert.equal((await read()).data.pieces[0].height,1244.56);
@@ -101,6 +102,15 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+deco
     // Reference-only documents keep the same materials + eight-view PDF structure.
     const refs=new Design();refs.add('person',[0,0,0]);const woman=refs.add('person',[500,0,0]);refs.setPersonCategory(woman.id,'child');refs.updatePerson(woman.id,{variant:'woman',height:1200});await load(refs.data());await download('#download-pdf','references-only.pdf');
     console.log('PASS real pointer movement, rotations, camera presets/Frame, live selection dimensions, 600/320px layouts and mixed/reference-only PDF downloads');
+    await load(single.data());await page.locator('#select-all').click();
+    for(const width of [600,320]){
+      await page.setViewportSize({width,height:1050});await page.selectOption('#person-category','adult');await number('#person-height',1850);
+      await page.selectOption('#person-category','child');assert.equal(await slider.inputValue(),'1700');await number('#person-height',1200);await page.selectOption('#person-variant','woman');
+      assert.equal((await read()).data.pieces[0].height,1200);assert.equal(await page.locator('#person-min').innerText(),'Min 600 mm');
+      const controls=await page.locator('#person-section input,#person-section select').evaluateAll(nodes=>nodes.map(n=>{const r=n.getBoundingClientRect();return {left:r.left,right:r.right};}));assert(controls.every(r=>r.left>=0&&r.right<=width));
+      await page.locator('#frame').click();await page.evaluate(()=>scrollTo(0,0));await page.waitForTimeout(200);await page.screenshot({path:path.join(out,'person-controls-'+width+'.png'),fullPage:true});
+    }
+    console.log('PASS functional Person inspector at 600/320px: numeric, range, category, silhouette and limits fit');
     assert.deepEqual(errors,[]);console.log('PASS no browser JavaScript errors');
   }finally{await browser.close();}
 })().then(()=>server.close()).catch(error=>{console.error(error);server.close();process.exitCode=1;});

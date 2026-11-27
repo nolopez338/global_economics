@@ -5,7 +5,7 @@ export const PERSON_LIMITS=Object.freeze({
   child:Object.freeze({label:'Child',min:600,max:1700,default:1200})
 });
 export const PERSON_VARIANTS=Object.freeze({man:'Man',woman:'Woman'});
-export const PERSON_DEFAULTS=Object.freeze({category:'adult',variant:'man',height:1800});
+export const PERSON_DEFAULTS=Object.freeze({category:'adult',variant:'man',height:PERSON_LIMITS.adult.default});
 export const PERSON_STEP=10;
 // Only absent properties receive defaults. Invalid supplied values are errors.
 // A missing height uses the chosen category's default (Adult 1800 / Child 1200).
