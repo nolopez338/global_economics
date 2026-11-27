@@ -1,4 +1,4 @@
-import {Design, validate, vec, quat, rectangle} from '../assets/js/pvc-model.mjs';
+import {Design, validate, vec, quat, rectangle, port} from '../assets/js/pvc-model.mjs';
 const iframe=document.querySelector('#app'), results=document.querySelector('#results');
 let w,d,c,api;
 const assert=(ok,message)=>{if(!ok)throw Error(message);};
@@ -174,13 +174,16 @@ await test('Converted length edits preserve connected joints and closed-loop loc
 });
 
 await test('Catalog click and drag placement: every fitting and tube, all cameras, exact preview commit and history',async()=>{
-  for(const [index,type] of ['tube','coupling','elbow90','elbow45','tee','cross','corner','cap'].entries()){
+  for(const [index,type] of ['tube','coupling','elbow90','elbow45','tee','cross','corner','multiway','cap'].entries()){
     const m=new Design(),target=m.add(type==='tube'?'tee':'tube',[0,120,0]);await load(m);
     change('#camera',['perspective','top','front','side'][index%4]);await tick();
     const dragEvent=(name,p)=>d.querySelector('#workspace').dispatchEvent(new w.DragEvent(name,{clientX:p.x,clientY:p.y,bubbles:true,cancelable:true,dataTransfer:new w.DataTransfer()}));
     const button=d.querySelector(`[data-type="${type}"]`);
     if(index%2)button.dispatchEvent(new w.DragEvent('dragstart',{bubbles:true,dataTransfer:new w.DataTransfer()}));else button.click();
-    const at=screen((await import('../assets/js/pvc-model.mjs')).port(target,type==='tube'?2:1).position.toArray());
+    // Rotate before the first pointer update, including catalog drag mode.
+    key('q',button);key('e',button);
+    assert(!same(state().placement.intentQ,[0,0,0,1]),'Initial orientation input ignored '+type);
+    const at=screen(port(target,type==='tube'?2:1).position.toArray());
     if(index%2)dragEvent('dragover',at);else pointer('pointermove',at,{buttons:0});
     const mesh=state().previewMesh,preview=state().placement;assert(preview.connection,'No connection preview: '+type);
     assert(same(state().data,m.data())&&state().undo===0,'Preview mutated model');
@@ -190,8 +193,34 @@ await test('Catalog click and drag placement: every fitting and tube, all camera
     if(index%2){dragEvent('drop',at);button.dispatchEvent(new w.DragEvent('dragend',{bubbles:true}));}else tap(at);
     const after=state(),added=after.data.pieces.at(-1);validate(after.data);
     assert(same(added.p,final.p)&&same(added.q,final.q),'Preview jumped on placement '+type);
+    const joint=after.data.connections.at(-1);
+    assert(joint.a.id===added.id&&joint.a.port===final.connection.source&&same(joint.b,final.connection.target),'Preview port pairing changed '+type);
+    const a=port(added,joint.a.port),b=port(after.data.pieces.find(p=>p.id===joint.b.id),joint.b.port),socket=a.type==='socket'?a:b;
+    assert(a.position.distanceTo(b.position)<1e-8&&a.direction.dot(b.direction)<-.999999,'Committed joint alignment '+type);
+    assert(near(socket.mouth.distanceTo(socket.position),20),'Insertion depth changed '+type);
     assert(after.data.connections.length===1&&after.undo===1&&after.selected[0]===added.id&&!after.placement,'Commit/selection '+type);
     click('#undo');assert(same(state().data,m.data()),'Undo '+type);click('#redo');assert(same(state().data,after.data),'Redo '+type);
+  }
+});
+await test('192 CSS-pixel acquisition and strict release in every camera, zoomed views and free rotation',async()=>{
+  for(const view of ['front','side','top','perspective'])for(const zoomed of [false,true]){
+    const m=new Design(),target=m.add('cap',[0,120,0]);await load(m);
+    change('#camera',view);change('#plane',view==='side'?'side':view==='front'?'front':'ground');await tick();
+    if(zoomed){c.dispatchEvent(new w.WheelEvent('wheel',{deltaY:-240,bubbles:true,cancelable:true}));await tick();}
+    click('[data-type="tube"]');key('q');const initial=state().placement.intentQ;
+    const at=screen(port(target,0).position.toArray()),mesh=state().previewMesh;
+    for(const distance of [128,191.75,192]){
+      pointer('pointermove',{x:at.x,y:at.y+distance},{buttons:0});
+      assert(state().placement.connection?.target.id===target.id,`${view} ${zoomed} did not acquire at ${distance}px`);
+    }
+    pointer('pointermove',{x:at.x,y:at.y+192.25},{buttons:0});
+    assert(!state().placement.connection,'Target retained outside 192px '+view);
+    assert(same(state().placement.q,initial),'Automatic alignment contaminated free orientation '+view);
+    key('e');const free=state().placement;
+    pointer('pointermove',{x:at.x,y:at.y+200},{buttons:0});
+    assert(same(state().placement.q,free.q),'Free pointer movement undid E '+view);
+    assert(state().previewMesh===mesh&&same(state().data,m.data())&&state().undo===0,'Query allocated mesh or changed model/history '+view);
+    key('Escape');assert(!state().placement&&same(state().data,m.data()),'Escape changed design '+view);
   }
 });
 await test('Placement switches by pointer, stays stable near competitors, moves away, disables snap and cancels',async()=>{

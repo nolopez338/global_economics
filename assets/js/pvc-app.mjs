@@ -1,10 +1,11 @@
 import * as THREE from '../vendor/three-0.170.0/three.module.js';
 import {OrbitControls} from '../vendor/three-0.170.0/OrbitControls.js';
 import {TransformControls} from '../vendor/three-0.170.0/TransformControls.js';
-import {Design,CATALOG,RADIUS,localPorts,port,vec,quat,clone,validate,rectangle} from './pvc-model.mjs';
+import {Design,CATALOG,RADIUS,localPorts,port,vec,quat,clone,validate,materialName} from './pvc-model.mjs';
 
+import {TEMPLATES,buildTemplate} from './pvc-templates.mjs';
 import {geometry,dispose} from './pvc-geometry.mjs';
-import {placementTargets,choosePlacement,projectPort} from './pvc-placement.mjs';
+import {placementTargets,choosePlacement,projectPort,SNAP_PIXELS} from './pvc-placement.mjs';
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const STORAGE='pvc-studio-v1', ROTATION_STORAGE='pvc-studio-rotation-increment', MAX_HISTORY=80, DRAG_THRESHOLD=4;
@@ -129,20 +130,27 @@ function inspector(){
 }
 function pickPort(endpoint){if(model.occupied(endpoint.id,endpoint.port)){status('This port is occupied. Select and detach its joint first.',true);return;}selectedJoint=null;const i=pickedPorts.findIndex(e=>e.id===endpoint.id&&e.port===endpoint.port);if(i>=0)pickedPorts.splice(i,1);else{if(pickedPorts.length===2)pickedPorts=[];pickedPorts.push(endpoint);}inspector();showOverlays();status(pickedPorts.length===2?'Connect selected ports to align the assemblies.':'Port selected. Shift-select another piece, or choose a second port in Joints mode.');}
 function round(n){return Math.round(n*1000)/1000;}
-function summary(){const {rows,total}=model.materials();$('#summary').replaceChildren();if(!rows.length)$('#summary').textContent='Your cut list will appear here.';for(const {type,length,count} of rows){const row=document.createElement('div');row.className='summary-row';const label=document.createElement('span'),value=document.createElement('b');label.textContent=type==='tube'?`Tube · ${lengthText(length)}`:CATALOG[type].name;value.textContent=`× ${count}`;row.append(label,value);$('#summary').append(row);}$('#total-length').textContent=lengthText(total);$('#summary-count').textContent=`${model.pieces.length} pieces`;$('#download-pdf').disabled=pdfExporting||!model.pieces.length;}
+function summary(){const {rows,total}=model.materials();$('#summary').replaceChildren();if(!rows.length)$('#summary').textContent='Your cut list will appear here.';for(const rowData of rows){const {type,length,count}=rowData;const row=document.createElement('div');row.className='summary-row';const label=document.createElement('span'),value=document.createElement('b');label.textContent=type==='tube'?`Tube · ${lengthText(length)}`:materialName(rowData);value.textContent=`× ${count}`;row.append(label,value);$('#summary').append(row);}$('#total-length').textContent=lengthText(total);$('#summary-count').textContent=`${model.pieces.length} pieces`;$('#download-pdf').disabled=pdfExporting||!model.pieces.length;}
 function refresh(){if(placement)placementPorts=placementTargets(model);updateInstructions();sync();inspector();summary();attach();showOverlays();$('#undo').disabled=!undo.length;$('#redo').disabled=!redo.length;$('#paste').disabled=!clipboard;$('#copy').disabled=!selected.size;$('#delete').disabled=!selected.size&&!selectedJoint;$('#save-state').textContent=storageOK?'Saved on this device':'Save JSON to keep your work';}
 function updateInstructions(){
   const degrees=`${rotationIncrement}°`;
   $$('[data-turn]').forEach(b=>{const axis=b.dataset.turn;b.textContent=b.dataset.rotationLabel?`${b.dataset.rotationLabel} +${degrees} (${axis==='y'?'Q':'E'})`:`${axis.toUpperCase()} +${degrees}`;b.title=`Rotate around world ${axis.toUpperCase()} by ${degrees}`;b.disabled=!placement&&!selected.size;});
-  $('#placement-bar').textContent=`Aim near a free port to connect · move away to place freely · Q/E: rotate ${degrees} · Esc: cancel`;
+  $('#placement-bar').textContent=`Aim within ${SNAP_PIXELS} screen px of a free port · move away to place freely · Q/E: rotate ${degrees} · Esc: cancel`;
   $('#movement-bar').hidden=tool!=='move-piece'||!!placement;
   workspace.dataset.mode=placement?'placement':tool;
 }
 function setTool(next){cancelInteraction();if(placement)cancelPlacement();tool=next;$$('[data-tool]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tool===tool||(tool==='move-piece'&&b.dataset.tool==='translate')));attach();showOverlays();updateInstructions();canvas.style.cursor=tool==='marquee'?'crosshair':tool==='move-piece'?'grab':'default';status(({select:'Click selects · Shift-click toggles · left drag pans · right drag orbits · double-click a piece to move.',translate:'Drag an axis handle to move. Double-click a piece for plane movement. Q/E rotate.', 'move-piece':'Piece movement mode · drag a highlighted piece on the working plane · Q/E rotate · Esc or Select exits.',rotate:'Drag a rotation ring, or Q/E for horizontal/vertical increments. Connected pieces rotate together.',marquee:'Left drag selects pieces whose centres are inside the rectangle. Shift adds to selection.',joints:'Click cyan joint markers to inspect and detach. Free port markers can be paired.'})[tool]);}
 function rotateDiscrete(axis){
-  if(transaction||pointerGesture||gizmo.dragging)return;
+  if(transaction||pointerGesture&&!placement||gizmo.dragging)return;
   const rotation=new THREE.Quaternion().setFromAxisAngle(vec(axis==='x'?[1,0,0]:axis==='y'?[0,1,0]:[0,0,1]),THREE.MathUtils.degToRad(rotationIncrement));
-  if(placement){placement.intentQ=rotation.multiply(quat(placement.q)).normalize().toArray();placement.q=[...placement.intentQ];if(placement.connection)delete placement.connection.source;if(placementPointer)updatePlacement(placementPointer);else{previewPlacement();showOverlays();}return;}
+  if(placement){
+    // Intent is never fed back from automatic alignment. Reproject the requested
+    // orientation onto the joint constraint independently on every update.
+    placement.intentQ=rotation.multiply(quat(placement.intentQ)).normalize().toArray();
+    placement.q=[...placement.intentQ];
+    if(placementPointer)updatePlacement(placementPointer,false);else{previewPlacement();showOverlays();}
+    return;
+  }
   if(selected.size)action(()=>model.transform(expanded(),rotation,center(selected)),`Rotated the connected selection around world ${axis.toUpperCase()} by ${rotationIncrement}°.`);
 }
 function setRotationIncrement(value){
@@ -167,21 +175,30 @@ function centerFrom(m,ids){const a=new THREE.Vector3();let n=0;for(const p of m.
 function workPlane(through=null){const mode=$('#plane').value,normal=mode==='front'?vec([0,0,1]):mode==='side'?vec([1,0,0]):vec([0,1,0]);const value=planeOffset;return new THREE.Plane(normal,through?-normal.dot(through):-value);}
 function setRay(event){const r=canvas.getBoundingClientRect();pointer.set((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);}
 function planePoint(event,plane=workPlane(),snap=true){setRay(event);const hit=ray.ray.intersectPlane(plane,new THREE.Vector3());if(!hit)return null;if(snap&&$('#grid-snap').checked)hit.toArray().forEach((v,i)=>hit.setComponent(i,Math.round(v/25)*25));return hit;}
-function startPlacement(type){cancelInteraction();cancelPlacement();selectedJoint=null;placement={type,p:[0,60,0],freeP:[0,60,0],q:[0,0,0,1],intentQ:[0,0,0,1],length:400};placementPorts=placementTargets(model);orbit.enabled=false;gizmo.detach();$('#placement-bar').hidden=false;$('#empty').hidden=true;canvas.style.cursor='crosshair';previewPlacement();updateInstructions();status(`Placing ${CATALOG[type].name}. Aim near a free compatible port to connect; move away for free placement. Click or release the catalog drag to commit. Q/E rotate; Escape cancels.`);}
+function startPlacement(type){cancelInteraction();cancelPlacement();selectedJoint=null;placement={type,p:[0,60,0],freeP:[0,60,0],q:[0,0,0,1],intentQ:[0,0,0,1],length:400};placementPorts=placementTargets(model);orbit.enabled=false;gizmo.detach();$('#placement-bar').hidden=false;$('#empty').hidden=true;canvas.style.cursor='crosshair';previewPlacement();updateInstructions();status(`Placing ${CATALOG[type].name}. Aim within ${SNAP_PIXELS} screen px of a free compatible port to connect; move away for free placement. Click or release the catalog drag to commit. Q/E rotate immediately; Escape cancels.`);}
 function previewPlacement(){
   if(!placement)return;
   if(!placementMesh){clearGhost();placementMesh=geometry({...placement,id:'preview'});placementMesh.traverse(o=>{if(o.isMesh){o.material.transparent=true;o.material.opacity=.55;o.material.color.set(0x2aadaf);o.material.depthWrite=false;o.castShadow=false;}});ghost.add(placementMesh);}
   ghost.visible=true;placementMesh.position.copy(vec(placement.p));placementMesh.quaternion.copy(quat(placement.q));
   workspace.dataset.connection=placement.connection?'ready':'free';
+  const guide=$('#placement-guide'),connection=placement.connection;
+  guide.toggleAttribute('hidden',!connection);
+  if(connection&&placementPointer){
+    const rect=canvas.getBoundingClientRect(),x=connection.screen.x-rect.left,y=connection.screen.y-rect.top;
+    const line=guide.querySelector('line'),circle=guide.querySelector('circle');
+    for(const [name,value] of Object.entries({x1:placementPointer.clientX-rect.left,y1:placementPointer.clientY-rect.top,x2:x,y2:y}))line.setAttribute(name,value);
+    circle.setAttribute('cx',x);circle.setAttribute('cy',y);
+  }
 }
-function updatePlacement(event){
+function updatePlacement(event,retainSource=true){
   placementPointer={clientX:event.clientX,clientY:event.clientY};
-  const point=planePoint(event);
-  if(point){if($('#plane').value==='ground')point.y+=placement.type==='tube'?RADIUS:22;placement.freeP=point.toArray();}
+  let point=planePoint(event);
+  if(point){if($('#plane').value==='ground')point.y+=placement.type==='tube'?RADIUS:22;if(point.toArray().every(n=>Number.isFinite(n)&&Math.abs(n)<1e7))placement.freeP=point.toArray();else point=null;}
   const prospective={...placement,id:'preview',p:placement.freeP,q:placement.intentQ};
   camera.updateMatrixWorld(true);
   const rect=canvas.getBoundingClientRect();
-  const connection=$('#port-snap').checked?choosePlacement({piece:prospective,targets:placementPorts,pointer:{x:event.clientX,y:event.clientY},project:p=>projectPort(p,camera,rect),previous:placement.connection,
+  const previous=retainSource?placement.connection:placement.connection&&{target:placement.connection.target};
+  const connection=$('#port-snap').checked?choosePlacement({piece:prospective,targets:placementPorts,pointer:{x:event.clientX,y:event.clientY},project:p=>projectPort(p,camera,rect),previous,
     visible:target=>{
       const s=projectPort(target.mouth,camera,rect);if(!s)return false;
       const visibilityRay=new THREE.Raycaster();visibilityRay.setFromCamera(new THREE.Vector2((s.x-rect.left)/rect.width*2-1,1-(s.y-rect.top)/rect.height*2),camera);
@@ -189,13 +206,13 @@ function updatePlacement(event){
       return !hit||hit.distance>=visibilityRay.ray.origin.distanceTo(target.mouth)-24;
     }}):null;
   placement.connection=connection;
-  if(!connection&&!point){ghost.visible=false;workspace.dataset.connection='free';showOverlays();status('Working plane is edge-on. Aim near a connection or choose a different plane.',true);return false;}
+  if(!connection&&!point){ghost.visible=false;$('#placement-guide').setAttribute('hidden','');workspace.dataset.connection='free';showOverlays();status('Working plane is edge-on or out of range. Aim near a connection or choose a different plane.',true);return false;}
   placement.p=connection?[...connection.p]:[...placement.freeP];placement.q=connection?[...connection.q]:[...placement.intentQ];
   previewPlacement();showOverlays();status(connection?'Connection preview · click or release to connect exactly as shown · Q/E: change orientation.':'Free placement · aim near a compatible connection to snap · click or release to place.');return true;
 }
 function commitPlacement(){const spec=clone(placement);cancelPlacement();action(()=>{const piece=model.add(spec.type,spec.p,spec.length,spec.q);if(spec.connection)model.connect({id:piece.id,port:spec.connection.source},spec.connection.target,false);selected=new Set([piece.id]);selectedJoint=null;},spec.connection?'Placed and connected.':'Piece placed. Double-click it for movement mode; Q/E rotate the selection.');}
 
-function cancelPlacement(){placement=null;placementPointer=null;placementPorts=[];placementMesh=null;ghost.visible=true;delete workspace.dataset.connection;candidate=null;clearGhost();$('#placement-bar').hidden=true;orbit.enabled=true;canvas.style.cursor='default';showOverlays();$('#empty').hidden=!!model.pieces.length;attach();updateInstructions();}
+function cancelPlacement(){placement=null;placementPointer=null;placementPorts=[];placementMesh=null;ghost.visible=true;delete workspace.dataset.connection;candidate=null;clearGhost();$('#placement-bar').hidden=true;$('#placement-guide').setAttribute('hidden','');orbit.enabled=true;canvas.style.cursor='default';showOverlays();$('#empty').hidden=!!model.pieces.length;attach();updateInstructions();}
 function hitPiece(event){setRay(event);const hit=ray.intersectObjects(parts.children,true)[0];if(!hit)return null;let o=hit.object;while(o&&!o.userData.id)o=o.parent;return o?.userData.id||null;}
 function hitOverlay(event){setRay(event);return ray.intersectObjects(overlays.children,false).find(h=>!h.object.userData.candidate)?.object.userData;}
 
@@ -265,7 +282,7 @@ workspace.addEventListener('dragover',e=>{if(placement){e.preventDefault();e.dat
 workspace.addEventListener('drop',e=>{e.preventDefault();if(placement&&updatePlacement(e))commitPlacement();});
 
 // Catalog is generated from the same definitions as geometry and port compatibility.
-function thumbnail(type){const paths={tube:'M14 47 L65 17',coupling:'M20 44 L59 22',elbow90:'M16 45 Q45 47 45 18',elbow45:'M14 45 L35 34 Q40 30 61 30',tee:'M12 47 L65 17 M38 32 L56 53',cross:'M12 47 L65 17 M20 12 L57 53',corner:'M12 47 L38 32 L65 47 M38 32 L38 9',cap:'M27 39 L53 24'};return `<svg viewBox="0 0 78 64" aria-hidden="true"><defs><filter id="shadow-${type}"><feDropShadow dx="1" dy="3" stdDeviation="2" flood-color="#69888f" flood-opacity=".25"/></filter></defs><path d="${paths[type]}" stroke="#aec3c6" stroke-width="${type==='tube'?12:17}" fill="none" stroke-linecap="${type==='cap'?'round':'butt'}" filter="url(#shadow-${type})"/><path d="${paths[type]}" stroke="#f3f8f7" stroke-width="${type==='tube'?9:13}" fill="none"/><path d="${paths[type]}" stroke="#ffffff" stroke-width="3" opacity=".9" fill="none"/>${type==='tube'?'<ellipse cx="65" cy="17" rx="5" ry="6" fill="#6f9298" transform="rotate(48 65 17)"/><ellipse cx="65" cy="17" rx="3" ry="4" fill="#35575f" transform="rotate(48 65 17)"/>':''}</svg>`;}
+function thumbnail(type){const paths={tube:'M14 47 L65 17',coupling:'M20 44 L59 22',elbow90:'M16 45 Q45 47 45 18',elbow45:'M14 45 L35 34 Q40 30 61 30',tee:'M12 47 L65 17 M38 32 L56 53',cross:'M12 47 L65 17 M20 12 L57 53',multiway:'M12 47 L38 32 L65 47 M38 32 L38 9 M38 32 L61 14',corner:'M12 47 L38 32 L65 47 M38 32 L38 9',cap:'M27 39 L53 24'};return `<svg viewBox="0 0 78 64" aria-hidden="true"><defs><filter id="shadow-${type}"><feDropShadow dx="1" dy="3" stdDeviation="2" flood-color="#69888f" flood-opacity=".25"/></filter></defs><path d="${paths[type]}" stroke="#aec3c6" stroke-width="${type==='tube'?12:17}" fill="none" stroke-linecap="${type==='cap'?'round':'butt'}" filter="url(#shadow-${type})"/><path d="${paths[type]}" stroke="#f3f8f7" stroke-width="${type==='tube'?9:13}" fill="none"/><path d="${paths[type]}" stroke="#ffffff" stroke-width="3" opacity=".9" fill="none"/>${type==='tube'?'<ellipse cx="65" cy="17" rx="5" ry="6" fill="#6f9298" transform="rotate(48 65 17)"/><ellipse cx="65" cy="17" rx="3" ry="4" fill="#35575f" transform="rotate(48 65 17)"/>':''}</svg>`;}
 for(const [type,def] of Object.entries(CATALOG)){const b=document.createElement('button');b.className='material';b.draggable=true;b.dataset.type=type;b.innerHTML=thumbnail(type);const name=document.createElement('strong'),note=document.createElement('small');name.textContent=def.name;note.textContent=def.note;b.append(name,note);b.onclick=()=>startPlacement(type);b.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',type);e.dataTransfer.effectAllowed='copy';startPlacement(type);});b.addEventListener('dragend',()=>{if(placement)cancelPlacement();});$('#catalog').append(b);}
 
 function editLength(value){const p=model.pieces.find(p=>selected.has(p.id));if(!p)return;if(!sliderBase){begin();sliderBase=clone(transaction.data);}try{model=new Design(sliderBase);model.resize(p.id,Number(value)*scale());sync();summary();showOverlays();showLengthInput($('#length'),Number(value)*scale());$('#length-slider').value=value;}catch(e){status(e.message,true);}}
@@ -294,7 +311,17 @@ $('#help-toggle').onclick=()=>{$('#help').showModal();$('#help-toggle').setAttri
 // Persistence is versioned and strictly validated before replacement.
 function mayReplace(){return JSON.stringify(model.data())===exported||!model.pieces.length||confirm('Replace this design? Changes are saved on this browser, but will be overwritten. Save JSON first if you need a separate copy.');}
 $('#new').onclick=()=>{if(mayReplace()){cancelPlacement();action(()=>{model=new Design();selected.clear();selectedJoint=null;},'Started a new design. Undo can restore the previous design.');exported=JSON.stringify(model.data());}};
-$('#sample').onclick=()=>{if(mayReplace()){cancelPlacement();action(()=>{model=rectangle();selected=new Set();selectedJoint=null;},'Rectangular frame: 4 elbows, 4 cut tubes, 8 joints. Select a tube to inspect the closed-loop length lock.');frame();}};
+for(const t of TEMPLATES){const option=document.createElement('option');option.value=t.id;option.textContent=t.name;$('#template').append(option);}
+function previewTemplate(){const t=TEMPLATES.find(t=>t.id===$('#template').value);$('#template-description').textContent=t.description;$('#template-dimensions').textContent=t.dimensions;}
+$('#template').onchange=previewTemplate;previewTemplate();
+$('#load-template').onclick=()=>{
+  if(!mayReplace())return;
+  // Roll back pending gestures before taking the single replacement snapshot.
+  cancelInteraction();cancelPlacement();setTool('select');
+  const t=TEMPLATES.find(t=>t.id===$('#template').value);
+  action(()=>{model=buildTemplate(t.id);selected.clear();selectedJoint=null;pickedPorts=[];hovered=null;placementPointer=null;pointerGesture=null;doubleClickEligible=false;},`Loaded ${t.name}. ${t.dimensions} Undo restores the previous design.`);
+  frame();
+};
 $('#export').onclick=()=>{const data=JSON.stringify(model.data(),null,2),blob=new Blob([data],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='pvc-design.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);exported=JSON.stringify(model.data());status('Design exported as pvc-design.json.');};
 // Read only the committed snapshot during an in-progress transform. Placement lives outside it.
 $('#download-pdf').onclick=async()=>{
@@ -306,7 +333,7 @@ $('#download-pdf').onclick=async()=>{
   try{
     const {createDesignPDF,downloadPDF}=await import('./pvc-pdf.mjs');
     const blob=await createDesignPDF(data,{unit,title:$('.document-title').firstChild.textContent.trim(),onProgress:message=>status(message)});
-    downloadPDF(blob);status('Downloaded pvc-design.pdf · 3 pages, materials and 8 views.');
+    downloadPDF(blob);status(`Downloaded pvc-design.pdf · ${blob.pageCount} pages, materials and 8 views.`);
   }catch(error){status('Could not export PDF: '+error.message,true);}
   finally{pdfExporting=false;button.removeAttribute('aria-busy');button.disabled=!model.pieces.length;}
 };
@@ -329,8 +356,8 @@ while(walker.nextNode()){const node=walker.currentNode;if(!node.parentElement.cl
 updateLengthUnits();
 let animation;function render(){animation=requestAnimationFrame(render);if(orbit.enabled)orbit.update();orientation();renderer.render(scene,camera);}resize();refresh();render();
 window.addEventListener('keydown',e=>{
-  if((e.target.closest('input,textarea,select')||e.target.isContentEditable)||$('#help').open)return;const key=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
-  if((pointerGesture||gizmo.dragging)&&key!=='escape'){e.preventDefault();return;}
+  if((e.target.closest?.('input,textarea,select')||e.target.isContentEditable)||$('#help').open)return;const key=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
+  if((pointerGesture||gizmo.dragging)&&key!=='escape'&&!(placement&&!mod&&['q','e'].includes(key))){e.preventDefault();return;}
   if(mod&&['c','v','z','y','a'].includes(key)){e.preventDefault();if(key==='c')$('#copy').click();if(key==='v')$('#paste').click();if(key==='z')history(e.shiftKey?'redo':'undo');if(key==='y')history('redo');if(key==='a')$('#select-all').click();return;}
   if(key==='escape'){e.preventDefault();const moving=tool==='move-piece';if(placement){cancelInteraction();cancelPlacement();status('Placement cancelled.');}else if(transaction||pointerGesture||moving){cancelInteraction();if(moving)setTool('select');status('Transform cancelled; piece movement mode exited.');}else{setSelection([]);pickedPorts=[];showOverlays();}return;}
   if(!mod&&(key==='q'||key==='e')){e.preventDefault();if(!e.repeat)rotateDiscrete(key==='q'?'y':'x');return;}

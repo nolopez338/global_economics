@@ -10,6 +10,7 @@ export const CATALOG = Object.freeze({
   tee: {name: 'Three-port tee', note: '3 sockets · branch', ports: [socket([-1,0,0]),socket([1,0,0]),socket([0,0,1])]},
   cross: {name: 'Four-port cross', note: '4 sockets · flat junction', ports: [socket([-1,0,0]),socket([1,0,0]),socket([0,0,-1]),socket([0,0,1])]},
   corner: {name: 'Three-way corner', note: '3 sockets · furniture corner', ports: [socket([1,0,0]),socket([0,1,0]),socket([0,0,1])]},
+  multiway: {name: 'Custom multiway junction', note: 'Configurable sockets · source / fabricate', ports: [socket([-1,0,0]),socket([1,0,0]),socket([0,1,0])]},
   cap: {name: 'End cap', note: '1 socket · closed end', ports: [socket([1,0,0])]}
 });
 export const uid = () => crypto.randomUUID();
@@ -17,7 +18,7 @@ export const vec = a => new Vector3(...a);
 export const quat = a => new Quaternion(...a);
 export const clone = a => JSON.parse(JSON.stringify(a));
 export function localPorts(piece) {
-  return piece.type === 'tube' ? [-1,1].map(s => ({position:[s*piece.length/2,0,0],direction:[s,0,0],type:'tube',insertion:0})) : CATALOG[piece.type].ports;
+  return piece.type === 'tube' ? [-1,1].map(s => ({position:[s*piece.length/2,0,0],direction:[s,0,0],type:'tube',insertion:0})) : piece.type==='multiway' ? (piece.sockets || CATALOG.multiway.ports) : CATALOG[piece.type].ports;
 }
 export function port(piece, index) {
   const p = localPorts(piece)[index];
@@ -35,9 +36,9 @@ export class Design {
   constructor(data = {pieces:[],connections:[]}) { this.pieces=clone(data.pieces); this.connections=clone(data.connections); }
   data() {return {format:'pvc-studio',version:1,catalog:'pvc-32-v1',units:'mm',radius:RADIUS,pieces:clone(this.pieces),connections:clone(this.connections)};}
   get(id) {const p=this.pieces.find(p=>p.id===id); if(!p) throw Error('Piece no longer exists.'); return p;}
-  add(type,p=[0,60,0],length=400,q=[0,0,0,1]) {
+  add(type,p=[0,60,0],length=400,q=[0,0,0,1],sockets=null) {
     if(!Object.hasOwn(CATALOG,type)) throw Error('Unknown component type.');
-    const piece={id:uid(),type,p:[...p],q:[...q],...(type==='tube'?{length}: {})}; this.pieces.push(piece); return piece;
+    const piece={id:uid(),type,p:[...p],q:[...q],...(type==='tube'?{length}: {}),...(type==='multiway'?{sockets:clone(sockets || CATALOG.multiway.ports)}:{})}; this.pieces.push(piece); return piece;
   }
   occupied(id,index) {return this.connections.some(c=>[c.a,c.b].some(e=>e.id===id&&e.port===index));}
   connected(ids,excluded=new Set()) {
@@ -90,14 +91,16 @@ export class Design {
     return new Set(map.values());
   }
   materials() {return materialsSummary(this.pieces);}
-  summary() {const {rows,total}=this.materials();return {rows:rows.map(p=>[p.type==='tube'?`Tube · ${p.length} mm`:CATALOG[p.type].name,p.count]),total};}
+  summary() {const {rows,total}=this.materials();return {rows:rows.map(p=>[p.type==='tube'?`Tube · ${p.length} mm`:materialName(p),p.count]),total};}
 }
 // Exact numeric cut lengths are the grouping key; presentation never changes identity.
+export function configuration(sockets) {let hash=2166136261;for(const c of JSON.stringify(sockets))hash=Math.imul(hash^c.charCodeAt(0),16777619);return (hash>>>0).toString(16).padStart(8,'0');}
+export function materialName(row) {return CATALOG[row.type].name+(row.type==='multiway'?` · ${row.sockets.length} sockets · ${row.configuration || configuration(row.sockets)}`:'');}
 export function materialsSummary(pieces) {
   const rows=new Map(),cuts=[];
   for(const p of pieces){
-    const key=p.type==='tube'?`tube:${p.length}`:p.type;
-    if(!rows.has(key))rows.set(key,{type:p.type,...(p.type==='tube'?{length:p.length}:{}),count:0});
+    const key=p.type==='tube'?`tube:${p.length}`:p.type==='multiway'?`multiway:${JSON.stringify(p.sockets)}`:p.type;
+    if(!rows.has(key))rows.set(key,{type:p.type,...(p.type==='tube'?{length:p.length}:{}),...(p.type==='multiway'?{sockets:clone(p.sockets),configuration:configuration(p.sockets)}:{}),count:0});
     rows.get(key).count++;if(p.type==='tube')cuts.push(String(p.length));
   }
   // Valid physical cuts (80-3000 mm) have decimal, non-exponential strings.
@@ -113,13 +116,22 @@ export function validate(data) {
   const ids=new Set(), array=(a,n)=>Array.isArray(a)&&a.length===n&&a.every(x=>Number.isFinite(x)&&Math.abs(x)<1e7);
   for(const p of data.pieces){if(typeof p.id!=='string'||!p.id||p.id.length>100||ids.has(p.id))throw Error('Missing or duplicate piece ID.');ids.add(p.id);
     if(!Object.hasOwn(CATALOG,p.type)||!array(p.p,3)||!array(p.q,4)||Math.abs(quat(p.q).length()-1)>.00001)throw Error('Invalid component or transform.');
+    if(p.type==='multiway'){
+      if(!Array.isArray(p.sockets)||p.sockets.length<2||p.sockets.length>8)throw Error('Invalid multiway sockets.');
+      for(const [i,s] of p.sockets.entries()){
+        if(!s||s.type!=='socket'||s.insertion!==INSERTION||!array(s.direction,3)||!array(s.position,3)||Math.abs(vec(s.direction).length()-1)>1e-8)throw Error('Invalid multiway socket.');
+        const reach=vec(s.position).dot(vec(s.direction));
+        if(reach<44||reach>106||vec(s.position).distanceTo(vec(s.direction).multiplyScalar(reach))>1e-8)throw Error('Invalid multiway socket reach.');
+        for(const t of p.sockets.slice(0,i))if(vec(t.direction).dot(vec(s.direction))>Math.cos(Math.PI/6)+1e-8)throw Error('Multiway sockets must be at least 30 degrees apart.');
+      }
+    }
     if(p.type==='tube'&&(!Number.isFinite(p.length)||p.length<MIN_LENGTH||p.length>MAX_LENGTH))throw Error('Invalid tube cut length.');}
   const model=new Design({pieces:data.pieces,connections:[]}), jointIds=new Set();
   for(const c of data.connections){if(typeof c.id!=='string'||!c.id||c.id.length>100||jointIds.has(c.id)||ids.has(c.id))throw Error('Missing or duplicate joint ID.');jointIds.add(c.id);
     for(const e of [c.a,c.b])if(!e||!ids.has(e.id)||!Number.isInteger(e.port)||e.port<0||e.port>=localPorts(model.get(e.id)).length)throw Error('Joint refers to an invalid piece or port.');
     model.check(c.a,c.b);model.connections.push(clone(c));}
   // Normalize to supported fields only; arbitrary imported properties never reach the UI.
-  model.pieces=model.pieces.map(p=>({id:p.id,type:p.type,p:[...p.p],q:[...p.q],...(p.type==='tube'?{length:p.length}:{})}));return model;
+  model.pieces=model.pieces.map(p=>({id:p.id,type:p.type,p:[...p.p],q:[...p.q],...(p.type==='tube'?{length:p.length}:{}),...(p.type==='multiway'?{sockets:p.sockets.map(s=>({position:[...s.position],direction:[...s.direction],type:'socket',insertion:INSERTION}))}:{})}));return model;
 }
 export function rectangle() {
   const m=new Design(), elbows=[];
