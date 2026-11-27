@@ -12,14 +12,14 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+deco
  const url=`http://127.0.0.1:${server.address().port}/tests/.pvc-browser/pvc_design.html`;
  const read=()=>page.evaluate(()=>pvcTest.read());
  await page.goto(`http://127.0.0.1:${server.address().port}/general_fundamentals/pvc_design.html`);
- await page.waitForSelector('#catalog button');assert.equal(await page.locator('#catalog button').count(),7);
+ await page.waitForSelector('#catalog button');assert.equal(await page.locator('#catalog button').count(),8);
  assert.equal(await page.locator('#template option').count(),10);
  await page.selectOption('#template','ground');await page.locator('#load-template').click();
  await page.locator('.materials').evaluate(e=>e.scrollTop=0);await page.screenshot({path:path.join(out,'production.png')});
  console.log('PASS production page catalog and standard-only template');
  await page.goto(url);await page.waitForFunction(()=>globalThis.pvcTest);
- assert.deepEqual(await page.locator('#catalog button').evaluateAll(a=>a.map(b=>b.dataset.type)),['tube','coupling','elbow90','elbow45','tee','cross','corner']);
- assert.equal(await page.locator('.materials .count').innerText(),'7');
+ assert.deepEqual(await page.locator('#catalog button').evaluateAll(a=>a.map(b=>b.dataset.type)),['tube','coupling','elbow90','elbow45','tee','cross','corner','person']);
+ assert.equal(await page.locator('.materials .count').innerText(),'8');
  await page.selectOption('#template','ground');await page.locator('#load-template').click();
  await page.locator('[data-type="corner"]').click();
  const base=await read(),invalid=[];
@@ -32,12 +32,12 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+deco
    await page.evaluate(data=>pvcTest.setClipboard(data),data);const pasteBefore=await read();await page.locator('#paste').click();assert.deepEqual(await read(),pasteBefore,'Rejected paste changed design');assert.equal(await page.locator('#status').getAttribute('data-error'),'true');
    for(const direction of ['undo','redo']){await page.evaluate(({direction,data})=>pvcTest.setHistory(direction,data),{direction,data});const historyBefore=await read();await page.locator('#'+direction).click();assert.deepEqual(await read(),historyBefore,'Rejected history changed state');assert.match(await page.locator('#status').innerText(),/Could not restore history/);}
  }
- console.log('PASS seven-item catalog and atomic rejection of custom types/socket overrides in file imports, paste, undo and redo');
+ console.log('PASS eight-item catalog (seven PVC components and Person) and atomic rejection of custom types/socket overrides in file imports, paste, undo and redo');
  await page.keyboard.press('Escape');
  let event=page.waitForEvent('download');await page.locator('#export').click();let download=await event;const file=path.join(out,'standard.json');await download.saveAs(file);assert.deepEqual(JSON.parse(fs.readFileSync(file,'utf8')),base.data);
  const pdf=await page.evaluate(async()=>{const {createDesignPDF}=await import('/assets/js/pvc-pdf.mjs');const {Design,CATALOG}=await import('/assets/js/pvc-model.mjs');const m=new Design();for(const [i,type] of Object.keys(CATALOG).entries())m.add(type,[i*160,100,0]);const blob=await createDesignPDF(m.data());return {pages:blob.pageCount,size:blob.size};});assert.equal(pdf.pages,3);assert(pdf.size>50000);
  await page.screenshot({path:path.join(out,'catalog-ground.png')});
- console.log('PASS real JSON download and PDF creation with all seven allowed components');
+ console.log('PASS real JSON download and PDF creation with all seven PVC components and Person');
  for(const data of invalid){await page.evaluate(data=>localStorage.setItem('pvc-studio-browser-test',JSON.stringify(data)),data);await page.reload();await page.waitForFunction(()=>globalThis.pvcTest);const state=await read();assert.equal(state.data.pieces.length,0);assert.equal(state.undo,0);assert.deepEqual(JSON.parse(state.autosave),data);assert.match(await page.locator('#status').innerText(),/Saved work could not be restored/);}
  console.log('PASS invalid autosave rejected without partial restoration or overwriting stored data');assert.deepEqual(errors,[]);
  }finally{await browser.close();}

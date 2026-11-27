@@ -1,5 +1,6 @@
 // PVC Studio's independent, millimetre-based construction model.
 import {Vector3, Quaternion} from '../vendor/three-0.170.0/three.module.js';
+import {personProperties,personCategoryChange} from './pvc-person.mjs';
 export const RADIUS = 16, INNER_RADIUS = 13, INSERTION = 20, MIN_LENGTH = 80, MAX_LENGTH = 3000;
 export const PARALLEL_TOLERANCE = 1e-7;
 const socket = (direction) => ({position: direction.map(x => x * 45), direction, type: 'socket', insertion: INSERTION});
@@ -11,7 +12,8 @@ export const CATALOG = deepFreeze({
   elbow45: {name: '45° elbow', note: '2 sockets · gentle turn', ports: [socket([-1,0,0]),socket([Math.SQRT1_2,0,Math.SQRT1_2])]},
   tee: {name: 'Three-port tee', note: '3 sockets · branch', ports: [socket([-1,0,0]),socket([1,0,0]),socket([0,0,1])]},
   cross: {name: 'Four-port cross', note: '4 sockets · flat junction', ports: [socket([-1,0,0]),socket([1,0,0]),socket([0,0,-1]),socket([0,0,1])]},
-  corner: {name: 'Three-way corner', note: '3 sockets · furniture corner', ports: [socket([1,0,0]),socket([0,1,0]),socket([0,0,1])]}
+  corner: {name: 'Three-way corner', note: '3 sockets · furniture corner', ports: [socket([1,0,0]),socket([0,1,0]),socket([0,0,1])]},
+  person: {name: 'Person', note: 'Scale reference · no connections', reference:true, ports:[]}
 });
 export const uid = () => crypto.randomUUID();
 export const vec = a => new Vector3(...a);
@@ -20,16 +22,17 @@ export const clone = a => JSON.parse(JSON.stringify(a));
 const header = {format:'pvc-studio',version:1,catalog:'pvc-32-v1',units:'mm',radius:RADIUS};
 const array = (a,n) => Array.isArray(a)&&a.length===n&&a.every(x=>Number.isFinite(x)&&Math.abs(x)<1e7);
 function standardType(piece) {
-  if(!piece || !Object.hasOwn(CATALOG,piece.type))throw Error('Unsupported component type. Only the seven standard PVC components are allowed.');
+  if(!piece || !Object.hasOwn(CATALOG,piece.type))throw Error('Unsupported component type. Use a standard PVC component or Person scale reference.');
   const overrides=['sockets','ports','socketCount','directions','positions','direction','position','insertion','compatibility'];
   if(overrides.some(key=>Object.hasOwn(piece,key)))throw Error('Socket overrides and arbitrary ports are not allowed. Standard fitting sockets are fixed.');
 }
 function validatePiece(p) {
   standardType(p);
-  const fields=['id','type','p','q',...(p.type==='tube'?['length']:[])];
-  if(Object.keys(p).some(key=>!fields.includes(key)))throw Error('Unsupported per-piece override. Only identity, position, rotation and tube cut length are allowed.');
+  const fields=['id','type','p','q',...(p.type==='tube'?['length']:p.type==='person'?['height','category','variant']:[])];
+  if(Object.keys(p).some(key=>!fields.includes(key)))throw Error('Unsupported per-piece override. Use identity, transforms and the size properties defined for this type.');
   if(!array(p.p,3)||!array(p.q,4)||Math.abs(quat(p.q).length()-1)>.00001)throw Error('Invalid component transform.');
   if(p.type==='tube'&&(!Number.isFinite(p.length)||p.length<MIN_LENGTH||p.length>MAX_LENGTH))throw Error('Invalid tube cut length.');
+  if(p.type==='person')personProperties(p);
 }
 export function localPorts(piece) {
   standardType(piece);
@@ -53,7 +56,7 @@ export class Design {
   get(id) {const p=this.pieces.find(p=>p.id===id); if(!p) throw Error('Piece no longer exists.'); return p;}
   add(type,p=[0,60,0],length=400,q=[0,0,0,1],...overrides) {
     if(overrides.length)throw Error('Socket overrides and arbitrary ports are not allowed.');
-    const piece={id:uid(),type,p:[...p],q:[...q],...(type==='tube'?{length}:{})};
+    const piece={id:uid(),type,p:[...p],q:[...q],...(type==='tube'?{length}:type==='person'?personProperties({}):{})};
     validatePiece(piece);this.pieces.push(piece);return piece;
   }
   occupied(id,index) {return this.connections.some(c=>[c.a,c.b].some(e=>e.id===id&&e.port===index));}
@@ -100,6 +103,16 @@ export class Design {
     if(plan.fixed!==null)p.p=vec(p.p).addScaledVector(axis,(plan.fixed===0?1:-1)*delta/2).toArray();
     this.transform(plan.side,new Quaternion(),new Vector3(),axis.multiplyScalar(delta));p.length=length;
   }
+  // Height changes only the reference's uniformly scaled local geometry.
+  updatePerson(id,changes) {
+    const p=this.get(id);if(p.type!=='person')throw Error('Select one Person to edit height or silhouette.');
+    if(Object.keys(changes).some(k=>!['height','category','variant'].includes(k)))throw Error('Unsupported Person override.');
+    const next={...p,...changes};validatePiece(next);Object.assign(p,personProperties(next));
+  }
+  setPersonCategory(id,category) {
+    const p=this.get(id);if(p.type!=='person')throw Error('Select one Person to change category.');
+    this.updatePerson(id,personCategoryChange(p,category));return p.height;
+  }
   // Remove every selected tube at once. Each remaining connected component is
   // rigid and may only translate. For a unit cut adjustment, its end velocities
   // must satisfy v(end 2) - v(end 1) = the tube's actual world-space axis.
@@ -108,7 +121,7 @@ export class Design {
     const selected=new Set(ids), blocked=reason=>({locked:true,reason});
     if(selected.size<2)return blocked('Select at least two tubes to change their lengths together.');
     const tubes=[...selected].map(id=>this.get(id)).sort((a,b)=>a.id.localeCompare(b.id));
-    if(tubes.some(p=>p.type!=='tube'))return blocked('The selection includes fittings. Select only tubes; every selected piece must participate.');
+    if(tubes.some(p=>p.type!=='tube'))return blocked('The selection includes fittings or scale references. Select only tubes; every selected piece must participate.');
     const axes=new Map(tubes.map(p=>[p.id,vec([1,0,0]).applyQuaternion(quat(p.q))]));
     const axis=axes.get(tubes[0].id).clone().normalize();
     if(tubes.some(p=>axes.get(p.id).clone().normalize().cross(axis).length()>PARALLEL_TOLERANCE))return blocked('Selected tubes are not parallel in world space (including reversed directions).');
@@ -181,9 +194,10 @@ export class Design {
 // Exact numeric cut lengths are the grouping key; presentation never changes identity.
 export function materialName(row) {standardType(row);return CATALOG[row.type].name;}
 export function materialsSummary(pieces) {
-  const rows=new Map(),cuts=[];
+  const rows=new Map(),cuts=[];let references=0;
   for(const p of pieces){
     validatePiece(p);
+    if(p.type==='person'){references++;continue;}
     const key=p.type==='tube'?`tube:${p.length}`:p.type;
     if(!rows.has(key))rows.set(key,{type:p.type,...(p.type==='tube'?{length:p.length}:{}),count:0});
     rows.get(key).count++;if(p.type==='tube')cuts.push(String(p.length));
@@ -193,14 +207,14 @@ export function materialsSummary(pieces) {
   const places=Math.max(0,...cuts.map(n=>(n.split('.')[1]||'').length));
   const digits=cuts.reduce((sum,n)=>{const [whole,fraction='']=n.split('.');return sum+BigInt(whole+fraction.padEnd(places,'0'));},0n).toString().padStart(places+1,'0');
   const total=Number(places?digits.slice(0,-places)+'.'+digits.slice(-places):digits);
-  return {rows:[...rows.values()],total,count:pieces.length};
+  return {rows:[...rows.values()],total,count:pieces.length-references,references};
 }
 export function validate(data) {
   if(!data||data.format!=='pvc-studio'||data.version!==1||data.catalog!=='pvc-32-v1'||data.units!=='mm'||data.radius!==RADIUS)throw Error('Unsupported design. Expected PVC Studio v1, pvc-32-v1 catalog, millimetres and 32 mm tubes.');
   if(!Array.isArray(data.pieces)||!Array.isArray(data.connections)||data.pieces.length>2000||data.connections.length>6000)throw Error('Invalid design arrays or design exceeds 2,000 pieces / 6,000 joints.');
   const ids=new Set();
   for(const p of data.pieces){validatePiece(p);if(typeof p.id!=='string'||!p.id||p.id.length>100||ids.has(p.id))throw Error('Missing or duplicate piece ID.');ids.add(p.id);}
-  const model=Object.create(Design.prototype),jointIds=new Set();model.pieces=clone(data.pieces);model.connections=[];
+  const model=Object.create(Design.prototype),jointIds=new Set();model.pieces=clone(data.pieces).map(p=>p.type==='person'?{...p,...personProperties(p)}:p);model.connections=[];
   for(const c of data.connections){if(!c||typeof c.id!=='string'||!c.id||c.id.length>100||jointIds.has(c.id)||ids.has(c.id))throw Error('Missing or duplicate joint ID.');jointIds.add(c.id);
     if(Object.keys(c).some(k=>!['id','a','b'].includes(k)))throw Error('Unsupported joint override.');
     for(const e of [c.a,c.b])if(!e||!ids.has(e.id)||!Number.isInteger(e.port)||e.port<0||e.port>=localPorts(model.get(e.id)).length)throw Error('Joint refers to an invalid piece or port.');

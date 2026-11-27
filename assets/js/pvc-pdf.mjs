@@ -91,7 +91,7 @@ function drawMaterials(doc,layout,thumbnails,summary,unit){
       y+=row.height;doc.setDrawColor(221,230,232);doc.line(x,y,x+layout.width,y);
     }
   }
-  text(doc,`Total pieces: ${summary.count}`,12,267,11,true);text(doc,`Total tube cut length: ${pdfLength(summary.total,unit)}`,12,274,11,true);
+  text(doc,`Total pieces: ${summary.count}${summary.references?`   |   Scale references: ${summary.references}`:''}`,12,267,11,true);text(doc,`Total tube cut length: ${pdfLength(summary.total,unit)}`,12,274,11,true);
   text(doc,'Cut lengths include the tube inserted into fitting sockets. Fittings are counted separately.',12,281,9);
 }
 export async function createDesignPDF(data,{unit='mm',title='Untitled design',onProgress=()=>{}}={}){

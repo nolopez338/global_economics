@@ -4,9 +4,11 @@ import {TransformControls} from '../vendor/three-0.170.0/TransformControls.js';
 import {Design,CATALOG,RADIUS,localPorts,port,vec,quat,clone,validate,materialName} from './pvc-model.mjs';
 
 import {TEMPLATES,buildTemplate} from './pvc-templates.mjs';
-import {geometry,dispose} from './pvc-geometry.mjs';
+import {geometry,dispose,PERSON_COLOR} from './pvc-geometry.mjs';
+import {PERSON_LIMITS,PERSON_VARIANTS,PERSON_DEFAULTS,PERSON_STEP} from './pvc-person.mjs';
 import {placementTargets,choosePlacement,projectPort,SNAP_PIXELS} from './pvc-placement.mjs';
 import {MagneticRotation} from './pvc-rotation.mjs';
+import {BoundsOverlay} from './pvc-bounds-overlay.mjs';
 
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const STORAGE='pvc-studio-v1', ROTATION_STORAGE='pvc-studio-rotation-increment', MAX_HISTORY=80, DRAG_THRESHOLD=4;
@@ -23,7 +25,7 @@ function showLengthInput(input,value){input.value=displayLength(value);input.dat
 function updateLengthUnits(){
   for(const [node,text] of lengthTemplates)node.textContent=unitText(text);
   const next=LENGTH_UNITS[(LENGTH_UNITS.indexOf(lengthUnit)+1)%3];
-  for(const button of [$('#length-unit'),$('#group-length-unit')]){button.textContent=lengthUnit;button.setAttribute('aria-label',`Length unit: ${lengthUnit}. Switch to ${next}`);}
+  for(const button of [$('#length-unit'),$('#group-length-unit'),$('#person-unit')]){button.textContent=lengthUnit;button.setAttribute('aria-label',`Length unit: ${lengthUnit}. Switch to ${next}`);}
   for(const id of ['length','length-slider']){const input=$('#'+id);input.min=80/scale();input.max=3000/scale();input.step=1/scale();input.setAttribute('aria-label',`Tube cut length${id==='length-slider'?' slider':''} in ${lengthUnit}`);}
   for(const axis of ['x','y','z']){const input=$('#position-'+axis);input.step=1/scale();input.setAttribute('aria-label',`position ${axis.toUpperCase()} in ${lengthUnit}`);}
   $('#plane-offset').setAttribute('aria-label',`Plane offset in ${lengthUnit}`);$('#plane-offset').step=25/scale();showLengthInput($('#plane-offset'),planeOffset);
@@ -55,7 +57,9 @@ orbit.mouseButtons={LEFT:THREE.MOUSE.PAN,MIDDLE:THREE.MOUSE.PAN,RIGHT:THREE.MOUS
 const pivot=new THREE.Object3D();scene.add(pivot);
 const gizmo=new TransformControls(camera,canvas);gizmo.setSize(.8);gizmo.setSpace('world');scene.add(gizmo.getHelper());
 const ray=new THREE.Raycaster(), pointer=new THREE.Vector2();
+const boundsOverlay=new BoundsOverlay({scene,workspace,button:$('#selection-bounds'),announcement:$('#bounds-announcement'),format:lengthText});
 let baseTransform=null, activeIds=new Set(), rotationDrag=null, sliderBase=null, groupEdit=null, groupCancelled=false, groupRangeKey=null, groupRangePointer=null;
+let personEdit=null,personCancelled=false,personRangeKey=null,personRangePointer=null,personAnnouncement;
 
 function status(text,error=false){statusSource=text;$('#status').textContent=unitText(text);$('#status').dataset.error=error;}
 function snapshot(){return {data:model.data(),selected:[...selected],joint:selectedJoint};}
@@ -70,14 +74,15 @@ function history(direction){const from=direction==='undo'?undo:redo,to=direction
 function clearGroup(group){dispose(group);}
 function expanded(){return model.connected(selected);}
 function center(ids){const result=new THREE.Vector3();let n=0;for(const p of model.pieces)if(ids.has(p.id)){result.add(vec(p.p));n++;}return n?result.divideScalar(n):result;}
-function paint(){const companions=expanded();for(const [id,g] of meshes){const color=selected.has(id)?0x219da5:companions.has(id)?0xd29c36:id===hovered?0x8abcc4:g.userData.type==='tube'?0xeaf3f1:0xffffff;g.traverse(o=>{if(o.isMesh){o.material.color.setHex(color);if(o.material.side===THREE.BackSide)o.material.color.multiplyScalar(.65);o.material.emissive.setHex(0);o.material.emissiveIntensity=0;}});}}
+function paint(){const companions=expanded();for(const [id,g] of meshes){const color=selected.has(id)?0x219da5:companions.has(id)?0xd29c36:id===hovered?0x8abcc4:g.userData.type==='person'?PERSON_COLOR:g.userData.type==='tube'?0xeaf3f1:0xffffff;g.traverse(o=>{if(o.isMesh){o.material.color.setHex(color);if(o.material.side===THREE.BackSide)o.material.color.multiplyScalar(.65);o.material.emissive.setHex(0);o.material.emissiveIntensity=0;}});}}
 function sync(){
   const existing=new Set(model.pieces.map(p=>p.id));
   for(const [id,g] of meshes)if(!existing.has(id)){parts.remove(g);dispose(g);meshes.delete(id);}
-  for(const p of model.pieces){let g=meshes.get(p.id);if(g&&(g.userData.length!==p.length||g.userData.type!==p.type)){parts.remove(g);dispose(g);meshes.delete(p.id);g=null;}
+  for(const p of model.pieces){let g=meshes.get(p.id);if(g&&(g.userData.length!==p.length||g.userData.type!==p.type||g.userData.height!==p.height||g.userData.variant!==p.variant||g.userData.category!==p.category)){parts.remove(g);dispose(g);meshes.delete(p.id);g=null;}
     if(!g){g=geometry(p);parts.add(g);meshes.set(p.id,g);}g.position.copy(vec(p.p));g.quaternion.copy(quat(p.q));}
   paint();scene.updateMatrixWorld(true);$('#empty').hidden=!!model.pieces.length||!!placement;
-  $('#scene-count').textContent=`${model.pieces.length} pieces · ${model.connections.length} joints`;
+  boundsOverlay.sync(selected,meshes);
+  const references=model.pieces.filter(p=>p.type==='person').length;$('#scene-count').textContent=`${model.pieces.length-references} pieces · ${model.connections.length} joints${references?` · ${references} scale references`:''}`;
 }
 function marker(position,color,radius,data){const mat=new THREE.MeshBasicMaterial({color,depthTest:false,transparent:true,opacity:.9});const m=new THREE.Mesh(new THREE.SphereGeometry(radius,12,8),mat);m.position.copy(position);m.renderOrder=5;m.userData=data;overlays.add(m);return m;}
 function showOverlays(){
@@ -108,7 +113,7 @@ function findCandidate(ids){
 function finishSnap(){if(candidate){const c=candidate;if(!c.internal){const t=model.alignment(c.a,c.b);model.transform(new Set(c.moving),t.rotation,t.pivot,t.translation);}model.connect(c.a,c.b,false);status('Joint connected. Transforming either piece moves its connected assembly.');}candidate=null;clearGhost();}
 
 // Inspector and selection state are independent of rendered geometry.
-function setSelection(ids,joint=null){finishLengthEdits();selected=new Set(ids);selectedJoint=joint;pickedPorts=[];refresh();}
+function setSelection(ids,joint=null){finishLengthEdits();personFeedback();selected=new Set(ids);selectedJoint=joint;pickedPorts=[];refresh();}
 function attach(){gizmo.detach();if(selected.size&&(tool==='translate'||tool==='move-piece'||tool==='rotate')){pivot.position.copy(center(selected));pivot.quaternion.identity();pivot.updateMatrixWorld(true);gizmo.setMode(tool==='move-piece'?'translate':tool);gizmo.setTranslationSnap($('#grid-snap').checked?25:null);gizmo.setRotationSnap(null);gizmo.attach(pivot);}}
 function fields(container,prefix){for(const axis of ['x','y','z']){const label=document.createElement('label');label.textContent=axis.toUpperCase();const input=document.createElement('input');input.type='number';input.step=prefix==='position'?'1':'5';input.id=`${prefix}-${axis}`;input.setAttribute('aria-label',`${prefix} ${axis.toUpperCase()}`);label.append(input);$(container).append(label);input.addEventListener('change',()=>numericTransform(prefix,axis,input));}}
 fields('#position-fields','position');fields('#rotation-fields','rotation');
@@ -119,21 +124,23 @@ function showSelectedPieces(list,joint){
 function inspector(){
   const list=model.pieces.filter(p=>selected.has(p.id)),single=list.length===1?list[0]:null,joint=model.connections.find(c=>c.id===selectedJoint),moves=expanded();
   $('#selection-title').textContent=joint?'Selected joint':single?CATALOG[single.type].name:list.length?`${list.length} selected`:'Your design';
-  $('#selection-note').textContent=joint?`Joint ${joint.id.slice(0,8)} · tube to socket`:single?`Piece ${single.id.slice(0,8)} · Ø ${lengthText(32)}`:list.length?'Edit a selection or its connected assemblies.':'Select a piece to refine it.';
+  $('#selection-note').textContent=joint?`Joint ${joint.id.slice(0,8)} · tube to socket`:single?.type==='person'?`Scale reference · ${lengthText(single.height)} · no connections`:single?`Piece ${single.id.slice(0,8)} · Ø ${lengthText(32)}`:list.length?'Edit a selection or its connected assemblies.':'Select a piece to refine it.';
   showSelectedPieces(list,joint);
-  $('#select-assembly').hidden=!list.length;$('#transform-section').hidden=!list.length;
+  $('#select-assembly').hidden=!list.some(p=>p.type!=='person');$('#transform-section').hidden=!list.length;
   if(list.length){const p=list[0],e=new THREE.Euler().setFromQuaternion(quat(p.q),'XYZ');['x','y','z'].forEach((a,i)=>{showLengthInput($(`#position-${a}`),p.p[i]);$(`#rotation-${a}`).value=round(THREE.MathUtils.radToDeg(e[a]));});$('#assembly-note').textContent=`${moves.size} pieces will move${moves.size>list.length?` · ${moves.size-list.length} connected companions highlighted in amber`:''}. Fields refer to the first selected piece.`;}
   $('#length-section').hidden=single?.type!=='tube';
   if(single?.type==='tube'){const plan=model.lengthPlan(single.id);showLengthInput($('#length'),single.length);$('#length-slider').value=single.length/scale();$('#length').disabled=$('#length-slider').disabled=!!plan.locked;$('#length-note').textContent=plan.locked?plan.reason:plan.fixed===null?'Physical cut length. Free tube resizes about its centre.':plan.side.size?'End 1 stays fixed. The assembly on end 2 translates with the new length.':`Connected end ${plan.fixed+1} stays fixed. The free end moves.`;$('#detach-blocking').hidden=!plan.locked;$('#detach-blocking').onclick=()=>{selectedJoint=plan.joint;setTool('joints');inspector();$('#detach').scrollIntoView({block:'nearest'});};}
-  $('#group-length-section').hidden=list.length<2;
-  if(list.length>1){
+  $('#person-section').hidden=single?.type!=='person';
+  if(single?.type==='person')showPersonControls(single);
+  $('#group-length-section').hidden=list.length<2||list.some(p=>p.type==='person');
+  if(list.length>1&&!list.some(p=>p.type==='person')){
     const plan=groupEdit?.plan??model.coordinatedLengthPlan(selected),min=plan.locked?0:Math.ceil(plan.minDelta*1000)/1000,max=plan.locked?0:Math.floor(plan.maxDelta*1000)/1000;
     for(const id of ['group-length','group-length-slider']){const input=$('#'+id);input.disabled=plan.locked;input.min=min/scale();input.max=max/scale();input.step=.001/scale();input.setAttribute('aria-label',`Change selected tube lengths${id.endsWith('slider')?' slider':''} in ${lengthUnit}`);input.removeAttribute('aria-invalid');showLengthInput(input,groupEdit?.delta??0);}
     $('#group-length-unit-label').textContent=lengthUnit;$('#group-length-min').textContent=lengthText(min);$('#group-length-max').textContent=lengthText(max);
     $('#group-length-slider').setAttribute('aria-valuetext',`${lengthText(groupEdit?.delta??0)} adjustment`);
     $('#group-length-note').textContent=plan.locked?unitText(plan.reason):`Same signed adjustment to each starting cut; unequal lengths stay unequal. ${plan.anchors.length?`In each connected group, the attached section with the lowest endpoint along the tube axis toward positive ${plan.axisLabel} stays fixed (ties: stable piece ID). Anchor section${plan.anchors.length>1?'s':''}: ${plan.anchors.map(id=>id.slice(0,8)).join(', ')}. Other sections translate rigidly.`:''} Free tubes keep their centres. Escape cancels; release, Enter or blur completes one undoable edit.`;
   }
-  $('#ports-section').hidden=!list.length&&!joint;$('#ports').replaceChildren();
+  $('#ports-section').hidden=!list.some(p=>p.type!=='person')&&!joint;$('#ports').replaceChildren();
   for(const p of list) localPorts(p).forEach((def,i)=>{
     const connection=model.connections.find(c=>[c.a,c.b].some(e=>e.id===p.id&&e.port===i));const row=document.createElement('div');row.className='port-row';const button=document.createElement('button');button.textContent=`${list.length>1?CATALOG[p.type].name+' · ':''}End ${i+1} · ${def.type}${connection?' · joined':''}`;button.setAttribute('aria-pressed',pickedPorts.some(e=>e.id===p.id&&e.port===i));button.onclick=()=>{if(connection){selectedJoint=connection.id;inspector();showOverlays();}else pickPort({id:p.id,port:i});};row.append(button);$('#ports').append(row);
   });
@@ -142,12 +149,12 @@ function inspector(){
 }
 function pickPort(endpoint){if(model.occupied(endpoint.id,endpoint.port)){status('This port is occupied. Select and detach its joint first.',true);return;}selectedJoint=null;const i=pickedPorts.findIndex(e=>e.id===endpoint.id&&e.port===endpoint.port);if(i>=0)pickedPorts.splice(i,1);else{if(pickedPorts.length===2)pickedPorts=[];pickedPorts.push(endpoint);}inspector();showOverlays();status(pickedPorts.length===2?'Connect selected ports to align the assemblies.':'Port selected. Shift-select another piece, or choose a second port in Joints mode.');}
 function round(n){return Math.round(n*1000)/1000;}
-function summary(){const {rows,total}=model.materials();$('#summary').replaceChildren();if(!rows.length)$('#summary').textContent='Your cut list will appear here.';for(const rowData of rows){const {type,length,count}=rowData;const row=document.createElement('div');row.className='summary-row';const label=document.createElement('span'),value=document.createElement('b');label.textContent=type==='tube'?`Tube · ${lengthText(length)}`:materialName(rowData);value.textContent=`× ${count}`;row.append(label,value);$('#summary').append(row);}$('#total-length').textContent=lengthText(total);$('#summary-count').textContent=`${model.pieces.length} pieces`;$('#download-pdf').disabled=pdfExporting||!model.pieces.length;}
-function refresh(){if(placement)placementPorts=placementTargets(model);updateInstructions();sync();inspector();summary();attach();showOverlays();$('#undo').disabled=!undo.length;$('#redo').disabled=!redo.length;$('#paste').disabled=!clipboard;$('#copy').disabled=!selected.size;$('#delete').disabled=!selected.size&&!selectedJoint;$('#save-state').textContent=storageOK?'Saved on this device':'Save JSON to keep your work';}
+function summary(){const {rows,total,count:pieces,references}=model.materials();$('#summary').replaceChildren();if(!rows.length)$('#summary').textContent='Your cut list will appear here.';for(const rowData of rows){const {type,length,count}=rowData;const row=document.createElement('div');row.className='summary-row';const label=document.createElement('span'),value=document.createElement('b');label.textContent=type==='tube'?`Tube · ${lengthText(length)}`:materialName(rowData);value.textContent=`× ${count}`;row.append(label,value);$('#summary').append(row);}$('#total-length').textContent=lengthText(total);$('#summary-count').textContent=`${pieces} pieces`;$('#reference-count').hidden=!references;$('#reference-count').textContent=`Scale references: ${references} · excluded from construction materials and template dimensions.`;$('#download-pdf').disabled=pdfExporting||!model.pieces.length;}
+function refresh(){if(placement)placementPorts=placement.type==='person'?[]:placementTargets(model);updateInstructions();sync();inspector();summary();attach();showOverlays();$('#undo').disabled=!undo.length;$('#redo').disabled=!redo.length;$('#paste').disabled=!clipboard;$('#copy').disabled=!selected.size;$('#delete').disabled=!selected.size&&!selectedJoint;$('#save-state').textContent=storageOK?'Saved on this device':'Save JSON to keep your work';}
 function updateInstructions(){
   const degrees=`${rotationIncrement}°`;
   $$('[data-turn]').forEach(b=>{const axis=b.dataset.turn;b.textContent=b.dataset.rotationLabel?`${b.dataset.rotationLabel} +${degrees} (${axis==='y'?'Q':'E'})`:`${axis.toUpperCase()} +${degrees}`;b.title=`Rotate around world ${axis.toUpperCase()} by ${degrees}`;b.disabled=!placement&&!selected.size;});
-  $('#placement-bar').textContent=`Aim within ${SNAP_PIXELS} screen px of a free port · move away to place freely · Q/E: rotate ${degrees} · Esc: cancel`;
+  $('#placement-bar').textContent=placement?.type==='person'?`Person · scale reference · working-plane placement · Q/E: rotate ${degrees} · Esc: cancel`:`Aim within ${SNAP_PIXELS} screen px of a free port · move away to place freely · Q/E: rotate ${degrees} · Esc: cancel`;
   $('#movement-bar').hidden=tool!=='move-piece'||!!placement;
   workspace.dataset.mode=placement?'placement':tool;
 }
@@ -204,7 +211,7 @@ function centerFrom(m,ids){const a=new THREE.Vector3();let n=0;for(const p of m.
 function workPlane(through=null){const mode=$('#plane').value,normal=mode==='front'?vec([0,0,1]):mode==='side'?vec([1,0,0]):vec([0,1,0]);const value=planeOffset;return new THREE.Plane(normal,through?-normal.dot(through):-value);}
 function setRay(event){const r=canvas.getBoundingClientRect();pointer.set((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);}
 function planePoint(event,plane=workPlane(),snap=true){setRay(event);const hit=ray.ray.intersectPlane(plane,new THREE.Vector3());if(!hit)return null;if(snap&&$('#grid-snap').checked)hit.toArray().forEach((v,i)=>hit.setComponent(i,Math.round(v/25)*25));return hit;}
-function startPlacement(type){if(!Object.hasOwn(CATALOG,type)){status('Unsupported component type. Only standard PVC components are allowed.',true);return;}cancelInteraction();cancelPlacement();selectedJoint=null;placement={type,p:[0,60,0],freeP:[0,60,0],q:[0,0,0,1],intentQ:[0,0,0,1],length:400};placementPorts=placementTargets(model);orbit.enabled=false;gizmo.detach();$('#placement-bar').hidden=false;$('#empty').hidden=true;canvas.style.cursor='crosshair';previewPlacement();updateInstructions();status(`Placing ${CATALOG[type].name}. Aim within ${SNAP_PIXELS} screen px of a free compatible port to connect; move away for free placement. Click or release the catalog drag to commit. Q/E rotate immediately; Escape cancels.`);}
+function startPlacement(type){if(!Object.hasOwn(CATALOG,type)){status('Unsupported catalog item.',true);return;}finishLengthEdits();cancelInteraction();cancelPlacement();selectedJoint=null;const p=type==='person'?[0,0,0]:[0,60,0];placement={type,p:[...p],freeP:[...p],q:[0,0,0,1],intentQ:[0,0,0,1],...(type==='person'?PERSON_DEFAULTS:{length:400})};placementPorts=type==='person'?[]:placementTargets(model);orbit.enabled=false;gizmo.detach();$('#placement-bar').hidden=false;$('#empty').hidden=true;canvas.style.cursor='crosshair';previewPlacement();updateInstructions();status(type==='person'?'Placing Person · scale reference, no connections. Click or release the catalog drag on the working plane. Q/E rotate; Escape cancels.':`Placing ${CATALOG[type].name}. Aim within ${SNAP_PIXELS} screen px of a free compatible port to connect; move away for free placement. Click or release the catalog drag to commit. Q/E rotate immediately; Escape cancels.`);}
 function previewPlacement(){
   if(!placement)return;
   if(!placementMesh){clearGhost();placementMesh=geometry({...placement,id:'preview'});placementMesh.traverse(o=>{if(o.isMesh){o.material.transparent=true;o.material.opacity=.55;o.material.color.set(0x2aadaf);o.material.depthWrite=false;o.castShadow=false;}});ghost.add(placementMesh);}
@@ -223,21 +230,21 @@ function updatePlacement(event,retainSource=true){
   placementPointer={clientX:event.clientX,clientY:event.clientY};
   camera.updateMatrixWorld(true);
   let point=planePoint(event);
-  if(point){if($('#plane').value==='ground')point.y+=placement.type==='tube'?RADIUS:22;if(point.toArray().every(n=>Number.isFinite(n)&&Math.abs(n)<1e7))placement.freeP=point.toArray();else point=null;}
+  if(point){if($('#plane').value==='ground')point.y+=placement.type==='person'?0:placement.type==='tube'?RADIUS:22;if(point.toArray().every(n=>Number.isFinite(n)&&Math.abs(n)<1e7))placement.freeP=point.toArray();else point=null;}
   const prospective={...placement,id:'preview',p:placement.freeP,q:placement.intentQ};
   const rect=canvas.getBoundingClientRect();
   const previous=retainSource?placement.connection:placement.connection&&{target:placement.connection.target};
-  const connection=$('#port-snap').checked?choosePlacement({piece:prospective,targets:placementPorts,pointer:{x:event.clientX,y:event.clientY},project:p=>projectPort(p,camera,rect),previous,
+  const connection=placement.type!=='person'&&$('#port-snap').checked?choosePlacement({piece:prospective,targets:placementPorts,pointer:{x:event.clientX,y:event.clientY},project:p=>projectPort(p,camera,rect),previous,
     visible:target=>{
       const s=projectPort(target.mouth,camera,rect);if(!s)return false;
       const visibilityRay=new THREE.Raycaster();visibilityRay.setFromCamera(new THREE.Vector2((s.x-rect.left)/rect.width*2-1,1-(s.y-rect.top)/rect.height*2),camera);
-      const hit=visibilityRay.intersectObjects(parts.children,true)[0];
+      const hit=visibilityRay.intersectObjects(parts.children.filter(g=>g.userData.type!=='person'),true)[0];
       return !hit||hit.distance>=visibilityRay.ray.origin.distanceTo(target.mouth)-24;
     }}):null;
   placement.connection=connection;
   if(!connection&&!point){ghost.visible=false;$('#placement-guide').setAttribute('hidden','');workspace.dataset.connection='free';showOverlays();status('Working plane is edge-on or out of range. Aim near a connection or choose a different plane.',true);return false;}
   placement.p=connection?[...connection.p]:[...placement.freeP];placement.q=connection?[...connection.q]:[...placement.intentQ];
-  previewPlacement();showOverlays();status(connection?'Connection preview · click or release to connect exactly as shown · Q/E: change orientation.':'Free placement · aim near a compatible connection to snap · click or release to place.');return true;
+  previewPlacement();showOverlays();status(placement.type==='person'?'Person · free scale reference · click or release to place; overlaps allowed.':connection?'Connection preview · click or release to connect exactly as shown · Q/E: change orientation.':'Free placement · aim near a compatible connection to snap · click or release to place.');return true;
 }
 function commitPlacement(){const spec=clone(placement);cancelPlacement();action(()=>{const piece=model.add(spec.type,spec.p,spec.length,spec.q);if(spec.connection)model.connect({id:piece.id,port:spec.connection.source},spec.connection.target,false);selected=new Set([piece.id]);selectedJoint=null;},spec.connection?'Placed and connected.':'Piece placed. Double-click it for movement mode; Q/E rotate the selection.');}
 
@@ -249,7 +256,7 @@ function hitOverlay(event){setRay(event);return ray.intersectObjects(overlays.ch
 // Camera input stays with OrbitControls, but sub-threshold motion never reaches it.
 function cancelInteraction(){
   if(pointerGesture)pointerGesture.cancelled=true;
-  cancelledGesture=true;baseTransform=null;rotationDrag=null;sliderBase=null;groupEdit=null;groupCancelled=true;groupRangeKey=null;groupRangePointer=null;
+  cancelledGesture=true;baseTransform=null;rotationDrag=null;sliderBase=null;groupEdit=null;groupCancelled=true;groupRangeKey=null;groupRangePointer=null;personEdit=null;personCancelled=true;personRangeKey=null;personRangePointer=null;
   if(transaction){restore(transaction);transaction=null;}
   if(gizmo.dragging)gizmo.pointerUp({button:0});
   directDrag=null;marquee=null;$('#marquee-box').hidden=true;candidate=null;clearGhost();orbit.enabled=!placement;refresh();
@@ -311,12 +318,88 @@ workspace.addEventListener('dragover',e=>{if(placement){e.preventDefault();e.dat
 workspace.addEventListener('drop',e=>{e.preventDefault();if(placement&&updatePlacement(e))commitPlacement();});
 
 // Catalog is generated from the same definitions as geometry and port compatibility.
-function thumbnail(type){const paths={tube:'M14 47 L65 17',coupling:'M20 44 L59 22',elbow90:'M16 45 Q45 47 45 18',elbow45:'M14 45 L35 34 Q40 30 61 30',tee:'M12 47 L65 17 M38 32 L56 53',cross:'M12 47 L65 17 M20 12 L57 53',corner:'M12 47 L38 32 L65 47 M38 32 L38 9'};return `<svg viewBox="0 0 78 64" aria-hidden="true"><defs><filter id="shadow-${type}"><feDropShadow dx="1" dy="3" stdDeviation="2" flood-color="#69888f" flood-opacity=".25"/></filter></defs><path d="${paths[type]}" stroke="#aec3c6" stroke-width="${type==='tube'?12:17}" fill="none" stroke-linecap="butt" filter="url(#shadow-${type})"/><path d="${paths[type]}" stroke="#f3f8f7" stroke-width="${type==='tube'?9:13}" fill="none"/><path d="${paths[type]}" stroke="#ffffff" stroke-width="3" opacity=".9" fill="none"/>${type==='tube'?'<ellipse cx="65" cy="17" rx="5" ry="6" fill="#6f9298" transform="rotate(48 65 17)"/><ellipse cx="65" cy="17" rx="3" ry="4" fill="#35575f" transform="rotate(48 65 17)"/>':''}</svg>`;}
+function thumbnail(type){if(type==='person')return '<svg viewBox="0 0 78 64" aria-hidden="true"><g fill="#71818b" stroke="#71818b" stroke-linecap="round" stroke-linejoin="round"><circle cx="39" cy="9" r="6" stroke="none"/><path d="M32 20h14l-2 18H34Z"/><path d="m32 22-6 17m20-17 6 17M35 38l-2 20m10-20 2 20" fill="none" stroke-width="6"/></g></svg>';const paths={tube:'M14 47 L65 17',coupling:'M20 44 L59 22',elbow90:'M16 45 Q45 47 45 18',elbow45:'M14 45 L35 34 Q40 30 61 30',tee:'M12 47 L65 17 M38 32 L56 53',cross:'M12 47 L65 17 M20 12 L57 53',corner:'M12 47 L38 32 L65 47 M38 32 L38 9'};return `<svg viewBox="0 0 78 64" aria-hidden="true"><defs><filter id="shadow-${type}"><feDropShadow dx="1" dy="3" stdDeviation="2" flood-color="#69888f" flood-opacity=".25"/></filter></defs><path d="${paths[type]}" stroke="#aec3c6" stroke-width="${type==='tube'?12:17}" fill="none" stroke-linecap="butt" filter="url(#shadow-${type})"/><path d="${paths[type]}" stroke="#f3f8f7" stroke-width="${type==='tube'?9:13}" fill="none"/><path d="${paths[type]}" stroke="#ffffff" stroke-width="3" opacity=".9" fill="none"/>${type==='tube'?'<ellipse cx="65" cy="17" rx="5" ry="6" fill="#6f9298" transform="rotate(48 65 17)"/><ellipse cx="65" cy="17" rx="3" ry="4" fill="#35575f" transform="rotate(48 65 17)"/>':''}</svg>`;}
 for(const [type,def] of Object.entries(CATALOG)){const b=document.createElement('button');b.className='material';b.draggable=true;b.dataset.type=type;b.innerHTML=thumbnail(type);const name=document.createElement('strong'),note=document.createElement('small');name.textContent=def.name;note.textContent=def.note;b.append(name,note);b.onclick=()=>startPlacement(type);b.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',type);e.dataTransfer.effectAllowed='copy';startPlacement(type);});b.addEventListener('dragend',()=>{if(placement)cancelPlacement();});$('#catalog').append(b);}
 $('.materials .count').textContent=Object.keys(CATALOG).length;
 
+// Single-reference editing follows the coordinated length editor's transaction
+// conventions. Invalid drafts never enter the model or autosave.
+for(const [id,values] of [['person-category',PERSON_LIMITS],['person-variant',PERSON_VARIANTS]]){
+  for(const [value,definition] of Object.entries(values)){const option=document.createElement('option');option.value=value;option.textContent=definition.label??definition;$('#'+id).append(option);}
+}
+function personFeedback(message='',error=false){clearTimeout(personAnnouncement);$('#person-feedback').textContent=message;$('#person-feedback').dataset.error=error;}
+function showPersonControls(p){
+  const limits=PERSON_LIMITS[p.category];$('#person-category').value=p.category;$('#person-variant').value=p.variant;
+  $('#person-unit-label').textContent=lengthUnit;
+  for(const id of ['person-height','person-height-slider']){
+    const input=$('#'+id);input.min=limits.min/scale();input.max=limits.max/scale();input.step=PERSON_STEP/scale();
+    input.setAttribute('aria-label',`Person height${id.endsWith('slider')?' slider':''} in ${lengthUnit}`);showLengthInput(input,p.height);input.removeAttribute('aria-invalid');
+  }
+  showPersonSlider(p.height);
+  $('#person-height-slider').setAttribute('aria-valuetext',lengthText(p.height));
+  $('#person-min').textContent=`Min ${lengthText(limits.min)}`;$('#person-max').textContent=`Max ${lengthText(limits.max)}`;
+}
+function showPersonSlider(height){
+  const input=$('#person-height-slider'),min=PERSON_LIMITS[selectedPerson().category].min;
+  // Imported or typed heights can have finer precision than the base increment.
+  // Keep the slider's actual value exact; keyboard steps still use 10 mm.
+  input.step=Math.abs((height-min)/PERSON_STEP-Math.round((height-min)/PERSON_STEP))<1e-8?PERSON_STEP/scale():'any';
+  showLengthInput(input,height);
+}
+function selectedPerson(){if(selected.size!==1)return null;const p=model.get([...selected][0]);return p.type==='person'?p:null;}
+function editPersonHeight(input){
+  const p=selectedPerson();if(!p||personCancelled)return;
+  if(!personEdit){begin();personEdit={base:clone(transaction.data),id:p.id,error:null};}
+  try{
+    const height=input.valueAsNumber*scale();
+    if(!input.value.trim()||!Number.isFinite(height))throw Error('Enter a finite Person height.');
+    const next=new Design(personEdit.base);next.updatePerson(personEdit.id,{height});model=next;personEdit.error=null;
+    const other=$('#'+(input.id==='person-height'?'person-height-slider':'person-height'));showLengthInput(other,height);showPersonSlider(height);
+    input.removeAttribute('aria-invalid');other.removeAttribute('aria-invalid');$('#person-height-slider').setAttribute('aria-valuetext',lengthText(height));
+    sync();summary();showOverlays();attach();$('#selection-note').textContent=`Scale reference · ${lengthText(height)} · no connections`;
+    personFeedback();status(`Person height: ${lengthText(height)}. Escape restores the starting height.`);
+  }catch(error){personEdit.error=unitText(error.message);input.setAttribute('aria-invalid','true');personFeedback(personEdit.error,true);status(error.message,true);}
+}
+function finishPersonEdit(){
+  if(!personEdit)return;const error=personEdit.error;personEdit=null;personRangeKey=null;
+  commit(error?undefined:'Person height updated.');
+  if(error){personFeedback(error+' Last valid height retained.',true);status(error,true);}
+}
+for(const id of ['person-height','person-height-slider']){
+  const input=$('#'+id),range=input.type==='range';
+  input.addEventListener('focus',()=>{personCancelled=false;});
+  input.addEventListener('pointerdown',e=>{if(document.activeElement!==input)finishLengthEdits();personCancelled=false;if(range)personRangePointer=e.pointerId;});
+  input.addEventListener('input',()=>{if(!range)personCancelled=false;editPersonHeight(input);});
+  input.addEventListener('change',()=>{if(personRangePointer===null&&(!range||!personRangeKey))finishPersonEdit();});
+  // A native range can emit input before the previous numeric field's change /
+  // blur. Its edit was finished at pointerdown; those events must not commit
+  // the new range gesture (relatedTarget may be null in Chromium).
+  input.addEventListener('blur',()=>{if(personRangePointer===null)finishPersonEdit();});
+  input.addEventListener('pointercancel',()=>{cancelInteraction();personFeedback();status('Person height edit cancelled.');});
+  input.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();cancelInteraction();personFeedback();status('Person height edit cancelled; starting height restored.');}
+    else if(e.key==='Enter'){e.preventDefault();finishPersonEdit();}
+    else if(range&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End','PageUp','PageDown'].includes(e.key)){
+      e.preventDefault();personCancelled=false;personRangeKey=e.key;const p=selectedPerson();if(!p)return;const limits=PERSON_LIMITS[p.category];
+      const direction=['ArrowLeft','ArrowDown','PageDown'].includes(e.key)?-1:1;
+      const height=e.key==='Home'?limits.min:e.key==='End'?limits.max:Math.max(limits.min,Math.min(limits.max,p.height+direction*PERSON_STEP*(e.key.startsWith('Page')?10:1)));
+      showPersonSlider(height);editPersonHeight(input);
+    }
+  });
+  input.addEventListener('keyup',e=>{if(e.key===personRangeKey){personRangeKey=null;finishPersonEdit();}});
+}
+window.addEventListener('pointerup',e=>{if(e.pointerId===personRangePointer){personRangePointer=null;finishPersonEdit();}});
+$('#person-category').onchange=e=>{
+  const category=e.target.value;finishLengthEdits();const p=selectedPerson();if(!p)return;const before=p.height;
+  action(()=>model.setPersonCategory(p.id,category),'Person size category updated.');
+  const after=model.get(p.id).height;personFeedback();
+  if(before!==after){const message=`Height adjusted from ${lengthText(before)} to ${lengthText(after)} for ${PERSON_LIMITS[category].label}.`;personFeedback(message);status(message);personAnnouncement=setTimeout(()=>personFeedback(),6000);}
+};
+$('#person-variant').onchange=e=>{const variant=e.target.value;finishLengthEdits();const p=selectedPerson();if(p)action(()=>model.updatePerson(p.id,{variant}),'Person silhouette updated.');personFeedback();};
+
 function editLength(value){const p=model.pieces.find(p=>selected.has(p.id));if(!p)return;if(!sliderBase){begin();sliderBase=clone(transaction.data);}try{const next=new Design(sliderBase);next.resize(p.id,Number(value)*scale());model=next;sync();summary();showOverlays();showLengthInput($('#length'),Number(value)*scale());$('#length-slider').value=value;}catch(e){status(e.message,true);}}
 function finishLengthEdits(){
+  finishPersonEdit();
   if(groupEdit){groupEdit=null;groupRangeKey=null;commit('Selected tube lengths updated together; all joints and other cuts preserved.');}
   if(sliderBase){sliderBase=null;commit('Tube cut length updated; valid joints preserved.');}
 }
@@ -354,7 +437,7 @@ for(const id of ['group-length','group-length-slider']){
 }
 window.addEventListener('pointerup',e=>{if(e.pointerId===groupRangePointer){groupRangePointer=null;finishLengthEdits();}});
 $('#length').addEventListener('change',e=>{const p=model.pieces.find(p=>selected.has(p.id));if(p&&e.target.value!==e.target.dataset.displayValue)action(()=>model.resize(p.id,e.target.valueAsNumber*scale()),'Tube cut length updated; valid joints preserved.');});
-for(const button of [$('#length-unit'),$('#group-length-unit')])button.onclick=()=>{finishLengthEdits();lengthUnit=LENGTH_UNITS[(LENGTH_UNITS.indexOf(lengthUnit)+1)%3];updateLengthUnits();inspector();summary();};
+for(const button of [$('#length-unit'),$('#group-length-unit'),$('#person-unit')])button.onclick=()=>{finishLengthEdits();lengthUnit=LENGTH_UNITS[(LENGTH_UNITS.indexOf(lengthUnit)+1)%3];updateLengthUnits();inspector();summary();};
 $('#plane-offset').onchange=e=>{if(e.target.value===e.target.dataset.displayValue)return;const value=e.target.valueAsNumber*scale();if(Number.isFinite(value))planeOffset=value;else status('Enter a finite plane offset.',true);showLengthInput(e.target,planeOffset);};
 $('#length-slider').addEventListener('input',e=>editLength(e.target.value));
 $('#length-slider').addEventListener('change',()=>{sliderBase=null;commit('Tube cut length updated; valid joints preserved.');});
@@ -424,7 +507,7 @@ function orientation(){const inverse=camera.quaternion.clone().invert(),lines=$(
 const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
 while(walker.nextNode()){const node=walker.currentNode;if(!node.parentElement.closest('script,#catalog,#length-unit,#status')&&/\bmm\b|millimetres/.test(node.textContent))lengthTemplates.push([node,node.textContent]);}
 updateLengthUnits();
-let animation;function render(){animation=requestAnimationFrame(render);if(orbit.enabled)orbit.update();orientation();renderer.render(scene,camera);}resize();refresh();render();
+let animation;function render(){animation=requestAnimationFrame(render);if(orbit.enabled)orbit.update();orientation();boundsOverlay.project(camera);renderer.render(scene,camera);}resize();refresh();render();
 window.addEventListener('keydown',e=>{
   if((e.target.closest?.('input,textarea,select')||e.target.isContentEditable)||$('#help').open)return;const key=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
   if((pointerGesture||gizmo.dragging)&&key!=='escape'&&!(placement&&!mod&&['q','e'].includes(key))){e.preventDefault();return;}
@@ -433,4 +516,4 @@ window.addEventListener('keydown',e=>{
   if(!mod&&(key==='q'||key==='e')){e.preventDefault();if(!e.repeat)rotateDiscrete(key==='q'?'y':'x');return;}
   if(placement)return;if(key==='delete'||key==='backspace'){e.preventDefault();$('#delete').click();}if(key==='f')frame();if(key==='g')setTool('translate');if(key==='r')setTool('rotate');if(key==='v')setTool('select');
 });
-window.addEventListener('pagehide',event=>{if(event.persisted)return;cancelAnimationFrame(animation);observer.disconnect();gizmo.dispose();orbit.dispose();clearGroup(parts);clearGroup(overlays);clearGroup(ghost);grid.geometry.dispose();grid.material.dispose();floor.geometry.dispose();floor.material.dispose();renderer.dispose();});
+window.addEventListener('pagehide',event=>{if(event.persisted)return;cancelAnimationFrame(animation);observer.disconnect();boundsOverlay.dispose();gizmo.dispose();orbit.dispose();clearGroup(parts);clearGroup(overlays);clearGroup(ghost);grid.geometry.dispose();grid.material.dispose();floor.geometry.dispose();floor.material.dispose();renderer.dispose();});

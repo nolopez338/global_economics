@@ -1,6 +1,31 @@
 // Shared, unpainted component geometry for the workspace and isolated exports.
 import * as THREE from '../vendor/three-0.170.0/three.module.js';
 import {RADIUS,INNER_RADIUS,localPorts,vec} from './pvc-model.mjs';
+import {personProperties} from './pvc-person.mjs';
+
+export const PERSON_COLOR=0x71818b;
+// Volumetric, low-poly silhouettes. The canonical figure spans y=0..1;
+// one uniform scale changes every dimension, with the soles at local y=0.
+function personGeometry(p){
+  const {height,variant,category}=personProperties(p),woman=variant==='woman';
+  const g=new THREE.Group(),mat=new THREE.MeshStandardMaterial({color:PERSON_COLOR,roughness:.85,metalness:0});
+  function ellipsoid(position,size){const m=mesh(new THREE.SphereGeometry(1,16,12),mat,g);m.position.set(...position);m.scale.set(...size);}
+  function limb(a,b,r1,r2){const start=vec(a),end=vec(b);const m=mesh(new THREE.CylinderGeometry(r2,r1,start.distanceTo(end),12),mat,g);m.position.copy(start).add(end).multiplyScalar(.5);m.quaternion.setFromUnitVectors(vec([0,1,0]),end.sub(start).normalize());}
+  ellipsoid([0,.93,0],[.052,.07,.055]);
+  limb([0,.82,0],[0,.88,0],.031,.028);
+  const shape=new THREE.Shape();
+  const outline=woman?[[-.085,.47],[-.104,.53],[-.067,.64],[-.102,.79],[-.062,.83],[.062,.83],[.102,.79],[.067,.64],[.104,.53],[.085,.47]]:[[-.084,.47],[-.091,.57],[-.119,.79],[-.064,.83],[.064,.83],[.119,.79],[.091,.57],[.084,.47]];
+  outline.forEach(([x,y],i)=>i?shape.lineTo(x,y):shape.moveTo(x,y));shape.closePath();
+  const torso=mesh(new THREE.ExtrudeGeometry(shape,{depth:.105,bevelEnabled:false,steps:1}),mat,g);torso.position.z=-.0525;
+  for(const s of [-1,1]){
+    const shoulder=[s*(woman?.101:.116),.785,0],elbow=[s*.144,.64,0],wrist=[s*.164,.505,.012];
+    ellipsoid(shoulder,[.033,.036,.037]);limb(shoulder,elbow,.03,.024);ellipsoid(elbow,[.024,.024,.025]);limb(elbow,wrist,.024,.018);ellipsoid([s*.165,.488,.012],[.021,.033,.023]);
+    const hip=[s*.055,.49,0],knee=[s*.061,.265,0],ankle=[s*.067,.057,0];
+    limb(hip,knee,woman?.046:.044,.032);ellipsoid(knee,[.032,.034,.034]);limb(knee,ankle,.032,.022);
+    const foot=mesh(new THREE.BoxGeometry(.058,.05,.12),mat,g);foot.position.set(s*.067,.025,.025);
+  }
+  g.scale.setScalar(height);Object.assign(g.userData,{id:p.id,type:p.type,height,variant,category});return g;
+}
 
 function material(color=0xf9fcfb){return new THREE.MeshStandardMaterial({color,roughness:.32,metalness:.04});}
 function mesh(geometry,mat,group){const m=new THREE.Mesh(geometry,mat);m.castShadow=true;m.receiveShadow=true;group.add(m);return m;}
@@ -14,6 +39,7 @@ function hollow(group,start,end,outer,inner,mat){
 }
 export function geometry(p){
   localPorts(p); // Reject unsupported types and socket overrides before allocating geometry.
+  if(p.type==='person')return personGeometry(p);
   const g=new THREE.Group(),mat=material(p.type==='tube'?0xeaf3f1:0xffffff);
   if(p.type==='tube')hollow(g,[-p.length/2,0,0],[p.length/2,0,0],RADIUS,INNER_RADIUS,mat);
   else {

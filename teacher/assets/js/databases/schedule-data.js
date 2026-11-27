@@ -7277,10 +7277,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C1 C2: 1st Learning Evidence - 1",
+    "Description": "No Class: Mayors Debate",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1C2 exam"
+    "Summary": "No Class"
   },
   {
     "Grade": 11,
@@ -7290,10 +7290,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 6,
-    "Description": "C4: Estimate means with known population variance",
+    "Description": "C1 C2: 1st Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C4: Estimate means with known population variance"
+    "Summary": "C1C2 exam"
   },
   {
     "Grade": 11,
@@ -7303,10 +7303,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C3 C4: Mock - Exam Practice",
+    "Description": "C4: Estimate means with known population variance",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3C4 mock"
+    "Summary": "C4: Estimate means with known population variance"
   },
   {
     "Grade": 11,
@@ -7316,10 +7316,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 6,
-    "Description": "C3 C4: 1st Learning Evidence - 2",
+    "Description": "C3 C4: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C3C4 exam"
+    "Summary": "C3C4 mock"
   },
   {
     "Grade": 11,
@@ -7329,10 +7329,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 1,
-    "Description": "C5: Construct confidence intervals for population proportions",
+    "Description": "C3 C4: 1st Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C5: Construct confidence intervals for population proportions"
+    "Summary": "C3C4 exam"
   },
   {
     "Grade": 11,
@@ -7342,10 +7342,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Thursday",
     "Day": 6,
-    "Description": "C6: Determine sample sizes for specified precision",
+    "Description": "C5: Construct confidence intervals for population proportions",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C6: Determine sample sizes for specified precision"
+    "Summary": "C5: Construct confidence intervals for population proportions"
   },
   {
     "Grade": 11,
@@ -7355,10 +7355,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 1,
-    "Description": "C7: Analyse confidence and precision trade-offs\nC5 C6 C7: Mock - Exam Practice",
+    "Description": "C6: Determine sample sizes for specified precision",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock"
+    "Summary": "C6: Determine sample sizes for specified precision"
   },
   {
     "Grade": 11,
@@ -7368,10 +7368,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Friday",
     "Day": 6,
-    "Description": "C5 C6 C7: 2nd Learning Evidence",
+    "Description": "C7: Analyse confidence and precision trade-offs\nC5 C6 C7: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C5C6C7 exam"
+    "Summary": "C7: Analyse confidence and precision trade-offs\nC5C6C7 Mock"
   },
   {
     "Grade": 11,
@@ -7381,10 +7381,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 1,
-    "Description": "C8: Estimate means using Student’s t-distribution",
+    "Description": "C5 C6 C7: 2nd Learning Evidence",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C8: Estimate means using Student’s t-distribution"
+    "Summary": "C5C6C7 exam"
   },
   {
     "Grade": 11,
@@ -7394,10 +7394,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Monday",
     "Day": 6,
-    "Description": "C9: Evaluate sampling assumptions and inference limitations",
+    "Description": "C8: Estimate means using Student’s t-distribution",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C9: Evaluate sampling assumptions and inference limitations"
+    "Summary": "C8: Estimate means using Student’s t-distribution"
   },
   {
     "Grade": 11,
@@ -7407,10 +7407,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 1,
-    "Description": "C10: Investigate economic questions using confidence intervals\nC8 C9 C10: Mock - Exam Practice",
+    "Description": "C9: Evaluate sampling assumptions and inference limitations",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock"
+    "Summary": "C9: Evaluate sampling assumptions and inference limitations"
   },
   {
     "Grade": 11,
@@ -7420,10 +7420,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Tuesday",
     "Day": 6,
-    "Description": "C8 C9 C10: 3rd Learning Evidence - 1",
+    "Description": "C10: Investigate economic questions using confidence intervals\nC8 C9 C10: Mock - Exam Practice",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C8C9C10 exam"
+    "Summary": "C10: Investigate economic questions using confidence intervals\nC8C9C10 Mock"
   },
   {
     "Grade": 11,
@@ -7433,10 +7433,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 1,
-    "Description": "C1 - C7 : 3rd Learning Evidence - 2",
+    "Description": "C8 C9 C10: 3rd Learning Evidence - 1",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "C1-C7 catch-up"
+    "Summary": "C8C9C10 exam"
   },
   {
     "Grade": 11,
@@ -7446,10 +7446,10 @@ window.SCHEDULE_DATA = [
     "Term": 2,
     "Weekday": "Wednesday",
     "Day": 6,
-    "Description": "Extra Class",
+    "Description": "C1 - C7 : 3rd Learning Evidence - 2",
     "Material": "-",
     "Material teacher": "-",
-    "Summary": "Extra Class"
+    "Summary": "C1-C7 catch-up"
   },
   {
     "Grade": 11,

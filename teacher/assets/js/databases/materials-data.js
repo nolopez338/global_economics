@@ -8704,6 +8704,14 @@ window.MATERIALS_DATA = [
     "Section": "E",
     "Class #": "3-2",
     "Date": "2026-12-04",
+    "Materials": []
+  },
+  {
+    "Grade": 11,
+    "Term": 2,
+    "Section": "E",
+    "Class #": "4-1",
+    "Date": "2027-01-13",
     "Materials": [
       {
         "Acronym": "C4P",
@@ -8729,8 +8737,8 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "E",
-    "Class #": "4-1",
-    "Date": "2027-01-13",
+    "Class #": "4-2",
+    "Date": "2027-01-20",
     "Materials": [
       {
         "Acronym": "ME",
@@ -8750,16 +8758,16 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "E",
-    "Class #": "4-2",
-    "Date": "2027-01-20",
+    "Class #": "5-1",
+    "Date": "2027-01-21",
     "Materials": []
   },
   {
     "Grade": 11,
     "Term": 2,
     "Section": "E",
-    "Class #": "5-1",
-    "Date": "2027-01-21",
+    "Class #": "5-2",
+    "Date": "2027-01-28",
     "Materials": [
       {
         "Acronym": "C5P",
@@ -8785,8 +8793,8 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "E",
-    "Class #": "5-2",
-    "Date": "2027-01-28",
+    "Class #": "6-1",
+    "Date": "2027-01-29",
     "Materials": [
       {
         "Acronym": "C6P",
@@ -8812,8 +8820,8 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "E",
-    "Class #": "6-1",
-    "Date": "2027-01-29",
+    "Class #": "6-2",
+    "Date": "2027-02-05",
     "Materials": [
       {
         "Acronym": "C7P",
@@ -8851,16 +8859,16 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "E",
-    "Class #": "6-2",
-    "Date": "2027-02-05",
+    "Class #": "7-1",
+    "Date": "2027-02-08",
     "Materials": []
   },
   {
     "Grade": 11,
     "Term": 2,
     "Section": "E",
-    "Class #": "7-1",
-    "Date": "2027-02-08",
+    "Class #": "7-2",
+    "Date": "2027-02-15",
     "Materials": [
       {
         "Acronym": "C8P",
@@ -8886,8 +8894,8 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "E",
-    "Class #": "7-2",
-    "Date": "2027-02-15",
+    "Class #": "8-1",
+    "Date": "2027-02-16",
     "Materials": [
       {
         "Acronym": "C9P",
@@ -8913,8 +8921,8 @@ window.MATERIALS_DATA = [
     "Grade": 11,
     "Term": 2,
     "Section": "E",
-    "Class #": "8-1",
-    "Date": "2027-02-16",
+    "Class #": "8-2",
+    "Date": "2027-02-23",
     "Materials": [
       {
         "Acronym": "C10P",
@@ -8947,14 +8955,6 @@ window.MATERIALS_DATA = [
         "Category": "mock-practices"
       }
     ]
-  },
-  {
-    "Grade": 11,
-    "Term": 2,
-    "Section": "E",
-    "Class #": "8-2",
-    "Date": "2027-02-23",
-    "Materials": []
   },
   {
     "Grade": 11,

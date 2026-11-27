@@ -37,6 +37,7 @@ export function projectPort(position,camera,rect) {
 }
 const sameTarget=(a,b)=>a?.id===b?.id&&a?.port===b?.port;
 export function choosePlacement({piece,targets,pointer,project,previous=null,visible=()=>true}) {
+  if(piece.type==='person')return null; // Reference placement always uses the working plane.
   if(!pointer||![pointer.x,pointer.y].every(Number.isFinite))return null;
   const sources=localPorts(piece).map((definition,i)=>({i,...definition}));
   const choices=[];

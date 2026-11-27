@@ -9,6 +9,21 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 HOOKS = '''
 globalThis.pvcTest = {
+  bounds: () => {
+    let excess=0;
+    if(boundsOverlay.box){const b=boundsOverlay.box;scene.updateMatrixWorld(true);
+      for(const id of selected)meshes.get(id)?.traverse(o=>{if(!o.isMesh)return;
+        const positions=o.geometry.getAttribute('position'),v=new THREE.Vector3();
+        for(let i=0;i<positions.count;i++){v.fromBufferAttribute(positions,i).applyMatrix4(o.matrixWorld);
+          for(let a=0;a<3;a++){let d=0;for(let j=0;j<3;j++)d+=(v.getComponent(j)-b.center[j])*b.axes[a][j];excess=Math.max(excess,Math.abs(d)-b.size[a]/2);}
+        }
+      });
+    }
+    return {mode:boundsOverlay.mode,box:clone(boundsOverlay.box),state:boundsOverlay.state,
+      visible:boundsOverlay.lines.visible,excess,computations:boundsOverlay.computations,
+      positionCount:boundsOverlay.geometry.getAttribute('position').count,
+      points:boundsOverlay.points?.length/3,workers:Number(!!boundsOverlay.worker),timer:Number(!!boundsOverlay.timer)};
+  },
   setClipboard: data => {clipboard=clone(data);$("#paste").disabled=false;},
   setHistory: (direction,data) => {(direction==='undo'?undo:redo).push({data:clone(data),selected:[],joint:null});refresh();},
   read: () => ({data:model.data(),selected:[...selected],tool,

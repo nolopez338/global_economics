@@ -4,6 +4,38 @@ Open `general_fundamentals/pvc_design.html` through the repository's normal
 static server (`start-project.bat`, or `python -m http.server 8000` at the root).
 No build, backend, npm installation, or runtime CDN is required.
 
+## Person scale references
+
+The eighth catalog item, **Person**, is a reference rather than a construction
+component. Each instance persists `type: "person"`, `height` (millimetres),
+`category` (`adult` / `child`) and `variant` (`man` / `woman`), alongside its ID,
+position and quaternion. `assets/js/pvc-person.mjs` owns the shared application
+limits: Adult 1400–2200 mm (default 1800), Child 600–1700 mm (default 1200).
+These configurable ranges are not medical or demographic definitions.
+
+Missing category and variant normalize to Adult and Man. A missing height uses
+the chosen category's default. Explicit invalid values are rejected rather than
+defaulted; PVC-only v1 designs remain compatible. No other per-piece overrides
+are added to construction components. Person endpoints cannot occur in joints.
+
+The lightweight volumetric silhouettes share the editor/PDF geometry path.
+Uniform scaling preserves proportions in all axes with soles at the local origin.
+The single-selection height inspector shares the mm/cm/m conversion precision,
+uses a 10 mm base increment, and previews numeric/slider edits transactionally.
+Finer typed or imported heights remain exact; keyboard increments still use 10 mm.
+Release, Enter, blur and selection changes finish one undo action; Escape cancels.
+Changing category preserves height in the overlap or clamps with an announcement.
+
+References have no ports, magnetic snapping, connected companions or collision
+restrictions. Explicit mixed selections transform coherently with PVC assemblies.
+Selection bounds and Frame include complete selected figures. Materials quantities,
+tube totals, fittings and template dimensions exclude people; the interface/PDF
+report a separate reference count. JSON, history, copy/paste and autosave preserve
+their properties. The existing three-page PDF includes all figures in its eight
+views, including reference-only designs, without adding a materials row.
+
+Verification and reproduction: [Person checks](../tests/pvc-person.md).
+
 ## Files and geometry contract
 
 - `assets/js/pvc-model.mjs`: structured catalog, local ports, graph traversal,
@@ -13,8 +45,17 @@ No build, backend, npm installation, or runtime CDN is required.
 - `assets/js/pvc-app.mjs`: hollow geometry, Three.js scene and controls,
   selection, snap preview, gesture transactions, persistence and inspector.
 - `assets/css/pvc-design.css`: scoped application styling and responsive panels.
+- `assets/js/pvc-bounds.mjs`, `pvc-bounds-overlay.mjs`, and
+  `pvc-bounds-worker.mjs`: cached rendered-geometry bounds, measurement overlay,
+  and cancellable numerical oriented-box search.
 - `assets/vendor/three-0.170.0/`: pinned Three.js modules and MIT license.
 - `tests/pvc-model.test.mjs`: independent construction-model regression tests.
+
+The compact box button beside Frame cycles Off, world-aligned selection bounds,
+and approximate minimum-volume oriented bounds. It measures only explicitly
+selected pieces, with three screen-facing dimensions in the current length unit.
+The oriented search is numerical, without a guaranteed global volume error;
+see [algorithm, accuracy limits, and verification](../tests/pvc-bounds.md).
 
 Coordinates and dimensions use millimetres. All tubes have a 16 mm outer
 radius and 13 mm inner radius. Tube length is the physical cut length,

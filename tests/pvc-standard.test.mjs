@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {Design,CATALOG,validate,localPorts,materialsSummary,rectangle,clone,compatiblePorts} from '../assets/js/pvc-model.mjs';
 import {geometry,dispose} from '../assets/js/pvc-geometry.mjs';
 import {createDesignPDF} from '../assets/js/pvc-pdf.mjs';
-const allowed=['tube','coupling','elbow90','elbow45','tee','cross','corner'];
+const allowed=['tube','coupling','elbow90','elbow45','tee','cross','corner','person'];
 const invalidTypes=['multiway','cap','custom','junction','constructor','__proto__'];
 const overrides={sockets:[],ports:[],socketCount:8,directions:[[1,0,0]],positions:[[0,0,0]],direction:[1,0,0],position:[0,0,0],insertion:0,compatibility:'any',radius:100,scale:2};
 test('exact allowlist; standard socket arrays are deeply immutable',()=>{

@@ -42,11 +42,11 @@ test('JSON round trip retains geometry, graph and materials',()=>{
 test('imports reject corrupt values, duplicate IDs, occupied ports, mismatches and malformed references',()=>{
   for(const mutate of [d=>d.version=2,d=>d.radius=20,d=>d.pieces[0].p[0]=null,d=>d.pieces[0].q=[0,0,0,0],d=>d.pieces[1].id=d.pieces[0].id,d=>d.connections[0].b.id='missing',d=>d.connections[0].b.port=1.5,d=>d.connections[0].b.port=99,d=>d.pieces.find(p=>p.type==='tube').length=1,d=>d.pieces[0].p[0]+=10,d=>d.connections.push({...d.connections[0],id:'unique'}),d=>d.pieces[0].type='__proto__']){const d=rectangle().data();mutate(d);assert.throws(()=>validate(d));}
 });
-test('every fitting has explicit normalized socket definitions',()=>{for(const [type,def] of Object.entries(CATALOG)){if(type==='tube')continue;assert.ok(def.ports.length);for(const p of def.ports){assert.equal(p.type,'socket');assert.equal(p.insertion,20);assert.ok(Math.abs(vec(p.direction).length()-1)<1e-10);}}});
+test('every fitting has explicit normalized socket definitions',()=>{for(const [type,def] of Object.entries(CATALOG)){if(type==='tube'||def.reference)continue;assert.ok(def.ports.length);for(const p of def.ports){assert.equal(p.type,'socket');assert.equal(p.insertion,20);assert.ok(Math.abs(vec(p.direction).length()-1)<1e-10);}}});
 
 test('materials group exact cuts and fitting types, with decimal totals',()=>{
   const m=new Design();m.add('tube',[0,0,0],123.456);m.add('tube',[0,0,0],123.4560001);
   m.add('tube',[0,0,0],650);m.add('tube',[0,0,0],650);m.add('tee');m.add('tee');
-  assert.deepEqual(m.materials(),{rows:[{type:'tube',length:123.456,count:1},{type:'tube',length:123.4560001,count:1},{type:'tube',length:650,count:2},{type:'tee',count:2}],total:1546.9120001,count:6});
-  assert.deepEqual(new Design().materials(),{rows:[],total:0,count:0});
+  assert.deepEqual(m.materials(),{rows:[{type:'tube',length:123.456,count:1},{type:'tube',length:123.4560001,count:1},{type:'tube',length:650,count:2},{type:'tee',count:2}],total:1546.9120001,count:6,references:0});
+  assert.deepEqual(new Design().materials(),{rows:[],total:0,count:0,references:0});
 });

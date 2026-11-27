@@ -57,7 +57,7 @@ test('every fitting port aligns at the insertion stop; preview commits without r
   const rotations=[[0,0,0,1],[0,.7071067811865475,0,.7071067811865476],
     quat([0,0,0,1]).setFromAxisAngle(vec([1,2,3]).normalize(),2.4).toArray(),
     quat([0,0,0,1]).setFromAxisAngle(vec([0,0,1]),Math.PI).toArray()];
-  for(const type of Object.keys(CATALOG))for(const q of rotations){
+  for(const type of Object.keys(CATALOG).filter(type=>!CATALOG[type].reference))for(const q of rotations){
     const m=new Design(),target=m.add(type==='tube'?'tee':'tube',[0,0,0]);
     for(const endpoint of placementTargets(m)){
       const before=m.data(),pointer=flat(endpoint.position);
