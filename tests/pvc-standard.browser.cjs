@@ -13,7 +13,7 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+deco
  const read=()=>page.evaluate(()=>pvcTest.read());
  await page.goto(`http://127.0.0.1:${server.address().port}/general_fundamentals/pvc_design.html`);
  await page.waitForSelector('#catalog button');assert.equal(await page.locator('#catalog button').count(),7);
- assert.equal(await page.locator('#template option').count(),2);
+ assert.equal(await page.locator('#template option').count(),10);
  await page.selectOption('#template','ground');await page.locator('#load-template').click();
  await page.locator('.materials').evaluate(e=>e.scrollTop=0);await page.screenshot({path:path.join(out,'production.png')});
  console.log('PASS production page catalog and standard-only template');

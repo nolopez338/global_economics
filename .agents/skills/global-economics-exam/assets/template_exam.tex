@@ -5,6 +5,7 @@
 \makeatother
 \input{preamble_exams}
 \graphicspath{{./}{preamble/}{../preamble/}{../../preamble/}{../../../preamble/}{../../../../book/preamble/}}
+\usepackage{varwidth}
 
 % Assessment-specific settings. Symbolic marks are NOT suggested allocations.
 \setYColumnWidth{0.23}
@@ -13,17 +14,52 @@
 % Ledger: Q1 A=a+b; Q2 B=c+d; Q3 A=e. Totals: A=a+b+e, B=c+d.
 % Replace all task marks, heading sums and criterion totals consistently.
 
-% Preserve starred/unstarred calls and subtract color-box padding ONCE.
-% Do not reduce linewidth again at individual calls.
-\let\ExamSubsectionBox\SubsectionBox
+% Neutral structural hierarchy only, adapted from classroom-activity styles.
+% Local replacement: preserve the question counter and starred interface.
+% No semantic colors, mathematical highlights, legends or teaching scaffolds.
 \RenewDocumentCommand{\SubsectionBox}{s m}{%
-  \par\Needspace{4\baselineskip}% keep heading with opening prompt
-  \begingroup
-  \setlength{\linewidth}{\dimexpr\linewidth-2\fboxsep\relax}%
-  \IfBooleanTF{#1}{\ExamSubsectionBox*{#2}}{\ExamSubsectionBox{#2}}%
-  \endgroup\nobreak
+  \par\Needspace{4\baselineskip}\addvspace{4pt}%
+  \IfBooleanF{#1}{\stepcounter{subsectionboxproblem}}%
+  {\centering\large\bfseries\color{black}%
+    \tikz[baseline=(title.base)]{%
+      \node[fill=black!10,draw=black,line width=.2pt,text=black,
+        rounded corners=2mm,inner sep=3pt,outer sep=0pt] (title) {%
+        \begin{varwidth}{\dimexpr\linewidth-6pt-.2pt\relax}%
+          \centering\strut
+          \IfBooleanF{#1}{\arabic{subsectionboxproblem}. }#2\strut
+        \end{varwidth}};}\par}%
+  \nopagebreak[4]\smallskip
 }
-% Shared headings use stepcounter, not refstepcounter: capture the automatic
+\newcommand{\ExamTaskHeading}[1]{%
+  \par\Needspace{4\baselineskip}\addvspace{4pt}%
+  \noindent\tikz[baseline=(title.base)]{%
+    \node[fill=black!5,draw=none,text=black,rounded corners=2mm,
+      inner sep=3pt,outer sep=0pt] (title) {%
+      \begin{varwidth}{\dimexpr\linewidth-6pt\relax}%
+        \raggedright\bfseries\strut #1\strut
+      \end{varwidth}};}\par\nopagebreak[4]\smallskip
+}
+\newcommand{\ExamSubtaskHeading}[1]{%
+  \par\Needspace{3\baselineskip}\addvspace{4pt}%
+  \noindent{\color{black}\textbf{\underline{#1}}}\par\nopagebreak[4]\smallskip
+}
+% Optional minimal response structures: use only when requested or answering
+% on the exam. See response_guides.md; prompts stay outside empty boxes.
+\newcommand{\ExamResponseBox}[2][12mm]{%
+  \tikz[baseline=(answer.base)]{%
+    \node[fill=black!1,draw=black!25,line width=.3pt,
+      rounded corners=2mm,inner sep=0pt,outer sep=.3pt,
+      minimum width=#2,minimum height=#1] (answer) {\phantom{0}};}}
+% #1: column spec with vertical dividers only; #2: concise output headers;
+% #3: blank body rows with positive struts for the needed handwriting height.
+% No horizontal rules, filled entries or derived row labels.
+\newcommand{\ExamResponseTable}[3]{%
+  \par\begingroup\setlength{\tabcolsep}{4pt}%
+  \renewcommand{\arraystretch}{1.15}%
+  \noindent\begin{tabularx}{\linewidth}{#1}#2\\#3\end{tabularx}\par
+  \endgroup
+}
+% Local headings use stepcounter, not refstepcounter: capture the automatic
 % number explicitly for score-table references, without manual question IDs.
 \makeatletter
 \newcommand{\QuestionLabel}[1]{%
@@ -149,7 +185,9 @@ above. Specify the operation order and any selection or tie rules.]
 \QuestionLabel{q:short}
 [Give the complete prompt and any data needed for a brief response.]
 \sscore{\CriterionA-\sml{$e$}}
-% For on-sheet answers add appropriately sized space, e.g. \vspace{15mm}.
+% Only when requested or answering on the exam, add adequate empty space:
+% \noindent\ExamResponseBox[30mm]{\dimexpr\linewidth-1pt\relax}
+% Put any short question/task label outside; keep assessed subparts identifiable.
 \end{minipage}\par
 \ifSeparateActivity
 \noindent\begin{minipage}{\linewidth}
@@ -160,4 +198,10 @@ This reminder carries no points in this exam.
 \end{minipage}\par
 \fi
 \end{multicols}
+% Optional dedicated response pages: insert only when requested or needed.
+% Use \clearpage, retain question-page paper size/orientation/margins, and label
+% by question number and task letter. No repeated General tasks or hints.
+% Tables: vertical dividers only, blank rows tall enough for handwriting.
+% Graphs: blank axes, light grid, uniform numerical scale; no plotted results.
+% Respect a requested page count; report conflicts with legible workspace.
 \end{document}

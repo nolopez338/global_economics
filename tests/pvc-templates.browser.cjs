@@ -1,6 +1,6 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const {chromium}=require('playwright');
-const root=process.cwd(),out=path.join(root,'tmp/pvc-templates');fs.mkdirSync(out,{recursive:true});
+const root=process.cwd(),out=path.join(root,'tmp/pvc-structural-templates');fs.mkdirSync(out,{recursive:true});
 const mime={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.svg':'image/svg+xml'};
 const server=http.createServer((req,res)=>fs.readFile(path.join(root,decodeURIComponent(req.url.split('?')[0])),(err,body)=>{res.writeHead(err?404:200,{'Content-Type':mime[path.extname(req.url)]||'application/octet-stream'});res.end(err?'Not found':body)}));
 (async()=>{
@@ -10,19 +10,24 @@ const server=http.createServer((req,res)=>fs.readFile(path.join(root,decodeURICo
  const page=await browser.newPage({viewport:{width:1440,height:1000},acceptDownloads:true});page.setDefaultTimeout(180000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(`http://127.0.0.1:${server.address().port}/tests/.pvc-browser/pvc_design.html`);await page.waitForFunction(()=>globalThis.pvcTest);
  const read=()=>page.evaluate(()=>pvcTest.read());
- const options=await page.locator('#template option').evaluateAll(a=>a.map(o=>({id:o.value,name:o.textContent})));assert.equal(options.length,2);assert.equal(options[0].name,'Empty');
+ const options=await page.locator('#template option').evaluateAll(a=>a.map(o=>({id:o.value,name:o.textContent})));assert.equal(options.length,10);assert(options[5].name.startsWith('6 ·'));assert.equal(options[5].id,'tower');
  let before=await read();await page.selectOption('#template','ground');assert.deepEqual((await read()).data,before.data,'preview mutated design');
  await page.locator('#load-template').click();let groundState=await read();assert.equal(groundState.undo,1);assert.equal(groundState.selected.length,0);assert.equal(groundState.tool,'select');assert.deepEqual(JSON.parse(groundState.autosave),groundState.data);
- // Reject both nonempty and Empty replacement without affecting model, history or placement.
+ // Reject template replacement without affecting model, history or placement.
  await page.locator('[data-type="tube"]').click();before=await read();
- for(const id of ['empty','ground']){await page.selectOption('#template',id);page.once('dialog',d=>d.dismiss());await page.locator('#load-template').click();assert.deepEqual(await read(),before);}
- await page.selectOption('#template','empty');page.once('dialog',d=>d.accept());await page.locator('#load-template').click();let empty=await read();assert.equal(empty.data.pieces.length,0);assert.equal(empty.placement,null);assert.equal(empty.undo,2);assert(await page.locator('#download-pdf').isDisabled());
+ for(const id of ['tower','grid']){await page.selectOption('#template',id);page.once('dialog',d=>d.dismiss());await page.locator('#load-template').click();assert.deepEqual(await read(),before);}
+ page.once('dialog',d=>d.accept());await page.locator('#new').click();let empty=await read();assert.equal(empty.data.pieces.length,0);assert.equal(empty.placement,null);assert.equal(empty.undo,2);assert(await page.locator('#download-pdf').isDisabled());
  await page.locator('#undo').click();assert.deepEqual((await read()).data,groundState.data);await page.locator('#redo').click();assert.equal((await read()).data.pieces.length,0);
- console.log('PASS preview, rejected replacements, Empty, placement reset, one-step undo / redo and autosave');
+ console.log('PASS preview, rejected replacements, New, placement reset, one-step undo / redo and autosave');
  page.on('dialog',d=>d.accept());
- for(const {id,name} of options.slice(1)){
+ for(const {id,name} of options){
    await page.selectOption('#template',id);const previous=await read();await page.locator('#load-template').click();const state=await read();assert.equal(state.undo,previous.undo+1);assert.equal(state.data.pieces.length,new Set(state.data.pieces.map(p=>p.id)).size);assert.deepEqual(JSON.parse(state.autosave),state.data);
    assert.equal(await page.locator('#selection-content').innerText(),'Nothing selected');
+   await page.locator('#select-all').click();await page.locator('[data-turn="y"]').first().click();
+   assert.notDeepEqual((await read()).data,state.data,'Template cannot be rigidly rotated');
+   await page.locator('#undo').click();assert.deepEqual((await read()).data,state.data,'Rotation undo did not restore template');
+   await page.locator('#clear').click();
+   if(process.env.PVC_EDITS_ONLY){console.log(`PASS ${name}: editable rigid rotation, exact undo and autosave`);continue;}
    for(const view of ['front','side','perspective']){await page.selectOption('#camera',view);await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
      const framing=await page.evaluate(async()=>{const {Box3,Group,Vector3}=await import('/assets/vendor/three-0.170.0/three.module.js');const {geometry,dispose}=await import('/assets/js/pvc-geometry.mjs');const g=new Group();for(const p of pvcTest.read().data.pieces){const o=geometry(p);o.position.fromArray(p.p);o.quaternion.fromArray(p.q);g.add(o);}g.updateMatrixWorld(true);const box=new Box3().setFromObject(g,true),bounds=document.querySelector('#workspace').getBoundingClientRect(),projected=[];for(const x of [box.min.x,box.max.x])for(const y of [box.min.y,box.max.y])for(const z of [box.min.z,box.max.z])projected.push(pvcTest.screen([x,y,z]));dispose(g);return {center:box.getCenter(new Vector3()).toArray(),target:pvcTest.read().target,inside:projected.every(p=>p.x>=bounds.left&&p.x<=bounds.right&&p.y>=bounds.top&&p.y<=bounds.bottom)};});
      assert(framing.inside,`${id} ${view}: assembly is clipped ${JSON.stringify(framing)}`);
@@ -35,7 +40,7 @@ const server=http.createServer((req,res)=>fs.readFile(path.join(root,decodeURICo
    await page.reload();await page.waitForFunction(()=>globalThis.pvcTest);assert.deepEqual((await read()).data,data);
    const result=await page.evaluate(async()=>{const {createDesignPDF}=await import('/assets/js/pvc-pdf.mjs');const blob=await createDesignPDF(pvcTest.read().data);return {pages:blob.pageCount,size:blob.size};});assert(result.size>50000&&result.pages>=3);
    // Also exercise the actual PDF download button.
-   if(id==='ground'){event=page.waitForEvent('download');await page.locator('#download-pdf').click();file=await event;await file.saveAs(path.join(out,id+'.pdf'));await page.waitForFunction(()=>!document.querySelector('#download-pdf').disabled);}
+   if(id==='tower'){event=page.waitForEvent('download');await page.locator('#download-pdf').click();file=await event;await file.saveAs(path.join(out,id+'.pdf'));await page.waitForFunction(()=>!document.querySelector('#download-pdf').disabled);}
    console.log(`PASS ${name}: rendered three views, JSON download/import, autosave reload, PDF ${result.pages} pages / ${result.size} bytes`);
  }
  await page.setViewportSize({width:360,height:850});await page.locator('#template').scrollIntoViewIfNeeded();const bounds=await page.locator('#template').boundingBox();assert(bounds.width<=140);await page.screenshot({path:path.join(out,'mobile.png')});assert.deepEqual(errors,[]);console.log('PASS responsive dropdown and no browser errors');

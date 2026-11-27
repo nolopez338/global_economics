@@ -8,8 +8,8 @@ No build, backend, npm installation, or runtime CDN is required.
 
 - `assets/js/pvc-model.mjs`: structured catalog, local ports, graph traversal,
   rigid transforms, cut-length editing, copying, materials and import validation.
-- `assets/js/pvc-templates.mjs`: Empty and a floor-supported footprint study with
-  fixed standard fittings, dimensions and explicit racking limitations.
+- `assets/js/pvc-templates.mjs`: ten structural pattern studies made from
+  fixed standard fittings, with dimensions and explicit structural limitations.
 - `assets/js/pvc-app.mjs`: hollow geometry, Three.js scene and controls,
   selection, snap preview, gesture transactions, persistence and inspector.
 - `assets/css/pvc-design.css`: scoped application styling and responsive panels.
@@ -32,23 +32,32 @@ position, direction, insertion and compatibility. Piece records permit only
 and every other per-piece override are rejected, even if they match a standard
 fitting. Removed components are never converted to standard parts.
 
-The Template dropdown offers Empty and Ground footprint study. The nine former
-elevated furniture templates were removed: their multi-directional junctions
-and variable brace angles cannot be represented by the allowed fittings.
-The remaining layout distributes four floor-contact elbows across a broad, low
-footprint, with short rails spanning between them; it provides no elevated load
-support or bracing. Its rectangle can rack, and
-unglued sockets are not assumed rigid. Floor contact is an explicit condition,
-not an invisible modeled support. Load template validates the whole graph before
-replacement, then records one undoable, autosaved action and frames the view.
-See [template checks](../tests/pvc-templates.md).
+The Template dropdown offers exactly ten nonempty structural patterns, ordered
+from perimeter, ladder and grillage layouts through portal and box frames to
+braced, multi-bay, pitched, re-entrant and polygonal arrangements. Use **New** to
+clear the workspace. Template selection previews only; Load template validates
+the complete graph before replacement, records one undoable, autosaved action,
+and frames the view. All templates remain ordinary editable pieces and joints.
+See [template geometry and verification](../tests/pvc-templates.md).
+
+Template 6 is a rectangular tower with an exact rendered outer envelope of
+1,300 mm width × 400 mm depth × 2,200 mm height. Six straight diagonal members
+address width-height sway, depth-height sway and horizontal plan distortion.
+Their endpoint tees rotate around transverse rails so the catalog's fixed
+perpendicular branch points along the brace; no socket geometry changes.
+The apparent width-height X uses two planes 98 mm apart, avoiding an
+unconnected crossing. Intermediate width and depth ties use staggered heights
+to keep every junction compatible with the available fittings.
 
 These are geometric planning considerations, not certified structural analysis.
-No safe load ratings or guaranteed stability are provided. Actual performance
-depends on PVC dimensions and properties, connection methods, assembly quality
-and use conditions, including asymmetric loading. Elevated furniture needs
-verified load paths and sway/racking restraint in both horizontal directions;
-the remaining footprint example does not provide those features.
+Rectangular bays and unglued sockets are not assumed rigid. Template 6 improves
+the arrangement of axial load paths qualitatively; long-brace flexure and
+buckling, socket rotation/slip/pullout and the shallow 400 mm tipping footprint
+remain limitations. Bracing does not widen the support polygon. No safe load
+ratings, guaranteed stability or quantitative stiffness claims are provided.
+Actual performance depends on PVC dimensions and properties, connection methods,
+assembly quality, support conditions and loading, including asymmetric or
+elevated loads. Other templates identify their unbraced deformation mechanisms.
 
 Joints are graph edges with stable IDs and explicit piece/port endpoints.
 Proximity only proposes a new joint; existing joints never depend on mesh
@@ -111,6 +120,14 @@ movement and gizmos from processing the same left drag. Keyboard shortcuts are
 ignored in inputs, selects, textareas and editable text; active gestures accept
 Escape and defer other shortcuts until release.
 
+A seated final graph does not simulate the assembly path. Dry-fit partial,
+unfixed subassemblies with the braces already in place before closing or fixing
+loops; a brace cannot simply be inserted between two sockets of an already
+rigid box. Check practical assembly order, insertion clearances, cut tolerances
+and actual vendor fitting dimensions before fabrication. The exact Template 6
+envelope describes this app's unchanged schematic geometry, not vendor CAD or
+a guaranteed manufactured dimension.
+
 ## Verification
 
 Run the model suites from the repository root:
@@ -119,7 +136,7 @@ Run the model suites from the repository root:
 node --test --test-isolation=none tests/pvc-model.test.mjs tests/pvc-placement.test.mjs tests/pvc-templates.test.mjs tests/pvc-standard.test.mjs
 ```
 
-The 49 tests cover the exact component allowlist, immutable socket geometry,
+The model suites cover the exact component allowlist, immutable socket geometry,
 rejection of custom types and per-piece or endpoint overrides, atomic paste,
 JSON/PDF input validation, connected templates, insertion, rigid transforms,
 cut-length editing, graph constraints, materials and serialization.
@@ -132,8 +149,8 @@ after changing production sources.
 
 `tests/pvc-standard.browser.cjs` checks the seven-item catalog, invalid JSON,
 paste, undo/redo and autosave rejection with unchanged state, JSON download and
-all-seven-component PDF creation. `tests/pvc-templates.browser.cjs` covers both
-template options, replacement prompts, history, autosave, JSON round trips,
+all-seven-component PDF creation. `tests/pvc-templates.browser.cjs` covers all
+ten template options, replacement prompts, history, autosave, JSON round trips,
 PDF output, camera framing and responsive layout.
 
 `tests/pvc-placement.browser.cjs` exercises DOM controls and real mouse/native

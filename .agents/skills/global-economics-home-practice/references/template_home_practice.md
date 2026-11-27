@@ -4,6 +4,8 @@
 
 Copy the [LaTeX scaffold](../assets/template_home_practice.tex) into the intended source directory. Replace the bracketed placeholders and remove unused optional blocks.
 
+Also copy [practice_procedure_diagrams.tex](../assets/practice_procedure_diagrams.tex) beside the source; its explicit input is already in the scaffold. This deployed snapshot travels with the activity. Reuse an existing copy, compare before updating, and preserve local modifications. The skill asset is the authoritative implementation; no build should search the skill directory implicitly. Read [Procedure diagrams](procedure_diagrams.md) for the API, detailed/compact examples, deployment/update policy, panels and validation cases.
+
 Keep the scaffold's `\input@path` setup and load the [shared preamble](../../../../book/preamble/preamble_exams.tex) once. It initializes the document class and loads the shared layout and navigation commands. The relative search paths cover the scaffold's directory and typical activity directories under `book/`.
 
 When the output source directory is outside that search range, add the absolute `book/preamble/` directory to `TEXINPUTS` for the build session. Include the trailing slash on the directory and an empty path component for TeX's default search paths. This also resolves nested inputs. In PowerShell, use a semicolon as the path separator and replace the placeholder path below. On systems with a POSIX shell, use a colon as the separator.
@@ -35,6 +37,18 @@ Replace each introductory-example placeholder with a short motivating situation,
 
 The scaffold loads the existing renderer once and places the commented disable toggle immediately after it. Define topic-specific role macros as needed, reuse them in tables and body, and preserve any existing toggle setting when adapting an activity. Highlights off must retain all text and notation. Preserve component roles in composite expressions, including substitutions.
 
+## Procedure families and diagrams
+
+Before composing diagrams, establish each family's meaningful stage names/order, common inputs/outputs, parallel cases or methods, branches, merges, checks and extension points. Declare the structure separately from problem-specific wording/values with `\PPDeclareFamily` and `\PPStage`. Reuse one family where adequate; introduce another only when the reasoning genuinely differs. The [diagram guide](procedure_diagrams.md) owns implementation guidance and runnable examples; the scaffold has clearly marked example invocations rather than a mandatory mathematical model.
+
+After a relevant introductory example, use `PracticeProcedure[mode=detailed]` with its actual data. Explain quantities, symbols, units, cases, arrows, intermediate values and outputs, distinguishing general formulas from substitutions. Introduce every family before its compact use. Preserve the first instructional legend and at least two introductory examples.
+
+In the Practice Procedure subsection, match the written procedure explicitly to the introductory stage names and order and give a generalized compact diagram per family, referring back to the introduction. In every worked task, including follow-ups and advanced solutions, place its actual-value compact summary after the reasoning and before return navigation. Several distinct procedures need appropriate separate summaries or a divided composite. Keep enough substitutions and intermediate values to connect inputs to outputs; diagrams do not replace written justification. Do not supply completed diagrams for unsolved independent or assessed tasks.
+
+Retain the base family's stage identities/order and aligned lanes in variants. Add alternatives as lanes, label an extra calculation inside its existing stage, or insert a meaningfully labelled `\PPExtension` at the correct logical point for a new operation. Branch/rejoin as the mathematics requires; common inputs and unchanged reasoning remain shared. A genuinely different method needs another introduced family and a brief relationship explanation. Consistency concerns reasoning, not identical dimensions or box counts.
+
+Use tall neutral stage rectangles from left to right with parallel cases vertically stacked in consistent lanes. Adapt widths, gaps, padding and explicit math wrapping; split large diagrams at meaningful stage boundaries into clearly linked panels preserving stage identities, case order and continuation quantities. Do not use tiny fonts, whole-diagram scaling, negative spacing or crowded arrows. Reuse semantic roles in all diagram content; neutral frames and connections remain readable with highlights off and in grayscale.
+
 ## Navigation
 
 - Keep `\phantomsection\label{toc}` immediately before `\tableofcontents` for the return arrows. Keep **Evaluated criteria** out of both the contents and PDF outline; its starred heading does not need a contents insertion or bookmark command.
@@ -64,3 +78,5 @@ As a final check, compare the source headings with the numbered entries in the c
 Confirm **Evaluated criteria** is visible and unnumbered in the rendered front matter but absent from the compiled contents and PDF outline entries. Inspect the source and scaffold for any equivalent contents or outline insertion, not just the literal prohibited command.
 
 Verify concise legend → at least two introductory examples → detailed reference in Section 2 → practice procedure in the source and PDF. Inspect both table schemas, linked contextual bullets, shared semantic treatments, enabled/disabled highlights, grayscale readability, and no duplicate tables or anchors.
+
+Verify detailed introduction → symbolic procedure → every actual-value worked summary for each family, including variants. Check shared-source arrows, corresponding lane alignment, stage/container fit, long labels and multiline equations, clean branch/merge paths, panel continuations and page boundaries. Follow [update-latex-complete](../../update-latex-complete/SKILL.md) and the [diagram validation cases](procedure_diagrams.md#coordination-and-validation) when the asset or integration changes.

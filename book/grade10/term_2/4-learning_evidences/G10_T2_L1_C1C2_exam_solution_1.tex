@@ -17,10 +17,12 @@
 \colorlet{keyMassColor}{blue!75!black}
 \colorlet{keyCDFColor}{cyan!65!blue!80!black}
 \colorlet{keyMassFill}{GTenHLProbability!32!white}
+\colorlet{keyGuideColor}{keyMassColor!35}
 \ifGTenHighlights\else
   \colorlet{keyMassColor}{black}
   \colorlet{keyCDFColor}{black}
   \colorlet{keyMassFill}{black!15}
+  \colorlet{keyGuideColor}{gray}
 \fi
 \linespread{0.98}
 \setlength{\parskip}{2pt}
@@ -30,6 +32,61 @@
  xlabel={$\GTenHLValue{x}$ (\GTenHLValue{USD})},
  xticklabel={ $\GTenHLValue{\pgfmathprintnumber{\tick}}$},grid=major,grid style={gray!15},
  tick label style={font=\small},label style={font=\small},clip=false}}
+\pgfplotsset{keyCombined/.style={width=.84\linewidth,height=4cm,scale only axis,
+every axis plot/.append style={forget plot},axis lines=left,x axis line style={->},ymin=-.035,ymax=1.13,
+ytick={0,.25,.5,.75,1},grid=major,
+grid style={gray!15},tick label style={font=\small},
+label style={font=\small},clip=false,
+legend style={at={(.5,-.34)},anchor=north,legend columns=2,
+font=\footnotesize,draw=none,cells={anchor=west}},
+},keyMass/.style={keyMassColor,thick},
+keyPhantom/.style={keyGuideColor,densely dashed,line width=.9pt},
+keyStep/.style={keyCDFColor,thick},
+keyIncluded/.style={only marks,mark=*,keyCDFColor,mark size=1.1pt},
+keyExcluded/.style={only marks,mark=*,keyCDFColor,
+mark options={fill=white},mark size=1.1pt}}
+% Arguments: supported value, exact mass, cumulative height immediately before it.
+% Only a vertical translation is applied: upper height = lower height + mass.
+% Coordinates are saved inside their own axes, then joined after both axes end.
+\usetikzlibrary{backgrounds,calc}
+\tikzset{keyCorrespondence/.style={gray!70,line width=.25pt,-{Stealth[length=3.5pt,width=3pt]}}}
+\newcommand{\keyCorrespondence}[1]{%
+\begingroup
+% Maximum sideways bow in physical units, independent of the axis scales.
+\def\keyCorrespondenceBow{3mm}%
+% Quadratic Bezier with midpoint control shifted by twice the bow;
+% its equivalent cubic controls lie at 1/3 and 2/3, shifted by 4/3 of it.
+\pgfmathsetlengthmacro{\keyControlOffset}{4/3*\keyCorrespondenceBow}%
+% Paint behind the stems and markers, even though both axes are already defined.
+\begin{pgfonlayer}{background}
+\draw[keyCorrespondence] (keyMassMid-#1)
+  .. controls ([xshift=\keyControlOffset]$(keyMassMid-#1)!1/3!(keyShadowMid-#1)$)
+          and ([xshift=\keyControlOffset]$(keyMassMid-#1)!2/3!(keyShadowMid-#1)$)
+  .. (keyShadowMid-#1);
+\end{pgfonlayer}%
+\endgroup}
+\newcommand{\keyPhantom}[3]{%
+\coordinate (keyShadowMid-#1) at (axis cs:#1,{#3+(#2)/2});
+\addplot[keyPhantom] coordinates {(#1,#3)(#1,{#3+#2})};
+\addplot[only marks,mark=*,keyGuideColor,mark size=1.8pt]
+coordinates {(#1,{#3+#2})};}
+\newcommand{\keyMass}[2]{%
+\coordinate (keyMassMid-#1) at (axis cs:#1,{(#2)/2});
+\addplot[keyMass] coordinates {(#1,0)(#1,#2)};
+\addplot[only marks,mark=*,keyMassColor,mark size=1.5pt]
+coordinates {(#1,#2)};}
+
+\newcommand{\keyConnectionReading}{%
+\textbf{Reading the comparison.} Both plotting areas use identical horizontal
+limits, support ticks, numerical spacing, widths and vertical scales.
+Each pale dashed shadow translates its lower \GTenHLProbability{PMF} stem upward
+by $\HLCumulativeProbability{F_X(}\GTenHLValue{a^-}\HLCumulativeProbability{)}$ without changing its length:
+$\HLCumulativeProbability{F_X(}\GTenHLValue{a}\HLCumulativeProbability{)}-\HLCumulativeProbability{F_X(}\GTenHLValue{a^-}\HLCumulativeProbability{)}=\GTenHLProbability{p_X(}\GTenHLValue{a}\GTenHLProbability{)}$.
+Thin curved arrows join the stem and shadow midpoints, including the first
+support value. They indicate correspondence. Stems and shadows show isolated
+masses; the filled \HLCumulativeProbability{CDF} endpoint gives its value and
+the open endpoint excludes the lower height.}
+
 \title{Global Economics Exam Solutions\\Grade 10 --- Term 2 --- C1 and C2}
 \author{}
 \date{}
@@ -85,8 +142,8 @@ This exam assesses C1 and C2. A \textbf{minimum of 4 out of 6 points for C1 and 
 $\GTenHLOutcome{\omega}$ & \GTenHLOutcome{Outcome} & One complete result or category.\\
 $\GTenHLValue{X},\GTenHLValue{x},\GTenHLValue{S_X}$ & \GTenHLValue{Variable and support} & Values and cutoffs in \GTenHLValue{USD}.\\
 $\GTenHLSecond{N},\GTenHLSecond{Y}$ & \GTenHLSecond{Other quantities} & Counts; adjusted payout in USD.\\
-$\GTenHLProbability{P},\GTenHLProbability{p_X(x)}$ & \GTenHLProbability{Probability / PMF} & Unitless likelihood or point mass.\\
-$\HLCumulativeProbability{F_X(x)}$ & \HLCumulativeProbability{Cumulative probability / CDF} & Mass at or below a cutoff.\\
+$\GTenHLProbability{P},\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}$ & \GTenHLProbability{Probability / PMF} & Unitless likelihood or point mass.\\
+$\HLCumulativeProbability{F_X(}\GTenHLValue{x}\HLCumulativeProbability{)}$ & \HLCumulativeProbability{Cumulative probability / CDF} & Mass at or below a cutoff.\\
 $\GTenHLParameter{a}$ & \GTenHLParameter{Unknown parameter} & Baseline mass to determine in Question 5.\\
 \bottomrule\end{tabular}
 \end{center}
@@ -96,10 +153,40 @@ $\GTenHLParameter{a}$ & \GTenHLParameter{Unknown parameter} & Baseline mass to d
 A meal vendor handles three meal reservations. The three reservations are independent. Each reservation is either kept or cancelled, two mutually exclusive and exhaustive outcomes. The keep probabilities for reservations 1, 2 and 3 are 0.2, 0.5 and 0.8, respectively. Each kept reservation contributes 7 USD and each cancellation contributes no money. A fixed handling cost of 5 USD is then deducted once from the combined contribution. There are no other receipts or costs. Record the net contribution for the three meal reservations.
 
 \Needspace{8\baselineskip}
-\subsection*{Task 1 --- question and worked solution (proposed allocation) \score{1}}
+\subsection*{Task 1 (a) --- question and worked solution (proposed allocation) \score{1}}
 \label{sol:q1t1}
 
-\noindent\textbf{\boldmath List every complete outcome in order and calculate its probability.}\par\nopagebreak
+\noindent\textbf{\boldmath Define the random variable and its units, and identify its support.}\par\nopagebreak
+
+Let $\GTenHLValue{X}$ be the \GTenHLValue{net contribution} from the three meal reservations, in \GTenHLValue{USD}. If $\GTenHLSecond{N}$ is the number of kept reservations, the monetary rule is
+\[
+\GTenHLValue{X}=\GTenHLValue{7}\GTenHLSecond{N}-\GTenHLValue{5}.
+\]
+Since $\GTenHLSecond{N}\in\{0,1,2,3\}$, the distinct possible values are $7(0)-5=-5$, $7(1)-5=2$, $7(2)-5=9$ and $7(3)-5=16$ USD. Therefore
+\[
+\GTenHLValue{S_X}=\{\GTenHLValue{-5},\GTenHLValue{2},\GTenHLValue{9},\GTenHLValue{16}\}\ \GTenHLValue{USD}.
+\]
+A negative net contribution means the handling cost exceeds receipts.
+
+\par\smallskip
+\noindent\begin{minipage}{\linewidth}\centering
+\textbf{Proposed partial credit.}\par\smallskip
+\begin{tabular}{@{}l r@{}}\toprule
+\CreditDescription{\textbf{Assessed step or criterion}} & \textbf{Points}\\\midrule
+\CreditDescription{Contextual definition of $X$, monetary rule and units} & 0.5\\
+\CreditDescription{Correct, complete support} & 0.5\\
+\midrule
+\CreditDescription{\textbf{Total}} & \textbf{1}\\
+\bottomrule\end{tabular}
+\end{minipage}\par\smallskip
+
+\par\vspace{3mm}\secInicio[][sec:q1]
+
+\clearpage
+\subsection*{Task 2 (b) --- question and worked solution (proposed allocation) \score{1}}
+\label{sol:q1t2}
+
+\noindent\textbf{\boldmath List every complete outcome, preserving order where relevant; map each outcome to its probability and monetary value; and construct the grouped PMF.}\par\nopagebreak
 
 Write $\GTenHLOutcome{K}$ for \GTenHLOutcome{kept} and $\GTenHLOutcome{C}$ for \GTenHLOutcome{cancelled}. Each triple is in reservation 1, 2, 3 order. Before calculating products, use the complementary outcomes:
 \[
@@ -111,63 +198,48 @@ P(C_3)&=1-P(K_3)=1-0.8=\GTenHLProbability{0.2}.
 \]
 There are $2^3=8$ ordered complete outcomes. Independence permits multiplication using each reservation's own probabilities; the trials have different keep probabilities.
 \begin{center}
-\begin{tabular}{ccc}\toprule
-Ordered outcome & Product & Exact probability\\
+\begin{tabular}{@{}cccc@{}}\toprule
+Ordered outcome & Probability calculation & Exact $P(\{\omega\})$ & $\GTenHLValue{X}(\GTenHLOutcome{\omega})$ (USD)\\
 \midrule
-$\GTenHLOutcome{\mathrm{KKK}}$ & $\GTenHLProbability{0.2}\cdot\GTenHLProbability{0.5}\cdot\GTenHLProbability{0.8}$ & $\GTenHLProbability{2/25}=\GTenHLProbability{0.08}$\\
-$\GTenHLOutcome{\mathrm{KKC}}$ & $\GTenHLProbability{0.2}\cdot\GTenHLProbability{0.5}\cdot\GTenHLProbability{0.2}$ & $\GTenHLProbability{1/50}=\GTenHLProbability{0.02}$\\
-$\GTenHLOutcome{\mathrm{KCK}}$ & $\GTenHLProbability{0.2}\cdot\GTenHLProbability{0.5}\cdot\GTenHLProbability{0.8}$ & $\GTenHLProbability{2/25}=\GTenHLProbability{0.08}$\\
-$\GTenHLOutcome{\mathrm{KCC}}$ & $\GTenHLProbability{0.2}\cdot\GTenHLProbability{0.5}\cdot\GTenHLProbability{0.2}$ & $\GTenHLProbability{1/50}=\GTenHLProbability{0.02}$\\
-$\GTenHLOutcome{\mathrm{CKK}}$ & $\GTenHLProbability{0.8}\cdot\GTenHLProbability{0.5}\cdot\GTenHLProbability{0.8}$ & $\GTenHLProbability{8/25}=\GTenHLProbability{0.32}$\\
-$\GTenHLOutcome{\mathrm{CKC}}$ & $\GTenHLProbability{0.8}\cdot\GTenHLProbability{0.5}\cdot\GTenHLProbability{0.2}$ & $\GTenHLProbability{2/25}=\GTenHLProbability{0.08}$\\
-$\GTenHLOutcome{\mathrm{CCK}}$ & $\GTenHLProbability{0.8}\cdot\GTenHLProbability{0.5}\cdot\GTenHLProbability{0.8}$ & $\GTenHLProbability{8/25}=\GTenHLProbability{0.32}$\\
-$\GTenHLOutcome{\mathrm{CCC}}$ & $\GTenHLProbability{0.8}\cdot\GTenHLProbability{0.5}\cdot\GTenHLProbability{0.2}$ & $\GTenHLProbability{2/25}=\GTenHLProbability{0.08}$\\
+$\GTenHLOutcome{\mathrm{KKK}}$ & $\GTenHLProbability{0.2}\cdot\GTenHLProbability{0.5}\cdot\GTenHLProbability{0.8}$ & $\GTenHLProbability{2/25}=\GTenHLProbability{0.08}=\GTenHLProbability{8\%}$ & $\GTenHLValue{16}$\\
+$\GTenHLOutcome{\mathrm{KKC}}$ & $\GTenHLProbability{0.2}\cdot\GTenHLProbability{0.5}\cdot\GTenHLProbability{0.2}$ & $\GTenHLProbability{1/50}=\GTenHLProbability{0.02}=\GTenHLProbability{2\%}$ & $\GTenHLValue{9}$\\
+$\GTenHLOutcome{\mathrm{KCK}}$ & $\GTenHLProbability{0.2}\cdot\GTenHLProbability{0.5}\cdot\GTenHLProbability{0.8}$ & $\GTenHLProbability{2/25}=\GTenHLProbability{0.08}=\GTenHLProbability{8\%}$ & $\GTenHLValue{9}$\\
+$\GTenHLOutcome{\mathrm{KCC}}$ & $\GTenHLProbability{0.2}\cdot\GTenHLProbability{0.5}\cdot\GTenHLProbability{0.2}$ & $\GTenHLProbability{1/50}=\GTenHLProbability{0.02}=\GTenHLProbability{2\%}$ & $\GTenHLValue{2}$\\
+$\GTenHLOutcome{\mathrm{CKK}}$ & $\GTenHLProbability{0.8}\cdot\GTenHLProbability{0.5}\cdot\GTenHLProbability{0.8}$ & $\GTenHLProbability{8/25}=\GTenHLProbability{0.32}=\GTenHLProbability{32\%}$ & $\GTenHLValue{9}$\\
+$\GTenHLOutcome{\mathrm{CKC}}$ & $\GTenHLProbability{0.8}\cdot\GTenHLProbability{0.5}\cdot\GTenHLProbability{0.2}$ & $\GTenHLProbability{2/25}=\GTenHLProbability{0.08}=\GTenHLProbability{8\%}$ & $\GTenHLValue{2}$\\
+$\GTenHLOutcome{\mathrm{CCK}}$ & $\GTenHLProbability{0.8}\cdot\GTenHLProbability{0.5}\cdot\GTenHLProbability{0.8}$ & $\GTenHLProbability{8/25}=\GTenHLProbability{0.32}=\GTenHLProbability{32\%}$ & $\GTenHLValue{2}$\\
+$\GTenHLOutcome{\mathrm{CCC}}$ & $\GTenHLProbability{0.8}\cdot\GTenHLProbability{0.5}\cdot\GTenHLProbability{0.2}$ & $\GTenHLProbability{2/25}=\GTenHLProbability{0.08}=\GTenHLProbability{8\%}$ & $\GTenHLValue{-5}$\\
 \bottomrule\end{tabular}
 \end{center}
 Exhaustiveness check: $(0.2+0.8)(0.5+0.5)(0.8+0.2)=1$; the eight probabilities sum to 1.
 
-\par\smallskip
-\noindent\begin{minipage}{\linewidth}\centering
-\textbf{Proposed partial credit.}\par\smallskip
-\begin{tabular}{@{}l r@{}}\toprule
-\CreditDescription{\textbf{Assessed step or criterion}} & \textbf{Points}\\\midrule
-\CreditDescription{All eight ordered outcomes} & 0.5\\
-\CreditDescription{Cancellation complements and independent product probabilities} & 0.5\\
-\midrule
-\CreditDescription{\textbf{Total}} & \textbf{1}\\
-\bottomrule\end{tabular}
-\end{minipage}\par\smallskip
 
 \par\vspace{3mm}\secInicio[][sec:q1]
 
 \clearpage
-\Needspace{8\baselineskip}
-\subsection*{Task 2 --- question and worked solution (proposed allocation) \score{1}}
-\label{sol:q1t2}
+\textbf{Question 1 --- Task 2 (b) continued: grouped \GTenHLProbability{PMF}}
 
-\noindent\textbf{\boldmath Define the random variable and its units. Map every complete outcome to a value, identify the support, and construct the grouped PMF.}\par\nopagebreak
-
-Let $\GTenHLValue{X}$ be the \GTenHLValue{net contribution} from the three meal reservations, in \GTenHLValue{USD}. If $\GTenHLSecond{N}$ is the number kept, $\GTenHLValue{X}=\GTenHLValue{7}\GTenHLSecond{N}-\GTenHLValue{5}$. The table maps all eight outcomes and groups those with the same \GTenHLValue{net contribution}.
-
+For one complete outcome $\GTenHLOutcome{\omega}$, $\GTenHLProbability{P(\{}\GTenHLOutcome{\omega}\GTenHLProbability{\})}$ is its probability. The grouped mass adds the probabilities of all outcomes with the same monetary value:
+\[
+\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}
+=\sum_{\omega:\,X(\omega)=x}\GTenHLProbability{P(\{}\GTenHLOutcome{\omega}\GTenHLProbability{\})}.
+\]
 \begin{center}
-\begin{tabular}{ccc}\toprule
-$\GTenHLValue{x}$ (USD) & Complete outcomes & Grouped probability\\
-\midrule
-$\GTenHLValue{-5}$ & $\GTenHLOutcome{\mathrm{CCC}}$ & $\GTenHLProbability{8/100}=\GTenHLProbability{8/100}$\\
-$\GTenHLValue{2}$ & $\GTenHLOutcome{\mathrm{KCC}},\GTenHLOutcome{\mathrm{CKC}},\GTenHLOutcome{\mathrm{CCK}}$ & $\GTenHLProbability{2/100}+\GTenHLProbability{8/100}+\GTenHLProbability{32/100}=\GTenHLProbability{42/100}$\\
-$\GTenHLValue{9}$ & $\GTenHLOutcome{\mathrm{KKC}},\GTenHLOutcome{\mathrm{KCK}},\GTenHLOutcome{\mathrm{CKK}}$ & $\GTenHLProbability{2/100}+\GTenHLProbability{8/100}+\GTenHLProbability{32/100}=\GTenHLProbability{42/100}$\\
-$\GTenHLValue{16}$ & $\GTenHLOutcome{\mathrm{KKK}}$ & $\GTenHLProbability{8/100}=\GTenHLProbability{8/100}$\\
+\begin{tabular}{@{}c l l@{}}\toprule
+$\GTenHLValue{x}$ (\GTenHLValue{USD}) & Complete outcomes & Grouped $\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}$\\\midrule
+$\GTenHLValue{-5}$ & $\GTenHLOutcome{\mathrm{CCC}}$ & $\begin{aligned}[t]\GTenHLProbability{8/100}&=\GTenHLProbability{8/100}\\&=\GTenHLProbability{0.08}=\GTenHLProbability{8\%}\end{aligned}$\\[5pt]
+$\GTenHLValue{2}$ & $\GTenHLOutcome{\mathrm{KCC}},\GTenHLOutcome{\mathrm{CKC}},\GTenHLOutcome{\mathrm{CCK}}$ & $\begin{aligned}[t]\GTenHLProbability{2/100}+\GTenHLProbability{8/100}+\GTenHLProbability{32/100}&=\GTenHLProbability{42/100}\\&=\GTenHLProbability{0.42}=\GTenHLProbability{42\%}\end{aligned}$\\[5pt]
+$\GTenHLValue{9}$ & $\GTenHLOutcome{\mathrm{KKC}},\GTenHLOutcome{\mathrm{KCK}},\GTenHLOutcome{\mathrm{CKK}}$ & $\begin{aligned}[t]\GTenHLProbability{2/100}+\GTenHLProbability{8/100}+\GTenHLProbability{32/100}&=\GTenHLProbability{42/100}\\&=\GTenHLProbability{0.42}=\GTenHLProbability{42\%}\end{aligned}$\\[5pt]
+$\GTenHLValue{16}$ & $\GTenHLOutcome{\mathrm{KKK}}$ & $\begin{aligned}[t]\GTenHLProbability{8/100}&=\GTenHLProbability{8/100}\\&=\GTenHLProbability{0.08}=\GTenHLProbability{8\%}\end{aligned}$\\[5pt]
 \bottomrule\end{tabular}
 \end{center}
-Thus $\GTenHLValue{S_X}=\{-\GTenHLValue{5},\GTenHLValue{2},\GTenHLValue{9},\GTenHLValue{16}\}$ \GTenHLValue{USD}. The \GTenHLProbability{PMF} is the last column.
+The grouped PMF is the last column.
 \Needspace{5\baselineskip}\textbf{PMF checks.}
 \begin{itemize}
 \item Nonnegativity: all listed masses are positive.
 \item Normalization: $(\GTenHLProbability{8}+\GTenHLProbability{42}+\GTenHLProbability{42}+\GTenHLProbability{8})/\GTenHLProbability{100}=\GTenHLProbability{1}$.
 \item Outside the \GTenHLValue{support}: the \GTenHLProbability{PMF} is zero elsewhere.
 \end{itemize}
-
-A negative value means the handling cost exceeds receipts.
 
 \textbf{Scoring note.} These explanatory positivity and normalization checks carry no separate points; omitting them does not reduce the task score.
 
@@ -176,10 +248,10 @@ A negative value means the handling cost exceeds receipts.
 \textbf{Proposed partial credit.}\par\smallskip
 \begin{tabular}{@{}l r@{}}\toprule
 \CreditDescription{\textbf{Assessed step or criterion}} & \textbf{Points}\\\midrule
-\CreditDescription{The variable and units} & 0.125\\
-\CreditDescription{All outcome mappings} & 0.25\\
-\CreditDescription{Support} & 0.125\\
-\CreditDescription{Grouped PMF masses} & 0.5\\
+\CreditDescription{Complete ordered outcomes} & 0.25\\
+\CreditDescription{Correct outcome probability calculations} & 0.25\\
+\CreditDescription{Correct monetary mapping for every outcome} & 0.25\\
+\CreditDescription{Correct grouping and grouped PMF masses} & 0.25\\
 \midrule
 \CreditDescription{\textbf{Total}} & \textbf{1}\\
 \bottomrule\end{tabular}
@@ -188,12 +260,12 @@ A negative value means the handling cost exceeds receipts.
 \par\vspace{3mm}\secInicio[][sec:q1]
 
 \Needspace{8\baselineskip}
-\subsection*{Task 3 --- question and worked solution (proposed allocation) \score{1}}
+\subsection*{Task 3 (c) --- question and worked solution (proposed allocation) \score{1}}
 \label{sol:q1t3}
 
 \noindent\textbf{\boldmath Calculate and interpret the probability that the net contribution is exactly 9 USD.}\par\nopagebreak
 
-From the grouped \GTenHLProbability{PMF}, $P(\GTenHLValue{X}=\GTenHLValue{9})=\GTenHLProbability{p_X(9)}=\GTenHLProbability{42/100}=\GTenHLProbability{0.42}=\GTenHLProbability{42\%}$. The vendor earns a \GTenHLValue{net contribution} of exactly \GTenHLValue{9 USD} with probability \GTenHLProbability{42\%}; this happens exactly when two reservations are kept and one is cancelled.
+From the grouped \GTenHLProbability{PMF}, $P(\GTenHLValue{X}=\GTenHLValue{9})=\GTenHLProbability{p_X(}\GTenHLValue{9}\GTenHLProbability{)}=\GTenHLProbability{\frac{21}{50}}=\GTenHLProbability{0.42}=\GTenHLProbability{42\%}$. The vendor earns a \GTenHLValue{net contribution} of exactly \GTenHLValue{9 USD} with probability \GTenHLProbability{42\%}; this happens exactly when two reservations are kept and one is cancelled.
 
 \par\smallskip
 \noindent\begin{minipage}{\linewidth}\centering
@@ -217,35 +289,31 @@ Question total: 3 points for C1.
 A bookshop receives one promotional credit from each of two distributors. The distributors award credits independently. Each has exactly three mutually exclusive possible outcomes: no credit, a 4 USD credit, or a 9 USD credit. For the first distributor these probabilities are 0.3, 0.4 and 0.3, respectively. For the second distributor they are 0.5, 0.2 and 0.3, respectively. Add both credits; there are no other adjustments. Record the total credit, keeping first-distributor then second-distributor order.
 
 \Needspace{8\baselineskip}
-\subsection*{Task 1 --- question and worked solution (proposed allocation) \score{1}}
+\subsection*{Task 1 (a) --- question and worked solution (proposed allocation) \score{1}}
 \label{sol:q2t1}
 
-\noindent\textbf{\boldmath List every complete ordered outcome and calculate its probability.}\par\nopagebreak
+\noindent\textbf{\boldmath Define the random variable and its units, and identify its support.}\par\nopagebreak
 
-Each distributor has three possible outcomes, giving $3^2=9$ ordered pairs. Write each pair in first-distributor then second-distributor order, in USD. Independence permits multiplication of the two marginal probabilities.
-\begin{center}
-\begin{tabular}{ccc}\toprule
-Ordered credit outcome (USD) & Product & Exact probability\\\midrule
-$(\GTenHLOutcome{0},\GTenHLOutcome{0})$ & $\GTenHLProbability{0.3}\cdot\GTenHLProbability{0.5}$ & $\GTenHLProbability{3/20}=\GTenHLProbability{0.15}$\\
-$(\GTenHLOutcome{0},\GTenHLOutcome{4})$ & $\GTenHLProbability{0.3}\cdot\GTenHLProbability{0.2}$ & $\GTenHLProbability{3/50}=\GTenHLProbability{0.06}$\\
-$(\GTenHLOutcome{0},\GTenHLOutcome{9})$ & $\GTenHLProbability{0.3}\cdot\GTenHLProbability{0.3}$ & $\GTenHLProbability{9/100}=\GTenHLProbability{0.09}$\\
-$(\GTenHLOutcome{4},\GTenHLOutcome{0})$ & $\GTenHLProbability{0.4}\cdot\GTenHLProbability{0.5}$ & $\GTenHLProbability{1/5}=\GTenHLProbability{0.20}$\\
-$(\GTenHLOutcome{4},\GTenHLOutcome{4})$ & $\GTenHLProbability{0.4}\cdot\GTenHLProbability{0.2}$ & $\GTenHLProbability{2/25}=\GTenHLProbability{0.08}$\\
-$(\GTenHLOutcome{4},\GTenHLOutcome{9})$ & $\GTenHLProbability{0.4}\cdot\GTenHLProbability{0.3}$ & $\GTenHLProbability{3/25}=\GTenHLProbability{0.12}$\\
-$(\GTenHLOutcome{9},\GTenHLOutcome{0})$ & $\GTenHLProbability{0.3}\cdot\GTenHLProbability{0.5}$ & $\GTenHLProbability{3/20}=\GTenHLProbability{0.15}$\\
-$(\GTenHLOutcome{9},\GTenHLOutcome{4})$ & $\GTenHLProbability{0.3}\cdot\GTenHLProbability{0.2}$ & $\GTenHLProbability{3/50}=\GTenHLProbability{0.06}$\\
-$(\GTenHLOutcome{9},\GTenHLOutcome{9})$ & $\GTenHLProbability{0.3}\cdot\GTenHLProbability{0.3}$ & $\GTenHLProbability{9/100}=\GTenHLProbability{0.09}$\\
-\bottomrule\end{tabular}
-\end{center}
-Exhaustiveness check: $(0.3+0.4+0.3)(0.5+0.2+0.3)=1$. The ordered pairs are not equally likely.
+Let $\GTenHLValue{X}$ be the sum of the first and second distributors' promotional credits, in \GTenHLValue{USD}. The monetary rule adds the two credits. Each credit belongs to $\{0,4,9\}$ USD, so their possible sums are
+\[
+\begin{array}{lll}
+0+0=0,&0+4=4,&0+9=9,\\
+4+0=4,&4+4=8,&4+9=13,\\
+9+0=9,&9+4=13,&9+9=18.
+\end{array}
+\]
+Repeated sums appear only once in the support. Hence
+\[
+\GTenHLValue{S_X}=\{\GTenHLValue{0},\GTenHLValue{4},\GTenHLValue{8},\GTenHLValue{9},\GTenHLValue{13},\GTenHLValue{18}\}\ \GTenHLValue{USD}.
+\]
 
 \par\smallskip
 \noindent\begin{minipage}{\linewidth}\centering
 \textbf{Proposed partial credit.}\par\smallskip
 \begin{tabular}{@{}l r@{}}\toprule
 \CreditDescription{\textbf{Assessed step or criterion}} & \textbf{Points}\\\midrule
-\CreditDescription{All nine ordered pairs} & 0.5\\
-\CreditDescription{Independent product probabilities} & 0.5\\
+\CreditDescription{Contextual definition of $X$, monetary rule and units} & 0.5\\
+\CreditDescription{Correct, complete support} & 0.5\\
 \midrule
 \CreditDescription{\textbf{Total}} & \textbf{1}\\
 \bottomrule\end{tabular}
@@ -253,25 +321,52 @@ Exhaustiveness check: $(0.3+0.4+0.3)(0.5+0.2+0.3)=1$. The ordered pairs are not 
 
 \par\vspace{3mm}\secInicio[][sec:q2]
 
-\Needspace{8\baselineskip}
-\subsection*{Task 2 --- question and worked solution (proposed allocation) \score{1}}
+\clearpage
+\subsection*{Task 2 (b) --- question and worked solution (proposed allocation) \score{1}}
 \label{sol:q2t2}
 
-\noindent\textbf{\boldmath Define the random variable and units; map every outcome to a value; identify the support; construct the grouped PMF.}\par\nopagebreak
+\noindent\textbf{\boldmath List every complete outcome, preserving order where relevant; map each outcome to its probability and monetary value; and construct the grouped PMF.}\par\nopagebreak
 
-Let $\GTenHLValue{X}$ be the total promotional credit, in USD. Add the two amounts in every ordered pair; distinct pairs with equal totals must be grouped.
+Each distributor has three possible outcomes, giving $3^2=9$ ordered pairs. Write each pair in first-distributor then second-distributor order, in USD. Independence permits multiplication of the two marginal probabilities.
 \begin{center}
-\begin{tabular}{ccc}\toprule
-$\GTenHLValue{x}$ (USD) & Ordered outcomes & Grouped probability\\\midrule
-$\GTenHLValue{0}$ & $(\GTenHLOutcome{0},\GTenHLOutcome{0})$ & $\GTenHLProbability{3/20}=\GTenHLProbability{3/20}$\\
-$\GTenHLValue{4}$ & $(\GTenHLOutcome{0},\GTenHLOutcome{4}),(\GTenHLOutcome{4},\GTenHLOutcome{0})$ & $\GTenHLProbability{3/50}+\GTenHLProbability{1/5}=\GTenHLProbability{13/50}$\\
-$\GTenHLValue{8}$ & $(\GTenHLOutcome{4},\GTenHLOutcome{4})$ & $\GTenHLProbability{2/25}=\GTenHLProbability{2/25}$\\
-$\GTenHLValue{9}$ & $(\GTenHLOutcome{0},\GTenHLOutcome{9}),(\GTenHLOutcome{9},\GTenHLOutcome{0})$ & $\GTenHLProbability{9/100}+\GTenHLProbability{3/20}=\GTenHLProbability{6/25}$\\
-$\GTenHLValue{13}$ & $(\GTenHLOutcome{4},\GTenHLOutcome{9}),(\GTenHLOutcome{9},\GTenHLOutcome{4})$ & $\GTenHLProbability{3/25}+\GTenHLProbability{3/50}=\GTenHLProbability{9/50}$\\
-$\GTenHLValue{18}$ & $(\GTenHLOutcome{9},\GTenHLOutcome{9})$ & $\GTenHLProbability{9/100}=\GTenHLProbability{9/100}$\\
+\begin{tabular}{@{}cccc@{}}\toprule
+Ordered pair (USD) & Probability calculation & Exact $P(\{\omega\})$ & $\GTenHLValue{X}(\GTenHLOutcome{\omega})$ (USD)\\\midrule
+$(\GTenHLOutcome{0},\GTenHLOutcome{0})$ & $\GTenHLProbability{0.3}\cdot\GTenHLProbability{0.5}$ & $\GTenHLProbability{3/20}=\GTenHLProbability{0.15}=\GTenHLProbability{15\%}$ & $\GTenHLValue{0}$\\
+$(\GTenHLOutcome{0},\GTenHLOutcome{4})$ & $\GTenHLProbability{0.3}\cdot\GTenHLProbability{0.2}$ & $\GTenHLProbability{3/50}=\GTenHLProbability{0.06}=\GTenHLProbability{6\%}$ & $\GTenHLValue{4}$\\
+$(\GTenHLOutcome{0},\GTenHLOutcome{9})$ & $\GTenHLProbability{0.3}\cdot\GTenHLProbability{0.3}$ & $\GTenHLProbability{9/100}=\GTenHLProbability{0.09}=\GTenHLProbability{9\%}$ & $\GTenHLValue{9}$\\
+$(\GTenHLOutcome{4},\GTenHLOutcome{0})$ & $\GTenHLProbability{0.4}\cdot\GTenHLProbability{0.5}$ & $\GTenHLProbability{1/5}=\GTenHLProbability{0.20}=\GTenHLProbability{20\%}$ & $\GTenHLValue{4}$\\
+$(\GTenHLOutcome{4},\GTenHLOutcome{4})$ & $\GTenHLProbability{0.4}\cdot\GTenHLProbability{0.2}$ & $\GTenHLProbability{2/25}=\GTenHLProbability{0.08}=\GTenHLProbability{8\%}$ & $\GTenHLValue{8}$\\
+$(\GTenHLOutcome{4},\GTenHLOutcome{9})$ & $\GTenHLProbability{0.4}\cdot\GTenHLProbability{0.3}$ & $\GTenHLProbability{3/25}=\GTenHLProbability{0.12}=\GTenHLProbability{12\%}$ & $\GTenHLValue{13}$\\
+$(\GTenHLOutcome{9},\GTenHLOutcome{0})$ & $\GTenHLProbability{0.3}\cdot\GTenHLProbability{0.5}$ & $\GTenHLProbability{3/20}=\GTenHLProbability{0.15}=\GTenHLProbability{15\%}$ & $\GTenHLValue{9}$\\
+$(\GTenHLOutcome{9},\GTenHLOutcome{4})$ & $\GTenHLProbability{0.3}\cdot\GTenHLProbability{0.2}$ & $\GTenHLProbability{3/50}=\GTenHLProbability{0.06}=\GTenHLProbability{6\%}$ & $\GTenHLValue{13}$\\
+$(\GTenHLOutcome{9},\GTenHLOutcome{9})$ & $\GTenHLProbability{0.3}\cdot\GTenHLProbability{0.3}$ & $\GTenHLProbability{9/100}=\GTenHLProbability{0.09}=\GTenHLProbability{9\%}$ & $\GTenHLValue{18}$\\
 \bottomrule\end{tabular}
 \end{center}
-The support is $S_X=\{0,4,8,9,13,18\}$ USD. All masses are positive, their sum is $(15+26+8+24+18+9)/100=1$, and the PMF is zero elsewhere. Reversing a pair can preserve the monetary value while changing its probability.
+Exhaustiveness check: $(0.3+0.4+0.3)(0.5+0.2+0.3)=1$. The ordered pairs are not equally likely.
+
+
+\par\vspace{3mm}\secInicio[][sec:q2]
+
+\clearpage
+\textbf{Question 2 --- Task 2 (b) continued: grouped \GTenHLProbability{PMF}}
+
+For one complete outcome $\GTenHLOutcome{\omega}$, $\GTenHLProbability{P(\{}\GTenHLOutcome{\omega}\GTenHLProbability{\})}$ is its probability. The grouped mass adds the probabilities of all outcomes with the same monetary value:
+\[
+\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}
+=\sum_{\omega:\,X(\omega)=x}\GTenHLProbability{P(\{}\GTenHLOutcome{\omega}\GTenHLProbability{\})}.
+\]
+\begin{center}
+\begin{tabular}{@{}c l l@{}}\toprule
+$\GTenHLValue{x}$ (\GTenHLValue{USD}) & Ordered outcomes & Grouped $\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}$\\\midrule
+$\GTenHLValue{0}$ & $(\GTenHLOutcome{0},\GTenHLOutcome{0})$ & $\begin{aligned}[t]\GTenHLProbability{3/20}&=\GTenHLProbability{3/20}\\&=\GTenHLProbability{0.15}=\GTenHLProbability{15\%}\end{aligned}$\\[5pt]
+$\GTenHLValue{4}$ & $(\GTenHLOutcome{0},\GTenHLOutcome{4}),(\GTenHLOutcome{4},\GTenHLOutcome{0})$ & $\begin{aligned}[t]\GTenHLProbability{3/50}+\GTenHLProbability{1/5}&=\GTenHLProbability{13/50}\\&=\GTenHLProbability{0.26}=\GTenHLProbability{26\%}\end{aligned}$\\[5pt]
+$\GTenHLValue{8}$ & $(\GTenHLOutcome{4},\GTenHLOutcome{4})$ & $\begin{aligned}[t]\GTenHLProbability{2/25}&=\GTenHLProbability{2/25}\\&=\GTenHLProbability{0.08}=\GTenHLProbability{8\%}\end{aligned}$\\[5pt]
+$\GTenHLValue{9}$ & $(\GTenHLOutcome{0},\GTenHLOutcome{9}),(\GTenHLOutcome{9},\GTenHLOutcome{0})$ & $\begin{aligned}[t]\GTenHLProbability{9/100}+\GTenHLProbability{3/20}&=\GTenHLProbability{6/25}\\&=\GTenHLProbability{0.24}=\GTenHLProbability{24\%}\end{aligned}$\\[5pt]
+$\GTenHLValue{13}$ & $(\GTenHLOutcome{4},\GTenHLOutcome{9}),(\GTenHLOutcome{9},\GTenHLOutcome{4})$ & $\begin{aligned}[t]\GTenHLProbability{3/25}+\GTenHLProbability{3/50}&=\GTenHLProbability{9/50}\\&=\GTenHLProbability{0.18}=\GTenHLProbability{18\%}\end{aligned}$\\[5pt]
+$\GTenHLValue{18}$ & $(\GTenHLOutcome{9},\GTenHLOutcome{9})$ & $\begin{aligned}[t]\GTenHLProbability{9/100}&=\GTenHLProbability{9/100}\\&=\GTenHLProbability{0.09}=\GTenHLProbability{9\%}\end{aligned}$\\[5pt]
+\bottomrule\end{tabular}
+\end{center}
+All masses are positive, their sum is $(15+26+8+24+18+9)/100=1$, and the PMF is zero elsewhere. Reversing a pair can preserve the monetary value while changing its probability.
 
 \textbf{Scoring note.} These explanatory positivity and normalization checks carry no separate points; omitting them does not reduce the task score.
 
@@ -280,10 +375,10 @@ The support is $S_X=\{0,4,8,9,13,18\}$ USD. All masses are positive, their sum i
 \textbf{Proposed partial credit.}\par\smallskip
 \begin{tabular}{@{}l r@{}}\toprule
 \CreditDescription{\textbf{Assessed step or criterion}} & \textbf{Points}\\\midrule
-\CreditDescription{Variable and units} & 0.125\\
-\CreditDescription{All mappings} & 0.25\\
-\CreditDescription{Support} & 0.125\\
-\CreditDescription{Grouped masses} & 0.5\\
+\CreditDescription{Complete ordered outcomes} & 0.25\\
+\CreditDescription{Correct outcome probability calculations} & 0.25\\
+\CreditDescription{Correct monetary mapping for every outcome} & 0.25\\
+\CreditDescription{Correct grouping and grouped PMF masses} & 0.25\\
 \midrule
 \CreditDescription{\textbf{Total}} & \textbf{1}\\
 \bottomrule\end{tabular}
@@ -292,12 +387,12 @@ The support is $S_X=\{0,4,8,9,13,18\}$ USD. All masses are positive, their sum i
 \par\vspace{3mm}\secInicio[][sec:q2]
 
 \Needspace{8\baselineskip}
-\subsection*{Task 3 --- question and worked solution (proposed allocation) \score{1}}
+\subsection*{Task 3 (c) --- question and worked solution (proposed allocation) \score{1}}
 \label{sol:q2t3}
 
 \noindent\textbf{\boldmath Calculate and interpret the probability that the total credit is exactly 13 USD.}\par\nopagebreak
 
-$P(\GTenHLValue{X}=\GTenHLValue{13})=\GTenHLProbability{p_X(13)}=\GTenHLProbability{3/25}+\GTenHLProbability{3/50}=\GTenHLProbability{9/50}=\GTenHLProbability{0.18}$. The bookshop receives exactly 13 USD with probability \GTenHLProbability{18\%}; the qualifying pairs are $(4,9)$ and $(9,4)$.
+$P(\GTenHLValue{X}=\GTenHLValue{13})=\GTenHLProbability{p_X(}\GTenHLValue{13}\GTenHLProbability{)}=\GTenHLProbability{3/25}+\GTenHLProbability{3/50}=\GTenHLProbability{\frac{9}{50}}=\GTenHLProbability{0.18}=\GTenHLProbability{18\%}$. The bookshop receives exactly 13 USD with probability \GTenHLProbability{18\%}; the qualifying pairs are $(4,9)$ and $(9,4)$.
 
 \par\smallskip
 \noindent\begin{minipage}{\linewidth}\centering
@@ -341,29 +436,28 @@ Category & Given probability & $\GTenHLValue{X}$ (USD)\\\midrule
 \bottomrule\end{tabular}
 \end{center}
 There are eight distinct sample-space outcomes and four monetary values. Add probabilities of mutually exclusive outcomes with the same value:
-\[\begin{aligned}
-\GTenHLProbability{p_X(0)}&=\GTenHLProbability{3/20}+\GTenHLProbability{2/20}=\GTenHLProbability{5/20}\\
-\GTenHLProbability{p_X(6)}&=\GTenHLProbability{2/20}+\GTenHLProbability{3/20}=\GTenHLProbability{5/20}\\
-\GTenHLProbability{p_X(10)}&=\GTenHLProbability{4/20}+\GTenHLProbability{1/20}=\GTenHLProbability{5/20}\\
-\GTenHLProbability{p_X(21)}&=\GTenHLProbability{3/20}+\GTenHLProbability{2/20}=\GTenHLProbability{5/20}
-\end{aligned}\]
+
 $\GTenHLValue{S_X}=\{0,6,10,21\}$ USD.
-\begin{center}\begin{minipage}{.26\linewidth}\centering
-\begin{tabular}{cc}\toprule
-$\GTenHLValue{x}$ (USD) & $\GTenHLProbability{p_X(x)}$\\
-\midrule
-$\GTenHLValue{0}$ & $\GTenHLProbability{5/20}$\\
-$\GTenHLValue{6}$ & $\GTenHLProbability{5/20}$\\
-$\GTenHLValue{10}$ & $\GTenHLProbability{5/20}$\\
-$\GTenHLValue{21}$ & $\GTenHLProbability{5/20}$\\
+\par\vspace{3mm}\secInicio[][sec:q3]
+\clearpage\textbf{Question 3 --- Task 1 continued: grouped \GTenHLProbability{PMF} and graph}
+\begin{center}
+\begingroup\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.18}
+\begin{tabular}{@{}p{.30\linewidth}c p{.55\linewidth}@{}}\toprule
+Complete outcomes or categories & $\GTenHLValue{x}$ (\GTenHLValue{USD}) & Grouped probability: $\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}$\\\midrule
+\GTenHLOutcome{Walking courier}, \GTenHLOutcome{Bicycle} & $\GTenHLValue{0}$ & $\begin{aligned}[t]\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)}&=\GTenHLProbability{3/20}+\GTenHLProbability{2/20}=\GTenHLProbability{5/20}\\&=\GTenHLProbability{0.25}=\GTenHLProbability{25\%}\end{aligned}$\\[5pt]
+\GTenHLOutcome{Cargo bicycle}, \GTenHLOutcome{Motorcycle} & $\GTenHLValue{6}$ & $\begin{aligned}[t]\GTenHLProbability{p_X(}\GTenHLValue{6}\GTenHLProbability{)}&=\GTenHLProbability{2/20}+\GTenHLProbability{3/20}=\GTenHLProbability{5/20}\\&=\GTenHLProbability{0.25}=\GTenHLProbability{25\%}\end{aligned}$\\[5pt]
+\GTenHLOutcome{Car}, \GTenHLOutcome{Van} & $\GTenHLValue{10}$ & $\begin{aligned}[t]\GTenHLProbability{p_X(}\GTenHLValue{10}\GTenHLProbability{)}&=\GTenHLProbability{4/20}+\GTenHLProbability{1/20}=\GTenHLProbability{5/20}\\&=\GTenHLProbability{0.25}=\GTenHLProbability{25\%}\end{aligned}$\\[5pt]
+\GTenHLOutcome{Refrigerated van}, \GTenHLOutcome{Truck} & $\GTenHLValue{21}$ & $\begin{aligned}[t]\GTenHLProbability{p_X(}\GTenHLValue{21}\GTenHLProbability{)}&=\GTenHLProbability{3/20}+\GTenHLProbability{2/20}=\GTenHLProbability{5/20}\\&=\GTenHLProbability{0.25}=\GTenHLProbability{25\%}\end{aligned}$\\[5pt]
 \bottomrule\end{tabular}
-\end{minipage}\hfill\begin{minipage}{.70\linewidth}\centering\begin{tikzpicture}
-\begin{axis}[keyaxis,width=.94\linewidth,height=5cm,xmin=-2,xmax=23,ymin=0,ymax=.65,xtick={0,6,10,21},ylabel={$\GTenHLProbability{p_X(x)}$},yticklabel={$\GTenHLProbability{\pgfmathprintnumber{\tick}}$}]
+\endgroup
+\end{center}
+\begin{center}\begin{tikzpicture}
+\begin{axis}[keyaxis,width=.86\linewidth,height=5cm,xmin=-2,xmax=23,ymin=0,ymax=.65,xtick={0,6,10,21},ylabel={$\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}$},yticklabel={$\GTenHLProbability{\pgfmathprintnumber{\tick}}$}]
 \draw[fill=keyMassFill,draw=keyMassColor] (axis cs:-0.45,0) rectangle (axis cs:0.45,5/20);
 \draw[fill=keyMassFill,draw=keyMassColor] (axis cs:5.55,0) rectangle (axis cs:6.45,5/20);
 \draw[fill=keyMassFill,draw=keyMassColor] (axis cs:9.55,0) rectangle (axis cs:10.45,5/20);
 \draw[fill=keyMassFill,draw=keyMassColor] (axis cs:20.55,0) rectangle (axis cs:21.45,5/20);
-\end{axis}\end{tikzpicture}\end{minipage}\end{center}\Needspace{5\baselineskip}\textbf{PMF checks.}\begin{itemize}\item Every mass is positive.\item Normalization: $(5+5+5+5)/20=1$.\item Set $p_X(x)=0$ outside the support. Bars use actual monetary spacing; gaps carry no mass.\end{itemize}
+\end{axis}\end{tikzpicture}\end{center}\Needspace{5\baselineskip}\textbf{PMF checks.}\begin{itemize}\item Every mass is positive.\item Normalization: $(5+5+5+5)/20=1$.\item Set $\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}=\GTenHLProbability{0}$ outside the support. Bars use actual monetary spacing; gaps carry no mass.\end{itemize}
 
 \textbf{Scoring note.} These explanatory positivity and normalization checks carry no separate points; omitting them does not reduce the task score.
 
@@ -391,20 +485,36 @@ $\GTenHLValue{21}$ & $\GTenHLProbability{5/20}$\\
 
 \noindent\textbf{\boldmath Construct the complete CDF table, including both tails, and draw a labeled step graph. Use open and filled endpoints correctly and preserve actual monetary spacing.}\par\nopagebreak
 
-For $\HLCumulativeProbability{F_X(x)}=P(X\leq x)$, add masses in increasing monetary order. The successive cumulative numerators are $5,10,15,20$, all over $20$.
+For $\HLCumulativeProbability{F_X(}\GTenHLValue{x}\HLCumulativeProbability{)}=P(X\leq x)$, add masses in increasing monetary order.
+
+The successive cumulative numerators are $5,10,15,20$, all over $20$.
 \begin{center}
-\begin{tabular}{cc}\toprule
-Cutoff interval (USD) & $\HLCumulativeProbability{F_X(x)}$\\
-\midrule
-$\GTenHLValue{x}<\GTenHLValue{0}$ & $\HLCumulativeProbability{0}$\\
-$\GTenHLValue{0}\leq \GTenHLValue{x}<\GTenHLValue{6}$ & $\HLCumulativeProbability{5/20}$\\
-$\GTenHLValue{6}\leq \GTenHLValue{x}<\GTenHLValue{10}$ & $\HLCumulativeProbability{10/20}$\\
-$\GTenHLValue{10}\leq \GTenHLValue{x}<\GTenHLValue{21}$ & $\HLCumulativeProbability{15/20}$\\
-$\GTenHLValue{x}\geq \GTenHLValue{21}$ & $\HLCumulativeProbability{1}$\\
+\begingroup
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}r@{}c@{}c@{}c@{}llc@{}}\toprule
+\multicolumn{5}{c}{Cutoff interval (USD)} & Calculations & $\HLCumulativeProbability{F_X(}\GTenHLValue{x}\HLCumulativeProbability{)}$\\\midrule
+ & & $\GTenHLValue{x}$ & $<$ & $\GTenHLValue{0}$ & $\text{No included support values}$ & $\HLCumulativeProbability{0}$\\[5pt]
+$\GTenHLValue{0}$ & $\leq$ & $\GTenHLValue{x}$ & $<$ & $\GTenHLValue{6}$ & $\begin{aligned}[t]
+  &\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)}
+  \\&= \GTenHLProbability{\frac{5}{20}}
+\end{aligned}$ & $\HLCumulativeProbability{5/20}$\\[5pt]
+$\GTenHLValue{6}$ & $\leq$ & $\GTenHLValue{x}$ & $<$ & $\GTenHLValue{10}$ & $\begin{aligned}[t]
+  &\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{6}\GTenHLProbability{)}
+  \\&= \GTenHLProbability{\frac{5}{20}} + \GTenHLProbability{\frac{5}{20}}
+\end{aligned}$ & $\HLCumulativeProbability{10/20}$\\[5pt]
+$\GTenHLValue{10}$ & $\leq$ & $\GTenHLValue{x}$ & $<$ & $\GTenHLValue{21}$ & $\begin{aligned}[t]
+  &\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{6}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{10}\GTenHLProbability{)}
+  \\&= \GTenHLProbability{\frac{5}{20}} + \GTenHLProbability{\frac{5}{20}} + \GTenHLProbability{\frac{5}{20}}
+\end{aligned}$ & $\HLCumulativeProbability{15/20}$\\[5pt]
+$\GTenHLValue{21}$ & $\leq$ & $\GTenHLValue{x}$ &  &  & $\begin{aligned}[t]
+  &\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{6}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{10}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{21}\GTenHLProbability{)}
+  \\&= \GTenHLProbability{\frac{5}{20}} + \GTenHLProbability{\frac{5}{20}} + \GTenHLProbability{\frac{5}{20}} + \GTenHLProbability{\frac{5}{20}}
+\end{aligned}$ & $\HLCumulativeProbability{1}$\\[5pt]
 \bottomrule\end{tabular}
+\endgroup
 \end{center}
 \begin{center}\begin{tikzpicture}
-\begin{axis}[keyaxis,width=.86\linewidth,height=7cm,xmin=-2,xmax=23,ymin=-.07,ymax=1.1,xtick={0,6,10,21},ylabel={$\HLCumulativeProbability{F_X(x)}$},yticklabel={$\HLCumulativeProbability{\pgfmathprintnumber{\tick}}$},ytick={0,.25,.5,.75,1}]
+\begin{axis}[keyaxis,width=.86\linewidth,height=7cm,xmin=-2,xmax=23,ymin=-.07,ymax=1.1,xtick={0,6,10,21},ylabel={$\HLCumulativeProbability{F_X(}\GTenHLValue{x}\HLCumulativeProbability{)}$},yticklabel={$\HLCumulativeProbability{\pgfmathprintnumber{\tick}}$},ytick={0,.25,.5,.75,1}]
 \addplot[keyCDFColor,thick,<-] coordinates {(-2,0)(0,0)};
 \addplot[keyCDFColor,thick] coordinates {(0,5/20)(6,5/20)};
 \addplot[keyCDFColor,thick] coordinates {(6,10/20)(10,10/20)};
@@ -412,7 +522,51 @@ $\GTenHLValue{x}\geq \GTenHLValue{21}$ & $\HLCumulativeProbability{1}$\\
 \addplot[keyCDFColor,thick,->] coordinates {(21,1)(23,1)};
 \addplot[keyCDFColor,only marks,mark=*,mark size=1.6pt,mark options={fill=white}] coordinates {(0,0/20)(6,5/20)(10,10/20)(21,15/20)};
 \addplot[keyCDFColor,only marks,mark=*,mark size=1.6pt] coordinates {(0,5/20)(6,10/20)(10,15/20)(21,20/20)};
-\end{axis}\end{tikzpicture}\end{center}\textbf{CDF checks.}\begin{itemize}\item The intervals cover every real cutoff, and every height lies in $[0,1]$.\item The heights never decrease.\item Each segment includes its left endpoint and excludes its right endpoint; the filled point gives the value at a jump, so the CDF is right-continuous.\item The lower-tail limit is 0 and the upper-tail limit is 1; the arrows extend both tails.\item Successive cumulative differences recover the PMF numerators $5,5,5,5$ over $20$. Thus $F_X(a)-F_X(a^-)=p_X(a)$; unsupported cutoffs have zero jump and zero mass.\end{itemize}
+\end{axis}\end{tikzpicture}\end{center}
+\clearpage
+\textbf{Question 3 --- Task 2 continued: comparison}\quad\hyperref[sec:q3]{Original description}
+\par\smallskip\textbf{Same distribution: CDF above, PMF below.}
+\begin{center}\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}
+\pgfplotsset{keySupport/.style={xmin=-2,xmax=23,xtick={0,6,10,21},
+xlabel={$\GTenHLValue{x}$ (\GTenHLValue{USD})},
+xticklabel={$\GTenHLValue{\pgfmathprintnumber{\tick}}$},
+xticklabel style={font=\footnotesize,anchor=north,fill=white,inner sep=1pt},
+xlabel style={fill=white,inner sep=2pt}}}
+\begin{axis}[keyCombined,keySupport,name=keyTop,anchor=south west,
+ylabel={$\HLCumulativeProbability{F_X(}\GTenHLValue{x}\HLCumulativeProbability{)}$},yticklabel={$\HLCumulativeProbability{\pgfmathprintnumber{\tick}}$}]
+\keyPhantom{0}{5/20}{0/20}
+\keyPhantom{6}{5/20}{5/20}
+\keyPhantom{10}{5/20}{10/20}
+\keyPhantom{21}{5/20}{15/20}
+\addplot[keyStep,<-] coordinates {(-2,0)(0,0)};
+\addplot[keyStep] coordinates {(0,5/20)(6,5/20)};
+\addplot[keyStep] coordinates {(6,10/20)(10,10/20)};
+\addplot[keyStep] coordinates {(10,15/20)(21,15/20)};
+\addplot[keyStep,->] coordinates {(21,1)(23,1)};
+\addplot[keyExcluded] coordinates {(0,0/20)(6,5/20)(10,10/20)(21,15/20)};
+\addplot[keyIncluded] coordinates {(0,5/20)(6,10/20)(10,15/20)(21,20/20)};
+\end{axis}
+\begin{axis}[keyCombined,keySupport,at={(keyTop.south west)},
+anchor=north west,yshift=-1.35cm,ylabel={$\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}$},
+yticklabel={$\GTenHLProbability{\pgfmathprintnumber{\tick}}$}]
+\keyMass{0}{5/20}
+\keyMass{6}{5/20}
+\keyMass{10}{5/20}
+\keyMass{21}{5/20}
+\addlegendimage{keyStep}\addlegendentry{Top: \HLCumulativeProbability{CDF} steps}
+\addlegendimage{keyPhantom,mark=*}\addlegendentry{Top: \GTenHLProbability{PMF} shadows (jumps)}
+\addlegendimage{keyMass,mark=*}\addlegendentry{Bottom: \GTenHLProbability{PMF} stems}
+\addlegendimage{keyCorrespondence}\addlegendentry{Midpoint correspondence}
+\end{axis}
+\keyCorrespondence{0}
+\keyCorrespondence{6}
+\keyCorrespondence{10}
+\keyCorrespondence{21}
+\end{tikzpicture}\end{minipage}\end{center}
+\keyConnectionReading
+\par\medskip
+\textbf{CDF checks.}\begin{itemize}\item The intervals cover every real cutoff, and every height lies in $[0,1]$.\item The heights never decrease.\item Each segment includes its left endpoint and excludes its right endpoint; the filled point gives the value at a jump, so the CDF is right-continuous.\item The lower-tail limit is 0 and the upper-tail limit is 1; the arrows extend both tails.\item Successive cumulative differences recover the PMF numerators $5,5,5,5$ over $20$. Thus $\HLCumulativeProbability{F_X(}\GTenHLValue{a}\HLCumulativeProbability{)}-\HLCumulativeProbability{F_X(}\GTenHLValue{a^-}\HLCumulativeProbability{)}=\GTenHLProbability{p_X(}\GTenHLValue{a}\GTenHLProbability{)}$; unsupported cutoffs have zero jump and zero mass.\end{itemize}
 
 \par\smallskip
 \noindent\begin{minipage}{\linewidth}\centering
@@ -442,11 +596,21 @@ $\GTenHLValue{x}\geq \GTenHLValue{21}$ & $\HLCumulativeProbability{1}$\\
 \textbf{Allocation:} (i) 0.25 points; (ii) 0.25 points.
 
 \textbf{(i)} Include only $0,6$ USD; exclude the boundary mass at 10 USD.
-\[P(\GTenHLValue{X}<\GTenHLValue{10})=\GTenHLProbability{p_X(0)}+\GTenHLProbability{p_X(6)}=\frac{5+5}{20}=\GTenHLProbability{1/2}=\GTenHLProbability{0.50}.\]
+\[
+\begin{aligned}
+P(\GTenHLValue{X}<\GTenHLValue{10})&=\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)}+\GTenHLProbability{p_X(}\GTenHLValue{6}\GTenHLProbability{)}=\frac{5+5}{20}
+\\ &=\GTenHLProbability{\frac{1}{2}}=\GTenHLProbability{0.50}=\GTenHLProbability{50\%}.
+\end{aligned}
+\]
 The handling fee for one produce crate is below 10 USD with probability $\GTenHLProbability{1/2}$, or $\GTenHLProbability{50\%}$.
 
 \textbf{(ii)} Include only $21$ USD; include the boundary mass at 21 USD.
-\[P(\GTenHLValue{X}\geq\GTenHLValue{21})=\GTenHLProbability{p_X(21)}=\frac{5}{20}=\GTenHLProbability{1/4}=\GTenHLProbability{0.25}.\]
+\[
+\begin{aligned}
+P(\GTenHLValue{X}\geq\GTenHLValue{21})&=\GTenHLProbability{p_X(}\GTenHLValue{21}\GTenHLProbability{)}=\frac{5}{20}
+\\ &=\GTenHLProbability{\frac{1}{4}}=\GTenHLProbability{0.25}=\GTenHLProbability{25\%}.
+\end{aligned}
+\]
 The handling fee for one produce crate is at least 21 USD with probability $\GTenHLProbability{1/4}$, or $\GTenHLProbability{25\%}$.
 
 \par\smallskip
@@ -497,29 +661,28 @@ Category & Given probability & $\GTenHLValue{X}$ (USD)\\\midrule
 \bottomrule\end{tabular}
 \end{center}
 There are eight distinct sample-space outcomes and four monetary values. Add probabilities of mutually exclusive outcomes with the same value:
-\[\begin{aligned}
-\GTenHLProbability{p_X(0)}&=\GTenHLProbability{3/20}+\GTenHLProbability{1/20}=\GTenHLProbability{4/20}\\
-\GTenHLProbability{p_X(11)}&=\GTenHLProbability{3/20}+\GTenHLProbability{2/20}=\GTenHLProbability{5/20}\\
-\GTenHLProbability{p_X(22)}&=\GTenHLProbability{2/20}+\GTenHLProbability{4/20}=\GTenHLProbability{6/20}\\
-\GTenHLProbability{p_X(34)}&=\GTenHLProbability{2/20}+\GTenHLProbability{3/20}=\GTenHLProbability{5/20}
-\end{aligned}\]
+
 $\GTenHLValue{S_X}=\{0,11,22,34\}$ USD.
-\begin{center}\begin{minipage}{.26\linewidth}\centering
-\begin{tabular}{cc}\toprule
-$\GTenHLValue{x}$ (USD) & $\GTenHLProbability{p_X(x)}$\\
-\midrule
-$\GTenHLValue{0}$ & $\GTenHLProbability{4/20}$\\
-$\GTenHLValue{11}$ & $\GTenHLProbability{5/20}$\\
-$\GTenHLValue{22}$ & $\GTenHLProbability{6/20}$\\
-$\GTenHLValue{34}$ & $\GTenHLProbability{5/20}$\\
+\par\vspace{3mm}\secInicio[][sec:q4]
+\clearpage\textbf{Question 4 --- Task 1 continued: grouped \GTenHLProbability{PMF} and graph}
+\begin{center}
+\begingroup\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.18}
+\begin{tabular}{@{}p{.30\linewidth}c p{.55\linewidth}@{}}\toprule
+Complete outcomes or categories & $\GTenHLValue{x}$ (\GTenHLValue{USD}) & Grouped probability: $\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}$\\\midrule
+\GTenHLOutcome{No service}, \GTenHLOutcome{Remote diagnosis} & $\GTenHLValue{0}$ & $\begin{aligned}[t]\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)}&=\GTenHLProbability{3/20}+\GTenHLProbability{1/20}=\GTenHLProbability{4/20}\\&=\GTenHLProbability{0.2}=\GTenHLProbability{20\%}\end{aligned}$\\[5pt]
+\GTenHLOutcome{Software reset}, \GTenHLOutcome{Minor repair} & $\GTenHLValue{11}$ & $\begin{aligned}[t]\GTenHLProbability{p_X(}\GTenHLValue{11}\GTenHLProbability{)}&=\GTenHLProbability{3/20}+\GTenHLProbability{2/20}=\GTenHLProbability{5/20}\\&=\GTenHLProbability{0.25}=\GTenHLProbability{25\%}\end{aligned}$\\[5pt]
+\GTenHLOutcome{Major repair}, \GTenHLOutcome{Replacement} & $\GTenHLValue{22}$ & $\begin{aligned}[t]\GTenHLProbability{p_X(}\GTenHLValue{22}\GTenHLProbability{)}&=\GTenHLProbability{2/20}+\GTenHLProbability{4/20}=\GTenHLProbability{6/20}\\&=\GTenHLProbability{0.3}=\GTenHLProbability{30\%}\end{aligned}$\\[5pt]
+\GTenHLOutcome{Store credit}, \GTenHLOutcome{Cash refund} & $\GTenHLValue{34}$ & $\begin{aligned}[t]\GTenHLProbability{p_X(}\GTenHLValue{34}\GTenHLProbability{)}&=\GTenHLProbability{2/20}+\GTenHLProbability{3/20}=\GTenHLProbability{5/20}\\&=\GTenHLProbability{0.25}=\GTenHLProbability{25\%}\end{aligned}$\\[5pt]
 \bottomrule\end{tabular}
-\end{minipage}\hfill\begin{minipage}{.70\linewidth}\centering\begin{tikzpicture}
-\begin{axis}[keyaxis,width=.94\linewidth,height=5cm,xmin=-2,xmax=36,ymin=0,ymax=.65,xtick={0,11,22,34},ylabel={$\GTenHLProbability{p_X(x)}$},yticklabel={$\GTenHLProbability{\pgfmathprintnumber{\tick}}$}]
+\endgroup
+\end{center}
+\begin{center}\begin{tikzpicture}
+\begin{axis}[keyaxis,width=.86\linewidth,height=5cm,xmin=-2,xmax=36,ymin=0,ymax=.65,xtick={0,11,22,34},ylabel={$\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}$},yticklabel={$\GTenHLProbability{\pgfmathprintnumber{\tick}}$}]
 \draw[fill=keyMassFill,draw=keyMassColor] (axis cs:-0.45,0) rectangle (axis cs:0.45,4/20);
 \draw[fill=keyMassFill,draw=keyMassColor] (axis cs:10.55,0) rectangle (axis cs:11.45,5/20);
 \draw[fill=keyMassFill,draw=keyMassColor] (axis cs:21.55,0) rectangle (axis cs:22.45,6/20);
 \draw[fill=keyMassFill,draw=keyMassColor] (axis cs:33.55,0) rectangle (axis cs:34.45,5/20);
-\end{axis}\end{tikzpicture}\end{minipage}\end{center}\Needspace{5\baselineskip}\textbf{PMF checks.}\begin{itemize}\item Every mass is positive.\item Normalization: $(4+5+6+5)/20=1$.\item Set $p_X(x)=0$ outside the support. Bars use actual monetary spacing; gaps carry no mass.\end{itemize}
+\end{axis}\end{tikzpicture}\end{center}\Needspace{5\baselineskip}\textbf{PMF checks.}\begin{itemize}\item Every mass is positive.\item Normalization: $(4+5+6+5)/20=1$.\item Set $\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}=\GTenHLProbability{0}$ outside the support. Bars use actual monetary spacing; gaps carry no mass.\end{itemize}
 
 \textbf{Scoring note.} These explanatory positivity and normalization checks carry no separate points; omitting them does not reduce the task score.
 
@@ -547,20 +710,36 @@ $\GTenHLValue{34}$ & $\GTenHLProbability{5/20}$\\
 
 \noindent\textbf{\boldmath Construct the complete CDF table, including both tails, and draw a labeled step graph. Use open and filled endpoints correctly and preserve actual monetary spacing.}\par\nopagebreak
 
-For $\HLCumulativeProbability{F_X(x)}=P(X\leq x)$, add masses in increasing monetary order. The successive cumulative numerators are $4,9,15,20$, all over $20$.
+For $\HLCumulativeProbability{F_X(}\GTenHLValue{x}\HLCumulativeProbability{)}=P(X\leq x)$, add masses in increasing monetary order.
+
+The successive cumulative numerators are $4,9,15,20$, all over $20$.
 \begin{center}
-\begin{tabular}{cc}\toprule
-Cutoff interval (USD) & $\HLCumulativeProbability{F_X(x)}$\\
-\midrule
-$\GTenHLValue{x}<\GTenHLValue{0}$ & $\HLCumulativeProbability{0}$\\
-$\GTenHLValue{0}\leq \GTenHLValue{x}<\GTenHLValue{11}$ & $\HLCumulativeProbability{4/20}$\\
-$\GTenHLValue{11}\leq \GTenHLValue{x}<\GTenHLValue{22}$ & $\HLCumulativeProbability{9/20}$\\
-$\GTenHLValue{22}\leq \GTenHLValue{x}<\GTenHLValue{34}$ & $\HLCumulativeProbability{15/20}$\\
-$\GTenHLValue{x}\geq \GTenHLValue{34}$ & $\HLCumulativeProbability{1}$\\
+\begingroup
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}r@{}c@{}c@{}c@{}llc@{}}\toprule
+\multicolumn{5}{c}{Cutoff interval (USD)} & Calculations & $\HLCumulativeProbability{F_X(}\GTenHLValue{x}\HLCumulativeProbability{)}$\\\midrule
+ & & $\GTenHLValue{x}$ & $<$ & $\GTenHLValue{0}$ & $\text{No included support values}$ & $\HLCumulativeProbability{0}$\\[5pt]
+$\GTenHLValue{0}$ & $\leq$ & $\GTenHLValue{x}$ & $<$ & $\GTenHLValue{11}$ & $\begin{aligned}[t]
+  &\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)}
+  \\&= \GTenHLProbability{\frac{4}{20}}
+\end{aligned}$ & $\HLCumulativeProbability{4/20}$\\[5pt]
+$\GTenHLValue{11}$ & $\leq$ & $\GTenHLValue{x}$ & $<$ & $\GTenHLValue{22}$ & $\begin{aligned}[t]
+  &\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{11}\GTenHLProbability{)}
+  \\&= \GTenHLProbability{\frac{4}{20}} + \GTenHLProbability{\frac{5}{20}}
+\end{aligned}$ & $\HLCumulativeProbability{9/20}$\\[5pt]
+$\GTenHLValue{22}$ & $\leq$ & $\GTenHLValue{x}$ & $<$ & $\GTenHLValue{34}$ & $\begin{aligned}[t]
+  &\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{11}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{22}\GTenHLProbability{)}
+  \\&= \GTenHLProbability{\frac{4}{20}} + \GTenHLProbability{\frac{5}{20}} + \GTenHLProbability{\frac{6}{20}}
+\end{aligned}$ & $\HLCumulativeProbability{15/20}$\\[5pt]
+$\GTenHLValue{34}$ & $\leq$ & $\GTenHLValue{x}$ &  &  & $\begin{aligned}[t]
+  &\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{11}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{22}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{34}\GTenHLProbability{)}
+  \\&= \GTenHLProbability{\frac{4}{20}} + \GTenHLProbability{\frac{5}{20}} + \GTenHLProbability{\frac{6}{20}} + \GTenHLProbability{\frac{5}{20}}
+\end{aligned}$ & $\HLCumulativeProbability{1}$\\[5pt]
 \bottomrule\end{tabular}
+\endgroup
 \end{center}
 \begin{center}\begin{tikzpicture}
-\begin{axis}[keyaxis,width=.86\linewidth,height=7cm,xmin=-2,xmax=36,ymin=-.07,ymax=1.1,xtick={0,11,22,34},ylabel={$\HLCumulativeProbability{F_X(x)}$},yticklabel={$\HLCumulativeProbability{\pgfmathprintnumber{\tick}}$},ytick={0,.25,.5,.75,1}]
+\begin{axis}[keyaxis,width=.86\linewidth,height=7cm,xmin=-2,xmax=36,ymin=-.07,ymax=1.1,xtick={0,11,22,34},ylabel={$\HLCumulativeProbability{F_X(}\GTenHLValue{x}\HLCumulativeProbability{)}$},yticklabel={$\HLCumulativeProbability{\pgfmathprintnumber{\tick}}$},ytick={0,.25,.5,.75,1}]
 \addplot[keyCDFColor,thick,<-] coordinates {(-2,0)(0,0)};
 \addplot[keyCDFColor,thick] coordinates {(0,4/20)(11,4/20)};
 \addplot[keyCDFColor,thick] coordinates {(11,9/20)(22,9/20)};
@@ -568,7 +747,51 @@ $\GTenHLValue{x}\geq \GTenHLValue{34}$ & $\HLCumulativeProbability{1}$\\
 \addplot[keyCDFColor,thick,->] coordinates {(34,1)(36,1)};
 \addplot[keyCDFColor,only marks,mark=*,mark size=1.6pt,mark options={fill=white}] coordinates {(0,0/20)(11,4/20)(22,9/20)(34,15/20)};
 \addplot[keyCDFColor,only marks,mark=*,mark size=1.6pt] coordinates {(0,4/20)(11,9/20)(22,15/20)(34,20/20)};
-\end{axis}\end{tikzpicture}\end{center}\textbf{CDF checks.}\begin{itemize}\item The intervals cover every real cutoff, and every height lies in $[0,1]$.\item The heights never decrease.\item Each segment includes its left endpoint and excludes its right endpoint; the filled point gives the value at a jump, so the CDF is right-continuous.\item The lower-tail limit is 0 and the upper-tail limit is 1; the arrows extend both tails.\item Successive cumulative differences recover the PMF numerators $4,5,6,5$ over $20$. Thus $F_X(a)-F_X(a^-)=p_X(a)$; unsupported cutoffs have zero jump and zero mass.\end{itemize}
+\end{axis}\end{tikzpicture}\end{center}
+\clearpage
+\textbf{Question 4 --- Task 2 continued: comparison}\quad\hyperref[sec:q4]{Original description}
+\par\smallskip\textbf{Same distribution: CDF above, PMF below.}
+\begin{center}\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}
+\pgfplotsset{keySupport/.style={xmin=-2,xmax=36,xtick={0,11,22,34},
+xlabel={$\GTenHLValue{x}$ (\GTenHLValue{USD})},
+xticklabel={$\GTenHLValue{\pgfmathprintnumber{\tick}}$},
+xticklabel style={font=\footnotesize,anchor=north,fill=white,inner sep=1pt},
+xlabel style={fill=white,inner sep=2pt}}}
+\begin{axis}[keyCombined,keySupport,name=keyTop,anchor=south west,
+ylabel={$\HLCumulativeProbability{F_X(}\GTenHLValue{x}\HLCumulativeProbability{)}$},yticklabel={$\HLCumulativeProbability{\pgfmathprintnumber{\tick}}$}]
+\keyPhantom{0}{4/20}{0/20}
+\keyPhantom{11}{5/20}{4/20}
+\keyPhantom{22}{6/20}{9/20}
+\keyPhantom{34}{5/20}{15/20}
+\addplot[keyStep,<-] coordinates {(-2,0)(0,0)};
+\addplot[keyStep] coordinates {(0,4/20)(11,4/20)};
+\addplot[keyStep] coordinates {(11,9/20)(22,9/20)};
+\addplot[keyStep] coordinates {(22,15/20)(34,15/20)};
+\addplot[keyStep,->] coordinates {(34,1)(36,1)};
+\addplot[keyExcluded] coordinates {(0,0/20)(11,4/20)(22,9/20)(34,15/20)};
+\addplot[keyIncluded] coordinates {(0,4/20)(11,9/20)(22,15/20)(34,20/20)};
+\end{axis}
+\begin{axis}[keyCombined,keySupport,at={(keyTop.south west)},
+anchor=north west,yshift=-1.35cm,ylabel={$\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}$},
+yticklabel={$\GTenHLProbability{\pgfmathprintnumber{\tick}}$}]
+\keyMass{0}{4/20}
+\keyMass{11}{5/20}
+\keyMass{22}{6/20}
+\keyMass{34}{5/20}
+\addlegendimage{keyStep}\addlegendentry{Top: \HLCumulativeProbability{CDF} steps}
+\addlegendimage{keyPhantom,mark=*}\addlegendentry{Top: \GTenHLProbability{PMF} shadows (jumps)}
+\addlegendimage{keyMass,mark=*}\addlegendentry{Bottom: \GTenHLProbability{PMF} stems}
+\addlegendimage{keyCorrespondence}\addlegendentry{Midpoint correspondence}
+\end{axis}
+\keyCorrespondence{0}
+\keyCorrespondence{11}
+\keyCorrespondence{22}
+\keyCorrespondence{34}
+\end{tikzpicture}\end{minipage}\end{center}
+\keyConnectionReading
+\par\medskip
+\textbf{CDF checks.}\begin{itemize}\item The intervals cover every real cutoff, and every height lies in $[0,1]$.\item The heights never decrease.\item Each segment includes its left endpoint and excludes its right endpoint; the filled point gives the value at a jump, so the CDF is right-continuous.\item The lower-tail limit is 0 and the upper-tail limit is 1; the arrows extend both tails.\item Successive cumulative differences recover the PMF numerators $4,5,6,5$ over $20$. Thus $\HLCumulativeProbability{F_X(}\GTenHLValue{a}\HLCumulativeProbability{)}-\HLCumulativeProbability{F_X(}\GTenHLValue{a^-}\HLCumulativeProbability{)}=\GTenHLProbability{p_X(}\GTenHLValue{a}\GTenHLProbability{)}$; unsupported cutoffs have zero jump and zero mass.\end{itemize}
 
 \par\smallskip
 \noindent\begin{minipage}{\linewidth}\centering
@@ -598,11 +821,21 @@ $\GTenHLValue{x}\geq \GTenHLValue{34}$ & $\HLCumulativeProbability{1}$\\
 \textbf{Allocation:} (i) 0.25 points; (ii) 0.25 points.
 
 \textbf{(i)} Include only $0$ USD; exclude the boundary mass at 11 USD.
-\[P(\GTenHLValue{X}<\GTenHLValue{11})=\GTenHLProbability{p_X(0)}=\frac{4}{20}=\GTenHLProbability{1/5}=\GTenHLProbability{0.20}.\]
+\[
+\begin{aligned}
+P(\GTenHLValue{X}<\GTenHLValue{11})&=\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)}=\frac{4}{20}
+\\ &=\GTenHLProbability{\frac{1}{5}}=\GTenHLProbability{0.20}=\GTenHLProbability{20\%}.
+\end{aligned}
+\]
 The provider's payout for one claim is below 11 USD with probability $\GTenHLProbability{1/5}$, or $\GTenHLProbability{20\%}$.
 
 \textbf{(ii)} Include only $22,34$ USD; include the boundary mass at 22 USD.
-\[P(\GTenHLValue{X}\geq\GTenHLValue{22})=\GTenHLProbability{p_X(22)}+\GTenHLProbability{p_X(34)}=\frac{6+5}{20}=\GTenHLProbability{11/20}=\GTenHLProbability{0.55}.\]
+\[
+\begin{aligned}
+P(\GTenHLValue{X}\geq\GTenHLValue{22})&=\GTenHLProbability{p_X(}\GTenHLValue{22}\GTenHLProbability{)}+\GTenHLProbability{p_X(}\GTenHLValue{34}\GTenHLProbability{)}=\frac{6+5}{20}
+\\ &=\GTenHLProbability{\frac{11}{20}}=\GTenHLProbability{0.55}=\GTenHLProbability{55\%}.
+\end{aligned}
+\]
 The provider's payout for one claim is at least 22 USD with probability $\GTenHLProbability{11/20}$, or $\GTenHLProbability{55\%}$.
 
 \par\smallskip
@@ -638,7 +871,7 @@ For one booking, a travel platform records exactly one of seven distinct, mutual
 
 \noindent\textbf{\boldmath Define the random variable and support. Derive the seven named outcome probabilities using normalization, map each outcome to its credit value, and construct the grouped PMF table and labeled graph.}\par\nopagebreak
 
-Let $\GTenHLValue{X}$ be the account credit for one booking, in USD. The sample space is $\Omega=\{A,B,C,D,E,F,G\}$, whereas $\GTenHLValue{S_X}=\{0,12,18\}$ USD. Set $\GTenHLParameter{a}=P(A)$, an outcome probability, not the grouped mass $p_X(0)$.
+Let $\GTenHLValue{X}$ be the account credit for one booking, in USD. The sample space is $\Omega=\{A,B,C,D,E,F,G\}$, whereas $\GTenHLValue{S_X}=\{0,12,18\}$ USD. Set $\GTenHLParameter{a}=P(A)$, an outcome probability, not the grouped mass $\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)}$.
 \begin{align*}
 P(A)&=a,&P(B)&=2a,&P(C)&=3a,\\
 P(D)&=2P(B)=4a,&P(E)&=P(B)=2a,\\
@@ -651,41 +884,39 @@ a+2a+3a+4a+2a+4a+4a=1,\qquad 20a=1,\qquad \GTenHLParameter{a}=\frac1{20}.
 The complete outcome probabilities and mappings are:
 \begin{center}
 \begin{tabular}{ccc}\toprule
-Named outcome & $\GTenHLProbability{P(\mathrm{outcome})}$ & $\GTenHLValue{X}$ (USD)\\
+Named outcome & $\GTenHLProbability{P(}\GTenHLOutcome{\mathrm{outcome}}\GTenHLProbability{)}$ & $\GTenHLValue{X}$ (USD)\\
 \midrule
-\GTenHLOutcome{A: Booking completed as scheduled} & $\GTenHLProbability{a}=\GTenHLProbability{1/20}$ & $\GTenHLValue{0}$\\
-\GTenHLOutcome{B: Customer cancellation within the free period} & $\GTenHLProbability{2a}=\GTenHLProbability{2/20}$ & $\GTenHLValue{0}$\\
-\GTenHLOutcome{C: Customer cancellation after the free period} & $\GTenHLProbability{3a}=\GTenHLProbability{3/20}$ & $\GTenHLValue{12}$\\
-\GTenHLOutcome{D: Duplicate booking corrected} & $\GTenHLProbability{4a}=\GTenHLProbability{4/20}$ & $\GTenHLValue{12}$\\
-\GTenHLOutcome{E: Alternative accommodation accepted} & $\GTenHLProbability{2a}=\GTenHLProbability{2/20}$ & $\GTenHLValue{18}$\\
-\GTenHLOutcome{F: Rescheduled journey accepted} & $\GTenHLProbability{4a}=\GTenHLProbability{4/20}$ & $\GTenHLValue{18}$\\
-\GTenHLOutcome{G: Provider cancellation with refund} & $\GTenHLProbability{4a}=\GTenHLProbability{4/20}$ & $\GTenHLValue{18}$\\
+\GTenHLOutcome{A: Booking completed as scheduled} & $\GTenHLParameter{a}=\GTenHLProbability{1/20}$ & $\GTenHLValue{0}$\\
+\GTenHLOutcome{B: Customer cancellation within the free period} & $2\GTenHLParameter{a}=\GTenHLProbability{2/20}$ & $\GTenHLValue{0}$\\
+\GTenHLOutcome{C: Customer cancellation after the free period} & $3\GTenHLParameter{a}=\GTenHLProbability{3/20}$ & $\GTenHLValue{12}$\\
+\GTenHLOutcome{D: Duplicate booking corrected} & $4\GTenHLParameter{a}=\GTenHLProbability{4/20}$ & $\GTenHLValue{12}$\\
+\GTenHLOutcome{E: Alternative accommodation accepted} & $2\GTenHLParameter{a}=\GTenHLProbability{2/20}$ & $\GTenHLValue{18}$\\
+\GTenHLOutcome{F: Rescheduled journey accepted} & $4\GTenHLParameter{a}=\GTenHLProbability{4/20}$ & $\GTenHLValue{18}$\\
+\GTenHLOutcome{G: Provider cancellation with refund} & $4\GTenHLParameter{a}=\GTenHLProbability{4/20}$ & $\GTenHLValue{18}$\\
 \bottomrule\end{tabular}
 \end{center}
 \par\vspace{3mm}\secInicio[][sec:q5]
 \clearpage\textbf{Question 5 --- Task 1 continued: outcome aggregation and grouped PMF}
 
-The seven outcomes are distinct even when they award the same credit. Group their probabilities to obtain $p_X(x)=P(X=x)$:
-\[\begin{aligned}
-\GTenHLProbability{p_X(0)}&=\GTenHLProbability{1/20}+\GTenHLProbability{2/20}=\GTenHLProbability{3/20}\\
-\GTenHLProbability{p_X(12)}&=\GTenHLProbability{3/20}+\GTenHLProbability{4/20}=\GTenHLProbability{7/20}\\
-\GTenHLProbability{p_X(18)}&=\GTenHLProbability{2/20}+\GTenHLProbability{4/20}+\GTenHLProbability{4/20}=\GTenHLProbability{10/20}
-\end{aligned}\]
+The seven outcomes are distinct even when they award the same credit. Group their probabilities to obtain $\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}=P(X=x)$:
+
 $\GTenHLValue{S_X}=\{0,12,18\}$ USD.
-\begin{center}\begin{minipage}{.26\linewidth}\centering
-\begin{tabular}{cc}\toprule
-$\GTenHLValue{x}$ (USD) & $\GTenHLProbability{p_X(x)}$\\
-\midrule
-$\GTenHLValue{0}$ & $\GTenHLProbability{3/20}$\\
-$\GTenHLValue{12}$ & $\GTenHLProbability{7/20}$\\
-$\GTenHLValue{18}$ & $\GTenHLProbability{10/20}$\\
+\begin{center}
+\begingroup\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.18}
+\begin{tabular}{@{}p{.30\linewidth}c p{.55\linewidth}@{}}\toprule
+Complete outcomes or categories & $\GTenHLValue{x}$ (\GTenHLValue{USD}) & Grouped probability: $\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}$\\\midrule
+\GTenHLOutcome{A}, \GTenHLOutcome{B} & $\GTenHLValue{0}$ & $\begin{aligned}[t]\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)}&=\GTenHLProbability{1/20}+\GTenHLProbability{2/20}=\GTenHLProbability{3/20}\\&=\GTenHLProbability{0.15}=\GTenHLProbability{15\%}\end{aligned}$\\[5pt]
+\GTenHLOutcome{C}, \GTenHLOutcome{D} & $\GTenHLValue{12}$ & $\begin{aligned}[t]\GTenHLProbability{p_X(}\GTenHLValue{12}\GTenHLProbability{)}&=\GTenHLProbability{3/20}+\GTenHLProbability{4/20}=\GTenHLProbability{7/20}\\&=\GTenHLProbability{0.35}=\GTenHLProbability{35\%}\end{aligned}$\\[5pt]
+\GTenHLOutcome{E}, \GTenHLOutcome{F}, \GTenHLOutcome{G} & $\GTenHLValue{18}$ & $\begin{aligned}[t]\GTenHLProbability{p_X(}\GTenHLValue{18}\GTenHLProbability{)}&=\GTenHLProbability{2/20}+\GTenHLProbability{4/20}+\GTenHLProbability{4/20}=\GTenHLProbability{10/20}\\&=\GTenHLProbability{0.5}=\GTenHLProbability{50\%}\end{aligned}$\\[5pt]
 \bottomrule\end{tabular}
-\end{minipage}\hfill\begin{minipage}{.70\linewidth}\centering\begin{tikzpicture}
-\begin{axis}[keyaxis,width=.94\linewidth,height=5cm,xmin=-2,xmax=20,ymin=0,ymax=.65,xtick={0,12,18},ylabel={$\GTenHLProbability{p_X(x)}$},yticklabel={$\GTenHLProbability{\pgfmathprintnumber{\tick}}$}]
+\endgroup
+\end{center}
+\begin{center}\begin{tikzpicture}
+\begin{axis}[keyaxis,width=.86\linewidth,height=5cm,xmin=-2,xmax=20,ymin=0,ymax=.65,xtick={0,12,18},ylabel={$\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}$},yticklabel={$\GTenHLProbability{\pgfmathprintnumber{\tick}}$}]
 \draw[fill=keyMassFill,draw=keyMassColor] (axis cs:-0.45,0) rectangle (axis cs:0.45,3/20);
 \draw[fill=keyMassFill,draw=keyMassColor] (axis cs:11.55,0) rectangle (axis cs:12.45,7/20);
 \draw[fill=keyMassFill,draw=keyMassColor] (axis cs:17.55,0) rectangle (axis cs:18.45,10/20);
-\end{axis}\end{tikzpicture}\end{minipage}\end{center}\Needspace{5\baselineskip}\textbf{PMF checks.}\begin{itemize}\item Every mass is positive.\item Normalization: $(3+7+10)/20=1$.\item Set $p_X(x)=0$ outside the support. Bars use actual monetary spacing; gaps carry no mass.\end{itemize}
+\end{axis}\end{tikzpicture}\end{center}\Needspace{5\baselineskip}\textbf{PMF checks.}\begin{itemize}\item Every mass is positive.\item Normalization: $(3+7+10)/20=1$.\item Set $\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}=\GTenHLProbability{0}$ outside the support. Bars use actual monetary spacing; gaps carry no mass.\end{itemize}
 \textbf{Relationship check.} Outcome numerators satisfy $2=2(1)$, $3=3(1)$, $4=2(2)$, $2=2$, $4=2(2)$ and $4=4$, reproducing all six relationships.
 
 \textbf{Scoring note.} These explanatory positivity and normalization checks carry no separate points; omitting them does not reduce the task score.
@@ -716,26 +947,79 @@ $\GTenHLValue{18}$ & $\GTenHLProbability{10/20}$\\
 
 \noindent\textbf{\boldmath Construct the complete CDF table, including both tails, and draw a labeled step graph. Use open and filled endpoints correctly and preserve actual monetary spacing.}\par\nopagebreak
 
-For $\HLCumulativeProbability{F_X(x)}=P(X\leq x)$, add masses in increasing monetary order. The successive cumulative numerators are $3,10,20$, all over $20$.
+For $\HLCumulativeProbability{F_X(}\GTenHLValue{x}\HLCumulativeProbability{)}=P(X\leq x)$, add masses in increasing monetary order.
+
+The successive cumulative numerators are $3,10,20$, all over $20$.
 \begin{center}
-\begin{tabular}{cc}\toprule
-Cutoff interval (USD) & $\HLCumulativeProbability{F_X(x)}$\\
-\midrule
-$\GTenHLValue{x}<\GTenHLValue{0}$ & $\HLCumulativeProbability{0}$\\
-$\GTenHLValue{0}\leq \GTenHLValue{x}<\GTenHLValue{12}$ & $\HLCumulativeProbability{3/20}$\\
-$\GTenHLValue{12}\leq \GTenHLValue{x}<\GTenHLValue{18}$ & $\HLCumulativeProbability{10/20}$\\
-$\GTenHLValue{x}\geq \GTenHLValue{18}$ & $\HLCumulativeProbability{1}$\\
+\begingroup
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}r@{}c@{}c@{}c@{}llc@{}}\toprule
+\multicolumn{5}{c}{Cutoff interval (USD)} & Calculations & $\HLCumulativeProbability{F_X(}\GTenHLValue{x}\HLCumulativeProbability{)}$\\\midrule
+ & & $\GTenHLValue{x}$ & $<$ & $\GTenHLValue{0}$ & $\text{No included support values}$ & $\HLCumulativeProbability{0}$\\[5pt]
+$\GTenHLValue{0}$ & $\leq$ & $\GTenHLValue{x}$ & $<$ & $\GTenHLValue{12}$ & $\begin{aligned}[t]
+  &\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)}
+  \\&= \GTenHLProbability{\frac{3}{20}}
+\end{aligned}$ & $\HLCumulativeProbability{3/20}$\\[5pt]
+$\GTenHLValue{12}$ & $\leq$ & $\GTenHLValue{x}$ & $<$ & $\GTenHLValue{18}$ & $\begin{aligned}[t]
+  &\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{12}\GTenHLProbability{)}
+  \\&= \GTenHLProbability{\frac{3}{20}} + \GTenHLProbability{\frac{7}{20}}
+\end{aligned}$ & $\HLCumulativeProbability{10/20}$\\[5pt]
+$\GTenHLValue{18}$ & $\leq$ & $\GTenHLValue{x}$ &  &  & $\begin{aligned}[t]
+  &\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{12}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{18}\GTenHLProbability{)}
+  \\&= \GTenHLProbability{\frac{3}{20}} + \GTenHLProbability{\frac{7}{20}} + \GTenHLProbability{\frac{10}{20}}
+\end{aligned}$ & $\HLCumulativeProbability{1}$\\[5pt]
 \bottomrule\end{tabular}
+\endgroup
 \end{center}
 \begin{center}\begin{tikzpicture}
-\begin{axis}[keyaxis,width=.86\linewidth,height=7cm,xmin=-2,xmax=20,ymin=-.07,ymax=1.1,xtick={0,12,18},ylabel={$\HLCumulativeProbability{F_X(x)}$},yticklabel={$\HLCumulativeProbability{\pgfmathprintnumber{\tick}}$},ytick={0,.25,.5,.75,1}]
+\begin{axis}[keyaxis,width=.86\linewidth,height=7cm,xmin=-2,xmax=20,ymin=-.07,ymax=1.1,xtick={0,12,18},ylabel={$\HLCumulativeProbability{F_X(}\GTenHLValue{x}\HLCumulativeProbability{)}$},yticklabel={$\HLCumulativeProbability{\pgfmathprintnumber{\tick}}$},ytick={0,.25,.5,.75,1}]
 \addplot[keyCDFColor,thick,<-] coordinates {(-2,0)(0,0)};
 \addplot[keyCDFColor,thick] coordinates {(0,3/20)(12,3/20)};
 \addplot[keyCDFColor,thick] coordinates {(12,10/20)(18,10/20)};
 \addplot[keyCDFColor,thick,->] coordinates {(18,1)(20,1)};
 \addplot[keyCDFColor,only marks,mark=*,mark size=1.6pt,mark options={fill=white}] coordinates {(0,0/20)(12,3/20)(18,10/20)};
 \addplot[keyCDFColor,only marks,mark=*,mark size=1.6pt] coordinates {(0,3/20)(12,10/20)(18,20/20)};
-\end{axis}\end{tikzpicture}\end{center}\textbf{CDF checks.}\begin{itemize}\item The intervals cover every real cutoff, and every height lies in $[0,1]$.\item The heights never decrease.\item Each segment includes its left endpoint and excludes its right endpoint; the filled point gives the value at a jump, so the CDF is right-continuous.\item The lower-tail limit is 0 and the upper-tail limit is 1; the arrows extend both tails.\item Successive cumulative differences recover the PMF numerators $3,7,10$ over $20$. Thus $F_X(a)-F_X(a^-)=p_X(a)$; unsupported cutoffs have zero jump and zero mass.\end{itemize}
+\end{axis}\end{tikzpicture}\end{center}
+\clearpage
+\textbf{Question 5 --- Task 2 continued: comparison}\quad\hyperref[sec:q5]{Original description}
+\par\smallskip\textbf{Same distribution: CDF above, PMF below.}
+\begin{center}\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}
+\pgfplotsset{keySupport/.style={xmin=-2,xmax=20,xtick={0,12,18},
+xlabel={$\GTenHLValue{x}$ (\GTenHLValue{USD})},
+xticklabel={$\GTenHLValue{\pgfmathprintnumber{\tick}}$},
+xticklabel style={font=\footnotesize,anchor=north,fill=white,inner sep=1pt},
+xlabel style={fill=white,inner sep=2pt}}}
+\begin{axis}[keyCombined,keySupport,name=keyTop,anchor=south west,
+ylabel={$\HLCumulativeProbability{F_X(}\GTenHLValue{x}\HLCumulativeProbability{)}$},yticklabel={$\HLCumulativeProbability{\pgfmathprintnumber{\tick}}$}]
+\keyPhantom{0}{3/20}{0/20}
+\keyPhantom{12}{7/20}{3/20}
+\keyPhantom{18}{10/20}{10/20}
+\addplot[keyStep,<-] coordinates {(-2,0)(0,0)};
+\addplot[keyStep] coordinates {(0,3/20)(12,3/20)};
+\addplot[keyStep] coordinates {(12,10/20)(18,10/20)};
+\addplot[keyStep,->] coordinates {(18,1)(20,1)};
+\addplot[keyExcluded] coordinates {(0,0/20)(12,3/20)(18,10/20)};
+\addplot[keyIncluded] coordinates {(0,3/20)(12,10/20)(18,20/20)};
+\end{axis}
+\begin{axis}[keyCombined,keySupport,at={(keyTop.south west)},
+anchor=north west,yshift=-1.35cm,ylabel={$\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}$},
+yticklabel={$\GTenHLProbability{\pgfmathprintnumber{\tick}}$}]
+\keyMass{0}{3/20}
+\keyMass{12}{7/20}
+\keyMass{18}{10/20}
+\addlegendimage{keyStep}\addlegendentry{Top: \HLCumulativeProbability{CDF} steps}
+\addlegendimage{keyPhantom,mark=*}\addlegendentry{Top: \GTenHLProbability{PMF} shadows (jumps)}
+\addlegendimage{keyMass,mark=*}\addlegendentry{Bottom: \GTenHLProbability{PMF} stems}
+\addlegendimage{keyCorrespondence}\addlegendentry{Midpoint correspondence}
+\end{axis}
+\keyCorrespondence{0}
+\keyCorrespondence{12}
+\keyCorrespondence{18}
+\end{tikzpicture}\end{minipage}\end{center}
+\keyConnectionReading
+\par\medskip
+\textbf{CDF checks.}\begin{itemize}\item The intervals cover every real cutoff, and every height lies in $[0,1]$.\item The heights never decrease.\item Each segment includes its left endpoint and excludes its right endpoint; the filled point gives the value at a jump, so the CDF is right-continuous.\item The lower-tail limit is 0 and the upper-tail limit is 1; the arrows extend both tails.\item Successive cumulative differences recover the PMF numerators $3,7,10$ over $20$. Thus $\HLCumulativeProbability{F_X(}\GTenHLValue{a}\HLCumulativeProbability{)}-\HLCumulativeProbability{F_X(}\GTenHLValue{a^-}\HLCumulativeProbability{)}=\GTenHLProbability{p_X(}\GTenHLValue{a}\GTenHLProbability{)}$; unsupported cutoffs have zero jump and zero mass.\end{itemize}
 
 \par\smallskip
 \noindent\begin{minipage}{\linewidth}\centering
@@ -765,11 +1049,21 @@ $\GTenHLValue{x}\geq \GTenHLValue{18}$ & $\HLCumulativeProbability{1}$\\
 \textbf{Allocation:} (i) 0.5 points; (ii) 0.5 points.
 
 \textbf{(i)} Include only $0$ USD; exclude the boundary mass at 12 USD.
-\[P(\GTenHLValue{X}<\GTenHLValue{12})=\GTenHLProbability{p_X(0)}=\frac{3}{20}=\GTenHLProbability{3/20}=\GTenHLProbability{0.15}.\]
+\[
+\begin{aligned}
+P(\GTenHLValue{X}<\GTenHLValue{12})&=\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)}=\frac{3}{20}
+\\ &=\GTenHLProbability{\frac{3}{20}}=\GTenHLProbability{0.15}=\GTenHLProbability{15\%}.
+\end{aligned}
+\]
 The account credit for one booking is below 12 USD with probability $\GTenHLProbability{3/20}$, or $\GTenHLProbability{15\%}$.
 
 \textbf{(ii)} Include only $18$ USD; include the boundary mass at 18 USD.
-\[P(\GTenHLValue{X}\geq\GTenHLValue{18})=\GTenHLProbability{p_X(18)}=\frac{10}{20}=\GTenHLProbability{1/2}=\GTenHLProbability{0.50}.\]
+\[
+\begin{aligned}
+P(\GTenHLValue{X}\geq\GTenHLValue{18})&=\GTenHLProbability{p_X(}\GTenHLValue{18}\GTenHLProbability{)}=\frac{10}{20}
+\\ &=\GTenHLProbability{\frac{1}{2}}=\GTenHLProbability{0.50}=\GTenHLProbability{50\%}.
+\end{aligned}
+\]
 The account credit for one booking is at least 18 USD with probability $\GTenHLProbability{1/2}$, or $\GTenHLProbability{50\%}$.
 
 \par\smallskip
@@ -827,24 +1121,27 @@ $(\GTenHLOutcome{0},\GTenHLOutcome{1},\GTenHLOutcome{2})$ & $\binom3{0}\binom4{1
 \endgroup
 All monetary columns are in USD. Listing $c=0,1,2$ and each feasible $b$ gives all nine compositions. Their counts sum to $1+12+18+4+6+24+12+3+4=84$. Compositions are not equally likely: $(1,1,1)$ represents 24 subsets, while $(3,0,0)$ represents only one.
 
-\textbf{Aggregation.} Below the cap, the 28 USD payout combines $(1,1,1)$ (24 subsets after the bonus) with $(1,0,2)$ (3 subsets without a bonus), giving $p_X(28)=(24+3)/84=27/84$. At the cap, adjusted amounts 34 and 42 USD from $(0,2,1)$ and $(0,1,2)$ combine, giving $p_X(30)=(12+4)/84=16/84$. Every other payout comes from one composition. Thus $S_X=\{0,6,12,14,18,28,30\}$ USD; the 28 USD payout stays below the cap.
+\textbf{Aggregation.} Below the cap, the 28 USD payout combines $(1,1,1)$ (24 subsets after the bonus) with $(1,0,2)$ (3 subsets without a bonus), giving $\GTenHLProbability{p_X(}\GTenHLValue{28}\GTenHLProbability{)}=(24+3)/84=27/84$. At the cap, adjusted amounts 34 and 42 USD from $(0,2,1)$ and $(0,1,2)$ combine, giving $\GTenHLProbability{p_X(}\GTenHLValue{30}\GTenHLProbability{)}=(12+4)/84=16/84$. Every other payout comes from one composition. Thus $S_X=\{0,6,12,14,18,28,30\}$ USD; the 28 USD payout stays below the cap.
 \par\vspace{3mm}\secInicio[][sec:q6]
 \clearpage\textbf{Question 6 --- Task 1 continued: grouped \GTenHLProbability{PMF} and graph}
 
+Each composition $(a,b,c)$ represents the stated number of distinct-ticket subsets; the original composition table supplies its binomial count. Add their probabilities when final payouts agree.
 \begin{center}
-\begin{tabular}{cc}\toprule
-$\GTenHLValue{x}$ (USD) & $\GTenHLProbability{p_X(x)}$\\\midrule
-$\GTenHLValue{0}$ & $\GTenHLProbability{1/84}$\\
-$\GTenHLValue{6}$ & $\GTenHLProbability{12/84}=\GTenHLProbability{1/7}$\\
-$\GTenHLValue{12}$ & $\GTenHLProbability{18/84}=\GTenHLProbability{3/14}$\\
-$\GTenHLValue{14}$ & $\GTenHLProbability{6/84}=\GTenHLProbability{1/14}$\\
-$\GTenHLValue{18}$ & $\GTenHLProbability{4/84}=\GTenHLProbability{1/21}$\\
-$\GTenHLValue{28}$ & $\GTenHLProbability{27/84}=\GTenHLProbability{9/28}$\\
-$\GTenHLValue{30}$ & $\GTenHLProbability{16/84}=\GTenHLProbability{4/21}$\\
+\begingroup\setlength{\tabcolsep}{5pt}\renewcommand{\arraystretch}{1.18}
+\begin{tabular}{@{}p{.30\linewidth}c p{.55\linewidth}@{}}\toprule
+Complete outcomes or categories & $\GTenHLValue{x}$ (\GTenHLValue{USD}) & Grouped probability: $\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}$\\\midrule
+$\GTenHLOutcome{(3,0,0)}$: \GTenHLSecond{1} subsets & $\GTenHLValue{0}$ & $\begin{aligned}[t]\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)}&=\GTenHLProbability{1/84}\\&\approx\GTenHLProbability{0.0119}=\GTenHLProbability{1.19\%}\end{aligned}$\\[5pt]
+$\GTenHLOutcome{(2,1,0)}$: \GTenHLSecond{12} subsets & $\GTenHLValue{6}$ & $\begin{aligned}[t]\GTenHLProbability{p_X(}\GTenHLValue{6}\GTenHLProbability{)}&=\GTenHLProbability{12/84}=\GTenHLProbability{1/7}\\&\approx\GTenHLProbability{0.1429}=\GTenHLProbability{14.29\%}\end{aligned}$\\[5pt]
+$\GTenHLOutcome{(1,2,0)}$: \GTenHLSecond{18} subsets & $\GTenHLValue{12}$ & $\begin{aligned}[t]\GTenHLProbability{p_X(}\GTenHLValue{12}\GTenHLProbability{)}&=\GTenHLProbability{18/84}=\GTenHLProbability{3/14}\\&\approx\GTenHLProbability{0.2143}=\GTenHLProbability{21.43\%}\end{aligned}$\\[5pt]
+$\GTenHLOutcome{(2,0,1)}$: \GTenHLSecond{6} subsets & $\GTenHLValue{14}$ & $\begin{aligned}[t]\GTenHLProbability{p_X(}\GTenHLValue{14}\GTenHLProbability{)}&=\GTenHLProbability{6/84}=\GTenHLProbability{1/14}\\&\approx\GTenHLProbability{0.0714}=\GTenHLProbability{7.14\%}\end{aligned}$\\[5pt]
+$\GTenHLOutcome{(0,3,0)}$: \GTenHLSecond{4} subsets & $\GTenHLValue{18}$ & $\begin{aligned}[t]\GTenHLProbability{p_X(}\GTenHLValue{18}\GTenHLProbability{)}&=\GTenHLProbability{4/84}=\GTenHLProbability{1/21}\\&\approx\GTenHLProbability{0.0476}=\GTenHLProbability{4.76\%}\end{aligned}$\\[5pt]
+$\GTenHLOutcome{(1,1,1)}$: \GTenHLSecond{24} subsets\newline $\GTenHLOutcome{(1,0,2)}$: \GTenHLSecond{3} subsets & $\GTenHLValue{28}$ & $\begin{aligned}[t]\GTenHLProbability{p_X(}\GTenHLValue{28}\GTenHLProbability{)}&=\GTenHLProbability{24/84}+\GTenHLProbability{3/84}=\GTenHLProbability{27/84}=\GTenHLProbability{9/28}\\&\approx\GTenHLProbability{0.3214}=\GTenHLProbability{32.14\%}\end{aligned}$\\[5pt]
+$\GTenHLOutcome{(0,2,1)}$: \GTenHLSecond{12} subsets\newline $\GTenHLOutcome{(0,1,2)}$: \GTenHLSecond{4} subsets & $\GTenHLValue{30}$ & $\begin{aligned}[t]\GTenHLProbability{p_X(}\GTenHLValue{30}\GTenHLProbability{)}&=\GTenHLProbability{12/84}+\GTenHLProbability{4/84}=\GTenHLProbability{16/84}=\GTenHLProbability{4/21}\\&\approx\GTenHLProbability{0.1905}=\GTenHLProbability{19.05\%}\end{aligned}$\\[5pt]
 \bottomrule\end{tabular}
+\endgroup
 \end{center}
 \begin{center}\begin{tikzpicture}
-\begin{axis}[keyaxis,width=.86\linewidth,height=5cm,xmin=-2,xmax=32,ymin=0,ymax=.65,xtick={0,6,12,14,18,28,30},xticklabel style={rotate=45,anchor=north east},ylabel={$\GTenHLProbability{p_X(x)}$},yticklabel={$\GTenHLProbability{\pgfmathprintnumber{\tick}}$}]
+\begin{axis}[keyaxis,width=.86\linewidth,height=5cm,xmin=-2,xmax=32,ymin=0,ymax=.65,xtick={0,6,12,14,18,28,30},xticklabel style={rotate=45,anchor=north east},ylabel={$\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}$},yticklabel={$\GTenHLProbability{\pgfmathprintnumber{\tick}}$}]
 \draw[fill=keyMassFill,draw=keyMassColor] (axis cs:-0.225,0) rectangle (axis cs:0.225,1/84);
 \draw[fill=keyMassFill,draw=keyMassColor] (axis cs:5.775,0) rectangle (axis cs:6.225,12/84);
 \draw[fill=keyMassFill,draw=keyMassColor] (axis cs:11.775,0) rectangle (axis cs:12.225,18/84);
@@ -852,7 +1149,7 @@ $\GTenHLValue{30}$ & $\GTenHLProbability{16/84}=\GTenHLProbability{4/21}$\\
 \draw[fill=keyMassFill,draw=keyMassColor] (axis cs:17.775,0) rectangle (axis cs:18.225,4/84);
 \draw[fill=keyMassFill,draw=keyMassColor] (axis cs:27.775,0) rectangle (axis cs:28.225,27/84);
 \draw[fill=keyMassFill,draw=keyMassColor] (axis cs:29.775,0) rectangle (axis cs:30.225,16/84);
-\end{axis}\end{tikzpicture}\end{center}\Needspace{5\baselineskip}\textbf{PMF checks.}\begin{itemize}\item Every mass is positive.\item Normalization: $(1+12+18+6+4+27+16)/84=1$.\item Set $p_X(x)=0$ outside the support. Bars use actual monetary spacing; gaps carry no mass.\end{itemize}
+\end{axis}\end{tikzpicture}\end{center}\Needspace{5\baselineskip}\textbf{PMF checks.}\begin{itemize}\item Every mass is positive.\item Normalization: $(1+12+18+6+4+27+16)/84=1$.\item Set $\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}=\GTenHLProbability{0}$ outside the support. Bars use actual monetary spacing; gaps carry no mass.\end{itemize}
 
 \textbf{Scoring note.} These explanatory positivity and normalization checks carry no separate points; omitting them does not reduce the task score.
 
@@ -882,22 +1179,54 @@ $\GTenHLValue{30}$ & $\GTenHLProbability{16/84}=\GTenHLProbability{4/21}$\\
 
 \noindent\textbf{\boldmath Construct the complete CDF table, including both tails, and draw a labeled step graph. Use open and filled endpoints correctly and preserve actual monetary spacing.}\par\nopagebreak
 
-For $\HLCumulativeProbability{F_X(x)}=P(X\leq x)$, add the masses in increasing monetary order. The successive cumulative numerators are $1,13,31,37,41,68,84$, all over $84$.
+For $\HLCumulativeProbability{F_X(}\GTenHLValue{x}\HLCumulativeProbability{)}=P(X\leq x)$, add the masses in increasing monetary order.
+
+The successive cumulative numerators are $1,13,31,37,41,68,84$, all over $84$.
 \begin{center}
-\begin{tabular}{cc}\toprule
-Cutoff interval (USD) & $\HLCumulativeProbability{F_X(x)}$\\\midrule
-$\GTenHLValue{x}<\GTenHLValue{0}$ & $\HLCumulativeProbability{0}$\\
-$\GTenHLValue{0}\leq \GTenHLValue{x}<\GTenHLValue{6}$ & $\HLCumulativeProbability{1/84}$\\
-$\GTenHLValue{6}\leq \GTenHLValue{x}<\GTenHLValue{12}$ & $\HLCumulativeProbability{13/84}$\\
-$\GTenHLValue{12}\leq \GTenHLValue{x}<\GTenHLValue{14}$ & $\HLCumulativeProbability{31/84}$\\
-$\GTenHLValue{14}\leq \GTenHLValue{x}<\GTenHLValue{18}$ & $\HLCumulativeProbability{37/84}$\\
-$\GTenHLValue{18}\leq \GTenHLValue{x}<\GTenHLValue{28}$ & $\HLCumulativeProbability{41/84}$\\
-$\GTenHLValue{28}\leq \GTenHLValue{x}<\GTenHLValue{30}$ & $\HLCumulativeProbability{17/21}$\\
-$\GTenHLValue{x}\geq \GTenHLValue{30}$ & $\HLCumulativeProbability{1}$\\
+\begingroup
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}r@{}c@{}c@{}c@{}llc@{}}\toprule
+\multicolumn{5}{c}{Cutoff interval (USD)} & Calculations & $\HLCumulativeProbability{F_X(}\GTenHLValue{x}\HLCumulativeProbability{)}$\\\midrule
+ & & $\GTenHLValue{x}$ & $<$ & $\GTenHLValue{0}$ & $\text{No included support values}$ & $\HLCumulativeProbability{0}$\\[5pt]
+$\GTenHLValue{0}$ & $\leq$ & $\GTenHLValue{x}$ & $<$ & $\GTenHLValue{6}$ & $\begin{aligned}[t]
+  &\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)}
+  \\&= \GTenHLProbability{\frac{1}{84}}
+\end{aligned}$ & $\HLCumulativeProbability{1/84}$\\[5pt]
+$\GTenHLValue{6}$ & $\leq$ & $\GTenHLValue{x}$ & $<$ & $\GTenHLValue{12}$ & $\begin{aligned}[t]
+  &\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{6}\GTenHLProbability{)}
+  \\&= \GTenHLProbability{\frac{1}{84}} + \GTenHLProbability{\frac{12}{84}}
+\end{aligned}$ & $\HLCumulativeProbability{13/84}$\\[5pt]
+$\GTenHLValue{12}$ & $\leq$ & $\GTenHLValue{x}$ & $<$ & $\GTenHLValue{14}$ & $\begin{aligned}[t]
+  &\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{6}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{12}\GTenHLProbability{)}
+  \\&= \GTenHLProbability{\frac{1}{84}} + \GTenHLProbability{\frac{12}{84}} + \GTenHLProbability{\frac{18}{84}}
+\end{aligned}$ & $\HLCumulativeProbability{31/84}$\\[5pt]
+$\GTenHLValue{14}$ & $\leq$ & $\GTenHLValue{x}$ & $<$ & $\GTenHLValue{18}$ & $\begin{aligned}[t]
+  &\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{6}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{12}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{14}\GTenHLProbability{)}
+  \\&= \GTenHLProbability{\frac{1}{84}} + \GTenHLProbability{\frac{12}{84}} + \GTenHLProbability{\frac{18}{84}} + \GTenHLProbability{\frac{6}{84}}
+\end{aligned}$ & $\HLCumulativeProbability{37/84}$\\[5pt]
+$\GTenHLValue{18}$ & $\leq$ & $\GTenHLValue{x}$ & $<$ & $\GTenHLValue{28}$ & $\begin{aligned}[t]
+  &\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{6}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{12}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{14}\GTenHLProbability{)}
+  \\&{}+ \GTenHLProbability{p_X(}\GTenHLValue{18}\GTenHLProbability{)}
+  \\&= \GTenHLProbability{\frac{1}{84}} + \GTenHLProbability{\frac{12}{84}} + \GTenHLProbability{\frac{18}{84}} + \GTenHLProbability{\frac{6}{84}}
+  \\&{}+ \GTenHLProbability{\frac{4}{84}}
+\end{aligned}$ & $\HLCumulativeProbability{41/84}$\\[5pt]
+$\GTenHLValue{28}$ & $\leq$ & $\GTenHLValue{x}$ & $<$ & $\GTenHLValue{30}$ & $\begin{aligned}[t]
+  &\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{6}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{12}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{14}\GTenHLProbability{)}
+  \\&{}+ \GTenHLProbability{p_X(}\GTenHLValue{18}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{28}\GTenHLProbability{)}
+  \\&= \GTenHLProbability{\frac{1}{84}} + \GTenHLProbability{\frac{12}{84}} + \GTenHLProbability{\frac{18}{84}} + \GTenHLProbability{\frac{6}{84}}
+  \\&{}+ \GTenHLProbability{\frac{4}{84}} + \GTenHLProbability{\frac{27}{84}}
+\end{aligned}$ & $\HLCumulativeProbability{17/21}$\\[5pt]
+$\GTenHLValue{30}$ & $\leq$ & $\GTenHLValue{x}$ &  &  & $\begin{aligned}[t]
+  &\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{6}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{12}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{14}\GTenHLProbability{)}
+  \\&{}+ \GTenHLProbability{p_X(}\GTenHLValue{18}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{28}\GTenHLProbability{)} + \GTenHLProbability{p_X(}\GTenHLValue{30}\GTenHLProbability{)}
+  \\&= \GTenHLProbability{\frac{1}{84}} + \GTenHLProbability{\frac{12}{84}} + \GTenHLProbability{\frac{18}{84}} + \GTenHLProbability{\frac{6}{84}}
+  \\&{}+ \GTenHLProbability{\frac{4}{84}} + \GTenHLProbability{\frac{27}{84}} + \GTenHLProbability{\frac{16}{84}}
+\end{aligned}$ & $\HLCumulativeProbability{1}$\\[5pt]
 \bottomrule\end{tabular}
+\endgroup
 \end{center}
 \begin{center}\begin{tikzpicture}
-\begin{axis}[keyaxis,width=.86\linewidth,height=7cm,xmin=-2,xmax=32,ymin=-.07,ymax=1.1,xtick={0,6,12,14,18,28,30},xticklabel style={rotate=45,anchor=north east},ylabel={$\HLCumulativeProbability{F_X(x)}$},yticklabel={$\HLCumulativeProbability{\pgfmathprintnumber{\tick}}$},ytick={0,.25,.5,.75,1}]
+\begin{axis}[keyaxis,width=.86\linewidth,height=7cm,xmin=-2,xmax=32,ymin=-.07,ymax=1.1,xtick={0,6,12,14,18,28,30},xticklabel style={rotate=45,anchor=north east},ylabel={$\HLCumulativeProbability{F_X(}\GTenHLValue{x}\HLCumulativeProbability{)}$},yticklabel={$\HLCumulativeProbability{\pgfmathprintnumber{\tick}}$},ytick={0,.25,.5,.75,1}]
 \addplot[keyCDFColor,thick,<-] coordinates {(-2,0)(0,0)};
 \addplot[keyCDFColor,thick] coordinates {(0,1/84)(6,1/84)};
 \addplot[keyCDFColor,thick] coordinates {(6,13/84)(12,13/84)};
@@ -908,7 +1237,63 @@ $\GTenHLValue{x}\geq \GTenHLValue{30}$ & $\HLCumulativeProbability{1}$\\
 \addplot[keyCDFColor,thick,->] coordinates {(30,1)(32,1)};
 \addplot[keyCDFColor,only marks,mark=*,mark size=.8pt,mark options={fill=white}] coordinates {(0,0/84)(6,1/84)(12,13/84)(14,31/84)(18,37/84)(28,41/84)(30,68/84)};
 \addplot[keyCDFColor,only marks,mark=*,mark size=.8pt] coordinates {(0,1/84)(6,13/84)(12,31/84)(14,37/84)(18,41/84)(28,68/84)(30,84/84)};
-\end{axis}\end{tikzpicture}\end{center}\textbf{CDF checks.}\begin{itemize}\item The intervals cover every real cutoff, and every height lies in $[0,1]$.\item The heights never decrease.\item Each segment includes its left endpoint and excludes its right endpoint; the filled point gives the value at a jump, so the CDF is right-continuous.\item The lower-tail limit is 0 and the upper-tail limit is 1; the arrows extend both tails.\item Successive cumulative differences recover the PMF numerators $1,12,18,6,4,27,16$ over $84$. Thus $F_X(a)-F_X(a^-)=p_X(a)$; unsupported cutoffs have zero jump and zero mass.\end{itemize}
+\end{axis}\end{tikzpicture}\end{center}
+\clearpage
+\textbf{Question 6 --- Task 2 continued: comparison}\quad\hyperref[sec:q6]{Original description}
+\par\smallskip\textbf{Same distribution: CDF above, PMF below.}
+\begin{center}\begin{minipage}{\linewidth}\centering
+\begin{tikzpicture}
+\pgfplotsset{keySupport/.style={xmin=-2,xmax=32,xtick={0,6,12,14,18,28,30},
+xlabel={$\GTenHLValue{x}$ (\GTenHLValue{USD})},
+xticklabel={$\GTenHLValue{\pgfmathprintnumber{\tick}}$},
+xticklabel style={font=\footnotesize,anchor=north,fill=white,inner sep=1pt},
+xlabel style={fill=white,inner sep=2pt}}}
+\begin{axis}[keyCombined,keySupport,name=keyTop,anchor=south west,
+ylabel={$\HLCumulativeProbability{F_X(}\GTenHLValue{x}\HLCumulativeProbability{)}$},yticklabel={$\HLCumulativeProbability{\pgfmathprintnumber{\tick}}$},keyIncluded/.append style={mark size=.5pt},keyExcluded/.append style={mark size=.5pt}]
+\keyPhantom{0}{1/84}{0/84}
+\keyPhantom{6}{12/84}{1/84}
+\keyPhantom{12}{18/84}{13/84}
+\keyPhantom{14}{6/84}{31/84}
+\keyPhantom{18}{4/84}{37/84}
+\keyPhantom{28}{27/84}{41/84}
+\keyPhantom{30}{16/84}{68/84}
+\addplot[keyStep,<-] coordinates {(-2,0)(0,0)};
+\addplot[keyStep] coordinates {(0,1/84)(6,1/84)};
+\addplot[keyStep] coordinates {(6,13/84)(12,13/84)};
+\addplot[keyStep] coordinates {(12,31/84)(14,31/84)};
+\addplot[keyStep] coordinates {(14,37/84)(18,37/84)};
+\addplot[keyStep] coordinates {(18,41/84)(28,41/84)};
+\addplot[keyStep] coordinates {(28,68/84)(30,68/84)};
+\addplot[keyStep,->] coordinates {(30,1)(32,1)};
+\addplot[keyExcluded] coordinates {(0,0/84)(6,1/84)(12,13/84)(14,31/84)(18,37/84)(28,41/84)(30,68/84)};
+\addplot[keyIncluded] coordinates {(0,1/84)(6,13/84)(12,31/84)(14,37/84)(18,41/84)(28,68/84)(30,84/84)};
+\end{axis}
+\begin{axis}[keyCombined,keySupport,at={(keyTop.south west)},
+anchor=north west,yshift=-1.35cm,ylabel={$\GTenHLProbability{p_X(}\GTenHLValue{x}\GTenHLProbability{)}$},
+yticklabel={$\GTenHLProbability{\pgfmathprintnumber{\tick}}$}]
+\keyMass{0}{1/84}
+\keyMass{6}{12/84}
+\keyMass{12}{18/84}
+\keyMass{14}{6/84}
+\keyMass{18}{4/84}
+\keyMass{28}{27/84}
+\keyMass{30}{16/84}
+\addlegendimage{keyStep}\addlegendentry{Top: \HLCumulativeProbability{CDF} steps}
+\addlegendimage{keyPhantom,mark=*}\addlegendentry{Top: \GTenHLProbability{PMF} shadows (jumps)}
+\addlegendimage{keyMass,mark=*}\addlegendentry{Bottom: \GTenHLProbability{PMF} stems}
+\addlegendimage{keyCorrespondence}\addlegendentry{Midpoint correspondence}
+\end{axis}
+\keyCorrespondence{0}
+\keyCorrespondence{6}
+\keyCorrespondence{12}
+\keyCorrespondence{14}
+\keyCorrespondence{18}
+\keyCorrespondence{28}
+\keyCorrespondence{30}
+\end{tikzpicture}\end{minipage}\end{center}
+\keyConnectionReading
+\par\medskip
+\textbf{CDF checks.}\begin{itemize}\item The intervals cover every real cutoff, and every height lies in $[0,1]$.\item The heights never decrease.\item Each segment includes its left endpoint and excludes its right endpoint; the filled point gives the value at a jump, so the CDF is right-continuous.\item The lower-tail limit is 0 and the upper-tail limit is 1; the arrows extend both tails.\item Successive cumulative differences recover the PMF numerators $1,12,18,6,4,27,16$ over $84$. Thus $\HLCumulativeProbability{F_X(}\GTenHLValue{a}\HLCumulativeProbability{)}-\HLCumulativeProbability{F_X(}\GTenHLValue{a^-}\HLCumulativeProbability{)}=\GTenHLProbability{p_X(}\GTenHLValue{a}\GTenHLProbability{)}$; unsupported cutoffs have zero jump and zero mass.\end{itemize}
 
 \par\smallskip
 \noindent\begin{minipage}{\linewidth}\centering
@@ -938,12 +1323,22 @@ $\GTenHLValue{x}\geq \GTenHLValue{30}$ & $\HLCumulativeProbability{1}$\\
 \textbf{Allocation:} (i) 0.75 points; (ii) 0.75 points.
 
 \textbf{(i)} Include only $0,6,12$ USD; exclude the boundary mass at 14 USD.
-\[P(\GTenHLValue{X}<\GTenHLValue{14})=\GTenHLProbability{p_X(0)}+\GTenHLProbability{p_X(6)}+\GTenHLProbability{p_X(12)}=\frac{1+12+18}{84}=\GTenHLProbability{31/84}\approx \GTenHLProbability{0.369048}.\]
-The final payout for a uniformly selected three-ticket subset, after the bonus and cap is below 14 USD with probability $\GTenHLProbability{31/84}$, approximately $\GTenHLProbability{36.90\%}$.
+\[
+\begin{aligned}
+P(\GTenHLValue{X}<\GTenHLValue{14})&=\GTenHLProbability{p_X(}\GTenHLValue{0}\GTenHLProbability{)}+\GTenHLProbability{p_X(}\GTenHLValue{6}\GTenHLProbability{)}+\GTenHLProbability{p_X(}\GTenHLValue{12}\GTenHLProbability{)}=\frac{1+12+18}{84}
+\\ &=\GTenHLProbability{\frac{31}{84}}=\GTenHLProbability{0.36\overline{904761}}=\GTenHLProbability{36.\overline{904761}\%}.
+\end{aligned}
+\]
+The final payout for a uniformly selected three-ticket subset, after the bonus and cap is below 14 USD with probability $\GTenHLProbability{31/84}\approx\GTenHLProbability{36.90\%}$.
 
 \textbf{(ii)} Include only $28,30$ USD; include the boundary mass at 28 USD.
-\[P(\GTenHLValue{X}\geq\GTenHLValue{28})=\GTenHLProbability{p_X(28)}+\GTenHLProbability{p_X(30)}=\frac{27+16}{84}=\GTenHLProbability{43/84}\approx \GTenHLProbability{0.511905}.\]
-The final payout for a uniformly selected three-ticket subset, after the bonus and cap is at least 28 USD with probability $\GTenHLProbability{43/84}$, approximately $\GTenHLProbability{51.19\%}$.
+\[
+\begin{aligned}
+P(\GTenHLValue{X}\geq\GTenHLValue{28})&=\GTenHLProbability{p_X(}\GTenHLValue{28}\GTenHLProbability{)}+\GTenHLProbability{p_X(}\GTenHLValue{30}\GTenHLProbability{)}=\frac{27+16}{84}
+\\ &=\GTenHLProbability{\frac{43}{84}}=\GTenHLProbability{0.51\overline{190476}}=\GTenHLProbability{51.\overline{190476}\%}.
+\end{aligned}
+\]
+The final payout for a uniformly selected three-ticket subset, after the bonus and cap is at least 28 USD with probability $\GTenHLProbability{43/84}\approx\GTenHLProbability{51.19\%}$.
 
 \par\smallskip
 \noindent\begin{minipage}{\linewidth}\centering

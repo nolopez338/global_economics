@@ -1,0 +1,150 @@
+% Practice procedure diagrams, version 1.0 (canonical skill asset).
+% Copy beside an activity as support/practice_procedure_diagrams.tex;
+% input AFTER the document preamble, BEFORE \begin{document}.
+% API and deployment/update policy: references/procedure_diagrams.md.
+% No mathematical roles or highlight colors are defined by this library.
+\ifdefined\PPDiagramAssetLoaded\endinput\fi
+\let\PPDiagramAssetLoaded\relax
+\RequirePackage{tikz}
+\RequirePackage{xcolor}
+\RequirePackage{amsmath}
+\RequirePackage{xparse}
+\usetikzlibrary{arrows.meta,positioning}
+\makeatletter
+\newcount\PP@serial
+\newcount\PP@columns
+\newcount\PP@index
+\newsavebox{\PP@contentbox}
+\newdimen\PP@width
+\newdimen\PP@textwidth
+\newdimen\PP@bottom
+\newdimen\PP@allowed
+\pgfkeys{/ppd/.is family,/ppd,
+  mode/.is choice,
+  mode/detailed/.style={lane height=32mm,heading height=14mm},
+  mode/compact/.style={lane height=24mm,heading height=14mm},
+  stage width/.store in=\PP@requestedwidth,
+  column gap/.store in=\PP@gap,
+  lane height/.store in=\PP@laneheight,
+  heading height/.store in=\PP@headingheight,
+  padding/.store in=\PP@padding,
+  annotation gap/.store in=\PP@annotationgap}
+% Declarations contain only PPStage / PPExtension calls, or macros expanding
+% to those calls. Reuse declaration fragments when splitting linked panels.
+\NewDocumentCommand{\PPDeclareFamily}{m m}{%
+  \expandafter\newcommand\csname PP@family@#1\endcsname{#2}}
+\NewDocumentCommand{\PPStage}{m m}{%
+  \PackageError{practice-procedure}{PPStage outside a family rendering}{}
+}
+\NewDocumentCommand{\PPExtension}{m m m}{%
+  \PackageError{practice-procedure}{PPExtension outside a family rendering}{}
+}
+\long\def\PP@countstage#1#2{\advance\PP@columns by 1 }
+\long\def\PP@countextension#1#2#3{\advance\PP@columns by 1 }
+% All style definitions are installed inside the environment's TeX group.
+\newcommand{\PP@styles}{%
+  \tikzset{
+    ppd/frame/.style={draw=black!60,fill=black!2,line width=.55pt},
+    ppd/content/.style={inner sep=0pt,outer sep=0pt},
+    ppd/sequence/.style={-{Stealth[length=1.8mm]},draw=black!75,line width=.65pt},
+    ppd/mapping/.style={dashed},
+    ppd/correspondence/.style={dotted,-},
+    ppd/from anchor/.store in=\PP@from,
+    ppd/to anchor/.store in=\PP@to,
+    ppd/edge label/.style={font=\small,fill=white,inner sep=1pt},
+    ppd/annotation/.style={align=center,inner sep=0pt,outer sep=0pt}}
+}
+% Typeset in a local paragraph box: prose wraps; mathematics may use aligned,
+% gathered or a small table/graph. Oversized content warns rather than scales.
+\long\def\PP@box#1#2{%
+  \sbox{\PP@contentbox}{\pgfinterruptpicture
+    \parbox{\PP@textwidth}{%
+      \normalfont\normalsize\centering\setlength{\parskip}{2pt}#2}%
+    \endpgfinterruptpicture}%
+  \PP@allowed=#1\relax
+  \ifdim\dimexpr\ht\PP@contentbox+\dp\PP@contentbox\relax>\PP@allowed
+    \PackageWarning{practice-procedure}{Content height
+      \the\dimexpr\ht\PP@contentbox+\dp\PP@contentbox\relax\space
+      exceeds reserved \the\PP@allowed;
+      increase lane/heading height or split the panel}%
+  \fi
+}
+\long\def\PP@renderstage#1#2{%
+  \pgfmathsetlengthmacro{\PP@left}{\the\PP@index*(\PP@width+\PP@gap)}%
+  \pgfmathsetlengthmacro{\PP@right}{\PP@left+\PP@width}%
+  \pgfmathsetlengthmacro{\PP@center}{\PP@left+.5*\PP@width}%
+  \expandafter\edef\csname PP@x@#1\endcsname{\PP@center}%
+  \draw[ppd/frame] (\PP@left,0) rectangle (\PP@right,\PP@bottom);
+  \draw[black!25] (\PP@left,-\PP@headingheight) --
+    (\PP@right,-\PP@headingheight);
+  \PP@box{\dimexpr\PP@headingheight-\PP@padding*2\relax}{{\bfseries #2}}%
+  \node[ppd/content] (\PP@prefix#1-heading)
+    at (\PP@center,-.5*\PP@headingheight) {\usebox{\PP@contentbox}};
+  \advance\PP@index by 1 }
+\long\def\PP@renderextension#1#2#3{\PP@renderstage{#1}{#2\par\normalfont #3}}
+\NewDocumentEnvironment{PracticeProcedure}{O{} m m}{%
+  \par\begingroup
+  \pgfqkeys{/ppd}{mode=compact,stage width=auto,column gap=8mm,
+    padding=2mm,annotation gap=3mm,#1}%
+  \global\advance\PP@serial by 1
+  \edef\PP@prefix{ppd\the\PP@serial-}%
+  \def\PP@lanes{#3}%
+  \PP@columns=0
+  \let\PPStage\PP@countstage\let\PPExtension\PP@countextension
+  \ifcsname PP@family@#2\endcsname
+    \csname PP@family@#2\endcsname
+  \else
+    \PackageError{practice-procedure}{Unknown procedure family #2}{Declare it with PPDeclareFamily.}%
+  \fi
+  \ifnum\PP@columns<1
+    \PackageError{practice-procedure}{A family needs at least one stage}{}%
+    \PP@columns=1
+  \fi
+  \ifnum#3<1 \PackageError{practice-procedure}{Use at least one lane}{}\fi
+  \def\PP@auto{auto}%
+  \ifx\PP@requestedwidth\PP@auto
+    \pgfmathsetlength{\PP@width}{(\linewidth-1pt-(\the\PP@columns-1)*\PP@gap)/\the\PP@columns}%
+  \else \PP@width=\PP@requestedwidth\relax \fi
+  \PP@textwidth=\dimexpr\PP@width-\PP@padding*2\relax
+  \pgfmathsetlength{\PP@bottom}{-\PP@headingheight-2*\PP@padding-#3*\PP@laneheight}%
+  \PP@styles
+  \noindent\begin{tikzpicture}
+    \PP@index=0
+    \let\PPStage\PP@renderstage\let\PPExtension\PP@renderextension
+    \csname PP@family@#2\endcsname
+}{%
+  % The repository's return-navigation macro moves upward by 3 mm. Reserve
+  % positive clearance so its white icon box cannot cover a stage's border.
+  \end{tikzpicture}\par\endgroup\addvspace{3mm}%
+}
+\NewDocumentCommand{\PPCell}{m m +m}{%
+  \pgfmathsetlengthmacro{\PP@y}{-\PP@headingheight-\PP@padding-(#2-.5)*\PP@laneheight}%
+  \PP@box{\dimexpr\PP@laneheight-\PP@padding*2\relax}{#3}%
+  \node[ppd/content] (\PP@prefix#1-#2)
+    at (\csname PP@x@#1\endcsname,\PP@y) {\usebox{\PP@contentbox}};
+}
+\NewDocumentCommand{\PPShared}{m +m}{%
+  \pgfmathsetlengthmacro{\PP@y}{-\PP@headingheight-\PP@padding-.5*\PP@lanes*\PP@laneheight}%
+  \PP@box{\dimexpr-\PP@bottom-\PP@headingheight-\PP@padding*2\relax}{#2}%
+  \node[ppd/content] (\PP@prefix#1-shared)
+    at (\csname PP@x@#1\endcsname,\PP@y) {\usebox{\PP@contentbox}};
+}
+% Endpoint syntax: stage-1, stage-2, ... or stage-shared.
+% One call per branch/merge edge; labels describe mathematics, not decoration.
+\NewDocumentCommand{\PPConnect}{O{} m m m}{%
+  \def\PP@from{east}\def\PP@to{west}%
+  \if\relax\detokenize{#4}\relax
+    \draw[ppd/sequence,#1] (\PP@prefix#2.\PP@from) to (\PP@prefix#3.\PP@to);
+  \else
+    \draw[ppd/sequence,#1] (\PP@prefix#2.\PP@from) to
+      node[ppd/edge label,above]{#4} (\PP@prefix#3.\PP@to);
+  \fi
+}
+\NewDocumentCommand{\PPAnnotation}{O{} m +m}{%
+  \node[ppd/annotation,text width=\PP@textwidth,anchor=north,#1]
+    at (\csname PP@x@#2\endcsname,\dimexpr\PP@bottom-\PP@annotationgap\relax) {#3};
+}
+% A panel occupies the same lane grid as ordinary content; dependencies and
+% mathematics of a supplied tabular or local graph remain activity-owned.
+\NewDocumentCommand{\PPPanel}{m m +m}{\PPCell{#1}{#2}{#3}}
+\makeatother

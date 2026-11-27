@@ -30,43 +30,1171 @@
 \title{Grade 10, Term 2, Lesson 1, Criterion C3\\Bernoulli Models and Individual Break-Even Analysis}
 \author{}
 \date{}
-% Individual expected-value graph: variable, state 0, state 1, exact root.
-\newcommand{\BreakEvenGraph}[4]{%
-% Keep near-zero tick backgrounds apart without moving their tick marks.
-\def\CThreeGraphTickAnchor{east}%
-\ifGTenHighlights
-  \pgfmathparse{min(abs(#2),abs(#3))/abs(#3-#2)<.15}%
-  \ifdim\pgfmathresult pt>0pt
-    \def\CThreeGraphTickAnchor{\ifdim\tick pt=0pt south east\else\ifdim\tick pt<0pt north east\else east\fi\fi}%
-  \fi
-\fi
-\begin{tikzpicture}\begin{axis}[
- width=.86\linewidth,height=5.3cm,xmin=0,xmax=1,
- ymin={min(#2,#3)-.15*abs(#3-#2)},
- ymax={max(#2,#3)+.15*abs(#3-#2)},
- axis lines=left,xlabel={\textcolor{CThreeProbabilityInk}{\SuccessProb{Probability} $\SuccessProb{p}=\SuccessProb{P}(\HLMathEvent{E})$}},
- ylabel={\textcolor{CThreeExpectedInk}{\ExpectedValue{Expected net profit} (\ExpectedValue{USD})}},
- yticklabel style={text=CThreeExpectedInk,anchor=\CThreeGraphTickAnchor}, xticklabel style={text=CThreeProbabilityInk},grid=major,
- yticklabel={$\ExpectedValue{\pgfmathprintnumber{\tick}}$},
- xticklabel={$\SuccessProb{\pgfmathprintnumber{\tick}}$},
- title={$\textcolor{CThreeExpectedInk}{\ExpectedValue{\mathbb E}}[\Money{Y_{#1}}]$: individual \SuccessProb{break-even} analysis},
- ytick={#2,0,#3},
- xtick={0,1},extra x ticks={#4},extra x tick labels={$\SuccessProb{p_{#1}^*}=\SuccessProb{#4}$},
- extra x tick style={tick label style={font=\small,text=CThreeProbabilityInk}},
- legend style={at={(.5,-.35)},anchor=north,legend columns=3,font=\small,
-   yshift=\CThreeGraphLegendShift}]
-\addplot[CThreeExpectedInk,thick,domain=0:1,samples=2]{#2+(#3-#2)*x};
-\addlegendentry{$\textcolor{CThreeExpectedInk}{\ExpectedValue{\mathbb E}}[\Money{Y_{#1}}]$}
-\addplot[black,dashed,domain=0:1,samples=2]{0};\addlegendentry{\ExpectedValue{Zero}}
-\addplot[CThreeProbabilityInk,thick,dotted,forget plot] coordinates {(#4,0) (#4,{min(#2,#3)-.15*abs(#3-#2)})};
-\addplot[black,only marks,mark=*,forget plot] coordinates {(0,#2) (1,#3)};
-\addplot[black,only marks,mark=*] coordinates {(#4,0)};
-\addlegendentry{\SuccessProb{Break-even}}
-\end{axis}\end{tikzpicture}}
 % Corresponding alternatives share a row; all inherited spacing is retained.
 \NewDocumentCommand{\PracticeColumnPair}{+m +m}{%
-\par\noindent\begin{minipage}[t]{.48\linewidth}#1\end{minipage}\hfill
-\begin{minipage}[t]{.48\linewidth}#2\end{minipage}\par}
+\par\noindent\begin{minipage}[t]{.48\linewidth}\raggedright #1\end{minipage}\hfill
+\begin{minipage}[t]{.48\linewidth}\raggedright #2\end{minipage}\par}
+% Local companion graphs. Both axes use the same physical probability unit.
+\usetikzlibrary{calc,backgrounds}
+\newcommand{\CThreePlain}[1]{\begingroup\GTenHighlightsfalse #1\endgroup}
+\ifGTenHighlights
+  \colorlet{CThreeMassInk}{GTenHLProbability!65!black}
+  \colorlet{CThreeCDFInk}{MathHLCumulativeColor!65!black}
+\else
+  \colorlet{CThreeMassInk}{black}
+  \colorlet{CThreeCDFInk}{black}
+\fi
+\colorlet{CThreeShadowInk}{CThreeMassInk!32}
+\tikzset{c3arrow/.style={gray!75,line width=.35pt,-{Stealth[length=4pt]}},
+ c3card/.style={draw=gray!65,rounded corners=2pt,fill=white,inner sep=4pt},
+ c3flow/.style={c3arrow,rounded corners=3pt}}
+% variable, state-0 value, state-1 value, initial p, units, value role.
+\newcommand{\CThreeDistributionPair}[6]{%
+\begingroup
+\tikzset{gten marker/.append style={inner xsep=.35mm,inner ysep=.15mm}}
+\pgfmathsetmacro{\cThreeLow}{min(#2,#3)}%
+\pgfmathsetmacro{\cThreeHigh}{max(#2,#3)}%
+\pgfmathsetmacro{\cThreeQ}{ifthenelse(#2<#3,1-(#4),#4)}%
+\pgfmathsetmacro{\cThreeR}{1-\cThreeQ}%
+\pgfmathsetmacro{\cThreeMin}{\cThreeLow-.28*(\cThreeHigh-\cThreeLow)}%
+\pgfmathsetmacro{\cThreeMax}{\cThreeHigh+.28*(\cThreeHigh-\cThreeLow)}%
+\begin{tikzpicture}
+\pgfplotsset{c3pair/.style={width=\dimexpr\linewidth-12mm\relax,height=1.45cm,
+ scale only axis,xmin=\cThreeMin,xmax=\cThreeMax,ymin=-.04,ymax=1.14,
+ axis lines=left,xtick={\cThreeLow,\cThreeHigh},ytick={0,1},
+ tick label style={font=\footnotesize},label style={font=\footnotesize},
+ xticklabel={$#6{\pgfmathprintnumber{\tick}}$},clip=false}}
+\begin{axis}[c3pair,name=c3top,anchor=south west,
+ ylabel={$\HLCumulativeProbability{F_{#1}}$},
+ yticklabel={$\HLCumulativeProbability{\pgfmathprintnumber{\tick}}$}]
+\addplot[CThreeShadowInk,densely dashed,line width=.9pt] coordinates
+ {(\cThreeLow,0)(\cThreeLow,\cThreeQ)};
+\addplot[CThreeShadowInk,densely dashed,line width=.9pt] coordinates
+ {(\cThreeHigh,\cThreeQ)(\cThreeHigh,1)};
+\coordinate (c3shadow0) at (axis cs:\cThreeLow,{\cThreeQ/2});
+\coordinate (c3shadow1) at (axis cs:\cThreeHigh,{\cThreeQ+\cThreeR/2});
+\addplot[CThreeCDFInk,thick,<-] coordinates {(\cThreeMin,0)(\cThreeLow,0)};
+\addplot[CThreeCDFInk,thick] coordinates {(\cThreeLow,\cThreeQ)(\cThreeHigh,\cThreeQ)};
+\addplot[CThreeCDFInk,thick,->] coordinates {(\cThreeHigh,1)(\cThreeMax,1)};
+\addplot[only marks,mark=*,mark size=1.4pt,CThreeCDFInk,mark options={fill=white}]
+ coordinates {(\cThreeLow,0)(\cThreeHigh,\cThreeQ)};
+\addplot[only marks,mark=*,mark size=1.4pt,CThreeCDFInk]
+ coordinates {(\cThreeLow,\cThreeQ)(\cThreeHigh,1)};
+\node[font=\footnotesize,anchor=\ifdim\cThreeQ pt>.7pt north\else south\fi,
+ fill=white,inner sep=1pt] at (axis cs:{(\cThreeLow+\cThreeHigh)/2},\cThreeQ)
+ {$\HLCumulativeProbability{\pgfmathprintnumber[fixed,precision=2]{\cThreeQ}}$};
+\end{axis}
+\begin{axis}[c3pair,at={(c3top.south west)},anchor=north west,yshift=-.85cm,
+ ylabel={$\HLProbability{m_{#1}}$},xlabel={#5},
+ yticklabel={$\HLProbability{\pgfmathprintnumber{\tick}}$}]
+\addplot[CThreeMassInk,thick] coordinates {(\cThreeLow,0)(\cThreeLow,\cThreeQ)};
+\addplot[CThreeMassInk,thick] coordinates {(\cThreeHigh,0)(\cThreeHigh,\cThreeR)};
+\addplot[only marks,mark=*,mark size=1.5pt,CThreeMassInk]
+ coordinates {(\cThreeLow,\cThreeQ)(\cThreeHigh,\cThreeR)};
+\node[font=\footnotesize,anchor=south,fill=white,inner sep=1pt]
+ at (axis cs:\cThreeLow,\cThreeQ) {$\HLProbability{\pgfmathprintnumber[fixed,precision=2]{\cThreeQ}}$};
+\node[font=\footnotesize,anchor=south,fill=white,inner sep=1pt]
+ at (axis cs:\cThreeHigh,\cThreeR) {$\HLProbability{\pgfmathprintnumber[fixed,precision=2]{\cThreeR}}$};
+\coordinate (c3mass0) at (axis cs:\cThreeLow,{\cThreeQ/2});
+\coordinate (c3mass1) at (axis cs:\cThreeHigh,{\cThreeR/2});
+\end{axis}
+\begin{pgfonlayer}{background}
+\draw[c3arrow] (c3mass0) .. controls ([xshift=2mm]$(c3mass0)!.33!(c3shadow0)$)
+ and ([xshift=2mm]$(c3mass0)!.67!(c3shadow0)$) .. (c3shadow0);
+\draw[c3arrow] (c3mass1) .. controls ([xshift=2mm]$(c3mass1)!.33!(c3shadow1)$)
+ and ([xshift=2mm]$(c3mass1)!.67!(c3shadow1)$) .. (c3shadow1);
+\end{pgfonlayer}
+\end{tikzpicture}\endgroup}
+% i, state-0 payoff, state-1 payoff, exact root, initial p.
+\newcommand{\CThreeExpectationGraph}[5]{%
+\begingroup
+\tikzset{gten marker/.append style={inner xsep=.35mm,inner ysep=.15mm}}
+\pgfmathsetmacro{\cThreeInitial}{#2+(#3-#2)*(#5)}%
+\pgfmathsetmacro{\cThreeP}{#5}%
+\def\cThreeTickAnchor{east}%
+\pgfmathparse{min(abs(#2),abs(#3))/abs(#3-#2)<.15}%
+\ifdim\pgfmathresult pt>0pt
+ \def\cThreeTickAnchor{\ifdim\tick pt=0pt south east\else\ifdim\tick pt<0pt north east\else east\fi\fi}%
+\fi
+\begin{tikzpicture}\begin{axis}[
+ width=\dimexpr\linewidth-14mm\relax,height=3.6cm,scale only axis,
+ xmin=0,xmax=1,ymin={min(#2,#3)-.22*abs(#3-#2)},
+ ymax={max(#2,#3)+.25*abs(#3-#2)},axis lines=left,
+ xtick={0,1},ytick={#2,0,#3},grid=major,grid style={gray!15},
+ yticklabel style={anchor=\cThreeTickAnchor},
+ tick label style={font=\footnotesize},label style={font=\footnotesize},
+ xlabel={$\SuccessProb{p}$},xlabel style={yshift=-3mm},
+ ylabel={$\ExpectedValue{g_{#1}}$ (\ExpectedValue{USD})},
+ yticklabel={$\ifdim\tick pt=0pt\ExpectedValue{0}\else\Money{\pgfmathprintnumber{\tick}}\fi$},
+ xticklabel={$\SuccessProb{\pgfmathprintnumber{\tick}}$},clip=false]
+\addplot[black,dashed,domain=0:1,samples=2]{0};
+\addplot[CThreeExpectedInk,thick,domain=0:1,samples=2]{#2+(#3-#2)*x};
+\addplot[black,only marks,mark=*,mark size=1.5pt] coordinates {(0,#2)(1,#3)(#4,0)};
+\addplot[gray,dotted] coordinates {(#4,0)(#4,{min(#2,#3)-.22*abs(#3-#2)})};
+\node[font=\footnotesize,anchor=north,yshift=-2pt] at
+ (axis cs:#4,{min(#2,#3)-.22*abs(#3-#2)}) {$\SuccessProb{p_{#1}^*}$};
+\addplot[CThreeExpectedInk,only marks,mark=square*,mark size=2pt]
+ coordinates {(#5,\cThreeInitial)};
+\node[font=\footnotesize,anchor=\ifdim#3pt>#2pt south east\else south west\fi,
+ inner sep=2pt,fill=white] at (axis cs:#5,\cThreeInitial) {\ExpectedValue{initial}};
+\node[font=\small,fill=white,inner sep=1pt] at
+ (axis cs:{(#4)/2},{max(#2,#3)+.13*abs(#3-#2)})
+ {$\ExpectedValue{\ifdim#3pt>#2pt -\else +\fi}$};
+\node[font=\small,fill=white,inner sep=1pt] at
+ (axis cs:{(1+(#4))/2},{max(#2,#3)+.13*abs(#3-#2)})
+ {$\ExpectedValue{\ifdim#3pt>#2pt +\else -\fi}$};
+\end{axis}\end{tikzpicture}\endgroup}
+\newcommand{\CThreeGraphReading}{%
+\small\textbf{Same distribution: CDF above, PMF below.}
+Solid \HLProbability{stems} have filled endpoints. Pale dashed shadows translate
+each \HLProbability{mass} to its \HLCumulativeProbability{CDF jump}; thin arrows link their midpoints.
+Within a pair, horizontal limits and physical probability scales are identical.
+Open circles exclude an endpoint; filled circles include it, making each
+\HLCumulativeProbability{CDF} right-continuous. Between variables, arrows show the
+\TransformationFunction{induced distribution}: apply \TransformationFunction{$f_i$}
+to state values and retain their probabilities, rather than applying it to CDF heights.
+At $\SuccessProb{p}=\SuccessProb{0}$ or $\SuccessProb{1}$, zero-mass jumps disappear.}
+
+\newcommand{\CThreeTaskOne}{%
+\textbf{Task 1 --- Establish the binary model and monetary transformations.}
+\textbf{1.} \textbf{Binary model and monetary transformations.} Present the shared observation, period, \HLMathEvent{event} $\HLMathEvent{E}$, \HLMathEvent{complement} $\HLMathEvent{E^c}$, \Indicator{indicator} $\Indicator{X}$, \Indicator{Bernoulli model} and initial $\SuccessProb{p}=P(\HLMathEvent{E})$. Then give each \Money{monetary variable}'s \Money{state payoffs} in \Money{USD} and derive $\Money{Y_i}=\TransformationFunction{f_i}(\Indicator{X})=\Money{f_i(0)}+[\Money{f_i(1)}-\Money{f_i(0)}]\Indicator{X}$.
+\textbf{2.} \textbf{Supports, \HLProbability{PMFs}, and ordered \HLCumulativeProbability{CDFs}.} Give the \Indicator{indicator}'s set-builder support, complete \HLProbability{PMF} and piecewise \HLCumulativeProbability{CDF}, including support cases at $\SuccessProb{p}=0,1$. Then give the \Money{monetary supports}, complete \HLProbability{PMFs} (zero elsewhere) and numerically ordered piecewise \HLCumulativeProbability{CDFs}, with endpoint support cases.
+\textbf{3.} \textbf{Initial probabilities and loss \HLMathEvent{events}.} State the initial \Indicator{indicator} probabilities. For each $\Money{Y_i}$, give both \HLProbability{initial masses}, identify $\HLMathEvent{\{Y_i<0\}}$ in terms of $\Indicator{X}$ and $\HLMathEvent{E}$ or $\HLMathEvent{E^c}$, calculate its probability and interpret it in context. All alternatives share $\Indicator{X}$; no independence is assumed.
+}
+\newcommand{\CThreeTaskTwo}{%
+\textbf{Task 2 --- Individual \ExpectedValue{expected values}.}
+\textbf{1.} \textbf{Initial \ExpectedValue{expected values}.} Calculate and interpret every \ExpectedValue{monetary expectation} at the supplied probability before sensitivity analysis.
+\textbf{2.} \textbf{\ExpectedValue{Expectation formulas} and sign intervals.} Hold \Money{payoffs} fixed and vary only $\SuccessProb{p}\in\left[0,1\right]$. For each $\Money{Y_i}$, derive $\ExpectedValue{\mathbb E}[\Money{Y_i}]=\SuccessProb{p} \Money{f_i(1)}+(\FailureProb{1-p})\Money{f_i(0)}$, solve its exact \SuccessProb{break-even equation}, and solve both strict sign inequalities with correct directions and endpoints. Explain \ExpectedValue{positive, negative and zero expectation}.
+\textbf{3.} \textbf{Graphs.} Give a separate labelled graph for each variable, showing its \ExpectedValue{expectation line}, zero line, endpoint \Money{payoffs} and exact \SuccessProb{break-even probability}. Finish with endpoint and root checks, and distinguish \ExpectedValue{expected profit} from \ExpectedValue{realized profit}.
+}
+\newcommand{\CThreeIntroTaskOne}{\textbf{Task 1 --- Modelling and distributions.} Model the shared \Indicator{indicator} and both monetary transformations; give their supports, \HLProbability{PMFs}, ordered \HLCumulativeProbability{CDFs} and loss events.}
+\newcommand{\CThreeIntroTaskTwo}{\textbf{Task 2 --- Expectations.} Calculate and interpret both initial \ExpectedValue{expected values}, derive their \ExpectedValue{expectation formulas}, solve their exact break-even equations and sign intervals, and graph each \ExpectedValue{expectation}.}
+\newcommand{\CThreeStatementIntroOne}{%
+Observe a student's art-print stall over one weekend. \HLMathEvent{High demand} means campus-market
+attendance meets the organizer's fixed target; \HLMathEvent{low demand} means it falls below that target.
+These states cover every outcome and apply to either hypothetical print-batch choice.
+Let $\HLMathEvent{E}$ be \HLMathEvent{high demand} and
+$\HLMathEvent{E^c}$ \HLMathEvent{low demand}. Define $\Indicator{X}=\Indicator{1}$ on $\HLMathEvent{E}$ and
+$\Indicator{X}=\Indicator{0}$ on $\HLMathEvent{E^c}$, with $\SuccessProb{p}=P(\HLMathEvent{E})=\SuccessProb{0.4}$
+and $\FailureProb{1-p}=\FailureProb{0.6}$. The \Indicator{indicator} is unitless.
+After printing and stall costs, a small print batch gives $\Money{f_1(0)}=\Money{-20}$, $\Money{f_1(1)}=\Money{60}$ \Money{USD};
+a large print batch gives $\Money{f_2(0)}=\Money{-40}$, $\Money{f_2(1)}=\Money{120}$ \Money{USD}.
+
+\begin{center}\begin{tabular}{lrr}\toprule Alternative & \HLMathEvent{low demand} & \HLMathEvent{high demand}\\\midrule
+$A_1$: small print batch & \Money{-20} & \Money{60}\\
+$A_2$: large print batch & \Money{-40} & \Money{120}\\
+\bottomrule\end{tabular}\end{center}
+}
+\newcommand{\CThreeModelIntroOne}{%
+\clearpage\noindent\textbf{Task 1 summary: shared states and induced distributions.}\par\medskip
+\textbf{Numerical illustration: introductory example 1.}\par
+\begingroup\small\setlength{\parskip}{2pt}\tikzset{gten marker/.append style={inner xsep=.4mm,inner ysep=.2mm}}
+\begin{center}\begin{tikzpicture}[x=1cm,y=1cm]
+\node[c3card,anchor=north,text width=7cm,align=center] (ev1) at (4,0) {$\HLMathEvent{E}$: \HLMathEvent{high demand}, $\SuccessProb{P}(\HLMathEvent{E})=\SuccessProb{p}$};
+
+\node[c3card,anchor=north,text width=7cm,align=center] (ev0) at (15,0) {$\HLMathEvent{E^c}$: \HLMathEvent{low demand}, $\FailureProb{P}(\HLMathEvent{E^c})=\FailureProb{1-p}$};
+
+\node[c3card,anchor=north,text width=6cm,align=center] (ind1) at (4,-1.2) {$\Indicator{X(\omega)}=\Indicator{1}$, for $\HLMathEvent{\omega\in E}$};
+
+\node[c3card,anchor=north,text width=6cm,align=center] (ind0) at (15,-1.2) {$\Indicator{X(\omega)}=\Indicator{0}$, for $\HLMathEvent{\omega\in E^c}$};
+
+\draw[c3flow] (ev1) -- (ind1);\draw[c3flow] (ev0) -- (ind0);
+\node[c3card,anchor=north,text width=16.2cm,align=center] (map1) at (9.5,-2.65) {\textbf{\Money{$Y_1$}: small print batch}\par 
+$\Money{Y_1(\omega)}=\TransformationFunction{f_1}(\Indicator{X(\omega)})=\Money{f_1(1)}=\Money{60}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E}$\par 
+$\Money{Y_1(\omega)}=\TransformationFunction{f_1}(\Indicator{X(\omega)})=\Money{f_1(0)}=\Money{-20}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E^c}$
+};
+
+\draw[c3flow] (ind1.west) -- (.15,-1.65) |- ([yshift=-7mm]map1.north west);
+\draw[c3flow,dashed] (ind0.east) -- (18.85,-1.65) |- ([yshift=-11.5mm]map1.north east);
+\node[c3card,anchor=north,text width=16.2cm,align=center] (map2) at (9.5,-4.45) {\textbf{\Money{$Y_2$}: large print batch}\par 
+$\Money{Y_2(\omega)}=\TransformationFunction{f_2}(\Indicator{X(\omega)})=\Money{f_2(1)}=\Money{120}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E}$\par 
+$\Money{Y_2(\omega)}=\TransformationFunction{f_2}(\Indicator{X(\omega)})=\Money{f_2(0)}=\Money{-40}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E^c}$
+};
+
+\draw[c3flow] (ind1.west) -- (.15,-1.65) |- ([yshift=-7mm]map2.north west);
+\draw[c3flow,dashed] (ind0.east) -- (18.85,-1.65) |- ([yshift=-11.5mm]map2.north east);
+\node[inner sep=1pt,anchor=north,text width=5.913333333333333cm,align=center] (head0) at (3.0666666666666664,-6.4) {$\Indicator{X}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (cdf0) at (3.0666666666666664,-7.050000000000001) {$\HLCumulativeProbability{F_{X}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Indicator{0},\\\FailureProb{1-p},&\Indicator{0}\leq t<\Indicator{1},\\\HLCumulativeProbability{1},&t\geq \Indicator{1}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (pmf0) at (3.0666666666666664,-9.8) {$\HLProbability{m_{X}}$\par $\begin{array}{ll}\Indicator{0}:&\FailureProb{1-p}\\\Indicator{1}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=5.913333333333333cm,align=center] (graph0) at (3.0666666666666664,-12.100000000000001) {\CThreeDistributionPair{X}{0}{1}{2/5}{unitless}{\Indicator}};
+
+\node[inner sep=1pt,anchor=north,text width=5.913333333333333cm,align=center] (head1) at (9.4,-6.4) {$\Money{Y_1}$ $\leftarrow\TransformationFunction{f_1}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (cdf1) at (9.4,-7.050000000000001) {$\HLCumulativeProbability{F_{Y_1}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Money{-20},\\\FailureProb{1-p},&\Money{-20}\leq t<\Money{60},\\\HLCumulativeProbability{1},&t\geq \Money{60}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (pmf1) at (9.4,-9.8) {$\HLProbability{m_{Y_1}}$\par $\begin{array}{ll}\Money{-20}:&\FailureProb{1-p}\\\Money{60}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=5.913333333333333cm,align=center] (graph1) at (9.4,-12.100000000000001) {\CThreeDistributionPair{Y_1}{-20}{60}{2/5}{\Money{USD}}{\Money}};
+
+\draw[c3flow] (cdf0.north) -- ++(0,.27) -| (cdf1.north);
+\draw[c3flow] (pmf0.south) -- ++(0,-.30) -| (pmf1.south);
+\draw[c3flow] (map1.east) -- (18.28,-3.3) -- (18.28,-6.1000000000000005) -| (head1.north);
+\node[inner sep=1pt,anchor=north,text width=5.913333333333333cm,align=center] (head2) at (15.733333333333333,-6.4) {$\Money{Y_2}$ $\leftarrow\TransformationFunction{f_2}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (cdf2) at (15.733333333333333,-7.050000000000001) {$\HLCumulativeProbability{F_{Y_2}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Money{-40},\\\FailureProb{1-p},&\Money{-40}\leq t<\Money{120},\\\HLCumulativeProbability{1},&t\geq \Money{120}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (pmf2) at (15.733333333333333,-9.8) {$\HLProbability{m_{Y_2}}$\par $\begin{array}{ll}\Money{-40}:&\FailureProb{1-p}\\\Money{120}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=5.913333333333333cm,align=center] (graph2) at (15.733333333333333,-12.100000000000001) {\CThreeDistributionPair{Y_2}{-40}{120}{2/5}{\Money{USD}}{\Money}};
+
+\draw[c3flow] (cdf0.north) -- ++(0,.27) -| (cdf2.north);
+\draw[c3flow] (pmf0.south) -- ++(0,-.30) -| (pmf2.south);
+\draw[c3flow] (map2.east) -- (18.1,-5.1) -- (18.1,-5.98) -| (head2.north);
+\end{tikzpicture}\end{center}
+\textbf{Numerical graph illustration:} $\SuccessProb{p_0}=\SuccessProb{\frac{2}{5}}$. All displayed distribution formulas remain symbolic in $\SuccessProb{p}$.
+\par\CThreeGraphReading\par
+For $0<\SuccessProb{p}<1$, $\Indicator{S_X}=\{\Indicator{0},\Indicator{1}\}$; at $\SuccessProb{p}=0$ only $\Indicator{0}$ remains, and at $\SuccessProb{p}=1$ only $\Indicator{1}$ remains. Each monetary support retains $\Money{f_i(0)}$ at $\SuccessProb{p}=0$ and $\Money{f_i(1)}$ at $\SuccessProb{p}=1$.
+\par\textbf{Loss events.} $\HLMathEvent{\{Y_1<0\}}=\HLMathEvent{\{X=0\}}=\HLMathEvent{E^c}$, probability $\FailureProb{1-p}$; $\HLMathEvent{\{Y_2<0\}}=\HLMathEvent{\{X=0\}}=\HLMathEvent{E^c}$, probability $\FailureProb{1-p}$.
+\endgroup
+}
+\newcommand{\CThreeExpectIntroOne}{%
+\clearpage\noindent\textbf{Task 2 summary: parallel expectation analyses.}\par\medskip
+\textbf{Numerical illustration: introductory example 1.}\par
+\begingroup\small\tikzset{gten marker/.append style={inner xsep=.4mm,inner ysep=.2mm}}
+\begin{center}\begin{tikzpicture}[x=1cm,y=1cm]
+\node[c3card,anchor=north,text width=17cm,align=center] (inputs) at (9.5,0) {Shared probability inputs: $\SuccessProb{p}$ and $\FailureProb{1-p}$; hold each alternative\textquotesingle s \Money{payoffs} fixed.};
+
+\node[c3card,anchor=north,text width=17cm,align=center] (formula) at (9.5,-1.2) {$\ExpectedValue{g_i}(\SuccessProb{p})=\ExpectedValue{\mathbb E}[\Money{Y_i}]=\SuccessProb{p}\Money{f_i(1)}+(\FailureProb{1-p})\Money{f_i(0)}$};
+
+\draw[c3flow] (inputs) -- (formula);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (pay1) at (4.75,-2.7) {\textbf{\Money{$Y_1$}: small print batch}\par $\Money{f_1(0)}=\Money{-20},\quad\Money{f_1(1)}=\Money{60}\ \Money{\mathrm{USD}}$\par $\ExpectedValue{g_1}(\SuccessProb{p})=\Money{-20}+\Money{80}\SuccessProb{p}$};
+
+\draw[c3flow] (formula.south) -- ++(0,-.25) -| (pay1.north);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (initial1) at (4.75,-5.0) {\ExpectedValue{Initial expectation}\par $\ExpectedValue{g_1}\!\left(\SuccessProb{\frac{2}{5}}\right)=\ExpectedValue{12\ \mathrm{USD}}$\par \ExpectedValue{expected net gain} per stated period};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (root1) at (4.75,-7.15) {\SuccessProb{Exact break-even equation}\par $\Money{-20}+\Money{80}\SuccessProb{p}=\ExpectedValue{0}$\par $\SuccessProb{p_1^*}=\SuccessProb{\frac{1}{4}}$};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (sign1) at (4.75,-9.45) {$\ExpectedValue{g_1}>\ExpectedValue{0}:\ \SuccessProb{p}\in \left(\SuccessProb{\frac{1}{4}},\SuccessProb{1}\right]$\par $\ExpectedValue{g_1}=\ExpectedValue{0}:\ \SuccessProb{p}=\SuccessProb{\frac{1}{4}}$\par $\ExpectedValue{g_1}<\ExpectedValue{0}:\ \SuccessProb{p}\in \left[\SuccessProb{0},\SuccessProb{\frac{1}{4}}\right)$};
+
+\node[inner sep=0pt,anchor=north,text width=8.8cm,align=center] (eg1) at (4.75,-12.0) {\CThreeExpectationGraph{1}{-20}{60}{1/4}{2/5}};
+
+\draw[c3flow] (pay1.south) -- (initial1.north);
+\draw[c3flow] (initial1.south) -- (root1.north);
+\draw[c3flow] (root1.south) -- (sign1.north);
+\draw[c3flow] (sign1.south) -- (eg1.north);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (pay2) at (14.25,-2.7) {\textbf{\Money{$Y_2$}: large print batch}\par $\Money{f_2(0)}=\Money{-40},\quad\Money{f_2(1)}=\Money{120}\ \Money{\mathrm{USD}}$\par $\ExpectedValue{g_2}(\SuccessProb{p})=\Money{-40}+\Money{160}\SuccessProb{p}$};
+
+\draw[c3flow] (formula.south) -- ++(0,-.25) -| (pay2.north);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (initial2) at (14.25,-5.0) {\ExpectedValue{Initial expectation}\par $\ExpectedValue{g_2}\!\left(\SuccessProb{\frac{2}{5}}\right)=\ExpectedValue{24\ \mathrm{USD}}$\par \ExpectedValue{expected net gain} per stated period};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (root2) at (14.25,-7.15) {\SuccessProb{Exact break-even equation}\par $\Money{-40}+\Money{160}\SuccessProb{p}=\ExpectedValue{0}$\par $\SuccessProb{p_2^*}=\SuccessProb{\frac{1}{4}}$};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (sign2) at (14.25,-9.45) {$\ExpectedValue{g_2}>\ExpectedValue{0}:\ \SuccessProb{p}\in \left(\SuccessProb{\frac{1}{4}},\SuccessProb{1}\right]$\par $\ExpectedValue{g_2}=\ExpectedValue{0}:\ \SuccessProb{p}=\SuccessProb{\frac{1}{4}}$\par $\ExpectedValue{g_2}<\ExpectedValue{0}:\ \SuccessProb{p}\in \left[\SuccessProb{0},\SuccessProb{\frac{1}{4}}\right)$};
+
+\node[inner sep=0pt,anchor=north,text width=8.8cm,align=center] (eg2) at (14.25,-12.0) {\CThreeExpectationGraph{2}{-40}{120}{1/4}{2/5}};
+
+\draw[c3flow] (pay2.south) -- (initial2.north);
+\draw[c3flow] (initial2.south) -- (root2.north);
+\draw[c3flow] (root2.south) -- (sign2.north);
+\draw[c3flow] (sign2.south) -- (eg2.north);
+\end{tikzpicture}\end{center}
+The dashed horizontal line is \ExpectedValue{zero}; filled circles show endpoint payoffs and the exact root. The square marks the \ExpectedValue{initial expectation}. The $+$ and $-$ labels connect the graph to its strict sign intervals.
+\par \ExpectedValue{Positive expectation} means \ExpectedValue{expected net gain}; \ExpectedValue{negative expectation} means \ExpectedValue{expected net loss}; \ExpectedValue{zero expectation} means break-even. These are long-run averages per stated period, not guarantees of realized profit. Each branch uses its own payoffs and root.
+\endgroup
+}
+\newcommand{\CThreeStatementIntroTwo}{%
+Observe a freelancer hosting paid livestream sessions over one day. Let $\HLMathEvent{E}$ be \HLMathEvent{a home-internet disruption}
+and $\HLMathEvent{E^c}$ \HLMathEvent{no disruption} that day. These are the only states. Compare hypothetical choices:
+use home internet alone or buy mobile data as backup. All \Money{payoffs} are \Money{net gains or losses}
+after platform fees, data charges and refunds. Set $\Indicator{X}=\Indicator{1}$ on $\HLMathEvent{E}$ and
+$\Indicator{X}=\Indicator{0}$ on $\HLMathEvent{E^c}$. Here $\SuccessProb{p}=P(\HLMathEvent{E})=\SuccessProb{0.1}$,
+$\FailureProb{1-p}=\FailureProb{0.9}$. Mathematical success can be financially undesirable.
+With home internet alone, $\Money{f_1(0)}=\Money{100}$, $\Money{f_1(1)}=\Money{-20}$ \Money{USD}.
+With mobile-data backup, $\Money{f_2(0)}=\Money{60}$, $\Money{f_2(1)}=\Money{-10}$ \Money{USD}:
+\begin{center}\begin{tabular}{lrr}\toprule Alternative & \HLMathEvent{no disruption} & \HLMathEvent{disruption}\\\midrule
+$A_1$: home internet alone & \Money{100} & \Money{-20}\\
+$A_2$: mobile-data backup & \Money{60} & \Money{-10}\\
+\bottomrule\end{tabular}\end{center}
+}
+\newcommand{\CThreeModelIntroTwo}{%
+\clearpage\noindent\textbf{Task 1 summary: shared states and induced distributions.}\par\medskip
+
+\begingroup\small\setlength{\parskip}{2pt}\tikzset{gten marker/.append style={inner xsep=.4mm,inner ysep=.2mm}}
+\begin{center}\begin{tikzpicture}[x=1cm,y=1cm]
+\node[c3card,anchor=north,text width=7cm,align=center] (ev1) at (4,0) {$\HLMathEvent{E}$: \HLMathEvent{disruption}, $\SuccessProb{P}(\HLMathEvent{E})=\SuccessProb{p}$};
+
+\node[c3card,anchor=north,text width=7cm,align=center] (ev0) at (15,0) {$\HLMathEvent{E^c}$: \HLMathEvent{no disruption}, $\FailureProb{P}(\HLMathEvent{E^c})=\FailureProb{1-p}$};
+
+\node[c3card,anchor=north,text width=6cm,align=center] (ind1) at (4,-1.2) {$\Indicator{X(\omega)}=\Indicator{1}$, for $\HLMathEvent{\omega\in E}$};
+
+\node[c3card,anchor=north,text width=6cm,align=center] (ind0) at (15,-1.2) {$\Indicator{X(\omega)}=\Indicator{0}$, for $\HLMathEvent{\omega\in E^c}$};
+
+\draw[c3flow] (ev1) -- (ind1);\draw[c3flow] (ev0) -- (ind0);
+\node[c3card,anchor=north,text width=16.2cm,align=center] (map1) at (9.5,-2.65) {\textbf{\Money{$Y_1$}: home internet alone}\par 
+$\Money{Y_1(\omega)}=\TransformationFunction{f_1}(\Indicator{X(\omega)})=\Money{f_1(1)}=\Money{-20}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E}$\par 
+$\Money{Y_1(\omega)}=\TransformationFunction{f_1}(\Indicator{X(\omega)})=\Money{f_1(0)}=\Money{100}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E^c}$
+};
+
+\draw[c3flow] (ind1.west) -- (.15,-1.65) |- ([yshift=-7mm]map1.north west);
+\draw[c3flow,dashed] (ind0.east) -- (18.85,-1.65) |- ([yshift=-11.5mm]map1.north east);
+\node[c3card,anchor=north,text width=16.2cm,align=center] (map2) at (9.5,-4.45) {\textbf{\Money{$Y_2$}: mobile-data backup}\par 
+$\Money{Y_2(\omega)}=\TransformationFunction{f_2}(\Indicator{X(\omega)})=\Money{f_2(1)}=\Money{-10}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E}$\par 
+$\Money{Y_2(\omega)}=\TransformationFunction{f_2}(\Indicator{X(\omega)})=\Money{f_2(0)}=\Money{60}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E^c}$
+};
+
+\draw[c3flow] (ind1.west) -- (.15,-1.65) |- ([yshift=-7mm]map2.north west);
+\draw[c3flow,dashed] (ind0.east) -- (18.85,-1.65) |- ([yshift=-11.5mm]map2.north east);
+\node[inner sep=1pt,anchor=north,text width=5.913333333333333cm,align=center] (head0) at (3.0666666666666664,-6.4) {$\Indicator{X}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (cdf0) at (3.0666666666666664,-7.050000000000001) {$\HLCumulativeProbability{F_{X}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Indicator{0},\\\FailureProb{1-p},&\Indicator{0}\leq t<\Indicator{1},\\\HLCumulativeProbability{1},&t\geq \Indicator{1}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (pmf0) at (3.0666666666666664,-9.8) {$\HLProbability{m_{X}}$\par $\begin{array}{ll}\Indicator{0}:&\FailureProb{1-p}\\\Indicator{1}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=5.913333333333333cm,align=center] (graph0) at (3.0666666666666664,-12.100000000000001) {\CThreeDistributionPair{X}{0}{1}{1/10}{unitless}{\Indicator}};
+
+\node[inner sep=1pt,anchor=north,text width=5.913333333333333cm,align=center] (head1) at (9.4,-6.4) {$\Money{Y_1}$ $\leftarrow\TransformationFunction{f_1}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (cdf1) at (9.4,-7.050000000000001) {$\HLCumulativeProbability{F_{Y_1}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Money{-20},\\\SuccessProb{p},&\Money{-20}\leq t<\Money{100},\\\HLCumulativeProbability{1},&t\geq \Money{100}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (pmf1) at (9.4,-9.8) {$\HLProbability{m_{Y_1}}$\par $\begin{array}{ll}\Money{100}:&\FailureProb{1-p}\\\Money{-20}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=5.913333333333333cm,align=center] (graph1) at (9.4,-12.100000000000001) {\CThreeDistributionPair{Y_1}{100}{-20}{1/10}{\Money{USD}}{\Money}};
+
+\draw[c3flow] (cdf0.north) -- ++(0,.27) -| (cdf1.north);
+\draw[c3flow] (pmf0.south) -- ++(0,-.30) -| (pmf1.south);
+\draw[c3flow] (map1.east) -- (18.28,-3.3) -- (18.28,-6.1000000000000005) -| (head1.north);
+\node[inner sep=1pt,anchor=north,text width=5.913333333333333cm,align=center] (head2) at (15.733333333333333,-6.4) {$\Money{Y_2}$ $\leftarrow\TransformationFunction{f_2}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (cdf2) at (15.733333333333333,-7.050000000000001) {$\HLCumulativeProbability{F_{Y_2}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Money{-10},\\\SuccessProb{p},&\Money{-10}\leq t<\Money{60},\\\HLCumulativeProbability{1},&t\geq \Money{60}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (pmf2) at (15.733333333333333,-9.8) {$\HLProbability{m_{Y_2}}$\par $\begin{array}{ll}\Money{60}:&\FailureProb{1-p}\\\Money{-10}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=5.913333333333333cm,align=center] (graph2) at (15.733333333333333,-12.100000000000001) {\CThreeDistributionPair{Y_2}{60}{-10}{1/10}{\Money{USD}}{\Money}};
+
+\draw[c3flow] (cdf0.north) -- ++(0,.27) -| (cdf2.north);
+\draw[c3flow] (pmf0.south) -- ++(0,-.30) -| (pmf2.south);
+\draw[c3flow] (map2.east) -- (18.1,-5.1) -- (18.1,-5.98) -| (head2.north);
+\end{tikzpicture}\end{center}
+\textbf{Numerical graph illustration:} $\SuccessProb{p_0}=\SuccessProb{\frac{1}{10}}$. All displayed distribution formulas remain symbolic in $\SuccessProb{p}$.
+\par\textbf{CDF above, PMF below.} Filled stems translate to pale dashed jump shadows; thin arrows link equal physical lengths. Open and filled circles show excluded and included endpoints. Distribution arrows retain state probabilities while mapping values, rather than applying $\TransformationFunction{f_i}$ to CDF heights. See \hyperref[ex:intro-one]{Example 1}.\par
+For $0<\SuccessProb{p}<1$, $\Indicator{S_X}=\{\Indicator{0},\Indicator{1}\}$; at $\SuccessProb{p}=0$ only $\Indicator{0}$ remains, and at $\SuccessProb{p}=1$ only $\Indicator{1}$ remains. Each monetary support retains $\Money{f_i(0)}$ at $\SuccessProb{p}=0$ and $\Money{f_i(1)}$ at $\SuccessProb{p}=1$.
+\par\textbf{Loss events.} $\HLMathEvent{\{Y_1<0\}}=\HLMathEvent{\{X=1\}}=\HLMathEvent{E}$, probability $\SuccessProb{p}$; $\HLMathEvent{\{Y_2<0\}}=\HLMathEvent{\{X=1\}}=\HLMathEvent{E}$, probability $\SuccessProb{p}$.
+\endgroup
+}
+\newcommand{\CThreeExpectIntroTwo}{%
+\clearpage\noindent\textbf{Task 2 summary: parallel expectation analyses.}\par\medskip
+
+\begingroup\small\tikzset{gten marker/.append style={inner xsep=.4mm,inner ysep=.2mm}}
+\begin{center}\begin{tikzpicture}[x=1cm,y=1cm]
+\node[c3card,anchor=north,text width=17cm,align=center] (inputs) at (9.5,0) {Shared probability inputs: $\SuccessProb{p}$ and $\FailureProb{1-p}$; hold each alternative\textquotesingle s \Money{payoffs} fixed.};
+
+\node[c3card,anchor=north,text width=17cm,align=center] (formula) at (9.5,-1.2) {$\ExpectedValue{g_i}(\SuccessProb{p})=\ExpectedValue{\mathbb E}[\Money{Y_i}]=\SuccessProb{p}\Money{f_i(1)}+(\FailureProb{1-p})\Money{f_i(0)}$};
+
+\draw[c3flow] (inputs) -- (formula);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (pay1) at (4.75,-2.7) {\textbf{\Money{$Y_1$}: home internet alone}\par $\Money{f_1(0)}=\Money{100},\quad\Money{f_1(1)}=\Money{-20}\ \Money{\mathrm{USD}}$\par $\ExpectedValue{g_1}(\SuccessProb{p})=\Money{100}-\Money{120}\SuccessProb{p}$};
+
+\draw[c3flow] (formula.south) -- ++(0,-.25) -| (pay1.north);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (initial1) at (4.75,-5.0) {\ExpectedValue{Initial expectation}\par $\ExpectedValue{g_1}\!\left(\SuccessProb{\frac{1}{10}}\right)=\ExpectedValue{88\ \mathrm{USD}}$\par \ExpectedValue{expected net gain} per stated period};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (root1) at (4.75,-7.15) {\SuccessProb{Exact break-even equation}\par $\Money{100}-\Money{120}\SuccessProb{p}=\ExpectedValue{0}$\par $\SuccessProb{p_1^*}=\SuccessProb{\frac{5}{6}}$};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (sign1) at (4.75,-9.45) {$\ExpectedValue{g_1}>\ExpectedValue{0}:\ \SuccessProb{p}\in \left[\SuccessProb{0},\SuccessProb{\frac{5}{6}}\right)$\par $\ExpectedValue{g_1}=\ExpectedValue{0}:\ \SuccessProb{p}=\SuccessProb{\frac{5}{6}}$\par $\ExpectedValue{g_1}<\ExpectedValue{0}:\ \SuccessProb{p}\in \left(\SuccessProb{\frac{5}{6}},\SuccessProb{1}\right]$};
+
+\node[inner sep=0pt,anchor=north,text width=8.8cm,align=center] (eg1) at (4.75,-12.0) {\CThreeExpectationGraph{1}{100}{-20}{5/6}{1/10}};
+
+\draw[c3flow] (pay1.south) -- (initial1.north);
+\draw[c3flow] (initial1.south) -- (root1.north);
+\draw[c3flow] (root1.south) -- (sign1.north);
+\draw[c3flow] (sign1.south) -- (eg1.north);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (pay2) at (14.25,-2.7) {\textbf{\Money{$Y_2$}: mobile-data backup}\par $\Money{f_2(0)}=\Money{60},\quad\Money{f_2(1)}=\Money{-10}\ \Money{\mathrm{USD}}$\par $\ExpectedValue{g_2}(\SuccessProb{p})=\Money{60}-\Money{70}\SuccessProb{p}$};
+
+\draw[c3flow] (formula.south) -- ++(0,-.25) -| (pay2.north);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (initial2) at (14.25,-5.0) {\ExpectedValue{Initial expectation}\par $\ExpectedValue{g_2}\!\left(\SuccessProb{\frac{1}{10}}\right)=\ExpectedValue{53\ \mathrm{USD}}$\par \ExpectedValue{expected net gain} per stated period};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (root2) at (14.25,-7.15) {\SuccessProb{Exact break-even equation}\par $\Money{60}-\Money{70}\SuccessProb{p}=\ExpectedValue{0}$\par $\SuccessProb{p_2^*}=\SuccessProb{\frac{6}{7}}$};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (sign2) at (14.25,-9.45) {$\ExpectedValue{g_2}>\ExpectedValue{0}:\ \SuccessProb{p}\in \left[\SuccessProb{0},\SuccessProb{\frac{6}{7}}\right)$\par $\ExpectedValue{g_2}=\ExpectedValue{0}:\ \SuccessProb{p}=\SuccessProb{\frac{6}{7}}$\par $\ExpectedValue{g_2}<\ExpectedValue{0}:\ \SuccessProb{p}\in \left(\SuccessProb{\frac{6}{7}},\SuccessProb{1}\right]$};
+
+\node[inner sep=0pt,anchor=north,text width=8.8cm,align=center] (eg2) at (14.25,-12.0) {\CThreeExpectationGraph{2}{60}{-10}{6/7}{1/10}};
+
+\draw[c3flow] (pay2.south) -- (initial2.north);
+\draw[c3flow] (initial2.south) -- (root2.north);
+\draw[c3flow] (root2.south) -- (sign2.north);
+\draw[c3flow] (sign2.south) -- (eg2.north);
+\end{tikzpicture}\end{center}
+The dashed horizontal line is \ExpectedValue{zero}; filled circles show endpoint payoffs and the exact root. The square marks the \ExpectedValue{initial expectation}. The $+$ and $-$ labels connect the graph to its strict sign intervals.
+\par \ExpectedValue{Positive expectation} means \ExpectedValue{expected net gain}; \ExpectedValue{negative expectation} means \ExpectedValue{expected net loss}; \ExpectedValue{zero expectation} means break-even. These are long-run averages per stated period, not guarantees of realized profit. Each branch uses its own payoffs and root.
+\endgroup
+}
+\newcommand{\CThreeStatementInventory}{%
+Observe a student's campus sticker sales over one weekend. \HLMathEvent{High demand} means campus-market attendance meets the organizer's fixed target; \HLMathEvent{low demand} means it falls below that target. Compare a basic sticker pack with a premium pack printed more cheaply per sticker through a shared bulk order. These are alternative stall plans after printing and stall costs. The two possible states are \HLMathEvent{high demand} and \HLMathEvent{low demand}. The \SuccessProb{initial probability} of \HLMathEvent{high demand} is $\SuccessProb{p}=\SuccessProb{\frac{2}{5}}$. All entries below are \Money{net profits} in \Money{USD} for the entire stated period, including relevant costs.
+\begin{center}\begin{tabular}{lrr}\toprule Alternative & \HLMathEvent{low demand} & \HLMathEvent{high demand}\\\midrule
+$A_1$: basic sticker pack & \Money{-40} & \Money{80}\\
+$A_2$: premium sticker pack & \Money{-20} & \Money{180}\\
+\bottomrule\end{tabular}\end{center}
+
+}
+\newcommand{\CThreeModelInventory}{%
+\clearpage\noindent\textbf{Task 1 summary: shared states and induced distributions.}\par\medskip
+
+\begingroup\small\setlength{\parskip}{2pt}\tikzset{gten marker/.append style={inner xsep=.4mm,inner ysep=.2mm}}
+\begin{center}\begin{tikzpicture}[x=1cm,y=1cm]
+\node[c3card,anchor=north,text width=7cm,align=center] (ev1) at (4,0) {$\HLMathEvent{E}$: \HLMathEvent{high demand}, $\SuccessProb{P}(\HLMathEvent{E})=\SuccessProb{p}$};
+
+\node[c3card,anchor=north,text width=7cm,align=center] (ev0) at (15,0) {$\HLMathEvent{E^c}$: \HLMathEvent{low demand}, $\FailureProb{P}(\HLMathEvent{E^c})=\FailureProb{1-p}$};
+
+\node[c3card,anchor=north,text width=6cm,align=center] (ind1) at (4,-1.2) {$\Indicator{X(\omega)}=\Indicator{1}$, for $\HLMathEvent{\omega\in E}$};
+
+\node[c3card,anchor=north,text width=6cm,align=center] (ind0) at (15,-1.2) {$\Indicator{X(\omega)}=\Indicator{0}$, for $\HLMathEvent{\omega\in E^c}$};
+
+\draw[c3flow] (ev1) -- (ind1);\draw[c3flow] (ev0) -- (ind0);
+\node[c3card,anchor=north,text width=16.2cm,align=center] (map1) at (9.5,-2.65) {\textbf{\Money{$Y_1$}: basic sticker pack}\par 
+$\Money{Y_1(\omega)}=\TransformationFunction{f_1}(\Indicator{X(\omega)})=\Money{f_1(1)}=\Money{80}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E}$\par 
+$\Money{Y_1(\omega)}=\TransformationFunction{f_1}(\Indicator{X(\omega)})=\Money{f_1(0)}=\Money{-40}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E^c}$
+};
+
+\draw[c3flow] (ind1.west) -- (.15,-1.65) |- ([yshift=-7mm]map1.north west);
+\draw[c3flow,dashed] (ind0.east) -- (18.85,-1.65) |- ([yshift=-11.5mm]map1.north east);
+\node[c3card,anchor=north,text width=16.2cm,align=center] (map2) at (9.5,-4.45) {\textbf{\Money{$Y_2$}: premium sticker pack}\par 
+$\Money{Y_2(\omega)}=\TransformationFunction{f_2}(\Indicator{X(\omega)})=\Money{f_2(1)}=\Money{180}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E}$\par 
+$\Money{Y_2(\omega)}=\TransformationFunction{f_2}(\Indicator{X(\omega)})=\Money{f_2(0)}=\Money{-20}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E^c}$
+};
+
+\draw[c3flow] (ind1.west) -- (.15,-1.65) |- ([yshift=-7mm]map2.north west);
+\draw[c3flow,dashed] (ind0.east) -- (18.85,-1.65) |- ([yshift=-11.5mm]map2.north east);
+\node[inner sep=1pt,anchor=north,text width=5.913333333333333cm,align=center] (head0) at (3.0666666666666664,-6.4) {$\Indicator{X}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (cdf0) at (3.0666666666666664,-7.050000000000001) {$\HLCumulativeProbability{F_{X}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Indicator{0},\\\FailureProb{1-p},&\Indicator{0}\leq t<\Indicator{1},\\\HLCumulativeProbability{1},&t\geq \Indicator{1}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (pmf0) at (3.0666666666666664,-9.8) {$\HLProbability{m_{X}}$\par $\begin{array}{ll}\Indicator{0}:&\FailureProb{1-p}\\\Indicator{1}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=5.913333333333333cm,align=center] (graph0) at (3.0666666666666664,-12.100000000000001) {\CThreeDistributionPair{X}{0}{1}{2/5}{unitless}{\Indicator}};
+
+\node[inner sep=1pt,anchor=north,text width=5.913333333333333cm,align=center] (head1) at (9.4,-6.4) {$\Money{Y_1}$ $\leftarrow\TransformationFunction{f_1}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (cdf1) at (9.4,-7.050000000000001) {$\HLCumulativeProbability{F_{Y_1}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Money{-40},\\\FailureProb{1-p},&\Money{-40}\leq t<\Money{80},\\\HLCumulativeProbability{1},&t\geq \Money{80}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (pmf1) at (9.4,-9.8) {$\HLProbability{m_{Y_1}}$\par $\begin{array}{ll}\Money{-40}:&\FailureProb{1-p}\\\Money{80}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=5.913333333333333cm,align=center] (graph1) at (9.4,-12.100000000000001) {\CThreeDistributionPair{Y_1}{-40}{80}{2/5}{\Money{USD}}{\Money}};
+
+\draw[c3flow] (cdf0.north) -- ++(0,.27) -| (cdf1.north);
+\draw[c3flow] (pmf0.south) -- ++(0,-.30) -| (pmf1.south);
+\draw[c3flow] (map1.east) -- (18.28,-3.3) -- (18.28,-6.1000000000000005) -| (head1.north);
+\node[inner sep=1pt,anchor=north,text width=5.913333333333333cm,align=center] (head2) at (15.733333333333333,-6.4) {$\Money{Y_2}$ $\leftarrow\TransformationFunction{f_2}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (cdf2) at (15.733333333333333,-7.050000000000001) {$\HLCumulativeProbability{F_{Y_2}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Money{-20},\\\FailureProb{1-p},&\Money{-20}\leq t<\Money{180},\\\HLCumulativeProbability{1},&t\geq \Money{180}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (pmf2) at (15.733333333333333,-9.8) {$\HLProbability{m_{Y_2}}$\par $\begin{array}{ll}\Money{-20}:&\FailureProb{1-p}\\\Money{180}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=5.913333333333333cm,align=center] (graph2) at (15.733333333333333,-12.100000000000001) {\CThreeDistributionPair{Y_2}{-20}{180}{2/5}{\Money{USD}}{\Money}};
+
+\draw[c3flow] (cdf0.north) -- ++(0,.27) -| (cdf2.north);
+\draw[c3flow] (pmf0.south) -- ++(0,-.30) -| (pmf2.south);
+\draw[c3flow] (map2.east) -- (18.1,-5.1) -- (18.1,-5.98) -| (head2.north);
+\end{tikzpicture}\end{center}
+\textbf{Numerical graph illustration:} $\SuccessProb{p_0}=\SuccessProb{\frac{2}{5}}$. All displayed distribution formulas remain symbolic in $\SuccessProb{p}$.
+\par\textbf{CDF above, PMF below.} Filled stems translate to pale dashed jump shadows; thin arrows link equal physical lengths. Open and filled circles show excluded and included endpoints. Distribution arrows retain state probabilities while mapping values, rather than applying $\TransformationFunction{f_i}$ to CDF heights. See \hyperref[ex:intro-one]{Example 1}.\par
+For $0<\SuccessProb{p}<1$, $\Indicator{S_X}=\{\Indicator{0},\Indicator{1}\}$; at $\SuccessProb{p}=0$ only $\Indicator{0}$ remains, and at $\SuccessProb{p}=1$ only $\Indicator{1}$ remains. Each monetary support retains $\Money{f_i(0)}$ at $\SuccessProb{p}=0$ and $\Money{f_i(1)}$ at $\SuccessProb{p}=1$.
+\par\textbf{Loss events.} $\HLMathEvent{\{Y_1<0\}}=\HLMathEvent{\{X=0\}}=\HLMathEvent{E^c}$, probability $\FailureProb{1-p}$; $\HLMathEvent{\{Y_2<0\}}=\HLMathEvent{\{X=0\}}=\HLMathEvent{E^c}$, probability $\FailureProb{1-p}$.
+\endgroup
+}
+\newcommand{\CThreeExpectInventory}{%
+\clearpage\noindent\textbf{Task 2 summary: parallel expectation analyses.}\par\medskip
+
+\begingroup\small\tikzset{gten marker/.append style={inner xsep=.4mm,inner ysep=.2mm}}
+\begin{center}\begin{tikzpicture}[x=1cm,y=1cm]
+\node[c3card,anchor=north,text width=17cm,align=center] (inputs) at (9.5,0) {Shared probability inputs: $\SuccessProb{p}$ and $\FailureProb{1-p}$; hold each alternative\textquotesingle s \Money{payoffs} fixed.};
+
+\node[c3card,anchor=north,text width=17cm,align=center] (formula) at (9.5,-1.2) {$\ExpectedValue{g_i}(\SuccessProb{p})=\ExpectedValue{\mathbb E}[\Money{Y_i}]=\SuccessProb{p}\Money{f_i(1)}+(\FailureProb{1-p})\Money{f_i(0)}$};
+
+\draw[c3flow] (inputs) -- (formula);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (pay1) at (4.75,-2.7) {\textbf{\Money{$Y_1$}: basic sticker pack}\par $\Money{f_1(0)}=\Money{-40},\quad\Money{f_1(1)}=\Money{80}\ \Money{\mathrm{USD}}$\par $\ExpectedValue{g_1}(\SuccessProb{p})=\Money{-40}+\Money{120}\SuccessProb{p}$};
+
+\draw[c3flow] (formula.south) -- ++(0,-.25) -| (pay1.north);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (initial1) at (4.75,-5.0) {\ExpectedValue{Initial expectation}\par $\ExpectedValue{g_1}\!\left(\SuccessProb{\frac{2}{5}}\right)=\ExpectedValue{8\ \mathrm{USD}}$\par \ExpectedValue{expected net gain} per stated period};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (root1) at (4.75,-7.15) {\SuccessProb{Exact break-even equation}\par $\Money{-40}+\Money{120}\SuccessProb{p}=\ExpectedValue{0}$\par $\SuccessProb{p_1^*}=\SuccessProb{\frac{1}{3}}$};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (sign1) at (4.75,-9.45) {$\ExpectedValue{g_1}>\ExpectedValue{0}:\ \SuccessProb{p}\in \left(\SuccessProb{\frac{1}{3}},\SuccessProb{1}\right]$\par $\ExpectedValue{g_1}=\ExpectedValue{0}:\ \SuccessProb{p}=\SuccessProb{\frac{1}{3}}$\par $\ExpectedValue{g_1}<\ExpectedValue{0}:\ \SuccessProb{p}\in \left[\SuccessProb{0},\SuccessProb{\frac{1}{3}}\right)$};
+
+\node[inner sep=0pt,anchor=north,text width=8.8cm,align=center] (eg1) at (4.75,-12.0) {\CThreeExpectationGraph{1}{-40}{80}{1/3}{2/5}};
+
+\draw[c3flow] (pay1.south) -- (initial1.north);
+\draw[c3flow] (initial1.south) -- (root1.north);
+\draw[c3flow] (root1.south) -- (sign1.north);
+\draw[c3flow] (sign1.south) -- (eg1.north);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (pay2) at (14.25,-2.7) {\textbf{\Money{$Y_2$}: premium sticker pack}\par $\Money{f_2(0)}=\Money{-20},\quad\Money{f_2(1)}=\Money{180}\ \Money{\mathrm{USD}}$\par $\ExpectedValue{g_2}(\SuccessProb{p})=\Money{-20}+\Money{200}\SuccessProb{p}$};
+
+\draw[c3flow] (formula.south) -- ++(0,-.25) -| (pay2.north);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (initial2) at (14.25,-5.0) {\ExpectedValue{Initial expectation}\par $\ExpectedValue{g_2}\!\left(\SuccessProb{\frac{2}{5}}\right)=\ExpectedValue{60\ \mathrm{USD}}$\par \ExpectedValue{expected net gain} per stated period};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (root2) at (14.25,-7.15) {\SuccessProb{Exact break-even equation}\par $\Money{-20}+\Money{200}\SuccessProb{p}=\ExpectedValue{0}$\par $\SuccessProb{p_2^*}=\SuccessProb{\frac{1}{10}}$};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (sign2) at (14.25,-9.45) {$\ExpectedValue{g_2}>\ExpectedValue{0}:\ \SuccessProb{p}\in \left(\SuccessProb{\frac{1}{10}},\SuccessProb{1}\right]$\par $\ExpectedValue{g_2}=\ExpectedValue{0}:\ \SuccessProb{p}=\SuccessProb{\frac{1}{10}}$\par $\ExpectedValue{g_2}<\ExpectedValue{0}:\ \SuccessProb{p}\in \left[\SuccessProb{0},\SuccessProb{\frac{1}{10}}\right)$};
+
+\node[inner sep=0pt,anchor=north,text width=8.8cm,align=center] (eg2) at (14.25,-12.0) {\CThreeExpectationGraph{2}{-20}{180}{1/10}{2/5}};
+
+\draw[c3flow] (pay2.south) -- (initial2.north);
+\draw[c3flow] (initial2.south) -- (root2.north);
+\draw[c3flow] (root2.south) -- (sign2.north);
+\draw[c3flow] (sign2.south) -- (eg2.north);
+\end{tikzpicture}\end{center}
+The dashed horizontal line is \ExpectedValue{zero}; filled circles show endpoint payoffs and the exact root. The square marks the \ExpectedValue{initial expectation}. The $+$ and $-$ labels connect the graph to its strict sign intervals.
+\par \ExpectedValue{Positive expectation} means \ExpectedValue{expected net gain}; \ExpectedValue{negative expectation} means \ExpectedValue{expected net loss}; \ExpectedValue{zero expectation} means break-even. These are long-run averages per stated period, not guarantees of realized profit. Each branch uses its own payoffs and root.
+\endgroup
+}
+\newcommand{\CThreeStatementCoffee}{%
+Observe a graduate's paid sessions over one day. A campus careers fair either goes ahead or is cancelled. Compare paid portraits at the fair with an online CV workshop. The fair brings portrait customers but draws students away from the workshop; cancellation reverses this effect. \Money{Payoffs} include venue, platform, travel and refund costs. The two possible states are \HLMathEvent{the fair goes ahead} and \HLMathEvent{the fair is cancelled}. The \SuccessProb{initial probability} that \HLMathEvent{the fair goes ahead} is $\SuccessProb{p}=\SuccessProb{\frac{1}{2}}$. All entries below are \Money{net profits} in \Money{USD} for the entire stated period, including relevant costs.
+\begin{center}\begin{tabular}{lrr}\toprule Alternative & \HLMathEvent{the fair is cancelled} & \HLMathEvent{the fair goes ahead}\\\midrule
+$A_1$: portrait sessions & \Money{-40} & \Money{100}\\
+$A_2$: online CV workshop & \Money{100} & \Money{-20}\\
+\bottomrule\end{tabular}\end{center}
+
+}
+\newcommand{\CThreeModelCoffee}{%
+\clearpage\noindent\textbf{Task 1 summary: shared states and induced distributions.}\par\medskip
+
+\begingroup\small\setlength{\parskip}{2pt}\tikzset{gten marker/.append style={inner xsep=.4mm,inner ysep=.2mm}}
+\begin{center}\begin{tikzpicture}[x=1cm,y=1cm]
+\node[c3card,anchor=north,text width=7cm,align=center] (ev1) at (4,0) {$\HLMathEvent{E}$: \HLMathEvent{the fair goes ahead}, $\SuccessProb{P}(\HLMathEvent{E})=\SuccessProb{p}$};
+
+\node[c3card,anchor=north,text width=7cm,align=center] (ev0) at (15,0) {$\HLMathEvent{E^c}$: \HLMathEvent{the fair is cancelled}, $\FailureProb{P}(\HLMathEvent{E^c})=\FailureProb{1-p}$};
+
+\node[c3card,anchor=north,text width=6cm,align=center] (ind1) at (4,-1.2) {$\Indicator{X(\omega)}=\Indicator{1}$, for $\HLMathEvent{\omega\in E}$};
+
+\node[c3card,anchor=north,text width=6cm,align=center] (ind0) at (15,-1.2) {$\Indicator{X(\omega)}=\Indicator{0}$, for $\HLMathEvent{\omega\in E^c}$};
+
+\draw[c3flow] (ev1) -- (ind1);\draw[c3flow] (ev0) -- (ind0);
+\node[c3card,anchor=north,text width=16.2cm,align=center] (map1) at (9.5,-2.65) {\textbf{\Money{$Y_1$}: portrait sessions}\par 
+$\Money{Y_1(\omega)}=\TransformationFunction{f_1}(\Indicator{X(\omega)})=\Money{f_1(1)}=\Money{100}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E}$\par 
+$\Money{Y_1(\omega)}=\TransformationFunction{f_1}(\Indicator{X(\omega)})=\Money{f_1(0)}=\Money{-40}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E^c}$
+};
+
+\draw[c3flow] (ind1.west) -- (.15,-1.65) |- ([yshift=-7mm]map1.north west);
+\draw[c3flow,dashed] (ind0.east) -- (18.85,-1.65) |- ([yshift=-11.5mm]map1.north east);
+\node[c3card,anchor=north,text width=16.2cm,align=center] (map2) at (9.5,-4.45) {\textbf{\Money{$Y_2$}: online CV workshop}\par 
+$\Money{Y_2(\omega)}=\TransformationFunction{f_2}(\Indicator{X(\omega)})=\Money{f_2(1)}=\Money{-20}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E}$\par 
+$\Money{Y_2(\omega)}=\TransformationFunction{f_2}(\Indicator{X(\omega)})=\Money{f_2(0)}=\Money{100}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E^c}$
+};
+
+\draw[c3flow] (ind1.west) -- (.15,-1.65) |- ([yshift=-7mm]map2.north west);
+\draw[c3flow,dashed] (ind0.east) -- (18.85,-1.65) |- ([yshift=-11.5mm]map2.north east);
+\node[inner sep=1pt,anchor=north,text width=5.913333333333333cm,align=center] (head0) at (3.0666666666666664,-6.4) {$\Indicator{X}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (cdf0) at (3.0666666666666664,-7.050000000000001) {$\HLCumulativeProbability{F_{X}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Indicator{0},\\\FailureProb{1-p},&\Indicator{0}\leq t<\Indicator{1},\\\HLCumulativeProbability{1},&t\geq \Indicator{1}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (pmf0) at (3.0666666666666664,-9.8) {$\HLProbability{m_{X}}$\par $\begin{array}{ll}\Indicator{0}:&\FailureProb{1-p}\\\Indicator{1}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=5.913333333333333cm,align=center] (graph0) at (3.0666666666666664,-12.100000000000001) {\CThreeDistributionPair{X}{0}{1}{1/2}{unitless}{\Indicator}};
+
+\node[inner sep=1pt,anchor=north,text width=5.913333333333333cm,align=center] (head1) at (9.4,-6.4) {$\Money{Y_1}$ $\leftarrow\TransformationFunction{f_1}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (cdf1) at (9.4,-7.050000000000001) {$\HLCumulativeProbability{F_{Y_1}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Money{-40},\\\FailureProb{1-p},&\Money{-40}\leq t<\Money{100},\\\HLCumulativeProbability{1},&t\geq \Money{100}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (pmf1) at (9.4,-9.8) {$\HLProbability{m_{Y_1}}$\par $\begin{array}{ll}\Money{-40}:&\FailureProb{1-p}\\\Money{100}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=5.913333333333333cm,align=center] (graph1) at (9.4,-12.100000000000001) {\CThreeDistributionPair{Y_1}{-40}{100}{1/2}{\Money{USD}}{\Money}};
+
+\draw[c3flow] (cdf0.north) -- ++(0,.27) -| (cdf1.north);
+\draw[c3flow] (pmf0.south) -- ++(0,-.30) -| (pmf1.south);
+\draw[c3flow] (map1.east) -- (18.28,-3.3) -- (18.28,-6.1000000000000005) -| (head1.north);
+\node[inner sep=1pt,anchor=north,text width=5.913333333333333cm,align=center] (head2) at (15.733333333333333,-6.4) {$\Money{Y_2}$ $\leftarrow\TransformationFunction{f_2}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (cdf2) at (15.733333333333333,-7.050000000000001) {$\HLCumulativeProbability{F_{Y_2}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Money{-20},\\\SuccessProb{p},&\Money{-20}\leq t<\Money{100},\\\HLCumulativeProbability{1},&t\geq \Money{100}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (pmf2) at (15.733333333333333,-9.8) {$\HLProbability{m_{Y_2}}$\par $\begin{array}{ll}\Money{100}:&\FailureProb{1-p}\\\Money{-20}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=5.913333333333333cm,align=center] (graph2) at (15.733333333333333,-12.100000000000001) {\CThreeDistributionPair{Y_2}{100}{-20}{1/2}{\Money{USD}}{\Money}};
+
+\draw[c3flow] (cdf0.north) -- ++(0,.27) -| (cdf2.north);
+\draw[c3flow] (pmf0.south) -- ++(0,-.30) -| (pmf2.south);
+\draw[c3flow] (map2.east) -- (18.1,-5.1) -- (18.1,-5.98) -| (head2.north);
+\end{tikzpicture}\end{center}
+\textbf{Numerical graph illustration:} $\SuccessProb{p_0}=\SuccessProb{\frac{1}{2}}$. All displayed distribution formulas remain symbolic in $\SuccessProb{p}$.
+\par\textbf{CDF above, PMF below.} Filled stems translate to pale dashed jump shadows; thin arrows link equal physical lengths. Open and filled circles show excluded and included endpoints. Distribution arrows retain state probabilities while mapping values, rather than applying $\TransformationFunction{f_i}$ to CDF heights. See \hyperref[ex:intro-one]{Example 1}.\par
+For $0<\SuccessProb{p}<1$, $\Indicator{S_X}=\{\Indicator{0},\Indicator{1}\}$; at $\SuccessProb{p}=0$ only $\Indicator{0}$ remains, and at $\SuccessProb{p}=1$ only $\Indicator{1}$ remains. Each monetary support retains $\Money{f_i(0)}$ at $\SuccessProb{p}=0$ and $\Money{f_i(1)}$ at $\SuccessProb{p}=1$.
+\par\textbf{Loss events.} $\HLMathEvent{\{Y_1<0\}}=\HLMathEvent{\{X=0\}}=\HLMathEvent{E^c}$, probability $\FailureProb{1-p}$; $\HLMathEvent{\{Y_2<0\}}=\HLMathEvent{\{X=1\}}=\HLMathEvent{E}$, probability $\SuccessProb{p}$.
+\endgroup
+}
+\newcommand{\CThreeExpectCoffee}{%
+\clearpage\noindent\textbf{Task 2 summary: parallel expectation analyses.}\par\medskip
+
+\begingroup\small\tikzset{gten marker/.append style={inner xsep=.4mm,inner ysep=.2mm}}
+\begin{center}\begin{tikzpicture}[x=1cm,y=1cm]
+\node[c3card,anchor=north,text width=17cm,align=center] (inputs) at (9.5,0) {Shared probability inputs: $\SuccessProb{p}$ and $\FailureProb{1-p}$; hold each alternative\textquotesingle s \Money{payoffs} fixed.};
+
+\node[c3card,anchor=north,text width=17cm,align=center] (formula) at (9.5,-1.2) {$\ExpectedValue{g_i}(\SuccessProb{p})=\ExpectedValue{\mathbb E}[\Money{Y_i}]=\SuccessProb{p}\Money{f_i(1)}+(\FailureProb{1-p})\Money{f_i(0)}$};
+
+\draw[c3flow] (inputs) -- (formula);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (pay1) at (4.75,-2.7) {\textbf{\Money{$Y_1$}: portrait sessions}\par $\Money{f_1(0)}=\Money{-40},\quad\Money{f_1(1)}=\Money{100}\ \Money{\mathrm{USD}}$\par $\ExpectedValue{g_1}(\SuccessProb{p})=\Money{-40}+\Money{140}\SuccessProb{p}$};
+
+\draw[c3flow] (formula.south) -- ++(0,-.25) -| (pay1.north);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (initial1) at (4.75,-5.0) {\ExpectedValue{Initial expectation}\par $\ExpectedValue{g_1}\!\left(\SuccessProb{\frac{1}{2}}\right)=\ExpectedValue{30\ \mathrm{USD}}$\par \ExpectedValue{expected net gain} per stated period};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (root1) at (4.75,-7.15) {\SuccessProb{Exact break-even equation}\par $\Money{-40}+\Money{140}\SuccessProb{p}=\ExpectedValue{0}$\par $\SuccessProb{p_1^*}=\SuccessProb{\frac{2}{7}}$};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (sign1) at (4.75,-9.45) {$\ExpectedValue{g_1}>\ExpectedValue{0}:\ \SuccessProb{p}\in \left(\SuccessProb{\frac{2}{7}},\SuccessProb{1}\right]$\par $\ExpectedValue{g_1}=\ExpectedValue{0}:\ \SuccessProb{p}=\SuccessProb{\frac{2}{7}}$\par $\ExpectedValue{g_1}<\ExpectedValue{0}:\ \SuccessProb{p}\in \left[\SuccessProb{0},\SuccessProb{\frac{2}{7}}\right)$};
+
+\node[inner sep=0pt,anchor=north,text width=8.8cm,align=center] (eg1) at (4.75,-12.0) {\CThreeExpectationGraph{1}{-40}{100}{2/7}{1/2}};
+
+\draw[c3flow] (pay1.south) -- (initial1.north);
+\draw[c3flow] (initial1.south) -- (root1.north);
+\draw[c3flow] (root1.south) -- (sign1.north);
+\draw[c3flow] (sign1.south) -- (eg1.north);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (pay2) at (14.25,-2.7) {\textbf{\Money{$Y_2$}: online CV workshop}\par $\Money{f_2(0)}=\Money{100},\quad\Money{f_2(1)}=\Money{-20}\ \Money{\mathrm{USD}}$\par $\ExpectedValue{g_2}(\SuccessProb{p})=\Money{100}-\Money{120}\SuccessProb{p}$};
+
+\draw[c3flow] (formula.south) -- ++(0,-.25) -| (pay2.north);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (initial2) at (14.25,-5.0) {\ExpectedValue{Initial expectation}\par $\ExpectedValue{g_2}\!\left(\SuccessProb{\frac{1}{2}}\right)=\ExpectedValue{40\ \mathrm{USD}}$\par \ExpectedValue{expected net gain} per stated period};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (root2) at (14.25,-7.15) {\SuccessProb{Exact break-even equation}\par $\Money{100}-\Money{120}\SuccessProb{p}=\ExpectedValue{0}$\par $\SuccessProb{p_2^*}=\SuccessProb{\frac{5}{6}}$};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (sign2) at (14.25,-9.45) {$\ExpectedValue{g_2}>\ExpectedValue{0}:\ \SuccessProb{p}\in \left[\SuccessProb{0},\SuccessProb{\frac{5}{6}}\right)$\par $\ExpectedValue{g_2}=\ExpectedValue{0}:\ \SuccessProb{p}=\SuccessProb{\frac{5}{6}}$\par $\ExpectedValue{g_2}<\ExpectedValue{0}:\ \SuccessProb{p}\in \left(\SuccessProb{\frac{5}{6}},\SuccessProb{1}\right]$};
+
+\node[inner sep=0pt,anchor=north,text width=8.8cm,align=center] (eg2) at (14.25,-12.0) {\CThreeExpectationGraph{2}{100}{-20}{5/6}{1/2}};
+
+\draw[c3flow] (pay2.south) -- (initial2.north);
+\draw[c3flow] (initial2.south) -- (root2.north);
+\draw[c3flow] (root2.south) -- (sign2.north);
+\draw[c3flow] (sign2.south) -- (eg2.north);
+\end{tikzpicture}\end{center}
+The dashed horizontal line is \ExpectedValue{zero}; filled circles show endpoint payoffs and the exact root. The square marks the \ExpectedValue{initial expectation}. The $+$ and $-$ labels connect the graph to its strict sign intervals.
+\par \ExpectedValue{Positive expectation} means \ExpectedValue{expected net gain}; \ExpectedValue{negative expectation} means \ExpectedValue{expected net loss}; \ExpectedValue{zero expectation} means break-even. These are long-run averages per stated period, not guarantees of realized profit. Each branch uses its own payoffs and root.
+\endgroup
+}
+\newcommand{\CThreeStatementEnergy}{%
+Observe a freelancer's digital projects over one month. \HLMathEvent{High inquiry volume} means messages from potential clients meet a fixed monthly target; \HLMathEvent{low inquiry volume} means fewer messages. Compare offering social-media graphics with offering short video edits to the same client pool. \Money{Payoffs} include software, platform and promotion costs. The two possible states are \HLMathEvent{high inquiry volume} and \HLMathEvent{low inquiry volume}. The \SuccessProb{initial probability} of \HLMathEvent{high inquiry volume} is $\SuccessProb{p}=\SuccessProb{\frac{1}{4}}$. All entries below are \Money{net profits} in \Money{USD} for the entire stated period, including relevant costs.
+\begin{center}\begin{tabular}{lrr}\toprule Alternative & \HLMathEvent{low inquiry volume} & \HLMathEvent{high inquiry volume}\\\midrule
+$A_1$: social-media graphics & \Money{-30} & \Money{90}\\
+$A_2$: short video edits & \Money{-60} & \Money{60}\\
+\bottomrule\end{tabular}\end{center}
+
+}
+\newcommand{\CThreeModelEnergy}{%
+\clearpage\noindent\textbf{Task 1 summary: shared states and induced distributions.}\par\medskip
+
+\begingroup\small\setlength{\parskip}{2pt}\tikzset{gten marker/.append style={inner xsep=.4mm,inner ysep=.2mm}}
+\begin{center}\begin{tikzpicture}[x=1cm,y=1cm]
+\node[c3card,anchor=north,text width=7cm,align=center] (ev1) at (4,0) {$\HLMathEvent{E}$: \HLMathEvent{high inquiry volume}, $\SuccessProb{P}(\HLMathEvent{E})=\SuccessProb{p}$};
+
+\node[c3card,anchor=north,text width=7cm,align=center] (ev0) at (15,0) {$\HLMathEvent{E^c}$: \HLMathEvent{low inquiry volume}, $\FailureProb{P}(\HLMathEvent{E^c})=\FailureProb{1-p}$};
+
+\node[c3card,anchor=north,text width=6cm,align=center] (ind1) at (4,-1.2) {$\Indicator{X(\omega)}=\Indicator{1}$, for $\HLMathEvent{\omega\in E}$};
+
+\node[c3card,anchor=north,text width=6cm,align=center] (ind0) at (15,-1.2) {$\Indicator{X(\omega)}=\Indicator{0}$, for $\HLMathEvent{\omega\in E^c}$};
+
+\draw[c3flow] (ev1) -- (ind1);\draw[c3flow] (ev0) -- (ind0);
+\node[c3card,anchor=north,text width=16.2cm,align=center] (map1) at (9.5,-2.65) {\textbf{\Money{$Y_1$}: social-media graphics}\par 
+$\Money{Y_1(\omega)}=\TransformationFunction{f_1}(\Indicator{X(\omega)})=\Money{f_1(1)}=\Money{90}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E}$\par 
+$\Money{Y_1(\omega)}=\TransformationFunction{f_1}(\Indicator{X(\omega)})=\Money{f_1(0)}=\Money{-30}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E^c}$
+};
+
+\draw[c3flow] (ind1.west) -- (.15,-1.65) |- ([yshift=-7mm]map1.north west);
+\draw[c3flow,dashed] (ind0.east) -- (18.85,-1.65) |- ([yshift=-11.5mm]map1.north east);
+\node[c3card,anchor=north,text width=16.2cm,align=center] (map2) at (9.5,-4.45) {\textbf{\Money{$Y_2$}: short video edits}\par 
+$\Money{Y_2(\omega)}=\TransformationFunction{f_2}(\Indicator{X(\omega)})=\Money{f_2(1)}=\Money{60}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E}$\par 
+$\Money{Y_2(\omega)}=\TransformationFunction{f_2}(\Indicator{X(\omega)})=\Money{f_2(0)}=\Money{-60}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E^c}$
+};
+
+\draw[c3flow] (ind1.west) -- (.15,-1.65) |- ([yshift=-7mm]map2.north west);
+\draw[c3flow,dashed] (ind0.east) -- (18.85,-1.65) |- ([yshift=-11.5mm]map2.north east);
+\node[inner sep=1pt,anchor=north,text width=5.913333333333333cm,align=center] (head0) at (3.0666666666666664,-6.4) {$\Indicator{X}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (cdf0) at (3.0666666666666664,-7.050000000000001) {$\HLCumulativeProbability{F_{X}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Indicator{0},\\\FailureProb{1-p},&\Indicator{0}\leq t<\Indicator{1},\\\HLCumulativeProbability{1},&t\geq \Indicator{1}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (pmf0) at (3.0666666666666664,-9.8) {$\HLProbability{m_{X}}$\par $\begin{array}{ll}\Indicator{0}:&\FailureProb{1-p}\\\Indicator{1}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=5.913333333333333cm,align=center] (graph0) at (3.0666666666666664,-12.100000000000001) {\CThreeDistributionPair{X}{0}{1}{1/4}{unitless}{\Indicator}};
+
+\node[inner sep=1pt,anchor=north,text width=5.913333333333333cm,align=center] (head1) at (9.4,-6.4) {$\Money{Y_1}$ $\leftarrow\TransformationFunction{f_1}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (cdf1) at (9.4,-7.050000000000001) {$\HLCumulativeProbability{F_{Y_1}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Money{-30},\\\FailureProb{1-p},&\Money{-30}\leq t<\Money{90},\\\HLCumulativeProbability{1},&t\geq \Money{90}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (pmf1) at (9.4,-9.8) {$\HLProbability{m_{Y_1}}$\par $\begin{array}{ll}\Money{-30}:&\FailureProb{1-p}\\\Money{90}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=5.913333333333333cm,align=center] (graph1) at (9.4,-12.100000000000001) {\CThreeDistributionPair{Y_1}{-30}{90}{1/4}{\Money{USD}}{\Money}};
+
+\draw[c3flow] (cdf0.north) -- ++(0,.27) -| (cdf1.north);
+\draw[c3flow] (pmf0.south) -- ++(0,-.30) -| (pmf1.south);
+\draw[c3flow] (map1.east) -- (18.28,-3.3) -- (18.28,-6.1000000000000005) -| (head1.north);
+\node[inner sep=1pt,anchor=north,text width=5.913333333333333cm,align=center] (head2) at (15.733333333333333,-6.4) {$\Money{Y_2}$ $\leftarrow\TransformationFunction{f_2}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (cdf2) at (15.733333333333333,-7.050000000000001) {$\HLCumulativeProbability{F_{Y_2}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Money{-60},\\\FailureProb{1-p},&\Money{-60}\leq t<\Money{60},\\\HLCumulativeProbability{1},&t\geq \Money{60}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (pmf2) at (15.733333333333333,-9.8) {$\HLProbability{m_{Y_2}}$\par $\begin{array}{ll}\Money{-60}:&\FailureProb{1-p}\\\Money{60}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=5.913333333333333cm,align=center] (graph2) at (15.733333333333333,-12.100000000000001) {\CThreeDistributionPair{Y_2}{-60}{60}{1/4}{\Money{USD}}{\Money}};
+
+\draw[c3flow] (cdf0.north) -- ++(0,.27) -| (cdf2.north);
+\draw[c3flow] (pmf0.south) -- ++(0,-.30) -| (pmf2.south);
+\draw[c3flow] (map2.east) -- (18.1,-5.1) -- (18.1,-5.98) -| (head2.north);
+\end{tikzpicture}\end{center}
+\textbf{Numerical graph illustration:} $\SuccessProb{p_0}=\SuccessProb{\frac{1}{4}}$. All displayed distribution formulas remain symbolic in $\SuccessProb{p}$.
+\par\textbf{CDF above, PMF below.} Filled stems translate to pale dashed jump shadows; thin arrows link equal physical lengths. Open and filled circles show excluded and included endpoints. Distribution arrows retain state probabilities while mapping values, rather than applying $\TransformationFunction{f_i}$ to CDF heights. See \hyperref[ex:intro-one]{Example 1}.\par
+For $0<\SuccessProb{p}<1$, $\Indicator{S_X}=\{\Indicator{0},\Indicator{1}\}$; at $\SuccessProb{p}=0$ only $\Indicator{0}$ remains, and at $\SuccessProb{p}=1$ only $\Indicator{1}$ remains. Each monetary support retains $\Money{f_i(0)}$ at $\SuccessProb{p}=0$ and $\Money{f_i(1)}$ at $\SuccessProb{p}=1$.
+\par\textbf{Loss events.} $\HLMathEvent{\{Y_1<0\}}=\HLMathEvent{\{X=0\}}=\HLMathEvent{E^c}$, probability $\FailureProb{1-p}$; $\HLMathEvent{\{Y_2<0\}}=\HLMathEvent{\{X=0\}}=\HLMathEvent{E^c}$, probability $\FailureProb{1-p}$.
+\endgroup
+}
+\newcommand{\CThreeExpectEnergy}{%
+\clearpage\noindent\textbf{Task 2 summary: parallel expectation analyses.}\par\medskip
+
+\begingroup\small\tikzset{gten marker/.append style={inner xsep=.4mm,inner ysep=.2mm}}
+\begin{center}\begin{tikzpicture}[x=1cm,y=1cm]
+\node[c3card,anchor=north,text width=17cm,align=center] (inputs) at (9.5,0) {Shared probability inputs: $\SuccessProb{p}$ and $\FailureProb{1-p}$; hold each alternative\textquotesingle s \Money{payoffs} fixed.};
+
+\node[c3card,anchor=north,text width=17cm,align=center] (formula) at (9.5,-1.2) {$\ExpectedValue{g_i}(\SuccessProb{p})=\ExpectedValue{\mathbb E}[\Money{Y_i}]=\SuccessProb{p}\Money{f_i(1)}+(\FailureProb{1-p})\Money{f_i(0)}$};
+
+\draw[c3flow] (inputs) -- (formula);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (pay1) at (4.75,-2.7) {\textbf{\Money{$Y_1$}: social-media graphics}\par $\Money{f_1(0)}=\Money{-30},\quad\Money{f_1(1)}=\Money{90}\ \Money{\mathrm{USD}}$\par $\ExpectedValue{g_1}(\SuccessProb{p})=\Money{-30}+\Money{120}\SuccessProb{p}$};
+
+\draw[c3flow] (formula.south) -- ++(0,-.25) -| (pay1.north);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (initial1) at (4.75,-5.0) {\ExpectedValue{Initial expectation}\par $\ExpectedValue{g_1}\!\left(\SuccessProb{\frac{1}{4}}\right)=\ExpectedValue{0\ \mathrm{USD}}$\par \ExpectedValue{break-even} per stated period};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (root1) at (4.75,-7.15) {\SuccessProb{Exact break-even equation}\par $\Money{-30}+\Money{120}\SuccessProb{p}=\ExpectedValue{0}$\par $\SuccessProb{p_1^*}=\SuccessProb{\frac{1}{4}}$};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (sign1) at (4.75,-9.45) {$\ExpectedValue{g_1}>\ExpectedValue{0}:\ \SuccessProb{p}\in \left(\SuccessProb{\frac{1}{4}},\SuccessProb{1}\right]$\par $\ExpectedValue{g_1}=\ExpectedValue{0}:\ \SuccessProb{p}=\SuccessProb{\frac{1}{4}}$\par $\ExpectedValue{g_1}<\ExpectedValue{0}:\ \SuccessProb{p}\in \left[\SuccessProb{0},\SuccessProb{\frac{1}{4}}\right)$};
+
+\node[inner sep=0pt,anchor=north,text width=8.8cm,align=center] (eg1) at (4.75,-12.0) {\CThreeExpectationGraph{1}{-30}{90}{1/4}{1/4}};
+
+\draw[c3flow] (pay1.south) -- (initial1.north);
+\draw[c3flow] (initial1.south) -- (root1.north);
+\draw[c3flow] (root1.south) -- (sign1.north);
+\draw[c3flow] (sign1.south) -- (eg1.north);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (pay2) at (14.25,-2.7) {\textbf{\Money{$Y_2$}: short video edits}\par $\Money{f_2(0)}=\Money{-60},\quad\Money{f_2(1)}=\Money{60}\ \Money{\mathrm{USD}}$\par $\ExpectedValue{g_2}(\SuccessProb{p})=\Money{-60}+\Money{120}\SuccessProb{p}$};
+
+\draw[c3flow] (formula.south) -- ++(0,-.25) -| (pay2.north);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (initial2) at (14.25,-5.0) {\ExpectedValue{Initial expectation}\par $\ExpectedValue{g_2}\!\left(\SuccessProb{\frac{1}{4}}\right)=\ExpectedValue{-30\ \mathrm{USD}}$\par \ExpectedValue{expected net loss} per stated period};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (root2) at (14.25,-7.15) {\SuccessProb{Exact break-even equation}\par $\Money{-60}+\Money{120}\SuccessProb{p}=\ExpectedValue{0}$\par $\SuccessProb{p_2^*}=\SuccessProb{\frac{1}{2}}$};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (sign2) at (14.25,-9.45) {$\ExpectedValue{g_2}>\ExpectedValue{0}:\ \SuccessProb{p}\in \left(\SuccessProb{\frac{1}{2}},\SuccessProb{1}\right]$\par $\ExpectedValue{g_2}=\ExpectedValue{0}:\ \SuccessProb{p}=\SuccessProb{\frac{1}{2}}$\par $\ExpectedValue{g_2}<\ExpectedValue{0}:\ \SuccessProb{p}\in \left[\SuccessProb{0},\SuccessProb{\frac{1}{2}}\right)$};
+
+\node[inner sep=0pt,anchor=north,text width=8.8cm,align=center] (eg2) at (14.25,-12.0) {\CThreeExpectationGraph{2}{-60}{60}{1/2}{1/4}};
+
+\draw[c3flow] (pay2.south) -- (initial2.north);
+\draw[c3flow] (initial2.south) -- (root2.north);
+\draw[c3flow] (root2.south) -- (sign2.north);
+\draw[c3flow] (sign2.south) -- (eg2.north);
+\end{tikzpicture}\end{center}
+The dashed horizontal line is \ExpectedValue{zero}; filled circles show endpoint payoffs and the exact root. The square marks the \ExpectedValue{initial expectation}. The $+$ and $-$ labels connect the graph to its strict sign intervals.
+\par \ExpectedValue{Positive expectation} means \ExpectedValue{expected net gain}; \ExpectedValue{negative expectation} means \ExpectedValue{expected net loss}; \ExpectedValue{zero expectation} means break-even. These are long-run averages per stated period, not guarantees of realized profit. Each branch uses its own payoffs and root.
+\endgroup
+}
+\newcommand{\CThreeStatementManufacturing}{%
+Observe a graduate's photography work over one quarter. The university graduation ceremony either goes ahead or is cancelled during that quarter. Compare a basic photo package with a package including extra editing. Both involve the same advance preparation costs; the edited package earns more when the ceremony takes place. \Money{Payoffs} include travel, software, preparation and refunds. The two possible states are \HLMathEvent{the ceremony goes ahead} and \HLMathEvent{the ceremony is cancelled}. The \SuccessProb{initial probability} that \HLMathEvent{the ceremony goes ahead} is $\SuccessProb{p}=\SuccessProb{\frac{3}{5}}$. All entries below are \Money{net profits} in \Money{USD} for the entire stated period, including relevant costs.
+\begin{center}\begin{tabular}{lrr}\toprule Alternative & \HLMathEvent{the ceremony is cancelled} & \HLMathEvent{the ceremony goes ahead}\\\midrule
+$A_1$: basic photo package & \Money{-100} & \Money{200}\\
+$A_2$: edited photo package & \Money{-100} & \Money{500}\\
+\bottomrule\end{tabular}\end{center}
+
+}
+\newcommand{\CThreeModelManufacturing}{%
+\clearpage\noindent\textbf{Task 1 summary: shared states and induced distributions.}\par\medskip
+
+\begingroup\small\setlength{\parskip}{2pt}\tikzset{gten marker/.append style={inner xsep=.4mm,inner ysep=.2mm}}
+\begin{center}\begin{tikzpicture}[x=1cm,y=1cm]
+\node[c3card,anchor=north,text width=7cm,align=center] (ev1) at (4,0) {$\HLMathEvent{E}$: \HLMathEvent{the ceremony goes ahead}, $\SuccessProb{P}(\HLMathEvent{E})=\SuccessProb{p}$};
+
+\node[c3card,anchor=north,text width=7cm,align=center] (ev0) at (15,0) {$\HLMathEvent{E^c}$: \HLMathEvent{the ceremony is cancelled}, $\FailureProb{P}(\HLMathEvent{E^c})=\FailureProb{1-p}$};
+
+\node[c3card,anchor=north,text width=6cm,align=center] (ind1) at (4,-1.2) {$\Indicator{X(\omega)}=\Indicator{1}$, for $\HLMathEvent{\omega\in E}$};
+
+\node[c3card,anchor=north,text width=6cm,align=center] (ind0) at (15,-1.2) {$\Indicator{X(\omega)}=\Indicator{0}$, for $\HLMathEvent{\omega\in E^c}$};
+
+\draw[c3flow] (ev1) -- (ind1);\draw[c3flow] (ev0) -- (ind0);
+\node[c3card,anchor=north,text width=16.2cm,align=center] (map1) at (9.5,-2.65) {\textbf{\Money{$Y_1$}: basic photo package}\par 
+$\Money{Y_1(\omega)}=\TransformationFunction{f_1}(\Indicator{X(\omega)})=\Money{f_1(1)}=\Money{200}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E}$\par 
+$\Money{Y_1(\omega)}=\TransformationFunction{f_1}(\Indicator{X(\omega)})=\Money{f_1(0)}=\Money{-100}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E^c}$
+};
+
+\draw[c3flow] (ind1.west) -- (.15,-1.65) |- ([yshift=-7mm]map1.north west);
+\draw[c3flow,dashed] (ind0.east) -- (18.85,-1.65) |- ([yshift=-11.5mm]map1.north east);
+\node[c3card,anchor=north,text width=16.2cm,align=center] (map2) at (9.5,-4.45) {\textbf{\Money{$Y_2$}: edited photo package}\par 
+$\Money{Y_2(\omega)}=\TransformationFunction{f_2}(\Indicator{X(\omega)})=\Money{f_2(1)}=\Money{500}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E}$\par 
+$\Money{Y_2(\omega)}=\TransformationFunction{f_2}(\Indicator{X(\omega)})=\Money{f_2(0)}=\Money{-100}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E^c}$
+};
+
+\draw[c3flow] (ind1.west) -- (.15,-1.65) |- ([yshift=-7mm]map2.north west);
+\draw[c3flow,dashed] (ind0.east) -- (18.85,-1.65) |- ([yshift=-11.5mm]map2.north east);
+\node[inner sep=1pt,anchor=north,text width=5.913333333333333cm,align=center] (head0) at (3.0666666666666664,-6.4) {$\Indicator{X}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (cdf0) at (3.0666666666666664,-7.050000000000001) {$\HLCumulativeProbability{F_{X}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Indicator{0},\\\FailureProb{1-p},&\Indicator{0}\leq t<\Indicator{1},\\\HLCumulativeProbability{1},&t\geq \Indicator{1}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (pmf0) at (3.0666666666666664,-9.8) {$\HLProbability{m_{X}}$\par $\begin{array}{ll}\Indicator{0}:&\FailureProb{1-p}\\\Indicator{1}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=5.913333333333333cm,align=center] (graph0) at (3.0666666666666664,-12.100000000000001) {\CThreeDistributionPair{X}{0}{1}{3/5}{unitless}{\Indicator}};
+
+\node[inner sep=1pt,anchor=north,text width=5.913333333333333cm,align=center] (head1) at (9.4,-6.4) {$\Money{Y_1}$ $\leftarrow\TransformationFunction{f_1}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (cdf1) at (9.4,-7.050000000000001) {$\HLCumulativeProbability{F_{Y_1}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Money{-100},\\\FailureProb{1-p},&\Money{-100}\leq t<\Money{200},\\\HLCumulativeProbability{1},&t\geq \Money{200}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (pmf1) at (9.4,-9.8) {$\HLProbability{m_{Y_1}}$\par $\begin{array}{ll}\Money{-100}:&\FailureProb{1-p}\\\Money{200}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=5.913333333333333cm,align=center] (graph1) at (9.4,-12.100000000000001) {\CThreeDistributionPair{Y_1}{-100}{200}{3/5}{\Money{USD}}{\Money}};
+
+\draw[c3flow] (cdf0.north) -- ++(0,.27) -| (cdf1.north);
+\draw[c3flow] (pmf0.south) -- ++(0,-.30) -| (pmf1.south);
+\draw[c3flow] (map1.east) -- (18.28,-3.3) -- (18.28,-6.1000000000000005) -| (head1.north);
+\node[inner sep=1pt,anchor=north,text width=5.913333333333333cm,align=center] (head2) at (15.733333333333333,-6.4) {$\Money{Y_2}$ $\leftarrow\TransformationFunction{f_2}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (cdf2) at (15.733333333333333,-7.050000000000001) {$\HLCumulativeProbability{F_{Y_2}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Money{-100},\\\FailureProb{1-p},&\Money{-100}\leq t<\Money{500},\\\HLCumulativeProbability{1},&t\geq \Money{500}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=5.913333333333333cm,align=center] (pmf2) at (15.733333333333333,-9.8) {$\HLProbability{m_{Y_2}}$\par $\begin{array}{ll}\Money{-100}:&\FailureProb{1-p}\\\Money{500}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=5.913333333333333cm,align=center] (graph2) at (15.733333333333333,-12.100000000000001) {\CThreeDistributionPair{Y_2}{-100}{500}{3/5}{\Money{USD}}{\Money}};
+
+\draw[c3flow] (cdf0.north) -- ++(0,.27) -| (cdf2.north);
+\draw[c3flow] (pmf0.south) -- ++(0,-.30) -| (pmf2.south);
+\draw[c3flow] (map2.east) -- (18.1,-5.1) -- (18.1,-5.98) -| (head2.north);
+\end{tikzpicture}\end{center}
+\textbf{Numerical graph illustration:} $\SuccessProb{p_0}=\SuccessProb{\frac{3}{5}}$. All displayed distribution formulas remain symbolic in $\SuccessProb{p}$.
+\par\textbf{CDF above, PMF below.} Filled stems translate to pale dashed jump shadows; thin arrows link equal physical lengths. Open and filled circles show excluded and included endpoints. Distribution arrows retain state probabilities while mapping values, rather than applying $\TransformationFunction{f_i}$ to CDF heights. See \hyperref[ex:intro-one]{Example 1}.\par
+For $0<\SuccessProb{p}<1$, $\Indicator{S_X}=\{\Indicator{0},\Indicator{1}\}$; at $\SuccessProb{p}=0$ only $\Indicator{0}$ remains, and at $\SuccessProb{p}=1$ only $\Indicator{1}$ remains. Each monetary support retains $\Money{f_i(0)}$ at $\SuccessProb{p}=0$ and $\Money{f_i(1)}$ at $\SuccessProb{p}=1$.
+\par\textbf{Loss events.} $\HLMathEvent{\{Y_1<0\}}=\HLMathEvent{\{X=0\}}=\HLMathEvent{E^c}$, probability $\FailureProb{1-p}$; $\HLMathEvent{\{Y_2<0\}}=\HLMathEvent{\{X=0\}}=\HLMathEvent{E^c}$, probability $\FailureProb{1-p}$.
+\endgroup
+}
+\newcommand{\CThreeExpectManufacturing}{%
+\clearpage\noindent\textbf{Task 2 summary: parallel expectation analyses.}\par\medskip
+
+\begingroup\small\tikzset{gten marker/.append style={inner xsep=.4mm,inner ysep=.2mm}}
+\begin{center}\begin{tikzpicture}[x=1cm,y=1cm]
+\node[c3card,anchor=north,text width=17cm,align=center] (inputs) at (9.5,0) {Shared probability inputs: $\SuccessProb{p}$ and $\FailureProb{1-p}$; hold each alternative\textquotesingle s \Money{payoffs} fixed.};
+
+\node[c3card,anchor=north,text width=17cm,align=center] (formula) at (9.5,-1.2) {$\ExpectedValue{g_i}(\SuccessProb{p})=\ExpectedValue{\mathbb E}[\Money{Y_i}]=\SuccessProb{p}\Money{f_i(1)}+(\FailureProb{1-p})\Money{f_i(0)}$};
+
+\draw[c3flow] (inputs) -- (formula);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (pay1) at (4.75,-2.7) {\textbf{\Money{$Y_1$}: basic photo package}\par $\Money{f_1(0)}=\Money{-100},\quad\Money{f_1(1)}=\Money{200}\ \Money{\mathrm{USD}}$\par $\ExpectedValue{g_1}(\SuccessProb{p})=\Money{-100}+\Money{300}\SuccessProb{p}$};
+
+\draw[c3flow] (formula.south) -- ++(0,-.25) -| (pay1.north);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (initial1) at (4.75,-5.0) {\ExpectedValue{Initial expectation}\par $\ExpectedValue{g_1}\!\left(\SuccessProb{\frac{3}{5}}\right)=\ExpectedValue{80\ \mathrm{USD}}$\par \ExpectedValue{expected net gain} per stated period};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (root1) at (4.75,-7.15) {\SuccessProb{Exact break-even equation}\par $\Money{-100}+\Money{300}\SuccessProb{p}=\ExpectedValue{0}$\par $\SuccessProb{p_1^*}=\SuccessProb{\frac{1}{3}}$};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (sign1) at (4.75,-9.45) {$\ExpectedValue{g_1}>\ExpectedValue{0}:\ \SuccessProb{p}\in \left(\SuccessProb{\frac{1}{3}},\SuccessProb{1}\right]$\par $\ExpectedValue{g_1}=\ExpectedValue{0}:\ \SuccessProb{p}=\SuccessProb{\frac{1}{3}}$\par $\ExpectedValue{g_1}<\ExpectedValue{0}:\ \SuccessProb{p}\in \left[\SuccessProb{0},\SuccessProb{\frac{1}{3}}\right)$};
+
+\node[inner sep=0pt,anchor=north,text width=8.8cm,align=center] (eg1) at (4.75,-12.0) {\CThreeExpectationGraph{1}{-100}{200}{1/3}{3/5}};
+
+\draw[c3flow] (pay1.south) -- (initial1.north);
+\draw[c3flow] (initial1.south) -- (root1.north);
+\draw[c3flow] (root1.south) -- (sign1.north);
+\draw[c3flow] (sign1.south) -- (eg1.north);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (pay2) at (14.25,-2.7) {\textbf{\Money{$Y_2$}: edited photo package}\par $\Money{f_2(0)}=\Money{-100},\quad\Money{f_2(1)}=\Money{500}\ \Money{\mathrm{USD}}$\par $\ExpectedValue{g_2}(\SuccessProb{p})=\Money{-100}+\Money{600}\SuccessProb{p}$};
+
+\draw[c3flow] (formula.south) -- ++(0,-.25) -| (pay2.north);
+\node[c3card,anchor=north,text width=8.8cm,align=center] (initial2) at (14.25,-5.0) {\ExpectedValue{Initial expectation}\par $\ExpectedValue{g_2}\!\left(\SuccessProb{\frac{3}{5}}\right)=\ExpectedValue{260\ \mathrm{USD}}$\par \ExpectedValue{expected net gain} per stated period};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (root2) at (14.25,-7.15) {\SuccessProb{Exact break-even equation}\par $\Money{-100}+\Money{600}\SuccessProb{p}=\ExpectedValue{0}$\par $\SuccessProb{p_2^*}=\SuccessProb{\frac{1}{6}}$};
+
+\node[c3card,anchor=north,text width=8.8cm,align=center] (sign2) at (14.25,-9.45) {$\ExpectedValue{g_2}>\ExpectedValue{0}:\ \SuccessProb{p}\in \left(\SuccessProb{\frac{1}{6}},\SuccessProb{1}\right]$\par $\ExpectedValue{g_2}=\ExpectedValue{0}:\ \SuccessProb{p}=\SuccessProb{\frac{1}{6}}$\par $\ExpectedValue{g_2}<\ExpectedValue{0}:\ \SuccessProb{p}\in \left[\SuccessProb{0},\SuccessProb{\frac{1}{6}}\right)$};
+
+\node[inner sep=0pt,anchor=north,text width=8.8cm,align=center] (eg2) at (14.25,-12.0) {\CThreeExpectationGraph{2}{-100}{500}{1/6}{3/5}};
+
+\draw[c3flow] (pay2.south) -- (initial2.north);
+\draw[c3flow] (initial2.south) -- (root2.north);
+\draw[c3flow] (root2.south) -- (sign2.north);
+\draw[c3flow] (sign2.south) -- (eg2.north);
+\end{tikzpicture}\end{center}
+The dashed horizontal line is \ExpectedValue{zero}; filled circles show endpoint payoffs and the exact root. The square marks the \ExpectedValue{initial expectation}. The $+$ and $-$ labels connect the graph to its strict sign intervals.
+\par \ExpectedValue{Positive expectation} means \ExpectedValue{expected net gain}; \ExpectedValue{negative expectation} means \ExpectedValue{expected net loss}; \ExpectedValue{zero expectation} means break-even. These are long-run averages per stated period, not guarantees of realized profit. Each branch uses its own payoffs and root.
+\endgroup
+}
+\newcommand{\CThreeStatementRestaurant}{%
+Observe a student group's ticketed concert over one evening. \HLMathEvent{High demand} means advance expressions of interest meet a fixed target; \HLMathEvent{low demand} means they fall below it. Compare hiring a small room, a discounted student-union room or a large room for the same concert. \Money{Payoffs} include venue hire, performers, ticket fees and refunds. The two possible states are \HLMathEvent{high demand} and \HLMathEvent{low demand}. The \SuccessProb{initial probability} of \HLMathEvent{high demand} is $\SuccessProb{p}=\SuccessProb{\frac{9}{25}}$. All entries below are \Money{net profits} in \Money{USD} for the entire stated period, including relevant costs.
+\begin{center}\begin{tabular}{lrr}\toprule Alternative & \HLMathEvent{low demand} & \HLMathEvent{high demand}\\\midrule
+$A_1$: small hired room & \Money{-80} & \Money{100}\\
+$A_2$: student-union room & \Money{-20} & \Money{220}\\
+$A_3$: large hired room & \Money{-100} & \Money{400}\\
+\bottomrule\end{tabular}\end{center}
+
+}
+\newcommand{\CThreeModelRestaurant}{%
+\clearpage\noindent\textbf{Task 1 summary: shared states and induced distributions.}\par\medskip
+
+\begingroup\small\setlength{\parskip}{2pt}\tikzset{gten marker/.append style={inner xsep=.4mm,inner ysep=.2mm}}
+\begin{center}\begin{tikzpicture}[x=1cm,y=1cm]
+\node[c3card,anchor=north,text width=7cm,align=center] (ev1) at (4,0) {$\HLMathEvent{E}$: \HLMathEvent{high demand}, $\SuccessProb{P}(\HLMathEvent{E})=\SuccessProb{p}$};
+
+\node[c3card,anchor=north,text width=7cm,align=center] (ev0) at (15,0) {$\HLMathEvent{E^c}$: \HLMathEvent{low demand}, $\FailureProb{P}(\HLMathEvent{E^c})=\FailureProb{1-p}$};
+
+\node[c3card,anchor=north,text width=6cm,align=center] (ind1) at (4,-1.2) {$\Indicator{X(\omega)}=\Indicator{1}$, for $\HLMathEvent{\omega\in E}$};
+
+\node[c3card,anchor=north,text width=6cm,align=center] (ind0) at (15,-1.2) {$\Indicator{X(\omega)}=\Indicator{0}$, for $\HLMathEvent{\omega\in E^c}$};
+
+\draw[c3flow] (ev1) -- (ind1);\draw[c3flow] (ev0) -- (ind0);
+\node[c3card,anchor=north,text width=16.2cm,align=center] (map1) at (9.5,-2.65) {\textbf{\Money{$Y_1$}: small hired room}\par 
+$\Money{Y_1(\omega)}=\TransformationFunction{f_1}(\Indicator{X(\omega)})=\Money{f_1(1)}=\Money{100}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E}$\par 
+$\Money{Y_1(\omega)}=\TransformationFunction{f_1}(\Indicator{X(\omega)})=\Money{f_1(0)}=\Money{-80}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E^c}$
+};
+
+\draw[c3flow] (ind1.west) -- (.15,-1.65) |- ([yshift=-7mm]map1.north west);
+\draw[c3flow,dashed] (ind0.east) -- (18.85,-1.65) |- ([yshift=-11.5mm]map1.north east);
+\node[c3card,anchor=north,text width=16.2cm,align=center] (map2) at (9.5,-4.45) {\textbf{\Money{$Y_2$}: student-union room}\par 
+$\Money{Y_2(\omega)}=\TransformationFunction{f_2}(\Indicator{X(\omega)})=\Money{f_2(1)}=\Money{220}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E}$\par 
+$\Money{Y_2(\omega)}=\TransformationFunction{f_2}(\Indicator{X(\omega)})=\Money{f_2(0)}=\Money{-20}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E^c}$
+};
+
+\draw[c3flow] (ind1.west) -- (.15,-1.65) |- ([yshift=-7mm]map2.north west);
+\draw[c3flow,dashed] (ind0.east) -- (18.85,-1.65) |- ([yshift=-11.5mm]map2.north east);
+\node[c3card,anchor=north,text width=16.2cm,align=center] (map3) at (9.5,-6.25) {\textbf{\Money{$Y_3$}: large hired room}\par 
+$\Money{Y_3(\omega)}=\TransformationFunction{f_3}(\Indicator{X(\omega)})=\Money{f_3(1)}=\Money{400}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E}$\par 
+$\Money{Y_3(\omega)}=\TransformationFunction{f_3}(\Indicator{X(\omega)})=\Money{f_3(0)}=\Money{-100}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E^c}$
+};
+
+\draw[c3flow] (ind1.west) -- (.15,-1.65) |- ([yshift=-7mm]map3.north west);
+\draw[c3flow,dashed] (ind0.east) -- (18.85,-1.65) |- ([yshift=-11.5mm]map3.north east);
+\node[inner sep=1pt,anchor=north,text width=4.33cm,align=center] (head0) at (2.275,-8.2) {$\Indicator{X}$};
+
+\node[c3card,anchor=north,text width=4.33cm,align=center] (cdf0) at (2.275,-8.85) {$\HLCumulativeProbability{F_{X}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Indicator{0},\\\FailureProb{1-p},&\Indicator{0}\leq t<\Indicator{1},\\\HLCumulativeProbability{1},&t\geq \Indicator{1}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=4.33cm,align=center] (pmf0) at (2.275,-11.6) {$\HLProbability{m_{X}}$\par $\begin{array}{ll}\Indicator{0}:&\FailureProb{1-p}\\\Indicator{1}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=4.33cm,align=center] (graph0) at (2.275,-13.899999999999999) {\CThreeDistributionPair{X}{0}{1}{9/25}{unitless}{\Indicator}};
+
+\node[inner sep=1pt,anchor=north,text width=4.33cm,align=center] (head1) at (7.025,-8.2) {$\Money{Y_1}$ $\leftarrow\TransformationFunction{f_1}$};
+
+\node[c3card,anchor=north,text width=4.33cm,align=center] (cdf1) at (7.025,-8.85) {$\HLCumulativeProbability{F_{Y_1}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Money{-80},\\\FailureProb{1-p},&\Money{-80}\leq t<\Money{100},\\\HLCumulativeProbability{1},&t\geq \Money{100}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=4.33cm,align=center] (pmf1) at (7.025,-11.6) {$\HLProbability{m_{Y_1}}$\par $\begin{array}{ll}\Money{-80}:&\FailureProb{1-p}\\\Money{100}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=4.33cm,align=center] (graph1) at (7.025,-13.899999999999999) {\CThreeDistributionPair{Y_1}{-80}{100}{9/25}{\Money{USD}}{\Money}};
+
+\draw[c3flow] (cdf0.north) -- ++(0,.27) -| (cdf1.north);
+\draw[c3flow] (pmf0.south) -- ++(0,-.30) -| (pmf1.south);
+\draw[c3flow] (map1.east) -- (18.46,-3.3) -- (18.46,-7.8999999999999995) -| (head1.north);
+\node[inner sep=1pt,anchor=north,text width=4.33cm,align=center] (head2) at (11.775,-8.2) {$\Money{Y_2}$ $\leftarrow\TransformationFunction{f_2}$};
+
+\node[c3card,anchor=north,text width=4.33cm,align=center] (cdf2) at (11.775,-8.85) {$\HLCumulativeProbability{F_{Y_2}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Money{-20},\\\FailureProb{1-p},&\Money{-20}\leq t<\Money{220},\\\HLCumulativeProbability{1},&t\geq \Money{220}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=4.33cm,align=center] (pmf2) at (11.775,-11.6) {$\HLProbability{m_{Y_2}}$\par $\begin{array}{ll}\Money{-20}:&\FailureProb{1-p}\\\Money{220}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=4.33cm,align=center] (graph2) at (11.775,-13.899999999999999) {\CThreeDistributionPair{Y_2}{-20}{220}{9/25}{\Money{USD}}{\Money}};
+
+\draw[c3flow] (cdf0.north) -- ++(0,.27) -| (cdf2.north);
+\draw[c3flow] (pmf0.south) -- ++(0,-.30) -| (pmf2.south);
+\draw[c3flow] (map2.east) -- (18.28,-5.1) -- (18.28,-7.779999999999999) -| (head2.north);
+\node[inner sep=1pt,anchor=north,text width=4.33cm,align=center] (head3) at (16.525,-8.2) {$\Money{Y_3}$ $\leftarrow\TransformationFunction{f_3}$};
+
+\node[c3card,anchor=north,text width=4.33cm,align=center] (cdf3) at (16.525,-8.85) {$\HLCumulativeProbability{F_{Y_3}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Money{-100},\\\FailureProb{1-p},&\Money{-100}\leq t<\Money{400},\\\HLCumulativeProbability{1},&t\geq \Money{400}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=4.33cm,align=center] (pmf3) at (16.525,-11.6) {$\HLProbability{m_{Y_3}}$\par $\begin{array}{ll}\Money{-100}:&\FailureProb{1-p}\\\Money{400}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=4.33cm,align=center] (graph3) at (16.525,-13.899999999999999) {\CThreeDistributionPair{Y_3}{-100}{400}{9/25}{\Money{USD}}{\Money}};
+
+\draw[c3flow] (cdf0.north) -- ++(0,.27) -| (cdf3.north);
+\draw[c3flow] (pmf0.south) -- ++(0,-.30) -| (pmf3.south);
+\draw[c3flow] (map3.east) -- (18.1,-6.9) -- (18.1,-7.659999999999999) -| (head3.north);
+\end{tikzpicture}\end{center}
+\textbf{Numerical graph illustration:} $\SuccessProb{p_0}=\SuccessProb{\frac{9}{25}}$. All displayed distribution formulas remain symbolic in $\SuccessProb{p}$.
+\par\textbf{CDF above, PMF below.} Filled stems translate to pale dashed jump shadows; thin arrows link equal physical lengths. Open and filled circles show excluded and included endpoints. Distribution arrows retain state probabilities while mapping values, rather than applying $\TransformationFunction{f_i}$ to CDF heights. See \hyperref[ex:intro-one]{Example 1}.\par
+For $0<\SuccessProb{p}<1$, $\Indicator{S_X}=\{\Indicator{0},\Indicator{1}\}$; at $\SuccessProb{p}=0$ only $\Indicator{0}$ remains, and at $\SuccessProb{p}=1$ only $\Indicator{1}$ remains. Each monetary support retains $\Money{f_i(0)}$ at $\SuccessProb{p}=0$ and $\Money{f_i(1)}$ at $\SuccessProb{p}=1$.
+\par\textbf{Loss events.} $\HLMathEvent{\{Y_1<0\}}=\HLMathEvent{\{X=0\}}=\HLMathEvent{E^c}$, probability $\FailureProb{1-p}$; $\HLMathEvent{\{Y_2<0\}}=\HLMathEvent{\{X=0\}}=\HLMathEvent{E^c}$, probability $\FailureProb{1-p}$; $\HLMathEvent{\{Y_3<0\}}=\HLMathEvent{\{X=0\}}=\HLMathEvent{E^c}$, probability $\FailureProb{1-p}$.
+\endgroup
+}
+\newcommand{\CThreeExpectRestaurant}{%
+\clearpage\noindent\textbf{Task 2 summary: parallel expectation analyses.}\par\medskip
+
+\begingroup\small\tikzset{gten marker/.append style={inner xsep=.4mm,inner ysep=.2mm}}
+\begin{center}\begin{tikzpicture}[x=1cm,y=1cm]
+\node[c3card,anchor=north,text width=17cm,align=center] (inputs) at (9.5,0) {Shared probability inputs: $\SuccessProb{p}$ and $\FailureProb{1-p}$; hold each alternative\textquotesingle s \Money{payoffs} fixed.};
+
+\node[c3card,anchor=north,text width=17cm,align=center] (formula) at (9.5,-1.2) {$\ExpectedValue{g_i}(\SuccessProb{p})=\ExpectedValue{\mathbb E}[\Money{Y_i}]=\SuccessProb{p}\Money{f_i(1)}+(\FailureProb{1-p})\Money{f_i(0)}$};
+
+\draw[c3flow] (inputs) -- (formula);
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (pay1) at (3.1666666666666665,-2.7) {\textbf{\Money{$Y_1$}: small hired room}\par $\Money{f_1(0)}=\Money{-80},\quad\Money{f_1(1)}=\Money{100}\ \Money{\mathrm{USD}}$\par $\ExpectedValue{g_1}(\SuccessProb{p})=\Money{-80}+\Money{180}\SuccessProb{p}$};
+
+\draw[c3flow] (formula.south) -- ++(0,-.25) -| (pay1.north);
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (initial1) at (3.1666666666666665,-5.0) {\ExpectedValue{Initial expectation}\par $\ExpectedValue{g_1}\!\left(\SuccessProb{\frac{9}{25}}\right)=\ExpectedValue{\frac{-76}{5}\ \mathrm{USD}}$\par \ExpectedValue{expected net loss} per stated period};
+
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (root1) at (3.1666666666666665,-7.15) {\SuccessProb{Exact break-even equation}\par $\Money{-80}+\Money{180}\SuccessProb{p}=\ExpectedValue{0}$\par $\SuccessProb{p_1^*}=\SuccessProb{\frac{4}{9}}$};
+
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (sign1) at (3.1666666666666665,-9.45) {$\ExpectedValue{g_1}>\ExpectedValue{0}:\ \SuccessProb{p}\in \left(\SuccessProb{\frac{4}{9}},\SuccessProb{1}\right]$\par $\ExpectedValue{g_1}=\ExpectedValue{0}:\ \SuccessProb{p}=\SuccessProb{\frac{4}{9}}$\par $\ExpectedValue{g_1}<\ExpectedValue{0}:\ \SuccessProb{p}\in \left[\SuccessProb{0},\SuccessProb{\frac{4}{9}}\right)$};
+
+\node[inner sep=0pt,anchor=north,text width=5.633333333333333cm,align=center] (eg1) at (3.1666666666666665,-12.0) {\CThreeExpectationGraph{1}{-80}{100}{4/9}{9/25}};
+
+\draw[c3flow] (pay1.south) -- (initial1.north);
+\draw[c3flow] (initial1.south) -- (root1.north);
+\draw[c3flow] (root1.south) -- (sign1.north);
+\draw[c3flow] (sign1.south) -- (eg1.north);
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (pay2) at (9.5,-2.7) {\textbf{\Money{$Y_2$}: student-union room}\par $\Money{f_2(0)}=\Money{-20},\quad\Money{f_2(1)}=\Money{220}\ \Money{\mathrm{USD}}$\par $\ExpectedValue{g_2}(\SuccessProb{p})=\Money{-20}+\Money{240}\SuccessProb{p}$};
+
+\draw[c3flow] (formula.south) -- ++(0,-.25) -| (pay2.north);
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (initial2) at (9.5,-5.0) {\ExpectedValue{Initial expectation}\par $\ExpectedValue{g_2}\!\left(\SuccessProb{\frac{9}{25}}\right)=\ExpectedValue{\frac{332}{5}\ \mathrm{USD}}$\par \ExpectedValue{expected net gain} per stated period};
+
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (root2) at (9.5,-7.15) {\SuccessProb{Exact break-even equation}\par $\Money{-20}+\Money{240}\SuccessProb{p}=\ExpectedValue{0}$\par $\SuccessProb{p_2^*}=\SuccessProb{\frac{1}{12}}$};
+
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (sign2) at (9.5,-9.45) {$\ExpectedValue{g_2}>\ExpectedValue{0}:\ \SuccessProb{p}\in \left(\SuccessProb{\frac{1}{12}},\SuccessProb{1}\right]$\par $\ExpectedValue{g_2}=\ExpectedValue{0}:\ \SuccessProb{p}=\SuccessProb{\frac{1}{12}}$\par $\ExpectedValue{g_2}<\ExpectedValue{0}:\ \SuccessProb{p}\in \left[\SuccessProb{0},\SuccessProb{\frac{1}{12}}\right)$};
+
+\node[inner sep=0pt,anchor=north,text width=5.633333333333333cm,align=center] (eg2) at (9.5,-12.0) {\CThreeExpectationGraph{2}{-20}{220}{1/12}{9/25}};
+
+\draw[c3flow] (pay2.south) -- (initial2.north);
+\draw[c3flow] (initial2.south) -- (root2.north);
+\draw[c3flow] (root2.south) -- (sign2.north);
+\draw[c3flow] (sign2.south) -- (eg2.north);
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (pay3) at (15.833333333333332,-2.7) {\textbf{\Money{$Y_3$}: large hired room}\par $\Money{f_3(0)}=\Money{-100},\quad\Money{f_3(1)}=\Money{400}\ \Money{\mathrm{USD}}$\par $\ExpectedValue{g_3}(\SuccessProb{p})=\Money{-100}+\Money{500}\SuccessProb{p}$};
+
+\draw[c3flow] (formula.south) -- ++(0,-.25) -| (pay3.north);
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (initial3) at (15.833333333333332,-5.0) {\ExpectedValue{Initial expectation}\par $\ExpectedValue{g_3}\!\left(\SuccessProb{\frac{9}{25}}\right)=\ExpectedValue{80\ \mathrm{USD}}$\par \ExpectedValue{expected net gain} per stated period};
+
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (root3) at (15.833333333333332,-7.15) {\SuccessProb{Exact break-even equation}\par $\Money{-100}+\Money{500}\SuccessProb{p}=\ExpectedValue{0}$\par $\SuccessProb{p_3^*}=\SuccessProb{\frac{1}{5}}$};
+
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (sign3) at (15.833333333333332,-9.45) {$\ExpectedValue{g_3}>\ExpectedValue{0}:\ \SuccessProb{p}\in \left(\SuccessProb{\frac{1}{5}},\SuccessProb{1}\right]$\par $\ExpectedValue{g_3}=\ExpectedValue{0}:\ \SuccessProb{p}=\SuccessProb{\frac{1}{5}}$\par $\ExpectedValue{g_3}<\ExpectedValue{0}:\ \SuccessProb{p}\in \left[\SuccessProb{0},\SuccessProb{\frac{1}{5}}\right)$};
+
+\node[inner sep=0pt,anchor=north,text width=5.633333333333333cm,align=center] (eg3) at (15.833333333333332,-12.0) {\CThreeExpectationGraph{3}{-100}{400}{1/5}{9/25}};
+
+\draw[c3flow] (pay3.south) -- (initial3.north);
+\draw[c3flow] (initial3.south) -- (root3.north);
+\draw[c3flow] (root3.south) -- (sign3.north);
+\draw[c3flow] (sign3.south) -- (eg3.north);
+\end{tikzpicture}\end{center}
+The dashed horizontal line is \ExpectedValue{zero}; filled circles show endpoint payoffs and the exact root. The square marks the \ExpectedValue{initial expectation}. The $+$ and $-$ labels connect the graph to its strict sign intervals.
+\par \ExpectedValue{Positive expectation} means \ExpectedValue{expected net gain}; \ExpectedValue{negative expectation} means \ExpectedValue{expected net loss}; \ExpectedValue{zero expectation} means break-even. These are long-run averages per stated period, not guarantees of realized profit. Each branch uses its own payoffs and root.
+\endgroup
+}
+\newcommand{\CThreeStatementAgriculture}{%
+Observe a student's paid fitness sessions over one university term. \HLMathEvent{High enrollment} means responses to a campus fitness-interest survey meet a fixed target; \HLMathEvent{low enrollment} means they fall below it. Compare a walking group, dance sessions or circuit sessions, using the same survey outcome for each hypothetical format. \Money{Payoffs} include space hire, supplies, promotion and refunds. The two possible states are \HLMathEvent{high enrollment} and \HLMathEvent{low enrollment}. The \SuccessProb{initial probability} of \HLMathEvent{high enrollment} is $\SuccessProb{p}=\SuccessProb{\frac{1}{2}}$. All entries below are \Money{net profits} in \Money{USD} for the entire stated period, including relevant costs.
+\begin{center}\begin{tabular}{lrr}\toprule Alternative & \HLMathEvent{low enrollment} & \HLMathEvent{high enrollment}\\\midrule
+$A_1$: walking group & \Money{-70} & \Money{90}\\
+$A_2$: dance sessions & \Money{-30} & \Money{190}\\
+$A_3$: circuit sessions & \Money{-150} & \Money{150}\\
+\bottomrule\end{tabular}\end{center}
+
+}
+\newcommand{\CThreeModelAgriculture}{%
+\clearpage\noindent\textbf{Task 1 summary: shared states and induced distributions.}\par\medskip
+
+\begingroup\small\setlength{\parskip}{2pt}\tikzset{gten marker/.append style={inner xsep=.4mm,inner ysep=.2mm}}
+\begin{center}\begin{tikzpicture}[x=1cm,y=1cm]
+\node[c3card,anchor=north,text width=7cm,align=center] (ev1) at (4,0) {$\HLMathEvent{E}$: \HLMathEvent{high enrollment}, $\SuccessProb{P}(\HLMathEvent{E})=\SuccessProb{p}$};
+
+\node[c3card,anchor=north,text width=7cm,align=center] (ev0) at (15,0) {$\HLMathEvent{E^c}$: \HLMathEvent{low enrollment}, $\FailureProb{P}(\HLMathEvent{E^c})=\FailureProb{1-p}$};
+
+\node[c3card,anchor=north,text width=6cm,align=center] (ind1) at (4,-1.2) {$\Indicator{X(\omega)}=\Indicator{1}$, for $\HLMathEvent{\omega\in E}$};
+
+\node[c3card,anchor=north,text width=6cm,align=center] (ind0) at (15,-1.2) {$\Indicator{X(\omega)}=\Indicator{0}$, for $\HLMathEvent{\omega\in E^c}$};
+
+\draw[c3flow] (ev1) -- (ind1);\draw[c3flow] (ev0) -- (ind0);
+\node[c3card,anchor=north,text width=16.2cm,align=center] (map1) at (9.5,-2.65) {\textbf{\Money{$Y_1$}: walking group}\par 
+$\Money{Y_1(\omega)}=\TransformationFunction{f_1}(\Indicator{X(\omega)})=\Money{f_1(1)}=\Money{90}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E}$\par 
+$\Money{Y_1(\omega)}=\TransformationFunction{f_1}(\Indicator{X(\omega)})=\Money{f_1(0)}=\Money{-70}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E^c}$
+};
+
+\draw[c3flow] (ind1.west) -- (.15,-1.65) |- ([yshift=-7mm]map1.north west);
+\draw[c3flow,dashed] (ind0.east) -- (18.85,-1.65) |- ([yshift=-11.5mm]map1.north east);
+\node[c3card,anchor=north,text width=16.2cm,align=center] (map2) at (9.5,-4.45) {\textbf{\Money{$Y_2$}: dance sessions}\par 
+$\Money{Y_2(\omega)}=\TransformationFunction{f_2}(\Indicator{X(\omega)})=\Money{f_2(1)}=\Money{190}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E}$\par 
+$\Money{Y_2(\omega)}=\TransformationFunction{f_2}(\Indicator{X(\omega)})=\Money{f_2(0)}=\Money{-30}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E^c}$
+};
+
+\draw[c3flow] (ind1.west) -- (.15,-1.65) |- ([yshift=-7mm]map2.north west);
+\draw[c3flow,dashed] (ind0.east) -- (18.85,-1.65) |- ([yshift=-11.5mm]map2.north east);
+\node[c3card,anchor=north,text width=16.2cm,align=center] (map3) at (9.5,-6.25) {\textbf{\Money{$Y_3$}: circuit sessions}\par 
+$\Money{Y_3(\omega)}=\TransformationFunction{f_3}(\Indicator{X(\omega)})=\Money{f_3(1)}=\Money{150}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E}$\par 
+$\Money{Y_3(\omega)}=\TransformationFunction{f_3}(\Indicator{X(\omega)})=\Money{f_3(0)}=\Money{-150}\ \Money{\mathrm{USD}}$, for $\HLMathEvent{\omega\in E^c}$
+};
+
+\draw[c3flow] (ind1.west) -- (.15,-1.65) |- ([yshift=-7mm]map3.north west);
+\draw[c3flow,dashed] (ind0.east) -- (18.85,-1.65) |- ([yshift=-11.5mm]map3.north east);
+\node[inner sep=1pt,anchor=north,text width=4.33cm,align=center] (head0) at (2.275,-8.2) {$\Indicator{X}$};
+
+\node[c3card,anchor=north,text width=4.33cm,align=center] (cdf0) at (2.275,-8.85) {$\HLCumulativeProbability{F_{X}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Indicator{0},\\\FailureProb{1-p},&\Indicator{0}\leq t<\Indicator{1},\\\HLCumulativeProbability{1},&t\geq \Indicator{1}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=4.33cm,align=center] (pmf0) at (2.275,-11.6) {$\HLProbability{m_{X}}$\par $\begin{array}{ll}\Indicator{0}:&\FailureProb{1-p}\\\Indicator{1}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=4.33cm,align=center] (graph0) at (2.275,-13.899999999999999) {\CThreeDistributionPair{X}{0}{1}{1/2}{unitless}{\Indicator}};
+
+\node[inner sep=1pt,anchor=north,text width=4.33cm,align=center] (head1) at (7.025,-8.2) {$\Money{Y_1}$ $\leftarrow\TransformationFunction{f_1}$};
+
+\node[c3card,anchor=north,text width=4.33cm,align=center] (cdf1) at (7.025,-8.85) {$\HLCumulativeProbability{F_{Y_1}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Money{-70},\\\FailureProb{1-p},&\Money{-70}\leq t<\Money{90},\\\HLCumulativeProbability{1},&t\geq \Money{90}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=4.33cm,align=center] (pmf1) at (7.025,-11.6) {$\HLProbability{m_{Y_1}}$\par $\begin{array}{ll}\Money{-70}:&\FailureProb{1-p}\\\Money{90}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=4.33cm,align=center] (graph1) at (7.025,-13.899999999999999) {\CThreeDistributionPair{Y_1}{-70}{90}{1/2}{\Money{USD}}{\Money}};
+
+\draw[c3flow] (cdf0.north) -- ++(0,.27) -| (cdf1.north);
+\draw[c3flow] (pmf0.south) -- ++(0,-.30) -| (pmf1.south);
+\draw[c3flow] (map1.east) -- (18.46,-3.3) -- (18.46,-7.8999999999999995) -| (head1.north);
+\node[inner sep=1pt,anchor=north,text width=4.33cm,align=center] (head2) at (11.775,-8.2) {$\Money{Y_2}$ $\leftarrow\TransformationFunction{f_2}$};
+
+\node[c3card,anchor=north,text width=4.33cm,align=center] (cdf2) at (11.775,-8.85) {$\HLCumulativeProbability{F_{Y_2}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Money{-30},\\\FailureProb{1-p},&\Money{-30}\leq t<\Money{190},\\\HLCumulativeProbability{1},&t\geq \Money{190}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=4.33cm,align=center] (pmf2) at (11.775,-11.6) {$\HLProbability{m_{Y_2}}$\par $\begin{array}{ll}\Money{-30}:&\FailureProb{1-p}\\\Money{190}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=4.33cm,align=center] (graph2) at (11.775,-13.899999999999999) {\CThreeDistributionPair{Y_2}{-30}{190}{1/2}{\Money{USD}}{\Money}};
+
+\draw[c3flow] (cdf0.north) -- ++(0,.27) -| (cdf2.north);
+\draw[c3flow] (pmf0.south) -- ++(0,-.30) -| (pmf2.south);
+\draw[c3flow] (map2.east) -- (18.28,-5.1) -- (18.28,-7.779999999999999) -| (head2.north);
+\node[inner sep=1pt,anchor=north,text width=4.33cm,align=center] (head3) at (16.525,-8.2) {$\Money{Y_3}$ $\leftarrow\TransformationFunction{f_3}$};
+
+\node[c3card,anchor=north,text width=4.33cm,align=center] (cdf3) at (16.525,-8.85) {$\HLCumulativeProbability{F_{Y_3}(t)}$\par $\begin{cases}\HLCumulativeProbability{0},&t<\Money{-150},\\\FailureProb{1-p},&\Money{-150}\leq t<\Money{150},\\\HLCumulativeProbability{1},&t\geq \Money{150}.\end{cases}$};
+
+\node[c3card,anchor=north,text width=4.33cm,align=center] (pmf3) at (16.525,-11.6) {$\HLProbability{m_{Y_3}}$\par $\begin{array}{ll}\Money{-150}:&\FailureProb{1-p}\\\Money{150}:&\SuccessProb{p}\end{array}$\par \HLProbability{zero elsewhere}};
+
+\node[inner sep=0pt,anchor=north,text width=4.33cm,align=center] (graph3) at (16.525,-13.899999999999999) {\CThreeDistributionPair{Y_3}{-150}{150}{1/2}{\Money{USD}}{\Money}};
+
+\draw[c3flow] (cdf0.north) -- ++(0,.27) -| (cdf3.north);
+\draw[c3flow] (pmf0.south) -- ++(0,-.30) -| (pmf3.south);
+\draw[c3flow] (map3.east) -- (18.1,-6.9) -- (18.1,-7.659999999999999) -| (head3.north);
+\end{tikzpicture}\end{center}
+\textbf{Numerical graph illustration:} $\SuccessProb{p_0}=\SuccessProb{\frac{1}{2}}$. All displayed distribution formulas remain symbolic in $\SuccessProb{p}$.
+\par\textbf{CDF above, PMF below.} Filled stems translate to pale dashed jump shadows; thin arrows link equal physical lengths. Open and filled circles show excluded and included endpoints. Distribution arrows retain state probabilities while mapping values, rather than applying $\TransformationFunction{f_i}$ to CDF heights. See \hyperref[ex:intro-one]{Example 1}.\par
+For $0<\SuccessProb{p}<1$, $\Indicator{S_X}=\{\Indicator{0},\Indicator{1}\}$; at $\SuccessProb{p}=0$ only $\Indicator{0}$ remains, and at $\SuccessProb{p}=1$ only $\Indicator{1}$ remains. Each monetary support retains $\Money{f_i(0)}$ at $\SuccessProb{p}=0$ and $\Money{f_i(1)}$ at $\SuccessProb{p}=1$.
+\par\textbf{Loss events.} $\HLMathEvent{\{Y_1<0\}}=\HLMathEvent{\{X=0\}}=\HLMathEvent{E^c}$, probability $\FailureProb{1-p}$; $\HLMathEvent{\{Y_2<0\}}=\HLMathEvent{\{X=0\}}=\HLMathEvent{E^c}$, probability $\FailureProb{1-p}$; $\HLMathEvent{\{Y_3<0\}}=\HLMathEvent{\{X=0\}}=\HLMathEvent{E^c}$, probability $\FailureProb{1-p}$.
+\endgroup
+}
+\newcommand{\CThreeExpectAgriculture}{%
+\clearpage\noindent\textbf{Task 2 summary: parallel expectation analyses.}\par\medskip
+
+\begingroup\small\tikzset{gten marker/.append style={inner xsep=.4mm,inner ysep=.2mm}}
+\begin{center}\begin{tikzpicture}[x=1cm,y=1cm]
+\node[c3card,anchor=north,text width=17cm,align=center] (inputs) at (9.5,0) {Shared probability inputs: $\SuccessProb{p}$ and $\FailureProb{1-p}$; hold each alternative\textquotesingle s \Money{payoffs} fixed.};
+
+\node[c3card,anchor=north,text width=17cm,align=center] (formula) at (9.5,-1.2) {$\ExpectedValue{g_i}(\SuccessProb{p})=\ExpectedValue{\mathbb E}[\Money{Y_i}]=\SuccessProb{p}\Money{f_i(1)}+(\FailureProb{1-p})\Money{f_i(0)}$};
+
+\draw[c3flow] (inputs) -- (formula);
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (pay1) at (3.1666666666666665,-2.7) {\textbf{\Money{$Y_1$}: walking group}\par $\Money{f_1(0)}=\Money{-70},\quad\Money{f_1(1)}=\Money{90}\ \Money{\mathrm{USD}}$\par $\ExpectedValue{g_1}(\SuccessProb{p})=\Money{-70}+\Money{160}\SuccessProb{p}$};
+
+\draw[c3flow] (formula.south) -- ++(0,-.25) -| (pay1.north);
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (initial1) at (3.1666666666666665,-5.0) {\ExpectedValue{Initial expectation}\par $\ExpectedValue{g_1}\!\left(\SuccessProb{\frac{1}{2}}\right)=\ExpectedValue{10\ \mathrm{USD}}$\par \ExpectedValue{expected net gain} per stated period};
+
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (root1) at (3.1666666666666665,-7.15) {\SuccessProb{Exact break-even equation}\par $\Money{-70}+\Money{160}\SuccessProb{p}=\ExpectedValue{0}$\par $\SuccessProb{p_1^*}=\SuccessProb{\frac{7}{16}}$};
+
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (sign1) at (3.1666666666666665,-9.45) {$\ExpectedValue{g_1}>\ExpectedValue{0}:\ \SuccessProb{p}\in \left(\SuccessProb{\frac{7}{16}},\SuccessProb{1}\right]$\par $\ExpectedValue{g_1}=\ExpectedValue{0}:\ \SuccessProb{p}=\SuccessProb{\frac{7}{16}}$\par $\ExpectedValue{g_1}<\ExpectedValue{0}:\ \SuccessProb{p}\in \left[\SuccessProb{0},\SuccessProb{\frac{7}{16}}\right)$};
+
+\node[inner sep=0pt,anchor=north,text width=5.633333333333333cm,align=center] (eg1) at (3.1666666666666665,-12.0) {\CThreeExpectationGraph{1}{-70}{90}{7/16}{1/2}};
+
+\draw[c3flow] (pay1.south) -- (initial1.north);
+\draw[c3flow] (initial1.south) -- (root1.north);
+\draw[c3flow] (root1.south) -- (sign1.north);
+\draw[c3flow] (sign1.south) -- (eg1.north);
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (pay2) at (9.5,-2.7) {\textbf{\Money{$Y_2$}: dance sessions}\par $\Money{f_2(0)}=\Money{-30},\quad\Money{f_2(1)}=\Money{190}\ \Money{\mathrm{USD}}$\par $\ExpectedValue{g_2}(\SuccessProb{p})=\Money{-30}+\Money{220}\SuccessProb{p}$};
+
+\draw[c3flow] (formula.south) -- ++(0,-.25) -| (pay2.north);
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (initial2) at (9.5,-5.0) {\ExpectedValue{Initial expectation}\par $\ExpectedValue{g_2}\!\left(\SuccessProb{\frac{1}{2}}\right)=\ExpectedValue{80\ \mathrm{USD}}$\par \ExpectedValue{expected net gain} per stated period};
+
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (root2) at (9.5,-7.15) {\SuccessProb{Exact break-even equation}\par $\Money{-30}+\Money{220}\SuccessProb{p}=\ExpectedValue{0}$\par $\SuccessProb{p_2^*}=\SuccessProb{\frac{3}{22}}$};
+
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (sign2) at (9.5,-9.45) {$\ExpectedValue{g_2}>\ExpectedValue{0}:\ \SuccessProb{p}\in \left(\SuccessProb{\frac{3}{22}},\SuccessProb{1}\right]$\par $\ExpectedValue{g_2}=\ExpectedValue{0}:\ \SuccessProb{p}=\SuccessProb{\frac{3}{22}}$\par $\ExpectedValue{g_2}<\ExpectedValue{0}:\ \SuccessProb{p}\in \left[\SuccessProb{0},\SuccessProb{\frac{3}{22}}\right)$};
+
+\node[inner sep=0pt,anchor=north,text width=5.633333333333333cm,align=center] (eg2) at (9.5,-12.0) {\CThreeExpectationGraph{2}{-30}{190}{3/22}{1/2}};
+
+\draw[c3flow] (pay2.south) -- (initial2.north);
+\draw[c3flow] (initial2.south) -- (root2.north);
+\draw[c3flow] (root2.south) -- (sign2.north);
+\draw[c3flow] (sign2.south) -- (eg2.north);
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (pay3) at (15.833333333333332,-2.7) {\textbf{\Money{$Y_3$}: circuit sessions}\par $\Money{f_3(0)}=\Money{-150},\quad\Money{f_3(1)}=\Money{150}\ \Money{\mathrm{USD}}$\par $\ExpectedValue{g_3}(\SuccessProb{p})=\Money{-150}+\Money{300}\SuccessProb{p}$};
+
+\draw[c3flow] (formula.south) -- ++(0,-.25) -| (pay3.north);
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (initial3) at (15.833333333333332,-5.0) {\ExpectedValue{Initial expectation}\par $\ExpectedValue{g_3}\!\left(\SuccessProb{\frac{1}{2}}\right)=\ExpectedValue{0\ \mathrm{USD}}$\par \ExpectedValue{break-even} per stated period};
+
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (root3) at (15.833333333333332,-7.15) {\SuccessProb{Exact break-even equation}\par $\Money{-150}+\Money{300}\SuccessProb{p}=\ExpectedValue{0}$\par $\SuccessProb{p_3^*}=\SuccessProb{\frac{1}{2}}$};
+
+\node[c3card,anchor=north,text width=5.633333333333333cm,align=center] (sign3) at (15.833333333333332,-9.45) {$\ExpectedValue{g_3}>\ExpectedValue{0}:\ \SuccessProb{p}\in \left(\SuccessProb{\frac{1}{2}},\SuccessProb{1}\right]$\par $\ExpectedValue{g_3}=\ExpectedValue{0}:\ \SuccessProb{p}=\SuccessProb{\frac{1}{2}}$\par $\ExpectedValue{g_3}<\ExpectedValue{0}:\ \SuccessProb{p}\in \left[\SuccessProb{0},\SuccessProb{\frac{1}{2}}\right)$};
+
+\node[inner sep=0pt,anchor=north,text width=5.633333333333333cm,align=center] (eg3) at (15.833333333333332,-12.0) {\CThreeExpectationGraph{3}{-150}{150}{1/2}{1/2}};
+
+\draw[c3flow] (pay3.south) -- (initial3.north);
+\draw[c3flow] (initial3.south) -- (root3.north);
+\draw[c3flow] (root3.south) -- (sign3.north);
+\draw[c3flow] (sign3.south) -- (eg3.north);
+\end{tikzpicture}\end{center}
+The dashed horizontal line is \ExpectedValue{zero}; filled circles show endpoint payoffs and the exact root. The square marks the \ExpectedValue{initial expectation}. The $+$ and $-$ labels connect the graph to its strict sign intervals.
+\par \ExpectedValue{Positive expectation} means \ExpectedValue{expected net gain}; \ExpectedValue{negative expectation} means \ExpectedValue{expected net loss}; \ExpectedValue{zero expectation} means break-even. These are long-run averages per stated period, not guarantees of realized profit. Each branch uses its own payoffs and root.
+\endgroup
+}
 \begin{document}
 \maketitle
 \setcounter{tocdepth}{1}
@@ -97,22 +1225,56 @@ The two probability treatments distinguish an \HLMathEvent{event} from its \HLMa
 the same model. Labels and units preserve meaning without color.
 See the \hyperref[tab:notation-reference]{detailed notation reference}.
 
-\section{Introduction}\label{sec:t2-c3-introduction}
+\clearpage\section{Introduction}\label{sec:t2-c3-introduction}
 \subsection{Introductory example 1: campus art-print stall}\label{ex:intro-one}
-Observe a student's art-print stall over one weekend. \HLMathEvent{High demand} means campus-market
-attendance meets the organizer's fixed target; \HLMathEvent{low demand} means it falls below that target.
-These states cover every outcome and apply to either hypothetical print-batch choice.
-Let $\HLMathEvent{E}$ be \HLMathEvent{high demand} and
-$\HLMathEvent{E^c}$ \HLMathEvent{low demand}. Define $\Indicator{X}=\Indicator{1}$ on $\HLMathEvent{E}$ and
-$\Indicator{X}=\Indicator{0}$ on $\HLMathEvent{E^c}$, with $\SuccessProb{p}=P(\HLMathEvent{E})=\SuccessProb{0.4}$
-and $\FailureProb{1-p}=\FailureProb{0.6}$. The indicator is unitless.
-After printing and stall costs, a small print batch gives $f_1(0)=\Money{-20}$, $f_1(1)=\Money{60}$ USD;
-a large print batch gives $f_2(0)=\Money{-40}$, $f_2(1)=\Money{120}$ USD.
-Both monetary variables use this same $X$:
+\CThreePlain{\CThreeStatementIntroOne}
+\CThreePlain{\CThreeIntroTaskOne}
+\CThreePlain{\CThreeIntroTaskTwo}
+
+\paragraph{Worked explanation --- highlighted statement.}
+\CThreeStatementIntroOne
+\CThreeIntroTaskOne
+\paragraph{Outcomes, events and monetary transformations.}
+An \HLMathEvent{outcome} $\HLMathEvent{\omega}$ is one possible outcome of observing the stall over the weekend.
+The \HLMathEvent{sample space} $\HLMathEvent{\Omega}$ contains all such outcomes, so $\HLMathEvent{\omega\in\Omega}$.
+The \HLMathEvent{event} $\HLMathEvent{E}\subseteq\HLMathEvent{\Omega}$ is the set of high-demand outcomes, and $\HLMathEvent{E^c}$ is its complement.
+Define the \Indicator{indicator} by
+\[
+\Indicator{X(\omega)}=
+\begin{cases}
+\Indicator{1},&\text{if }\HLMathEvent{\omega\in E},\\
+\Indicator{0},&\text{if }\HLMathEvent{\omega\in E^c}.
+\end{cases}
+\]
+Now let $\Money{Y}=\TransformationFunction{f}(\Indicator{X})$.
+This means $\Money{Y(\omega)}=\TransformationFunction{f}(\Indicator{X(\omega)})$ for every outcome:
+\[
+\Money{Y(\omega)}=
+\begin{cases}
+\Money{f(1)},&\text{if }\HLMathEvent{\omega\in E},\\
+\Money{f(0)},&\text{if }\HLMathEvent{\omega\in E^c}.
+\end{cases}
+\]
+If $\HLMathEvent{\omega\in E}$, then $\Indicator{X(\omega)}=\Indicator{1}$,
+$\Money{Y_1(\omega)}=\Money{60\ \mathrm{USD}}$ and $\Money{Y_2(\omega)}=\Money{120\ \mathrm{USD}}$.
+If $\HLMathEvent{\omega\in E^c}$, then $\Indicator{X(\omega)}=\Indicator{0}$,
+$\Money{Y_1(\omega)}=\Money{-20\ \mathrm{USD}}$ and $\Money{Y_2(\omega)}=\Money{-40\ \mathrm{USD}}$.
+The \Indicator{indicator} records which \HLMathEvent{event} occurred;
+$\TransformationFunction{f_i}$ converts that indicator value into the \Money{monetary consequence} for alternative $i$.
+All alternatives use the same observed $\HLMathEvent{\omega}$ and the same $\Indicator{X(\omega)}$.
+Since the indicator is either \Indicator{0} or \Indicator{1}, the two state evaluations are equivalent to the affine rule
+\[
+\Money{Y_i}=\Money{f_i(0)}+[\Money{f_i(1)}-\Money{f_i(0)}]\Indicator{X},
+\qquad
+\Money{Y_i(\omega)}=\Money{f_i(0)}+[\Money{f_i(1)}-\Money{f_i(0)}]\Indicator{X(\omega)}.
+\]
+Write $\Indicator{X(\omega)}$ for $\HLMathEvent{\omega\in E}$: an event is a set of outcomes, not an individual input to the indicator.
+
+Both monetary variables use this same $\Indicator{X}$:
 \[
 \begin{aligned}
-Y_1&=f_1(0)+[f_1(1)-f_1(0)]X=-20+80X\quad\text{USD},\\
-Y_2&=f_2(0)+[f_2(1)-f_2(0)]X=-40+160X\quad\text{USD}.
+\Money{Y_1}&=\Money{f_1(0)}+[\Money{f_1(1)}-\Money{f_1(0)}]\Indicator{X}=-20+80\Indicator{X}\quad\text{USD},\\
+\Money{Y_2}&=\Money{f_2(0)}+[\Money{f_2(1)}-\Money{f_2(0)}]\Indicator{X}=-40+160\Indicator{X}\quad\text{USD}.
 \end{aligned}
 \]
 Their supports are $\{-20,60\}$ and $\{-40,120\}$ USD; each puts mass 0.6
@@ -120,6 +1282,9 @@ on its negative value and 0.4 on its positive value. Each CDF is 0 below its
 negative value, 0.6 from that value up to (excluding) its positive value,
 and 1 from its positive value onward.
 For $i=1,2$, $\HLMathEvent{\{Y_i<0\}}=\HLMathEvent{\{X=0\}}=\HLMathEvent{E^c}$ has probability $1-p$, initially 0.6.
+\CThreeModelIntroOne
+\clearpage
+\CThreeIntroTaskTwo
 \paragraph{Initial expected values.}
 \textbf{$Y_1$: initial expectation.}
 Initially, $\ExpectedValue{\mathbb E}[\Money{Y_1}]=\Money{60}(\SuccessProb{\frac{2}{5}})+\Money{(-20)}(\FailureProb{\frac{3}{5}})=\ExpectedValue{12\,\text{USD}}$:
@@ -136,7 +1301,7 @@ With both payoffs fixed and only $p\in\left[0,1\right]$ varying,
 \begin{aligned}
 \ExpectedValue{\mathbb E}[\Money{Y_1}]&=\SuccessProb{p}(\Money{60})+(\FailureProb{1-p})(\Money{-20})=\Money{-20}+\Money{80}\SuccessProb{p}\ \text{USD},\\
 \ExpectedValue{\mathbb E}[\Money{Y_1}]&=\ExpectedValue{0}\\
- &\iff \Money{-20}+\Money{80}\SuccessProb{p}=\ExpectedValue{0}\iff 80p=20\iff p_1^*=\frac{1}{4}.
+ &\iff \Money{-20}+\Money{80}\SuccessProb{p}=\ExpectedValue{0}\iff 80\SuccessProb{p}=20\iff \SuccessProb{p_1^*}=\frac{1}{4}.
 \end{aligned}
 \]
 Solving $\ExpectedValue{\mathbb E}[\Money{Y_1}]>0$ gives $p\in\left(\frac{1}{4},1\right]$ (\ExpectedValue{expected net gain}).
@@ -149,30 +1314,32 @@ With both payoffs fixed and only $p\in\left[0,1\right]$ varying,
 \begin{aligned}
 \ExpectedValue{\mathbb E}[\Money{Y_2}]&=\SuccessProb{p}(\Money{120})+(\FailureProb{1-p})(\Money{-40})=\Money{-40}+\Money{160}\SuccessProb{p}\ \text{USD},\\
 \ExpectedValue{\mathbb E}[\Money{Y_2}]&=\ExpectedValue{0}\\
- &\iff \Money{-40}+\Money{160}\SuccessProb{p}=\ExpectedValue{0}\iff 160p=40\iff p_2^*=\frac{1}{4}.
+ &\iff \Money{-40}+\Money{160}\SuccessProb{p}=\ExpectedValue{0}\iff 160\SuccessProb{p}=40\iff \SuccessProb{p_2^*}=\frac{1}{4}.
 \end{aligned}
 \]
 Solving $\ExpectedValue{\mathbb E}[\Money{Y_2}]>0$ gives $p\in\left(\frac{1}{4},1\right]$ (\ExpectedValue{expected net gain}).
 Solving $\ExpectedValue{\mathbb E}[\Money{Y_2}]<0$ gives $p\in\left[0,\frac{1}{4}\right)$ (\ExpectedValue{expected net loss}).
 At $p=\frac{1}{4}$ the \ExpectedValue{expectation} is \ExpectedValue{zero} (break-even).
-\needspace{25\baselineskip}\paragraph{Graphs.}
-\begin{center}\BreakEvenGraph{1}{-20}{60}{1/4}\end{center}
-\begin{center}\BreakEvenGraph{2}{-40}{120}{1/4}\end{center}
+\CThreeExpectIntroOne
 
 \clearpage
 \subsection{Introductory example 2: freelance livestream work}\label{ex:intro-two}
-Observe a freelancer hosting paid livestream sessions over one day. Let $\HLMathEvent{E}$ be \HLMathEvent{a home-internet disruption}
-and $\HLMathEvent{E^c}$ \HLMathEvent{no disruption} that day. These are the only states. Compare hypothetical choices:
-use home internet alone or buy mobile data as backup. All payoffs are net gains or losses
-after platform fees, data charges and refunds. Set $\Indicator{X}=\Indicator{1}$ on $\HLMathEvent{E}$ and
-$\Indicator{X}=\Indicator{0}$ on $\HLMathEvent{E^c}$. Here $\SuccessProb{p}=P(\HLMathEvent{E})=\SuccessProb{0.1}$,
-$\FailureProb{1-p}=\FailureProb{0.9}$. Mathematical success can be financially undesirable.
-With home internet alone, $f_1(0)=\Money{100}$, $f_1(1)=\Money{-20}$ USD.
-With mobile-data backup, $f_2(0)=\Money{60}$, $f_2(1)=\Money{-10}$ USD:
+\CThreePlain{\CThreeStatementIntroTwo}
+\CThreePlain{\CThreeIntroTaskOne}
+\CThreePlain{\CThreeIntroTaskTwo}
+
+\paragraph{Worked explanation --- highlighted statement.}
+\CThreeStatementIntroTwo
+\CThreeIntroTaskOne
+
+For the same observed $\HLMathEvent{\omega\in\Omega}$, $\Indicator{X(\omega)}=\Indicator{1}$ represents \HLMathEvent{disruption}: then $\Money{Y_1(\omega)}=\Money{-20\ \mathrm{USD}}$ and $\Money{Y_2(\omega)}=\Money{-10\ \mathrm{USD}}$.
+For $\HLMathEvent{\omega\in E^c}$, $\Indicator{X(\omega)}=\Indicator{0}$, giving $\Money{100\ \mathrm{USD}}$ and $\Money{60\ \mathrm{USD}}$.
+Each $\Money{Y_i(\omega)}=\TransformationFunction{f_i}(\Indicator{X(\omega)})$ uses this same outcome and indicator; here the monetary rules are decreasing.
+
 \[
 \begin{aligned}
-Y_1&=f_1(0)+[f_1(1)-f_1(0)]X=100-120X\quad\text{USD},\\
-Y_2&=f_2(0)+[f_2(1)-f_2(0)]X=60-70X\quad\text{USD}.
+\Money{Y_1}&=\Money{f_1(0)}+[\Money{f_1(1)}-\Money{f_1(0)}]\Indicator{X}=100-120\Indicator{X}\quad\text{USD},\\
+\Money{Y_2}&=\Money{f_2(0)}+[\Money{f_2(1)}-\Money{f_2(0)}]\Indicator{X}=60-70\Indicator{X}\quad\text{USD}.
 \end{aligned}
 \]
 Their supports are $\{-20,100\}$ and $\{-10,60\}$ USD. Each PMF places
@@ -180,6 +1347,9 @@ mass $p=0.1$ on the negative payoff and $1-p=0.9$ on the positive payoff.
 Each CDF is 0 below its negative value, $p$ between its ordered values,
 and 1 at or above its positive value. For each variable,
 $\HLMathEvent{\{Y_i<0\}}=\HLMathEvent{\{X=1\}}=\HLMathEvent{E}$, so $P(Y_i<0)=p=0.1$ initially.
+\CThreeModelIntroTwo
+\clearpage
+\CThreeIntroTaskTwo
 \paragraph{Initial expected values.}
 \textbf{$Y_1$: initial expectation.}
 Initially, $\ExpectedValue{\mathbb E}[\Money{Y_1}]=\Money{-20}(\SuccessProb{\frac{1}{10}})+\Money{(100)}(\FailureProb{\frac{9}{10}})=\ExpectedValue{88\,\text{USD}}$:
@@ -196,7 +1366,7 @@ With both payoffs fixed and only $p\in\left[0,1\right]$ varying,
 \begin{aligned}
 \ExpectedValue{\mathbb E}[\Money{Y_1}]&=\SuccessProb{p}(\Money{-20})+(\FailureProb{1-p})(\Money{100})=\Money{100}-\Money{120}\SuccessProb{p}\ \text{USD},\\
 \ExpectedValue{\mathbb E}[\Money{Y_1}]&=\ExpectedValue{0}\\
- &\iff \Money{100}-\Money{120}\SuccessProb{p}=\ExpectedValue{0}\iff -120p=-100\iff p_1^*=\frac{5}{6}.
+ &\iff \Money{100}-\Money{120}\SuccessProb{p}=\ExpectedValue{0}\iff -120\SuccessProb{p}=-100\iff \SuccessProb{p_1^*}=\frac{5}{6}.
 \end{aligned}
 \]
 Solving $\ExpectedValue{\mathbb E}[\Money{Y_1}]>0$ gives $p\in\left[0,\frac{5}{6}\right)$ (\ExpectedValue{expected net gain}).
@@ -209,17 +1379,15 @@ With both payoffs fixed and only $p\in\left[0,1\right]$ varying,
 \begin{aligned}
 \ExpectedValue{\mathbb E}[\Money{Y_2}]&=\SuccessProb{p}(\Money{-10})+(\FailureProb{1-p})(\Money{60})=\Money{60}-\Money{70}\SuccessProb{p}\ \text{USD},\\
 \ExpectedValue{\mathbb E}[\Money{Y_2}]&=\ExpectedValue{0}\\
- &\iff \Money{60}-\Money{70}\SuccessProb{p}=\ExpectedValue{0}\iff -70p=-60\iff p_2^*=\frac{6}{7}.
+ &\iff \Money{60}-\Money{70}\SuccessProb{p}=\ExpectedValue{0}\iff -70\SuccessProb{p}=-60\iff \SuccessProb{p_2^*}=\frac{6}{7}.
 \end{aligned}
 \]
 Solving $\ExpectedValue{\mathbb E}[\Money{Y_2}]>0$ gives $p\in\left[0,\frac{6}{7}\right)$ (\ExpectedValue{expected net gain}).
 Solving $\ExpectedValue{\mathbb E}[\Money{Y_2}]<0$ gives $p\in\left(\frac{6}{7},1\right]$ (\ExpectedValue{expected net loss}).
 At $p=\frac{6}{7}$ the \ExpectedValue{expectation} is \ExpectedValue{zero} (break-even).
-\needspace{25\baselineskip}\paragraph{Graphs.}
-\begin{center}\BreakEvenGraph{1}{100}{-20}{5/6}\end{center}
-\begin{center}\BreakEvenGraph{2}{60}{-10}{6/7}\end{center}
+\CThreeExpectIntroTwo
 
-\subsection{Binary models and distributions}
+\clearpage\subsection{Binary models and distributions}
 One observation in a stated period gives two mutually exclusive and exhaustive
 states. Write $X\sim\operatorname{Bernoulli}(p)$, $0\leq p\leq1$.
 The support is a set of numerical values with \emph{positive} probability:
@@ -243,6 +1411,19 @@ Strictly positive and negative describe monetary payoffs, not $\HLMathEvent{E}$ 
 % Reuse table infrastructure and applicable fields without concept-union rendering.
 \begingroup\small
 \HighlightDetailedTable{%
+$\HLMathEvent{\omega\in\Omega}$ & \HLMathEvent{Outcome and sample space} & An outcome $\HLMathEvent{\omega}$ is one possible observation; the sample space $\HLMathEvent{\Omega}$ is the set of all possible outcomes. An event satisfies $\HLMathEvent{E}\subseteq\HLMathEvent{\Omega}$. &
+\textbullet\ \hyperref[ex:intro-one]{Example 1}: one possible weekend observation of the campus art-print stall.\par
+\textbullet\ \hyperref[ex:intro-two]{Example 2}: one possible day of freelance livestream work.\\[4pt]
+$\Indicator{X(\omega)}$ & \Indicator{Outcome evaluation} & Evaluate $\Indicator{X}$ at the individual outcome: $\Indicator{1}$ if $\HLMathEvent{\omega\in E}$, $\Indicator{0}$ if $\HLMathEvent{\omega\in E^c}$. The event is a set, not the argument of $X$. &
+\textbullet\ \hyperref[ex:intro-one]{Example 1}: $\Indicator{1}$ on a high-demand weekend; $\Indicator{0}$ otherwise.\par
+\textbullet\ \hyperref[ex:intro-two]{Example 2}: $\Indicator{1}$ on a disrupted day, even though disruption is financially undesirable.\\[4pt]
+$\Money{Y_i(\omega)}$ & \Money{Monetary evaluation} & $\Money{Y_i(\omega)}=\TransformationFunction{f_i}(\Indicator{X(\omega)})$: compose the \Indicator{indicator} with alternative $i$'s \TransformationFunction{rule}. The evaluated amounts $\Money{f_i(0)}$ and $\Money{f_i(1)}$ are in \Money{USD}. &
+\textbullet\ \hyperref[ex:intro-one]{Example 1}: at the same high-demand outcome, \Money{60 USD} for the small batch and \Money{120 USD} for the large batch.\par
+\textbullet\ \hyperref[ex:intro-two]{Example 2}: at the same disrupted outcome, \Money{-20 USD} without backup and \Money{-10 USD} with backup.\\[4pt]
+$\ExpectedValue{g_i}(\SuccessProb{p})$ & \ExpectedValue{Expectation} as a \ExpectedValue{function} of \SuccessProb{probability} & $\ExpectedValue{g_i}(\SuccessProb{p})=\ExpectedValue{\mathbb E}[\Money{Y_i}]$ for fixed state payoffs; varying $\SuccessProb{p}$ changes the distribution, not the payoffs. &
+\textbullet\ \hyperref[ex:intro-one]{Example 1}: both expectation functions increase with $\SuccessProb{p}$.\par
+\textbullet\ \hyperref[ex:intro-two]{Example 2}: both decrease because $\SuccessProb{p}$ measures disruption.\\[4pt]
+
 $\HLMathEvent{E}$ & \HLMathEvent{Event} & A set of outcomes satisfying the stated condition in one observation period; distinct from the expectation operator $\ExpectedValue{\mathbb E}$. &
 \textbullet\ \hyperref[ex:intro-one]{Example 1}: \HLMathEvent{high campus-market attendance} over one weekend.\par
 \textbullet\ \hyperref[ex:intro-two]{Example 2}: \HLMathEvent{home-internet disruption} over one day; mathematical success can be financially undesirable.\\[4pt]
@@ -314,29 +1495,34 @@ monetary values and $F_{Y_i}$ accumulates them. These are different functions.
 \clearpage\needspace{20\baselineskip}\subsection{Reusable practice procedure}
 \textbf{Task 1 --- Establish the binary model and monetary transformations.}
 \begin{enumerate}
-\item \textbf{Binary model and monetary transformations.} Present the shared observation, period, \HLMathEvent{event} $\HLMathEvent{E}$, \HLMathEvent{complement} $\HLMathEvent{E^c}$, indicator $X$, Bernoulli model and initial $p=P(\HLMathEvent{E})$. Then give each monetary variable's state payoffs in USD and derive $Y_i=f_i(X)=f_i(0)+[f_i(1)-f_i(0)]X$.
-\item \textbf{Supports, PMFs, and ordered CDFs.} Give the indicator's set-builder support, complete PMF and piecewise CDF, including support cases at $p=0,1$. Then give the monetary supports, complete PMFs (zero elsewhere) and numerically ordered piecewise CDFs, with endpoint support cases.
-\item \textbf{Initial probabilities and loss \HLMathEvent{events}.} State the initial indicator probabilities. For each $Y_i$, give both initial masses, identify $\HLMathEvent{\{Y_i<0\}}$ in terms of $X$ and $\HLMathEvent{E}$ or $\HLMathEvent{E^c}$, calculate its probability and interpret it in context. All alternatives share $X$; no independence is assumed.
+\item \textbf{Binary model and monetary transformations.} Present the shared observation, period, \HLMathEvent{event} $\HLMathEvent{E}$, \HLMathEvent{complement} $\HLMathEvent{E^c}$, \Indicator{indicator} $\Indicator{X}$, \Indicator{Bernoulli model} and initial $\SuccessProb{p}=\SuccessProb{P}(\HLMathEvent{E})$.\par Then give each \Money{monetary variable}'s \Money{state payoffs} in \Money{USD} and derive $\Money{Y_i}=\TransformationFunction{f_i}(\Indicator{X})$\allowbreak${}=\Money{f_i(0)}+[\Money{f_i(1)}-\Money{f_i(0)}]\Indicator{X}$.
+\item \textbf{Supports, \HLProbability{PMFs}, and ordered \HLCumulativeProbability{CDFs}.} Give the \Indicator{indicator}'s \Indicator{set-builder support}, complete \HLProbability{PMF} and piecewise \HLCumulativeProbability{CDF}, including support cases at $\SuccessProb{p}=\SuccessProb{0},\SuccessProb{1}$. Then give the \Money{monetary supports}, complete \HLProbability{PMFs} (\HLProbability{zero elsewhere}) and numerically ordered piecewise \HLCumulativeProbability{CDFs}, with endpoint support cases.
+\item \textbf{Initial probabilities and loss \HLMathEvent{events}.} State the initial \Indicator{indicator} probabilities. For each $\Money{Y_i}$, give both \HLProbability{initial masses}, identify $\HLMathEvent{\{Y_i<0\}}$ in terms of $\Indicator{X}$ and $\HLMathEvent{E}$ or $\HLMathEvent{E^c}$, calculate its probability and interpret it in context. All alternatives share $\Indicator{X}$; no independence is assumed.
 \end{enumerate}
-For $0<p<1$, $S_X=\{0,1\}$; at $p=0$ only 0 remains and at $p=1$ only 1 remains.
-Monetary supports contain positive-mass values: $f_i(0)$ only at $p=0$, $f_i(1)$ only at $p=1$.
-For ordered amounts $a<b$ and $q=P(Y_i=a)$,
+For $\SuccessProb{0}<\SuccessProb{p}<\SuccessProb{1}$, $\Indicator{S_X}=\{\Indicator{0},\Indicator{1}\}$; at $\SuccessProb{p}=\SuccessProb{0}$ only \Indicator{0} remains and at $\SuccessProb{p}=\SuccessProb{1}$ only \Indicator{1} remains.
+\Money{Monetary supports} contain positive-mass values: $\Money{f_i(0)}$ only at $\SuccessProb{p}=\SuccessProb{0}$, $\Money{f_i(1)}$ only at $\SuccessProb{p}=\SuccessProb{1}$.
+For ordered amounts $\Money{a}<\Money{b}$ and $\HLProbability{q}=\HLProbability{P}(\Money{Y_i}=\Money{a})$,
 \[
-F_{Y_i}(t)=\begin{cases}0,&t<a,\\q,&a\leq t<b,\\1,&t\geq b.\end{cases}
+\HLCumulativeProbability{F_{Y_i}(t)}=\begin{cases}\HLCumulativeProbability{0},&t<\Money{a},\\\HLProbability{q},&\Money{a}\leq t<\Money{b},\\\HLCumulativeProbability{1},&t\geq\Money{b}.\end{cases}
 \]
-Here $q=1-p$ if $a=f_i(0)$, and $q=p$ if $a=f_i(1)$.
-Check total mass 1, right continuity, units and opposite strict payoff signs.
-\textbf{Task 2 --- Individual expected values.}
+Here $\HLProbability{q}=\FailureProb{1-p}$ if $\Money{a}=\Money{f_i(0)}$, and $\HLProbability{q}=\SuccessProb{p}$ if $\Money{a}=\Money{f_i(1)}$.
+Check total mass \HLProbability{1}, \HLCumulativeProbability{right continuity}, units and opposite strict payoff signs.
+
+\CThreeModelIntroOne
+\clearpage
+\textbf{Task 2 --- Individual \ExpectedValue{expected values}.}
 \begin{enumerate}
-\item \textbf{Initial expected values.} Calculate and interpret every monetary expectation at the supplied probability before sensitivity analysis.
-\item \textbf{Expectation formulas and sign intervals.} Hold payoffs fixed and vary only $p\in\left[0,1\right]$. For each $Y_i$, derive $\mathbb E[Y_i]=p f_i(1)+(1-p)f_i(0)$, solve its exact break-even equation, and solve both strict sign inequalities with correct directions and endpoints. Explain positive, negative and zero expectation.
-\item \textbf{Graphs.} Give a separate labelled graph for each variable, showing its expectation line, zero line, endpoint payoffs and exact break-even probability. Finish with endpoint and root checks, and distinguish expected profit from realized profit.
+\item \textbf{Initial \ExpectedValue{expected values}.} Calculate and interpret every \ExpectedValue{monetary expectation} at the supplied probability before sensitivity analysis.
+\item \textbf{\ExpectedValue{Expectation formulas} and sign intervals.} Hold \Money{payoffs} fixed and vary only $\SuccessProb{p}\in\left[\SuccessProb{0},\SuccessProb{1}\right]$. For each $\Money{Y_i}$, derive $\ExpectedValue{\mathbb E}[\Money{Y_i}]=\SuccessProb{p} \Money{f_i(1)}+(\FailureProb{1-p})\Money{f_i(0)}$, solve its exact \SuccessProb{break-even equation}, and solve both strict sign inequalities with correct directions and endpoints. Explain \ExpectedValue{positive, negative and zero expectation}.
+\item \textbf{Graphs.} Give a separate labelled graph for each variable, showing its \ExpectedValue{expectation line}, zero line, endpoint \Money{payoffs} and exact \SuccessProb{break-even probability}. Finish with endpoint and root checks, and distinguish \ExpectedValue{expected profit} from \ExpectedValue{realized profit}.
 \end{enumerate}
-Use $p_i^*=-f_i(0)/[f_i(1)-f_i(0)]$. For an increasing expectation,
-gain occurs on $\left(p_i^*,1\right]$ and loss on $\left[0,p_i^*\right)$; for a decreasing expectation,
-gain occurs on $\left[0,p_i^*\right)$ and loss on $\left(p_i^*,1\right]$. Dividing by a negative slope reverses inequalities.
-Equality is break-even. Group corresponding steps across alternatives before moving to the next subtask.
-Each analysis uses its own payoffs and threshold; all alternatives share $X$.
+Use $\SuccessProb{p_i^*}=-\Money{f_i(0)}/[\Money{f_i(1)}-\Money{f_i(0)}]$. For an increasing \ExpectedValue{expectation},
+\ExpectedValue{gain} occurs on $\left(\SuccessProb{p_i^*},\SuccessProb{1}\right]$ and \ExpectedValue{loss} on $\left[\SuccessProb{0},\SuccessProb{p_i^*}\right)$; for a decreasing \ExpectedValue{expectation},
+\ExpectedValue{gain} occurs on $\left[\SuccessProb{0},\SuccessProb{p_i^*}\right)$ and \ExpectedValue{loss} on $\left(\SuccessProb{p_i^*},\SuccessProb{1}\right]$. Dividing by a negative slope reverses inequalities.
+Equality is \ExpectedValue{break-even}. Group corresponding steps across alternatives before moving to the next subtask.
+Each analysis uses its own \Money{payoffs} and threshold; all alternatives share $\Indicator{X}$.
+
+\CThreeExpectIntroOne
 \enlargethispage{\baselineskip}
 \secInicio[][sec:t2-c3-introduction]
 \clearpage
@@ -347,24 +1533,18 @@ Each problem applies C3 through one Bernoulli model and analyses each monetary \
 \SectionProblemLink{prob:c3-energy}{Freelance digital projects for one month}\\
 \SectionProblemLink{prob:c3-manufacturing}{Graduation photography for one quarter}}
 \subsection{Campus sticker sales for one weekend}\label{prob:c3-inventory}
-Observe a student's campus sticker sales over one weekend. \HLMathEvent{High demand} means campus-market attendance meets the organizer's fixed target; \HLMathEvent{low demand} means it falls below that target. Compare a basic sticker pack with a premium pack printed more cheaply per sticker through a shared bulk order. These are alternative stall plans after printing and stall costs. The two possible states are \HLMathEvent{high demand} and \HLMathEvent{low demand}. The initial probability of \HLMathEvent{high demand} is $p=\frac{2}{5}$. All entries below are net profits in USD for the entire stated period, including relevant costs.
-\begin{center}\begin{tabular}{lrr}\toprule Alternative & \HLMathEvent{low demand} & \HLMathEvent{high demand}\\\midrule
-$A_1$: basic sticker pack & -40 & 80\\
-$A_2$: premium sticker pack & -20 & 180\\
-\bottomrule\end{tabular}\end{center}
+\CThreePlain{\CThreeStatementInventory}
 \QuestionsTasks[sec:t2-c3-general]{
-{3}/{sol:c3-inventory-model}/{\textbf{Task 1 --- Establish the binary model and monetary transformations.}
-\textbf{1.} \textbf{Binary model and monetary transformations.} Present the shared observation, period, \HLMathEvent{event} $\HLMathEvent{E}$, \HLMathEvent{complement} $\HLMathEvent{E^c}$, indicator $X$, Bernoulli model and initial $p=P(\HLMathEvent{E})$. Then give each monetary variable's state payoffs in USD and derive $Y_i=f_i(X)=f_i(0)+[f_i(1)-f_i(0)]X$.
-\textbf{2.} \textbf{Supports, PMFs, and ordered CDFs.} Give the indicator's set-builder support, complete PMF and piecewise CDF, including support cases at $p=0,1$. Then give the monetary supports, complete PMFs (zero elsewhere) and numerically ordered piecewise CDFs, with endpoint support cases.
-\textbf{3.} \textbf{Initial probabilities and loss \HLMathEvent{events}.} State the initial indicator probabilities. For each $Y_i$, give both initial masses, identify $\HLMathEvent{\{Y_i<0\}}$ in terms of $X$ and $\HLMathEvent{E}$ or $\HLMathEvent{E^c}$, calculate its probability and interpret it in context. All alternatives share $X$; no independence is assumed.
+{3}/{sol:c3-inventory-model}/{\CThreePlain{\CThreeTaskOne}
 },
-{3}/{sol:c3-inventory-decision}/{\textbf{Task 2 --- Individual expected values.}
-\textbf{1.} \textbf{Initial expected values.} Calculate and interpret every monetary expectation at the supplied probability before sensitivity analysis.
-\textbf{2.} \textbf{Expectation formulas and sign intervals.} Hold payoffs fixed and vary only $p\in\left[0,1\right]$. For each $Y_i$, derive $\mathbb E[Y_i]=p f_i(1)+(1-p)f_i(0)$, solve its exact break-even equation, and solve both strict sign inequalities with correct directions and endpoints. Explain positive, negative and zero expectation.
-\textbf{3.} \textbf{Graphs.} Give a separate labelled graph for each variable, showing its expectation line, zero line, endpoint payoffs and exact break-even probability. Finish with endpoint and root checks, and distinguish expected profit from realized profit.
+{3}/{sol:c3-inventory-decision}/{\CThreePlain{\CThreeTaskTwo}
 }
 }
 \needspace{16\baselineskip}\subsubsection*{Task 1 --- Worked solution}\label{sol:c3-inventory-model}
+\paragraph{Highlighted problem statement.}
+\CThreeStatementInventory
+\CThreeTaskOne
+
 \needspace{8\baselineskip}\paragraph{1. Binary model and monetary transformations.}
 The observation is a student's campus sticker sales over one weekend. Let $\HLMathEvent{E}$ be \HLMathEvent{high demand}; $\HLMathEvent{E^c}$ is \HLMathEvent{low demand}. Exactly one state occurs. Define $\Indicator{X}=\Indicator{1}$ on $\HLMathEvent{E}$ and $\Indicator{X}=\Indicator{0}$ on $\HLMathEvent{E^c}$. This unitless indicator has $\Indicator{X}\sim\operatorname{Bernoulli}(\SuccessProb{p})$, initially $\SuccessProb{p}=\SuccessProb{\frac{2}{5}}$.
 \PracticeColumnPair{
@@ -458,8 +1638,11 @@ P(Y_2<0)=\FailureProb{1-p}= \frac{3}{5}\quad\text{initially}.
 \]
 For premium sticker pack, loss occurs on $\HLMathEvent{E^c}$: its initial probability per stated period is $\frac{3}{5}$.
 }
+\CThreeModelInventory
 \secInicio[prob:c3-inventory][sec:t2-c3-general]
 \clearpage\subsubsection*{Task 2 --- Worked solution}\label{sol:c3-inventory-decision}
+\CThreeTaskTwo
+
 Keep the \HLMathEvent{event}, its \HLMathEvent{complement} and the indicator from Task 1.
 \needspace{8\baselineskip}\paragraph{1. Initial expected values.}
 Use the supplied $\SuccessProb{p}=\SuccessProb{\frac{2}{5}}$ for every alternative.
@@ -548,14 +1731,8 @@ At $\SuccessProb{p}=\frac{1}{10}$, $\ExpectedValue{\mathbb E}[\Money{Y_2}]$ is \
 }
 Positive \ExpectedValue{expectation} means \ExpectedValue{expected net gain}; negative
 \ExpectedValue{expectation} means \ExpectedValue{expected net loss}; zero is break-even.
-\clearpage
 \needspace{8\baselineskip}\paragraph{3. Graphs.}
-\needspace{25\baselineskip}\paragraph{$Y_1$: graph.}
-\begin{center}\BreakEvenGraph{1}{-40}{80}{1/3}\end{center}
 The line joins $(0,-40)$ and $(1,80)$; its zero is $p_1^*=\frac{1}{3}$.
-\clearpage
-\needspace{25\baselineskip}\paragraph{$Y_2$: graph.}
-\begin{center}\BreakEvenGraph{2}{-20}{180}{1/10}\end{center}
 The line joins $(0,-20)$ and $(1,180)$; its zero is $p_2^*=\frac{1}{10}$.
 
 \textbf{Endpoint and root checks.} $Y_1$: $\mathbb E[Y_1](0)=-40$ and $\mathbb E[Y_1](1)=80$ USD; at $p_1^*=\frac{1}{3}$, $-40+(120)(\frac{1}{3})=0$.
@@ -564,27 +1741,22 @@ $Y_2$: $\mathbb E[Y_2](0)=-20$ and $\mathbb E[Y_2](1)=180$ USD; at $p_2^*=\frac{
 
 Each observation realizes one state payoff. An \ExpectedValue{expected profit} is a long-run average,
 not a guarantee of realized profit. At break-even, zero expectation coexists with nonzero realized payoffs.
+\CThreeExpectInventory
 \secInicio[prob:c3-inventory][sec:t2-c3-general]
 \clearpage
 \subsection{Campus fair or online CV workshop}\label{prob:c3-coffee}
-Observe a graduate's paid sessions over one day. A campus careers fair either goes ahead or is cancelled. Compare paid portraits at the fair with an online CV workshop. The fair brings portrait customers but draws students away from the workshop; cancellation reverses this effect. Payoffs include venue, platform, travel and refund costs. The two possible states are \HLMathEvent{the fair goes ahead} and \HLMathEvent{the fair is cancelled}. The initial probability that \HLMathEvent{the fair goes ahead} is $p=\frac{1}{2}$. All entries below are net profits in USD for the entire stated period, including relevant costs.
-\begin{center}\begin{tabular}{lrr}\toprule Alternative & \HLMathEvent{the fair is cancelled} & \HLMathEvent{the fair goes ahead}\\\midrule
-$A_1$: portrait sessions & -40 & 100\\
-$A_2$: online CV workshop & 100 & -20\\
-\bottomrule\end{tabular}\end{center}
+\CThreePlain{\CThreeStatementCoffee}
 \QuestionsTasks[sec:t2-c3-general]{
-{3}/{sol:c3-coffee-model}/{\textbf{Task 1 --- Establish the binary model and monetary transformations.}
-\textbf{1.} \textbf{Binary model and monetary transformations.} Present the shared observation, period, \HLMathEvent{event} $\HLMathEvent{E}$, \HLMathEvent{complement} $\HLMathEvent{E^c}$, indicator $X$, Bernoulli model and initial $p=P(\HLMathEvent{E})$. Then give each monetary variable's state payoffs in USD and derive $Y_i=f_i(X)=f_i(0)+[f_i(1)-f_i(0)]X$.
-\textbf{2.} \textbf{Supports, PMFs, and ordered CDFs.} Give the indicator's set-builder support, complete PMF and piecewise CDF, including support cases at $p=0,1$. Then give the monetary supports, complete PMFs (zero elsewhere) and numerically ordered piecewise CDFs, with endpoint support cases.
-\textbf{3.} \textbf{Initial probabilities and loss \HLMathEvent{events}.} State the initial indicator probabilities. For each $Y_i$, give both initial masses, identify $\HLMathEvent{\{Y_i<0\}}$ in terms of $X$ and $\HLMathEvent{E}$ or $\HLMathEvent{E^c}$, calculate its probability and interpret it in context. All alternatives share $X$; no independence is assumed.
+{3}/{sol:c3-coffee-model}/{\CThreePlain{\CThreeTaskOne}
 },
-{3}/{sol:c3-coffee-decision}/{\textbf{Task 2 --- Individual expected values.}
-\textbf{1.} \textbf{Initial expected values.} Calculate and interpret every monetary expectation at the supplied probability before sensitivity analysis.
-\textbf{2.} \textbf{Expectation formulas and sign intervals.} Hold payoffs fixed and vary only $p\in\left[0,1\right]$. For each $Y_i$, derive $\mathbb E[Y_i]=p f_i(1)+(1-p)f_i(0)$, solve its exact break-even equation, and solve both strict sign inequalities with correct directions and endpoints. Explain positive, negative and zero expectation.
-\textbf{3.} \textbf{Graphs.} Give a separate labelled graph for each variable, showing its expectation line, zero line, endpoint payoffs and exact break-even probability. Finish with endpoint and root checks, and distinguish expected profit from realized profit.
+{3}/{sol:c3-coffee-decision}/{\CThreePlain{\CThreeTaskTwo}
 }
 }
 \needspace{16\baselineskip}\subsubsection*{Task 1 --- Worked solution}\label{sol:c3-coffee-model}
+\paragraph{Highlighted problem statement.}
+\CThreeStatementCoffee
+\CThreeTaskOne
+
 \needspace{8\baselineskip}\paragraph{1. Binary model and monetary transformations.}
 The observation is a graduate's paid sessions over one day. Let $\HLMathEvent{E}$ be \HLMathEvent{the fair going ahead}; $\HLMathEvent{E^c}$ is \HLMathEvent{its cancellation}. Exactly one state occurs. Define $\Indicator{X}=\Indicator{1}$ on $\HLMathEvent{E}$ and $\Indicator{X}=\Indicator{0}$ on $\HLMathEvent{E^c}$. This unitless indicator has $\Indicator{X}\sim\operatorname{Bernoulli}(\SuccessProb{p})$, initially $\SuccessProb{p}=\SuccessProb{\frac{1}{2}}$.
 \PracticeColumnPair{
@@ -678,8 +1850,11 @@ P(Y_2<0)=\SuccessProb{p}= \frac{1}{2}\quad\text{initially}.
 \]
 For online CV workshop, loss occurs on $\HLMathEvent{E}$: its initial probability per stated period is $\frac{1}{2}$.
 }
+\CThreeModelCoffee
 \secInicio[prob:c3-coffee][sec:t2-c3-general]
 \clearpage\subsubsection*{Task 2 --- Worked solution}\label{sol:c3-coffee-decision}
+\CThreeTaskTwo
+
 Keep the \HLMathEvent{event}, its \HLMathEvent{complement} and the indicator from Task 1.
 \needspace{8\baselineskip}\paragraph{1. Initial expected values.}
 Use the supplied $\SuccessProb{p}=\SuccessProb{\frac{1}{2}}$ for every alternative.
@@ -769,14 +1944,8 @@ At $\SuccessProb{p}=\frac{5}{6}$, $\ExpectedValue{\mathbb E}[\Money{Y_2}]$ is \E
 }
 Positive \ExpectedValue{expectation} means \ExpectedValue{expected net gain}; negative
 \ExpectedValue{expectation} means \ExpectedValue{expected net loss}; zero is break-even.
-\clearpage
 \needspace{8\baselineskip}\paragraph{3. Graphs.}
-\needspace{25\baselineskip}\paragraph{$Y_1$: graph.}
-\begin{center}\BreakEvenGraph{1}{-40}{100}{2/7}\end{center}
 The line joins $(0,-40)$ and $(1,100)$; its zero is $p_1^*=\frac{2}{7}$.
-\clearpage
-\needspace{25\baselineskip}\paragraph{$Y_2$: graph.}
-\begin{center}\BreakEvenGraph{2}{100}{-20}{5/6}\end{center}
 The line joins $(0,100)$ and $(1,-20)$; its zero is $p_2^*=\frac{5}{6}$.
 
 \textbf{Endpoint and root checks.} $Y_1$: $\mathbb E[Y_1](0)=-40$ and $\mathbb E[Y_1](1)=100$ USD; at $p_1^*=\frac{2}{7}$, $-40+(140)(\frac{2}{7})=0$.
@@ -785,27 +1954,22 @@ $Y_2$: $\mathbb E[Y_2](0)=100$ and $\mathbb E[Y_2](1)=-20$ USD; at $p_2^*=\frac{
 
 Each observation realizes one state payoff. An \ExpectedValue{expected profit} is a long-run average,
 not a guarantee of realized profit. At break-even, zero expectation coexists with nonzero realized payoffs.
+\CThreeExpectCoffee
 \secInicio[prob:c3-coffee][sec:t2-c3-general]
 \clearpage
 \subsection{Freelance digital projects for one month}\label{prob:c3-energy}
-Observe a freelancer's digital projects over one month. \HLMathEvent{High inquiry volume} means messages from potential clients meet a fixed monthly target; \HLMathEvent{low inquiry volume} means fewer messages. Compare offering social-media graphics with offering short video edits to the same client pool. Payoffs include software, platform and promotion costs. The two possible states are \HLMathEvent{high inquiry volume} and \HLMathEvent{low inquiry volume}. The initial probability of \HLMathEvent{high inquiry volume} is $p=\frac{1}{4}$. All entries below are net profits in USD for the entire stated period, including relevant costs.
-\begin{center}\begin{tabular}{lrr}\toprule Alternative & \HLMathEvent{low inquiry volume} & \HLMathEvent{high inquiry volume}\\\midrule
-$A_1$: social-media graphics & -30 & 90\\
-$A_2$: short video edits & -60 & 60\\
-\bottomrule\end{tabular}\end{center}
+\CThreePlain{\CThreeStatementEnergy}
 \QuestionsTasks[sec:t2-c3-general]{
-{3}/{sol:c3-energy-model}/{\textbf{Task 1 --- Establish the binary model and monetary transformations.}
-\textbf{1.} \textbf{Binary model and monetary transformations.} Present the shared observation, period, \HLMathEvent{event} $\HLMathEvent{E}$, \HLMathEvent{complement} $\HLMathEvent{E^c}$, indicator $X$, Bernoulli model and initial $p=P(\HLMathEvent{E})$. Then give each monetary variable's state payoffs in USD and derive $Y_i=f_i(X)=f_i(0)+[f_i(1)-f_i(0)]X$.
-\textbf{2.} \textbf{Supports, PMFs, and ordered CDFs.} Give the indicator's set-builder support, complete PMF and piecewise CDF, including support cases at $p=0,1$. Then give the monetary supports, complete PMFs (zero elsewhere) and numerically ordered piecewise CDFs, with endpoint support cases.
-\textbf{3.} \textbf{Initial probabilities and loss \HLMathEvent{events}.} State the initial indicator probabilities. For each $Y_i$, give both initial masses, identify $\HLMathEvent{\{Y_i<0\}}$ in terms of $X$ and $\HLMathEvent{E}$ or $\HLMathEvent{E^c}$, calculate its probability and interpret it in context. All alternatives share $X$; no independence is assumed.
+{3}/{sol:c3-energy-model}/{\CThreePlain{\CThreeTaskOne}
 },
-{3}/{sol:c3-energy-decision}/{\textbf{Task 2 --- Individual expected values.}
-\textbf{1.} \textbf{Initial expected values.} Calculate and interpret every monetary expectation at the supplied probability before sensitivity analysis.
-\textbf{2.} \textbf{Expectation formulas and sign intervals.} Hold payoffs fixed and vary only $p\in\left[0,1\right]$. For each $Y_i$, derive $\mathbb E[Y_i]=p f_i(1)+(1-p)f_i(0)$, solve its exact break-even equation, and solve both strict sign inequalities with correct directions and endpoints. Explain positive, negative and zero expectation.
-\textbf{3.} \textbf{Graphs.} Give a separate labelled graph for each variable, showing its expectation line, zero line, endpoint payoffs and exact break-even probability. Finish with endpoint and root checks, and distinguish expected profit from realized profit.
+{3}/{sol:c3-energy-decision}/{\CThreePlain{\CThreeTaskTwo}
 }
 }
 \needspace{16\baselineskip}\subsubsection*{Task 1 --- Worked solution}\label{sol:c3-energy-model}
+\paragraph{Highlighted problem statement.}
+\CThreeStatementEnergy
+\CThreeTaskOne
+
 \needspace{8\baselineskip}\paragraph{1. Binary model and monetary transformations.}
 The observation is a freelancer's digital projects over one month. Let $\HLMathEvent{E}$ be \HLMathEvent{high inquiry volume}; $\HLMathEvent{E^c}$ is \HLMathEvent{low inquiry volume}. Exactly one state occurs. Define $\Indicator{X}=\Indicator{1}$ on $\HLMathEvent{E}$ and $\Indicator{X}=\Indicator{0}$ on $\HLMathEvent{E^c}$. This unitless indicator has $\Indicator{X}\sim\operatorname{Bernoulli}(\SuccessProb{p})$, initially $\SuccessProb{p}=\SuccessProb{\frac{1}{4}}$.
 \PracticeColumnPair{
@@ -899,8 +2063,11 @@ P(Y_2<0)=\FailureProb{1-p}= \frac{3}{4}\quad\text{initially}.
 \]
 For short video edits, loss occurs on $\HLMathEvent{E^c}$: its initial probability per stated period is $\frac{3}{4}$.
 }
+\CThreeModelEnergy
 \secInicio[prob:c3-energy][sec:t2-c3-general]
 \clearpage\subsubsection*{Task 2 --- Worked solution}\label{sol:c3-energy-decision}
+\CThreeTaskTwo
+
 Keep the \HLMathEvent{event}, its \HLMathEvent{complement} and the indicator from Task 1.
 \needspace{8\baselineskip}\paragraph{1. Initial expected values.}
 Use the supplied $\SuccessProb{p}=\SuccessProb{\frac{1}{4}}$ for every alternative.
@@ -989,14 +2156,8 @@ At $\SuccessProb{p}=\frac{1}{2}$, $\ExpectedValue{\mathbb E}[\Money{Y_2}]$ is \E
 }
 Positive \ExpectedValue{expectation} means \ExpectedValue{expected net gain}; negative
 \ExpectedValue{expectation} means \ExpectedValue{expected net loss}; zero is break-even.
-\clearpage
 \needspace{8\baselineskip}\paragraph{3. Graphs.}
-\needspace{25\baselineskip}\paragraph{$Y_1$: graph.}
-\begin{center}\BreakEvenGraph{1}{-30}{90}{1/4}\end{center}
 The line joins $(0,-30)$ and $(1,90)$; its zero is $p_1^*=\frac{1}{4}$.
-\clearpage
-\needspace{25\baselineskip}\paragraph{$Y_2$: graph.}
-\begin{center}\BreakEvenGraph{2}{-60}{60}{1/2}\end{center}
 The line joins $(0,-60)$ and $(1,60)$; its zero is $p_2^*=\frac{1}{2}$.
 
 \textbf{Endpoint and root checks.} $Y_1$: $\mathbb E[Y_1](0)=-30$ and $\mathbb E[Y_1](1)=90$ USD; at $p_1^*=\frac{1}{4}$, $-30+(120)(\frac{1}{4})=0$.
@@ -1005,27 +2166,22 @@ $Y_2$: $\mathbb E[Y_2](0)=-60$ and $\mathbb E[Y_2](1)=60$ USD; at $p_2^*=\frac{1
 
 Each observation realizes one state payoff. An \ExpectedValue{expected profit} is a long-run average,
 not a guarantee of realized profit. At break-even, zero expectation coexists with nonzero realized payoffs.
+\CThreeExpectEnergy
 \secInicio[prob:c3-energy][sec:t2-c3-general]
 \clearpage
 \subsection{Graduation photography for one quarter}\label{prob:c3-manufacturing}
-Observe a graduate's photography work over one quarter. The university graduation ceremony either goes ahead or is cancelled during that quarter. Compare a basic photo package with a package including extra editing. Both involve the same advance preparation costs; the edited package earns more when the ceremony takes place. Payoffs include travel, software, preparation and refunds. The two possible states are \HLMathEvent{the ceremony goes ahead} and \HLMathEvent{the ceremony is cancelled}. The initial probability that \HLMathEvent{the ceremony goes ahead} is $p=\frac{3}{5}$. All entries below are net profits in USD for the entire stated period, including relevant costs.
-\begin{center}\begin{tabular}{lrr}\toprule Alternative & \HLMathEvent{the ceremony is cancelled} & \HLMathEvent{the ceremony goes ahead}\\\midrule
-$A_1$: basic photo package & -100 & 200\\
-$A_2$: edited photo package & -100 & 500\\
-\bottomrule\end{tabular}\end{center}
+\CThreePlain{\CThreeStatementManufacturing}
 \QuestionsTasks[sec:t2-c3-general]{
-{3}/{sol:c3-manufacturing-model}/{\textbf{Task 1 --- Establish the binary model and monetary transformations.}
-\textbf{1.} \textbf{Binary model and monetary transformations.} Present the shared observation, period, \HLMathEvent{event} $\HLMathEvent{E}$, \HLMathEvent{complement} $\HLMathEvent{E^c}$, indicator $X$, Bernoulli model and initial $p=P(\HLMathEvent{E})$. Then give each monetary variable's state payoffs in USD and derive $Y_i=f_i(X)=f_i(0)+[f_i(1)-f_i(0)]X$.
-\textbf{2.} \textbf{Supports, PMFs, and ordered CDFs.} Give the indicator's set-builder support, complete PMF and piecewise CDF, including support cases at $p=0,1$. Then give the monetary supports, complete PMFs (zero elsewhere) and numerically ordered piecewise CDFs, with endpoint support cases.
-\textbf{3.} \textbf{Initial probabilities and loss \HLMathEvent{events}.} State the initial indicator probabilities. For each $Y_i$, give both initial masses, identify $\HLMathEvent{\{Y_i<0\}}$ in terms of $X$ and $\HLMathEvent{E}$ or $\HLMathEvent{E^c}$, calculate its probability and interpret it in context. All alternatives share $X$; no independence is assumed.
+{3}/{sol:c3-manufacturing-model}/{\CThreePlain{\CThreeTaskOne}
 },
-{3}/{sol:c3-manufacturing-decision}/{\textbf{Task 2 --- Individual expected values.}
-\textbf{1.} \textbf{Initial expected values.} Calculate and interpret every monetary expectation at the supplied probability before sensitivity analysis.
-\textbf{2.} \textbf{Expectation formulas and sign intervals.} Hold payoffs fixed and vary only $p\in\left[0,1\right]$. For each $Y_i$, derive $\mathbb E[Y_i]=p f_i(1)+(1-p)f_i(0)$, solve its exact break-even equation, and solve both strict sign inequalities with correct directions and endpoints. Explain positive, negative and zero expectation.
-\textbf{3.} \textbf{Graphs.} Give a separate labelled graph for each variable, showing its expectation line, zero line, endpoint payoffs and exact break-even probability. Finish with endpoint and root checks, and distinguish expected profit from realized profit.
+{3}/{sol:c3-manufacturing-decision}/{\CThreePlain{\CThreeTaskTwo}
 }
 }
 \needspace{16\baselineskip}\subsubsection*{Task 1 --- Worked solution}\label{sol:c3-manufacturing-model}
+\paragraph{Highlighted problem statement.}
+\CThreeStatementManufacturing
+\CThreeTaskOne
+
 \needspace{8\baselineskip}\paragraph{1. Binary model and monetary transformations.}
 The observation is a graduate's photography work over one quarter. Let $\HLMathEvent{E}$ be \HLMathEvent{the ceremony going ahead}; $\HLMathEvent{E^c}$ is \HLMathEvent{its cancellation}. Exactly one state occurs. Define $\Indicator{X}=\Indicator{1}$ on $\HLMathEvent{E}$ and $\Indicator{X}=\Indicator{0}$ on $\HLMathEvent{E^c}$. This unitless indicator has $\Indicator{X}\sim\operatorname{Bernoulli}(\SuccessProb{p})$, initially $\SuccessProb{p}=\SuccessProb{\frac{3}{5}}$.
 \PracticeColumnPair{
@@ -1119,8 +2275,11 @@ P(Y_2<0)=\FailureProb{1-p}= \frac{2}{5}\quad\text{initially}.
 \]
 For edited photo package, loss occurs on $\HLMathEvent{E^c}$: its initial probability per stated period is $\frac{2}{5}$.
 }
+\CThreeModelManufacturing
 \secInicio[prob:c3-manufacturing][sec:t2-c3-general]
 \clearpage\subsubsection*{Task 2 --- Worked solution}\label{sol:c3-manufacturing-decision}
+\CThreeTaskTwo
+
 Keep the \HLMathEvent{event}, its \HLMathEvent{complement} and the indicator from Task 1.
 \needspace{8\baselineskip}\paragraph{1. Initial expected values.}
 Use the supplied $\SuccessProb{p}=\SuccessProb{\frac{3}{5}}$ for every alternative.
@@ -1209,14 +2368,8 @@ At $\SuccessProb{p}=\frac{1}{6}$, $\ExpectedValue{\mathbb E}[\Money{Y_2}]$ is \E
 }
 Positive \ExpectedValue{expectation} means \ExpectedValue{expected net gain}; negative
 \ExpectedValue{expectation} means \ExpectedValue{expected net loss}; zero is break-even.
-\clearpage
 \needspace{8\baselineskip}\paragraph{3. Graphs.}
-\needspace{25\baselineskip}\paragraph{$Y_1$: graph.}
-\begin{center}\BreakEvenGraph{1}{-100}{200}{1/3}\end{center}
 The line joins $(0,-100)$ and $(1,200)$; its zero is $p_1^*=\frac{1}{3}$.
-\clearpage
-\needspace{25\baselineskip}\paragraph{$Y_2$: graph.}
-\begin{center}\BreakEvenGraph{2}{-100}{500}{1/6}\end{center}
 The line joins $(0,-100)$ and $(1,500)$; its zero is $p_2^*=\frac{1}{6}$.
 
 \textbf{Endpoint and root checks.} $Y_1$: $\mathbb E[Y_1](0)=-100$ and $\mathbb E[Y_1](1)=200$ USD; at $p_1^*=\frac{1}{3}$, $-100+(300)(\frac{1}{3})=0$.
@@ -1225,6 +2378,7 @@ $Y_2$: $\mathbb E[Y_2](0)=-100$ and $\mathbb E[Y_2](1)=500$ USD; at $p_2^*=\frac
 
 Each observation realizes one state payoff. An \ExpectedValue{expected profit} is a long-run average,
 not a guarantee of realized profit. At break-even, zero expectation coexists with nonzero realized payoffs.
+\CThreeExpectManufacturing
 \secInicio[prob:c3-manufacturing][sec:t2-c3-general]
 \clearpage
 \section{Advanced Problems}\label{sec:t2-c3-advanced}
@@ -1232,25 +2386,18 @@ Each problem applies C3 through one Bernoulli model and analyses each monetary \
 \SectionProblemsTableOfContents{\SectionProblemLink{prob:c3-restaurant}{Campus concert: three venue choices, two states}\\
 \SectionProblemLink{prob:c3-agriculture}{Student fitness sessions: three break-even thresholds}}
 \subsection{Campus concert: three venue choices, two states}\label{prob:c3-restaurant}
-Observe a student group's ticketed concert over one evening. \HLMathEvent{High demand} means advance expressions of interest meet a fixed target; \HLMathEvent{low demand} means they fall below it. Compare hiring a small room, a discounted student-union room or a large room for the same concert. Payoffs include venue hire, performers, ticket fees and refunds. The two possible states are \HLMathEvent{high demand} and \HLMathEvent{low demand}. The initial probability of \HLMathEvent{high demand} is $p=\frac{9}{25}$. All entries below are net profits in USD for the entire stated period, including relevant costs.
-\begin{center}\begin{tabular}{lrr}\toprule Alternative & \HLMathEvent{low demand} & \HLMathEvent{high demand}\\\midrule
-$A_1$: small hired room & -80 & 100\\
-$A_2$: student-union room & -20 & 220\\
-$A_3$: large hired room & -100 & 400\\
-\bottomrule\end{tabular}\end{center}
+\CThreePlain{\CThreeStatementRestaurant}
 \QuestionsTasks[sec:t2-c3-advanced]{
-{3}/{sol:c3-restaurant-model}/{\textbf{Task 1 --- Establish the binary model and monetary transformations.}
-\textbf{1.} \textbf{Binary model and monetary transformations.} Present the shared observation, period, \HLMathEvent{event} $\HLMathEvent{E}$, \HLMathEvent{complement} $\HLMathEvent{E^c}$, indicator $X$, Bernoulli model and initial $p=P(\HLMathEvent{E})$. Then give each monetary variable's state payoffs in USD and derive $Y_i=f_i(X)=f_i(0)+[f_i(1)-f_i(0)]X$.
-\textbf{2.} \textbf{Supports, PMFs, and ordered CDFs.} Give the indicator's set-builder support, complete PMF and piecewise CDF, including support cases at $p=0,1$. Then give the monetary supports, complete PMFs (zero elsewhere) and numerically ordered piecewise CDFs, with endpoint support cases.
-\textbf{3.} \textbf{Initial probabilities and loss \HLMathEvent{events}.} State the initial indicator probabilities. For each $Y_i$, give both initial masses, identify $\HLMathEvent{\{Y_i<0\}}$ in terms of $X$ and $\HLMathEvent{E}$ or $\HLMathEvent{E^c}$, calculate its probability and interpret it in context. All alternatives share $X$; no independence is assumed.
+{3}/{sol:c3-restaurant-model}/{\CThreePlain{\CThreeTaskOne}
 },
-{3}/{sol:c3-restaurant-decision}/{\textbf{Task 2 --- Individual expected values.}
-\textbf{1.} \textbf{Initial expected values.} Calculate and interpret every monetary expectation at the supplied probability before sensitivity analysis.
-\textbf{2.} \textbf{Expectation formulas and sign intervals.} Hold payoffs fixed and vary only $p\in\left[0,1\right]$. For each $Y_i$, derive $\mathbb E[Y_i]=p f_i(1)+(1-p)f_i(0)$, solve its exact break-even equation, and solve both strict sign inequalities with correct directions and endpoints. Explain positive, negative and zero expectation.
-\textbf{3.} \textbf{Graphs.} Give a separate labelled graph for each variable, showing its expectation line, zero line, endpoint payoffs and exact break-even probability. Finish with endpoint and root checks, and distinguish expected profit from realized profit.
+{3}/{sol:c3-restaurant-decision}/{\CThreePlain{\CThreeTaskTwo}
 }
 }
 \needspace{16\baselineskip}\subsubsection*{Task 1 --- Worked solution}\label{sol:c3-restaurant-model}
+\paragraph{Highlighted problem statement.}
+\CThreeStatementRestaurant
+\CThreeTaskOne
+
 \needspace{8\baselineskip}\paragraph{1. Binary model and monetary transformations.}
 The observation is a student group's ticketed concert over one evening. Let $\HLMathEvent{E}$ be \HLMathEvent{high demand}; $\HLMathEvent{E^c}$ is \HLMathEvent{low demand}. Exactly one state occurs. Define $\Indicator{X}=\Indicator{1}$ on $\HLMathEvent{E}$ and $\Indicator{X}=\Indicator{0}$ on $\HLMathEvent{E^c}$. This unitless indicator has $\Indicator{X}\sim\operatorname{Bernoulli}(\SuccessProb{p})$, initially $\SuccessProb{p}=\SuccessProb{\frac{9}{25}}$.
 \PracticeColumnPair{
@@ -1387,8 +2534,11 @@ P(Y_3<0)=\FailureProb{1-p}= \frac{16}{25}\quad\text{initially}.
 \]
 For large hired room, loss occurs on $\HLMathEvent{E^c}$: its initial probability per stated period is $\frac{16}{25}$.
 \end{minipage}\par
+\CThreeModelRestaurant
 \secInicio[prob:c3-restaurant][sec:t2-c3-advanced]
 \clearpage\subsubsection*{Task 2 --- Worked solution}\label{sol:c3-restaurant-decision}
+\CThreeTaskTwo
+
 Keep the \HLMathEvent{event}, its \HLMathEvent{complement} and the indicator from Task 1.
 \needspace{8\baselineskip}\paragraph{1. Initial expected values.}
 Use the supplied $\SuccessProb{p}=\SuccessProb{\frac{9}{25}}$ for every alternative.
@@ -1521,18 +2671,9 @@ At $\SuccessProb{p}=\frac{1}{5}$, $\ExpectedValue{\mathbb E}[\Money{Y_3}]$ is \E
 \end{minipage}\par
 Positive \ExpectedValue{expectation} means \ExpectedValue{expected net gain}; negative
 \ExpectedValue{expectation} means \ExpectedValue{expected net loss}; zero is break-even.
-\clearpage
 \needspace{8\baselineskip}\paragraph{3. Graphs.}
-\needspace{25\baselineskip}\paragraph{$Y_1$: graph.}
-\begin{center}\BreakEvenGraph{1}{-80}{100}{4/9}\end{center}
 The line joins $(0,-80)$ and $(1,100)$; its zero is $p_1^*=\frac{4}{9}$.
-\clearpage
-\needspace{25\baselineskip}\paragraph{$Y_2$: graph.}
-\begin{center}\BreakEvenGraph{2}{-20}{220}{1/12}\end{center}
 The line joins $(0,-20)$ and $(1,220)$; its zero is $p_2^*=\frac{1}{12}$.
-\clearpage
-\needspace{25\baselineskip}\paragraph{$Y_3$: graph.}
-\begin{center}\BreakEvenGraph{3}{-100}{400}{1/5}\end{center}
 The line joins $(0,-100)$ and $(1,400)$; its zero is $p_3^*=\frac{1}{5}$.
 
 \textbf{Endpoint and root checks.} $Y_1$: $\mathbb E[Y_1](0)=-80$ and $\mathbb E[Y_1](1)=100$ USD; at $p_1^*=\frac{4}{9}$, $-80+(180)(\frac{4}{9})=0$.
@@ -1543,28 +2684,22 @@ $Y_3$: $\mathbb E[Y_3](0)=-100$ and $\mathbb E[Y_3](1)=400$ USD; at $p_3^*=\frac
 
 Each observation realizes one state payoff. An \ExpectedValue{expected profit} is a long-run average,
 not a guarantee of realized profit. At break-even, zero expectation coexists with nonzero realized payoffs.
+\CThreeExpectRestaurant
 \secInicio[prob:c3-restaurant][sec:t2-c3-advanced]
 \clearpage
 \subsection{Student fitness sessions: three break-even thresholds}\label{prob:c3-agriculture}
-Observe a student's paid fitness sessions over one university term. \HLMathEvent{High enrollment} means responses to a campus fitness-interest survey meet a fixed target; \HLMathEvent{low enrollment} means they fall below it. Compare a walking group, dance sessions or circuit sessions, using the same survey outcome for each hypothetical format. Payoffs include space hire, supplies, promotion and refunds. The two possible states are \HLMathEvent{high enrollment} and \HLMathEvent{low enrollment}. The initial probability of \HLMathEvent{high enrollment} is $p=\frac{1}{2}$. All entries below are net profits in USD for the entire stated period, including relevant costs.
-\begin{center}\begin{tabular}{lrr}\toprule Alternative & \HLMathEvent{low enrollment} & \HLMathEvent{high enrollment}\\\midrule
-$A_1$: walking group & -70 & 90\\
-$A_2$: dance sessions & -30 & 190\\
-$A_3$: circuit sessions & -150 & 150\\
-\bottomrule\end{tabular}\end{center}
+\CThreePlain{\CThreeStatementAgriculture}
 \QuestionsTasks[sec:t2-c3-advanced]{
-{3}/{sol:c3-agriculture-model}/{\textbf{Task 1 --- Establish the binary model and monetary transformations.}
-\textbf{1.} \textbf{Binary model and monetary transformations.} Present the shared observation, period, \HLMathEvent{event} $\HLMathEvent{E}$, \HLMathEvent{complement} $\HLMathEvent{E^c}$, indicator $X$, Bernoulli model and initial $p=P(\HLMathEvent{E})$. Then give each monetary variable's state payoffs in USD and derive $Y_i=f_i(X)=f_i(0)+[f_i(1)-f_i(0)]X$.
-\textbf{2.} \textbf{Supports, PMFs, and ordered CDFs.} Give the indicator's set-builder support, complete PMF and piecewise CDF, including support cases at $p=0,1$. Then give the monetary supports, complete PMFs (zero elsewhere) and numerically ordered piecewise CDFs, with endpoint support cases.
-\textbf{3.} \textbf{Initial probabilities and loss \HLMathEvent{events}.} State the initial indicator probabilities. For each $Y_i$, give both initial masses, identify $\HLMathEvent{\{Y_i<0\}}$ in terms of $X$ and $\HLMathEvent{E}$ or $\HLMathEvent{E^c}$, calculate its probability and interpret it in context. All alternatives share $X$; no independence is assumed.
+{3}/{sol:c3-agriculture-model}/{\CThreePlain{\CThreeTaskOne}
 },
-{3}/{sol:c3-agriculture-decision}/{\textbf{Task 2 --- Individual expected values.}
-\textbf{1.} \textbf{Initial expected values.} Calculate and interpret every monetary expectation at the supplied probability before sensitivity analysis.
-\textbf{2.} \textbf{Expectation formulas and sign intervals.} Hold payoffs fixed and vary only $p\in\left[0,1\right]$. For each $Y_i$, derive $\mathbb E[Y_i]=p f_i(1)+(1-p)f_i(0)$, solve its exact break-even equation, and solve both strict sign inequalities with correct directions and endpoints. Explain positive, negative and zero expectation.
-\textbf{3.} \textbf{Graphs.} Give a separate labelled graph for each variable, showing its expectation line, zero line, endpoint payoffs and exact break-even probability. Finish with endpoint and root checks, and distinguish expected profit from realized profit.
+{3}/{sol:c3-agriculture-decision}/{\CThreePlain{\CThreeTaskTwo}
 }
 }
 \needspace{16\baselineskip}\subsubsection*{Task 1 --- Worked solution}\label{sol:c3-agriculture-model}
+\paragraph{Highlighted problem statement.}
+\CThreeStatementAgriculture
+\CThreeTaskOne
+
 \needspace{8\baselineskip}\paragraph{1. Binary model and monetary transformations.}
 The observation is a student's paid fitness sessions over one university term. Let $\HLMathEvent{E}$ be \HLMathEvent{high enrollment}; $\HLMathEvent{E^c}$ is \HLMathEvent{low enrollment}. Exactly one state occurs. Define $\Indicator{X}=\Indicator{1}$ on $\HLMathEvent{E}$ and $\Indicator{X}=\Indicator{0}$ on $\HLMathEvent{E^c}$. This unitless indicator has $\Indicator{X}\sim\operatorname{Bernoulli}(\SuccessProb{p})$, initially $\SuccessProb{p}=\SuccessProb{\frac{1}{2}}$.
 \PracticeColumnPair{
@@ -1701,8 +2836,11 @@ P(Y_3<0)=\FailureProb{1-p}= \frac{1}{2}\quad\text{initially}.
 \]
 For circuit sessions, loss occurs on $\HLMathEvent{E^c}$: its initial probability per stated period is $\frac{1}{2}$.
 \end{minipage}\par
+\CThreeModelAgriculture
 \secInicio[prob:c3-agriculture][sec:t2-c3-advanced]
 \clearpage\subsubsection*{Task 2 --- Worked solution}\label{sol:c3-agriculture-decision}
+\CThreeTaskTwo
+
 Keep the \HLMathEvent{event}, its \HLMathEvent{complement} and the indicator from Task 1.
 \needspace{8\baselineskip}\paragraph{1. Initial expected values.}
 Use the supplied $\SuccessProb{p}=\SuccessProb{\frac{1}{2}}$ for every alternative.
@@ -1835,18 +2973,9 @@ At $\SuccessProb{p}=\frac{1}{2}$, $\ExpectedValue{\mathbb E}[\Money{Y_3}]$ is \E
 \end{minipage}\par
 Positive \ExpectedValue{expectation} means \ExpectedValue{expected net gain}; negative
 \ExpectedValue{expectation} means \ExpectedValue{expected net loss}; zero is break-even.
-\clearpage
 \needspace{8\baselineskip}\paragraph{3. Graphs.}
-\needspace{25\baselineskip}\paragraph{$Y_1$: graph.}
-\begin{center}\BreakEvenGraph{1}{-70}{90}{7/16}\end{center}
 The line joins $(0,-70)$ and $(1,90)$; its zero is $p_1^*=\frac{7}{16}$.
-\clearpage
-\needspace{25\baselineskip}\paragraph{$Y_2$: graph.}
-\begin{center}\BreakEvenGraph{2}{-30}{190}{3/22}\end{center}
 The line joins $(0,-30)$ and $(1,190)$; its zero is $p_2^*=\frac{3}{22}$.
-\clearpage
-\needspace{25\baselineskip}\paragraph{$Y_3$: graph.}
-\begin{center}\BreakEvenGraph{3}{-150}{150}{1/2}\end{center}
 The line joins $(0,-150)$ and $(1,150)$; its zero is $p_3^*=\frac{1}{2}$.
 
 \textbf{Endpoint and root checks.} $Y_1$: $\mathbb E[Y_1](0)=-70$ and $\mathbb E[Y_1](1)=90$ USD; at $p_1^*=\frac{7}{16}$, $-70+(160)(\frac{7}{16})=0$.
@@ -1857,9 +2986,10 @@ $Y_3$: $\mathbb E[Y_3](0)=-150$ and $\mathbb E[Y_3](1)=150$ USD; at $p_3^*=\frac
 
 Each observation realizes one state payoff. An \ExpectedValue{expected profit} is a long-run average,
 not a guarantee of realized profit. At break-even, zero expectation coexists with nonzero realized payoffs.
+\CThreeExpectAgriculture
 \secInicio[prob:c3-agriculture][sec:t2-c3-advanced]
 
-\subsection*{Closing reminders: Bernoulli modelling and individual break-even analysis}
+\clearpage\subsection*{Closing reminders: Bernoulli modelling and individual break-even analysis}
 Define one \HLMathEvent{event} $\HLMathEvent{E}$, its \HLMathEvent{complement} $\HLMathEvent{E^c}$, and keep $X=1$ on $\HLMathEvent{E}$, $X=0$ on $\HLMathEvent{E^c}$.
 The indicator is unitless; $p=P(\HLMathEvent{E})$. Each $Y_i=f_i(X)$ is in USD, with one
 strictly positive and one strictly negative monetary payoff. These signs refer
