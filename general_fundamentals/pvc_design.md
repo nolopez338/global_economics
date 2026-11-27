@@ -74,6 +74,57 @@ translates. If an alternate path still joins the branches, length editing is
 disabled and a specific incident joint is identified for detachment. Detaching
 one edge never moves pieces or automatically breaks other edges.
 
+### Coordinated parallel-tube resizing
+
+Select two or more tubes with Shift-click or Marquee to reveal **Change selected
+tube lengths**. Its slider and numeric field show a signed adjustment, initially
+zero, in the current mm/cm/m units. Every preview adds the same adjustment to
+each starting cut; 500 and 700 mm become 600 and 800 mm with +100 mm. The shared
+range is `[max(80 − startingLength), min(3000 − startingLength)]` mm, displayed
+at the existing 0.001 mm precision. Reversed tube directions are supported.
+Mixed tube/fitting and nonparallel selections retain all selected pieces and
+show a specific disabled-state explanation.
+
+`Design.coordinatedLengthPlan(ids)` checks world-axis parallelism with a cross
+product tolerance of `1e-7` (unit directions, approximately radians), then removes
+all selected tubes together from the connection graph. Each remaining connected
+section is rigid and may only translate. For each selected tube, the translation
+velocity at end 2 minus that at end 1 must equal its actual world direction, per
+millimetre of shared adjustment. A graph potential solve enforces these equations
+simultaneously. A tube whose ends remain in the same rigid section, or conflicting
+translations around alternate selected paths, blocks the entire operation.
+The solver never calls the single-tube resize method.
+
+For each independent connected group, an attached rigid section stays fixed:
+choose the section with the lowest selected mating endpoint projected onto the
+tube axis, orienting that axis so its largest absolute world component is
+positive (X/Y/Z breaks equal component ties). Equal projections use stable piece
+IDs. Free ends have lower anchor priority than attached sections; completely
+free tubes keep their centres. Selection order and reversed endpoint numbering
+do not change the result. The inspector identifies the axis and anchor section
+IDs. Other sections translate rigidly; fitting rotations, socket geometry, joint
+identities and all unselected cuts remain unchanged.
+
+`Design.resizeTogether(ids, delta)` builds and validates a complete candidate
+before publishing it. Live UI previews always rebuild from the edit's fixed
+starting snapshot. Invalid or empty input retains the last valid geometry.
+Release a slider, press Enter or leave the numeric field to complete one undoable
+edit and autosave it; the adjustment then resets to zero. Arrow/Home/End keys
+operate the slider. Escape inside either control restores the starting snapshot
+without history or autosave changes, including during a pointer drag. Changing
+selection finishes the valid preview before updating the inspector.
+
+**Template 7 verification selection:** load **Two-bay supported frame** and
+Shift-click the four horizontal rails in its left bay. Their tube centres in mm
+are `(-350, 21, -300)`, `(-350, 21, 300)`, `(-350, 821, -300)` and
+`(-350, 821, 300)`; all four cut lengths are 650 mm. Each is individually locked
+by a closed loop, while selecting all four permits coordinated resizing. With
++100 mm, all four become 750 mm, the left support section stays fixed and the
+centre/right section translates +100 mm along X. With −100 mm, all four become
+550 mm and that section translates −100 mm. The original shared range is
+−570 to +2350 mm. Selecting only three of these rails is blocked by the remaining
+unselected path.
+
 The JSON contract is `format: pvc-studio`, `version: 1`, `catalog: pvc-32-v1`,
 `units: mm`, `radius: 16`, plus pieces and connections. Import checks transforms,
 normalized quaternions, ID uniqueness, port compatibility and occupancy, tube
@@ -133,7 +184,7 @@ a guaranteed manufactured dimension.
 Run the model suites from the repository root:
 
 ```powershell
-node --test --test-isolation=none tests/pvc-model.test.mjs tests/pvc-placement.test.mjs tests/pvc-templates.test.mjs tests/pvc-standard.test.mjs
+node --test --test-isolation=none tests/pvc-model.test.mjs tests/pvc-placement.test.mjs tests/pvc-templates.test.mjs tests/pvc-standard.test.mjs tests/pvc-coordinated-resize.test.mjs
 ```
 
 The model suites cover the exact component allowlist, immutable socket geometry,
@@ -157,6 +208,14 @@ PDF output, camera framing and responsive layout.
 drag input, camera and working-plane modes, custom rotation increments, rigid
 assembly edits, cut lengths and units, exact snap commits, copy/history and
 Escape cancellation. Its native-input checks use device pixel ratios 1 and 2.
+`tests/pvc-coordinated-resize.test.mjs` covers valid/blocked connected groups,
+conflicting paths, reversed directions, rotated assemblies, unequal cuts, limits,
+parallelism tolerance and fixed-snapshot fractional previews.
+`tests/pvc-coordinated-resize.browser.cjs` checks the concrete Template 7 selection
+with real Shift-clicks, numeric and mouse previews, every joint's alignment and
+20 mm insertion throughout, shared limits, units, cancellation, atomic invalid
+input, selection changes, undo/redo, totals and autosave. It saves before/preview/
+after screenshots in ignored `tmp/pvc-coordinated-resize/`.
 `tests/pvc-pdf.browser.cjs` checks real downloads, committed snapshots, export
 state preservation, eight camera views, compact lists, overflow and rendering
 errors. `tests/pvc-pdf-check.py` inspects downloaded PDF pages, materials,

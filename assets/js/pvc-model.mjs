@@ -1,6 +1,7 @@
 // PVC Studio's independent, millimetre-based construction model.
 import {Vector3, Quaternion} from '../vendor/three-0.170.0/three.module.js';
 export const RADIUS = 16, INNER_RADIUS = 13, INSERTION = 20, MIN_LENGTH = 80, MAX_LENGTH = 3000;
+export const PARALLEL_TOLERANCE = 1e-7;
 const socket = (direction) => ({position: direction.map(x => x * 45), direction, type: 'socket', insertion: INSERTION});
 const deepFreeze = value => {if(value && typeof value==='object'){Object.values(value).forEach(deepFreeze);Object.freeze(value);}return value;};
 export const CATALOG = deepFreeze({
@@ -98,6 +99,71 @@ export class Design {
     const delta=length-p.length, axis=vec([1,0,0]).applyQuaternion(quat(p.q));
     if(plan.fixed!==null)p.p=vec(p.p).addScaledVector(axis,(plan.fixed===0?1:-1)*delta/2).toArray();
     this.transform(plan.side,new Quaternion(),new Vector3(),axis.multiplyScalar(delta));p.length=length;
+  }
+  // Remove every selected tube at once. Each remaining connected component is
+  // rigid and may only translate. For a unit cut adjustment, its end velocities
+  // must satisfy v(end 2) - v(end 1) = the tube's actual world-space axis.
+  // Consistent vector potentials solve loops without invoking single resize().
+  coordinatedLengthPlan(ids) {
+    const selected=new Set(ids), blocked=reason=>({locked:true,reason});
+    if(selected.size<2)return blocked('Select at least two tubes to change their lengths together.');
+    const tubes=[...selected].map(id=>this.get(id)).sort((a,b)=>a.id.localeCompare(b.id));
+    if(tubes.some(p=>p.type!=='tube'))return blocked('The selection includes fittings. Select only tubes; every selected piece must participate.');
+    const axes=new Map(tubes.map(p=>[p.id,vec([1,0,0]).applyQuaternion(quat(p.q))]));
+    const axis=axes.get(tubes[0].id).clone().normalize();
+    if(tubes.some(p=>axes.get(p.id).clone().normalize().cross(axis).length()>PARALLEL_TOLERANCE))return blocked('Selected tubes are not parallel in world space (including reversed directions).');
+    const dominant=[0,1,2].sort((a,b)=>Math.abs(axis.getComponent(b))-Math.abs(axis.getComponent(a)))[0];
+    if(axis.getComponent(dominant)<0)axis.negate();
+    const neighbors=new Map(this.pieces.filter(p=>!selected.has(p.id)).map(p=>[p.id,[]]));
+    for(const {a,b} of this.connections)if(neighbors.has(a.id)&&neighbors.has(b.id)){neighbors.get(a.id).push(b.id);neighbors.get(b.id).push(a.id);}
+    const components=new Map(), nodes=[];
+    for(const id of [...neighbors.keys()].sort())if(!components.has(id)){
+      const node={key:id,ids:[],edges:[],rank:Infinity},queue=[id];nodes.push(node);components.set(id,node);
+      while(queue.length){const next=queue.pop();node.ids.push(next);for(const other of neighbors.get(next))if(!components.has(other)){components.set(other,node);queue.push(other);}}
+    }
+    const attached=new Map();
+    for(const {a,b} of this.connections)for(const [end,other] of [[a,b],[b,a]])if(selected.has(end.id))attached.set(`${end.id}:${end.port}`,components.get(other.id));
+    const ends=new Map();
+    for(const p of tubes){
+      const pair=[0,1].map(i=>{
+        let node=attached.get(`${p.id}:${i}`);
+        if(!node){node={key:`${p.id}:${i}`,ids:[],edges:[],rank:Infinity};nodes.push(node);}
+        node.rank=Math.min(node.rank,port(p,i).position.dot(axis));return node;
+      });
+      if(pair[0]===pair[1])return blocked(`Tube ${p.id.slice(0,8)} has both ends joined through an unselected rigid section. Include the parallel tubes on that alternate path; resizing would otherwise change an unselected tube or joint.`);
+      const difference=axes.get(p.id);
+      pair[0].edges.push({node:pair[1],difference});pair[1].edges.push({node:pair[0],difference:difference.clone().negate()});ends.set(p.id,pair);
+    }
+    // Prefer an attached rigid section over a free end. Rank by the lowest
+    // mating endpoint along the positive dominant world axis, then stable ID.
+    const ordered=nodes.filter(n=>n.edges.length).sort((a,b)=>Number(!a.ids.length)-Number(!b.ids.length)||a.rank-b.rank||a.key.localeCompare(b.key));
+    const velocities=new Map(),anchors=[];
+    for(const root of ordered)if(!velocities.has(root)){
+      const free=!root.ids.length,queue=[root];
+      velocities.set(root,free?root.edges[0].difference.clone().multiplyScalar(-.5):vec([0,0,0]));
+      if(!free)anchors.push(root.key);
+      while(queue.length){const node=queue.pop();for(const edge of node.edges){
+        const expected=velocities.get(node).clone().add(edge.difference),existing=velocities.get(edge.node);
+        if(existing&&existing.distanceTo(expected)>PARALLEL_TOLERANCE)return blocked(`Conflicting resize paths near rigid section ${edge.node.key.slice(0,8)}: the selected tubes require different translations of the same connected geometry.`);
+        if(!existing){velocities.set(edge.node,expected);queue.push(edge.node);}
+      }}
+    }
+    const minDelta=Math.max(...tubes.map(p=>MIN_LENGTH-p.length)),maxDelta=Math.min(...tubes.map(p=>MAX_LENGTH-p.length));
+    if(minDelta===maxDelta)return blocked(`Cut-length limits leave no nonzero shared adjustment: selected cuts already span ${MIN_LENGTH}–${MAX_LENGTH} mm.`);
+    return {locked:false,minDelta,maxDelta,axis:axis.toArray(),axisLabel:'XYZ'[dominant],anchors,
+      tubes:tubes.map(p=>({id:p.id,velocity:velocities.get(ends.get(p.id)[0]).clone().addScaledVector(axes.get(p.id),.5).toArray()})),
+      sections:nodes.filter(n=>n.ids.length&&velocities.has(n)).map(n=>({ids:n.ids,velocity:velocities.get(n).toArray()}))};
+  }
+  resizeTogether(ids,delta) {
+    const plan=this.coordinatedLengthPlan(ids);
+    if(plan.locked)throw Error(plan.reason);
+    if(!Number.isFinite(delta)||delta<plan.minDelta||delta>plan.maxDelta)throw Error(`Shared adjustment must be ${plan.minDelta}–${plan.maxDelta} mm so every cut stays ${MIN_LENGTH}–${MAX_LENGTH} mm.`);
+    if(delta===0)return;
+    const next=clone(this.data()),pieces=new Map(next.pieces.map(p=>[p.id,p]));
+    for(const section of plan.sections)for(const id of section.ids){const p=pieces.get(id);p.p=vec(p.p).addScaledVector(vec(section.velocity),delta).toArray();}
+    for(const tube of plan.tubes){const p=pieces.get(tube.id);p.p=vec(p.p).addScaledVector(vec(tube.velocity),delta).toArray();p.length+=delta;}
+    // Validate every socket stop, direction and cut before publishing anything.
+    const checked=validate(next);this.pieces=checked.pieces;this.connections=checked.connections;
   }
   copy(ids) {this.data();return {pieces:clone(this.pieces.filter(p=>ids.has(p.id))),connections:clone(this.connections.filter(c=>ids.has(c.a.id)&&ids.has(c.b.id)))};}
   paste(data,offset=[80,0,80]) {

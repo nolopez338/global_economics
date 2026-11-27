@@ -21,8 +21,8 @@ function unitText(text){return text.replace(/(\d[\d,]*(?:\.\d+)?)[–−](\d[\d,
 function showLengthInput(input,value){input.value=displayLength(value);input.dataset.displayValue=input.value;}
 function updateLengthUnits(){
   for(const [node,text] of lengthTemplates)node.textContent=unitText(text);
-  const next=LENGTH_UNITS[(LENGTH_UNITS.indexOf(lengthUnit)+1)%3],button=$('#length-unit');
-  button.textContent=lengthUnit;button.setAttribute('aria-label',`Length unit: ${lengthUnit}. Switch to ${next}`);
+  const next=LENGTH_UNITS[(LENGTH_UNITS.indexOf(lengthUnit)+1)%3];
+  for(const button of [$('#length-unit'),$('#group-length-unit')]){button.textContent=lengthUnit;button.setAttribute('aria-label',`Length unit: ${lengthUnit}. Switch to ${next}`);}
   for(const id of ['length','length-slider']){const input=$('#'+id);input.min=80/scale();input.max=3000/scale();input.step=1/scale();input.setAttribute('aria-label',`Tube cut length${id==='length-slider'?' slider':''} in ${lengthUnit}`);}
   for(const axis of ['x','y','z']){const input=$('#position-'+axis);input.step=1/scale();input.setAttribute('aria-label',`position ${axis.toUpperCase()} in ${lengthUnit}`);}
   $('#plane-offset').setAttribute('aria-label',`Plane offset in ${lengthUnit}`);$('#plane-offset').step=25/scale();showLengthInput($('#plane-offset'),planeOffset);
@@ -54,7 +54,7 @@ orbit.mouseButtons={LEFT:THREE.MOUSE.PAN,MIDDLE:THREE.MOUSE.PAN,RIGHT:THREE.MOUS
 const pivot=new THREE.Object3D();scene.add(pivot);
 const gizmo=new TransformControls(camera,canvas);gizmo.setSize(.8);gizmo.setSpace('world');scene.add(gizmo.getHelper());
 const ray=new THREE.Raycaster(), pointer=new THREE.Vector2();
-let baseTransform=null, activeIds=new Set(), sliderBase=null;
+let baseTransform=null, activeIds=new Set(), sliderBase=null, groupEdit=null, groupCancelled=false, groupRangeKey=null, groupRangePointer=null;
 
 function status(text,error=false){statusSource=text;$('#status').textContent=unitText(text);$('#status').dataset.error=error;}
 function snapshot(){return {data:model.data(),selected:[...selected],joint:selectedJoint};}
@@ -107,20 +107,31 @@ function findCandidate(ids){
 function finishSnap(){if(candidate){const c=candidate;if(!c.internal){const t=model.alignment(c.a,c.b);model.transform(new Set(c.moving),t.rotation,t.pivot,t.translation);}model.connect(c.a,c.b,false);status('Joint connected. Transforming either piece moves its connected assembly.');}candidate=null;clearGhost();}
 
 // Inspector and selection state are independent of rendered geometry.
-function setSelection(ids,joint=null){selected=new Set(ids);selectedJoint=joint;pickedPorts=[];refresh();}
+function setSelection(ids,joint=null){finishLengthEdits();selected=new Set(ids);selectedJoint=joint;pickedPorts=[];refresh();}
 function attach(){gizmo.detach();if(selected.size&&(tool==='translate'||tool==='move-piece'||tool==='rotate')){pivot.position.copy(center(selected));pivot.quaternion.identity();pivot.updateMatrixWorld(true);gizmo.setMode(tool==='move-piece'?'translate':tool);gizmo.setTranslationSnap($('#grid-snap').checked?25:null);gizmo.setRotationSnap($('#grid-snap').checked?Math.PI/12:null);gizmo.attach(pivot);}}
 function fields(container,prefix){for(const axis of ['x','y','z']){const label=document.createElement('label');label.textContent=axis.toUpperCase();const input=document.createElement('input');input.type='number';input.step=prefix==='position'?'1':'5';input.id=`${prefix}-${axis}`;input.setAttribute('aria-label',`${prefix} ${axis.toUpperCase()}`);label.append(input);$(container).append(label);input.addEventListener('change',()=>numericTransform(prefix,axis,input));}}
 fields('#position-fields','position');fields('#rotation-fields','rotation');
+function showSelectedPieces(list,joint){
+  $('#selection-content').replaceChildren();if(!list.length)$('#selection-content').textContent=joint?'Detach to separate the two ports.':'Nothing selected';
+  for(const p of list.slice(0,8)){const chip=document.createElement('span');chip.className='piece-chip';chip.textContent=CATALOG[p.type].name+(p.type==='tube'?` · ${lengthText(p.length)}`:'');$('#selection-content').append(chip);}if(list.length>8)$('#selection-content').append(`+ ${list.length-8} more`);
+}
 function inspector(){
   const list=model.pieces.filter(p=>selected.has(p.id)),single=list.length===1?list[0]:null,joint=model.connections.find(c=>c.id===selectedJoint),moves=expanded();
   $('#selection-title').textContent=joint?'Selected joint':single?CATALOG[single.type].name:list.length?`${list.length} selected`:'Your design';
   $('#selection-note').textContent=joint?`Joint ${joint.id.slice(0,8)} · tube to socket`:single?`Piece ${single.id.slice(0,8)} · Ø ${lengthText(32)}`:list.length?'Edit a selection or its connected assemblies.':'Select a piece to refine it.';
-  $('#selection-content').replaceChildren();if(!list.length)$('#selection-content').textContent=joint?'Detach to separate the two ports.':'Nothing selected';
-  for(const p of list.slice(0,8)){const chip=document.createElement('span');chip.className='piece-chip';chip.textContent=CATALOG[p.type].name+(p.type==='tube'?` · ${lengthText(p.length)}`:'');$('#selection-content').append(chip);}if(list.length>8)$('#selection-content').append(`+ ${list.length-8} more`);
+  showSelectedPieces(list,joint);
   $('#select-assembly').hidden=!list.length;$('#transform-section').hidden=!list.length;
   if(list.length){const p=list[0],e=new THREE.Euler().setFromQuaternion(quat(p.q),'XYZ');['x','y','z'].forEach((a,i)=>{showLengthInput($(`#position-${a}`),p.p[i]);$(`#rotation-${a}`).value=round(THREE.MathUtils.radToDeg(e[a]));});$('#assembly-note').textContent=`${moves.size} pieces will move${moves.size>list.length?` · ${moves.size-list.length} connected companions highlighted in amber`:''}. Fields refer to the first selected piece.`;}
   $('#length-section').hidden=single?.type!=='tube';
   if(single?.type==='tube'){const plan=model.lengthPlan(single.id);showLengthInput($('#length'),single.length);$('#length-slider').value=single.length/scale();$('#length').disabled=$('#length-slider').disabled=!!plan.locked;$('#length-note').textContent=plan.locked?plan.reason:plan.fixed===null?'Physical cut length. Free tube resizes about its centre.':plan.side.size?'End 1 stays fixed. The assembly on end 2 translates with the new length.':`Connected end ${plan.fixed+1} stays fixed. The free end moves.`;$('#detach-blocking').hidden=!plan.locked;$('#detach-blocking').onclick=()=>{selectedJoint=plan.joint;setTool('joints');inspector();$('#detach').scrollIntoView({block:'nearest'});};}
+  $('#group-length-section').hidden=list.length<2;
+  if(list.length>1){
+    const plan=groupEdit?.plan??model.coordinatedLengthPlan(selected),min=plan.locked?0:Math.ceil(plan.minDelta*1000)/1000,max=plan.locked?0:Math.floor(plan.maxDelta*1000)/1000;
+    for(const id of ['group-length','group-length-slider']){const input=$('#'+id);input.disabled=plan.locked;input.min=min/scale();input.max=max/scale();input.step=.001/scale();input.setAttribute('aria-label',`Change selected tube lengths${id.endsWith('slider')?' slider':''} in ${lengthUnit}`);input.removeAttribute('aria-invalid');showLengthInput(input,groupEdit?.delta??0);}
+    $('#group-length-unit-label').textContent=lengthUnit;$('#group-length-min').textContent=lengthText(min);$('#group-length-max').textContent=lengthText(max);
+    $('#group-length-slider').setAttribute('aria-valuetext',`${lengthText(groupEdit?.delta??0)} adjustment`);
+    $('#group-length-note').textContent=plan.locked?unitText(plan.reason):`Same signed adjustment to each starting cut; unequal lengths stay unequal. ${plan.anchors.length?`In each connected group, the attached section with the lowest endpoint along the tube axis toward positive ${plan.axisLabel} stays fixed (ties: stable piece ID). Anchor section${plan.anchors.length>1?'s':''}: ${plan.anchors.map(id=>id.slice(0,8)).join(', ')}. Other sections translate rigidly.`:''} Free tubes keep their centres. Escape cancels; release, Enter or blur completes one undoable edit.`;
+  }
   $('#ports-section').hidden=!list.length&&!joint;$('#ports').replaceChildren();
   for(const p of list) localPorts(p).forEach((def,i)=>{
     const connection=model.connections.find(c=>[c.a,c.b].some(e=>e.id===p.id&&e.port===i));const row=document.createElement('div');row.className='port-row';const button=document.createElement('button');button.textContent=`${list.length>1?CATALOG[p.type].name+' · ':''}End ${i+1} · ${def.type}${connection?' · joined':''}`;button.setAttribute('aria-pressed',pickedPorts.some(e=>e.id===p.id&&e.port===i));button.onclick=()=>{if(connection){selectedJoint=connection.id;inspector();showOverlays();}else pickPort({id:p.id,port:i});};row.append(button);$('#ports').append(row);
@@ -220,7 +231,7 @@ function hitOverlay(event){setRay(event);return ray.intersectObjects(overlays.ch
 // Camera input stays with OrbitControls, but sub-threshold motion never reaches it.
 function cancelInteraction(){
   if(pointerGesture)pointerGesture.cancelled=true;
-  cancelledGesture=true;baseTransform=null;sliderBase=null;
+  cancelledGesture=true;baseTransform=null;sliderBase=null;groupEdit=null;groupCancelled=true;groupRangeKey=null;groupRangePointer=null;
   if(transaction){restore(transaction);transaction=null;}
   if(gizmo.dragging)gizmo.pointerUp({button:0});
   directDrag=null;marquee=null;$('#marquee-box').hidden=true;candidate=null;clearGhost();orbit.enabled=!placement;refresh();
@@ -286,9 +297,46 @@ function thumbnail(type){const paths={tube:'M14 47 L65 17',coupling:'M20 44 L59 
 for(const [type,def] of Object.entries(CATALOG)){const b=document.createElement('button');b.className='material';b.draggable=true;b.dataset.type=type;b.innerHTML=thumbnail(type);const name=document.createElement('strong'),note=document.createElement('small');name.textContent=def.name;note.textContent=def.note;b.append(name,note);b.onclick=()=>startPlacement(type);b.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',type);e.dataTransfer.effectAllowed='copy';startPlacement(type);});b.addEventListener('dragend',()=>{if(placement)cancelPlacement();});$('#catalog').append(b);}
 $('.materials .count').textContent=Object.keys(CATALOG).length;
 
-function editLength(value){const p=model.pieces.find(p=>selected.has(p.id));if(!p)return;if(!sliderBase){begin();sliderBase=clone(transaction.data);}try{model=new Design(sliderBase);model.resize(p.id,Number(value)*scale());sync();summary();showOverlays();showLengthInput($('#length'),Number(value)*scale());$('#length-slider').value=value;}catch(e){status(e.message,true);}}
+function editLength(value){const p=model.pieces.find(p=>selected.has(p.id));if(!p)return;if(!sliderBase){begin();sliderBase=clone(transaction.data);}try{const next=new Design(sliderBase);next.resize(p.id,Number(value)*scale());model=next;sync();summary();showOverlays();showLengthInput($('#length'),Number(value)*scale());$('#length-slider').value=value;}catch(e){status(e.message,true);}}
+function finishLengthEdits(){
+  if(groupEdit){groupEdit=null;groupRangeKey=null;commit('Selected tube lengths updated together; all joints and other cuts preserved.');}
+  if(sliderBase){sliderBase=null;commit('Tube cut length updated; valid joints preserved.');}
+}
+function editGroupLength(input){
+  if(groupCancelled)return;
+  if(!groupEdit){const plan=model.coordinatedLengthPlan(selected);if(plan.locked){status(plan.reason,true);return;}begin();groupEdit={base:clone(transaction.data),ids:[...selected],plan,delta:0};}
+  try{
+    const delta=input.valueAsNumber*scale();
+    if(!input.value.trim()||!Number.isFinite(delta))throw Error('Enter a finite signed length adjustment.');
+    // Publish only a fully solved and validated candidate. Every preview starts
+    // from the same snapshot; invalid input leaves the last valid preview live.
+    const next=new Design(groupEdit.base);next.resizeTogether(groupEdit.ids,delta);model=next;groupEdit.delta=delta;
+    const other=input.id==='group-length'?$('#group-length-slider'):$('#group-length');showLengthInput(other,delta);
+    input.removeAttribute('aria-invalid');other.removeAttribute('aria-invalid');$('#group-length-slider').setAttribute('aria-valuetext',`${lengthText(delta)} adjustment`);
+    showSelectedPieces(model.pieces.filter(p=>selected.has(p.id)),null);sync();summary();showOverlays();attach();
+    status(`Selected tubes: ${delta>=0?'+':''}${lengthText(delta)} each. Escape restores the starting geometry.`);
+  }catch(error){input.setAttribute('aria-invalid','true');status(error.message,true);}
+}
+for(const id of ['group-length','group-length-slider']){
+  const input=$('#'+id),range=input.type==='range';
+  input.addEventListener('focus',()=>{groupCancelled=false;});
+  input.addEventListener('pointerdown',e=>{if(document.activeElement!==input)finishLengthEdits();groupCancelled=false;if(range)groupRangePointer=e.pointerId;});
+  input.addEventListener('input',()=>{if(!range)groupCancelled=false;editGroupLength(input);});
+  input.addEventListener('change',()=>{if(!range||!groupRangeKey&&groupRangePointer===null)finishLengthEdits();});
+  // Chromium may emit the range's first input before blurring the numeric
+  // field. That blur belongs to the previous focus, not the new slider drag.
+  input.addEventListener('blur',e=>{if(!(groupRangePointer!==null&&e.relatedTarget===$('#group-length-slider')))finishLengthEdits();});
+  input.addEventListener('pointercancel',()=>{cancelInteraction();status('Tube length adjustment cancelled.');});
+  input.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();cancelInteraction();status('Tube length adjustment cancelled; starting geometry restored.');}
+    else if(e.key==='Enter'){e.preventDefault();finishLengthEdits();}
+    else if(range&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End','PageUp','PageDown'].includes(e.key)){groupCancelled=false;groupRangeKey=e.key;}
+  });
+  input.addEventListener('keyup',e=>{if(e.key===groupRangeKey){groupRangeKey=null;finishLengthEdits();}});
+}
+window.addEventListener('pointerup',e=>{if(e.pointerId===groupRangePointer){groupRangePointer=null;finishLengthEdits();}});
 $('#length').addEventListener('change',e=>{const p=model.pieces.find(p=>selected.has(p.id));if(p&&e.target.value!==e.target.dataset.displayValue)action(()=>model.resize(p.id,e.target.valueAsNumber*scale()),'Tube cut length updated; valid joints preserved.');});
-$('#length-unit').onclick=()=>{lengthUnit=LENGTH_UNITS[(LENGTH_UNITS.indexOf(lengthUnit)+1)%3];updateLengthUnits();inspector();summary();};
+for(const button of [$('#length-unit'),$('#group-length-unit')])button.onclick=()=>{finishLengthEdits();lengthUnit=LENGTH_UNITS[(LENGTH_UNITS.indexOf(lengthUnit)+1)%3];updateLengthUnits();inspector();summary();};
 $('#plane-offset').onchange=e=>{if(e.target.value===e.target.dataset.displayValue)return;const value=e.target.valueAsNumber*scale();if(Number.isFinite(value))planeOffset=value;else status('Enter a finite plane offset.',true);showLengthInput(e.target,planeOffset);};
 $('#length-slider').addEventListener('input',e=>editLength(e.target.value));
 $('#length-slider').addEventListener('change',()=>{sliderBase=null;commit('Tube cut length updated; valid joints preserved.');});
