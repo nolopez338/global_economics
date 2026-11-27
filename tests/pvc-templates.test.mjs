@@ -1,14 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {TEMPLATES,buildTemplate} from '../assets/js/pvc-templates.mjs';
-import {validate,port,vec,clone} from '../assets/js/pvc-model.mjs';
-import {geometry,dispose} from '../assets/js/pvc-geometry.mjs';
-import {Box3,Group} from '../assets/vendor/three-0.170.0/three.module.js';
+import {validate,port,vec} from '../assets/js/pvc-model.mjs';
 
-test('exactly ten uniquely named templates, including Empty',()=>{
-  assert.equal(TEMPLATES.length,10);assert.equal(new Set(TEMPLATES.map(t=>t.id)).size,10);
-  assert.equal(TEMPLATES[0].name,'Empty');assert.equal(buildTemplate('empty').pieces.length,0);
-  assert.throws(()=>buildTemplate('unknown'));
+test('only Empty and the floor-level layout remain; elevated templates are unavailable',()=>{
+  assert.deepEqual(TEMPLATES.map(t=>t.id),['empty','ground']);
+  assert.equal(buildTemplate('empty').pieces.length,0);
+  for(const id of ['unknown','window','shelving','worktable','desk','clothes','shoes','plant','hamper','display'])assert.throws(()=>buildTemplate(id),/Unavailable/);
 });
 for(const t of TEMPLATES.slice(1))test(`${t.name}: seated connected assembly, round trip and materials`,()=>{
   assert(t.description&&t.dimensions);const m=buildTemplate(t.id),data=m.data();
@@ -22,27 +20,19 @@ for(const t of TEMPLATES.slice(1))test(`${t.name}: seated connected assembly, ro
   for(const p of m.pieces){if(p.type==='tube'){
     assert(p.length>=80&&p.length<=3000);assert.equal(p.length,Math.round(p.length));
     assert(used.has(p.id+':0')&&used.has(p.id+':1'));
-    const d=port(p,1).direction.toArray().filter(v=>Math.abs(v)>1e-7);
-    if(d.length===1)assert.equal(p.length%100,0,'axial cuts use 100 mm increments');
+    assert([350,550].includes(p.length));
   }}
   const restored=validate(JSON.parse(JSON.stringify(data)));assert.deepEqual(restored.data(),data);assert.deepEqual(restored.materials(),m.materials());
   assert.equal(m.materials().rows.reduce((n,r)=>n+r.count,0),m.pieces.length);
   assert.equal(m.materials().total,m.pieces.filter(p=>p.type==='tube').reduce((n,p)=>n+p.length,0));
-  // Copy and rigid editing retain every configured socket and joint.
+  // Copy and rigid editing retain fixed sockets and joint.
   const copy=m.copy(new Set(m.pieces.map(p=>p.id))),fresh=m.paste(copy);m.transform(fresh,undefined,undefined,vec([3000,0,0]));validate(m.data());
 });
-test('window front opening, sill, rear / side bracing and physical bounds',()=>{
-  const m=buildTemplate('window'),group=new Group();
-  for(const p of m.pieces){const g=geometry(p);g.position.fromArray(p.p);g.quaternion.fromArray(p.q);group.add(g);}
-  group.updateMatrixWorld(true);const box=new Box3().setFromObject(group,true);assert.deepEqual(box.min.toArray(),[-771,0,-544]);assert.deepEqual(box.max.toArray(),[771,2242,544]);
-  const frontTubes=m.pieces.filter(p=>p.type==='tube'&&Math.abs(p.p[2]-175)<1e-8);
-  for(const p of frontTubes){const ends=[port(p,0).position,port(p,1).position];assert(!ends.some(v=>v.y>1142&&v.y<2200&&Math.abs(v.x)<729));}
-  assert(frontTubes.some(p=>Math.abs(p.p[1]-1121)<1e-8));
-  assert(m.pieces.some(p=>p.type==='tube'&&p.p[2]>175));assert(m.pieces.some(p=>p.type==='tube'&&p.p[2]<-175));dispose(group);
-});
-test('custom junction import rejects malformed, colliding and off-axis sockets',()=>{
-  const data=buildTemplate('window').data(),p=data.pieces.find(p=>p.type==='multiway');
-  for(const mutate of [p=>p.sockets=[],p=>p.sockets[1]=clone(p.sockets[0]),p=>p.sockets[0].insertion=0,p=>p.sockets[0].direction=[2,0,0],p=>p.sockets[0].position=[999,0,0]]){const d=clone(data);mutate(d.pieces.find(q=>q.id===p.id));assert.throws(()=>validate(d));}
+test('floor layout has no elevated branches and no overlapping fitting bodies',()=>{
+  const m=buildTemplate('ground'),fittings=m.pieces.filter(p=>p.type!=='tube');
+  for(const p of m.pieces)assert.equal(p.p[1],22);
+  for(const a of fittings)for(const b of fittings)if(a!==b)assert(vec(a.p).distanceTo(vec(b.p))>90);
+  assert.match(TEMPLATES[1].description,/unbraced rectangle can rack/);
 });
 
 function segmentDistance(p1,q1,p2,q2){

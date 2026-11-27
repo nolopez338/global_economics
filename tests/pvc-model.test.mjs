@@ -13,7 +13,7 @@ test('tube + elbow seat at socket stop and move rigidly, then detach independent
 });
 test('free tube resizes about centre, each single attached end stays fixed',()=>{
   const free=new Design(),f=free.add('tube');free.resize(f.id,600);near(f.p,[0,60,0]);
-  for(const i of [0,1]){const m=new Design(),t=m.add('tube'),e=m.add('cap');m.connect(end(e,0),end(t,i));const point=port(t,i).position.toArray(),fixed=[...e.p];m.resize(t.id,700);near(port(t,i).position.toArray(),point);near(e.p,fixed);valid(m);}
+  for(const i of [0,1]){const m=new Design(),t=m.add('tube'),e=m.add('coupling');m.connect(end(e,0),end(t,i));const point=port(t,i).position.toArray(),fixed=[...e.p];m.resize(t.id,700);near(port(t,i).position.toArray(),point);near(e.p,fixed);valid(m);}
 });
 test('two-ended tube translates only the free branch and retains every joint',()=>{
   const m=new Design(),t=m.add('tube'),a=m.add('tee'),b=m.add('elbow90');m.connect(end(a,1),end(t,0));m.connect(end(b,0),end(t,1));
@@ -34,7 +34,7 @@ test('compatibility, occupied ports, self joints and impossible connections are 
   const m=new Design(),a=m.add('tube'),b=m.add('tube'),e=m.add('elbow90');assert.throws(()=>m.connect(end(a,0),end(b,0)),/tube end/);assert.throws(()=>m.connect(end(a,0),end(a,1)),/itself/);m.connect(end(a,0),end(e,0));assert.throws(()=>m.connect(end(b,0),end(e,0)),/occupied/);valid(m);
 });
 test('rotated assemblies retain constraints and length-edit axes',()=>{
-  const m=new Design(),t=m.add('tube'),a=m.add('cap'),b=m.add('corner');m.connect(end(a,0),end(t,0));m.connect(end(b,0),end(t,1));m.transform(m.connected([t.id]),new Quaternion().setFromAxisAngle(vec([0,0,1]),Math.PI/2),vec([10,30,0]));m.resize(t.id,900);valid(m);
+  const m=new Design(),t=m.add('tube'),a=m.add('coupling'),b=m.add('corner');m.connect(end(a,0),end(t,0));m.connect(end(b,0),end(t,1));m.transform(m.connected([t.id]),new Quaternion().setFromAxisAngle(vec([0,0,1]),Math.PI/2),vec([10,30,0]));m.resize(t.id,900);valid(m);
 });
 test('JSON round trip retains geometry, graph and materials',()=>{
   const m=rectangle(),round=validate(JSON.parse(JSON.stringify(m.data())));assert.deepEqual(round.data(),m.data());assert.deepEqual(round.summary(),m.summary());assert.equal(round.summary().total,1800);assert.deepEqual(round.summary().rows,[['90° elbow',4],['Tube · 550 mm',2],['Tube · 350 mm',2]]);

@@ -31,7 +31,7 @@ const server=http.createServer((req,res)=>{const file=path.join(root,decodeURICo
  await load(rectangle().data());await page.locator('#select-all').click();await page.locator('[data-tool="rotate"]').click();await page.locator('[data-type="tee"]').click();
  await download('frame'); // selected, transform tool, joints, pending placement and ghosts retained
  const mixed=new Design();mixed.add('tube',[-330,130,90],123.456);mixed.add('tube',[240,330,-100],650);mixed.add('tube',[240,330,300],650);mixed.add('tube',[1200,-200,-750],123.4560001);
- for(const [i,type] of ['coupling','elbow90','elbow45','tee','cross','corner','cap'].entries())mixed.add(type,[i*145-400,i*48,-400],400,[0,0,Math.sin(i*.12),Math.cos(i*.12)]);
+ for(const [i,type] of ['coupling','elbow90','elbow45','tee','cross','corner'].entries())mixed.add(type,[i*145-400,i*48,-400],400,[0,0,Math.sin(i*.12),Math.cos(i*.12)]);
  await load(mixed.data());await page.locator('#select-all').click();await page.evaluate(()=>document.querySelector('#length-unit').click());assert.equal(await page.evaluate(()=>pvcTest.read().lengthUnit),'cm');await download('mixed-cm');
  await page.screenshot({path:path.join(out,'workspace.png')});
  // A pending cut-length gesture exports its committed snapshot without completing it.

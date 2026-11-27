@@ -1,6 +1,6 @@
 // Isolated client-side PDF export. No live scene, controls, storage or history access.
 import * as THREE from '../vendor/three-0.170.0/three.module.js';
-import {Design,CATALOG,vec,quat,materialName} from './pvc-model.mjs';
+import {validate,CATALOG,vec,quat,materialName} from './pvc-model.mjs';
 import {geometry,dispose} from './pvc-geometry.mjs';
 
 export const PDF_VIEWS=Object.freeze([
@@ -62,19 +62,19 @@ function heading(doc,title,section,page,total=3){
 }
 
 // Fixed readable type and thumbnail sizes; measure wrapping before allocating any GPU resources.
-export function materialsLayout(doc,rows,unit,paginate=false){
+export function materialsLayout(doc,rows,unit){
   for(const columns of [1,2]){
     const width=(186-(columns-1)*6)/columns,ref=22,name=columns===1?57:27,spec=width-ref-name-12;
     doc.setFont('helvetica','normal');doc.setFontSize(9);
     const measured=rows.map(row=>{
       const nameLines=doc.splitTextToSize(materialName(row),name-3);
-      const specification=row.type==='tube'?`Cut ${pdfLength(row.length,unit)}\nOD ${pdfLength(32,unit)}`:`${(row.sockets || CATALOG[row.type].ports).length} socket${(row.sockets || CATALOG[row.type].ports).length===1?'':'s'}\nFor OD ${pdfLength(32,unit)}`;
+      const specification=row.type==='tube'?`Cut ${pdfLength(row.length,unit)}\nOD ${pdfLength(32,unit)}`:`${CATALOG[row.type].ports.length} socket${CATALOG[row.type].ports.length===1?'':'s'}\nFor OD ${pdfLength(32,unit)}`;
       const specLines=doc.splitTextToSize(specification,spec-3);
       return {...row,nameLines,specLines,height:Math.max(16,Math.max(nameLines.length,specLines.length)*3.8+5)};
     });
     const groups=[[]];let height=0;
     for(const row of measured){if(height+row.height>204){groups.push([]);height=0;}groups.at(-1).push(row);height+=row.height;}
-    if(groups.length<=columns||paginate&&columns===2)return {groups,width,ref,name,spec,columns};
+    if(groups.length<=columns)return {groups,width,ref,name,spec,columns};
   }
   throw Error(`The ${rows.length}-row materials list cannot fit legibly on one A4 page, even in two columns. Reduce the number of distinct cut lengths or export smaller designs separately. No PDF was downloaded.`);
 }
@@ -86,7 +86,7 @@ function drawMaterials(doc,layout,thumbnails,summary,unit){
     let y=56;
     for(const row of rows){
       doc.setFillColor(248,250,250);doc.rect(x,y,layout.width,row.height,'F');
-      doc.addImage(thumbnails.get(row.configuration || row.type),'PNG',x+2,y+(row.height-12)/2,18,12,`reference-${row.configuration || row.type}`);
+      doc.addImage(thumbnails.get(row.type),'PNG',x+2,y+(row.height-12)/2,18,12,`reference-${row.type}`);
       text(doc,row.nameLines,nameX,y+5,9);text(doc,row.specLines,specX,y+5,9);text(doc,String(row.count),quantityX,y+5,9,true);
       y+=row.height;doc.setDrawColor(221,230,232);doc.line(x,y,x+layout.width,y);
     }
@@ -95,22 +95,22 @@ function drawMaterials(doc,layout,thumbnails,summary,unit){
   text(doc,'Cut lengths include the tube inserted into fitting sockets. Fittings are counted separately.',12,281,9);
 }
 export async function createDesignPDF(data,{unit='mm',title='Untitled design',onProgress=()=>{}}={}){
-  const model=new Design(data);if(!model.pieces.length)throw Error('Add a component before exporting.');
+  const model=validate(data);if(!model.pieces.length)throw Error('Add a component before exporting.');
   if(!Object.hasOwn(lengths,unit))throw Error('Unsupported length unit.');
   await import('../vendor/jspdf-3.0.3/jspdf.umd.min.js');
   const doc=new globalThis.jspdf.jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true});
   doc.setProperties({title:`${title} - PVC design`,subject:'Materials and eight design views',creator:'PVC Studio'});
-  const summary=model.materials(),layout=materialsLayout(doc,summary.rows,unit,summary.rows.some(r=>r.type==='multiway'));
+  const summary=model.materials(),layout=materialsLayout(doc,summary.rows,unit);
   const materialPages=Math.ceil(layout.groups.length/layout.columns),totalPages=materialPages+2;
   let renderer;const scene=exportScene(),parts=new THREE.Group(),reference=new THREE.Group();scene.add(parts,reference);
   try{
     renderer=exportRenderer();parts.visible=false;
     const thumbnails=new Map();
-    for(const row of summary.rows.filter((r,i,a)=>a.findIndex(t=>(t.configuration || t.type)===(r.configuration || r.type))===i)){
+    for(const row of summary.rows.filter((r,i,a)=>a.findIndex(t=>t.type===r.type)===i)){
       const {type}=row;
       onProgress(`PDF: rendering reference for ${CATALOG[type].name}…`);await pause();
-      reference.add(geometry({type,sockets:row.sockets,length:120,id:'reference'}));
-      thumbnails.set(row.configuration || type,capture(renderer,scene,reference,{direction:[1,.9,1.3],up:[0,1,0]},450,300));dispose(reference);
+      reference.add(geometry({type,length:120,id:'reference'}));
+      thumbnails.set(type,capture(renderer,scene,reference,{direction:[1,.9,1.3],up:[0,1,0]},450,300));dispose(reference);
     }
     for(let page=0;page<materialPages;page++){
       if(page)doc.addPage('a4','portrait');

@@ -52,10 +52,10 @@ const server=http.createServer((req,res)=>{
       };
       const target=async()=>page.evaluate(async()=>{
         const {Design}=await import('/assets/js/pvc-model.mjs');const {placementTargets}=await import('/assets/js/pvc-placement.mjs');
-        const t=placementTargets(new Design(pvcTest.read().data))[0];return pvcTest.screen(t.position.toArray());
+        const targets=placementTargets(new Design(pvcTest.read().data));return targets.map(t=>pvcTest.screen(t.position.toArray())).sort((a,b)=>b.y-a.y)[0];
       });
       if(!process.env.PVC_ONLY_STATIONARY){
-      await load('cap');
+      await load('coupling');
       for(const view of ['front','side','top','perspective']){
         await page.selectOption('#camera',view);await page.selectOption('#plane',view==='side'?'side':view==='front'?'front':'ground');
         // Zoom while camera controls are enabled, before catalog selection.
@@ -68,7 +68,7 @@ const server=http.createServer((req,res)=>{
       }
       console.log(`PASS real mouse 192 CSS-pixel targeting at DPR ${dpr}, four cameras and zoom`);
       }
-      await load('cap');await page.selectOption('#camera','front');await page.selectOption('#plane','front');
+      await load('coupling');await page.selectOption('#camera','front');await page.selectOption('#plane','front');
       await page.locator('[data-type="tube"]').click();const stationary=await target();await page.mouse.move(stationary.x,stationary.y+40);
       assert((await read()).placement.connection);
       const guideMatches=()=>page.evaluate(()=>{
@@ -118,7 +118,7 @@ const server=http.createServer((req,res)=>{
       await page.locator('#undo').click();assert.deepEqual((await read()).data,base.data);
       await page.locator('#redo').click();assert.deepEqual((await read()).data,placed.data);
       console.log(`PASS native drag exact commit, rotation (${delivered?'hardware key delivered':'Chromium suppressed hardware key; DOM key delivered'}), mesh reuse, autosave and undo/redo at DPR ${dpr}`);
-      await load('cap');await page.selectOption('#camera','front');await page.selectOption('#plane','front');
+      await load('coupling');await page.selectOption('#camera','front');await page.selectOption('#plane','front');
       await page.locator('#port-snap').uncheck();
       const freeAt=await target(),tubeBox=await page.locator('[data-type="tube"]').boundingBox();
       await page.mouse.move(tubeBox.x+tubeBox.width/2,tubeBox.y+tubeBox.height/2);await page.mouse.down();

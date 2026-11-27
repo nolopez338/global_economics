@@ -13,6 +13,7 @@ function hollow(group,start,end,outer,inner,mat){
   for(const sign of [-1,1]){const rim=mesh(new THREE.RingGeometry(inner,outer,32),mat,shell);rim.rotation.x=sign===1?-Math.PI/2:Math.PI/2;rim.position.y=sign*length/2;}
 }
 export function geometry(p){
+  localPorts(p); // Reject unsupported types and socket overrides before allocating geometry.
   const g=new THREE.Group(),mat=material(p.type==='tube'?0xeaf3f1:0xffffff);
   if(p.type==='tube')hollow(g,[-p.length/2,0,0],[p.length/2,0,0],RADIUS,INNER_RADIUS,mat);
   else {
@@ -26,7 +27,6 @@ export function geometry(p){
     } else {
       if(p.type!=='coupling')mesh(new THREE.SphereGeometry(19,24,16),mat,g);
       for(const d of defs)hollow(g,p.type==='coupling'?d.direction.map(x=>-x*3):[0,0,0],d.position,21,RADIUS+.25,mat);
-      if(p.type==='cap'){const cap=mesh(new THREE.CylinderGeometry(21,21,8,32),mat,g);cap.rotation.z=Math.PI/2;cap.position.x=3;}
     }
   }
   g.userData.id=p.id;g.userData.type=p.type;g.userData.length=p.length;return g;

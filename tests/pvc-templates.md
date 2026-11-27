@@ -1,64 +1,40 @@
-# PVC Studio planning templates
+# PVC Studio standard-component templates
 
-The Materials panel offers exactly ten options. Changing the option only previews its description and dimensions; **Load template** uses the existing replacement prompt, creates one history entry, clears temporary editing state, autosaves, updates materials, and frames the assembly. Empty uses the same replacement path. The original rectangular fixture remains available to model regression tests.
+The dropdown contains **Empty** and **Ground footprint study**. The former nine
+elevated furniture templates were removed because their junction layouts and
+brace reaches require components outside the seven-part catalog. Their IDs
+now fail explicitly; they are never silently mapped to another template.
 
-All nonempty assemblies are tube-and-fitting graphs with a joint at both ends of every tube. They use rear and side triangles, lower rails and intermediate supports. Tall narrow shapes also have braced outriggers. Front is +Z. The window template has no brace or intermediate post across the upper front opening; rear reinforcement remains visible through it.
+The floor-level example uses four 90° elbows, two 550 mm tubes and two 350 mm
+tubes, with all eight tube/socket joints aligned and recorded. Centerline
+spans are 600 × 400 mm; the footprint is approximately 64 × 44 cm. The rails
+span between four floor-contact elbows on a level supporting surface. There are no legs, unsupported
+branches, elevated surfaces, crossing tubes, or overlapping fittings.
 
-These are geometric planning templates without load ratings or certified strength. Tops, shelves, liners and panels are not included. Custom junctions require compatible sourcing or fabrication.
+This is a footprint study, not a furniture support. It is unbraced and can rack;
+unglued sockets are not assumed rigid. It supplies no lateral restraint for an
+elevated structure in either horizontal direction. Performance depends on PVC
+dimensions and properties, connection methods, assembly quality and use
+conditions. No load rating, certified analysis or guaranteed stability is given.
 
-## Window dimensions and cut list
-
-Dimensions include fitting geometry and 20 mm insertion at each tube end:
-
-- Main box: **1542 W × 2242 H × 392 D mm**; centerline box 1500 × 2200 × 350 mm.
-- Complete footprint with four outriggers: **1542 × 1088 mm**.
-- Sill center: 1121 mm above the floor, exactly halfway between the lower and upper rail centerlines.
-- Clear upper front opening between the perimeter sleeves: approximately **1458 W × 1058 H mm**.
-- 108 pieces, 150 recorded joints, 75 tubes; total physical tube cuts **39164 mm**.
-- Straight cuts: 300 mm × 17, 500 mm × 22, 700 mm × 16.
-- Diagonal cuts: **482 mm × 12**, **760 mm × 8**.
-
-Every axial cut in all nine templates is a multiple of 100 mm. The following whole-mm diagonal cuts are the only exceptions:
-
-| Template | Diagonal cuts (mm) |
-| --- | --- |
-| Window-ready box frame | 482, 760 |
-| Reinforced shelving frame | 608, 681 |
-| Worktable frame | 621 |
-| Compact desk frame | 482 |
-| Freestanding clothes rack | 541, 608 |
-| Shoe rack | 325, 482 |
-| Plant stand | 482, 608 |
-| Laundry hamper frame | 541 |
-| Freestanding display frame | 621, 749 |
-
-## Custom junction representation
-
-Existing catalog fittings are used whenever their directions and reaches match. Other junctions use the `multiway` catalog entry with 2–8 serialized local `sockets`. Each socket has a normalized direction, a collinear mouth position, `type: "socket"`, and `insertion: 20`. Import validation restricts mouth reach to 44–106 mm and socket separation to at least 30 degrees. Geometry uses these same ports; connections still go through `Design.connect` and `Design.check`.
-
-Axial socket mouths are 45 mm from the node center (25 mm internal stop). Diagonal mouths are approximately 105 mm from the center; rounding the physical diagonal cut to the nearest whole millimetre adjusts each neck by less than 0.25 mm. This gives exact seating without hidden gaps or a different insertion depth. Rotations, copying, undo/redo, JSON and autosave retain the socket array. Materials and PDFs count each distinct local socket configuration separately with an identifier; JSON carries the full socket layout. PDF materials overflow continues onto additional pages, followed by all eight views.
-
-## Repeatable verification
+Template selection previews only. Load validates before changing current state,
+asks before replacing unexported work, and creates one undoable, autosaved edit.
+Tests check the exact allowlist, fixed and immutable socket geometry, rejected
+component types and overrides, atomic imports and paste, constructor/history
+validation, real JSON/PDF exports, physical connection alignment, connected
+components and unintended intersections.
 
 Run from the repository root:
 
 ```powershell
-node --test --test-isolation=none tests/pvc-model.test.mjs tests/pvc-placement.test.mjs tests/pvc-templates.test.mjs
+node --test --test-isolation=none tests/pvc-model.test.mjs tests/pvc-placement.test.mjs tests/pvc-templates.test.mjs tests/pvc-standard.test.mjs
 python tests/pvc-browser-fixtures.py
 node tests/pvc-templates.browser.cjs
+node tests/pvc-standard.browser.cjs
+node tests/pvc-placement.browser.cjs
+node tests/pvc-pdf.browser.cjs
 ```
 
-The browser test requires Playwright and installed Chrome (set `NODE_PATH` to the bundled Node dependencies when needed). Its fixture uses separate browser-storage keys. It writes screenshots, portable JSON and the window PDF to `tmp/pvc-templates/`.
-
-Model checks cover all ten options, unique IDs, cut limits and increments, compatible ports used once, alignment within 1e-8 mm, a single connected component, occupied tube ends, serialization, materials totals, copied / transformed assemblies, invalid custom sockets, unintended tube intersections, the window opening and rendered bounds. Browser checks load all nine nonempty options, capture front / side / perspective views, exercise rejected replacements and Empty, one-step undo/redo, placement reset, actual JSON downloads and imports, autosave reload, materials and PDF generation, and the narrow dropdown. Inspect the saved images for the visual checks.
-
-## Verification results — 2026-11-26
-
-- 44 model, placement and template tests passed.
-- All ten dropdown options verified; all nine nonempty templates loaded in Chrome.
-- All 27 front / side / perspective captures inspected. Projected bounding-box corners fit the viewport in every view.
-- Replacement rejection, Empty, pending-placement reset, one-step undo/redo and autosave passed.
-- All nine designs passed actual JSON download/import and autosave reload checks, plus PDF generation (3–4 pages each). The window PDF was also downloaded through the application button and all four pages rendered and inspected.
-- Custom junction configurations, cut grouping, piece counts and tube totals verified; malformed socket layouts rejected.
-- All 19 existing editor interaction scenarios passed, including transforms, selection, connection snapping, unit changes, cut edits, keyboard handling and undo/redo.
-- Native mouse click / placement and native catalog drag checks passed. Responsive dropdown and browser error checks passed.
+Browser checks require Playwright and Chrome; set NODE_PATH to the local bundled
+dependencies if necessary. Generated fixtures use isolated storage keys. Results
+and screenshots are written under tmp/.

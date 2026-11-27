@@ -9,6 +9,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 HOOKS = '''
 globalThis.pvcTest = {
+  setClipboard: data => {clipboard=clone(data);$("#paste").disabled=false;},
+  setHistory: (direction,data) => {(direction==='undo'?undo:redo).push({data:clone(data),selected:[],joint:null});refresh();},
   read: () => ({data:model.data(),selected:[...selected],tool,
     undo:undo.length,redo:redo.length,placement:clone(placement),
     candidate:clone(candidate),rotationIncrement,selectedJoint,

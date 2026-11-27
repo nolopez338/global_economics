@@ -58,12 +58,12 @@ let baseTransform=null, activeIds=new Set(), sliderBase=null;
 
 function status(text,error=false){statusSource=text;$('#status').textContent=unitText(text);$('#status').dataset.error=error;}
 function snapshot(){return {data:model.data(),selected:[...selected],joint:selectedJoint};}
-function restore(s){model=new Design(s.data);selected=new Set(s.selected.filter(id=>model.pieces.some(p=>p.id===id)));selectedJoint=s.joint;candidate=null;pickedPorts=[];}
+function restore(s){model=validate(s.data);selected=new Set(s.selected.filter(id=>model.pieces.some(p=>p.id===id)));selectedJoint=s.joint;candidate=null;pickedPorts=[];}
 function begin(){if(!transaction)transaction=snapshot();}
 function persist(){try{localStorage.setItem(STORAGE,JSON.stringify(model.data()));storageOK=true;}catch{storageOK=false;status('Browser storage is unavailable or full. Use Save JSON to keep your work.',true);}}
 function commit(message){if(transaction&&JSON.stringify(transaction.data)!==JSON.stringify(model.data())){undo.push(transaction);if(undo.length>MAX_HISTORY)undo.shift();redo=[];persist();}transaction=null;refresh();if(message)status(message);}
 function action(fn,message){begin();try{fn();commit(message);}catch(e){restore(transaction);transaction=null;refresh();status(e.message,true);}}
-function history(direction){cancelInteraction();if(placement)cancelPlacement();const from=direction==='undo'?undo:redo,to=direction==='undo'?redo:undo;if(!from.length)return;to.push(snapshot());restore(from.pop());persist();refresh();status(direction==='undo'?'Undid construction change.':'Redid construction change.');}
+function history(direction){const from=direction==='undo'?undo:redo,to=direction==='undo'?redo:undo;if(!from.length)return;try{validate(from.at(-1).data);}catch(error){status('Could not restore history: '+error.message,true);return;}cancelInteraction();if(placement)cancelPlacement();to.push(snapshot());restore(from.pop());persist();refresh();status(direction==='undo'?'Undid construction change.':'Redid construction change.');}
 
 // Geometry: hollow tube walls, annular rims, recessed fitting sockets. No mesh scaling changes diameter.
 function clearGroup(group){dispose(group);}
@@ -175,7 +175,7 @@ function centerFrom(m,ids){const a=new THREE.Vector3();let n=0;for(const p of m.
 function workPlane(through=null){const mode=$('#plane').value,normal=mode==='front'?vec([0,0,1]):mode==='side'?vec([1,0,0]):vec([0,1,0]);const value=planeOffset;return new THREE.Plane(normal,through?-normal.dot(through):-value);}
 function setRay(event){const r=canvas.getBoundingClientRect();pointer.set((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1);ray.setFromCamera(pointer,camera);}
 function planePoint(event,plane=workPlane(),snap=true){setRay(event);const hit=ray.ray.intersectPlane(plane,new THREE.Vector3());if(!hit)return null;if(snap&&$('#grid-snap').checked)hit.toArray().forEach((v,i)=>hit.setComponent(i,Math.round(v/25)*25));return hit;}
-function startPlacement(type){cancelInteraction();cancelPlacement();selectedJoint=null;placement={type,p:[0,60,0],freeP:[0,60,0],q:[0,0,0,1],intentQ:[0,0,0,1],length:400};placementPorts=placementTargets(model);orbit.enabled=false;gizmo.detach();$('#placement-bar').hidden=false;$('#empty').hidden=true;canvas.style.cursor='crosshair';previewPlacement();updateInstructions();status(`Placing ${CATALOG[type].name}. Aim within ${SNAP_PIXELS} screen px of a free compatible port to connect; move away for free placement. Click or release the catalog drag to commit. Q/E rotate immediately; Escape cancels.`);}
+function startPlacement(type){if(!Object.hasOwn(CATALOG,type)){status('Unsupported component type. Only standard PVC components are allowed.',true);return;}cancelInteraction();cancelPlacement();selectedJoint=null;placement={type,p:[0,60,0],freeP:[0,60,0],q:[0,0,0,1],intentQ:[0,0,0,1],length:400};placementPorts=placementTargets(model);orbit.enabled=false;gizmo.detach();$('#placement-bar').hidden=false;$('#empty').hidden=true;canvas.style.cursor='crosshair';previewPlacement();updateInstructions();status(`Placing ${CATALOG[type].name}. Aim within ${SNAP_PIXELS} screen px of a free compatible port to connect; move away for free placement. Click or release the catalog drag to commit. Q/E rotate immediately; Escape cancels.`);}
 function previewPlacement(){
   if(!placement)return;
   if(!placementMesh){clearGhost();placementMesh=geometry({...placement,id:'preview'});placementMesh.traverse(o=>{if(o.isMesh){o.material.transparent=true;o.material.opacity=.55;o.material.color.set(0x2aadaf);o.material.depthWrite=false;o.castShadow=false;}});ghost.add(placementMesh);}
@@ -282,8 +282,9 @@ workspace.addEventListener('dragover',e=>{if(placement){e.preventDefault();e.dat
 workspace.addEventListener('drop',e=>{e.preventDefault();if(placement&&updatePlacement(e))commitPlacement();});
 
 // Catalog is generated from the same definitions as geometry and port compatibility.
-function thumbnail(type){const paths={tube:'M14 47 L65 17',coupling:'M20 44 L59 22',elbow90:'M16 45 Q45 47 45 18',elbow45:'M14 45 L35 34 Q40 30 61 30',tee:'M12 47 L65 17 M38 32 L56 53',cross:'M12 47 L65 17 M20 12 L57 53',multiway:'M12 47 L38 32 L65 47 M38 32 L38 9 M38 32 L61 14',corner:'M12 47 L38 32 L65 47 M38 32 L38 9',cap:'M27 39 L53 24'};return `<svg viewBox="0 0 78 64" aria-hidden="true"><defs><filter id="shadow-${type}"><feDropShadow dx="1" dy="3" stdDeviation="2" flood-color="#69888f" flood-opacity=".25"/></filter></defs><path d="${paths[type]}" stroke="#aec3c6" stroke-width="${type==='tube'?12:17}" fill="none" stroke-linecap="${type==='cap'?'round':'butt'}" filter="url(#shadow-${type})"/><path d="${paths[type]}" stroke="#f3f8f7" stroke-width="${type==='tube'?9:13}" fill="none"/><path d="${paths[type]}" stroke="#ffffff" stroke-width="3" opacity=".9" fill="none"/>${type==='tube'?'<ellipse cx="65" cy="17" rx="5" ry="6" fill="#6f9298" transform="rotate(48 65 17)"/><ellipse cx="65" cy="17" rx="3" ry="4" fill="#35575f" transform="rotate(48 65 17)"/>':''}</svg>`;}
+function thumbnail(type){const paths={tube:'M14 47 L65 17',coupling:'M20 44 L59 22',elbow90:'M16 45 Q45 47 45 18',elbow45:'M14 45 L35 34 Q40 30 61 30',tee:'M12 47 L65 17 M38 32 L56 53',cross:'M12 47 L65 17 M20 12 L57 53',corner:'M12 47 L38 32 L65 47 M38 32 L38 9'};return `<svg viewBox="0 0 78 64" aria-hidden="true"><defs><filter id="shadow-${type}"><feDropShadow dx="1" dy="3" stdDeviation="2" flood-color="#69888f" flood-opacity=".25"/></filter></defs><path d="${paths[type]}" stroke="#aec3c6" stroke-width="${type==='tube'?12:17}" fill="none" stroke-linecap="butt" filter="url(#shadow-${type})"/><path d="${paths[type]}" stroke="#f3f8f7" stroke-width="${type==='tube'?9:13}" fill="none"/><path d="${paths[type]}" stroke="#ffffff" stroke-width="3" opacity=".9" fill="none"/>${type==='tube'?'<ellipse cx="65" cy="17" rx="5" ry="6" fill="#6f9298" transform="rotate(48 65 17)"/><ellipse cx="65" cy="17" rx="3" ry="4" fill="#35575f" transform="rotate(48 65 17)"/>':''}</svg>`;}
 for(const [type,def] of Object.entries(CATALOG)){const b=document.createElement('button');b.className='material';b.draggable=true;b.dataset.type=type;b.innerHTML=thumbnail(type);const name=document.createElement('strong'),note=document.createElement('small');name.textContent=def.name;note.textContent=def.note;b.append(name,note);b.onclick=()=>startPlacement(type);b.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',type);e.dataTransfer.effectAllowed='copy';startPlacement(type);});b.addEventListener('dragend',()=>{if(placement)cancelPlacement();});$('#catalog').append(b);}
+$('.materials .count').textContent=Object.keys(CATALOG).length;
 
 function editLength(value){const p=model.pieces.find(p=>selected.has(p.id));if(!p)return;if(!sliderBase){begin();sliderBase=clone(transaction.data);}try{model=new Design(sliderBase);model.resize(p.id,Number(value)*scale());sync();summary();showOverlays();showLengthInput($('#length'),Number(value)*scale());$('#length-slider').value=value;}catch(e){status(e.message,true);}}
 $('#length').addEventListener('change',e=>{const p=model.pieces.find(p=>selected.has(p.id));if(p&&e.target.value!==e.target.dataset.displayValue)action(()=>model.resize(p.id,e.target.valueAsNumber*scale()),'Tube cut length updated; valid joints preserved.');});
@@ -315,18 +316,20 @@ for(const t of TEMPLATES){const option=document.createElement('option');option.v
 function previewTemplate(){const t=TEMPLATES.find(t=>t.id===$('#template').value);$('#template-description').textContent=t.description;$('#template-dimensions').textContent=t.dimensions;}
 $('#template').onchange=previewTemplate;previewTemplate();
 $('#load-template').onclick=()=>{
+  const t=TEMPLATES.find(t=>t.id===$('#template').value);let incoming;
+  try{incoming=validate(buildTemplate(t?.id).data());}catch(error){status('Could not load template: '+error.message,true);return;}
   if(!mayReplace())return;
   // Roll back pending gestures before taking the single replacement snapshot.
   cancelInteraction();cancelPlacement();setTool('select');
-  const t=TEMPLATES.find(t=>t.id===$('#template').value);
-  action(()=>{model=buildTemplate(t.id);selected.clear();selectedJoint=null;pickedPorts=[];hovered=null;placementPointer=null;pointerGesture=null;doubleClickEligible=false;},`Loaded ${t.name}. ${t.dimensions} Undo restores the previous design.`);
+  action(()=>{model=incoming;selected.clear();selectedJoint=null;pickedPorts=[];hovered=null;placementPointer=null;pointerGesture=null;doubleClickEligible=false;},`Loaded ${t.name}. ${t.dimensions} Undo restores the previous design.`);
   frame();
 };
-$('#export').onclick=()=>{const data=JSON.stringify(model.data(),null,2),blob=new Blob([data],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='pvc-design.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);exported=JSON.stringify(model.data());status('Design exported as pvc-design.json.');};
+$('#export').onclick=()=>{try{const data=JSON.stringify(model.data(),null,2),blob=new Blob([data],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='pvc-design.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);exported=JSON.stringify(model.data());status('Design exported as pvc-design.json.');}catch(error){status('Could not export JSON: '+error.message,true);}};
 // Read only the committed snapshot during an in-progress transform. Placement lives outside it.
 $('#download-pdf').onclick=async()=>{
   if(pdfExporting)return;
-  const data=clone(transaction?.data??model.data()),unit=lengthUnit;
+  let data;const unit=lengthUnit;
+  try{data=validate(clone(transaction?.data??model.data())).data();}catch(error){status('Could not export PDF: '+error.message,true);return;}
   if(!data.pieces.length)return;
   pdfExporting=true;const button=$('#download-pdf');button.disabled=true;button.setAttribute('aria-busy','true');
   status('PDF: preparing materials and eight views…');

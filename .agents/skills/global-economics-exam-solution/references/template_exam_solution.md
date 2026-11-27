@@ -32,6 +32,16 @@ Preserve original figures in the prompt. For a reusable graph, start with the [g
 
 Pair a figure and its calculation or completed table in top-aligned minipages when both are legible at normal size. Give each minipage enough width for its contents and keep their combined widths below `\linewidth`. Use `aligned` or `align*` to break long derivations and give wider work the full text width. For genuinely wide work, use a `landscape` environment from the shared preamble.
 
+## Partial-credit presentation
+
+Use the scaffold's worked algebra example as a layout model, replacing its task, reasoning, rows, and values with those of the governing source. The authoring order and scoring decisions are defined in `SKILL.md`; document placement does not change that order.
+
+For newly generated allocations, put a bold **Proposed partial credit.** label above a two-column table headed **Assessed step or criterion** and **Points**. Use concise descriptions of observable mathematical work. Finish with a separated, bold **Total** row equal to the task allocation exactly. Supplied official rubrics retain their content and status; do not relabel official allocations as proposed. Identify any added subdivision separately.
+
+Match the scaffold's reference-style layout: `\par\smallskip` before and after a full-width minipage, `\centering` inside it, `\par\smallskip` after the label, and `\begin{tabular}{@{}l r@{}}`. Use booktabs `\toprule`, `\midrule` after the header and before Total, and `\bottomrule`. The shared preamble supplies booktabs; the scaffold loads `varwidth` and defines `\CreditDescription` with a top-aligned, ragged-right wrapping width of `.72\linewidth`. Use it for the description cells, including the header and Total, or an equivalent reusable definition; avoid defining it twice in adapted keys.
+
+Place each rubric immediately after its completed worked task, before `\secInicio`. When a task contains subparts, retain their explicit source labels in the relevant rows and give subpart subtotal notes directly below the table. Subtotal notes summarize the awarded rows; they are not additional credit. For separately scored and separately worked tasks, give each its own rubric and Total. Keep any unscored explanatory checks or scoring exclusions outside the assessed rows. Inspect long tables for page fit and description wrapping; do not shrink them to illegibility to keep the minipage intact.
+
 ## Build and inspect
 
 Run from the directory containing the key's `.tex` file. Use its filename as the job name so the PDF has the same basename. For a temporary build, create a temporary directory first and pass its absolute path with `-output-directory`.

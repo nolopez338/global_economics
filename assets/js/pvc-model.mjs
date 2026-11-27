@@ -2,23 +2,37 @@
 import {Vector3, Quaternion} from '../vendor/three-0.170.0/three.module.js';
 export const RADIUS = 16, INNER_RADIUS = 13, INSERTION = 20, MIN_LENGTH = 80, MAX_LENGTH = 3000;
 const socket = (direction) => ({position: direction.map(x => x * 45), direction, type: 'socket', insertion: INSERTION});
-export const CATALOG = Object.freeze({
+const deepFreeze = value => {if(value && typeof value==='object'){Object.values(value).forEach(deepFreeze);Object.freeze(value);}return value;};
+export const CATALOG = deepFreeze({
   tube: {name: 'Straight tube', note: '80–3,000 mm cut length', ports: null, icon: 'tube'},
   coupling: {name: 'Straight coupling', note: '2 sockets · inline', ports: [socket([-1,0,0]),socket([1,0,0])]},
   elbow90: {name: '90° elbow', note: '2 sockets · right angle', ports: [socket([1,0,0]),socket([0,0,1])]},
   elbow45: {name: '45° elbow', note: '2 sockets · gentle turn', ports: [socket([-1,0,0]),socket([Math.SQRT1_2,0,Math.SQRT1_2])]},
   tee: {name: 'Three-port tee', note: '3 sockets · branch', ports: [socket([-1,0,0]),socket([1,0,0]),socket([0,0,1])]},
   cross: {name: 'Four-port cross', note: '4 sockets · flat junction', ports: [socket([-1,0,0]),socket([1,0,0]),socket([0,0,-1]),socket([0,0,1])]},
-  corner: {name: 'Three-way corner', note: '3 sockets · furniture corner', ports: [socket([1,0,0]),socket([0,1,0]),socket([0,0,1])]},
-  multiway: {name: 'Custom multiway junction', note: 'Configurable sockets · source / fabricate', ports: [socket([-1,0,0]),socket([1,0,0]),socket([0,1,0])]},
-  cap: {name: 'End cap', note: '1 socket · closed end', ports: [socket([1,0,0])]}
+  corner: {name: 'Three-way corner', note: '3 sockets · furniture corner', ports: [socket([1,0,0]),socket([0,1,0]),socket([0,0,1])]}
 });
 export const uid = () => crypto.randomUUID();
 export const vec = a => new Vector3(...a);
 export const quat = a => new Quaternion(...a);
 export const clone = a => JSON.parse(JSON.stringify(a));
+const header = {format:'pvc-studio',version:1,catalog:'pvc-32-v1',units:'mm',radius:RADIUS};
+const array = (a,n) => Array.isArray(a)&&a.length===n&&a.every(x=>Number.isFinite(x)&&Math.abs(x)<1e7);
+function standardType(piece) {
+  if(!piece || !Object.hasOwn(CATALOG,piece.type))throw Error('Unsupported component type. Only the seven standard PVC components are allowed.');
+  const overrides=['sockets','ports','socketCount','directions','positions','direction','position','insertion','compatibility'];
+  if(overrides.some(key=>Object.hasOwn(piece,key)))throw Error('Socket overrides and arbitrary ports are not allowed. Standard fitting sockets are fixed.');
+}
+function validatePiece(p) {
+  standardType(p);
+  const fields=['id','type','p','q',...(p.type==='tube'?['length']:[])];
+  if(Object.keys(p).some(key=>!fields.includes(key)))throw Error('Unsupported per-piece override. Only identity, position, rotation and tube cut length are allowed.');
+  if(!array(p.p,3)||!array(p.q,4)||Math.abs(quat(p.q).length()-1)>.00001)throw Error('Invalid component transform.');
+  if(p.type==='tube'&&(!Number.isFinite(p.length)||p.length<MIN_LENGTH||p.length>MAX_LENGTH))throw Error('Invalid tube cut length.');
+}
 export function localPorts(piece) {
-  return piece.type === 'tube' ? [-1,1].map(s => ({position:[s*piece.length/2,0,0],direction:[s,0,0],type:'tube',insertion:0})) : piece.type==='multiway' ? (piece.sockets || CATALOG.multiway.ports) : CATALOG[piece.type].ports;
+  standardType(piece);
+  return piece.type === 'tube' ? [-1,1].map(s => ({position:[s*piece.length/2,0,0],direction:[s,0,0],type:'tube',insertion:0})) : CATALOG[piece.type].ports;
 }
 export function port(piece, index) {
   const p = localPorts(piece)[index];
@@ -28,17 +42,18 @@ export function port(piece, index) {
   // Socket's mating datum is its internal stop. A physical tube end seats 20 mm inside the mouth.
   return {...p, direction, mouth, position: mouth.clone().addScaledVector(direction,-p.insertion)};
 }
-export const compatiblePorts = (a,b) => a.type !== b.type;
+export const compatiblePorts = (a,b) => (a.type==='tube'&&b.type==='socket')||(a.type==='socket'&&b.type==='tube');
 export function portAlignment(pa,pb) {
   return {rotation:new Quaternion().setFromUnitVectors(pa.direction,pb.direction.clone().negate()),pivot:pa.position,translation:pb.position.clone().sub(pa.position)};
 }
 export class Design {
-  constructor(data = {pieces:[],connections:[]}) { this.pieces=clone(data.pieces); this.connections=clone(data.connections); }
-  data() {return {format:'pvc-studio',version:1,catalog:'pvc-32-v1',units:'mm',radius:RADIUS,pieces:clone(this.pieces),connections:clone(this.connections)};}
+  constructor(data = {pieces:[],connections:[]}) { const checked=validate({...header,...data});this.pieces=checked.pieces;this.connections=checked.connections; }
+  data() {const checked=validate({...header,pieces:this.pieces,connections:this.connections});return {...header,pieces:checked.pieces,connections:checked.connections};}
   get(id) {const p=this.pieces.find(p=>p.id===id); if(!p) throw Error('Piece no longer exists.'); return p;}
-  add(type,p=[0,60,0],length=400,q=[0,0,0,1],sockets=null) {
-    if(!Object.hasOwn(CATALOG,type)) throw Error('Unknown component type.');
-    const piece={id:uid(),type,p:[...p],q:[...q],...(type==='tube'?{length}: {}),...(type==='multiway'?{sockets:clone(sockets || CATALOG.multiway.ports)}:{})}; this.pieces.push(piece); return piece;
+  add(type,p=[0,60,0],length=400,q=[0,0,0,1],...overrides) {
+    if(overrides.length)throw Error('Socket overrides and arbitrary ports are not allowed.');
+    const piece={id:uid(),type,p:[...p],q:[...q],...(type==='tube'?{length}:{})};
+    validatePiece(piece);this.pieces.push(piece);return piece;
   }
   occupied(id,index) {return this.connections.some(c=>[c.a,c.b].some(e=>e.id===id&&e.port===index));}
   connected(ids,excluded=new Set()) {
@@ -50,6 +65,7 @@ export class Design {
     for(const p of this.pieces) if(ids.has(p.id)) {p.p=vec(p.p).sub(pivot).applyQuaternion(rotation).add(pivot).add(translation).toArray();p.q=rotation.clone().multiply(quat(p.q)).normalize().toArray();}
   }
   check(a,b,geometry=true) {
+    for(const e of [a,b])if(!e||typeof e.id!=='string'||!Number.isInteger(e.port)||e.port<0||Object.keys(e).some(k=>!['id','port'].includes(k)))throw Error('Invalid connection endpoint. Use a piece ID and fixed standard port index; port overrides are not allowed.');
     if(a.id===b.id) throw Error('A piece cannot connect to itself.');
     const pa=port(this.get(a.id),a.port),pb=port(this.get(b.id),b.port);
     if(!compatiblePorts(pa,pb)) throw Error('Connect a tube end to a fitting socket. Tube-to-tube and socket-to-socket joints are incompatible.');
@@ -83,24 +99,27 @@ export class Design {
     if(plan.fixed!==null)p.p=vec(p.p).addScaledVector(axis,(plan.fixed===0?1:-1)*delta/2).toArray();
     this.transform(plan.side,new Quaternion(),new Vector3(),axis.multiplyScalar(delta));p.length=length;
   }
-  copy(ids) {return {pieces:clone(this.pieces.filter(p=>ids.has(p.id))),connections:clone(this.connections.filter(c=>ids.has(c.a.id)&&ids.has(c.b.id)))};}
+  copy(ids) {this.data();return {pieces:clone(this.pieces.filter(p=>ids.has(p.id))),connections:clone(this.connections.filter(c=>ids.has(c.a.id)&&ids.has(c.b.id)))};}
   paste(data,offset=[80,0,80]) {
+    data=new Design(data).data();
     const map=new Map(data.pieces.map(p=>[p.id,uid()]));
-    this.pieces.push(...data.pieces.map(p=>({...clone(p),id:map.get(p.id),p:vec(p.p).add(vec(offset)).toArray()})));
-    this.connections.push(...data.connections.map(c=>({id:uid(),a:{id:map.get(c.a.id),port:c.a.port},b:{id:map.get(c.b.id),port:c.b.port}})));
+    const pieces=data.pieces.map(p=>({...clone(p),id:map.get(p.id),p:vec(p.p).add(vec(offset)).toArray()}));
+    const connections=data.connections.map(c=>({id:uid(),a:{id:map.get(c.a.id),port:c.a.port},b:{id:map.get(c.b.id),port:c.b.port}}));
+    const checked=new Design({pieces:[...this.pieces,...pieces],connections:[...this.connections,...connections]});
+    this.pieces=checked.pieces;this.connections=checked.connections;
     return new Set(map.values());
   }
   materials() {return materialsSummary(this.pieces);}
   summary() {const {rows,total}=this.materials();return {rows:rows.map(p=>[p.type==='tube'?`Tube · ${p.length} mm`:materialName(p),p.count]),total};}
 }
 // Exact numeric cut lengths are the grouping key; presentation never changes identity.
-export function configuration(sockets) {let hash=2166136261;for(const c of JSON.stringify(sockets))hash=Math.imul(hash^c.charCodeAt(0),16777619);return (hash>>>0).toString(16).padStart(8,'0');}
-export function materialName(row) {return CATALOG[row.type].name+(row.type==='multiway'?` · ${row.sockets.length} sockets · ${row.configuration || configuration(row.sockets)}`:'');}
+export function materialName(row) {standardType(row);return CATALOG[row.type].name;}
 export function materialsSummary(pieces) {
   const rows=new Map(),cuts=[];
   for(const p of pieces){
-    const key=p.type==='tube'?`tube:${p.length}`:p.type==='multiway'?`multiway:${JSON.stringify(p.sockets)}`:p.type;
-    if(!rows.has(key))rows.set(key,{type:p.type,...(p.type==='tube'?{length:p.length}:{}),...(p.type==='multiway'?{sockets:clone(p.sockets),configuration:configuration(p.sockets)}:{}),count:0});
+    validatePiece(p);
+    const key=p.type==='tube'?`tube:${p.length}`:p.type;
+    if(!rows.has(key))rows.set(key,{type:p.type,...(p.type==='tube'?{length:p.length}:{}),count:0});
     rows.get(key).count++;if(p.type==='tube')cuts.push(String(p.length));
   }
   // Valid physical cuts (80-3000 mm) have decimal, non-exponential strings.
@@ -113,25 +132,14 @@ export function materialsSummary(pieces) {
 export function validate(data) {
   if(!data||data.format!=='pvc-studio'||data.version!==1||data.catalog!=='pvc-32-v1'||data.units!=='mm'||data.radius!==RADIUS)throw Error('Unsupported design. Expected PVC Studio v1, pvc-32-v1 catalog, millimetres and 32 mm tubes.');
   if(!Array.isArray(data.pieces)||!Array.isArray(data.connections)||data.pieces.length>2000||data.connections.length>6000)throw Error('Invalid design arrays or design exceeds 2,000 pieces / 6,000 joints.');
-  const ids=new Set(), array=(a,n)=>Array.isArray(a)&&a.length===n&&a.every(x=>Number.isFinite(x)&&Math.abs(x)<1e7);
-  for(const p of data.pieces){if(typeof p.id!=='string'||!p.id||p.id.length>100||ids.has(p.id))throw Error('Missing or duplicate piece ID.');ids.add(p.id);
-    if(!Object.hasOwn(CATALOG,p.type)||!array(p.p,3)||!array(p.q,4)||Math.abs(quat(p.q).length()-1)>.00001)throw Error('Invalid component or transform.');
-    if(p.type==='multiway'){
-      if(!Array.isArray(p.sockets)||p.sockets.length<2||p.sockets.length>8)throw Error('Invalid multiway sockets.');
-      for(const [i,s] of p.sockets.entries()){
-        if(!s||s.type!=='socket'||s.insertion!==INSERTION||!array(s.direction,3)||!array(s.position,3)||Math.abs(vec(s.direction).length()-1)>1e-8)throw Error('Invalid multiway socket.');
-        const reach=vec(s.position).dot(vec(s.direction));
-        if(reach<44||reach>106||vec(s.position).distanceTo(vec(s.direction).multiplyScalar(reach))>1e-8)throw Error('Invalid multiway socket reach.');
-        for(const t of p.sockets.slice(0,i))if(vec(t.direction).dot(vec(s.direction))>Math.cos(Math.PI/6)+1e-8)throw Error('Multiway sockets must be at least 30 degrees apart.');
-      }
-    }
-    if(p.type==='tube'&&(!Number.isFinite(p.length)||p.length<MIN_LENGTH||p.length>MAX_LENGTH))throw Error('Invalid tube cut length.');}
-  const model=new Design({pieces:data.pieces,connections:[]}), jointIds=new Set();
-  for(const c of data.connections){if(typeof c.id!=='string'||!c.id||c.id.length>100||jointIds.has(c.id)||ids.has(c.id))throw Error('Missing or duplicate joint ID.');jointIds.add(c.id);
+  const ids=new Set();
+  for(const p of data.pieces){validatePiece(p);if(typeof p.id!=='string'||!p.id||p.id.length>100||ids.has(p.id))throw Error('Missing or duplicate piece ID.');ids.add(p.id);}
+  const model=Object.create(Design.prototype),jointIds=new Set();model.pieces=clone(data.pieces);model.connections=[];
+  for(const c of data.connections){if(!c||typeof c.id!=='string'||!c.id||c.id.length>100||jointIds.has(c.id)||ids.has(c.id))throw Error('Missing or duplicate joint ID.');jointIds.add(c.id);
+    if(Object.keys(c).some(k=>!['id','a','b'].includes(k)))throw Error('Unsupported joint override.');
     for(const e of [c.a,c.b])if(!e||!ids.has(e.id)||!Number.isInteger(e.port)||e.port<0||e.port>=localPorts(model.get(e.id)).length)throw Error('Joint refers to an invalid piece or port.');
     model.check(c.a,c.b);model.connections.push(clone(c));}
-  // Normalize to supported fields only; arbitrary imported properties never reach the UI.
-  model.pieces=model.pieces.map(p=>({id:p.id,type:p.type,p:[...p.p],q:[...p.q],...(p.type==='tube'?{length:p.length}:{}),...(p.type==='multiway'?{sockets:p.sockets.map(s=>({position:[...s.position],direction:[...s.direction],type:'socket',insertion:INSERTION}))}:{})}));return model;
+  return model;
 }
 export function rectangle() {
   const m=new Design(), elbows=[];

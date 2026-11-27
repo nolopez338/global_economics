@@ -174,7 +174,7 @@ await test('Converted length edits preserve connected joints and closed-loop loc
 });
 
 await test('Catalog click and drag placement: every fitting and tube, all cameras, exact preview commit and history',async()=>{
-  for(const [index,type] of ['tube','coupling','elbow90','elbow45','tee','cross','corner','multiway','cap'].entries()){
+  for(const [index,type] of ['tube','coupling','elbow90','elbow45','tee','cross','corner'].entries()){
     const m=new Design(),target=m.add(type==='tube'?'tee':'tube',[0,120,0]);await load(m);
     change('#camera',['perspective','top','front','side'][index%4]);await tick();
     const dragEvent=(name,p)=>d.querySelector('#workspace').dispatchEvent(new w.DragEvent(name,{clientX:p.x,clientY:p.y,bubbles:true,cancelable:true,dataTransfer:new w.DataTransfer()}));
@@ -204,16 +204,17 @@ await test('Catalog click and drag placement: every fitting and tube, all camera
 });
 await test('192 CSS-pixel acquisition and strict release in every camera, zoomed views and free rotation',async()=>{
   for(const view of ['front','side','top','perspective'])for(const zoomed of [false,true]){
-    const m=new Design(),target=m.add('cap',[0,120,0]);await load(m);
+    const m=new Design(),target=m.add('coupling',[0,120,0]);await load(m);
     change('#camera',view);change('#plane',view==='side'?'side':view==='front'?'front':'ground');await tick();
     if(zoomed){c.dispatchEvent(new w.WheelEvent('wheel',{deltaY:-240,bubbles:true,cancelable:true}));await tick();}
     click('[data-type="tube"]');key('q');const initial=state().placement.intentQ;
-    const at=screen(port(target,0).position.toArray()),mesh=state().previewMesh;
+    const at=[0,1].map(i=>screen(port(target,i).position.toArray())).sort((a,b)=>b.y-a.y)[0],mesh=state().previewMesh;
     for(const distance of [128,191.75,192]){
       pointer('pointermove',{x:at.x,y:at.y+distance},{buttons:0});
       assert(state().placement.connection?.target.id===target.id,`${view} ${zoomed} did not acquire at ${distance}px`);
       const guide=d.querySelector('#placement-guide'),circle=guide.querySelector('circle'),r=c.getBoundingClientRect();
-      assert(!guide.hasAttribute('hidden')&&near(Number(circle.getAttribute('cx')),at.x-r.left)&&near(Number(circle.getAttribute('cy')),at.y-r.top),'Connection guide target '+view);
+      const chosen=screen(port(target,state().placement.connection.target.port).position.toArray());
+      assert(!guide.hasAttribute('hidden')&&near(Number(circle.getAttribute('cx')),chosen.x-r.left)&&near(Number(circle.getAttribute('cy')),chosen.y-r.top),'Connection guide target '+view);
     }
     pointer('pointermove',{x:at.x,y:at.y+192.25},{buttons:0});
     assert(!state().placement.connection,'Target retained outside 192px '+view);
@@ -227,7 +228,7 @@ await test('192 CSS-pixel acquisition and strict release in every camera, zoomed
   }
 });
 await test('Placement switches by pointer, stays stable near competitors, moves away, disables snap and cancels',async()=>{
-  const m=new Design();m.add('cap',[-20,120,0]);m.add('cap',[20,120,0]);await load(m);change('#camera','front');change('#plane','front');await tick();click('[data-type="tube"]');
+  const m=new Design();m.add('coupling',[-20,120,0]);m.add('coupling',[20,120,0]);await load(m);change('#camera','front');change('#plane','front');await tick();click('[data-type="tube"]');
   const {port}=await import('../assets/js/pvc-model.mjs');
   const a=screen(port(m.pieces[0],0).position.toArray()),b=screen(port(m.pieces[1],0).position.toArray());
   pointer('pointermove',a,{buttons:0});const first=state().placement.connection;assert(first,'First target');

@@ -8,8 +8,8 @@ No build, backend, npm installation, or runtime CDN is required.
 
 - `assets/js/pvc-model.mjs`: structured catalog, local ports, graph traversal,
   rigid transforms, cut-length editing, copying, materials and import validation.
-- `assets/js/pvc-templates.mjs`: ten editable planning templates, connected bracing,
-  dimensions and cut-length planning.
+- `assets/js/pvc-templates.mjs`: Empty and a floor-supported footprint study with
+  fixed standard fittings, dimensions and explicit racking limitations.
 - `assets/js/pvc-app.mjs`: hollow geometry, Three.js scene and controls,
   selection, snap preview, gesture transactions, persistence and inspector.
 - `assets/css/pvc-design.css`: scoped application styling and responsive panels.
@@ -24,18 +24,31 @@ are 45 mm from the local origin, and their internal mating stops are 20 mm
 inside their mouths. The tube end aligns with that stop, with opposing outward
 directions. Socket walls are thicker than tube walls.
 
-Custom multiway junctions serialize their local socket layout with validated
-normalized directions, 44–106 mm mouth reaches and the same 20 mm insertion.
-Materials distinguish socket configurations. These parts need compatible
-sourcing or fabrication; they are geometric planning components without
-certified load ratings. See [template dimensions, cuts and verification](../tests/pvc-templates.md).
+Only seven components are supported: straight tube, straight coupling, 90° elbow,
+45° elbow, three-port tee, four-port cross and three-way corner (three mutually
+perpendicular sockets). The deeply frozen catalog defines every socket count,
+position, direction, insertion and compatibility. Piece records permit only
+`id`, `type`, `p`, `q`, and `length` for tubes. Socket arrays, port definitions
+and every other per-piece override are rejected, even if they match a standard
+fitting. Removed components are never converted to standard parts.
 
-The labeled Template dropdown previews exactly ten options, including Empty.
-Only Load template replaces the assembly, using the existing unexported-work
-prompt. Each load is one undoable, autosaved operation with cleared temporary
-state and a framed view. Diagonal socket necks account for whole-mm cut
-rounding; all axial cuts use 100 mm increments. PDFs paginate large custom
-junction lists before the eight design views.
+The Template dropdown offers Empty and Ground footprint study. The nine former
+elevated furniture templates were removed: their multi-directional junctions
+and variable brace angles cannot be represented by the allowed fittings.
+The remaining layout distributes four floor-contact elbows across a broad, low
+footprint, with short rails spanning between them; it provides no elevated load
+support or bracing. Its rectangle can rack, and
+unglued sockets are not assumed rigid. Floor contact is an explicit condition,
+not an invisible modeled support. Load template validates the whole graph before
+replacement, then records one undoable, autosaved action and frames the view.
+See [template checks](../tests/pvc-templates.md).
+
+These are geometric planning considerations, not certified structural analysis.
+No safe load ratings or guaranteed stability are provided. Actual performance
+depends on PVC dimensions and properties, connection methods, assembly quality
+and use conditions, including asymmetric loading. Elevated furniture needs
+verified load paths and sway/racking restraint in both horizontal directions;
+the remaining footprint example does not provide those features.
 
 Joints are graph edges with stable IDs and explicit piece/port endpoints.
 Proximity only proposes a new joint; existing joints never depend on mesh
@@ -55,7 +68,10 @@ one edge never moves pieces or automatically breaks other edges.
 The JSON contract is `format: pvc-studio`, `version: 1`, `catalog: pvc-32-v1`,
 `units: mm`, `radius: 16`, plus pieces and connections. Import checks transforms,
 normalized quaternions, ID uniqueness, port compatibility and occupancy, tube
-lengths, endpoint references and all joint geometry before replacement.
+lengths, endpoint references and all joint geometry before replacement. The same
+validation protects constructors, manual creation, paste, autosave, history,
+JSON exports and PDF materials. Invalid input leaves the current design intact
+and reports an error. Invalid autosave remains in storage for manual recovery.
 Import limits are 5 MB, 2,000 pieces and 6,000 joints. Browser autosave uses
 `pvc-studio-v1` in local storage. Undo/redo retains up to 80 completed actions
 in the current session; history and the copy buffer are not persisted.
@@ -97,60 +113,38 @@ Escape and defer other shortcuts until release.
 
 ## Verification
 
-Run `node --test tests/pvc-model.test.mjs` from the repository root.
-All 11 model tests pass, covering insertion, rigid movement, independent pieces
-after detachment, free/one-ended/two-ended resizing, rotated branches,
-alternate paths, rectangular closed loops, rejected inconsistent closure,
-copy/paste with fresh IDs, materials, JSON round trips and malformed imports.
+Run the model suites from the repository root:
 
-For repeatable browser regression tests, run
-`python tests/pvc-browser-fixtures.py`, serve the repository normally, and open
-`tests/pvc-interactions.html`. The generator copies the current implementation
-into ignored `tests/.pvc-browser/` files, adding read-only observation hooks
-only to that test copy. Separate test storage keys protect ordinary autosaves
-and preferences. Regenerate after changing production sources.
+```powershell
+node --test --test-isolation=none tests/pvc-model.test.mjs tests/pvc-placement.test.mjs tests/pvc-templates.test.mjs tests/pvc-standard.test.mjs
+```
 
-All 12 browser scenarios pass in Chromium with WebGL: Q/E during placement
-and selection, world axes, presets/custom increments and local persistence,
-on-screen rotations, rigid connected and disconnected selections, left pan,
-right orbit, wheel zoom, the click threshold, click/Shift-click, marquee,
-double-click movement, all three working planes, no offset/grid jump, snapping,
-Escape cancellation, typing protection, gizmo availability and cancellation,
-and exact drag/discrete-rotation undo/redo counts. The suite sends DOM keyboard
-and pointer events through the real controls and validates resulting joints.
-Native browser input also verified preview Q/E, double-click mode entry,
-translation, Q/E on a connected selection, undo and Escape exit. Desktop and
-narrow layouts were visually inspected. Cross-browser and touch-device QA
-remain outside this verification.
+The 49 tests cover the exact component allowlist, immutable socket geometry,
+rejection of custom types and per-piece or endpoint overrides, atomic paste,
+JSON/PDF input validation, connected templates, insertion, rigid transforms,
+cut-length editing, graph constraints, materials and serialization.
 
-Browser QA used the working page in the in-app Chromium browser:
+Generate browser fixtures with `python tests/pvc-browser-fixtures.py`. These copy
+the production implementation into ignored `tests/.pvc-browser/` files and add
+observation and invalid-buffer injection hooks only to that test copy. Separate
+storage keys protect ordinary autosaves and placement preferences. Regenerate
+after changing production sources.
 
-1. Placed a hollow tube, placed an elbow near its end, and confirmed automatic
-   snap and one committed joint. Also tested inspector-based port connection.
-2. Moved the connected pair with the translation gizmo and rotated it with a
-   rotation ring; the connection remained intact.
-3. Detached a selected joint, undid and redid the detachment, and moved the
-   detached tube independently while its elbow stayed in place.
-4. Changed length with the numeric control and the synchronized range control.
-   Tested one attached end, then a tube between an elbow and a tee: both joints
-   remained intact while the opposite branch translated.
-5. Copied and pasted a two-piece selection; counts changed from two pieces /
-   one joint to four pieces / two joints, with the pasted pieces selected.
-6. Opened the eight-piece rectangular frame. Confirmed its length lock, used
-   Show blocking joint and Detach, resized the open tube, then attempted to
-   reconnect the loop: the inconsistent closure was rejected without mutation.
-7. Exported JSON and imported that actual downloaded file; the four pieces,
-   one remaining joint and 1,400 mm cut total matched the export. Reload also
-   restored the autosaved design.
-8. Checked materials quantities and changing cut totals throughout construction.
-9. Tested all four camera presets, marquee selection, Shift-click add/remove,
-   catalog drag-and-drop, placement cancellation, and dismissible help.
-10. Inspected the three-panel layout at 1280×720 and 1366×768, and the stacked
-    layout at 390×844. Narrow-screen properties are below the workspace; panels
-    scroll independently on desktop. No browser console errors were reported.
-11. Moved two disconnected selected tubes into snapping range of an elbow.
-    Both tubes received the same rigid snap correction, retaining their
-    spacing and relative rotation; only the mating tube gained a joint.
+`tests/pvc-standard.browser.cjs` checks the seven-item catalog, invalid JSON,
+paste, undo/redo and autosave rejection with unchanged state, JSON download and
+all-seven-component PDF creation. `tests/pvc-templates.browser.cjs` covers both
+template options, replacement prompts, history, autosave, JSON round trips,
+PDF output, camera framing and responsive layout.
+
+`tests/pvc-placement.browser.cjs` exercises DOM controls and real mouse/native
+drag input, camera and working-plane modes, custom rotation increments, rigid
+assembly edits, cut lengths and units, exact snap commits, copy/history and
+Escape cancellation. Its native-input checks use device pixel ratios 1 and 2.
+`tests/pvc-pdf.browser.cjs` checks real downloads, committed snapshots, export
+state preservation, eight camera views, compact lists, overflow and rendering
+errors. `tests/pvc-pdf-check.py` inspects downloaded PDF pages, materials,
+quantities, exact cuts and embedded images using pypdf. Browser tests require
+Playwright and Chrome. Cross-browser and touch-device QA remain outside scope.
 
 ## Deliberate scope
 

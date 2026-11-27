@@ -41,11 +41,14 @@ for name in ['frame', 'mixed-cm', 'compact', 'committed']:
         for length in [350, 550]:
             assert re.search(rf'Cut {length} mm\nOD 32 mm\n2', text)
     elif name == 'mixed-cm':
-        assert 'Total pieces: 11' in text and 'Total tube cut length: 154.69120001 cm' in text
+        assert 'Total pieces: 10' in text and 'Total tube cut length: 154.69120001 cm' in text
+        for component in ['Straight tube','Straight coupling','90° elbow','45° elbow','Three-port tee','Four-port cross','Three-way corner']:
+            assert component in text, component
+        assert 'multiway' not in text.lower() and 'end cap' not in text.lower()
         for length in ['12.3456', '12.34560001', '65']:
             assert f'Cut {length} cm' in text
         assert re.search(r'Cut 65 cm\nOD 3.2 cm\n2', text)
-        assert len({args[0] for args, op in reader.pages[0].get_contents().operations if op == b'Do'}) == 8  # All catalog types, tubes reuse one reference.
+        assert len({args[0] for args, op in reader.pages[0].get_contents().operations if op == b'Do'}) == 7  # All catalog types, tubes reuse one reference.
     elif name == 'compact':
         assert 'Total pieces: 20' in text and 'Total tube cut length: 1790 mm' in text
         assert text.count('Reference') == 2
