@@ -59,6 +59,7 @@
 
 \usetikzlibrary{shapes.geometric,decorations.pathreplacing,arrows.meta}
 \usepackage{cancel}
+\usepackage[outline]{contour}
 \definecolor{CircleBlue}{HTML}{2879B9}
 \definecolor{TriangleOrange}{HTML}{DD8428}
 \definecolor{SquareGreen}{HTML}{398553}
@@ -76,11 +77,17 @@
  group/.style={draw=GEInk,rounded corners=2mm,line width=1pt},
  object/.style={draw=GEInk,minimum size=3.4mm,inner sep=0pt},
  C/.style={object,circle,fill=CircleBlue},
- T/.style={object,regular polygon,regular polygon sides=3,fill=TriangleOrange},
+ % Pointed shapes need a little more fill around the centered digits.
+ T/.style={object,regular polygon,regular polygon sides=3,minimum size=4.6mm,fill=TriangleOrange},
  S/.style={object,rectangle,fill=SquareGreen},
- D/.style={object,diamond,aspect=1,fill=DiamondPurple}}
-% Object identifiers are ABOVE objects. Position/job labels are BELOW rows.
-\newcommand{\Obj}[4]{\node[#1] at (#2,#3) {};\node[font=\small] at (#2,{#3+.30}) {#4};}
+ D/.style={object,diamond,aspect=1,minimum size=4.2mm,fill=DiamondPurple}}
+% Object identifiers are centered ON the colored shapes; position/job labels stay BELOW rows.
+% Outline only the glyphs: empty and overlay-hidden identifiers leave no badge behind.
+\newcommand{\Obj}[4]{%
+  \node[#1] at (#2,#3) {};% Draw the shape before its identifier.
+  \node[font=\fontsize{8}{8}\selectfont\sffamily\bfseries,text=white,
+    inner sep=0pt,outer sep=0pt] at (#2,#3)
+    {\contourlength{.18pt}\contour{GEInk}{#4}};}
 \newcommand{\Q}[1]{\noindent\begin{minipage}{\linewidth}\raggedright\textbf{#1}\end{minipage}\par}
 \newcommand{\DiagramStart}{\par\centering\begin{tikzpicture}
  \path[use as bounding box] (-.05,-.55) rectangle (13.55,4.05);}
@@ -102,7 +109,7 @@
 \DiagramStart
 \Obj{C}{4.8}{2.6}{1}\Obj{C}{5.9}{2.6}{2}\Obj{C}{7.0}{2.6}{3}\node[] at (6,1.4) {Same shape and color; different identities.};
 \DiagramEnd
-\begin{overlayarea}{\linewidth}{1.15cm}\only<2>{No. A number above a shape identifies that object.\par}
+\begin{overlayarea}{\linewidth}{1.15cm}\only<2>{No. A number on a shape identifies that object.\par}
 \only<3->{Position labels go below the row. Shapes also work without color.\par}\end{overlayarea}
 \end{frame}
 
@@ -201,7 +208,7 @@
 \end{frame}
 
 \section{2. Arrange all distinct objects}
-% Frame 12. Teaching note: Position numbers below the rows are separate from identifiers above the circles.
+% Frame 12. Teaching note: Position numbers below the rows are separate from identifiers on the circles.
 \begin{frame}[t]{2A. Both possible rows}
 \Q{Does exchanging the objects change the row?}
 \DiagramStart
