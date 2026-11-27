@@ -19,6 +19,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 body {
   margin: 0;
@@ -30,7 +31,7 @@ body {
 
 .class-view {
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(220px, 1fr);
   gap: clamp(.5rem, 1.5vh, 1rem);
   width: 100%;
   max-width: 100rem;
@@ -38,9 +39,10 @@ body {
   height: 100dvh;
   margin: auto;
   padding: clamp(.75rem, 2vmin, 1.5rem);
+  container-type: inline-size;
 }
 
-.class-view.timer-mode { grid-template-rows: auto minmax(0, 1fr); }
+.class-view.timer-mode { grid-template-rows: auto minmax(220px, 1fr); }
 .class-view.timer-mode .status { display: none; }
 
 .class-view-header {
@@ -59,6 +61,46 @@ body {
   white-space: nowrap;
 }
 
+.presentation-controls {
+  display: grid;
+  grid-template-columns: repeat(3, 2.75rem);
+  gap: .25rem;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: .35rem;
+  border: 1px solid #41566d;
+  border-radius: .4rem;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  cursor: pointer;
+}
+.icon-button svg { width: 1.75rem; height: 1.75rem; }
+.presentation-index {
+  fill: currentColor;
+  stroke: none;
+  font: 800 11px system-ui, sans-serif;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+.icon-button:hover { background: var(--surface); color: var(--text); }
+.icon-button[aria-pressed="true"] { background: var(--surface); color: var(--text); border-color: currentColor; box-shadow: inset 0 0 0 1px currentColor; }
+.icon-button:disabled { opacity: .55; cursor: wait; }
+button:focus-visible, .return-link:focus-visible, input:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 3px;
+}
+.presentation-toolbar { display: flex; justify-content: flex-end; }
+.presentation-message { margin: 0; padding: .5rem; border: 1px solid currentColor; border-radius: .4rem; font-size: .875rem; line-height: 1.35; overflow-wrap: anywhere; }
+.presentation-message:empty { display: none; }
+
 .return-link {
   justify-self: start;
   padding: .4rem .65rem;
@@ -69,7 +111,6 @@ body {
   text-decoration: none;
 }
 
-.fullscreen-toggle,
 .control-button,
 .dialog-actions button {
   padding: .45rem .7rem;
@@ -82,8 +123,6 @@ body {
   cursor: pointer;
 }
 
-.fullscreen-toggle:hover,
-.fullscreen-toggle:focus-visible,
 .control-button:hover,
 .control-button:focus-visible {
   color: var(--text);
@@ -277,8 +316,9 @@ body.dark-theme .schedule-visual.period-lunch {
 .dialog-actions { display: flex; justify-content: flex-end; gap: .75rem; margin-top: 1.25rem; }
 
 
-.class-view:fullscreen {
-  grid-template-rows: minmax(0, 1fr);
+.class-view:fullscreen,
+.class-view.clock-mode {
+  grid-template-rows: auto minmax(220px, 1fr);
   width: 100%;
   max-width: none;
   margin: 0;
@@ -286,7 +326,15 @@ body.dark-theme .schedule-visual.period-lunch {
 }
 
 .class-view:fullscreen .class-view-header,
-.class-view:fullscreen .status { display: none; }
+.class-view:fullscreen .status,
+.clock-mode .class-view-header,
+.clock-mode .status { display: none; }
+
+/* Only the main element's fullscreen hides content. Fullscreen on <html>
+   preserves the full-page grid, header, status, and active timer. */
+.class-view:fullscreen .presentation-message,
+.clock-mode .presentation-message,
+.minimal-mode .presentation-message { max-width: 36rem; justify-self: center; }
 
 body.dark-theme {
   --background: #090d16;
@@ -323,17 +371,20 @@ body.dark-theme .timer-visual:not(.timer-alarm) {
 }
 
 @media (max-width: 420px) {
+  .class-view-header { grid-template-columns: minmax(0, 1fr); }
+  .class-view-controls { justify-self: center; }
   .class-view-controls { flex-wrap: wrap; justify-content: flex-end; white-space: normal; }
+  .theme-control { font-size: .8rem; }
+  .return-link { font-size: .875rem; }
 }
 
 /* Reserve room for the outline, keyboard focus and the existing alarm shake.
    Container units keep the circle and digits proportional in small windows. */
 .class-view.minimal-mode {
-  grid-template-rows: minmax(0, 1fr);
+  grid-template-rows: auto minmax(180px, 1fr);
   max-width: none;
-  gap: 0;
+  gap: .5rem;
   padding: 12px;
-  overflow: hidden;
 }
 
 .minimal-mode .class-view-header,
@@ -366,3 +417,33 @@ body.dark-theme .timer-visual:not(.timer-alarm) {
 }
 
 .minimal-mode .timer-alarm .minimal-remaining { background: #dc2626; color: #fff; }
+
+/* Intrinsic fit dimensions are independent of the current viewport. The JS
+   measures this layout once, adds browser chrome, then verifies resizeTo. */
+.class-view.window-fit {
+  width: min(100%, var(--fit-width));
+  height: auto;
+  min-height: 0;
+  gap: .5rem;
+  padding: 12px;
+  grid-template-rows: auto auto auto;
+}
+.class-view.measuring-fit { width: var(--fit-width); max-width: none; }
+.window-fit .visual-stage {
+  height: calc(var(--fit-clock-size) + 56px);
+  padding: 44px 10px 12px;
+}
+.window-fit.minimal-mode .visual-stage { height: calc(var(--fit-clock-size) + 16px); padding: 8px; }
+.window-fit .live-clock { font-size: 2rem; }
+.window-fit h1 { font-size: 1.5rem; }
+.window-fit .cycle-label { font-size: .875rem; }
+.window-fit .next-activity { font-size: 1rem; }
+.window-fit .countdown { font-size: 1.25rem; }
+.window-fit .progress-time-label { font-size: 1rem; }
+.window-fit .class-view-header { grid-template-columns: auto 1fr; }
+.window-fit .live-clock { grid-column: 1 / -1; grid-row: 1; text-align: center; }
+.window-fit .class-view-controls { font-size: .875rem; flex-wrap: wrap; justify-self: end; }
+@container (max-width: 420px) {
+  .window-fit .class-view-header { grid-template-columns: minmax(0, 1fr); }
+  .window-fit .class-view-controls { justify-self: center; }
+}

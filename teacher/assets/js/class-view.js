@@ -14,6 +14,11 @@
   const classView = document.querySelector(".class-view");
   const fullscreenToggle = document.getElementById("fullscreen-toggle");
   const minimalToggle = document.getElementById("minimal-toggle");
+  const pageFullscreenToggle = document.getElementById("page-fullscreen-toggle");
+  const resizeButtons = ["resize-clock", "resize-minimal", "resize-page"].map((id) => document.getElementById(id));
+  const presentationToolbar = document.querySelector(".presentation-toolbar");
+  const presentationExit = document.getElementById("presentation-exit");
+  const presentationMessage = document.getElementById("presentation-message");
   const blockRemaining = document.getElementById("block-remaining");
   const timerRemaining = document.getElementById("timer-remaining");
   const timerToggle = document.getElementById("timer-toggle");
@@ -38,11 +43,39 @@
   });
   const periodStateClasses = ["period-between-classes", "period-recess", "period-lunch"];
 
-  function setMinimalMode(enabled) {
-    classView.classList.toggle("minimal-mode", enabled);
-    minimalToggle.setAttribute("aria-pressed", String(enabled));
+  let presentation = "page";
+  let lastFullscreen = document.fullscreenElement;
+  let presentationBusy = false;
+  let returnControl = fullscreenToggle;
+  let pendingFocus = null;
+
+  function describeButton(button, label, pressed) {
+    button.title = label;
+    button.setAttribute("aria-label", label);
+    button.setAttribute("aria-pressed", String(pressed));
+  }
+
+  function updatePresentationControls() {
+    const clockFullscreen = document.fullscreenElement === classView;
+    const pageFullscreen = document.fullscreenElement === document.documentElement;
+    describeButton(fullscreenToggle, `Presentation 1: ${clockFullscreen ? "exit fullscreen clock" : "fullscreen the clock"}`, clockFullscreen);
+    describeButton(minimalToggle, `Presentation 2: ${presentation === "minimal" ? "exit minimal clock" : "show the minimal clock (windowed)"}`, presentation === "minimal");
+    describeButton(pageFullscreenToggle, `Presentation 3: ${pageFullscreen ? "exit whole-page fullscreen" : "fullscreen the whole page"}`, pageFullscreen);
+    resizeButtons.forEach((button, index) => {
+      const active = classView.classList.contains("window-fit") && presentation === ["clock", "minimal", "page"][index];
+      const name = ["the clock", "the minimal clock", "the whole page"][index];
+      describeButton(button, `Resize ${index + 1}: show ${name} and fit this browser window`, active);
+    });
+  }
+
+  function setPresentation(mode, { fit = false, focus = true } = {}) {
+    presentation = mode;
+    classView.classList.toggle("minimal-mode", mode === "minimal");
+    classView.classList.toggle("clock-mode", mode === "clock");
+    classView.classList.toggle("window-fit", fit);
+    presentationToolbar.hidden = mode === "page";
     [visual, timerVisual].forEach((circle) => {
-      if (enabled) {
+      if (mode === "minimal") {
         circle.setAttribute("role", "button");
         circle.tabIndex = 0;
         circle.setAttribute("aria-label", "Exit minimal mode (click or press Enter, Space, or Escape)");
@@ -54,44 +87,192 @@
         circle.setAttribute("aria-label", circle === visual ? "Current schedule block" : "Countdown timer");
       }
     });
-    if (enabled) {
+    updatePresentationControls();
+    if (!focus) return;
+    if (mode === "minimal") {
       const activeCircle = timerState ? timerVisual : visual;
-      if (!activeCircle.hidden) activeCircle.focus({ preventScroll: true });
+      pendingFocus = activeCircle.hidden ? presentationExit : activeCircle;
+    } else if (mode === "clock") {
+      pendingFocus = presentationExit;
     } else {
-      minimalToggle.focus({ preventScroll: true });
+      pendingFocus = returnControl;
+    }
+    if (!presentationBusy) {
+      pendingFocus.focus({ preventScroll: true });
+      pendingFocus = null;
     }
   }
 
-  minimalToggle.addEventListener("click", async () => {
-    const enabled = !classView.classList.contains("minimal-mode");
-    // These are separate presentation modes; Min never requests fullscreen.
-    if (enabled && document.fullscreenElement) {
-      try {
-        await document.exitFullscreen();
-      } catch (error) {
-        console.error("Unable to leave fullscreen for minimal mode.", error);
-        return;
+  function announce(message) {
+    presentationMessage.textContent = message;
+  }
+
+  async function leaveFullscreen() {
+    if (document.fullscreenElement) {
+      if (!document.exitFullscreen) throw new Error("Fullscreen exit is unavailable");
+      await document.exitFullscreen();
+      if (document.fullscreenElement) throw new Error("Browser did not exit fullscreen");
+    }
+  }
+
+  // Serialize presentation changes, but never touch the timer or schedule state.
+  async function changePresentation(action) {
+    if (presentationBusy) return;
+    presentationBusy = true;
+    const buttons = [fullscreenToggle, minimalToggle, pageFullscreenToggle, ...resizeButtons, presentationExit];
+    buttons.forEach((button) => { button.disabled = true; });
+    try {
+      await action();
+    } catch (error) {
+      announce("The browser could not change presentation. Exit fullscreen and try again.");
+      console.warn("Unable to change presentation.", error);
+    } finally {
+      buttons.forEach((button) => { button.disabled = false; });
+      presentationBusy = false;
+      updatePresentationControls();
+      if (pendingFocus) {
+        pendingFocus.focus({ preventScroll: true });
+        pendingFocus = null;
       }
     }
-    setMinimalMode(enabled);
-  });
+  }
+
+  async function returnToPage() {
+    await leaveFullscreen();
+    announce("");
+    setPresentation("page");
+  }
+
+  minimalToggle.addEventListener("click", () => changePresentation(async () => {
+    const mode = presentation === "minimal" ? "page" : "minimal";
+    await leaveFullscreen();
+    returnControl = minimalToggle;
+    announce("");
+    setPresentation(mode);
+  }));
+  presentationExit.addEventListener("click", () => changePresentation(returnToPage));
   [visual, timerVisual].forEach((circle) => {
     circle.addEventListener("click", () => {
-      if (classView.classList.contains("minimal-mode")) setMinimalMode(false);
+      if (presentation === "minimal") changePresentation(returnToPage);
     });
     circle.addEventListener("keydown", (event) => {
-      if (classView.classList.contains("minimal-mode") && (event.key === "Enter" || event.key === " ")) {
+      if (presentation === "minimal" && (event.key === "Enter" || event.key === " ")) {
         event.preventDefault();
-        setMinimalMode(false);
+        changePresentation(returnToPage);
       }
     });
   });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && classView.classList.contains("minimal-mode")) {
+    if (event.key === "Escape" && !timerDialog.open && (presentation !== "page" || classView.classList.contains("window-fit"))) {
       event.preventDefault();
-      setMinimalMode(false);
+      changePresentation(returnToPage);
     }
   });
+
+  async function toggleFullscreen(target, mode, button) {
+    if (document.fullscreenElement === target) {
+      await returnToPage();
+      return;
+    }
+    await leaveFullscreen();
+    returnControl = button;
+    announce("");
+    const keepFit = mode === "page" && presentation === "page" && classView.classList.contains("window-fit");
+    setPresentation(mode, { fit: keepFit });
+    if (!document.fullscreenEnabled || !target.requestFullscreen) {
+      announce("Fullscreen is unavailable in this browser. The presentation is ready in this window.");
+      return;
+    }
+    try {
+      await target.requestFullscreen();
+    } catch (error) {
+      announce("Fullscreen was blocked by the browser. The presentation is ready in this window.");
+      console.warn("Unable to enter fullscreen.", error);
+    }
+  }
+
+  fullscreenToggle.addEventListener("click", () => changePresentation(() => toggleFullscreen(classView, "clock", fullscreenToggle)));
+  pageFullscreenToggle.addEventListener("click", () => changePresentation(() => toggleFullscreen(document.documentElement, "page", pageFullscreenToggle)));
+  document.addEventListener("fullscreenchange", () => {
+    const current = document.fullscreenElement;
+    // Native Escape/browser exit must also restore the toolbar and keyboard focus.
+    if (lastFullscreen === classView && current !== classView && presentation === "clock") {
+      setPresentation("page");
+    }
+    lastFullscreen = current;
+    updatePresentationControls();
+  });
+
+  function windowDimensions() {
+    return { width: window.outerWidth, height: window.outerHeight, innerWidth: window.innerWidth, innerHeight: window.innerHeight };
+  }
+
+  const nextPaint = () => new Promise((resolve) => window.requestAnimationFrame(resolve));
+  const delay = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
+
+  async function fitWindow(mode, index) {
+    await leaveFullscreen();
+    // Fullscreen exit can restore window chrome asynchronously.
+    await nextPaint();
+    await nextPaint();
+    returnControl = resizeButtons[index];
+    setPresentation(mode, { fit: true });
+    const manualMessage = "Browser requires manual window resizing. Resize this window to fit.";
+    // Reserve room for the final feedback without prematurely claiming failure.
+    announce("Fitting this window. If the browser blocks resizing, resize this window manually.");
+    const before = windowDimensions();
+    const chromeWidth = Math.max(0, before.width - before.innerWidth);
+    const chromeHeight = Math.max(0, before.height - before.innerHeight);
+    const maxWidth = Math.max(1, (screen.availWidth || before.width) - chromeWidth);
+    const maxHeight = Math.max(1, (screen.availHeight || before.height) - chromeHeight);
+    const preferredWidth = { clock: 360, minimal: 248, page: 640 }[mode];
+    let clockSize = mode === "minimal" ? 192 : 288;
+    classView.style.setProperty("--fit-width", `${Math.min(preferredWidth, maxWidth)}px`);
+    classView.style.setProperty("--fit-clock-size", `${clockSize}px`);
+    classView.classList.add("measuring-fit");
+    let bounds;
+    let contentWidth;
+    try {
+      bounds = classView.getBoundingClientRect();
+      // One bounded correction for short screens, with a readable clock floor.
+      if (bounds.height > maxHeight) {
+        clockSize = Math.max(160, clockSize - (bounds.height - maxHeight));
+        classView.style.setProperty("--fit-clock-size", `${clockSize}px`);
+        bounds = classView.getBoundingClientRect();
+      }
+      contentWidth = Math.max(bounds.width, classView.scrollWidth);
+    } finally {
+      classView.classList.remove("measuring-fit");
+    }
+    const targetWidth = Math.ceil(Math.min(maxWidth, contentWidth) + chromeWidth);
+    const targetHeight = Math.ceil(Math.min(maxHeight, bounds.height) + chromeHeight);
+    try {
+      if (!window.resizeTo) throw new Error("Window resizing is unavailable");
+      window.resizeTo(targetWidth, targetHeight);
+    } catch (error) {
+      // Ordinary browser windows often reject this silently instead of throwing.
+      console.info("Window resizing was unavailable.", error);
+    }
+    // Wait for native geometry to settle, without resizing again or binding a loop.
+    await delay(350);
+    let after = windowDimensions();
+    if (after.width === before.width && after.height === before.height) {
+      await delay(350);
+      after = windowDimensions();
+    }
+    const nearTarget = Math.abs(after.width - targetWidth) <= 8 && Math.abs(after.height - targetHeight) <= 8;
+    const changed = Math.abs(after.width - before.width) > 2 || Math.abs(after.height - before.height) > 2;
+    const viewportChanged = Math.abs(after.innerWidth - before.innerWidth) > 2 || Math.abs(after.innerHeight - before.innerHeight) > 2;
+    const fits = classView.scrollWidth <= after.innerWidth + 1 && classView.getBoundingClientRect().height <= after.innerHeight + 1;
+    if ((changed && viewportChanged && fits) || (nearTarget && fits)) {
+      announce(changed ? `Window fitted to presentation ${index + 1}.` : `Window already fits presentation ${index + 1}.`);
+    } else {
+      announce(changed ? "Browser limited window resizing. Resize this window manually to fit." : manualMessage);
+    }
+  }
+
+  resizeButtons.forEach((button, index) => button.addEventListener("click", () => changePresentation(() => fitWindow(["clock", "minimal", "page"][index], index))));
+  updatePresentationControls();
 
   function setPeriodState(state) {
     visual.classList.remove(...periodStateClasses);
@@ -104,37 +285,6 @@
     if (name === "lunch") return "lunch";
     if (name === "break" || name === "recess") return "recess";
     return null;
-  }
-
-  function updateFullscreenControl() {
-    const isFullscreen = document.fullscreenElement === classView;
-    if (isFullscreen && classView.classList.contains("minimal-mode")) setMinimalMode(false);
-    fullscreenToggle.textContent = isFullscreen ? "Exit Fullscreen" : "Fullscreen";
-    fullscreenToggle.setAttribute("aria-pressed", String(isFullscreen));
-  }
-
-  if (document.fullscreenEnabled && classView.requestFullscreen && document.exitFullscreen) {
-    fullscreenToggle.addEventListener("click", async () => {
-      const exitingFullscreen = document.fullscreenElement === classView;
-      fullscreenToggle.disabled = true;
-      try {
-        if (exitingFullscreen) {
-          await document.exitFullscreen();
-        } else {
-          await classView.requestFullscreen();
-        }
-      } catch (error) {
-        console.error(`Unable to ${exitingFullscreen ? "exit" : "enter"} fullscreen.`, error);
-        if (!exitingFullscreen) fullscreenToggle.hidden = true;
-        updateFullscreenControl();
-      } finally {
-        fullscreenToggle.disabled = false;
-      }
-    });
-    document.addEventListener("fullscreenchange", updateFullscreenControl);
-    updateFullscreenControl();
-  } else {
-    fullscreenToggle.hidden = true;
   }
 
   const returnPage = origin === "schedule-teacher" ? "schedule-teacher.html" : "schedule.html";
@@ -153,7 +303,8 @@
     timerDuration.textContent = "";
     timerForm.reset();
     timerError.hidden = true;
-    timerToggle.textContent = "Timer";
+    timerToggle.title = "Set countdown timer";
+    timerToggle.setAttribute("aria-label", timerToggle.title);
     timerToggle.setAttribute("aria-pressed", "false");
     update();
   }
@@ -177,7 +328,8 @@
       return;
     }
     timerDuration.textContent = window.CountdownTimer.formatTime(durationMs);
-    timerToggle.textContent = "Close Timer";
+    timerToggle.title = "Close countdown timer and return to the schedule";
+    timerToggle.setAttribute("aria-label", timerToggle.title);
     timerToggle.setAttribute("aria-pressed", "true");
     classView.classList.add("timer-mode");
     visual.hidden = true;
