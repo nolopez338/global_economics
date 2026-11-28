@@ -156,6 +156,7 @@ function inspector(){
     $('#group-length-slider').setAttribute('aria-valuetext',`${lengthText(groupEdit?.delta??0)} adjustment`);
     $('#group-length-note').textContent=plan.locked?unitText(plan.reason):`Same signed adjustment to each starting cut; unequal lengths stay unequal. ${plan.anchors.length?`In each connected group, the attached section with the lowest endpoint along the tube axis toward positive ${plan.axisLabel} stays fixed (ties: stable piece ID). Anchor section${plan.anchors.length>1?'s':''}: ${plan.anchors.map(id=>id.slice(0,8)).join(', ')}. Other sections translate rigidly.`:''} Free tubes keep their centres. Escape cancels; release, Enter or blur completes one undoable edit.`;
   }
+  for(const group of $$('.value-adjustments'))for(const button of group.querySelectorAll('button'))button.disabled=$('#'+group.dataset.input).disabled;
   $('#ports-section').hidden=!list.some(p=>p.type!=='person')&&!joint;$('#ports').replaceChildren();
   for(const p of list) localPorts(p).forEach((def,i)=>{
     const connection=model.connections.find(c=>[c.a,c.b].some(e=>e.id===p.id&&e.port===i));const row=document.createElement('div');row.className='port-row';const button=document.createElement('button');button.textContent=`${list.length>1?CATALOG[p.type].name+' · ':''}End ${i+1} · ${def.type}${connection?' · joined':''}`;button.setAttribute('aria-pressed',pickedPorts.some(e=>e.id===p.id&&e.port===i));button.onclick=()=>{if(connection){selectedJoint=connection.id;inspector();showOverlays();}else pickPort({id:p.id,port:i});};row.append(button);$('#ports').append(row);
@@ -467,6 +468,18 @@ $('#plane-offset').onchange=e=>{if(e.target.value===e.target.dataset.displayValu
 $('#length-slider').addEventListener('input',e=>editLength(e.target.value));
 $('#length-slider').addEventListener('change',()=>{sliderBase=null;commit('Tube cut length updated; valid joints preserved.');});
 $('#length-slider').addEventListener('blur',()=>{if(sliderBase){sliderBase=null;commit();}});
+// Reuse numeric edits so each click updates geometry, summaries and history.
+for(const group of $$('.value-adjustments'))group.addEventListener('click',event=>{
+  const button=event.target.closest('button');if(!button||button.disabled)return;
+  finishLengthEdits();
+  const input=$('#'+group.dataset.input);if(input.disabled)return;
+  const current=input.valueAsNumber;if(!Number.isFinite(current))return;
+  const next=Math.max(Number(input.min),Math.min(Number(input.max),Number((current+Number(button.dataset.delta)).toFixed(6))));
+  if(next===current)return;
+  input.value=next;
+  input.dispatchEvent(new Event('input',{bubbles:true}));
+  input.dispatchEvent(new Event('change',{bubbles:true}));
+});
 $$('[data-tool]').forEach(b=>b.onclick=()=>setTool(b.dataset.tool));
 $$('[data-turn]').forEach(b=>b.onclick=()=>rotateDiscrete(b.dataset.turn));
 $('#rotation-increment').onchange=e=>{const custom=e.target.value==='custom';$('#rotation-custom-label').hidden=!custom;if(custom){$('#rotation-custom').focus();}else setRotationIncrement(Number(e.target.value));};
