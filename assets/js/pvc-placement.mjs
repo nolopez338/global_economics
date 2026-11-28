@@ -36,10 +36,10 @@ export function projectPort(position,camera,rect) {
   return [x,y].every(Number.isFinite)?{x,y,depth:-view.z}:null;
 }
 const sameTarget=(a,b)=>a?.id===b?.id&&a?.port===b?.port;
-export function choosePlacement({piece,targets,pointer,project,previous=null,visible=()=>true}) {
+export function choosePlacement({piece,targets,pointer,project,previous=null,visible=()=>true,sources:sourceIndices=null}) {
   if(piece.type==='person')return null; // Reference placement always uses the working plane.
   if(!pointer||![pointer.x,pointer.y].every(Number.isFinite))return null;
-  const sources=localPorts(piece).map((definition,i)=>({i,...definition}));
+  const sources=localPorts(piece).map((definition,i)=>({i,...definition})).filter(s=>!sourceIndices||sourceIndices.includes(s.i));
   const choices=[];
   for(const target of targets){
     const screen=project(target.position);if(!screen)continue;

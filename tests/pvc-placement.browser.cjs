@@ -23,7 +23,7 @@ const server=http.createServer((req,res)=>{
     const page=await browser.newPage({viewport:{width:1440,height:1100}}),errors=[];
     page.setDefaultTimeout(120000);page.on('pageerror',error=>errors.push(error.message));
     await page.exposeFunction('reportPVCResult',text=>console.log(text));
-    await page.goto(origin+'/tests/pvc-interactions.html');
+    await page.goto(origin+'/tests/pvc-interactions.html'+(process.env.PVC_INTERACTION_FILTER?'?filter='+encodeURIComponent(process.env.PVC_INTERACTION_FILTER):''));
     await page.evaluate(()=>{
       const seen=new Set();new MutationObserver(()=>{
         for(const li of document.querySelectorAll('#results li'))if(li.textContent&&!seen.has(li)){
@@ -31,7 +31,7 @@ const server=http.createServer((req,res)=>{
         }
       }).observe(document.querySelector('#results'),{childList:true,subtree:true});
     });
-    await page.waitForFunction(()=>/^(PASS|FAIL)/.test(document.title),{},{timeout:240000});
+    await page.waitForFunction(()=>/^(PASS|FAIL)/.test(document.title),{},{timeout:Number(process.env.PVC_INTERACTION_TIMEOUT||600000)});
     const interactions=await page.locator('#results').innerText();
     assert(!interactions.includes('FAIL'),'DOM interaction suite failed');assert.deepEqual(errors,[]);
     await page.close();

@@ -166,3 +166,12 @@ test('nonfinite prospective transforms never produce a candidate',()=>{
   for(const project of [()=>({x:NaN,y:0,depth:1}),()=>({x:25,y:0,depth:Infinity})])
     assert.equal(query(m,{x:25,y:0},{project}),null);
 });
+
+
+test('movement can restrict source ports to currently free endpoints on each query',()=>{
+  const m=new Design();m.add('coupling',[0,0,0]);const target=placementTargets(m)[0];
+  const options={targets:[target],pointer:flat(target.position),piece:piece('tube')};
+  const onlyFree=query(m,options.pointer,{...options,sources:[1]});assert.equal(onlyFree.source,1);
+  assert.equal(query(m,options.pointer,{...options,sources:[]}),null,'All source ports occupied');
+  assert.equal(query(m,options.pointer,{...options,sources:[0]}).source,0,'Detached endpoint was not reconsidered');
+});

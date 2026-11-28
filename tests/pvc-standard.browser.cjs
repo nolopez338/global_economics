@@ -38,6 +38,25 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+deco
  const pdf=await page.evaluate(async()=>{const {createDesignPDF}=await import('/assets/js/pvc-pdf.mjs');const {Design,CATALOG}=await import('/assets/js/pvc-model.mjs');const m=new Design();for(const [i,type] of Object.keys(CATALOG).entries())m.add(type,[i*160,100,0]);const blob=await createDesignPDF(m.data());return {pages:blob.pageCount,size:blob.size};});assert.equal(pdf.pages,3);assert(pdf.size>50000);
  await page.screenshot({path:path.join(out,'catalog-ground.png')});
  console.log('PASS real JSON download and PDF creation with all seven PVC components and Person');
+ // Exercise the unique-socket bridge path with real mouse and keyboard events,
+ // then round-trip the new tube and joints through the actual download/import UI.
+ await page.evaluate(async()=>{
+   const {Design}=await import('/assets/js/pvc-model.mjs');const m=new Design(),a=m.add('coupling',[0,100,0]),b=m.add('coupling',[600,100,0]);
+   for(const [fitting,socket] of [[a,0],[b,1]]){const t=m.add('tube');m.connect({id:t.id,port:0},{id:fitting.id,port:socket});}
+   localStorage.setItem('pvc-studio-browser-test',JSON.stringify(m.data()));
+ });
+ await page.reload();await page.waitForFunction(()=>globalThis.pvcTest);await page.selectOption('#camera','top');
+ const bridgeBase=await read(),fittings=bridgeBase.data.pieces.filter(p=>p.type==='coupling');
+ for(let i=0;i<fittings.length;i++){const at=await page.evaluate(p=>pvcTest.screen(p),fittings[i].p);if(i)await page.keyboard.down('Shift');await page.mouse.click(at.x,at.y);if(i)await page.keyboard.up('Shift');}
+ assert.equal((await read()).data.connections.length,2,'Native Shift-click detached a joint');
+ await page.locator('#connect').click();const bridge=await read();assert.equal(bridge.data.pieces.length,5);assert.equal(bridge.data.connections.length,4);assert.equal(bridge.undo,1);assert.deepEqual(JSON.parse(bridge.autosave),bridge.data);
+ await page.locator('#undo').click();assert.deepEqual((await read()).data,bridgeBase.data);await page.locator('#redo').click();assert.deepEqual((await read()).data,bridge.data);
+ await page.screenshot({path:path.join(out,'fitting-bridge.png')});
+ event=page.waitForEvent('download');await page.locator('#export').click();download=await event;const bridgeFile=path.join(out,'fitting-bridge.json');await download.saveAs(bridgeFile);assert.deepEqual(JSON.parse(fs.readFileSync(bridgeFile,'utf8')),bridge.data);
+ await page.locator('#new').click();assert.equal((await read()).data.pieces.length,0);
+ await page.locator('#file').setInputFiles(bridgeFile);await page.waitForFunction(()=>document.querySelector('#status').textContent.startsWith('Loaded 5 pieces'));
+ assert.deepEqual((await read()).data,bridge.data);await page.reload();await page.waitForFunction(()=>globalThis.pvcTest);assert.deepEqual((await read()).data,bridge.data);
+ console.log('PASS native fitting selection, Shift-click, unique-socket tube bridge, undo/redo, JSON download/import and autosave reload');
  for(const data of invalid){await page.evaluate(data=>localStorage.setItem('pvc-studio-browser-test',JSON.stringify(data)),data);await page.reload();await page.waitForFunction(()=>globalThis.pvcTest);const state=await read();assert.equal(state.data.pieces.length,0);assert.equal(state.undo,0);assert.deepEqual(JSON.parse(state.autosave),data);assert.match(await page.locator('#status').innerText(),/Saved work could not be restored/);}
  console.log('PASS invalid autosave rejected without partial restoration or overwriting stored data');assert.deepEqual(errors,[]);
  }finally{await browser.close();}

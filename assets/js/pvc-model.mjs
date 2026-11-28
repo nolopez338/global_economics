@@ -88,6 +88,41 @@ export class Design {
     this.check(a,b); const c={id:uid(),a:{...a},b:{...b}};this.connections.push(c);return c;
   }
   disconnect(id) {this.connections=this.connections.filter(c=>c.id!==id);}
+  detachSelection(ids) {
+    this.connections=this.connections.filter(c=>ids.has(c.a.id)===ids.has(c.b.id));
+  }
+  connectFittings(a,b,areas=[0,0]) {
+    // Plan on an isolated model: failures never leave alignment or half a bridge.
+    const plan=new Design(this.data());
+    const ends=[a,b].map(e=>{
+      const p=plan.get(e.id),socket=port(p,e.port);
+      if(socket.type!=='socket')throw Error('Choose one fitting socket on each fitting.');
+      if(plan.occupied(e.id,e.port))throw Error('This socket is occupied. Detach its joint first.');
+      return socket;
+    });
+    if(a.id===b.id)throw Error('Choose sockets on two different fittings.');
+    const groups=[plan.connected([a.id]),plan.connected([b.id])],same=groups[0].has(b.id);
+    // Ignore floating-point noise when equal bounds were translated or rotated.
+    const tolerance=1e-10*Math.max(1,...areas);
+    const fixed=areas[0]>=areas[1]-tolerance?0:1,moving=1-fixed;
+    const start=ends[fixed],end=ends[moving],delta=end.position.clone().sub(start.position);
+    // Keep the signed longitudinal separation; only remove transverse offset.
+    const length=delta.dot(start.direction);
+    if(length<MIN_LENGTH||length>MAX_LENGTH)throw Error(`Resulting tube cut length must be ${MIN_LENGTH}–${MAX_LENGTH} mm (including 20 mm insertion at each end). Move the assemblies farther apart or choose different sockets.`);
+    const destination=start.position.clone().addScaledVector(start.direction,length);
+    if(same){
+      if(destination.distanceTo(end.position)>.00001||start.direction.dot(end.direction)>-.999999999)
+        throw Error('These sockets belong to the same assembly and do not face each other on one straight axis. Detach a joint first.');
+    }else{
+      const rotation=new Quaternion().setFromUnitVectors(end.direction,start.direction.clone().negate());
+      plan.transform(groups[moving],rotation,end.position,destination.clone().sub(end.position));
+    }
+    const tube=plan.add('tube',start.position.clone().add(destination).multiplyScalar(.5).toArray(),length,
+      new Quaternion().setFromUnitVectors(vec([1,0,0]),start.direction).toArray());
+    plan.connect({id:tube.id,port:0},[a,b][fixed],false);
+    plan.connect({id:tube.id,port:1},[a,b][moving],false);
+    plan.data();this.pieces=plan.pieces;this.connections=plan.connections;return tube;
+  }
   remove(ids) {this.pieces=this.pieces.filter(p=>!ids.has(p.id));this.connections=this.connections.filter(c=>!ids.has(c.a.id)&&!ids.has(c.b.id));}
   lengthPlan(id) {
     const p=this.get(id), ends=[0,1].map(i=>this.connections.find(c=>[c.a,c.b].some(e=>e.id===id&&e.port===i)));

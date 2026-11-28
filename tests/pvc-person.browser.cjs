@@ -13,7 +13,9 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+deco
     page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());page.setDefaultTimeout(30000);
     const read=()=>page.evaluate(()=>pvcTest.read()),screen=p=>page.evaluate(p=>pvcTest.screen(p),p);
     const {Design,rectangle,validate,vec,quat}=await import(pathToFileURL(path.join(root,'assets/js/pvc-model.mjs')));
-    const load=async data=>{await page.locator('#file').setInputFiles({name:'person.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(data))});assert.deepEqual((await read()).data,data);};
+    const load=async data=>{await page.locator('#file').setInputFiles({name:'person.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(data))});
+      // File.text() and the replacement confirmation finish asynchronously.
+      await page.waitForFunction(data=>JSON.stringify(pvcTest.read().data)===JSON.stringify(data),data);assert.deepEqual((await read()).data,data);};
     const pick=async(p,shift=false)=>{const local=p.type==='person'?[0,p.height*.93,0]:p.type==='tube'?[p.length*.35,0,0]:[0,0,0];const v=await screen(vec(local).applyQuaternion(quat(p.q)).add(vec(p.p)).toArray());if(shift)await page.keyboard.down('Shift');await page.mouse.click(v.x,v.y);if(shift)await page.keyboard.up('Shift');};
     const number=async(id,value)=>{await page.locator(id).fill(String(value));await page.locator(id).press('Enter');};
     async function download(button,name){const event=page.waitForEvent('download',{timeout:120000});await page.locator(button).click();const item=await event;await item.saveAs(path.join(out,name));return path.join(out,name);}

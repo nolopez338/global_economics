@@ -10,7 +10,8 @@ async function load(model=new Design()){
   iframe.src='/tests/.pvc-browser/pvc_design.html'+'?test='+Math.random();
   await new Promise(resolve=>iframe.onload=resolve);
   w=iframe.contentWindow;d=w.document;
-  for(let i=0;i<120&&!w.pvcTest;i++)await tick();
+  const deadline=performance.now()+30000;
+  while(!w.pvcTest&&performance.now()<deadline)await tick();
   assert(w.pvcTest,'App did not initialize');api=w.pvcTest;c=d.querySelector('canvas');await tick();
 }
 const state=()=>api.read();
@@ -22,8 +23,76 @@ function tap(p,extra={}){pointer('pointerdown',p,extra);pointer('pointerup',p,ex
 function double(p){tap(p);tap(p);c.dispatchEvent(new w.MouseEvent('dblclick',{clientX:p.x,clientY:p.y,button:0,bubbles:true}));}
 async function drag(a,b,extra={}){pointer('pointerdown',a,extra);for(let i=1;i<=6;i++){pointer('pointermove',{x:a.x+(b.x-a.x)*i/6,y:a.y+(b.y-a.y)*i/6},extra);await tick();}pointer('pointerup',b,extra);await tick();}
 const screen=p=>api.screen(p);
-async function test(name,fn){const li=document.createElement('li');results.append(li);try{await fn();li.textContent='PASS · '+name;}catch(e){li.className='fail';li.textContent='FAIL · '+name+': '+e.message;console.error(e);}}
+async function test(name,fn){if(new URLSearchParams(location.search).has('filter')&&!new RegExp(new URLSearchParams(location.search).get('filter')).test(name))return;const li=document.createElement('li');results.append(li);try{await fn();li.textContent='PASS · '+name;}catch(e){li.className='fail';li.textContent='FAIL · '+name+': '+e.message;console.error(e);}}
 function connectedPair(){const m=new Design(),t=m.add('tube',[0,120,0]),e=m.add('elbow90');m.connect({id:e.id,port:0},{id:t.id,port:1});return m;}
+
+function releaseShift(target=c){target.dispatchEvent(new w.KeyboardEvent('keyup',{key:'Shift',bubbles:true}));}
+function portButton(index){d.querySelectorAll('#ports .port-row button')[index].click();}
+await test('Fitting bridge inspector ambiguity, rigid smaller assembly, undo/redo and autosave',async()=>{
+  const m=new Design(),a=m.add('tee',[0,100,0]),b=m.add('coupling',[500,100,80]),t=m.add('tube');m.connect({id:t.id,port:1},{id:a.id,port:0});
+  await load(m);change('#camera','top');await tick();
+  tap(screen(a.p));tap(screen(b.p),{shiftKey:true});click('#connect');assert(state().undo===0&&d.querySelector('#status').textContent.includes('Choose'),'Ambiguous sockets not explained');
+  portButton(1);portButton(3);assert(d.querySelectorAll('#ports button[aria-pressed=true]').length===2,'Socket highlighting');
+  const before=state();click('#connect');const after=state();validate(after.data);
+  assert(after.data.connections.length===3&&after.data.pieces.length===4&&after.undo===1,'Bridge transaction');
+  for(const id of [a.id,t.id])assert(same(after.data.pieces.find(p=>p.id===id),before.data.pieces.find(p=>p.id===id)),'Larger assembly moved');
+  assert(same(JSON.parse(after.autosave),after.data),'Bridge autosave');click('#undo');assert(same(state().data,before.data),'Bridge undo');click('#redo');assert(same(state().data,after.data),'Bridge redo');
+});
+await test('Shift alone boundary detachment, selected internal joints, Shift-click and modified key suppression',async()=>{
+  const m=connectedPair(),f=m.add('tee');m.connect({id:f.id,port:0},{id:m.pieces[0].id,port:0});await load(m);change('#camera','top');await tick();
+  tap(screen(m.pieces[0].p));tap(screen(m.pieces[1].p),{shiftKey:true});
+  const before=state();key('Shift');releaseShift();const after=state();assert(after.data.connections.length===1&&after.undo===1,'Boundary detachment');assert(same(after.data.pieces,before.data.pieces),'Detach moved pieces');
+  click('#undo');assert(same(state().data,before.data),'Detach undo');
+  key('Shift');tap(screen(m.pieces[1].p),{shiftKey:true});releaseShift();assert(state().data.connections.length===2,'Shift click detached');
+  key('Shift');key('f',c,{shiftKey:true});releaseShift();assert(state().data.connections.length===2,'Shift shortcut detached');
+  key('Shift',d.querySelector('#plane-offset'));releaseShift(d.querySelector('#plane-offset'));assert(state().data.connections.length===2,'Typing detached');
+});
+await test('Repeated plane snapping, active Q/E intent, exact release, detach/reconnect, Escape',async()=>{
+  const m=new Design(),t=m.add('tube',[0,100,0]),f=m.add('coupling',[700,100,0]);await load(m);change('#camera','top');await tick();
+  for(let cycle=0;cycle<2;cycle++){
+    double(screen(state().data.pieces.find(p=>p.id===t.id).p));
+    const moving=state().data.pieces.find(p=>p.id===t.id),from=screen(vec(moving.p).add(vec([-100,0,0]).applyQuaternion(quat(moving.q))).toArray());
+    const to=screen(port(new Design(state().data).get(f.id),0).position.toArray());
+    pointer('pointerdown',from);pointer('pointermove',to);assert(state().candidate,'No repeated snap');
+    key('q');key('e');assert(state().candidate,'Rotation lost preview');const q=state().data.pieces.find(p=>p.id===t.id).q;
+    pointer('pointermove',{x:to.x+1,y:to.y});assert(same(state().data.pieces.find(p=>p.id===t.id).q,q),'Pointer reset requested orientation');
+    const preview=state().candidate;pointer('pointerup',{x:to.x+1,y:to.y});validate(state().data);
+    assert(state().data.connections.length===1,'Release did not connect');for(const p of preview.preview)assert(same(state().data.pieces.find(o=>o.id===p.id),p),'Preview differs from commit');
+    key('Shift');releaseShift();assert(!state().data.connections.length,'Detach for next move');
+    key('q');
+  }
+  double(screen(state().data.pieces.find(p=>p.id===t.id).p));const before=state(),from=screen(before.data.pieces.find(p=>p.id===t.id).p);
+  pointer('pointerdown',from);pointer('pointermove',{x:from.x+50,y:from.y+30});key('q');key('Escape');pointer('pointerup',{x:from.x+50,y:from.y+30});assert(same(state().data,before.data)&&state().undo===before.undo,'Cancel rotation/movement');
+});
+
+await test('Working-plane model area chooses the fixed assembly independently of camera and selection order',async()=>{
+  for(const plane of ['ground','front']){
+    const m=new Design(),a=m.add('corner',[0,100,0]),b=m.add('corner',[600,100,0],400,quat([0,0,0,1]).setFromAxisAngle(vec([0,1,0]),Math.PI).toArray());
+    const ta=m.add('tube',[0,0,0],800),tb=m.add('tube',[0,0,0],400);
+    m.connect({id:ta.id,port:0},{id:a.id,port:2});m.connect({id:tb.id,port:0},{id:b.id,port:1});
+    await load(m);change('#plane',plane);change('#camera','top');await tick();tap(screen(a.p));tap(screen(b.p),{shiftKey:true});portButton(0);portButton(3);const before=state();click('#connect');const after=state();validate(after.data);assert(after.data.connections.length===4,'Bridge failed');
+    const fixed=plane==='ground'?[a,ta]:[b,tb];for(const p of fixed)assert(same(after.data.pieces.find(o=>o.id===p.id),before.data.pieces.find(o=>o.id===p.id)),'Wrong projected assembly fixed on '+plane);
+  }
+});
+await test('Active translation-handle Q/E persists and one undo restores starting joints',async()=>{
+  const m=connectedPair();await load(m);click('#select-all');click('[data-tool="translate"]');await tick();
+  const origin=m.pieces.reduce((a,p)=>a.map((v,i)=>v+p.p[i]/2),[0,0,0]),before=state();let hit=false;
+  for(let offset=40;offset<180&&!hit;offset+=10){const a=screen([origin[0]+offset,origin[1],origin[2]]);pointer('pointermove',a,{buttons:0});pointer('pointerdown',a);
+    if(state().gizmoDragging){hit=true;const to={x:a.x+55,y:a.y};pointer('pointermove',to);key('q');key('e');const rotated=state();assert(!same(rotated.data.pieces[0].q,before.data.pieces[0].q),'Handle rotation blocked');pointer('pointermove',{x:to.x+10,y:to.y});assert(same(state().data.pieces[0].q,rotated.data.pieces[0].q),'Handle reset orientation');pointer('pointerup',{x:to.x+10,y:to.y});validate(state().data);assert(state().undo===1,'Handle rotations split history');click('#undo');assert(same(state().data,before.data),'Handle rotation undo');click('#redo');validate(state().data);
+    }else pointer('pointerup',a);
+  }assert(hit,'No translation handle picked');
+});
+await test('Movement snap releases outside screen range and respects option during an active drag',async()=>{
+  const m=new Design(),t=m.add('tube',[0,100,0]),f=m.add('coupling',[600,100,0]);await load(m);change('#camera','top');await tick();double(screen(t.p));const a=screen([-100,100,0]),to=screen([575,100,0]);pointer('pointerdown',a);pointer('pointermove',to);assert(state().candidate,'No initial preview');
+  const toggle=d.querySelector('#port-snap');toggle.checked=false;toggle.dispatchEvent(new w.Event('change'));assert(!state().candidate,'Disabled snap retained preview');toggle.checked=true;toggle.dispatchEvent(new w.Event('change'));assert(state().candidate,'Reenabled snap did not recompute');
+  const far={x:to.x-300,y:to.y};pointer('pointermove',far);assert(!state().candidate,'Range did not release');const free=state().data;pointer('pointerup',far);assert(same(state().data,free)&&!state().data.connections.length,'Free release unexpectedly aligned');
+});
+
+await test('Merged Person references remain outside fitting connections and mixed selection does not offer a bridge',async()=>{
+  const m=new Design();m.add('coupling',[0,100,0]);const person=m.add('person',[500,0,0]);await load(m);click('#select-all');assert(d.querySelector('#connect').hidden,'Person offered as a fitting');
+  assert(!state().candidate,'Person created snap candidate');assert(same(state().data,m.data()),'Mixed selection changed model');
+  const before=state();key('q');validate(state().data);assert(state().data.pieces.find(p=>p.id===person.id).height===person.height,'Mixed rotation changed Person size');click('#undo');assert(same(state().data,before.data),'Mixed rotation undo');
+});
 
 localStorage.removeItem('pvc-studio-browser-test-increment');
 await test('Q/E preview world axes; default 90°; placement creates one history entry',async()=>{
@@ -87,7 +156,7 @@ await test('Escape during piece drag restores geometry, exits mode, and creates 
 });
 await test('Compatible-port preview and release create a persistent joint in the same drag history entry',async()=>{
   const m=new Design(),t=m.add('tube',[0,100,0]),e=m.add('elbow90',[300,100,0]);await load(m);change('#camera','top');await tick();double(screen(t.p));
-  const from=screen([-100,100,0]),to=screen([-50,100,0]);pointer('pointerdown',from);pointer('pointermove',to);assert(state().candidate,'No snap preview');pointer('pointerup',to);const after=state();assert(after.data.connections.length===1&&after.undo===1,'Snap connection/history');validate(after.data);
+  const from=screen([-100,100,0]),to=screen([325,100,0]);pointer('pointerdown',from);pointer('pointermove',to);assert(state().candidate,'No snap preview');pointer('pointerup',to);const after=state();assert(after.data.connections.length===1&&after.undo===1,'Snap connection/history');validate(after.data);
   key('z',c,{ctrlKey:true});assert(same(state().data,m.data()),'Undo snap');key('z',c,{ctrlKey:true,shiftKey:true});assert(state().data.connections.length===1,'Redo snap');
 });
 await test('Keyboard shortcuts ignore number, select, textarea and editable text while typing',async()=>{
